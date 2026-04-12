@@ -5,142 +5,368 @@
   <title>Dice Roller</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #121212;
+      color: white;
+    }
+
+    .dice-row {
+      background: #1e1e1e;
+      padding: 6px;
+      border-radius: 10px;
+      margin-bottom: 6px;
+      align-items: center;
+    }
+
+    .mini-input {
+      width: 100%;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .mini-select {
+      width: 100%;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .icon-btn {
+      width: 32px;
+      height: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+    }
+
+    .result-text {
+      font-size: 13px;
+      color: #ccc;
+      white-space: nowrap;
+    }
+
+    .section-title {
+      margin-top: 16px;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+
+    .header-row {
+      font-size: 11px;
+      color: #aaa;
+      margin-bottom: 4px;
+      text-align: center;
+    }
+
+    .crit {
+      color: #ff4d4d;
+      font-weight: bold;
+    }
+
+    .result-box {
+      background: #1e1e1e;
+      padding: 12px;
+      border-radius: 10px;
+    }
+
+    .fixed-die {
+      font-size: 13px;
+      color: #aaa;
+      text-align: center;
+    }
+  </style>
 </head>
 
-<body class="bg-dark text-light">
+<body>
 
-<!-- ✅ NAVBAR -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-black border-bottom">
   <div class="container-fluid">
+
+    <!-- Brand -->
     <a class="navbar-brand" href="dice-roller.html">Pathfinder-friends</a>
 
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+    <!-- Hamburger -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
       <span class="navbar-toggler-icon"></span>
     </button>
 
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ms-auto">
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarMain">
+
+      <!-- Left links -->
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
         <li class="nav-item">
           <a class="nav-link active" href="dice-roller.html">Dice Roller</a>
         </li>
+
         <li class="nav-item">
-          <a class="nav-link active" href="craft-calculator.html">Craft Calculator</a>
+          <a class="nav-link" href="craft-calculator.html">Alchemical Crafting</a>
         </li>
-        <!-- Add more pages here later -->
-        <!-- Example:
+
         <li class="nav-item">
-          <a class="nav-link" href="characters.html">Characters</a>
+          <a class="nav-link" href="buffs.html">Buff tracker</a>
         </li>
-        -->
+
       </ul>
+
+      <!-- Right side -->
+      <div class="d-flex gap-2">
+        <button class="btn btn-outline-light btn-sm">Login</button>
+      </div>
+
     </div>
   </div>
 </nav>
 
-<!-- ✅ MAIN CONTENT -->
-<div class="container py-4">
+<div class="container mt-3">
 
-  <h1 class="mb-4 text-center">🎲 Dice Roller</h1>
+  <h3>Dice Roller</h3>
 
-  <div id="dice-container"></div>
+  <div class="row">
 
-  <div class="mt-3 d-flex flex-wrap gap-2 justify-content-center">
-    <button class="btn btn-success" onclick="addDiceRow()">Add Die</button>
-    <button class="btn btn-primary" onclick="rollAll()">Roll Dice</button>
+    <!-- LEFT -->
+    <div class="col-lg-8">
+
+      <!-- ATTACK -->
+      <div class="section-title">Attack Rolls</div>
+
+      <div class="row header-row">
+        <div class="col-3">Die</div>
+        <div class="col-3">Modifier</div>
+        <div class="col-2">Crit</div>
+        <div class="col-2">Roll</div>
+        <div class="col-2">Del</div>
+      </div>
+
+      <div id="attackContainer"></div>
+      <button class="btn btn-primary btn-sm mb-3" onclick="addAttack()">Add Attack</button>
+
+      <!-- DAMAGE -->
+      <div class="section-title">Damage Rolls</div>
+
+      <div class="row header-row">
+        <div class="col-3">Count / Die</div>
+        <div class="col-3">Modifier</div>
+        <div class="col-2"></div>
+        <div class="col-2">Roll</div>
+        <div class="col-2">Del</div>
+      </div>
+
+      <div id="damageContainer"></div>
+      <button class="btn btn-primary btn-sm" onclick="addDamage()">Add Damage</button>
+
+      <div class="mt-3">
+        <button class="btn btn-success btn-sm" onclick="rollAll()">Roll All</button>
+      </div>
+
+    </div>
+
+    <!-- RIGHT -->
+    <div class="col-lg-4 mt-3 mt-lg-0">
+      <div class="result-box">
+        <h5>Results</h5>
+        <div id="results"></div>
+        <hr>
+        <strong>Total: <span id="total">0</span></strong>
+      </div>
+    </div>
+
   </div>
-
-  <div class="mt-4 text-center">
-    <h3>Total: <span id="grandTotal">0</span></h3>
-  </div>
-
 </div>
 
 <script>
-let diceId = 0;
 
-function addDiceRow() {
-  const container = document.getElementById("dice-container");
+function attackRow() {
+  return `
+    <div class="row dice-row align-items-center">
 
-  const row = document.createElement("div");
-  row.className = "row g-2 align-items-center mb-3 border rounded p-2";
+      <div class="col-3 fixed-die">d20</div>
 
-  row.innerHTML = `
-    <div class="col-6 col-md-2">
-      <input type="number" class="form-control dice-count" value="1" min="1">
-    </div>
+      <div class="col-3">
+        <input class="form-control form-control-sm attack-mod mini-input" type="number" value="0">
+      </div>
 
-    <div class="col-6 col-md-2">
-      <select class="form-select dice-type">
-        <option value="4">d4</option>
-        <option value="6">d6</option>
-        <option value="8">d8</option>
-        <option value="10">d10</option>
-        <option value="12">d12</option>
-        <option value="20">d20</option>
-        <option value="100">d100</option>
-      </select>
-    </div>
+      <div class="col-2">
+        <input class="form-control form-control-sm attack-crit mini-input" type="text" value="20">
+      </div>
 
-    <div class="col-6 col-md-2">
-      <input type="number" class="form-control dice-modifier" value="0">
-    </div>
+      <div class="col-2 text-center">
+        <button class="btn btn-success btn-sm icon-btn" onclick="rollSingle(this)">
+          <i class="bi bi-dice-5"></i>
+        </button>
+      </div>
 
-    <div class="col-12 col-md-4">
-      <input type="text" class="form-control dice-result" readonly placeholder="Result">
-    </div>
+      <div class="col-2 text-center">
+        <button class="btn btn-danger btn-sm icon-btn" onclick="removeRow(this)">
+          <i class="bi bi-trash"></i>
+        </button>
+      </div>
 
-    <div class="col-12 col-md-2">
-      <button class="btn btn-danger w-100" onclick="removeRow(this)">Remove</button>
+      <div class="col-12 mt-1 result-text"></div>
+
     </div>
   `;
-
-  container.appendChild(row);
-  diceId::::::
 }
 
-function removeRow(button) {
-  button.closest(".row").remove();
+function damageRow() {
+  return `
+    <div class="row dice-row align-items-center">
+
+      <div class="col-3">
+        <div class="d-flex gap-1">
+          <input class="form-control form-control-sm dmg-count mini-input" type="number" value="1">
+          <select class="form-select form-select-sm dmg-type mini-input">
+            <option value="4">d4</option>
+            <option value="6">d6</option>
+            <option value="8">d8</option>
+            <option value="10">d10</option>
+            <option value="12">d12</option>
+            <option value="20">d20</option>
+            <option value="100">d100</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="col-3">
+        <input class="form-control form-control-sm dmg-mod mini-input" type="number" value="0">
+      </div>
+
+      <div class="col-2"></div>
+
+      <div class="col-2 text-center">
+        <button class="btn btn-success btn-sm icon-btn" onclick="rollSingle(this)">
+          <i class="bi bi-dice-5"></i>
+        </button>
+      </div>
+
+      <div class="col-2 text-center">
+        <button class="btn btn-danger btn-sm icon-btn" onclick="removeRow(this)">
+          <i class="bi bi-trash"></i>
+        </button>
+      </div>
+
+      <div class="col-12 mt-1 result-text"></div>
+
+    </div>
+  `;
 }
 
-function rollDie(sides) {
-  return Math.floor(Math.random() * sides) + 1;
+function addAttack() {
+  const div = document.createElement("div");
+  div.innerHTML = attackRow();
+  document.getElementById("attackContainer").appendChild(div.firstElementChild);
+}
+
+function addDamage() {
+  const div = document.createElement("div");
+  div.innerHTML = damageRow();
+  document.getElementById("damageContainer").appendChild(div.firstElementChild);
+}
+
+function removeRow(btn) {
+  btn.closest(".dice-row")?.remove();
+}
+
+function isCrit(range, value) {
+  if (!range) return false;
+  if (range.includes("-")) {
+    const [a, b] = range.split("-").map(Number);
+    return value >= a && value <= b;
+  }
+  return value >= parseInt(range);
+}
+
+function rollAttack(row) {
+  const mod = parseInt(row.querySelector(".attack-mod").value || 0);
+  const critRange = row.querySelector(".attack-crit").value;
+
+  const roll = Math.floor(Math.random() * 20) + 1;
+  const total = roll + mod;
+  const crit = isCrit(critRange, roll);
+
+  return { roll, mod, total, crit };
+}
+
+function rollDamage(row) {
+  const count = parseInt(row.querySelector(".dmg-count").value || 1);
+  const type = parseInt(row.querySelector(".dmg-type").value || 6);
+  const mod = parseInt(row.querySelector(".dmg-mod").value || 0);
+
+  let rolls = [];
+  let sum = 0;
+
+  for (let i = 0; i < count; i++) {
+    const r = Math.floor(Math.random() * type) + 1;
+    rolls.push(r);
+    sum += r;
+  }
+
+  return { rolls, total: sum + mod, mod, count, type };
+}
+
+function rollSingle(btn) {
+  const row = btn.closest(".dice-row");
+  if (!row) return;
+
+  let result;
+
+  if (row.closest("#attackContainer")) {
+    result = rollAttack(row);
+    row.querySelector(".result-text").innerHTML =
+      `d20 [${result.roll}] + ${result.mod} = ` +
+      (result.crit ? `<span class="crit">${result.total} CRIT</span>` : result.total);
+  } else {
+    result = rollDamage(row);
+    row.querySelector(".result-text").innerHTML =
+      `${result.count}d${result.type} [${result.rolls.join(", ")}] + ${result.mod} = ${result.total}`;
+  }
 }
 
 function rollAll() {
-  const rows = document.querySelectorAll("#dice-container .row");
-  let grandTotal = 0;
+  const rows = document.querySelectorAll(".dice-row");
+  const results = document.getElementById("results");
+
+  results.innerHTML = "";
+  let total = 0;
 
   rows.forEach(row => {
-    const type = parseInt(row.querySelector(".dice-type").value);
-    const count = parseInt(row.querySelector(".dice-count").value);
-    con.st modifier = parseInt(row.querySelector(".dice-modifier").value);
+    let text = "";
 
-    let rolls = [];
-    let sum = 0;
+    if (row.closest("#attackContainer")) {
+      const r = rollAttack(row);
+      total += r.total;
 
-    for (let i = 0; i < count; i++) {
-      const roll = rollDie(type);
-      rolls.push(roll);
-      sum += roll;
+      text =
+        `ATTACK: d20 [${r.roll}] + ${r.mod} = ` +
+        (r.crit ? `<span class="crit">${r.total} CRIT</span>` : r.total);
+    } else {
+      const r = rollDamage(row);
+      total += r.total;
+
+      text =
+        `DAMAGE: ${r.count}d${r.type} [${r.rolls.join(", ")}] + ${r.mod} = ${r.total}`;
     }
 
-    const final = sum + modifier;
-    grandTotal += final;
-
-    const resultText = `${rolls.join(" + ")} ${modifier !== 0 ? (modifier > 0 ? "+ " + modifier : "- " + Math.abs(modifier)) : ""} = ${final}`;
-    row.querySelector(".dice-result").value = resultText;
+    const div = document.createElement("div");
+    div.innerHTML = text;
+    results.appendChild(div);
   });
 
-  document.getElementById("grandTotal").innerText = grandTotal;
+  document.getElementById("total").innerText = total;
 }
 
-// Initialize
-addDiceRow();
+// init
+addAttack();
+addDamage();
+
 </script>
 
-<!-- Bootstrap JS (needed for navbar toggle on mobile) -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>
