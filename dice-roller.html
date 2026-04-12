@@ -24,6 +24,9 @@
         <li class="nav-item">
           <a class="nav-link active" href="dice-roller.html">Dice Roller</a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="craft-calculator.html">Craft Calculator</a>
+        </li>
         <!-- Add more pages here later -->
         <!-- Example:
         <li class="nav-item">
@@ -93,7 +96,7 @@ function addDiceRow() {
   `;
 
   container.appendChild(row);
-  diceId++;
+  diceId::::::
 }
 
 function removeRow(button) {
@@ -111,7 +114,7 @@ function rollAll() {
   rows.forEach(row => {
     const type = parseInt(row.querySelector(".dice-type").value);
     const count = parseInt(row.querySelector(".dice-count").value);
-    const modifier = parseInt(row.querySelector(".dice-modifier").value);
+    con.st modifier = parseInt(row.querySelector(".dice-modifier").value);
 
     let rolls = [];
     let sum = 0;
