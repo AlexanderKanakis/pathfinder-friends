@@ -35,7 +35,7 @@
     }
 
     .icon-btn {
-      width: 32px;
+      width: 28px;
       height: 32px;
       display: inline-flex;
       align-items: center;
@@ -78,50 +78,41 @@
       color: #aaa;
       text-align: center;
     }
+
+    @media (max-width: 575.98px) {
+      .damage-row {
+        --bs-gutter-x: 0.25rem;
+      }
+
+      .damage-row .icon-btn {
+        width: 26px;
+      }
+
+      .damage-row .damage-dice-col {
+        flex: 0 0 40%;
+        max-width: 40%;
+      }
+
+      .damage-row .damage-mod-col {
+        flex: 0 0 22%;
+        max-width: 22%;
+      }
+
+      .damage-row .damage-spacer-col {
+        display: none;
+      }
+
+      .damage-row .damage-actions-col {
+        flex: 0 0 38%;
+        max-width: 38%;
+      }
+    }
   </style>
 </head>
 
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-black border-bottom">
-  <div class="container-fluid">
-
-    <!-- Brand -->
-    <a class="navbar-brand" href="dice-roller.html">Pathfinder-friends</a>
-
-    <!-- Hamburger -->
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-
-    <!-- Collapsible content -->
-    <div class="collapse navbar-collapse" id="navbarMain">
-
-      <!-- Left links -->
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-
-        <li class="nav-item">
-          <a class="nav-link active" href="dice-roller.html">Dice Roller</a>
-        </li>
-
-        <li class="nav-item">
-          <a class="nav-link" href="craft-calculator.html">Alchemical Crafting</a>
-        </li>
-
-        <li class="nav-item">
-          <a class="nav-link" href="buffs.html">Buff tracker</a>
-        </li>
-
-      </ul>
-
-      <!-- Right side -->
-      <div class="d-flex gap-2">
-        <button class="btn btn-outline-light btn-sm">Login</button>
-      </div>
-
-    </div>
-  </div>
-</nav>
+<div id="appNavbar"></div>
 
 <div class="container mt-3">
 
@@ -139,8 +130,7 @@
         <div class="col-3">Die</div>
         <div class="col-3">Modifier</div>
         <div class="col-2">Crit</div>
-        <div class="col-2">Roll</div>
-        <div class="col-2">Del</div>
+        <div class="col-4">Actions</div>
       </div>
 
       <div id="attackContainer"></div>
@@ -149,12 +139,11 @@
       <!-- DAMAGE -->
       <div class="section-title">Damage Rolls</div>
 
-      <div class="row header-row">
-        <div class="col-3">Count / Die</div>
-        <div class="col-3">Modifier</div>
-        <div class="col-2"></div>
-        <div class="col-2">Roll</div>
-        <div class="col-2">Del</div>
+      <div class="row header-row damage-row">
+        <div class="col-3 damage-dice-col">Count / Die</div>
+        <div class="col-3 damage-mod-col">Modifier</div>
+        <div class="col-2 damage-spacer-col"></div>
+        <div class="col-4 damage-actions-col">Actions</div>
       </div>
 
       <div id="damageContainer"></div>
@@ -179,7 +168,14 @@
   </div>
 </div>
 
+<script src="navbar.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="app-supabase.js"></script>
+
 <script>
+let diceSaveTimer;
+let diceContextKey = "general";
 
 function attackRow() {
   return `
@@ -195,14 +191,16 @@ function attackRow() {
         <input class="form-control form-control-sm attack-crit mini-input" type="text" value="20">
       </div>
 
-      <div class="col-2 text-center">
-        <button class="btn btn-success btn-sm icon-btn" onclick="rollSingle(this)">
+      <div class="col-4 d-flex justify-content-center gap-1 px-0">
+        <button class="btn btn-success btn-sm icon-btn" onclick="rollSingle(this)" title="Roll" aria-label="Roll attack">
           <i class="bi bi-dice-5"></i>
         </button>
-      </div>
 
-      <div class="col-2 text-center">
-        <button class="btn btn-danger btn-sm icon-btn" onclick="removeRow(this)">
+        <button class="btn btn-secondary btn-sm icon-btn" onclick="duplicateRow(this)" title="Duplicate" aria-label="Duplicate attack">
+          <i class="bi bi-copy"></i>
+        </button>
+
+        <button class="btn btn-danger btn-sm icon-btn" onclick="removeRow(this)" title="Delete" aria-label="Delete attack">
           <i class="bi bi-trash"></i>
         </button>
       </div>
@@ -215,9 +213,9 @@ function attackRow() {
 
 function damageRow() {
   return `
-    <div class="row dice-row align-items-center">
+    <div class="row dice-row damage-row align-items-center">
 
-      <div class="col-3">
+      <div class="col-3 damage-dice-col">
         <div class="d-flex gap-1">
           <input class="form-control form-control-sm dmg-count mini-input" type="number" value="1">
           <select class="form-select form-select-sm dmg-type mini-input">
@@ -232,20 +230,22 @@ function damageRow() {
         </div>
       </div>
 
-      <div class="col-3">
+      <div class="col-3 damage-mod-col">
         <input class="form-control form-control-sm dmg-mod mini-input" type="number" value="0">
       </div>
 
-      <div class="col-2"></div>
+      <div class="col-2 damage-spacer-col"></div>
 
-      <div class="col-2 text-center">
-        <button class="btn btn-success btn-sm icon-btn" onclick="rollSingle(this)">
+      <div class="col-4 damage-actions-col d-flex justify-content-center gap-1 px-0">
+        <button class="btn btn-success btn-sm icon-btn" onclick="rollSingle(this)" title="Roll" aria-label="Roll damage">
           <i class="bi bi-dice-5"></i>
         </button>
-      </div>
 
-      <div class="col-2 text-center">
-        <button class="btn btn-danger btn-sm icon-btn" onclick="removeRow(this)">
+        <button class="btn btn-secondary btn-sm icon-btn" onclick="duplicateRow(this)" title="Duplicate" aria-label="Duplicate damage">
+          <i class="bi bi-copy"></i>
+        </button>
+
+        <button class="btn btn-danger btn-sm icon-btn" onclick="removeRow(this)" title="Delete" aria-label="Delete damage">
           <i class="bi bi-trash"></i>
         </button>
       </div>
@@ -256,20 +256,110 @@ function damageRow() {
   `;
 }
 
-function addAttack() {
+function addAttack(save = true) {
   const div = document.createElement("div");
   div.innerHTML = attackRow();
   document.getElementById("attackContainer").appendChild(div.firstElementChild);
+  if (save) queueDiceSave();
 }
 
-function addDamage() {
+function addDamage(save = true) {
   const div = document.createElement("div");
   div.innerHTML = damageRow();
   document.getElementById("damageContainer").appendChild(div.firstElementChild);
+  if (save) queueDiceSave();
 }
 
 function removeRow(btn) {
   btn.closest(".dice-row")?.remove();
+  queueDiceSave();
+}
+
+function duplicateRow(btn) {
+  const row = btn.closest(".dice-row");
+  if (!row) return;
+
+  const clone = row.cloneNode(true);
+
+  clone.querySelectorAll("input, select").forEach((field, index) => {
+    field.value = row.querySelectorAll("input, select")[index].value;
+  });
+
+  clone.querySelector(".result-text").innerHTML = "";
+  row.after(clone);
+  queueDiceSave();
+}
+
+function collectDiceState() {
+  const attacks = [...document.querySelectorAll("#attackContainer .dice-row")].map(row => ({
+    modifier: row.querySelector(".attack-mod").value,
+    crit: row.querySelector(".attack-crit").value
+  }));
+
+  const damages = [...document.querySelectorAll("#damageContainer .dice-row")].map(row => ({
+    count: row.querySelector(".dmg-count").value,
+    die: row.querySelector(".dmg-type").value,
+    modifier: row.querySelector(".dmg-mod").value
+  }));
+
+  return { attacks, damages };
+}
+
+function restoreDiceState(state) {
+  document.getElementById("attackContainer").innerHTML = "";
+  document.getElementById("damageContainer").innerHTML = "";
+
+  (state.attacks || []).forEach(attack => {
+    addAttack(false);
+    const row = document.querySelector("#attackContainer .dice-row:last-child");
+    row.querySelector(".attack-mod").value = attack.modifier ?? 0;
+    row.querySelector(".attack-crit").value = attack.crit ?? 20;
+  });
+
+  (state.damages || []).forEach(damage => {
+    addDamage(false);
+    const row = document.querySelector("#damageContainer .dice-row:last-child");
+    row.querySelector(".dmg-count").value = damage.count ?? 1;
+    row.querySelector(".dmg-type").value = damage.die ?? 6;
+    row.querySelector(".dmg-mod").value = damage.modifier ?? 0;
+  });
+
+  if (!document.querySelector("#attackContainer .dice-row")) addAttack(false);
+  if (!document.querySelector("#damageContainer .dice-row")) addDamage(false);
+}
+
+function queueDiceSave() {
+  clearTimeout(diceSaveTimer);
+  diceSaveTimer = setTimeout(() => {
+    PFApp.saveDiceState(collectDiceState(), diceContextKey);
+  }, 300);
+}
+
+async function loadDiceContext(contextKey) {
+  clearTimeout(diceSaveTimer);
+  diceContextKey = contextKey || "general";
+
+  const savedState = await PFApp.loadDiceState(diceContextKey);
+  if (savedState) {
+    restoreDiceState(savedState);
+  } else {
+    restoreDiceState({ attacks: [], damages: [] });
+    queueDiceSave();
+  }
+}
+
+async function initDiceRoller() {
+  const user = await PFApp.requireAuth();
+  if (!user) return;
+
+  diceContextKey = PFApp.getSelectedContextKey();
+  await loadDiceContext(diceContextKey);
+  window.addEventListener("pf-context-change", event => loadDiceContext(event.detail.contextKey));
+
+  document.getElementById("attackContainer").addEventListener("input", queueDiceSave);
+  document.getElementById("attackContainer").addEventListener("change", queueDiceSave);
+  document.getElementById("damageContainer").addEventListener("input", queueDiceSave);
+  document.getElementById("damageContainer").addEventListener("change", queueDiceSave);
 }
 
 function isCrit(range, value) {
@@ -360,9 +450,7 @@ function rollAll() {
   document.getElementById("total").innerText = total;
 }
 
-// init
-addAttack();
-addDamage();
+initDiceRoller();
 
 </script>
 

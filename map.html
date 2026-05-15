@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Map</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    body { background: #121212; color: #fff; }
+    .map-shell { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 12px; height: calc(100vh - 78px); padding: 12px; }
+    .map-main, .map-side { background: #1e1e1e; border: 1px solid #333; border-radius: 8px; min-width: 0; }
+    .map-main { display: grid; grid-template-rows: auto minmax(0, 1fr); overflow: hidden; }
+    .map-toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: end; padding: 10px; border-bottom: 1px solid #333; }
+    .map-toolbar .form-control, .map-toolbar .form-select { width: auto; min-width: 96px; }
+    .map-stage-wrap { overflow: auto; padding: 12px; }
+    .map-stage { position: relative; width: calc(var(--cols) * var(--cell)); height: calc(var(--rows) * var(--cell)); min-width: calc(var(--cols) * var(--cell)); min-height: calc(var(--rows) * var(--cell)); background-color: #202020; background-image: linear-gradient(to right, rgba(255,255,255,.18) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,.18) 1px, transparent 1px), var(--map-bg); background-size: var(--cell) var(--cell), var(--cell) var(--cell), var(--bg-size); background-position: 0 0, 0 0, center; background-repeat: repeat, repeat, no-repeat; border: 1px solid #555; }
+    .map-token, .map-shape { position: absolute; left: calc(var(--x) * var(--cell)); top: calc(var(--y) * var(--cell)); width: calc(var(--w) * var(--cell)); height: calc(var(--h) * var(--cell)); display: grid; place-items: center; user-select: none; touch-action: none; cursor: grab; }
+    .map-aura { position: absolute; left: calc(var(--aura-x) * var(--cell)); top: calc(var(--aura-y) * var(--cell)); width: calc(var(--aura-size) * var(--cell)); height: calc(var(--aura-size) * var(--cell)); border: 2px solid var(--aura-color); border-radius: 50%; background: color-mix(in srgb, var(--aura-color) 18%, transparent); pointer-events: none; z-index: 1; box-shadow: 0 0 10px color-mix(in srgb, var(--aura-color) 30%, transparent); }
+    .map-token { border-radius: 50%; background: var(--color); border: 2px solid #f8f9fa; color: #111; font-weight: 800; box-shadow: 0 2px 8px rgba(0,0,0,.45); }
+    .map-token.enemy { border-color: #ffb3b3; color: #fff; }
+    .map-token, .map-shape { z-index: 2; }
+    .map-token.selected, .map-shape.selected { outline: 3px solid #8fd19e; outline-offset: 2px; }
+    .token-label { max-width: 100%; padding: 0 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; text-shadow: 0 1px 2px rgba(255,255,255,.5); }
+    .token-hover-card { display: none; position: absolute; bottom: calc(100% + 7px); left: 50%; transform: translateX(-50%); min-width: 150px; max-width: 220px; padding: 6px 8px; border: 1px solid #555; border-radius: 6px; background: #1e1e1e; color: #f8f9fa; box-shadow: 0 4px 12px rgba(0,0,0,.45); font-size: 12px; line-height: 1.25; z-index: 5; pointer-events: none; }
+    .token-hover-card::after { content: ""; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border: 6px solid transparent; border-top-color: #555; }
+    .map-token:hover .token-hover-card { display: block; }
+    .token-hover-name { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .token-hover-hp { color: #8fd19e; }
+    .map-shape { border: 2px solid var(--color); background: color-mix(in srgb, var(--color) 28%, transparent); }
+    .map-shape.shape-grid { display: grid; grid-template-columns: repeat(var(--shape-cols), var(--cell)); grid-template-rows: repeat(var(--shape-rows), var(--cell)); place-items: stretch; border: 0; background: transparent; }
+    .shape-cell { background: color-mix(in srgb, var(--color) 28%, transparent); border: 1px solid var(--color); }
+    .shape-cell.texture-cell { border: 0; background-color: transparent; background-image: var(--texture-url); background-repeat: no-repeat; background-size: 600% 400%; background-position: var(--tile-x) var(--tile-y); }
+    .shape-texture-picker { display: grid; grid-template-columns: repeat(auto-fill, minmax(52px, 1fr)); gap: 6px; }
+    .shape-texture-option { min-height: 46px; border: 1px solid #555; border-radius: 6px; background: #242424; color: #ddd; display: grid; place-items: center; padding: 4px; }
+    .shape-texture-option.active { border-color: #8fd19e; box-shadow: 0 0 0 1px #8fd19e inset; }
+    .shape-texture-icon { width: 34px; height: 34px; background-repeat: no-repeat; background-size: 600% 400%; background-position: 0 0; }
+    .movement-ruler { position: absolute; inset: 0; pointer-events: none; z-index: 20; overflow: visible; }
+    .movement-ruler-line { stroke: #f0d58c; stroke-width: 2; vector-effect: non-scaling-stroke; filter: drop-shadow(0 1px 2px rgba(0,0,0,.65)); }
+    .movement-ruler-dot { fill: #f0d58c; stroke: #1e1e1e; stroke-width: 2; }
+    .movement-ruler-label { position: absolute; transform: translate(-50%, calc(-100% - 8px)); padding: 3px 7px; border: 1px solid #665b35; border-radius: 999px; background: #1e1e1e; color: #f0d58c; font-size: 12px; font-weight: 700; white-space: nowrap; pointer-events: none; box-shadow: 0 4px 10px rgba(0,0,0,.45); }
+    .map-side { display: grid; grid-template-rows: auto minmax(0, 1fr); overflow: hidden; }
+    .side-tabs { padding: 10px; border-bottom: 1px solid #333; }
+    .side-scroll { overflow: auto; padding: 10px; }
+    .side-section { margin-bottom: 14px; }
+    .side-title { color: #aaa; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 6px; }
+    .initiative-row, .timeline-row { background: #242424; border: 1px solid #444; border-radius: 8px; padding: 7px; margin-bottom: 6px; }
+    .initiative-row.active { border-color: #8fd19e; background: rgba(143, 209, 158, .1); }
+    .enemy-stats { color: #ffb3b3; font-size: 11px; }
+    .map-context-menu { position: fixed; z-index: 1080; min-width: 190px; padding: 6px; background: #1e1e1e; border: 1px solid #555; border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,.45); }
+    .map-context-menu.d-none { display: none !important; }
+    .map-context-menu-title { padding: 4px 8px 7px; color: #aaa; font-size: 12px; border-bottom: 1px solid #333; margin-bottom: 5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .map-context-menu .btn { width: 100%; justify-content: flex-start; text-align: left; }
+    .selected-collapse .accordion-button { background: #242424; color: #ddd; padding: 7px 10px; font-size: 12px; }
+    .selected-collapse .accordion-button:not(.collapsed) { background: #2b2b2b; color: #fff; box-shadow: none; }
+    .selected-collapse .accordion-body { background: #1e1e1e; border: 1px solid #333; border-top: 0; padding: 8px; }
+    .mini-sheet { display: grid; gap: 8px; margin-bottom: 8px; }
+    .mini-sheet-title { color: #aaa; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; }
+    .mini-sheet-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(70px, 1fr)); gap: 5px; }
+    .mini-sheet-card { background: #242424; border: 1px solid #444; border-radius: 6px; padding: 5px 7px; min-width: 0; }
+    .mini-sheet-label { color: #aaa; font-size: 10px; text-transform: uppercase; }
+    .mini-sheet-value { color: #fff; font-weight: 700; overflow-wrap: anywhere; }
+    .mini-sheet-list { display: grid; gap: 4px; }
+    .mini-sheet-row { display: flex; justify-content: space-between; gap: 8px; background: #242424; border: 1px solid #444; border-radius: 6px; padding: 5px 7px; }
+    .mini-sheet-row span:last-child { color: #fff; font-weight: 700; text-align: right; }
+    input, textarea, select { background-color: #2b2b2b !important; color: white !important; border-color: #555 !important; }
+    textarea { min-height: 72px; }
+    .btn-icon { width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center; padding: 0; }
+    @media (max-width: 980px) {
+      .map-shell { grid-template-columns: 1fr; height: auto; }
+      .map-main { min-height: 70vh; }
+      .map-side { min-height: 420px; }
+    }
+  </style>
+</head>
+<body>
+<div id="appNavbar"></div>
+
+<main class="map-shell">
+  <section class="map-main">
+    <div class="map-toolbar">
+      <div>
+        <label for="gridSize">Grid</label>
+        <input id="gridSize" class="form-control form-control-sm" type="number" min="24" max="96" value="48">
+      </div>
+      <div>
+        <label for="mapCols">Width</label>
+        <input id="mapCols" class="form-control form-control-sm" type="number" min="8" max="80" value="30">
+      </div>
+      <div>
+        <label for="mapRows">Height</label>
+        <input id="mapRows" class="form-control form-control-sm" type="number" min="8" max="80" value="20">
+      </div>
+      <div>
+        <label for="backgroundUrl">Background URL</label>
+        <input id="backgroundUrl" class="form-control form-control-sm" placeholder="https://...">
+      </div>
+      <div>
+        <label for="backgroundFit">Fit</label>
+        <select id="backgroundFit" class="form-select form-select-sm">
+          <option value="cover">Cover</option>
+          <option value="contain">Contain</option>
+          <option value="100% 100%">Stretch</option>
+          <option value="auto">Original</option>
+        </select>
+      </div>
+      <button id="addCharacterToken" class="btn btn-primary btn-sm" type="button"><i class="bi bi-person-plus"></i> Character</button>
+      <button id="addEnemyToken" class="btn btn-danger btn-sm" type="button"><i class="bi bi-bug"></i> Enemy</button>
+      <button id="addRectShape" class="btn btn-outline-light btn-sm" type="button"><i class="bi bi-square"></i> Rect</button>
+      <button id="addCircleShape" class="btn btn-outline-light btn-sm" type="button"><i class="bi bi-circle"></i> Circle</button>
+      <button id="deleteSelected" class="btn btn-outline-danger btn-sm btn-icon" type="button" title="Delete selected"><i class="bi bi-trash"></i></button>
+      <span id="mapStatus" class="small text-secondary"></span>
+    </div>
+
+    <div class="map-stage-wrap">
+      <div id="mapStage" class="map-stage" aria-label="Battle map"></div>
+    </div>
+  </section>
+
+  <aside class="map-side">
+    <div class="side-tabs">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h5 class="mb-0">Map</h5>
+          <div id="gmHint" class="small text-secondary"></div>
+        </div>
+        <button id="nextTurn" class="btn btn-success btn-sm" type="button">Next</button>
+      </div>
+    </div>
+    <div class="side-scroll">
+      <section class="side-section">
+        <div class="side-title">Selected</div>
+        <div id="selectedPanel" class="small text-secondary">Select a token or shape.</div>
+      </section>
+
+      <section class="side-section">
+        <div class="side-title">Initiative</div>
+        <div class="d-flex gap-2 mb-2">
+          <button id="addSelectedInitiative" class="btn btn-outline-light btn-sm" type="button">Add Selected</button>
+          <button id="sortInitiative" class="btn btn-outline-light btn-sm" type="button">Sort</button>
+        </div>
+        <div id="initiativeList"></div>
+      </section>
+
+      <section class="side-section">
+        <div class="side-title">Timeline</div>
+        <form id="timelineForm" class="d-flex gap-2 mb-2">
+          <input id="timelineText" class="form-control form-control-sm" placeholder="Event">
+          <button class="btn btn-primary btn-sm" type="submit">Add</button>
+        </form>
+        <div id="timelineList"></div>
+      </section>
+    </div>
+  </aside>
+</main>
+
+<div id="mapContextMenu" class="map-context-menu d-none" role="menu">
+  <div id="mapContextMenuTitle" class="map-context-menu-title"></div>
+  <button id="openAuraOptions" class="btn btn-outline-info btn-sm mb-1" type="button" role="menuitem">
+    <i class="bi bi-broadcast-pin me-1"></i> Aura options
+  </button>
+  <button id="removeTokenFromMap" class="btn btn-outline-danger btn-sm" type="button" role="menuitem">
+    <i class="bi bi-box-arrow-right me-1"></i> Remove from map
+  </button>
+</div>
+
+<div class="modal fade" id="auraOptionsModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <form id="auraOptionsForm" class="modal-content bg-dark text-white border-secondary">
+      <div class="modal-header border-secondary">
+        <h5 class="modal-title">Aura Options</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-check form-switch mb-3">
+          <input id="auraVisible" class="form-check-input" type="checkbox" role="switch">
+          <label class="form-check-label" for="auraVisible">Visible</label>
+        </div>
+        <div class="mb-3">
+          <label for="auraRadiusCells">Radius</label>
+          <div class="d-flex align-items-center gap-2">
+            <input id="auraRadiusCells" class="form-control form-control-sm" type="number" min="1" max="60" value="1">
+            <span id="auraRadiusText" class="small text-secondary text-nowrap">1 cell / 5 ft</span>
+          </div>
+        </div>
+        <div>
+          <label for="auraColor">Color</label>
+          <input id="auraColor" class="form-control form-control-sm" type="color" value="#8fd19e">
+        </div>
+      </div>
+      <div class="modal-footer border-secondary">
+        <button type="button" class="btn btn-outline-light btn-sm" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-primary btn-sm" type="submit">Save Aura</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="navbar.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="app-supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+let mapContextKey = "";
+let mapCharacters = [];
+let currentUserId = "";
+let isGm = false;
+let selectedId = "";
+let saveTimer = null;
+let dragState = null;
+let mapRealtimeChannel = null;
+let pendingRemoteState = null;
+let localGridSize = Number(sessionStorage.getItem("pf_map_grid_size") || 48);
+let suppressStageClick = false;
+let contextMenuTokenId = "";
+let movementMeasure = null;
+let suppressNextContextMenu = false;
+let auraModal = null;
+let auraEditingTokenId = "";
+
+const defaultState = {
+  settings: { cols: 30, rows: 20, backgroundUrl: "", backgroundFit: "cover" },
+  tokens: [],
+  shapes: [],
+  initiative: [],
+  activeTurn: 0,
+  timeline: []
+};
+let state = structuredClone(defaultState);
+const SHAPE_TEXTURES = [
+  { id: "flames", name: "Flames", url: "assets/shape icons/flames.png" },
+  { id: "grass", name: "Grass", url: "assets/shape icons/grass.png" },
+  { id: "pit", name: "Pit", url: "assets/shape icons/pit.png" },
+  { id: "stone", name: "Stone", url: "assets/shape icons/stone.png" }
+];
+
+function el(id) { return document.getElementById(id); }
+function showSelectedPanel() {
+  const sideScroll = document.querySelector(".side-scroll");
+  if (sideScroll) sideScroll.scrollTo({ top: 0, behavior: "smooth" });
+}
+function escapeHtml(value) {
+  return String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
+}
+function uid(prefix) { return `${prefix}_${Date.now()}_${Math.random().toString(16).slice(2)}`; }
+function clamp(value, min, max) { return Math.max(min, Math.min(max, value)); }
+function selectedObject() { return [...state.tokens, ...state.shapes].find(item => item.id === selectedId); }
+function tokenById(tokenId) { return state.tokens.find(token => token.id === tokenId); }
+function tokenInitials(name) { return String(name || "?").split(/\s+/).slice(0, 2).map(part => part[0] || "").join("").toUpperCase(); }
+function tokenCharacter(token) { return mapCharacters.find(character => character.id === token.characterId); }
+function canManageMapItem(item) {
+  if (!item) return false;
+  if (isGm) return true;
+  if (item.kind === "character") return item.ownerId === currentUserId;
+  if (item.shape) return true;
+  return false;
+}
+function canManageAura(token) {
+  if (!token?.kind) return false;
+  if (isGm) return true;
+  return token.kind === "character" && token.ownerId === currentUserId;
+}
+function tokenHpText(token) {
+  if (token.kind !== "character") return "";
+  const fields = tokenCharacter(token)?.sheet?.fields || {};
+  const current = fields.currentHitPoints;
+  const total = fields.hitPointsTotal || fields.hitPoints;
+  if ((current === undefined || current === "") && (total === undefined || total === "")) return "HP not set";
+  return `${current ?? "?"}/${total ?? "?"} HP`;
+}
+
+function sheetNum(value, fallback = 0) {
+  const number = Number(value);
+  return Number.isFinite(number) ? number : fallback;
+}
+
+function sheetMod(score) {
+  return Math.floor((sheetNum(score, 10) - 10) / 2);
+}
+
+function fmtSigned(value) {
+  const number = sheetNum(value);
+  return number >= 0 ? `+${number}` : String(number);
+}
+
+function iterativeBabBonuses(bab) {
+  const first = sheetNum(bab);
+  if (first < 1) return [first];
+  const bonuses = [];
+  for (let value = first; value >= 1; value -= 5) bonuses.push(value);
+  return bonuses;
+}
+
+function sheetAbilityScore(sheet, key) {
+  return sheetNum(sheet?.abilities?.[key]?.score, 10);
+}
+
+function sheetAbilityMod(sheet, key) {
+  return sheetMod(sheetAbilityScore(sheet, key));
+}
+
+function firstScalingKey(value, fallback = "str") {
+  return String(value || fallback).toLowerCase().match(/\b(str|dex|con|int|wis|cha)\b/)?.[1] || fallback;
+}
+
+function sheetArmorBonus(sheet, typeName) {
+  return (sheet?.armor || []).reduce((total, item) => {
+    const type = String(item.type || "").toLowerCase();
+    if (!type.includes(typeName)) return total;
+    return total + sheetNum(item.bonus) + sheetNum(item.enhancement);
+  }, 0);
+}
+
+function compactStat(label, value) {
+  return `<div class="mini-sheet-card"><div class="mini-sheet-label">${escapeHtml(label)}</div><div class="mini-sheet-value">${escapeHtml(value)}</div></div>`;
+}
+
+function compactSection(title, html) {
+  return `<div><div class="mini-sheet-title">${escapeHtml(title)}</div>${html}</div>`;
+}
+
+function compactAbilityValue(row) {
+  const total = String(row.total || "");
+  const mod = String(row.mod || "");
+  if (!mod || /\([+-]?\d+\)/.test(total)) return total;
+  return `${total} (${mod})`;
+}
+
+function renderCalculatedSheetSummary(calculated) {
+  const abilities = calculated.abilities || [];
+  const saves = calculated.saves || [];
+  const weapons = calculated.weapons || [];
+  return `
+    <div class="mini-sheet">
+      ${compactSection("Character", `<div class="mini-sheet-grid">
+        ${compactStat("HP", `${calculated.hp?.current || "?"}/${calculated.hp?.total || "?"}`)}
+        ${compactStat("Init", calculated.initiative || "")}
+      </div>`)}
+      ${compactSection("Abilities", `<div class="mini-sheet-grid">
+        ${abilities.map(row => compactStat(row.label || row.key?.toUpperCase() || "Ability", compactAbilityValue(row))).join("")}
+      </div>`)}
+      ${compactSection("Armor Class", `<div class="mini-sheet-grid">
+        ${compactStat("AC", calculated.armorClass?.ac || "")}
+        ${compactStat("Touch", calculated.armorClass?.touch || "")}
+        ${compactStat("Flat", calculated.armorClass?.flat || "")}
+      </div>`)}
+      ${compactSection("Combat", `<div class="mini-sheet-grid">
+        ${compactStat("CMB", calculated.combat?.cmb || "")}
+        ${compactStat("CMD", calculated.combat?.cmd || "")}
+      </div>`)}
+      ${compactSection("Saves", `<div class="mini-sheet-grid">
+        ${saves.map(row => compactStat(row.label || row.key || "Save", row.total || "")).join("")}
+      </div>`)}
+      ${compactSection("Weapons", `<div class="mini-sheet-list">${
+        weapons.length
+          ? weapons.map(weapon => `<div class="mini-sheet-row"><span>${escapeHtml(weapon.name || "Weapon")}</span><span>${escapeHtml([weapon.attack, weapon.damage, weapon.critical].filter(Boolean).join(" | "))}</span></div>`).join("")
+          : `<div class="small text-secondary">No weapons.</div>`
+      }</div>`)}
+    </div>
+  `;
+}
+
+function renderCompactCharacterSheet(token) {
+  if (token.kind === "enemy") {
+    return isGm
+      ? `<div class="mini-sheet">${compactSection("Enemy Sheet", `<div class="small text-secondary">Enemy sheets will be added later.</div>`)}</div>`
+      : "";
+  }
+  if (token.kind !== "character") return "";
+  if (!canManageAura(token)) return `<div class="small text-secondary mb-2">You can only view your own character sheet.</div>`;
+
+  const character = tokenCharacter(token);
+  const sheet = character?.sheet || {};
+  const fields = sheet.fields || {};
+  if (!Object.keys(sheet).length) return `<div class="small text-secondary mb-2">No saved sheet data found.</div>`;
+  if (sheet.calculated) return renderCalculatedSheetSummary(sheet.calculated);
+
+  const str = sheetAbilityMod(sheet, "str");
+  const dex = sheetAbilityMod(sheet, "dex");
+  const con = sheetAbilityMod(sheet, "con");
+  const wis = sheetAbilityMod(sheet, "wis");
+  const bab = sheetNum(fields.bab);
+  const miscAc = sheetNum(fields.acMisc);
+  const natural = sheetNum(fields.acNatural);
+  const deflection = sheetNum(fields.acDeflection);
+  const armor = sheetArmorBonus(sheet, "armor");
+  const shield = sheetArmorBonus(sheet, "shield");
+  const ac = 10 + armor + shield + dex + natural + deflection + miscAc;
+  const touch = 10 + dex + deflection + miscAc;
+  const flat = ac - Math.max(0, dex);
+  const hpCurrent = fields.currentHitPoints ?? "?";
+  const hpTotal = fields.hitPointsTotal || fields.hitPoints || "?";
+  const initiative = dex + sheetNum(fields.initMisc);
+  const saves = [
+    ["Fort", sheetNum(sheet.saves?.fort?.base) + con],
+    ["Ref", sheetNum(sheet.saves?.reflex?.base) + dex],
+    ["Will", sheetNum(sheet.saves?.will?.base) + wis]
+  ];
+  const weapons = (sheet.weapons || []).slice(0, 4).map(weapon => {
+    const attackKey = firstScalingKey(weapon.attackScale, "str");
+    const damageKey = firstScalingKey(weapon.damageScale, attackKey);
+    const enhancement = sheetNum(weapon.enhancement);
+    const attack = bab + sheetAbilityMod(sheet, attackKey) + enhancement;
+    const attacks = iterativeBabBonuses(bab).map(base => fmtSigned(base + sheetAbilityMod(sheet, attackKey) + enhancement)).join("/");
+    const damageMod = Math.floor(sheetAbilityMod(sheet, damageKey) * (weapon.twoHanded === "yes" ? 1.5 : 1)) + enhancement;
+    const damage = `${weapon.damage || ""}${damageMod ? fmtSigned(damageMod) : ""}` || fmtSigned(damageMod);
+    return `<div class="mini-sheet-row"><span>${escapeHtml(weapon.name || "Weapon")}</span><span>${escapeHtml(attacks || fmtSigned(attack))} | ${escapeHtml(damage)} | ${escapeHtml(weapon.critical || "-")}</span></div>`;
+  }).join("") || `<div class="small text-secondary">No weapons.</div>`;
+
+  return `
+    <div class="mini-sheet">
+      ${compactSection("Character", `<div class="mini-sheet-grid">
+        ${compactStat("HP", `${hpCurrent}/${hpTotal}`)}
+        ${compactStat("Init", fmtSigned(initiative))}
+      </div>`)}
+      ${compactSection("Abilities", `<div class="mini-sheet-grid">
+        ${["str","dex","con","int","wis","cha"].map(key => compactStat(key.toUpperCase(), `${sheetAbilityScore(sheet, key)} (${fmtSigned(sheetAbilityMod(sheet, key))})`)).join("")}
+      </div>`)}
+      ${compactSection("Armor Class", `<div class="mini-sheet-grid">
+        ${compactStat("AC", ac)}
+        ${compactStat("Touch", touch)}
+        ${compactStat("Flat", flat)}
+      </div>`)}
+      ${compactSection("Combat", `<div class="mini-sheet-grid">
+        ${compactStat("CMB", fmtSigned(bab + str))}
+        ${compactStat("CMD", 10 + bab + str + dex)}
+      </div>`)}
+      ${compactSection("Saves", `<div class="mini-sheet-grid">${saves.map(([label, value]) => compactStat(label, fmtSigned(value))).join("")}</div>`)}
+      ${compactSection("Weapons", `<div class="mini-sheet-list">${weapons}</div>`)}
+    </div>
+  `;
+}
+
+function shapeTexture(textureId) {
+  return SHAPE_TEXTURES.find(texture => texture.id === textureId);
+}
+
+function tilePosition(tileIndex) {
+  const index = Math.max(0, Math.min(23, Number(tileIndex || 0)));
+  const col = index % 6;
+  const row = Math.floor(index / 6);
+  return { x: `${col * 20}%`, y: `${row * (100 / 3)}%` };
+}
+
+async function hydrateMapCharacterSheets() {
+  if (!mapCharacters.length) return;
+  await Promise.all(mapCharacters.map(async character => {
+    const saved = await PFApp.loadCharacterSheet("", mapContextKey, character.id);
+    if (saved?.sheet) character.sheet = saved.sheet;
+  }));
+}
+
+async function determineGm(contextKey) {
+  const gameId = contextKey.startsWith("game:") ? contextKey.slice(5) : "";
+  const campaigns = await PFApp.loadCampaigns();
+  const current = campaigns.find(campaign => campaign.id === gameId);
+  return ["owner", "gm", "admin"].includes(current?.role);
+}
+
+function normalizeState(raw) {
+  return {
+    settings: { ...defaultState.settings, ...(raw?.settings || {}) },
+    tokens: Array.isArray(raw?.tokens) ? raw.tokens : [],
+    shapes: Array.isArray(raw?.shapes) ? raw.shapes : [],
+    initiative: Array.isArray(raw?.initiative) ? raw.initiative : [],
+    activeTurn: Number(raw?.activeTurn || 0),
+    timeline: Array.isArray(raw?.timeline) ? raw.timeline : []
+  };
+}
+
+function applySettingsToInputs() {
+  el("gridSize").value = localGridSize;
+  el("mapCols").value = state.settings.cols;
+  el("mapRows").value = state.settings.rows;
+  el("backgroundUrl").value = state.settings.backgroundUrl || "";
+  el("backgroundFit").value = state.settings.backgroundFit || "cover";
+}
+
+function hideContextMenu() {
+  contextMenuTokenId = "";
+  el("mapContextMenu").classList.add("d-none");
+}
+
+function showMapContextMenu(event, item) {
+  if (!canManageMapItem(item) || (!item.kind && !item.shape)) return;
+  event.preventDefault();
+  event.stopPropagation();
+  contextMenuTokenId = item.id;
+  selectedId = item.id;
+  renderAll(false);
+  const menu = el("mapContextMenu");
+  el("mapContextMenuTitle").textContent = item.kind === "character"
+    ? tokenCharacter(item)?.name || item.name || "Character"
+    : item.name || "Shape";
+  el("openAuraOptions").classList.toggle("d-none", !canManageAura(item));
+  menu.classList.remove("d-none");
+  const rect = menu.getBoundingClientRect();
+  menu.style.left = `${clamp(event.clientX, 8, window.innerWidth - rect.width - 8)}px`;
+  menu.style.top = `${clamp(event.clientY, 8, window.innerHeight - rect.height - 8)}px`;
+}
+
+function stageCellFromEvent(event) {
+  const stage = el("mapStage");
+  const rect = stage.getBoundingClientRect();
+  const cell = Number(localGridSize || 48);
+  const x = clamp(Math.floor((event.clientX - rect.left) / cell), 0, state.settings.cols - 1);
+  const y = clamp(Math.floor((event.clientY - rect.top) / cell), 0, state.settings.rows - 1);
+  return { x, y, px: (x + 0.5) * cell, py: (y + 0.5) * cell };
+}
+
+function pathfinderDistance(start, end) {
+  const dx = Math.abs(end.x - start.x);
+  const dy = Math.abs(end.y - start.y);
+  const diagonals = Math.min(dx, dy);
+  const straight = Math.max(dx, dy) - diagonals;
+  return (straight * 5) + (Math.floor(diagonals / 2) * 15) + ((diagonals % 2) * 5);
+}
+
+function renderMovementMeasure() {
+  document.querySelector(".movement-ruler")?.remove();
+  if (!movementMeasure) return;
+  const stage = el("mapStage");
+  const { start, current } = movementMeasure;
+  const distance = pathfinderDistance(start, current);
+  const layer = document.createElement("div");
+  layer.className = "movement-ruler";
+  layer.innerHTML = `
+    <svg width="100%" height="100%" class="position-absolute top-0 start-0">
+      <line class="movement-ruler-line" x1="${start.px}" y1="${start.py}" x2="${current.px}" y2="${current.py}"></line>
+      <circle class="movement-ruler-dot" cx="${start.px}" cy="${start.py}" r="4"></circle>
+      <circle class="movement-ruler-dot" cx="${current.px}" cy="${current.py}" r="4"></circle>
+    </svg>
+    <div class="movement-ruler-label" style="left:${current.px}px;top:${current.py}px;">${distance} ft</div>
+  `;
+  stage.appendChild(layer);
+}
+
+function clearMovementMeasure(delay = 0) {
+  const clear = () => {
+    movementMeasure = null;
+    document.querySelector(".movement-ruler")?.remove();
+  };
+  if (delay) {
+    setTimeout(clear, delay);
+  } else {
+    clear();
+  }
+}
+
+function startMovementMeasure(event) {
+  if (event.button !== 2) return;
+  hideContextMenu();
+  const point = stageCellFromEvent(event);
+  movementMeasure = { start: point, current: point, dragged: false };
+  renderMovementMeasure();
+  window.addEventListener("pointermove", moveMovementMeasure);
+  window.addEventListener("pointerup", endMovementMeasure, { once: true });
+}
+
+function moveMovementMeasure(event) {
+  if (!movementMeasure) return;
+  const next = stageCellFromEvent(event);
+  movementMeasure.dragged = movementMeasure.dragged || next.x !== movementMeasure.start.x || next.y !== movementMeasure.start.y;
+  movementMeasure.current = next;
+  renderMovementMeasure();
+}
+
+function endMovementMeasure() {
+  const wasDragged = Boolean(movementMeasure?.dragged);
+  suppressNextContextMenu = wasDragged;
+  window.removeEventListener("pointermove", moveMovementMeasure);
+  clearMovementMeasure(wasDragged ? 700 : 0);
+}
+
+function renderMap() {
+  const stage = el("mapStage");
+  const { cols, rows, backgroundUrl, backgroundFit } = state.settings;
+  stage.style.setProperty("--cell", `${localGridSize}px`);
+  stage.style.setProperty("--cols", cols);
+  stage.style.setProperty("--rows", rows);
+  stage.style.setProperty("--map-bg", backgroundUrl ? `url("${backgroundUrl.replaceAll('"', "%22")}")` : "none");
+  stage.style.setProperty("--bg-size", backgroundFit || "cover");
+
+  stage.innerHTML = [
+    ...state.tokens.map(renderAura),
+    ...state.shapes.map(renderShape),
+    ...state.tokens.map(renderToken)
+  ].join("");
+
+  stage.onpointerdown = startMovementMeasure;
+  stage.querySelectorAll("[data-map-id]").forEach(node => {
+    node.addEventListener("pointerdown", startDrag);
+    node.addEventListener("click", event => {
+      event.stopPropagation();
+      suppressStageClick = true;
+      hideContextMenu();
+      selectedId = node.dataset.mapId;
+      renderAll(false);
+      showSelectedPanel();
+    });
+    node.addEventListener("contextmenu", event => {
+      if (suppressNextContextMenu) {
+        event.preventDefault();
+        suppressNextContextMenu = false;
+        return;
+      }
+      event.preventDefault();
+      hideContextMenu();
+      const item = [...state.tokens, ...state.shapes].find(entry => entry.id === node.dataset.mapId);
+      if (item) showMapContextMenu(event, item);
+    });
+  });
+  stage.oncontextmenu = event => {
+    if (suppressNextContextMenu) {
+      event.preventDefault();
+      suppressNextContextMenu = false;
+      return;
+    }
+    if (event.target === stage) event.preventDefault();
+  };
+  stage.onclick = event => {
+    if (suppressStageClick) {
+      suppressStageClick = false;
+      return;
+    }
+    if (event.target !== stage) return;
+    hideContextMenu();
+    selectedId = "";
+    renderAll(false);
+  };
+}
+
+function renderAura(token) {
+  const aura = token.aura || {};
+  if (!aura.visible) return "";
+  const radius = Math.max(1, Number(aura.radius || 1));
+  const size = radius * 2;
+  const centerX = Number(token.x || 0) + (Number(token.w || 1) / 2);
+  const centerY = Number(token.y || 0) + (Number(token.h || 1) / 2);
+  return `<div class="map-aura" style="--aura-x:${centerX - radius};--aura-y:${centerY - radius};--aura-size:${size};--aura-color:${escapeHtml(aura.color || "#8fd19e")};"></div>`;
+}
+
+function renderToken(token) {
+  const enemyClass = token.kind === "enemy" ? " enemy" : "";
+  const selectedClass = token.id === selectedId ? " selected" : "";
+  const stats = token.kind === "enemy" && isGm ? `<span class="enemy-stats">${escapeHtml(token.hp || "?")} HP | AC ${escapeHtml(token.ac || "?")}</span>` : "";
+  const character = token.kind === "character" ? tokenCharacter(token) : null;
+  const hover = character ? `
+    <div class="token-hover-card">
+      <div class="token-hover-name">${escapeHtml(character.name || token.name || "Character")}</div>
+      <div class="token-hover-hp">${escapeHtml(tokenHpText(token))}</div>
+    </div>
+  ` : "";
+  return `
+    <div class="map-token${enemyClass}${selectedClass}" data-map-id="${escapeHtml(token.id)}" style="--x:${token.x};--y:${token.y};--w:${token.w || 1};--h:${token.h || 1};--color:${escapeHtml(token.color || "#8fd19e")};">
+      <div class="text-center">
+        <div class="token-label">${escapeHtml(tokenInitials(token.name))}</div>
+        ${stats}
+      </div>
+      ${hover}
+    </div>
+  `;
+}
+
+function shapeMask(shape) {
+  const cols = Math.max(1, Number(shape.w || 2));
+  const rows = Math.max(1, Number(shape.h || 2));
+  const occupied = new Set();
+  if (shape.shape !== "circle") {
+    for (let y = 0; y < rows; y += 1) {
+      for (let x = 0; x < cols; x += 1) occupied.add(`${x},${y}`);
+    }
+    return { cols, rows, occupied };
+  }
+
+  const centerX = cols / 2;
+  const centerY = rows / 2;
+  const radiusX = Math.max(0.5, cols / 2 - 0.15);
+  const radiusY = Math.max(0.5, rows / 2 - 0.15);
+  for (let y = 0; y < rows; y += 1) {
+    for (let x = 0; x < cols; x += 1) {
+      const dx = (x + 0.5 - centerX) / radiusX;
+      const dy = (y + 0.5 - centerY) / radiusY;
+      if (dx * dx + dy * dy <= 1) occupied.add(`${x},${y}`);
+    }
+  }
+  return { cols, rows, occupied };
+}
+
+function spriteCellIndex(cellNumber) {
+  return Math.max(1, Math.min(24, Number(cellNumber || 1))) - 1;
+}
+
+function shapeTileIndex(shape, mask, x, y) {
+  if (mask.cols === 1 && mask.rows === 1) return spriteCellIndex(1);
+
+  if (mask.rows === 1) {
+    if (x === 0) return spriteCellIndex(2);
+    if (x === mask.cols - 1) return spriteCellIndex(4);
+    return spriteCellIndex(3);
+  }
+
+  if (mask.cols === 1) {
+    if (y === 0) return spriteCellIndex(7);
+    if (y === mask.rows - 1) return spriteCellIndex(19);
+    return spriteCellIndex(13);
+  }
+
+  if (shape.shape === "circle") {
+    const has = (cx, cy) => mask.occupied.has(`${cx},${cy}`);
+    const hasLeft = has(x - 1, y);
+    const hasRight = has(x + 1, y);
+    const hasTop = has(x, y - 1);
+    const hasBottom = has(x, y + 1);
+    if (mask.cols === 3 && mask.rows === 3 && mask.occupied.size === 5) {
+      if (x === 1 && y === 0) return spriteCellIndex(7);
+      if (x === 0 && y === 1) return spriteCellIndex(2);
+      if (x === 2 && y === 1) return spriteCellIndex(4);
+      if (x === 1 && y === 2) return spriteCellIndex(19);
+      return spriteCellIndex(15);
+    }
+    if (!hasTop && !hasBottom && !hasLeft) return spriteCellIndex(2);
+    if (!hasTop && !hasBottom && !hasRight) return spriteCellIndex(4);
+    if (!hasLeft && !hasRight && !hasTop) return spriteCellIndex(7);
+    if (!hasLeft && !hasRight && !hasBottom) return spriteCellIndex(19);
+    if (!hasLeft && !hasTop) return spriteCellIndex(8);
+    if (!hasRight && !hasTop) return spriteCellIndex(10);
+    if (!hasLeft && !hasBottom) return spriteCellIndex(20);
+    if (!hasRight && !hasBottom) return spriteCellIndex(22);
+    if (!hasTop) return spriteCellIndex(9);
+    if (!hasBottom) return spriteCellIndex(21);
+    if (!hasLeft) return spriteCellIndex(14);
+    if (!hasRight) return spriteCellIndex(16);
+    return spriteCellIndex(15);
+  }
+
+  if (y === 0) {
+    if (x === 0) return spriteCellIndex(8);
+    if (x === mask.cols - 1) return spriteCellIndex(10);
+    return spriteCellIndex(9);
+  }
+
+  if (y === mask.rows - 1) {
+    if (x === 0) return spriteCellIndex(20);
+    if (x === mask.cols - 1) return spriteCellIndex(22);
+    return spriteCellIndex(21);
+  }
+
+  if (x === 0) return spriteCellIndex(14);
+  if (x === mask.cols - 1) return spriteCellIndex(16);
+  return spriteCellIndex(15);
+}
+
+function renderShape(shape) {
+  const selectedClass = shape.id === selectedId ? " selected" : "";
+  const texture = shapeTexture(shape.texture);
+  if (texture || shape.shape === "circle") {
+    const mask = shapeMask(shape);
+    const cells = [];
+    for (let y = 0; y < mask.rows; y += 1) {
+      for (let x = 0; x < mask.cols; x += 1) {
+        if (!mask.occupied.has(`${x},${y}`)) {
+          cells.push("<span></span>");
+          continue;
+        }
+        if (texture) {
+          const tile = tilePosition(shapeTileIndex(shape, mask, x, y));
+          cells.push(`<span class="shape-cell texture-cell" style="--texture-url:url('${texture.url}');--tile-x:${tile.x};--tile-y:${tile.y};"></span>`);
+        } else {
+          cells.push(`<span class="shape-cell"></span>`);
+        }
+      }
+    }
+    return `
+      <div class="map-shape shape-grid${selectedClass}" data-map-id="${escapeHtml(shape.id)}" style="--x:${shape.x};--y:${shape.y};--w:${mask.cols};--h:${mask.rows};--shape-cols:${mask.cols};--shape-rows:${mask.rows};--color:${escapeHtml(shape.color || "#f0d58c")};">
+        ${cells.join("")}
+      </div>
+    `;
+  }
+  return `<div class="map-shape ${shape.shape || "rect"}${selectedClass}" data-map-id="${escapeHtml(shape.id)}" style="--x:${shape.x};--y:${shape.y};--w:${shape.w || 2};--h:${shape.h || 2};--color:${escapeHtml(shape.color || "#f0d58c")};"></div>`;
+}
+
+function renderSelectedPanel() {
+  const item = selectedObject();
+  if (!item) {
+    el("selectedPanel").innerHTML = "Select a token or shape.";
+    return;
+  }
+  const enemyFields = item.kind === "enemy" && isGm
+    ? `<div class="row g-2 mt-1"><div class="col"><label>HP</label><input data-selected-field="hp" class="form-control form-control-sm" value="${escapeHtml(item.hp || "")}"></div><div class="col"><label>AC</label><input data-selected-field="ac" class="form-control form-control-sm" value="${escapeHtml(item.ac || "")}"></div></div>`
+    : "";
+  const compactSheet = item.kind ? renderCompactCharacterSheet(item) : "";
+  const textureFields = item.shape
+    ? `<div class="mt-2">
+        <label>Texture</label>
+        <div class="shape-texture-picker">
+          <button class="shape-texture-option${!item.texture ? " active" : ""}" type="button" data-shape-texture="">None</button>
+          ${SHAPE_TEXTURES.map(texture => `
+            <button class="shape-texture-option${item.texture === texture.id ? " active" : ""}" type="button" data-shape-texture="${escapeHtml(texture.id)}" title="${escapeHtml(texture.name)}">
+              <span class="shape-texture-icon" style="background-image:url('${texture.url}')"></span>
+            </button>
+          `).join("")}
+        </div>
+      </div>`
+    : "";
+  el("selectedPanel").innerHTML = `
+    <label>Name</label>
+    <input data-selected-field="name" class="form-control form-control-sm" value="${escapeHtml(item.name || "")}">
+    ${compactSheet}
+    <div class="accordion selected-collapse mt-2" id="selectedDetailsAccordion">
+      <div class="accordion-item bg-dark border-secondary">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#selectedDetailsCollapse" aria-expanded="false" aria-controls="selectedDetailsCollapse">
+            Position & Style
+          </button>
+        </h2>
+        <div id="selectedDetailsCollapse" class="accordion-collapse collapse" data-bs-parent="#selectedDetailsAccordion">
+          <div class="accordion-body">
+            <div class="row g-2">
+              <div class="col-6"><label>X</label><input data-selected-field="x" class="form-control form-control-sm" type="number" value="${item.x || 0}"></div>
+              <div class="col-6"><label>Y</label><input data-selected-field="y" class="form-control form-control-sm" type="number" value="${item.y || 0}"></div>
+              <div class="col-6"><label>W</label><input data-selected-field="w" class="form-control form-control-sm" type="number" min="1" value="${item.w || 1}"></div>
+              <div class="col-6"><label>H</label><input data-selected-field="h" class="form-control form-control-sm" type="number" min="1" value="${item.h || 1}"></div>
+              <div class="col-12"><label>Color</label><input data-selected-field="color" class="form-control form-control-sm" type="color" value="${escapeHtml(item.color || "#8fd19e")}"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    ${textureFields}
+    ${enemyFields}
+  `;
+  el("selectedPanel").querySelectorAll("[data-selected-field]").forEach(input => {
+    input.addEventListener("input", () => {
+      const value = ["x", "y", "w", "h"].includes(input.dataset.selectedField)
+        ? Number(input.value || 0)
+        : input.value;
+      item[input.dataset.selectedField] = value;
+      renderMap();
+      renderInitiative();
+      queueSave();
+    });
+  });
+  el("selectedPanel").querySelectorAll("[data-shape-texture]").forEach(button => {
+    button.addEventListener("click", () => {
+      item.texture = button.dataset.shapeTexture || "";
+      renderAll();
+    });
+  });
+}
+
+function renderInitiative() {
+  const list = el("initiativeList");
+  if (!state.initiative.length) {
+    list.innerHTML = `<div class="small text-secondary">No initiative entries.</div>`;
+    return;
+  }
+  list.innerHTML = state.initiative.map((entry, index) => {
+    const token = state.tokens.find(item => item.id === entry.tokenId);
+    if (!token) return "";
+    const active = index === state.activeTurn ? " active" : "";
+    const stats = token.kind === "enemy" && isGm ? `<div class="enemy-stats">HP ${escapeHtml(token.hp || "?")} | AC ${escapeHtml(token.ac || "?")}</div>` : "";
+    return `
+      <div class="initiative-row${active}">
+        <div class="d-flex justify-content-between gap-2">
+          <strong>${escapeHtml(token.name || "Unnamed")}</strong>
+          <input class="form-control form-control-sm" data-init-score="${escapeHtml(entry.tokenId)}" type="number" value="${entry.score || 0}" style="width:72px;">
+        </div>
+        ${stats}
+      </div>
+    `;
+  }).join("");
+  list.querySelectorAll("[data-init-score]").forEach(input => {
+    input.addEventListener("change", () => {
+      const row = state.initiative.find(entry => entry.tokenId === input.dataset.initScore);
+      if (row) row.score = Number(input.value || 0);
+      queueSave();
+    });
+  });
+}
+
+function renderTimeline() {
+  el("timelineList").innerHTML = state.timeline.length
+    ? state.timeline.slice().reverse().map(row => `<div class="timeline-row"><div>${escapeHtml(row.text)}</div><div class="small text-secondary">${escapeHtml(row.time || "")}</div></div>`).join("")
+    : `<div class="small text-secondary">No events yet.</div>`;
+}
+
+function renderAll(save = true) {
+  renderMap();
+  renderSelectedPanel();
+  renderInitiative();
+  renderTimeline();
+  if (save) queueSave();
+}
+
+function applyRemoteMapState(remoteState) {
+  if (dragState) {
+    pendingRemoteState = remoteState;
+    el("mapStatus").textContent = "Remote update pending";
+    return;
+  }
+  clearTimeout(saveTimer);
+  state = normalizeState(remoteState);
+  if (selectedId && !selectedObject()) selectedId = "";
+  if (contextMenuTokenId && !state.tokens.some(token => token.id === contextMenuTokenId)) hideContextMenu();
+  applySettingsToInputs();
+  renderAll(false);
+  if (selectedId) showSelectedPanel();
+  el("mapStatus").textContent = "Updated";
+}
+
+function flushPendingRemoteState() {
+  if (!pendingRemoteState) return;
+  const localDraggedId = dragState?.id;
+  const localDraggedItem = [...state.tokens, ...state.shapes].find(entry => entry.id === localDraggedId);
+  const remoteState = normalizeState(pendingRemoteState);
+  pendingRemoteState = null;
+
+  if (!localDraggedId || !localDraggedItem) {
+    state = remoteState;
+    if (selectedId && !selectedObject()) selectedId = "";
+    applySettingsToInputs();
+    renderAll(false);
+    if (selectedId) showSelectedPanel();
+    return;
+  }
+
+  state = remoteState;
+  const collection = localDraggedItem.kind ? state.tokens : state.shapes;
+  const existingIndex = collection.findIndex(entry => entry.id === localDraggedId);
+  if (existingIndex >= 0) {
+    collection[existingIndex] = localDraggedItem;
+  } else {
+    collection.push(localDraggedItem);
+  }
+  if (selectedId && !selectedObject()) selectedId = "";
+  applySettingsToInputs();
+  renderAll(false);
+  if (selectedId) showSelectedPanel();
+}
+
+function queueSave() {
+  clearTimeout(saveTimer);
+  el("mapStatus").textContent = "Saving...";
+  saveTimer = setTimeout(async () => {
+    await PFApp.saveMapState(state, mapContextKey);
+    el("mapStatus").textContent = "Saved";
+  }, 500);
+}
+
+function startDrag(event) {
+  if (event.button !== 0) return;
+  event.preventDefault();
+  event.stopPropagation();
+  hideContextMenu();
+  suppressStageClick = true;
+  const id = event.currentTarget.dataset.mapId;
+  const item = [...state.tokens, ...state.shapes].find(entry => entry.id === id);
+  if (!item) return;
+  selectedId = id;
+  dragState = { id, startX: event.clientX, startY: event.clientY, x: item.x || 0, y: item.y || 0 };
+  event.currentTarget.setPointerCapture(event.pointerId);
+  window.addEventListener("pointermove", moveDrag);
+  window.addEventListener("pointerup", endDrag, { once: true });
+  renderAll(false);
+  showSelectedPanel();
+}
+
+function moveDrag(event) {
+  if (!dragState) return;
+  const item = [...state.tokens, ...state.shapes].find(entry => entry.id === dragState.id);
+  if (!item) return;
+  const cell = Number(localGridSize || 48);
+  const dx = Math.round((event.clientX - dragState.startX) / cell);
+  const dy = Math.round((event.clientY - dragState.startY) / cell);
+  item.x = clamp(dragState.x + dx, 0, state.settings.cols - (item.w || 1));
+  item.y = clamp(dragState.y + dy, 0, state.settings.rows - (item.h || 1));
+  renderAll(false);
+}
+
+function endDrag() {
+  flushPendingRemoteState();
+  dragState = null;
+  window.removeEventListener("pointermove", moveDrag);
+  renderAll();
+}
+
+function addToken(kind) {
+  if (kind === "enemy" && !isGm) return;
+  const selectedCharacterId = PFApp.getSelectedCharacterId(mapContextKey);
+  const character = mapCharacters.find(item => item.id === selectedCharacterId) || mapCharacters[0];
+  if (kind === "character" && character?.id) {
+    const existingToken = state.tokens.find(token => token.kind === "character" && token.characterId === character.id);
+    if (existingToken) {
+      selectedId = existingToken.id;
+      renderAll(false);
+      showSelectedPanel();
+      return;
+    }
+  }
+  const name = kind === "enemy" ? "Enemy" : character?.name || "Character";
+  const token = {
+    id: uid("token"),
+    kind,
+    characterId: kind === "character" ? character?.id || "" : "",
+    ownerId: kind === "character" ? character?.userId || currentUserId : "",
+    name,
+    x: 1,
+    y: 1,
+    w: 1,
+    h: 1,
+    hp: kind === "enemy" ? "?" : "",
+    ac: kind === "enemy" ? "?" : "",
+    color: kind === "enemy" ? "#b02a37" : "#8fd19e"
+  };
+  state.tokens.push(token);
+  selectedId = token.id;
+  addTimeline(`${name} entered the map.`);
+  renderAll();
+}
+
+function addShape(shape) {
+  const item = { id: uid("shape"), shape, ownerId: currentUserId, name: shape === "circle" ? "Circle" : "Rectangle", x: 3, y: 3, w: 3, h: 3, color: "#f0d58c" };
+  state.shapes.push(item);
+  selectedId = item.id;
+  renderAll();
+}
+
+function deleteSelected() {
+  if (!selectedId) return;
+  const item = selectedObject();
+  if (!canManageMapItem(item)) return;
+  removeMapItem(selectedId);
+}
+
+function removeMapItem(itemId) {
+  const item = [...state.tokens, ...state.shapes].find(entry => entry.id === itemId);
+  if (!item) return;
+  const name = item.name || "Token";
+  state.tokens = state.tokens.filter(token => token.id !== itemId);
+  state.shapes = state.shapes.filter(shape => shape.id !== itemId);
+  state.initiative = state.initiative.filter(entry => entry.tokenId !== itemId);
+  selectedId = "";
+  contextMenuTokenId = "";
+  state.activeTurn = clamp(state.activeTurn, 0, Math.max(0, state.initiative.length - 1));
+  if (item.kind === "character") addTimeline(`${name} left the map.`);
+  renderAll();
+}
+
+function removeContextMenuToken() {
+  const item = [...state.tokens, ...state.shapes].find(entry => entry.id === contextMenuTokenId);
+  if (!item || !canManageMapItem(item)) return;
+  hideContextMenu();
+  selectedId = item.id;
+  removeMapItem(item.id);
+}
+
+function addSelectedToInitiative() {
+  const token = state.tokens.find(item => item.id === selectedId);
+  if (!token || state.initiative.some(entry => entry.tokenId === token.id)) return;
+  state.initiative.push({ tokenId: token.id, score: 0 });
+  renderAll();
+}
+
+function nextTurn() {
+  if (!state.initiative.length) return;
+  state.activeTurn = (state.activeTurn + 1) % state.initiative.length;
+  const token = state.tokens.find(item => item.id === state.initiative[state.activeTurn]?.tokenId);
+  if (token) addTimeline(`${token.name || "Token"} begins their turn.`);
+  renderAll();
+}
+
+function addTimeline(text) {
+  state.timeline.push({ id: uid("event"), text, time: new Date().toLocaleString() });
+  state.timeline = state.timeline.slice(-80);
+}
+
+function updateAuraRadiusText() {
+  const cells = Math.max(1, Number(el("auraRadiusCells").value || 1));
+  el("auraRadiusText").textContent = `${cells} cell${cells === 1 ? "" : "s"} / ${cells * 5} ft`;
+}
+
+function openAuraOptions() {
+  const token = tokenById(contextMenuTokenId);
+  if (!token || !canManageAura(token)) return;
+  hideContextMenu();
+  auraEditingTokenId = token.id;
+  const aura = token.aura || {};
+  el("auraVisible").checked = Boolean(aura.visible);
+  el("auraRadiusCells").value = Math.max(1, Number(aura.radius || 1));
+  el("auraColor").value = aura.color || (token.kind === "enemy" ? "#b02a37" : "#8fd19e");
+  updateAuraRadiusText();
+  auraModal.show();
+}
+
+function saveAuraOptions(event) {
+  event.preventDefault();
+  const token = tokenById(auraEditingTokenId);
+  if (!token || !canManageAura(token)) return;
+  token.aura = {
+    visible: el("auraVisible").checked,
+    radius: Math.max(1, Number(el("auraRadiusCells").value || 1)),
+    color: el("auraColor").value || "#8fd19e"
+  };
+  auraModal.hide();
+  auraEditingTokenId = "";
+  renderAll();
+}
+
+async function loadMap(contextKey) {
+  if (!contextKey || contextKey === "general") return;
+  unsubscribeMapRealtime();
+  mapContextKey = contextKey;
+  mapCharacters = await PFApp.loadContextCharacters(mapContextKey);
+  await hydrateMapCharacterSheets();
+  isGm = await determineGm(mapContextKey);
+  el("addEnemyToken").classList.toggle("d-none", !isGm);
+  el("gmHint").textContent = isGm ? "GM tools enabled" : "Player view";
+  state = normalizeState(await PFApp.loadMapState(mapContextKey));
+  applySettingsToInputs();
+  selectedId = "";
+  renderAll(false);
+  subscribeMapRealtime();
+}
+
+function subscribeMapRealtime() {
+  if (!PFApp.client || !mapContextKey) return;
+  mapRealtimeChannel = PFApp.client
+    .channel(`map_state:${mapContextKey}`)
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "map_state", filter: `context_key=eq.${mapContextKey}` },
+      payload => {
+        const row = payload.new;
+        if (!row?.state || row.updated_by === currentUserId) return;
+        applyRemoteMapState(row.state);
+      }
+    )
+    .subscribe(status => {
+      if (status === "SUBSCRIBED") el("mapStatus").textContent = "Live";
+    });
+}
+
+function unsubscribeMapRealtime() {
+  if (mapRealtimeChannel && PFApp.client) {
+    PFApp.client.removeChannel(mapRealtimeChannel);
+  }
+  mapRealtimeChannel = null;
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+  const user = await PFApp.requireAuth();
+  if (!user) return;
+  currentUserId = user.id;
+
+  el("gridSize").addEventListener("change", () => {
+    localGridSize = clamp(Number(el("gridSize").value || 48), 24, 96);
+    sessionStorage.setItem("pf_map_grid_size", String(localGridSize));
+    applySettingsToInputs();
+    renderAll(false);
+  });
+
+  ["mapCols", "mapRows", "backgroundUrl", "backgroundFit"].forEach(id => {
+    el(id).addEventListener("change", () => {
+      state.settings.cols = clamp(Number(el("mapCols").value || 30), 8, 80);
+      state.settings.rows = clamp(Number(el("mapRows").value || 20), 8, 80);
+      state.settings.backgroundUrl = el("backgroundUrl").value.trim();
+      state.settings.backgroundFit = el("backgroundFit").value;
+      renderAll();
+    });
+  });
+
+  el("addCharacterToken").addEventListener("click", () => addToken("character"));
+  el("addEnemyToken").addEventListener("click", () => addToken("enemy"));
+  el("addRectShape").addEventListener("click", () => addShape("rect"));
+  el("addCircleShape").addEventListener("click", () => addShape("circle"));
+  el("deleteSelected").addEventListener("click", deleteSelected);
+  el("openAuraOptions").addEventListener("click", openAuraOptions);
+  el("removeTokenFromMap").addEventListener("click", removeContextMenuToken);
+  auraModal = new bootstrap.Modal(el("auraOptionsModal"));
+  el("auraRadiusCells").addEventListener("input", updateAuraRadiusText);
+  el("auraOptionsForm").addEventListener("submit", saveAuraOptions);
+  el("addSelectedInitiative").addEventListener("click", addSelectedToInitiative);
+  el("sortInitiative").addEventListener("click", () => {
+    state.initiative.sort((a, b) => Number(b.score || 0) - Number(a.score || 0));
+    state.activeTurn = 0;
+    renderAll();
+  });
+  el("nextTurn").addEventListener("click", nextTurn);
+  el("timelineForm").addEventListener("submit", event => {
+    event.preventDefault();
+    const text = el("timelineText").value.trim();
+    if (!text) return;
+    addTimeline(text);
+    el("timelineText").value = "";
+    renderAll();
+  });
+  document.addEventListener("click", event => {
+    if (!event.target.closest("#mapContextMenu")) hideContextMenu();
+  });
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape") hideContextMenu();
+  });
+  window.addEventListener("resize", hideContextMenu);
+  window.addEventListener("scroll", hideContextMenu, true);
+
+  const requiredContext = await PFApp.requireGameContext();
+  if (!requiredContext) return;
+  await loadMap(requiredContext);
+  window.addEventListener("pf-context-change", event => {
+    if (event.detail.contextKey && event.detail.contextKey !== "general") loadMap(event.detail.contextKey);
+  });
+});
+</script>
+</body>
+</html>

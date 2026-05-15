@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Bag of Holding</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    body { background-color: #121212; color: white; }
+    .loot-section { background: #1e1e1e; border: 1px solid #333; border-radius: 8px; padding: 12px; }
+    .loot-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr)); gap: 12px; }
+    .loot-group { background: #181818; border: 1px solid #3a3a3a; border-radius: 8px; min-height: 180px; }
+    .loot-group-header { border-bottom: 1px solid #333; padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .loot-group-body { padding: 10px; display: grid; gap: 10px; }
+    .loot-card { background: #242424; border: 1px solid #444; border-radius: 8px; padding: 10px; cursor: pointer; min-width: 0; max-width: 100%; overflow: hidden; }
+    .loot-card:hover { border-color: #666; }
+    .loot-card-head { display: flex; gap: 8px; align-items: flex-start; min-width: 0; }
+    .loot-icon { width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; background: #303030; border: 1px solid #555; color: #8fd19e; flex: 0 0 auto; }
+    .loot-title { min-width: 0; }
+    .loot-name { font-weight: 700; overflow-wrap: anywhere; }
+    .loot-meta { color: #aaa; font-size: 12px; }
+    .loot-count { margin-left: auto; background: #343a40; border: 1px solid #555; color: #f8f9fa; border-radius: 999px; padding: 2px 8px; font-size: 12px; font-weight: 700; line-height: 1.4; flex: 0 0 auto; }
+    .loot-count-actions { margin-left: auto; display: inline-flex; align-items: center; gap: 4px; flex: 0 0 auto; max-width: max-content; }
+    .loot-icon-btn { width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; padding: 0; }
+    .loot-description { color: #ddd; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .loot-attributes { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .loot-attribute { background: #1c1c1c; border: 1px solid #444; border-radius: 6px; padding: 4px 7px; font-size: 12px; color: #eee; }
+    .loot-attribute strong { color: #aaa; font-weight: 600; margin-right: 4px; }
+    .loot-effects-display { display: grid; gap: 4px; margin-top: 8px; }
+    .loot-effect-display { background: rgba(143, 209, 158, .08); border-left: 3px solid #8fd19e; border-radius: 4px; padding: 4px 7px; font-size: 12px; overflow-wrap: anywhere; }
+    .bag-subtitle { color: #aaa; font-size: 14px; }
+    .bag-header { display: grid; grid-template-columns: minmax(180px, 1fr) minmax(240px, 420px) minmax(120px, 1fr); gap: 12px; align-items: end; }
+    .bag-search { width: 100%; }
+    .bag-action { justify-self: end; }
+    @media (max-width: 760px) {
+      .bag-header { grid-template-columns: 1fr; align-items: stretch; }
+      .bag-action { justify-self: stretch; }
+      .bag-action .btn { width: 100%; }
+    }
+    .empty-state { color: #777; border: 1px dashed #444; border-radius: 8px; padding: 16px; text-align: center; }
+    label { font-size: 12px; color: #aaa; margin-bottom: 2px; }
+    input, textarea, select { background-color: #2b2b2b !important; color: white !important; border-color: #555 !important; }
+    select { min-width: 0; max-width: 100%; }
+    textarea { min-height: 90px; }
+    .modal-content { background: #1e1e1e; color: white; border: 1px solid #444; }
+    .btn-close { filter: invert(1); }
+    .form-text { color: #888; }
+    .loot-detail-grid, .loot-effect-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .loot-effect-row { grid-template-columns: 1.4fr .6fr 1fr .7fr auto; background: #242424; border: 1px solid #444; border-radius: 8px; padding: 8px; align-items: end; }
+    .loot-condition-inline { display: grid; grid-template-columns: auto minmax(140px, 1fr); gap: 8px; align-items: end; grid-column: 1 / -2; }
+    .scale-options { display: grid; grid-template-columns: repeat(3, minmax(44px, 1fr)); gap: 6px; max-width: 170px; }
+    .scale-options .btn { min-width: 0; }
+    @media (max-width: 760px) {
+      .loot-detail-grid, .loot-effect-row, .loot-condition-inline { grid-template-columns: 1fr; }
+      .loot-condition-inline { grid-column: auto; }
+    }
+  </style>
+</head>
+<body>
+<div id="appNavbar"></div>
+
+<main class="container-fluid mt-3">
+  <div class="bag-header mb-3">
+    <div>
+      <h3 class="mb-0">Bag of Holding</h3>
+      <div class="bag-subtitle">Campaign's Inventory</div>
+      <div id="contextHint" class="small text-secondary"></div>
+    </div>
+    <div class="bag-search">
+      <label for="lootSearch">Search</label>
+      <input id="lootSearch" class="form-control form-control-sm" placeholder="Name or description">
+    </div>
+    <div class="bag-action">
+      <button class="btn btn-primary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#lootModal">
+        <i class="bi bi-plus-lg"></i> Add Item
+      </button>
+    </div>
+  </div>
+
+  <div id="lootStatus" class="alert d-none py-2"></div>
+
+  <section class="loot-section">
+    <div id="lootGrid" class="loot-grid"></div>
+  </section>
+</main>
+
+<div class="modal fade" id="lootModal" tabindex="-1" aria-labelledby="lootModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <form class="modal-content" id="lootForm">
+      <div class="modal-header">
+        <h5 class="modal-title" id="lootModalLabel">Add Item</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-2">
+          <label for="lootName">Name</label>
+          <input id="lootName" class="form-control form-control-sm" required>
+        </div>
+        <div class="mb-2">
+          <label for="lootDescription">Description</label>
+          <textarea id="lootDescription" class="form-control form-control-sm"></textarea>
+        </div>
+        <div class="row g-2">
+          <div class="col-6">
+            <label for="lootCount">Count</label>
+            <input id="lootCount" class="form-control form-control-sm" type="number" min="1" value="1" required>
+          </div>
+          <div class="col-6">
+            <label for="lootType">Type</label>
+            <select id="lootType" class="form-select form-select-sm">
+              <option>Weapon</option>
+              <option>Armor</option>
+              <option>Shield</option>
+              <option selected>Item</option>
+            </select>
+          </div>
+        </div>
+        <div id="lootWeaponFields" class="loot-detail-grid mt-2 d-none">
+          <div>
+            <label for="lootWeaponType">Weapon Type</label>
+            <select id="lootWeaponType" class="form-select form-select-sm"></select>
+          </div>
+          <div>
+            <label>Attack Scales With</label>
+            <input id="lootAttackScale" type="hidden" value="STR">
+            <div class="scale-options" id="lootAttackScaleOptions">
+              <button class="btn btn-primary btn-sm" type="button" data-attack-scale-ability="STR">STR</button>
+              <button class="btn btn-outline-light btn-sm" type="button" data-attack-scale-ability="DEX">DEX</button>
+              <button class="btn btn-outline-light btn-sm" type="button" data-attack-scale-ability="CON">CON</button>
+              <button class="btn btn-outline-light btn-sm" type="button" data-attack-scale-ability="INT">INT</button>
+              <button class="btn btn-outline-light btn-sm" type="button" data-attack-scale-ability="WIS">WIS</button>
+              <button class="btn btn-outline-light btn-sm" type="button" data-attack-scale-ability="CHA">CHA</button>
+            </div>
+          </div>
+          <div><label for="lootDamageDice">Damage Dice</label><input id="lootDamageDice" class="form-control form-control-sm" placeholder="1d8"></div>
+          <div><label for="lootWeaponCritical">Critical</label><input id="lootWeaponCritical" class="form-control form-control-sm" placeholder="20/x2"></div>
+          <div>
+            <label>Damage Scales With</label>
+            <input id="lootDamageScale" type="hidden" value="STR">
+            <div class="scale-options" id="lootDamageScaleOptions">
+              <button class="btn btn-primary btn-sm" type="button" data-scale-ability="STR">STR</button>
+              <button class="btn btn-outline-light btn-sm" type="button" data-scale-ability="DEX">DEX</button>
+              <button class="btn btn-outline-light btn-sm" type="button" data-scale-ability="CON">CON</button>
+              <button class="btn btn-outline-light btn-sm" type="button" data-scale-ability="INT">INT</button>
+              <button class="btn btn-outline-light btn-sm" type="button" data-scale-ability="WIS">WIS</button>
+              <button class="btn btn-outline-light btn-sm" type="button" data-scale-ability="CHA">CHA</button>
+            </div>
+          </div>
+          <div><label for="lootWeaponEnhancement">Enhancement</label><input id="lootWeaponEnhancement" class="form-control form-control-sm" type="number" min="0" max="5" value="0"></div>
+          <div>
+            <label for="lootWeaponEnchantment">Enchantment</label>
+            <select id="lootWeaponEnchantment" class="form-select form-select-sm"></select>
+          </div>
+          <div class="grid-column-full"><label for="lootWeaponDetails">Details</label><input id="lootWeaponDetails" class="form-control form-control-sm"></div>
+        </div>
+        <div id="lootArmorFields" class="loot-detail-grid mt-2 d-none">
+          <div><label for="lootArmorBonus">Bonus</label><input id="lootArmorBonus" class="form-control form-control-sm" type="number" value="0"></div>
+          <div><label for="lootArmorEnhancement">Enhancement</label><input id="lootArmorEnhancement" class="form-control form-control-sm" type="number" min="0" max="5" value="0"></div>
+          <div>
+            <label for="lootArmorEnchantment">Enchantment</label>
+            <select id="lootArmorEnchantment" class="form-select form-select-sm"></select>
+          </div>
+        </div>
+        <div class="mt-3">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <div class="small text-secondary">Item Effects</div>
+            <button id="addLootEffect" class="btn btn-outline-info btn-sm" type="button">Create Effect</button>
+          </div>
+          <div id="lootEffectRows" class="vstack gap-2"></div>
+        </div>
+        <div class="mt-2">
+          <label for="lootAssignedTo">Give to</label>
+          <select id="lootAssignedTo" class="form-select form-select-sm"></select>
+          <div class="form-text">Leave empty to keep it unassigned.</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-light btn-sm" data-bs-dismiss="modal">Cancel</button>
+        <button id="lootSubmitButton" type="submit" class="btn btn-primary btn-sm">Add Item</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal fade" id="moveLootModal" tabindex="-1" aria-labelledby="moveLootModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <form class="modal-content" id="moveLootForm">
+      <div class="modal-header">
+        <h5 class="modal-title" id="moveLootModalLabel">Move Item</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="moveLootSummary" class="small text-secondary mb-2"></div>
+        <label for="moveLootCount">How many?</label>
+        <input id="moveLootCount" class="form-control form-control-sm" type="number" min="1" value="1" required>
+        <div id="moveLootMax" class="form-text"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-light btn-sm" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary btn-sm">Move</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal fade" id="deleteLootModal" tabindex="-1" aria-labelledby="deleteLootModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <form class="modal-content" id="deleteLootForm">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteLootModalLabel">Delete Item</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="deleteLootSummary" class="small text-secondary mb-2"></div>
+        <label for="deleteLootCount">How many?</label>
+        <input id="deleteLootCount" class="form-control form-control-sm" type="number" min="1" value="1" required>
+        <div id="deleteLootMax" class="form-text"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-light btn-sm" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="navbar.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="app-supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+let bagContextKey = "general";
+let bagCharacters = [];
+let bagLoot = [];
+let lootModal;
+let moveLootModal;
+let deleteLootModal;
+let pendingLootMove = null;
+let pendingLootDelete = null;
+let lootSearchTerm = "";
+let editingLootId = null;
+
+const typeIcons = {
+  Weapon: "bi-crosshair",
+  Armor: "bi-shield-fill",
+  Shield: "bi-shield",
+  Item: "bi-gem"
+};
+const EFFECT_STATS = ["strength","dexterity","constitution","intelligence","wisdom","charisma","attack","melee attack","ranged attack","damage","melee damage","ranged damage","ac","touch ac","flat-footed ac","natural armor","deflection","fortitude","reflex","will","initiative","cmb","cmd","hit points","spell resistance"];
+const SKILL_STATS = ["skill checks","strength skill checks","dexterity skill checks","constitution skill checks","intelligence skill checks","wisdom skill checks","charisma skill checks"];
+const PF_SKILLS = ["Acrobatics","Appraise","Bluff","Climb","Diplomacy","Disable Device","Disguise","Escape Artist","Fly","Heal","Intimidate","Knowledge (arcana)","Knowledge (dungeoneering)","Knowledge (engineering)","Knowledge (geography)","Knowledge (history)","Knowledge (local)","Knowledge (nature)","Knowledge (nobility)","Knowledge (planes)","Knowledge (religion)","Linguistics","Perception","Ride","Sense Motive","Sleight of Hand","Spellcraft","Stealth","Survival","Swim","Use Magic Device"];
+const SPECIFIC_SKILL_STATS = PF_SKILLS.map(skill => `skill:${skill.replace(/[^a-z0-9]/gi, "").toLowerCase()}`);
+const BONUS_TYPES = ["untyped","alchemical","condition","penalty","armor","circumstance","competence","deflection","dodge","enhancement","insight","luck","morale","natural armor","profane","resistance","sacred","shield","size"];
+const WEAPON_TYPES = ["Melee Weapon (Light)", "Melee Weapon (One-Handed)", "Melee Weapon (Two-Handed)", "Ranged Weapon", "Firearm (One-Handed)", "Firearm (Two-Handed)", "Natural"];
+const WEAPON_ENCHANTMENTS = ["", "Adaptive", "Allying", "Anarchic", "Anchoring", "Axiomatic", "Bane", "Brilliant Energy", "Called", "Conductive", "Corrosive", "Corrosive Burst", "Cruel", "Cunning", "Dancing", "Defending", "Disruption", "Distance", "Flaming", "Flaming Burst", "Frost", "Furious", "Ghost Touch", "Holy", "Icy Burst", "Impact", "Keen", "Merciful", "Returning", "Seeking", "Shock", "Shocking Burst", "Speed", "Spell Storing", "Throwing", "Thundering", "Unholy", "Vicious", "Vorpal", "Wounding"];
+const ARMOR_ENCHANTMENTS = ["", "Balanced", "Benevolent", "Bitter", "Bolstering", "Brawling", "Champion", "Dastard", "Deathless", "Defiant", "Determination", "Energy Resistance", "Energy Resistance (Improved)", "Energy Resistance (Greater)", "Etherealness", "Fortification (Light)", "Fortification (Moderate)", "Fortification (Heavy)", "Ghost Touch", "Glamered", "Invulnerability", "Shadow", "Shadow (Improved)", "Shadow (Greater)", "Slick", "Slick (Improved)", "Slick (Greater)", "Spell Resistance (13)", "Spell Resistance (15)", "Spell Resistance (17)", "Spell Resistance (19)", "Wild"];
+const SHIELD_ENCHANTMENTS = ["", "Animated", "Arrow Catching", "Arrow Deflection", "Bashing", "Blinding", "Clangorous", "Defiant", "Determination", "Energy Resistance", "Energy Resistance (Improved)", "Energy Resistance (Greater)", "Fortification (Light)", "Fortification (Moderate)", "Fortification (Heavy)", "Ghost Touch", "Impervious", "Merging", "Mirrored", "Poison-Resistant", "Rallying", "Ramming", "Reflecting", "Spell Resistance (13)", "Spell Resistance (15)", "Spell Resistance (17)", "Spell Resistance (19)", "Wild"];
+
+function el(id) {
+  return document.getElementById(id);
+}
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function optionList(options, selected = "") {
+  return options.map(value => `<option value="${escapeHtml(value)}" ${value === selected ? "selected" : ""}>${value || "None"}</option>`).join("");
+}
+
+function armorEnchantmentOptions(selected = "") {
+  return `
+    <option value="" ${selected === "" ? "selected" : ""}>None</option>
+    <optgroup label="Armor">${optionList(ARMOR_ENCHANTMENTS.slice(1), selected)}</optgroup>
+    <optgroup label="Shield">${optionList(SHIELD_ENCHANTMENTS.slice(1), selected)}</optgroup>
+  `;
+}
+
+function titleCaseStat(value) {
+  const key = String(value || "").toLowerCase().trim();
+  if (key.startsWith("skill:")) {
+    const skill = PF_SKILLS.find(entry => `skill:${entry.replace(/[^a-z0-9]/gi, "").toLowerCase()}` === key);
+    return `Skill: ${skill || key.slice(6)}`;
+  }
+  return key.split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
+}
+
+function effectStatOptions(selected = "") {
+  const option = (value, label = titleCaseStat(value)) => `<option value="${escapeHtml(value)}" ${selected === value ? "selected" : ""}>${escapeHtml(label)}</option>`;
+  return `
+    <optgroup label="Stats">${EFFECT_STATS.map(stat => option(stat)).join("")}</optgroup>
+    <optgroup label="Skills">
+      ${SKILL_STATS.map(stat => option(stat)).join("")}
+      <option value="skill:craft" ${selected === "skill:craft" ? "selected" : ""}>Skill: Craft</option>
+      <option value="skill:profession" ${selected === "skill:profession" ? "selected" : ""}>Skill: Profession</option>
+      ${SPECIFIC_SKILL_STATS.map(stat => option(stat)).join("")}
+    </optgroup>
+  `;
+}
+
+function skillKey(name) {
+  return `skill:${String(name || "").replace(/[^a-z0-9]/gi, "").toLowerCase()}`;
+}
+
+function namedSkill(kind, value) {
+  const text = String(value || "").trim();
+  if (!text) return "";
+  const prefix = kind === "skill:profession" ? "Profession" : "Craft";
+  if (text.toLowerCase().startsWith(`${prefix.toLowerCase()} (`)) return text;
+  return `${prefix} (${text})`;
+}
+
+function setLootStatus(message, type = "info") {
+  const status = el("lootStatus");
+  status.className = `alert alert-${type} py-2`;
+  status.textContent = message;
+  status.classList.remove("d-none");
+}
+
+function clearLootStatus() {
+  el("lootStatus").classList.add("d-none");
+}
+
+function characterLabel(character) {
+  const owner = character?.username || character?.email || "";
+  return owner ? `${character.name} (${owner})` : character?.name || "Unnamed character";
+}
+
+function renderCharacterOptions(select, selectedCharacterId = "") {
+  select.innerHTML = `<option value="">Unassigned</option>`;
+  bagCharacters.forEach(character => {
+    const option = document.createElement("option");
+    option.value = character.id;
+    option.textContent = characterLabel(character);
+    select.appendChild(option);
+  });
+  select.value = selectedCharacterId || "";
+}
+
+function itemGroupKey(item) {
+  return item.assigned_character_id || "unassigned";
+}
+
+function searchableLoot(item) {
+  return `${item.name || ""} ${item.description || ""}`.toLowerCase();
+}
+
+function renderLoot() {
+  const grid = el("lootGrid");
+  const visibleLoot = lootSearchTerm
+    ? bagLoot.filter(item => searchableLoot(item).includes(lootSearchTerm))
+    : bagLoot;
+  const groups = [
+    { key: "unassigned", label: "Unassigned" },
+    ...bagCharacters.map(character => ({ key: character.id, label: characterLabel(character) }))
+  ];
+
+  grid.innerHTML = groups.map(group => {
+    const items = visibleLoot.filter(item => itemGroupKey(item) === group.key);
+    return `
+      <div class="loot-group">
+        <div class="loot-group-header">
+          <strong>${escapeHtml(group.label)}</strong>
+          <span class="badge text-bg-secondary">${items.length}</span>
+        </div>
+        <div class="loot-group-body">
+          ${items.length ? items.map(renderLootCard).join("") : `<div class="empty-state">No loot here.</div>`}
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  grid.querySelectorAll("[data-loot-assign]").forEach(select => {
+    select.addEventListener("click", event => event.stopPropagation());
+    select.addEventListener("change", event => {
+      event.stopPropagation();
+      assignLoot(select.dataset.lootAssign, select.value);
+    });
+  });
+  grid.querySelectorAll("[data-delete-loot]").forEach(button => {
+    button.addEventListener("click", event => {
+      event.stopPropagation();
+      requestLootDelete(button.dataset.deleteLoot);
+    });
+  });
+  grid.querySelectorAll(".loot-card").forEach(card => {
+    card.addEventListener("click", () => openLootEditor(card.dataset.lootId));
+    card.addEventListener("keydown", event => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        openLootEditor(card.dataset.lootId);
+      }
+    });
+  });
+}
+
+function toggleLootDetailFields() {
+  const type = el("lootType").value;
+  el("lootWeaponFields").classList.toggle("d-none", type !== "Weapon");
+  el("lootArmorFields").classList.toggle("d-none", !["Armor", "Shield"].includes(type));
+  el("lootArmorEnchantment").innerHTML = armorEnchantmentOptions(el("lootArmorEnchantment").value);
+}
+
+function setupLootScalingControls() {
+  el("lootDamageScaleOptions").querySelectorAll("[data-scale-ability]").forEach(button => {
+    button.addEventListener("click", () => {
+      button.classList.toggle("btn-primary");
+      button.classList.toggle("btn-outline-light");
+      const selected = [...el("lootDamageScaleOptions").querySelectorAll(".btn-primary")].map(btn => btn.dataset.scaleAbility);
+      el("lootDamageScale").value = (selected.length ? selected : ["STR"]).join(" + ");
+    });
+  });
+  el("lootAttackScaleOptions").querySelectorAll("[data-attack-scale-ability]").forEach(button => {
+    button.addEventListener("click", () => {
+      button.classList.toggle("btn-primary");
+      button.classList.toggle("btn-outline-light");
+      const selected = [...el("lootAttackScaleOptions").querySelectorAll(".btn-primary")].map(btn => btn.dataset.attackScaleAbility);
+      el("lootAttackScale").value = (selected.length ? selected : ["STR"]).join(" + ");
+    });
+  });
+}
+
+function setLootDamageScale(value = "STR") {
+  const selected = String(value || "STR").split("+").map(part => part.trim().toUpperCase()).filter(Boolean);
+  const activeSet = new Set(selected.length ? selected : ["STR"]);
+  el("lootDamageScale").value = [...activeSet].join(" + ");
+  el("lootDamageScaleOptions").querySelectorAll("[data-scale-ability]").forEach(button => {
+    const active = activeSet.has(button.dataset.scaleAbility);
+    button.classList.toggle("btn-primary", active);
+    button.classList.toggle("btn-outline-light", !active);
+  });
+}
+
+function setLootAttackScale(value = "STR") {
+  const selected = String(value || "STR").split("+").map(part => part.trim().toUpperCase()).filter(Boolean);
+  const activeSet = new Set(selected.length ? selected : ["STR"]);
+  el("lootAttackScale").value = [...activeSet].join(" + ");
+  el("lootAttackScaleOptions").querySelectorAll("[data-attack-scale-ability]").forEach(button => {
+    const active = activeSet.has(button.dataset.attackScaleAbility);
+    button.classList.toggle("btn-primary", active);
+    button.classList.toggle("btn-outline-light", !active);
+  });
+}
+
+function addLootEffectRow(data = {}) {
+  const row = document.createElement("div");
+  row.className = "loot-effect-row";
+  const selectedStat = String(data.skillName || "").toLowerCase().startsWith("profession")
+    ? "skill:profession"
+    : String(data.skillName || "").toLowerCase().startsWith("craft")
+      ? "skill:craft"
+      : data.stat || "";
+  row.innerHTML = `
+    <div>
+      <label>Stat</label>
+      <select data-effect-field="stat" class="form-select form-select-sm">
+        ${effectStatOptions(selectedStat)}
+      </select>
+    </div>
+    <div class="loot-named-skill-field d-none"><label>Skill Name</label><input data-effect-field="skillName" class="form-control form-control-sm" value="${escapeHtml(data.skillName || "")}" placeholder="Alchemy"></div>
+    <div><label>Value</label><input data-effect-field="value" class="form-control form-control-sm" type="number" value="${data.value ?? 0}"></div>
+    <div>
+      <label>Type</label>
+      <select data-effect-field="type" class="form-select form-select-sm">
+        ${BONUS_TYPES.map(type => `<option value="${type}" ${(data.type || "untyped") === type ? "selected" : ""}>${escapeHtml(type)}</option>`).join("")}
+      </select>
+    </div>
+    <div>
+      <label>Stacks</label>
+      <div class="form-check form-switch">
+        <input data-effect-field="stacks" class="form-check-input" type="checkbox" ${data.stacks ? "checked" : ""}>
+      </div>
+    </div>
+    <div class="loot-condition-inline">
+      <div>
+        <label>Conditional</label>
+        <div class="form-check form-switch">
+          <input data-effect-field="conditional" class="form-check-input" type="checkbox" ${data.conditional ? "checked" : ""}>
+        </div>
+      </div>
+      <div><label>Applies When</label><input data-effect-field="appliesWhen" class="form-control form-control-sm" value="${escapeHtml(data.appliesWhen || "")}" placeholder="vs undead"></div>
+    </div>
+    <button class="btn btn-danger btn-sm" type="button" aria-label="Delete effect"><i class="bi bi-trash"></i></button>
+  `;
+  const statSelect = row.querySelector('[data-effect-field="stat"]');
+  const namedSkillField = row.querySelector(".loot-named-skill-field");
+  const skillNameInput = row.querySelector('[data-effect-field="skillName"]');
+  const syncNamedSkill = () => {
+    const named = ["skill:craft", "skill:profession"].includes(statSelect.value);
+    namedSkillField.classList.toggle("d-none", !named);
+    skillNameInput.placeholder = statSelect.value === "skill:profession" ? "Sailor" : "Alchemy";
+  };
+  statSelect.addEventListener("change", syncNamedSkill);
+  syncNamedSkill();
+  row.querySelector("button").addEventListener("click", () => row.remove());
+  el("lootEffectRows").appendChild(row);
+}
+
+function collectLootEffects() {
+  return [...el("lootEffectRows").querySelectorAll(".loot-effect-row")].map(row => {
+    const selectedStat = row.querySelector('[data-effect-field="stat"]').value;
+    const skillName = ["skill:craft", "skill:profession"].includes(selectedStat)
+      ? namedSkill(selectedStat, row.querySelector('[data-effect-field="skillName"]')?.value)
+      : "";
+    const effect = {
+      stat: skillName ? skillKey(skillName) : selectedStat,
+      value: Number(row.querySelector('[data-effect-field="value"]').value || 0),
+      type: row.querySelector('[data-effect-field="type"]').value || "untyped",
+      stacks: row.querySelector('[data-effect-field="stacks"]').checked,
+      conditional: row.querySelector('[data-effect-field="conditional"]').checked,
+      appliesWhen: row.querySelector('[data-effect-field="appliesWhen"]').value.trim()
+    };
+    if (skillName) effect.skillName = skillName;
+    return effect;
+  });
+}
+
+function collectLootDetails() {
+  const type = el("lootType").value;
+  if (type === "Weapon") {
+    return {
+      weaponType: el("lootWeaponType").value || "Melee Weapon (One-Handed)",
+      attackScale: el("lootAttackScale").value.trim() || "STR",
+      damage: el("lootDamageDice").value.trim(),
+      critical: el("lootWeaponCritical").value.trim(),
+      damageScale: el("lootDamageScale").value.trim() || "STR",
+      enhancement: el("lootWeaponEnhancement").value || "0",
+      enchantment: el("lootWeaponEnchantment").value.trim(),
+      details: el("lootWeaponDetails").value.trim()
+    };
+  }
+  if (["Armor", "Shield"].includes(type)) {
+    return {
+      bonus: el("lootArmorBonus").value || "0",
+      enhancement: el("lootArmorEnhancement").value || "0",
+      enchantment: el("lootArmorEnchantment").value.trim()
+    };
+  }
+  return {};
+}
+
+function signedValue(value) {
+  const number = Number(value || 0);
+  return number >= 0 ? `+${number}` : String(number);
+}
+
+function renderLootAttributes(item) {
+  const details = item.details || {};
+  const rows = [];
+  if (item.type === "Weapon") {
+    rows.push(["Weapon Type", details.weaponType || "Melee Weapon (One-Handed)"]);
+    rows.push(["Attack Scales", details.attackScale || "STR"]);
+    if (details.damage) rows.push(["Damage", details.damage]);
+    if (details.critical) rows.push(["Critical", details.critical]);
+    rows.push(["Damage Scales", details.damageScale || "STR"]);
+    rows.push(["Enhancement", signedValue(details.enhancement || 0)]);
+    if (details.enchantment) rows.push(["Enchantment", details.enchantment]);
+    if (details.details) rows.push(["Details", details.details]);
+  } else if (["Armor", "Shield"].includes(item.type)) {
+    rows.push(["Bonus", signedValue(details.bonus || 0)]);
+    rows.push(["Enhancement", signedValue(details.enhancement || 0)]);
+    if (details.enchantment) rows.push(["Enchantment", details.enchantment]);
+  }
+
+  if (!rows.length) return "";
+  return `
+    <div class="loot-attributes">
+      ${rows.map(([label, value]) => `<span class="loot-attribute"><strong>${escapeHtml(label)}</strong>${escapeHtml(value)}</span>`).join("")}
+    </div>
+  `;
+}
+
+function renderLootEffects(item) {
+  const effects = Array.isArray(item.effects) ? item.effects : [];
+  if (!effects.length) return "";
+  return `
+    <div class="loot-effects-display">
+      <div class="loot-meta">Item effects</div>
+      ${effects.map(effect => `
+        <div class="loot-effect-display">
+          ${escapeHtml(titleCaseStat(effect.stat || "effect"))} ${signedValue(effect.value)} (${escapeHtml(effect.type || "untyped")})${effect.conditional ? ` (${escapeHtml(effect.appliesWhen || "conditional")})` : ""}${effect.stacks ? " stacks" : ""}
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+
+function renderLootCard(item) {
+  const icon = typeIcons[item.type] || typeIcons.Item;
+  const options = [
+    `<option value="">Unassigned</option>`,
+    ...bagCharacters.map(character => `<option value="${escapeHtml(character.id)}"${character.id === item.assigned_character_id ? " selected" : ""}>${escapeHtml(characterLabel(character))}</option>`)
+  ].join("");
+
+  return `
+    <article class="loot-card" data-loot-id="${escapeHtml(item.id)}" role="button" tabindex="0" aria-label="Edit ${escapeHtml(item.name)}">
+      <div class="loot-card-head">
+        <span class="loot-icon"><i class="bi ${icon}"></i></span>
+        <div class="loot-title flex-grow-1">
+          <div class="loot-name">${escapeHtml(item.name)}</div>
+          <div class="loot-meta">${escapeHtml(item.type)}</div>
+        </div>
+        <span class="loot-count-actions">
+          <span class="loot-count">x${escapeHtml(item.count)}</span>
+          <button class="btn btn-outline-danger btn-sm loot-icon-btn" type="button" data-delete-loot="${escapeHtml(item.id)}" aria-label="Delete ${escapeHtml(item.name)}">
+            <i class="bi bi-trash"></i>
+          </button>
+        </span>
+      </div>
+      ${item.description ? `<div class="loot-description mt-2">${escapeHtml(item.description)}</div>` : ""}
+      <div class="mt-2">
+        <label for="assign-${escapeHtml(item.id)}">Give to</label>
+        <select id="assign-${escapeHtml(item.id)}" class="form-select form-select-sm w-100" data-loot-assign="${escapeHtml(item.id)}">
+          ${options}
+        </select>
+      </div>
+    </article>
+  `;
+}
+
+async function assignLoot(itemId, assignedTo) {
+  const item = bagLoot.find(entry => entry.id === itemId);
+  if (!item) return;
+
+  const previous = item.assigned_character_id || "";
+  const target = assignedTo || null;
+  if (previous === (target || "")) return;
+
+  if (Number(item.count || 1) > 1) {
+    pendingLootMove = { itemId, target, previous };
+    renderLoot();
+    openMoveLootModal(item, target);
+    return;
+  }
+
+  item.assigned_character_id = target;
+  renderLoot();
+
+  const saved = await PFApp.saveLootItem({
+    id: item.id,
+    name: item.name,
+    description: item.description,
+    count: item.count,
+    type: item.type,
+    assignedCharacterId: item.assigned_character_id,
+    details: item.details,
+    effects: item.effects
+  }, bagContextKey);
+
+  if (!saved) {
+    item.assigned_character_id = previous || null;
+    renderLoot();
+    setLootStatus("Could not update assignment.", "danger");
+    return;
+  }
+
+  clearLootStatus();
+  await loadBagContext(bagContextKey, false);
+}
+
+function openMoveLootModal(item, targetCharacterId) {
+  const target = bagCharacters.find(character => character.id === targetCharacterId);
+  el("moveLootSummary").textContent = `${item.name} -> ${target ? characterLabel(target) : "Unassigned"}`;
+  el("moveLootCount").max = String(item.count || 1);
+  el("moveLootCount").value = String(item.count || 1);
+  el("moveLootMax").textContent = `Max: ${item.count || 1}`;
+  moveLootModal.show();
+}
+
+async function submitLootMove(event) {
+  event.preventDefault();
+  if (!pendingLootMove) return;
+
+  const item = bagLoot.find(entry => entry.id === pendingLootMove.itemId);
+  if (!item) return;
+
+  const total = Number(item.count || 1);
+  const amount = Math.max(1, Math.min(total, Number.parseInt(el("moveLootCount").value, 10) || 1));
+  const target = pendingLootMove.target || null;
+
+  if (amount >= total) {
+    item.assigned_character_id = target;
+    await PFApp.saveLootItem({
+      id: item.id,
+      name: item.name,
+      description: item.description,
+      count: item.count,
+      type: item.type,
+      assignedCharacterId: target,
+      details: item.details,
+      effects: item.effects
+    }, bagContextKey);
+  } else {
+    await PFApp.saveLootItem({
+      id: item.id,
+      name: item.name,
+      description: item.description,
+      count: total - amount,
+      type: item.type,
+      assignedCharacterId: pendingLootMove.previous || null,
+      details: item.details,
+      effects: item.effects
+    }, bagContextKey);
+    await PFApp.saveLootItem({
+      name: item.name,
+      description: item.description,
+      count: amount,
+      type: item.type,
+      assignedCharacterId: target,
+      details: item.details,
+      effects: item.effects
+    }, bagContextKey);
+  }
+
+  pendingLootMove = null;
+  moveLootModal.hide();
+  clearLootStatus();
+  await loadBagContext(bagContextKey, false);
+}
+
+function resetLootForm() {
+  editingLootId = null;
+  el("lootModalLabel").textContent = "Add Item";
+  el("lootSubmitButton").textContent = "Add Item";
+  el("lootForm").reset();
+  el("lootCount").value = "1";
+  setLootAttackScale("STR");
+  setLootDamageScale("STR");
+  el("lootWeaponType").value = "Melee Weapon (One-Handed)";
+  el("lootWeaponCritical").value = "";
+  el("lootEffectRows").innerHTML = "";
+  toggleLootDetailFields();
+  renderCharacterOptions(el("lootAssignedTo"));
+}
+
+function openLootEditor(itemId) {
+  const item = bagLoot.find(entry => entry.id === itemId);
+  if (!item) return;
+
+  editingLootId = item.id;
+  el("lootModalLabel").textContent = "Edit Item";
+  el("lootSubmitButton").textContent = "Save Changes";
+  el("lootName").value = item.name || "";
+  el("lootDescription").value = item.description || "";
+  el("lootCount").value = item.count || 1;
+  el("lootType").value = item.type || "Item";
+  renderCharacterOptions(el("lootAssignedTo"), item.assigned_character_id || "");
+
+  const details = item.details || {};
+  el("lootWeaponType").value = details.weaponType || "Melee Weapon (One-Handed)";
+  setLootAttackScale(details.attackScale || "STR");
+  el("lootDamageDice").value = details.damage || "";
+  el("lootWeaponCritical").value = details.critical || "";
+  setLootDamageScale(details.damageScale || "STR");
+  el("lootWeaponEnhancement").value = details.enhancement || "0";
+  el("lootWeaponEnchantment").value = details.enchantment || "";
+  el("lootWeaponDetails").value = details.details || "";
+  el("lootArmorBonus").value = details.bonus || "0";
+  el("lootArmorEnhancement").value = details.enhancement || "0";
+  el("lootArmorEnchantment").value = details.enchantment || "";
+  el("lootEffectRows").innerHTML = "";
+  (Array.isArray(item.effects) ? item.effects : []).forEach(effect => addLootEffectRow(effect));
+  toggleLootDetailFields();
+  lootModal.show();
+}
+
+async function syncEditedLootBuff(item) {
+  if (!item?.assigned_character_id) return;
+  const buffs = await PFApp.loadBuffState(bagContextKey, item.assigned_character_id);
+  if (!Array.isArray(buffs)) return;
+  const index = buffs.findIndex(buff => buff.sourceLootId === item.id);
+  if (index < 0) return;
+  if (Array.isArray(item.effects) && item.effects.length) {
+    buffs[index] = { ...buffs[index], name: item.name, bonuses: item.effects };
+  } else {
+    buffs.splice(index, 1);
+  }
+  await PFApp.saveBuffState(buffs, bagContextKey, item.assigned_character_id);
+  localStorage.setItem(`pf_buffs_updated_${bagContextKey}_${item.assigned_character_id}`, String(Date.now()));
+}
+
+async function removeLootBuff(item) {
+  if (!item?.assigned_character_id) return;
+  const buffs = await PFApp.loadBuffState(bagContextKey, item.assigned_character_id);
+  if (!Array.isArray(buffs)) return;
+  const next = buffs.filter(buff => buff.sourceLootId !== item.id);
+  if (next.length === buffs.length) return;
+  await PFApp.saveBuffState(next, bagContextKey, item.assigned_character_id);
+  localStorage.setItem(`pf_buffs_updated_${bagContextKey}_${item.assigned_character_id}`, String(Date.now()));
+}
+
+function requestLootDelete(itemId) {
+  const item = bagLoot.find(entry => entry.id === itemId);
+  if (!item) return;
+  const total = Number(item.count || 1);
+  pendingLootDelete = { itemId };
+  el("deleteLootSummary").textContent = `${item.name}${item.assigned_character_id ? " is assigned. If fully deleted, equipped copies and item effects will be removed." : ""}`;
+  el("deleteLootCount").max = String(total);
+  el("deleteLootCount").value = String(total);
+  el("deleteLootMax").textContent = `Max: ${total}`;
+  deleteLootModal.show();
+}
+
+async function submitLootDelete(event) {
+  event.preventDefault();
+  if (!pendingLootDelete) return;
+  const item = bagLoot.find(entry => entry.id === pendingLootDelete.itemId);
+  if (!item) return;
+
+  const total = Number(item.count || 1);
+  const amount = Math.max(1, Math.min(total, Number.parseInt(el("deleteLootCount").value, 10) || 1));
+  let ok = false;
+
+  if (amount >= total) {
+    await removeLootBuff(item);
+    ok = await PFApp.deleteLootItem(item.id);
+  } else {
+    ok = Boolean(await PFApp.saveLootItem({
+      id: item.id,
+      name: item.name,
+      description: item.description,
+      count: total - amount,
+      type: item.type,
+      assignedCharacterId: item.assigned_character_id,
+      details: item.details,
+      effects: item.effects
+    }, bagContextKey));
+  }
+
+  if (!ok) {
+    setLootStatus("Could not delete item.", "danger");
+    return;
+  }
+
+  pendingLootDelete = null;
+  deleteLootModal.hide();
+  clearLootStatus();
+  await loadBagContext(bagContextKey, false);
+}
+
+async function submitLootForm(event) {
+  event.preventDefault();
+  const name = el("lootName").value.trim();
+  if (!name) return;
+
+  const saved = await PFApp.saveLootItem({
+    id: editingLootId,
+    name,
+    description: el("lootDescription").value.trim(),
+    count: el("lootCount").value,
+    type: el("lootType").value,
+    assignedCharacterId: el("lootAssignedTo").value,
+    details: collectLootDetails(),
+    effects: collectLootEffects()
+  }, bagContextKey);
+
+  if (!saved) {
+    setLootStatus(editingLootId ? "Could not update item." : "Could not add item.", "danger");
+    return;
+  }
+
+  resetLootForm();
+  lootModal.hide();
+  await syncEditedLootBuff(saved);
+  clearLootStatus();
+  await loadBagContext(bagContextKey, false);
+}
+
+async function loadBagContext(contextKey, showLoading = true) {
+  if (!contextKey || contextKey === "general") return;
+  bagContextKey = contextKey;
+  if (showLoading) setLootStatus("Loading bag...", "secondary");
+
+  bagCharacters = await PFApp.loadContextCharacters(bagContextKey);
+  bagLoot = await PFApp.loadLootItems(bagContextKey);
+  renderCharacterOptions(el("lootAssignedTo"));
+  renderLoot();
+
+  const contexts = await PFApp.loadContexts();
+  const current = contexts.find(context => context.key === bagContextKey);
+  el("contextHint").textContent = current ? `Context: ${current.label}` : "";
+  clearLootStatus();
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+  const user = await PFApp.requireAuth();
+  if (!user) return;
+
+  lootModal = new bootstrap.Modal(el("lootModal"));
+  moveLootModal = new bootstrap.Modal(el("moveLootModal"));
+  deleteLootModal = new bootstrap.Modal(el("deleteLootModal"));
+  el("lootWeaponType").innerHTML = optionList(WEAPON_TYPES, "Melee Weapon (One-Handed)");
+  el("lootWeaponEnchantment").innerHTML = optionList(WEAPON_ENCHANTMENTS);
+  el("lootArmorEnchantment").innerHTML = armorEnchantmentOptions();
+  el("lootForm").addEventListener("submit", submitLootForm);
+  el("lootModal").addEventListener("hidden.bs.modal", resetLootForm);
+  el("lootType").addEventListener("change", toggleLootDetailFields);
+  setupLootScalingControls();
+  el("addLootEffect").addEventListener("click", () => addLootEffectRow());
+  el("moveLootForm").addEventListener("submit", submitLootMove);
+  el("deleteLootForm").addEventListener("submit", submitLootDelete);
+  el("lootSearch").addEventListener("input", event => {
+    lootSearchTerm = event.target.value.trim().toLowerCase();
+    renderLoot();
+  });
+  bagContextKey = await PFApp.requireGameContext();
+  if (!bagContextKey) return;
+  await loadBagContext(bagContextKey);
+  window.addEventListener("pf-context-change", event => {
+    if (event.detail.contextKey && event.detail.contextKey !== "general") loadBagContext(event.detail.contextKey);
+  });
+});
+</script>
+</body>
+</html>

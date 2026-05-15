@@ -1,0 +1,2700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Character Sheet</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+  <style>
+    body { background-color: #121212; color: white; }
+    .sheet-section { background: #1e1e1e; border-radius: 10px; padding: 12px; margin-bottom: 12px; }
+    .sheet-card { background: #242424; border: 1px solid #444; border-radius: 8px; padding: 10px; }
+    .sheet-title { font-size: 13px; color: #aaa; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+    .sheet-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
+    .sheet-grid-wide { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 8px; }
+    .scale-options { display: grid; grid-template-columns: repeat(3, minmax(44px, 1fr)); gap: 6px; max-width: 170px; }
+    .scale-options .btn { min-width: 0; }
+    .weapon-toggle-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, max-content)); gap: 12px; align-items: end; }
+    .weapon-group { border-top: 1px solid #3a3a3a; padding-top: 8px; margin-top: 8px; }
+    .weapon-group-title { font-size: 12px; color: #aaa; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 6px; }
+    .equipment-card-header { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .equipment-name-input { width: min(100%, 320px); flex: 0 1 320px; }
+    .equipment-actions { display: flex; gap: 6px; flex: 0 0 auto; }
+    .equipment-actions .btn { padding: 2px 7px; font-size: 12px; line-height: 1.4; }
+    @media (max-width: 520px) {
+      .equipment-card-header { align-items: flex-start; }
+      .equipment-name-input { flex: 1 1 auto; min-width: 0; }
+      .equipment-actions { flex-wrap: wrap; justify-content: flex-end; }
+    }
+    .card-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; align-items: end; }
+    .enhancement-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 220px)); gap: 8px; align-items: end; margin-top: 8px; }
+    .weapon-summary { display: grid; grid-template-columns: minmax(220px, 2fr) minmax(150px, 1fr) minmax(130px, 1fr); gap: 8px; align-items: end; margin-top: 8px; }
+    .weapon-attack-summary input { font-size: 13px; min-width: 0; }
+    @media (max-width: 760px) {
+      .weapon-summary { grid-template-columns: 1fr; }
+    }
+    .card-details.d-none { display: none !important; }
+    .ac-primary-grid { display: grid; grid-template-columns: repeat(2, minmax(120px, 180px)); gap: 8px; margin-bottom: 8px; }
+    .compact-table { font-size: 13px; }
+    .compact-table input { min-width: 58px; }
+    .no-spinner::-webkit-outer-spin-button,
+    .no-spinner::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    .no-spinner { appearance: textfield; -moz-appearance: textfield; }
+    label { font-size: 12px; color: #aaa; margin-bottom: 2px; }
+    input, textarea, select { background-color: #2b2b2b !important; color: white !important; border-color: #555 !important; }
+    input[readonly] { background-color: #202020 !important; color: #ddd !important; }
+    textarea { min-height: 92px; }
+    .small-text { font-size: 12px; color: #aaa; }
+    .calc-line { margin-top: 6px; }
+    .calc-formula { color: #777; }
+    .calc-buffs { display: grid; gap: 2px; margin-top: 4px; }
+    .calc-conditional-block { display: grid; gap: 3px; padding: 5px 7px; margin-bottom: 6px; border-left: 3px solid #f0d58c; background: rgba(240, 213, 140, .08); border-radius: 4px; }
+    .calc-buff-block { display: grid; gap: 2px; }
+    .calc-buff-name { font-weight: 700; }
+    .calc-value-positive { color: #8fd19e; font-weight: 700; }
+    .calc-value-negative { color: #b02a37; font-weight: 700; }
+    .calc-value-neutral { color: #ddd; font-weight: 700; }
+    .buff-field { color: #8fd19e !important; font-weight: 600; }
+    .calc-applied { color: #e7f7ec; }
+    .calc-conditional { color: #f0d58c; }
+    .calc-overridden { color: #8a8a8a; }
+    .inventory-list { display: grid; gap: 12px; }
+    .inventory-group-title { font-size: 12px; color: #aaa; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 6px; }
+    .inventory-group-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .inventory-item { background: #242424; border: 1px solid #444; border-radius: 8px; padding: 8px; cursor: pointer; }
+    .inventory-item:hover { border-color: #666; }
+    .inventory-card-head { display: flex; gap: 8px; align-items: flex-start; }
+    .inventory-card-title { min-width: 0; flex: 1 1 auto; }
+    .inventory-count-actions { display: inline-flex; align-items: center; gap: 4px; flex: 0 0 auto; }
+    .inventory-count { background: #343a40; border: 1px solid #555; border-radius: 999px; padding: 1px 7px; font-size: 12px; font-weight: 700; }
+    .inventory-icon-btn { width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; padding: 0; }
+    .inventory-description { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #ddd; }
+    .inventory-attributes { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+    .inventory-attribute { background: #1c1c1c; border: 1px solid #444; border-radius: 6px; padding: 4px 7px; font-size: 12px; color: #eee; }
+    .inventory-attribute strong { color: #aaa; font-weight: 600; margin-right: 4px; }
+    .inventory-effects { display: grid; gap: 4px; margin-top: 6px; }
+    .inventory-effect { background: rgba(143, 209, 158, .08); border-left: 3px solid #8fd19e; border-radius: 4px; padding: 4px 7px; font-size: 12px; overflow-wrap: anywhere; }
+    .inventory-edit-grid, .inventory-effect-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .inventory-effect-row { grid-template-columns: 1.4fr .6fr 1fr .7fr auto; background: #242424; border: 1px solid #444; border-radius: 8px; padding: 8px; align-items: end; }
+    .inventory-condition-inline { display: grid; grid-template-columns: auto minmax(140px, 1fr); gap: 8px; align-items: end; grid-column: 1 / -2; }
+    @media (max-width: 760px) {
+      .inventory-group-grid { grid-template-columns: 1fr; }
+      .inventory-edit-grid, .inventory-effect-row, .inventory-condition-inline { grid-template-columns: 1fr; }
+      .inventory-condition-inline { grid-column: auto; }
+    }
+    .view-tabs .btn { min-width: 92px; }
+    .simple-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, max-content)); gap: 6px; align-items: stretch; }
+    .simple-grid-tight { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 6px; }
+    .simple-section { background: #1e1e1e; border-radius: 8px; padding: 8px; margin-bottom: 8px; }
+    .simple-card { background: #242424; border: 1px solid #444; border-radius: 8px; padding: 6px 8px; min-width: 120px; }
+    .simple-label { color: #aaa; font-size: 11px; text-transform: uppercase; }
+    .simple-value { font-weight: 700; overflow-wrap: anywhere; }
+    .simple-table { font-size: 12px; margin-bottom: 0; }
+    .simple-table th, .simple-table td { padding: 4px 6px; }
+    .simple-table tr.simple-conditional td { background: rgba(240, 213, 140, .08); color: #f0d58c; }
+    .simple-table tr.simple-conditional td:first-child { border-left: 3px solid #f0d58c; }
+    .simple-wrap { max-width: 1180px; }
+    .simple-chip-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, max-content)); gap: 6px; align-items: start; }
+    .simple-chip { background: #242424; border: 1px solid #444; border-radius: 8px; padding: 5px 8px; min-width: 150px; }
+    .simple-card.simple-conditional, .simple-chip.simple-conditional { border-left: 3px solid #f0d58c; background: rgba(240, 213, 140, .08); }
+    .simple-chip-main { font-weight: 700; }
+    .simple-chip-sub { color: #aaa; font-size: 12px; }
+    .simple-list { display: grid; gap: 4px; }
+    .simple-list-row { display: flex; justify-content: space-between; gap: 10px; background: #242424; border: 1px solid #444; border-radius: 8px; padding: 5px 8px; }
+    .simple-list-row.simple-conditional { border-left: 3px solid #f0d58c; background: rgba(240, 213, 140, .08); }
+    .simple-list-main { font-weight: 700; }
+    .simple-list-sub { color: #ddd; font-weight: 700; white-space: nowrap; }
+    .simple-weapon-block { display: grid; gap: 6px; }
+    .simple-weapon-card { width: fit-content; max-width: 100%; }
+    .simple-weapon-block .simple-card,
+    .simple-weapon-block .simple-list-row { width: 260px; max-width: 100%; }
+    .simple-weapon-block .simple-list { width: fit-content; max-width: 100%; }
+    @media (min-width: 1200px) {
+      .simple-section { padding: 8px; margin-bottom: 6px; }
+      .simple-grid-tight { grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); }
+      .simple-table th, .simple-table td { padding: 3px 6px; }
+      .simple-chip-grid { grid-template-columns: repeat(auto-fill, minmax(160px, max-content)); }
+    }
+  </style>
+</head>
+
+<body>
+<div id="appNavbar"></div>
+
+<main class="container-fluid mt-3">
+  <div class="d-flex justify-content-between align-items-center mb-2">
+    <h3 class="mb-0">Character Sheet</h3>
+    <div class="d-flex gap-2">
+      <button class="btn btn-outline-light btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#newCharacterModal">New Character</button>
+      <button class="btn btn-outline-success btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#effectTrackerModal" onclick="openEffectTrackerModal()">Effects</button>
+      <button id="showAppliedBuffsToggle" class="btn btn-outline-info btn-sm" type="button" onclick="toggleAppliedBuffs()">Show Applied Buffs</button>
+      <button class="btn btn-primary btn-sm" type="button" onclick="saveSheetNow()">Save</button>
+    </div>
+  </div>
+  <div class="btn-group btn-group-sm view-tabs mb-2" role="group" aria-label="Character sheet view">
+    <button id="fullViewBtn" class="btn btn-primary" type="button" onclick="setSheetView('full')">Full</button>
+    <button id="simplifiedViewBtn" class="btn btn-outline-primary" type="button" onclick="setSheetView('simplified')">Simplified</button>
+  </div>
+
+  <div id="sheetStatus" class="alert d-none py-2"></div>
+
+  <div id="fullSheetView">
+  <section class="sheet-section">
+    <div class="sheet-title">Character</div>
+    <div class="sheet-grid-wide">
+      <div><label for="characterName">Character Name</label><input id="characterName" class="form-control form-control-sm sheet-input" required></div>
+      <div><label for="classLevel">Class / Level</label><input id="classLevel" class="form-control form-control-sm sheet-input"></div>
+      <div><label for="characterLevel">Character Level</label><input id="characterLevel" class="form-control form-control-sm sheet-input" type="number" min="1" value="1"></div>
+      <div><label for="race">Race</label><input id="race" class="form-control form-control-sm sheet-input"></div>
+      <div><label for="alignment">Alignment</label><input id="alignment" class="form-control form-control-sm sheet-input"></div>
+      <div><label for="deity">Deity</label><input id="deity" class="form-control form-control-sm sheet-input"></div>
+      <div><label for="homeland">Homeland</label><input id="homeland" class="form-control form-control-sm sheet-input"></div>
+      <div><label for="size">Size</label><input id="size" class="form-control form-control-sm sheet-input" value="Medium"></div>
+      <div><label for="gender">Gender</label><input id="gender" class="form-control form-control-sm sheet-input"></div>
+      <div><label for="age">Age</label><input id="age" class="form-control form-control-sm sheet-input"></div>
+      <div><label for="height">Height</label><input id="height" class="form-control form-control-sm sheet-input"></div>
+      <div><label for="weight">Weight</label><input id="weight" class="form-control form-control-sm sheet-input"></div>
+      <div><label for="hair">Hair</label><input id="hair" class="form-control form-control-sm sheet-input"></div>
+      <div><label for="eyes">Eyes</label><input id="eyes" class="form-control form-control-sm sheet-input"></div>
+    </div>
+  </section>
+
+  <div class="row">
+    <div class="col-xl-4">
+      <section class="sheet-section">
+        <div class="sheet-title">Abilities</div>
+        <div class="table-responsive">
+          <table class="table table-dark table-sm align-middle compact-table">
+            <thead><tr><th>Ability</th><th>Score</th><th>Buff</th><th>Total</th><th>Mod</th></tr></thead>
+            <tbody id="abilityRows"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="sheet-section">
+        <div class="sheet-title">Base Attack Bonus</div>
+        <div class="sheet-grid">
+          <div><label for="bab">BAB</label><input id="bab" class="form-control form-control-sm sheet-input" type="number" value="0"></div>
+        </div>
+      </section>
+
+      <section class="sheet-section">
+        <div class="sheet-title">HP</div>
+        <div class="sheet-grid">
+          <div><label for="currentHitPoints">Current HP</label><input id="currentHitPoints" class="form-control form-control-sm sheet-input" type="number" value="0"></div>
+          <div><label for="hitPoints">Base HP</label><input id="hitPoints" class="form-control form-control-sm sheet-input" type="number" value="0"></div>
+          <div><label for="hitPointsBuff">Buff</label><input id="hitPointsBuff" class="form-control form-control-sm buff-field" readonly></div>
+          <div><label for="hitPointsTotal">Total HP</label><input id="hitPointsTotal" class="form-control form-control-sm" readonly></div>
+          <div><label for="damageReduction">DR</label><input id="damageReduction" class="form-control form-control-sm sheet-input"></div>
+        </div>
+        <div class="small-text calc-line" data-calc-for="hitPointsTotal"></div>
+      </section>
+
+      <section class="sheet-section">
+        <div class="sheet-title">Initiative</div>
+        <div class="sheet-grid">
+          <div><label for="initTotal">Total</label><input id="initTotal" class="form-control form-control-sm" readonly></div>
+          <div><label for="initDexMod">Dex</label><input id="initDexMod" class="form-control form-control-sm" readonly></div>
+          <div><label for="initBuff">Buff</label><input id="initBuff" class="form-control form-control-sm buff-field" readonly></div>
+          <div><label for="initMisc">Misc</label><input id="initMisc" class="form-control form-control-sm sheet-input" type="number" value="0"></div>
+        </div>
+        <div class="small-text calc-line" data-calc-for="initTotal"></div>
+      </section>
+
+      <section class="sheet-section">
+        <div class="sheet-title">Movement</div>
+        <div class="sheet-grid">
+          <div><label for="speedBase">Base Speed</label><input id="speedBase" class="form-control form-control-sm sheet-input"></div>
+          <div><label for="speedArmor">Armor Speed</label><input id="speedArmor" class="form-control form-control-sm sheet-input"></div>
+        </div>
+      </section>
+    </div>
+
+    <div class="col-xl-4">
+      <section class="sheet-section">
+        <div class="sheet-title">Armor Class</div>
+        <div class="ac-primary-grid">
+          <div><label for="acTotal">AC</label><input id="acTotal" class="form-control form-control-sm" readonly></div>
+          <div><label for="acBuff">AC Buff</label><input id="acBuff" class="form-control form-control-sm buff-field" readonly></div>
+        </div>
+        <div class="sheet-grid">
+          <div><label for="acTouch">Touch</label><input id="acTouch" class="form-control form-control-sm" readonly></div>
+          <div><label for="acTouchBuff">Touch Buff</label><input id="acTouchBuff" class="form-control form-control-sm buff-field" readonly></div>
+          <div><label for="acFlat">Flat-Footed</label><input id="acFlat" class="form-control form-control-sm" readonly></div>
+          <div><label for="acFlatBuff">Flat Buff</label><input id="acFlatBuff" class="form-control form-control-sm buff-field" readonly></div>
+          <div><label for="acArmor">Armor</label><input id="acArmor" class="form-control form-control-sm" readonly></div>
+          <div><label for="acShield">Shield</label><input id="acShield" class="form-control form-control-sm" readonly></div>
+          <div><label for="acDex">Dex</label><input id="acDex" class="form-control form-control-sm" readonly></div>
+          <div><label for="acNatural">Natural</label><input id="acNatural" class="form-control form-control-sm no-spinner" value="0" readonly></div>
+          <div><label for="acDeflection">Deflection</label><input id="acDeflection" class="form-control form-control-sm no-spinner" value="0" readonly></div>
+          <div><label for="acMisc">Misc</label><input id="acMisc" class="form-control form-control-sm sheet-input" type="number" value="0"></div>
+        </div>
+        <div class="small-text calc-line" data-calc-for="acTotal"></div>
+      </section>
+
+      <section class="sheet-section">
+        <div class="sheet-title">Saving Throws</div>
+        <div class="table-responsive">
+          <table class="table table-dark table-sm align-middle compact-table">
+            <thead><tr><th>Save</th><th>Base</th><th>Ability</th><th>Buff</th><th>Total</th></tr></thead>
+            <tbody id="saveRows"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <div class="col-xl-4">
+      <section class="sheet-section">
+        <div class="sheet-title">Combat Maneuvers</div>
+        <div class="sheet-grid">
+          <div><label for="cmbTotal">CMB</label><input id="cmbTotal" class="form-control form-control-sm" readonly></div>
+          <div><label for="cmbBuff">CMB Buff</label><input id="cmbBuff" class="form-control form-control-sm buff-field" readonly></div>
+          <div><label for="cmdTotal">CMD</label><input id="cmdTotal" class="form-control form-control-sm" readonly></div>
+          <div><label for="cmdBuff">CMD Buff</label><input id="cmdBuff" class="form-control form-control-sm buff-field" readonly></div>
+        </div>
+        <div class="small-text calc-line" data-calc-for="cmbTotal"></div>
+        <div class="small-text calc-line" data-calc-for="cmdTotal"></div>
+      </section>
+
+      <section class="sheet-section">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <div class="sheet-title mb-0">Weapons</div>
+          <button class="btn btn-primary btn-sm" type="button" onclick="addWeapon()">Add Weapon</button>
+        </div>
+        <div id="weaponRows" class="vstack gap-2"></div>
+      </section>
+
+      <section class="sheet-section">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <div class="sheet-title mb-0">Armor & Shields</div>
+          <button class="btn btn-primary btn-sm" type="button" onclick="addArmor()">Add Armor/Shield</button>
+        </div>
+        <div id="armorRows" class="vstack gap-2"></div>
+      </section>
+
+      <section class="sheet-section">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <div class="sheet-title mb-0">Gear</div>
+          <button class="btn btn-primary btn-sm" type="button" onclick="addGear()">Add Gear</button>
+        </div>
+        <div id="gearRows" class="vstack gap-2"></div>
+      </section>
+    </div>
+  </div>
+
+  <section class="sheet-section">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <div class="sheet-title mb-0">Skills</div>
+      <div class="d-flex gap-2">
+        <button class="btn btn-outline-light btn-sm" type="button" onclick="addNamedSkill('Craft', 'int')">Add Craft</button>
+        <button class="btn btn-outline-light btn-sm" type="button" onclick="addNamedSkill('Profession', 'wis')">Add Profession</button>
+      </div>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-dark table-sm align-middle compact-table">
+        <thead><tr><th>Skill</th><th>Ability</th><th>Ranks</th><th>Misc</th><th>Buff</th><th>Total</th></tr></thead>
+        <tbody id="skillRows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="sheet-section">
+    <div class="sheet-title">Inventory</div>
+    <div id="characterInventory" class="inventory-list"></div>
+  </section>
+
+  <div class="row">
+    <div class="col-lg-6">
+      <section class="sheet-section">
+        <div class="sheet-title">Carrying Capacity & Currency</div>
+        <div class="sheet-grid">
+          <div><label for="lightLoad">Light Load</label><input id="lightLoad" class="form-control form-control-sm sheet-input"></div>
+          <div><label for="mediumLoad">Medium Load</label><input id="mediumLoad" class="form-control form-control-sm sheet-input"></div>
+          <div><label for="heavyLoad">Heavy Load</label><input id="heavyLoad" class="form-control form-control-sm sheet-input"></div>
+          <div><label for="liftOverHead">Lift Over Head</label><input id="liftOverHead" class="form-control form-control-sm sheet-input"></div>
+          <div><label for="liftOffGround">Lift Off Ground</label><input id="liftOffGround" class="form-control form-control-sm sheet-input"></div>
+          <div><label for="dragOrPush">Drag / Push</label><input id="dragOrPush" class="form-control form-control-sm sheet-input"></div>
+          <div><label for="GP">GP</label><input id="GP" class="form-control form-control-sm sheet-input" type="number" value="0"></div>
+          <div><label for="SP">SP</label><input id="SP" class="form-control form-control-sm sheet-input" type="number" value="0"></div>
+          <div><label for="CP">CP</label><input id="CP" class="form-control form-control-sm sheet-input" type="number" value="0"></div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <section class="sheet-section">
+    <div class="sheet-title">Notes</div>
+    <textarea id="notes" class="form-control sheet-input"></textarea>
+  </section>
+  </div>
+
+  <div id="simplifiedSheetView" class="simple-wrap d-none"></div>
+</main>
+
+<div class="modal fade" id="newCharacterModal" tabindex="-1" aria-labelledby="newCharacterModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <form id="newCharacterForm" class="modal-content bg-dark text-white border-secondary">
+      <div class="modal-header">
+        <h5 class="modal-title" id="newCharacterModalLabel">New Character</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <label for="newCharacterName">Character Name</label>
+        <input id="newCharacterName" class="form-control form-control-sm" required>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-light btn-sm" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary btn-sm">Create</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal fade" id="inventoryItemModal" tabindex="-1" aria-labelledby="inventoryItemModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <form id="inventoryItemForm" class="modal-content bg-dark text-white border-secondary">
+      <div class="modal-header">
+        <h5 class="modal-title" id="inventoryItemModalLabel">Edit Item</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-2">
+          <label for="inventoryItemName">Name</label>
+          <input id="inventoryItemName" class="form-control form-control-sm" required>
+        </div>
+        <div class="mb-2">
+          <label for="inventoryItemDescription">Description</label>
+          <textarea id="inventoryItemDescription" class="form-control form-control-sm"></textarea>
+        </div>
+        <div class="row g-2">
+          <div class="col-6">
+            <label for="inventoryItemCount">Count</label>
+            <input id="inventoryItemCount" class="form-control form-control-sm" type="number" min="1" value="1" required>
+          </div>
+          <div class="col-6">
+            <label for="inventoryItemType">Type</label>
+            <select id="inventoryItemType" class="form-select form-select-sm">
+              <option>Weapon</option>
+              <option>Armor</option>
+              <option>Shield</option>
+              <option>Item</option>
+            </select>
+          </div>
+        </div>
+        <div id="inventoryWeaponFields" class="inventory-edit-grid mt-2 d-none">
+          <div>
+            <label for="inventoryWeaponType">Weapon Type</label>
+            <select id="inventoryWeaponType" class="form-select form-select-sm"></select>
+          </div>
+          <div>
+            <label>Attack Scales With</label>
+            <input id="inventoryAttackScale" type="hidden" value="STR">
+            <div class="scale-options" id="inventoryAttackScaleOptions">
+              <button class="btn btn-primary btn-sm" type="button" data-inventory-attack-scale-ability="STR">STR</button>
+              <button class="btn btn-outline-light btn-sm" type="button" data-inventory-attack-scale-ability="DEX">DEX</button>
+              <button class="btn btn-outline-light btn-sm" type="button" data-inventory-attack-scale-ability="CON">CON</button>
+              <button class="btn btn-outline-light btn-sm" type="button" data-inventory-attack-scale-ability="INT">INT</button>
+              <button class="btn btn-outline-light btn-sm" type="button" data-inventory-attack-scale-ability="WIS">WIS</button>
+              <button class="btn btn-outline-light btn-sm" type="button" data-inventory-attack-scale-ability="CHA">CHA</button>
+            </div>
+          </div>
+          <div><label for="inventoryDamageDice">Damage Dice</label><input id="inventoryDamageDice" class="form-control form-control-sm" placeholder="1d8"></div>
+          <div><label for="inventoryWeaponCritical">Critical</label><input id="inventoryWeaponCritical" class="form-control form-control-sm" placeholder="20/x2"></div>
+          <div>
+            <label>Damage Scales With</label>
+            <input id="inventoryDamageScale" type="hidden" value="STR">
+            <div class="scale-options" id="inventoryDamageScaleOptions">
+              <button class="btn btn-primary btn-sm" type="button" data-inventory-scale-ability="STR">STR</button>
+              <button class="btn btn-outline-light btn-sm" type="button" data-inventory-scale-ability="DEX">DEX</button>
+              <button class="btn btn-outline-light btn-sm" type="button" data-inventory-scale-ability="CON">CON</button>
+              <button class="btn btn-outline-light btn-sm" type="button" data-inventory-scale-ability="INT">INT</button>
+              <button class="btn btn-outline-light btn-sm" type="button" data-inventory-scale-ability="WIS">WIS</button>
+              <button class="btn btn-outline-light btn-sm" type="button" data-inventory-scale-ability="CHA">CHA</button>
+            </div>
+          </div>
+          <div><label for="inventoryWeaponEnhancement">Enhancement</label><input id="inventoryWeaponEnhancement" class="form-control form-control-sm" type="number" min="0" max="5" value="0"></div>
+          <div>
+            <label for="inventoryWeaponEnchantment">Enchantment</label>
+            <select id="inventoryWeaponEnchantment" class="form-select form-select-sm"></select>
+          </div>
+          <div><label for="inventoryWeaponDetails">Details</label><input id="inventoryWeaponDetails" class="form-control form-control-sm"></div>
+        </div>
+        <div id="inventoryArmorFields" class="inventory-edit-grid mt-2 d-none">
+          <div><label for="inventoryArmorBonus">Bonus</label><input id="inventoryArmorBonus" class="form-control form-control-sm" type="number" value="0"></div>
+          <div><label for="inventoryArmorEnhancement">Enhancement</label><input id="inventoryArmorEnhancement" class="form-control form-control-sm" type="number" min="0" max="5" value="0"></div>
+          <div>
+            <label for="inventoryArmorEnchantment">Enchantment</label>
+            <select id="inventoryArmorEnchantment" class="form-select form-select-sm"></select>
+          </div>
+        </div>
+        <div class="mt-3">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <div class="small text-secondary">Item Effects</div>
+            <button id="addInventoryEffect" class="btn btn-outline-info btn-sm" type="button">Create Effect</button>
+          </div>
+          <div id="inventoryEffectRows" class="vstack gap-2"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-light btn-sm" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary btn-sm">Save Changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal fade" id="deleteInventoryItemModal" tabindex="-1" aria-labelledby="deleteInventoryItemModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <form id="deleteInventoryItemForm" class="modal-content bg-dark text-white border-secondary">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteInventoryItemModalLabel">Delete Item</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="deleteInventoryItemSummary" class="small text-secondary mb-2"></div>
+        <label for="deleteInventoryItemCount">How many?</label>
+        <input id="deleteInventoryItemCount" class="form-control form-control-sm" type="number" min="1" value="1" required>
+        <div id="deleteInventoryItemMax" class="form-text"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-light btn-sm" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal fade" id="effectTrackerModal" tabindex="-1" aria-labelledby="effectTrackerModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content bg-dark text-white border-secondary">
+      <div class="modal-header">
+        <h5 class="modal-title" id="effectTrackerModalLabel">Effects</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="sheetEffectTracker"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="navbar.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="app-supabase.js"></script>
+<script src="buff-calculator.js"></script>
+<script src="buff-tracker-widget.js"></script>
+<script>
+const ABILITIES = [
+  ["str", "STR"], ["dex", "DEX"], ["con", "CON"], ["int", "INT"], ["wis", "WIS"], ["cha", "CHA"]
+];
+const SAVES = [["fort", "Fortitude", "con"], ["reflex", "Reflex", "dex"], ["will", "Will", "wis"]];
+const SKILLS = [
+  ["Acrobatics", "dex"], ["Appraise", "int"], ["Bluff", "cha"], ["Climb", "str"], ["Diplomacy", "cha"],
+  ["Disable Device", "dex"], ["Disguise", "cha"], ["Escape Artist", "dex"], ["Fly", "dex"], ["Heal", "wis"],
+  ["Intimidate", "cha"], ["Knowledge (arcana)", "int"], ["Knowledge (dungeoneering)", "int"],
+  ["Knowledge (engineering)", "int"], ["Knowledge (geography)", "int"], ["Knowledge (history)", "int"],
+  ["Knowledge (local)", "int"], ["Knowledge (nature)", "int"], ["Knowledge (nobility)", "int"],
+  ["Knowledge (planes)", "int"], ["Knowledge (religion)", "int"], ["Linguistics", "int"],
+  ["Perception", "wis"], ["Ride", "dex"], ["Sense Motive", "wis"], ["Sleight of Hand", "dex"],
+  ["Spellcraft", "int"], ["Stealth", "dex"], ["Survival", "wis"], ["Swim", "str"], ["Use Magic Device", "cha"]
+];
+const SIMPLE_FIELDS = ["characterName","classLevel","characterLevel","race","alignment","deity","homeland","size","gender","age","height","weight","hair","eyes","bab","currentHitPoints","hitPoints","hitPointsTotal","damageReduction","initMisc","speedBase","speedArmor","acNatural","acDeflection","acMisc","lightLoad","mediumLoad","heavyLoad","liftOverHead","liftOffGround","dragOrPush","GP","SP","CP","notes"];
+const ABILITY_STAT_NAMES = { str: "strength", dex: "dexterity", con: "constitution", int: "intelligence", wis: "wisdom", cha: "charisma" };
+const SCALE_ABILITIES = ["STR", "DEX", "CON", "INT", "WIS", "CHA"];
+const WEAPON_TYPES = ["Melee Weapon (Light)", "Melee Weapon (One-Handed)", "Melee Weapon (Two-Handed)", "Ranged Weapon", "Firearm (One-Handed)", "Firearm (Two-Handed)", "Natural"];
+const WEAPON_ENCHANTMENTS = ["", "Adaptive", "Allying", "Anarchic", "Anchoring", "Axiomatic", "Bane", "Brilliant Energy", "Called", "Conductive", "Corrosive", "Corrosive Burst", "Cruel", "Cunning", "Dancing", "Defending", "Disruption", "Distance", "Flaming", "Flaming Burst", "Frost", "Furious", "Ghost Touch", "Holy", "Icy Burst", "Impact", "Keen", "Merciful", "Returning", "Seeking", "Shock", "Shocking Burst", "Speed", "Spell Storing", "Throwing", "Thundering", "Unholy", "Vicious", "Vorpal", "Wounding"];
+const ARMOR_ENCHANTMENTS = ["", "Balanced", "Benevolent", "Bitter", "Bolstering", "Brawling", "Champion", "Dastard", "Deathless", "Defiant", "Determination", "Energy Resistance", "Energy Resistance (Improved)", "Energy Resistance (Greater)", "Etherealness", "Fortification (Light)", "Fortification (Moderate)", "Fortification (Heavy)", "Ghost Touch", "Glamered", "Invulnerability", "Shadow", "Shadow (Improved)", "Shadow (Greater)", "Slick", "Slick (Improved)", "Slick (Greater)", "Spell Resistance (13)", "Spell Resistance (15)", "Spell Resistance (17)", "Spell Resistance (19)", "Wild"];
+const SHIELD_ENCHANTMENTS = ["", "Animated", "Arrow Catching", "Arrow Deflection", "Bashing", "Blinding", "Clangorous", "Defiant", "Determination", "Energy Resistance", "Energy Resistance (Improved)", "Energy Resistance (Greater)", "Fortification (Light)", "Fortification (Moderate)", "Fortification (Heavy)", "Ghost Touch", "Impervious", "Merging", "Mirrored", "Poison-Resistant", "Rallying", "Ramming", "Reflecting", "Spell Resistance (13)", "Spell Resistance (15)", "Spell Resistance (17)", "Spell Resistance (19)", "Wild"];
+const LOOT_EFFECT_STATS = ["strength","dexterity","constitution","intelligence","wisdom","charisma","attack","melee attack","ranged attack","damage","melee damage","ranged damage","ac","touch ac","flat-footed ac","natural armor","deflection","fortitude","reflex","will","initiative","cmb","cmd","hit points","spell resistance"];
+const LOOT_SKILL_STATS = ["skill checks","strength skill checks","dexterity skill checks","constitution skill checks","intelligence skill checks","wisdom skill checks","charisma skill checks"];
+const LOOT_BONUS_TYPES = ["untyped","alchemical","condition","penalty","armor","circumstance","competence","deflection","dodge","enhancement","insight","luck","morale","natural armor","profane","resistance","sacred","shield","size"];
+let weaponCount = 0;
+let armorCount = 0;
+let gearCount = 0;
+let sheetSaveTimer;
+let sheetContextKey = "general";
+let showCalculations = false;
+let currentSheetId = null;
+let isRestoringSheet = false;
+let activeBuffs = [];
+let lastBuffRefresh = "";
+let effectTrackerInstance = null;
+let currentUserId = "";
+let currentSheetOwnerId = "";
+let sheetViewMode = sessionStorage.getItem("pf_character_sheet_view") || "full";
+let customSkills = [];
+let inventoryItemModal = null;
+let deleteInventoryItemModal = null;
+let editingInventoryItemId = null;
+let pendingInventoryDeleteId = null;
+let characterInventoryItems = [];
+
+const PDF_SAMPLE = {
+  characterName: "Choose Name", classLevel: "", race: "", alignment: "",
+  deity: "Not set", homeland: "Not set", size: "Medium", gender: "Not set", age: "Not set (Adult)",
+    characterLevel: 0, currentHitPoints: 0, hitPoints: 0, damageReduction: "", strScore: 10, dexScore: 10, conScore: 10, intScore: 10, wisScore: 10, chaScore: 10,
+  bab: 6, acArmor: 8, acShield: 0, acNatural: 0, acDeflection: 0, acMisc: 0, fortBase: 6, reflexBase: 3, willBase: 6,
+  initMisc: 0, speedArmor: "20 ft. 4 sq.", mediumLoad: "174-346 lbs.", heavyLoad: "347-520 lbs.",
+  liftOverHead: "520 lbs.", liftOffGround: "1040 lbs.", dragOrPush: "2600 lbs.", notes: "173 lbs. or less"
+};
+
+function el(id) { return document.getElementById(id); }
+function num(id) { return Number(el(id)?.value || 0); }
+function mod(score) { return Math.floor((Number(score || 0) - 10) / 2); }
+function signed(value) { return value >= 0 ? `+${value}` : String(value); }
+function skillId(skill) { return skill.replace(/[^a-z0-9]/gi, ""); }
+function normalizeSkillName(skill) { return skillId(skill).toLowerCase(); }
+function allSkills() { return [...SKILLS, ...customSkills.map(skill => [skill.name, skill.ability || "int", true])]; }
+function abilityMod(key) { return mod(num(`${key}Score`)); }
+function abilityModFor(key, buffed) {
+  return buffed?.abilityMods?.[ABILITY_STAT_NAMES[key]] ?? abilityMod(key);
+}
+
+function parseScalingKeys(value) {
+  const matches = String(value || "").toLowerCase().match(/\b(str|dex|con|int|wis|cha)\b/g);
+  return matches ? [...new Set(matches)] : [];
+}
+
+function scalingOptionButtons(name, value = "STR") {
+  const selected = parseScalingKeys(value).map(key => key.toUpperCase());
+  const active = selected.length ? selected : ["STR"];
+  return `
+    <input data-field="${name}" class="sheet-input" type="hidden" value="${escapeHtml(active.join(" + "))}">
+    <div class="scale-options" data-scale-options="${name}">
+      ${SCALE_ABILITIES.map(ability => `
+        <button class="btn btn-sm ${active.includes(ability) ? "btn-primary" : "btn-outline-light"}" type="button" data-scale-ability="${ability}">${ability}</button>
+      `).join("")}
+    </div>
+  `;
+}
+
+function attachScalingControls(root = document) {
+  root.querySelectorAll("[data-scale-options]").forEach(group => {
+    if (group.dataset.bound === "true") return;
+    group.dataset.bound = "true";
+    const field = group.dataset.scaleOptions;
+    const hidden = group.parentElement.querySelector(`[data-field="${field}"]`);
+    group.querySelectorAll("[data-scale-ability]").forEach(button => {
+      button.addEventListener("click", () => {
+        button.classList.toggle("btn-primary");
+        button.classList.toggle("btn-outline-light");
+        const selected = [...group.querySelectorAll(".btn-primary")].map(btn => btn.dataset.scaleAbility);
+        hidden.value = (selected.length ? selected : ["STR"]).join(" + ");
+        recalculateSheet();
+        queueSheetSave();
+      });
+    });
+  });
+}
+
+function isRangedWeaponType(type) {
+  return ["Ranged Weapon", "Firearm (One-Handed)", "Firearm (Two-Handed)"].includes(type);
+}
+
+function isMeleeWeaponType(type) {
+  return !isRangedWeaponType(type);
+}
+
+function isTwoHandedWeaponType(type) {
+  return ["Melee Weapon (Two-Handed)", "Firearm (Two-Handed)"].includes(type);
+}
+
+function syncWeaponTypeControls(card, resetToggles = false) {
+  const weaponType = card.querySelector('[data-field="weaponType"]')?.value || "Melee Weapon (One-Handed)";
+  const melee = isMeleeWeaponType(weaponType);
+  card.querySelectorAll("[data-melee-weapon-option]").forEach(node => node.classList.toggle("d-none", !melee));
+  card.querySelectorAll("[data-ranged-weapon-option]").forEach(node => node.classList.toggle("d-none", melee));
+  if (resetToggles) {
+    ["twoHanded", "powerAttack", "deadlyAim"].forEach(field => {
+      const input = card.querySelector(`[data-field="${field}"]`);
+      if (input) input.checked = false;
+    });
+  }
+}
+
+function attachWeaponTypeControls(card) {
+  const select = card.querySelector('[data-field="weaponType"]');
+  if (!select || select.dataset.bound === "true") return;
+  select.dataset.bound = "true";
+  syncWeaponTypeControls(card);
+  select.addEventListener("change", () => {
+    syncWeaponTypeControls(card, true);
+    recalculateSheet();
+    queueSheetSave();
+  });
+}
+
+function parseScalingTerms(value, fallback = "STR") {
+  const text = String(value || fallback).toLowerCase();
+  const terms = [];
+  const pattern = /\b(str|dex|con|int|wis|cha)\b/g;
+  let match;
+  while ((match = pattern.exec(text))) {
+    terms.push({ multiplier: 1, key: match[1] });
+  }
+  if (terms.length) return terms;
+  return fallback && String(value || "").toLowerCase() !== String(fallback).toLowerCase() ? parseScalingTerms(fallback, "") : [];
+}
+
+function stripDamageModifier(value) {
+  const text = String(value || "").trim();
+  return text.replace(/\s*[+-]\s*\d+\s*$/, "").trim() || text;
+}
+
+function buffCauseForStat(buffed, statName) {
+  const items = buffed?.breakdown?.[statName] || [];
+  const causes = items
+    .filter(item => !["Base", "Formula"].includes(item.source))
+    .filter(item => item.applied !== false)
+    .map(item => `${item.source} ${signed(Number(item.value || 0))} ${item.type || ""}`.trim());
+  return causes.length ? causes.join(", ") : "no active buff modifiers";
+}
+
+function breakdownForStat(buffed, statName, detailPrefix = "") {
+  const items = buffed?.breakdown?.[statName] || [];
+  if (!items.length) return [];
+  return items
+    .filter(item => !["Base", "Formula"].includes(item.source))
+    .map(item => detailPrefix ? { ...item, detail: item.detail ? `${detailPrefix}: ${item.detail}` : detailPrefix } : item);
+}
+
+function combinedBreakdowns(buffed, entries = []) {
+  return entries.flatMap(entry => {
+    if (typeof entry === "string") return breakdownForStat(buffed, entry);
+    return breakdownForStat(buffed, entry.stat, entry.detail).map(item => ({
+      ...item,
+      targetLabel: entry.target || item.targetLabel
+    }));
+  });
+}
+
+function skillBuffKeyForAbility(abilityKey) {
+  const statName = ABILITY_STAT_NAMES[abilityKey];
+  return statName ? `${statName} skill checks` : "";
+}
+
+function skillStatKey(skill) {
+  return `skill:${normalizeSkillName(skill)}`;
+}
+
+function iterativeBabBonuses(bab) {
+  const first = Number(bab || 0);
+  if (first < 1) return [first];
+  const bonuses = [];
+  for (let value = first; value >= 1; value -= 5) bonuses.push(value);
+  return bonuses;
+}
+
+function optionList(options, selected = "") {
+  return options.map(value => `<option value="${escapeHtml(value)}" ${value === selected ? "selected" : ""}>${value || "None"}</option>`).join("");
+}
+
+function armorEnchantmentOptions(selected = "") {
+  return `
+    <option value="" ${selected === "" ? "selected" : ""}>None</option>
+    <optgroup label="Armor">${optionList(ARMOR_ENCHANTMENTS.slice(1), selected)}</optgroup>
+    <optgroup label="Shield">${optionList(SHIELD_ENCHANTMENTS.slice(1), selected)}</optgroup>
+  `;
+}
+
+function titleCaseStat(value) {
+  const key = String(value || "").toLowerCase().trim();
+  if (key.startsWith("skill:")) {
+    const skill = allSkills().map(([name]) => name).find(entry => `skill:${normalizeSkillName(entry)}` === key);
+    return `Skill: ${skill || key.slice(6)}`;
+  }
+  return key.split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
+}
+
+function lootEffectStatOptions(selected = "") {
+  const skillStats = allSkills().map(([skill]) => `skill:${normalizeSkillName(skill)}`);
+  const option = (value, label = titleCaseStat(value)) => `<option value="${escapeHtml(value)}" ${selected === value ? "selected" : ""}>${escapeHtml(label)}</option>`;
+  return `
+    <optgroup label="Stats">${LOOT_EFFECT_STATS.map(stat => option(stat)).join("")}</optgroup>
+    <optgroup label="Skills">
+      ${LOOT_SKILL_STATS.map(stat => option(stat)).join("")}
+      <option value="skill:craft" ${selected === "skill:craft" ? "selected" : ""}>Skill: Craft</option>
+      <option value="skill:profession" ${selected === "skill:profession" ? "selected" : ""}>Skill: Profession</option>
+      ${skillStats.map(stat => option(stat)).join("")}
+    </optgroup>
+  `;
+}
+
+function skillKey(name) {
+  return `skill:${String(name || "").replace(/[^a-z0-9]/gi, "").toLowerCase()}`;
+}
+
+function namedSkill(kind, value) {
+  const text = String(value || "").trim();
+  if (!text) return "";
+  const prefix = kind === "skill:profession" ? "Profession" : "Craft";
+  if (text.toLowerCase().startsWith(`${prefix.toLowerCase()} (`)) return text;
+  return `${prefix} (${text})`;
+}
+
+function enhancementValue(value) {
+  return Math.max(0, Math.min(5, Number(value || 0)));
+}
+
+function isYes(value) {
+  return ["yes", "true", "1", "on"].includes(String(value || "").toLowerCase());
+}
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function setSheetView(mode) {
+  sheetViewMode = mode === "simplified" ? "simplified" : "full";
+  sessionStorage.setItem("pf_character_sheet_view", sheetViewMode);
+  const isSimple = sheetViewMode === "simplified";
+  el("fullSheetView")?.classList.toggle("d-none", isSimple);
+  el("simplifiedSheetView")?.classList.toggle("d-none", !isSimple);
+  el("fullViewBtn")?.classList.toggle("btn-primary", !isSimple);
+  el("fullViewBtn")?.classList.toggle("btn-outline-primary", isSimple);
+  el("simplifiedViewBtn")?.classList.toggle("btn-primary", isSimple);
+  el("simplifiedViewBtn")?.classList.toggle("btn-outline-primary", !isSimple);
+  if (isSimple) renderSimplifiedSheet();
+}
+
+function fieldValue(id, fallback = "") {
+  return el(id)?.value || fallback;
+}
+
+function simpleStat(label, value) {
+  return `<div class="simple-card"><div class="simple-label">${escapeHtml(label)}</div><div class="simple-value">${escapeHtml(value || "-")}</div></div>`;
+}
+
+function simpleTable(headers, rows) {
+  return `
+    <table class="table table-dark table-sm align-middle simple-table">
+      <thead><tr>${headers.map(header => `<th>${escapeHtml(header)}</th>`).join("")}</tr></thead>
+      <tbody>${rows.map(row => {
+        const cells = Array.isArray(row) ? row : row.cells;
+        const className = row.conditional ? ' class="simple-conditional"' : "";
+        return `<tr${className}>${cells.map(cell => `<td>${escapeHtml(cell || "-")}</td>`).join("")}</tr>`;
+      }).join("")}</tbody>
+    </table>
+  `;
+}
+
+function simpleChips(rows, emptyText = "None.") {
+  if (!rows.length) return `<div class="small-text">${escapeHtml(emptyText)}</div>`;
+  return `<div class="simple-chip-grid">${rows.map(row => `
+    <div class="simple-chip">
+      <div class="simple-chip-main">${escapeHtml(row.main || "-")}</div>
+      ${row.sub ? `<div class="simple-chip-sub">${escapeHtml(row.sub)}</div>` : ""}
+    </div>
+  `).join("")}</div>`;
+}
+
+function simpleList(rows, emptyText = "None.") {
+  if (!rows.length) return `<div class="small-text">${escapeHtml(emptyText)}</div>`;
+  return `<div class="simple-list">${rows.map(row => `
+    <div class="simple-list-row${row.conditional ? " simple-conditional" : ""}">
+      <div>
+        <div class="simple-list-main">${escapeHtml(row.main || "-")}</div>
+        ${row.detail ? `<div class="simple-chip-sub">${escapeHtml(row.detail)}</div>` : ""}
+      </div>
+      ${row.sub ? `<div class="simple-list-sub">${escapeHtml(row.sub)}</div>` : ""}
+    </div>
+  `).join("")}</div>`;
+}
+
+function statDisplayLabel(stat) {
+  const key = String(stat || "").toLowerCase();
+  const ability = Object.entries(ABILITY_STAT_NAMES).find(([, value]) => value === key);
+  if (ability) return ability[0].toUpperCase();
+  const skill = allSkills().find(([name]) => skillStatKey(name) === key);
+  if (skill) return skill[0];
+  const labels = {
+    ac: "AC",
+    "touch ac": "Touch AC",
+    "flat-footed ac": "Flat-Footed AC",
+    cmb: "CMB",
+    cmd: "CMD",
+    fortitude: "Fortitude",
+    reflex: "Reflex",
+    will: "Will",
+    initiative: "Initiative",
+    "hit points": "HP",
+    "skill checks": "All skills",
+    "strength skill checks": "STR skills",
+    "dexterity skill checks": "DEX skills",
+    "constitution skill checks": "CON skills",
+    "intelligence skill checks": "INT skills",
+    "wisdom skill checks": "WIS skills",
+    "charisma skill checks": "CHA skills"
+  };
+  return labels[key] || key.split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
+}
+
+function totalForStat(stat) {
+  const key = String(stat || "").toLowerCase();
+  const ability = Object.entries(ABILITY_STAT_NAMES).find(([, value]) => value === key);
+  if (ability) return fieldValue(`${ability[0]}Total`);
+  const skill = allSkills().find(([name]) => skillStatKey(name) === key);
+  if (skill) return fieldValue(`${skillId(skill[0])}Total`);
+  const ids = {
+    ac: "acTotal",
+    "touch ac": "acTouch",
+    "flat-footed ac": "acFlat",
+    cmb: "cmbTotal",
+    cmd: "cmdTotal",
+    fortitude: "fortTotal",
+    reflex: "reflexTotal",
+    will: "willTotal",
+    initiative: "initTotal",
+    "hit points": "hitPointsTotal"
+  };
+  return ids[key] ? fieldValue(ids[key]) : "";
+}
+
+function simpleConditionalsByStat() {
+  const buffed = window.PFBuffs?.calculateStatsDetailed(activeBuffs, sheetToBaseline());
+  const groups = {};
+  Object.entries(buffed?.breakdown || {}).forEach(([stat, items]) => {
+    items
+      .filter(item => item.conditional || item.applied === "conditional")
+      .forEach(item => {
+        const value = Number(item.value || 0);
+        const total = totalForStat(stat)
+          ? numericTotalText(totalForStat(stat), value, stat)
+          : signed(value);
+        const appliesWhen = item.detail ? ` (${item.detail})` : "";
+        if (!groups[stat]) groups[stat] = [];
+        groups[stat].push({
+          label: `${statDisplayLabel(stat)}${appliesWhen}`,
+          total,
+          source: `${item.source} ${signed(value)} (${item.type || "untyped"})`,
+          value,
+          type: item.type || "untyped",
+          effect: item.source,
+          appliesWhen: item.detail || ""
+        });
+      });
+  });
+  return groups;
+}
+
+function simpleConditionalStats(stat, groups) {
+  return (groups[stat] || []).map(row => simpleStat(row.label, row.total).replace("simple-card", "simple-card simple-conditional")).join("");
+}
+
+function conditionalTableRows(stat, groups) {
+  return (groups[stat] || []).map(row => ({
+    conditional: true,
+    cells: [row.label, row.total]
+  }));
+}
+
+function simpleSkillRows(groups) {
+  const rows = [];
+  allSkills().forEach(([skill, ability]) => {
+    const key = skillStatKey(skill);
+    rows.push({ main: skill, sub: fieldValue(`${skillId(skill)}Total`) });
+    (groups["skill checks"] || []).forEach(row => rows.push({ main: row.label, sub: row.total, detail: row.source, conditional: true }));
+    (groups[skillBuffKeyForAbility(ability)] || []).forEach(row => rows.push({ main: row.label, sub: row.total, detail: row.source, conditional: true }));
+    (groups[key] || []).forEach(row => rows.push({ main: row.label, sub: row.total, detail: row.source, conditional: true }));
+  });
+  return rows;
+}
+
+function simpleConditionalListRows(label, currentTotal, stats, groups) {
+  return stats.flatMap(stat => (groups[stat] || []).map(row => ({
+    main: `${numericTotalText(currentTotal, row.value, stat)}${row.appliesWhen ? ` (${row.appliesWhen})` : ""}`,
+    sub: "",
+    detail: row.source,
+    conditional: true
+  })));
+}
+
+function simpleWeaponCards(rows) {
+  if (!rows.length) return `<div class="small-text">No weapons.</div>`;
+  return `<div class="vstack gap-2">${rows.map(row => `
+    <div class="sheet-card simple-weapon-card">
+      <div class="mb-2">
+        <div class="simple-label">Name</div>
+        <div class="simple-value">${escapeHtml(row[0] || "-")}</div>
+      </div>
+      <div class="simple-weapon-block">
+        <div>
+          ${simpleStat("Attack Bonus", row[1])}
+          ${row[4]?.length ? simpleList(row[4]) : ""}
+        </div>
+        <div>
+          ${simpleStat("Damage", row[2])}
+          ${row[5]?.length ? simpleList(row[5]) : ""}
+        </div>
+        <div>
+          ${simpleStat("Critical", row[3])}
+        </div>
+      </div>
+    </div>
+  `).join("")}</div>`;
+}
+
+function lootIcon(type) {
+  return {
+    Weapon: "bi-crosshair",
+    Armor: "bi-shield-fill",
+    Shield: "bi-shield",
+    Item: "bi-gem"
+  }[type] || "bi-gem";
+}
+
+function rememberSelectedCharacter(characterId, contextKey = sheetContextKey) {
+  if (PFApp.setSelectedCharacterId) {
+    PFApp.setSelectedCharacterId(characterId, contextKey);
+    return;
+  }
+
+  const key = `pf_character_id_${contextKey}`;
+  if (characterId) localStorage.setItem(key, characterId);
+  else localStorage.removeItem(key);
+}
+
+function sheetToBaseline() {
+  const gearAc = calculateGearAc();
+  return {
+    str: num("strScore"),
+    dex: num("dexScore"),
+    con: num("conScore"),
+    int: num("intScore"),
+    wis: num("wisScore"),
+    cha: num("chaScore"),
+    bab: num("bab"),
+    hitPoints: num("hitPoints"),
+    hitDice: Math.max(1, num("characterLevel")),
+    armor: gearAc.armor,
+    shield: gearAc.shield,
+    naturalArmor: num("acNatural"),
+    deflection: num("acDeflection"),
+    acMisc: num("acMisc"),
+    fortBase: num("fortBase"),
+    reflexBase: num("reflexBase"),
+    willBase: num("willBase"),
+    initMisc: num("initMisc"),
+    sizeAc: 0,
+    sizeCombat: 0
+  };
+}
+
+function setStatus(message, type = "info") {
+  const status = el("sheetStatus");
+  status.className = `alert alert-${type} py-2`;
+  status.textContent = message;
+  status.classList.remove("d-none");
+}
+
+function buildSheet() {
+  el("abilityRows").innerHTML = ABILITIES.map(([key, label]) => `
+    <tr>
+      <th>${label}</th>
+      <td><input id="${key}Score" class="form-control form-control-sm sheet-input" type="number" value="10"></td>
+      <td><input id="${key}Buff" class="form-control form-control-sm buff-field" readonly></td>
+      <td><input id="${key}Total" class="form-control form-control-sm" readonly></td>
+      <td><input id="${key}Mod" class="form-control form-control-sm" readonly></td>
+    </tr>
+    <tr>
+      <td colspan="5"><div class="small-text calc-line" data-calc-for="${key}Total"></div></td>
+    </tr>
+  `).join("");
+
+  el("saveRows").innerHTML = SAVES.map(([key, label]) => `
+    <tr>
+      <th>${label}</th>
+      <td><input id="${key}Base" class="form-control form-control-sm sheet-input" type="number" value="0"></td>
+      <td><input id="${key}Ability" class="form-control form-control-sm" readonly></td>
+      <td><input id="${key}Buff" class="form-control form-control-sm buff-field" readonly></td>
+      <td><input id="${key}Total" class="form-control form-control-sm" readonly></td>
+    </tr>
+    <tr>
+      <td colspan="5"><div class="small-text calc-line" data-calc-for="${key}Total"></div></td>
+    </tr>
+  `).join("");
+
+  renderSkillRows();
+}
+
+function renderSkillRows(saved = {}) {
+  el("skillRows").innerHTML = allSkills().map(([skill, ability, custom]) => {
+    const id = skillId(skill);
+    const values = saved[id] || {};
+    return `
+      <tr>
+        <th>
+          ${escapeHtml(skill)}
+          ${custom ? `<button class="btn btn-outline-danger btn-sm ms-2 py-0 px-1" type="button" onclick="removeNamedSkillByKey('${normalizeSkillName(skill)}')" aria-label="Remove ${escapeHtml(skill)}"><i class="bi bi-trash"></i></button>` : ""}
+        </th>
+        <td><input id="${id}Ability" class="form-control form-control-sm no-spinner" value="0" data-ability="${ability}" readonly></td>
+        <td><input id="${id}Ranks" class="form-control form-control-sm sheet-input" type="number" value="${values.ranks || 0}"></td>
+        <td><input id="${id}Misc" class="form-control form-control-sm sheet-input" type="number" value="${values.misc || 0}"></td>
+        <td><input id="${id}Buff" class="form-control form-control-sm buff-field" readonly></td>
+        <td><input id="${id}Total" class="form-control form-control-sm" readonly></td>
+      </tr>
+      <tr>
+        <td colspan="6"><div class="small-text calc-line" data-calc-for="${id}Total"></div></td>
+      </tr>
+    `;
+  }).join("");
+  attachInputListeners(el("skillRows"));
+}
+
+function currentSkillValues() {
+  const values = {};
+  allSkills().forEach(([skill]) => {
+    const id = skillId(skill);
+    values[id] = {
+      ranks: el(`${id}Ranks`)?.value || 0,
+      misc: el(`${id}Misc`)?.value || 0
+    };
+  });
+  return values;
+}
+
+function addNamedSkill(prefix, ability) {
+  const detail = window.prompt(`${prefix} name`, "");
+  if (detail === null) return;
+  const clean = detail.trim();
+  if (!clean) return;
+  const name = `${prefix} (${clean})`;
+  const key = normalizeSkillName(name);
+  if (allSkills().some(([skill]) => normalizeSkillName(skill) === key)) {
+    setStatus(`${name} already exists.`, "warning");
+    return;
+  }
+  customSkills.push({ name, ability });
+  renderSkillRows(currentSkillValues());
+  recalculateSheet();
+  queueSheetSave();
+}
+
+function removeNamedSkillByKey(key) {
+  const saved = currentSkillValues();
+  customSkills = customSkills.filter(skill => normalizeSkillName(skill.name) !== key);
+  renderSkillRows(saved);
+  recalculateSheet();
+  queueSheetSave();
+}
+
+function addWeapon(data = {}) {
+  const i = weaponCount++;
+  const card = document.createElement("div");
+  card.className = "sheet-card";
+  card.dataset.weaponIndex = i;
+  const name = data.name || `Weapon ${i + 1}`;
+  const attackScale = data.attackScale || data.attack_scale || "STR";
+  const damageScale = data.damageScale || data.damage_scale || "STR";
+  const twoHanded = isYes(data.twoHanded || data.two_handed) ? "yes" : "no";
+  const powerAttack = isYes(data.powerAttack || data.power_attack) ? "yes" : "no";
+  const deadlyAim = isYes(data.deadlyAim || data.deadly_aim) ? "yes" : "no";
+  const weaponType = data.weaponType || data.weapon_type || "Melee Weapon (One-Handed)";
+  const enhancement = data.enhancement || "0";
+  const enchantment = data.enchantment || "";
+  card.innerHTML = `
+    <div class="equipment-card-header">
+      <input data-field="name" class="form-control form-control-sm sheet-input fw-semibold equipment-name-input" value="${escapeHtml(name)}">
+      <div class="equipment-actions">
+        <button class="btn btn-outline-light btn-sm" type="button" onclick="toggleCardDetails(this)">More</button>
+        <button class="btn btn-danger btn-sm" type="button" onclick="removeCard(this)">Remove</button>
+      </div>
+    </div>
+    <input data-field="sourceLootId" class="sheet-input" type="hidden" value="${data.sourceLootId || data.source_loot_id || ""}">
+    <div class="weapon-summary">
+      <div class="weapon-attack-summary"><label>Attack Bonus</label><input data-attack-total class="form-control form-control-sm" readonly></div>
+      <div><label>Damage</label><input data-damage-total class="form-control form-control-sm" readonly></div>
+      <div><label>Critical</label><input data-field="critical" class="form-control form-control-sm sheet-input" value="${data.critical || ""}"></div>
+    </div>
+    <div class="small-text calc-line" data-weapon-attack-calc></div>
+    <div class="small-text calc-line" data-weapon-damage-calc></div>
+    <div class="card-details d-none" data-card-details>
+    <div class="enhancement-summary">
+      <div><label>Enhancement</label><input data-field="enhancement" class="form-control form-control-sm sheet-input" type="number" min="0" max="5" value="${enhancement}"></div>
+      <div>
+        <label>Enchantment</label>
+        <select data-field="enchantment" class="form-select form-select-sm sheet-input">
+          ${optionList(WEAPON_ENCHANTMENTS, enchantment)}
+        </select>
+      </div>
+    </div>
+    <div class="weapon-group">
+      <div class="weapon-group-title">Weapon Type</div>
+      <div class="sheet-grid-wide">
+        <div>
+          <label>Weapon Type</label>
+          <select data-field="weaponType" class="form-select form-select-sm sheet-input">
+            ${optionList(WEAPON_TYPES, weaponType)}
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="weapon-group">
+      <div class="weapon-group-title">Attack</div>
+      <div class="sheet-grid-wide">
+      <div><label>Attack Buff</label><input data-attack-buff class="form-control form-control-sm buff-field" readonly></div>
+      <div><label>Attack Scales With</label>${scalingOptionButtons("attackScale", attackScale)}</div>
+      </div>
+    </div>
+    <div class="weapon-group">
+      <div class="weapon-group-title">Damage</div>
+      <div class="sheet-grid-wide">
+      <div><label>Damage Dice</label><input data-field="damage" class="form-control form-control-sm sheet-input" value="${data.damage || ""}"></div>
+      <div><label>Damage Scales With</label>${scalingOptionButtons("damageScale", damageScale)}</div>
+      <div><label>Damage Buff</label><input data-damage-buff class="form-control form-control-sm buff-field" readonly></div>
+      <div><label>Scaling Bonus</label><input data-damage-scaling class="form-control form-control-sm" readonly></div>
+      <div><label>Damage Bonus</label><input data-damage-bonus class="form-control form-control-sm buff-field" readonly></div>
+      </div>
+    </div>
+    <div class="weapon-group">
+      <div class="weapon-group-title">Attack Options</div>
+      <div class="weapon-toggle-grid">
+        <div data-melee-weapon-option>
+          <label class="d-block" for="weaponTwoHanded${i}">Two-Handed</label>
+          <div class="form-check form-switch mt-1">
+            <input id="weaponTwoHanded${i}" data-field="twoHanded" class="form-check-input sheet-input" type="checkbox" value="yes" ${twoHanded === "yes" ? "checked" : ""}>
+          </div>
+        </div>
+        <div data-melee-weapon-option>
+          <label class="d-block" for="weaponPowerAttack${i}">Power Attack</label>
+          <div class="form-check form-switch mt-1">
+            <input id="weaponPowerAttack${i}" data-field="powerAttack" class="form-check-input sheet-input" type="checkbox" value="yes" ${powerAttack === "yes" ? "checked" : ""}>
+          </div>
+        </div>
+        <div data-ranged-weapon-option>
+          <label class="d-block" for="weaponDeadlyAim${i}">Deadly Aim</label>
+          <div class="form-check form-switch mt-1">
+            <input id="weaponDeadlyAim${i}" data-field="deadlyAim" class="form-check-input sheet-input" type="checkbox" value="yes" ${deadlyAim === "yes" ? "checked" : ""}>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="weapon-group">
+      <div class="weapon-group-title">Details</div>
+      <div class="sheet-grid-wide">
+      <div><label>Type</label><input data-field="type" class="form-control form-control-sm sheet-input" value="${data.type || ""}"></div>
+      <div><label>Range / Ammo</label><input data-field="range" class="form-control form-control-sm sheet-input" value="${data.range || ""}"></div>
+      </div>
+    </div>
+    </div>
+  `;
+  el("weaponRows").appendChild(card);
+  attachInputListeners(card);
+  attachScalingControls(card);
+  attachWeaponTypeControls(card);
+}
+
+function addArmor(data = {}) {
+  const i = armorCount++;
+  const card = document.createElement("div");
+  card.className = "sheet-card";
+  card.dataset.armorIndex = i;
+  const type = data.type === "Shield" ? "Shield" : "Armor";
+  const itemName = data.item || `Armor / Shield ${i + 1}`;
+  const enhancement = data.enhancement || "0";
+  const enchantment = data.enchantment || "";
+  card.innerHTML = `
+    <div class="equipment-card-header">
+      <input data-field="item" class="form-control form-control-sm sheet-input fw-semibold equipment-name-input" value="${escapeHtml(itemName)}">
+      <div class="equipment-actions">
+        <button class="btn btn-outline-light btn-sm" type="button" onclick="toggleCardDetails(this)">More</button>
+        <button class="btn btn-danger btn-sm" type="button" onclick="removeCard(this)">Remove</button>
+      </div>
+    </div>
+    <div class="card-summary">
+      <div><label>Bonus</label><input data-field="bonus" class="form-control form-control-sm sheet-input" value="${data.bonus || ""}"></div>
+      <input data-field="sourceLootId" class="sheet-input" type="hidden" value="${data.sourceLootId || data.source_loot_id || ""}">
+    </div>
+    <div class="card-details d-none" data-card-details>
+    <div class="enhancement-summary">
+      <div><label>Enhancement</label><input data-field="enhancement" class="form-control form-control-sm sheet-input" type="number" min="0" max="5" value="${enhancement}"></div>
+      <div>
+        <label>Enchantment</label>
+        <select data-field="enchantment" class="form-select form-select-sm sheet-input">
+          ${armorEnchantmentOptions(enchantment)}
+        </select>
+      </div>
+    </div>
+    <div class="sheet-grid-wide mt-2">
+      <div>
+        <label>Type</label>
+        <select data-field="type" class="form-select form-select-sm sheet-input">
+          <option value="Armor" ${type === "Armor" ? "selected" : ""}>Armor</option>
+          <option value="Shield" ${type === "Shield" ? "selected" : ""}>Shield</option>
+        </select>
+      </div>
+      <div><label>Penalty</label><input data-field="penalty" class="form-control form-control-sm sheet-input" value="${data.penalty || ""}"></div>
+      <div><label>Failure</label><input data-field="failure" class="form-control form-control-sm sheet-input" value="${data.failure || ""}"></div>
+      <div><label>Weight</label><input data-field="weight" class="form-control form-control-sm sheet-input" value="${data.weight || ""}"></div>
+    </div>
+    </div>
+  `;
+  el("armorRows").appendChild(card);
+  attachInputListeners(card);
+}
+
+function addGear(data = {}) {
+  const i = gearCount++;
+  const card = document.createElement("div");
+  card.className = "sheet-card";
+  card.dataset.gearIndex = i;
+  const itemName = data.item || data.name || `Gear ${i + 1}`;
+  card.innerHTML = `
+    <div class="equipment-card-header">
+      <input data-field="item" class="form-control form-control-sm sheet-input fw-semibold equipment-name-input" value="${escapeHtml(itemName)}">
+      <div class="equipment-actions">
+        <button class="btn btn-outline-light btn-sm" type="button" onclick="toggleCardDetails(this)">More</button>
+        <button class="btn btn-danger btn-sm" type="button" onclick="removeCard(this)">Remove</button>
+      </div>
+    </div>
+    <input data-field="sourceLootId" class="sheet-input" type="hidden" value="${data.sourceLootId || data.source_loot_id || ""}">
+    <div class="card-details d-none" data-card-details>
+      <div class="sheet-grid-wide mt-2">
+        <div><label>Details</label><input data-field="details" class="form-control form-control-sm sheet-input" value="${data.details || ""}"></div>
+      </div>
+    </div>
+  `;
+  el("gearRows").appendChild(card);
+  attachInputListeners(card);
+}
+
+function removeCard(btn) {
+  const card = btn.closest(".sheet-card");
+  const sourceLootId = card?.querySelector('[data-field="sourceLootId"]')?.value || "";
+  card?.remove();
+  recalculateSheet();
+  queueSheetSave();
+  if (sourceLootId) void removeWornLootEffect(sourceLootId);
+}
+
+async function removeWornLootEffect(sourceLootId) {
+  const before = activeBuffs.length;
+  activeBuffs = activeBuffs.filter(buff => buff.sourceLootId !== sourceLootId);
+  if (activeBuffs.length === before) return;
+  await PFApp.saveBuffState(activeBuffs, sheetContextKey, currentSheetId);
+  localStorage.setItem(buffRefreshKey(), String(Date.now()));
+  recalculateSheet();
+}
+
+function removeEquippedLoot(sourceLootId) {
+  ["weaponRows", "armorRows", "gearRows"].forEach(containerId => {
+    el(containerId).querySelectorAll(".sheet-card").forEach(card => {
+      if (card.querySelector('[data-field="sourceLootId"]')?.value === sourceLootId) card.remove();
+    });
+  });
+  activeBuffs = activeBuffs.filter(buff => buff.sourceLootId !== sourceLootId);
+}
+
+function setCardScaling(card, name, value = "STR") {
+  const input = card?.querySelector(`[data-field="${name}"]`);
+  const group = card?.querySelector(`[data-scale-options="${name}"]`);
+  if (!input || !group) return;
+  const selected = parseScalingKeys(value).map(key => key.toUpperCase());
+  const activeSet = new Set(selected.length ? selected : ["STR"]);
+  input.value = [...activeSet].join(" + ");
+  group.querySelectorAll("[data-scale-ability]").forEach(button => {
+    const active = activeSet.has(button.dataset.scaleAbility);
+    button.classList.toggle("btn-primary", active);
+    button.classList.toggle("btn-outline-light", !active);
+  });
+}
+
+function updateWornCardFromLoot(item) {
+  const details = item.details || {};
+  const weaponCard = [...el("weaponRows").querySelectorAll(".sheet-card")]
+    .find(card => card.querySelector('[data-field="sourceLootId"]')?.value === item.id);
+  const armorCard = [...el("armorRows").querySelectorAll(".sheet-card")]
+    .find(card => card.querySelector('[data-field="sourceLootId"]')?.value === item.id);
+  const gearCard = [...el("gearRows").querySelectorAll(".sheet-card")]
+    .find(card => card.querySelector('[data-field="sourceLootId"]')?.value === item.id);
+
+  if (weaponCard && item.type === "Weapon") {
+    weaponCard.querySelector('[data-field="name"]').value = item.name || "";
+    weaponCard.querySelector('[data-field="damage"]').value = details.damage || "";
+    weaponCard.querySelector('[data-field="critical"]').value = details.critical || "";
+    weaponCard.querySelector('[data-field="enhancement"]').value = details.enhancement || "0";
+    weaponCard.querySelector('[data-field="enchantment"]').value = details.enchantment || "";
+    const previousType = weaponCard.querySelector('[data-field="weaponType"]').value || "";
+    const nextType = details.weaponType || "Melee Weapon (One-Handed)";
+    weaponCard.querySelector('[data-field="weaponType"]').value = nextType;
+    weaponCard.querySelector('[data-field="type"]').value = details.details || "";
+    syncWeaponTypeControls(weaponCard, previousType !== nextType);
+    setCardScaling(weaponCard, "attackScale", details.attackScale || "STR");
+    setCardScaling(weaponCard, "damageScale", details.damageScale || "STR");
+  }
+
+  if (armorCard && ["Armor", "Shield"].includes(item.type)) {
+    armorCard.querySelector('[data-field="item"]').value = item.name || "";
+    armorCard.querySelector('[data-field="type"]').value = item.type === "Shield" ? "Shield" : item.type === "Armor" ? "Armor" : "Gear";
+    armorCard.querySelector('[data-field="bonus"]').value = details.bonus || "0";
+    armorCard.querySelector('[data-field="enhancement"]').value = details.enhancement || "0";
+    armorCard.querySelector('[data-field="enchantment"]').value = details.enchantment || "";
+  }
+
+  if (gearCard && !["Weapon", "Armor", "Shield"].includes(item.type)) {
+    gearCard.querySelector('[data-field="item"]').value = item.name || "";
+    gearCard.querySelector('[data-field="details"]').value = details.details || item.description || "";
+  }
+
+  const isWorn = Boolean(weaponCard || armorCard || gearCard);
+  if (!isWorn) return;
+  if (item.type === "Weapon" && !weaponCard) {
+    armorCard?.remove();
+    gearCard?.remove();
+    addWeapon({
+      name: item.name,
+      sourceLootId: item.id,
+      weaponType: details.weaponType || "Melee Weapon (One-Handed)",
+      attackScale: details.attackScale || "STR",
+      damage: details.damage || "",
+      damageScale: details.damageScale || "STR",
+      enhancement: details.enhancement || "0",
+      enchantment: details.enchantment || "",
+      type: details.details || "",
+      critical: details.critical || ""
+    });
+  } else if (["Armor", "Shield"].includes(item.type) && !armorCard) {
+    weaponCard?.remove();
+    gearCard?.remove();
+    addArmor({
+      item: item.name,
+      sourceLootId: item.id,
+      type: item.type,
+      bonus: details.bonus || "0",
+      enhancement: details.enhancement || "0",
+      enchantment: details.enchantment || ""
+    });
+  } else if (!["Weapon", "Armor", "Shield"].includes(item.type) && !gearCard) {
+    weaponCard?.remove();
+    armorCard?.remove();
+    addGear({
+      item: item.name,
+      sourceLootId: item.id,
+      details: details.details || item.description || ""
+    });
+  }
+}
+
+function isLootEquipped(sourceLootId) {
+  return ["weaponRows", "armorRows", "gearRows"].some(containerId =>
+    [...el(containerId).querySelectorAll(".sheet-card")].some(card =>
+      card.querySelector('[data-field="sourceLootId"]')?.value === sourceLootId
+    )
+  );
+}
+
+function toggleCardDetails(btn) {
+  const card = btn.closest(".sheet-card");
+  const details = card?.querySelector("[data-card-details]");
+  if (!details) return;
+
+  const isHidden = details.classList.toggle("d-none");
+  btn.textContent = isHidden ? "More" : "Less";
+}
+
+function calculateGearAc() {
+  return collectCards("armorRows").reduce((totals, item) => {
+    const bonus = Number(item.bonus || 0) + enhancementValue(item.enhancement);
+    if (item.type === "Armor") totals.armor = Math.max(totals.armor, bonus);
+    if (item.type === "Shield") totals.shield = Math.max(totals.shield, bonus);
+    return totals;
+  }, { armor: 0, shield: 0 });
+}
+
+function powerFeatStep() {
+  const bab = Math.max(0, num("bab"));
+  return bab > 0 ? Math.floor((bab + 3) / 4) : 0;
+}
+
+function weaponFeatAdjustments(card) {
+  const field = name => {
+    const input = card.querySelector(`[data-field="${name}"]`);
+    if (!input) return "";
+    if (input.type === "checkbox") return input.checked ? "yes" : "no";
+    return input.value || "";
+  };
+  const weaponType = field("weaponType") || "Melee Weapon (One-Handed)";
+  const step = powerFeatStep();
+  const result = { attackPenalty: 0, damageBonus: 0, breakdown: [] };
+  if (!step) return result;
+
+  if (isMeleeWeaponType(weaponType) && isYes(field("powerAttack"))) {
+    const penalty = -step;
+    const baseDamage = step * 2;
+    const twoHanded = isTwoHandedWeaponType(weaponType) || isYes(field("twoHanded"));
+    const lightMelee = weaponType === "Melee Weapon (Light)";
+    const damage = lightMelee ? 0 : twoHanded ? Math.floor(baseDamage * 1.5) : baseDamage;
+    result.attackPenalty += penalty;
+    result.damageBonus += damage;
+    result.breakdown.push({ source: "Power Attack", value: penalty, type: "feat", applied: true, targetLabel: "Attack" });
+    if (damage) result.breakdown.push({ source: "Power Attack", value: damage, type: "feat", applied: true, targetLabel: "Damage" });
+  }
+
+  if (isRangedWeaponType(weaponType) && isYes(field("deadlyAim"))) {
+    const penalty = -step;
+    const damage = step * 2;
+    result.attackPenalty += penalty;
+    result.damageBonus += damage;
+    result.breakdown.push({ source: "Deadly Aim", value: penalty, type: "feat", applied: true, targetLabel: "Attack" });
+    result.breakdown.push({ source: "Deadly Aim", value: damage, type: "feat", applied: true, targetLabel: "Damage" });
+  }
+
+  return result;
+}
+
+function calculateWeaponDamage(card, buffed, buffBonuses) {
+  const field = name => {
+    const input = card.querySelector(`[data-field="${name}"]`);
+    if (!input) return "";
+    if (input.type === "checkbox") return input.checked ? "yes" : "no";
+    return input.value || "";
+  };
+  const dice = stripDamageModifier(field("damage"));
+  const scalingTerms = parseScalingTerms(field("damageScale"), "STR");
+  const weaponType = field("weaponType") || "Melee Weapon (One-Handed)";
+  const isRanged = isRangedWeaponType(weaponType) || Boolean(field("range").trim()) || parseScalingKeys(field("attackScale")).includes("dex");
+  const twoHanded = isTwoHandedWeaponType(weaponType) || isYes(field("twoHanded"));
+  const enhancement = enhancementValue(field("enhancement"));
+  const feat = weaponFeatAdjustments(card);
+  const scalingBonus = scalingTerms.reduce((total, term) => {
+    const multiplier = twoHanded && term.key === "str" ? 1.5 : term.multiplier;
+    return total + Math.floor(abilityModFor(term.key, buffed) * multiplier);
+  }, 0);
+  const buffBonus =
+    Number(buffBonuses.damage || 0) +
+    Number(buffBonuses[isRanged ? "ranged damage" : "melee damage"] || 0);
+  const totalBonus = scalingBonus + enhancement + buffBonus + feat.damageBonus;
+  const totalText = `${dice || "0"}${signed(totalBonus)}`;
+  const statItems = scalingTerms.flatMap(term => {
+    const statName = ABILITY_STAT_NAMES[term.key];
+    const multiplier = twoHanded && term.key === "str" ? 1.5 : term.multiplier;
+    return breakdownForStat(buffed, statName, `${statName} scaling x${multiplier}`).map(item => ({ ...item, targetLabel: "Damage scaling" }));
+  });
+  const directItems = [
+    ...breakdownForStat(buffed, "damage").map(item => ({ ...item, targetLabel: "Damage" })),
+    ...breakdownForStat(buffed, isRanged ? "ranged damage" : "melee damage").map(item => ({ ...item, targetLabel: isRanged ? "Ranged damage" : "Melee damage" })),
+    ...feat.breakdown.filter(item => item.targetLabel === "Damage")
+  ];
+  const formula = `${dice || "0"} + scaling ${signed(scalingBonus)} + enhancement ${signed(enhancement)} + buffs ${signed(buffBonus)} + feats ${signed(feat.damageBonus)}`;
+  return { buffBonus, scalingBonus, totalBonus, totalText, formula, breakdown: [...statItems, ...directItems] };
+}
+
+function calculateWeaponAttack(card, buffed, buffBonuses) {
+  const field = name => {
+    const input = card.querySelector(`[data-field="${name}"]`);
+    if (!input) return "";
+    if (input.type === "checkbox") return input.checked ? "yes" : "no";
+    return input.value || "";
+  };
+  const weaponType = field("weaponType") || "Melee Weapon (One-Handed)";
+  const isRanged = isRangedWeaponType(weaponType) || Boolean(field("range").trim()) || parseScalingKeys(field("attackScale")).includes("dex");
+  const scalingTerms = parseScalingTerms(field("attackScale"), String(isRanged ? "DEX" : "STR"));
+  const scalingBonus = scalingTerms.reduce((total, term) => total + Math.floor(abilityModFor(term.key, buffed) * term.multiplier), 0);
+  const enhancement = enhancementValue(field("enhancement"));
+  const feat = weaponFeatAdjustments(card);
+  const buffBonus =
+    Number(buffBonuses.attack || 0) +
+    Number(buffBonuses[isRanged ? "ranged attack" : "melee attack"] || 0);
+  const totalBonus = scalingBonus + enhancement + buffBonus + feat.attackPenalty;
+  const attacks = iterativeBabBonuses(num("bab")).map(base => signed(base + totalBonus)).join("/");
+  const statItems = scalingTerms.flatMap(term => breakdownForStat(buffed, ABILITY_STAT_NAMES[term.key], `${ABILITY_STAT_NAMES[term.key]} attack scaling`).map(item => ({ ...item, targetLabel: "Attack scaling" })));
+  const directItems = [
+    ...breakdownForStat(buffed, "attack").map(item => ({ ...item, targetLabel: "Attack" })),
+    ...breakdownForStat(buffed, isRanged ? "ranged attack" : "melee attack").map(item => ({ ...item, targetLabel: isRanged ? "Ranged attack" : "Melee attack" })),
+    ...feat.breakdown.filter(item => item.targetLabel === "Attack")
+  ];
+  const formula = `BAB iteratives + scaling ${signed(scalingBonus)} + enhancement ${signed(enhancement)} + buffs ${signed(buffBonus)} + feats ${signed(feat.attackPenalty)}`;
+  return { buffBonus, attacks, formula, breakdown: [...statItems, ...directItems] };
+}
+
+function recalculateWeapons(buffed, buffBonuses) {
+  el("weaponRows").querySelectorAll(".sheet-card").forEach(card => {
+    const attack = calculateWeaponAttack(card, buffed, buffBonuses);
+    const damage = calculateWeaponDamage(card, buffed, buffBonuses);
+    const attackField = card.querySelector("[data-attack-total]");
+    const attackBuffField = card.querySelector("[data-attack-buff]");
+    const damageBuffField = card.querySelector("[data-damage-buff]");
+    const scalingField = card.querySelector("[data-damage-scaling]");
+    const bonusField = card.querySelector("[data-damage-bonus]");
+    const totalField = card.querySelector("[data-damage-total]");
+    const attackCalc = card.querySelector("[data-weapon-attack-calc]");
+    const damageCalc = card.querySelector("[data-weapon-damage-calc]");
+    if (attackField) attackField.value = attack.attacks;
+    if (attackBuffField) attackBuffField.value = signed(attack.buffBonus);
+    if (damageBuffField) damageBuffField.value = signed(damage.buffBonus);
+    if (scalingField) scalingField.value = signed(damage.scalingBonus);
+    if (bonusField) bonusField.value = signed(damage.totalBonus);
+    if (totalField) totalField.value = damage.totalText;
+    if (attackCalc) attackCalc.innerHTML = showCalculations ? formatBreakdown(attack.breakdown, attack.attacks) : "";
+    if (damageCalc) damageCalc.innerHTML = showCalculations ? formatBreakdown(damage.breakdown, damage.totalText) : "";
+  });
+}
+
+function setCalc(id, formula, items = [], currentTotal = null) {
+  const line = document.querySelector(`[data-calc-for="${id}"]`);
+  if (!line) return;
+  const total = currentTotal ?? el(id)?.value ?? "";
+  const buffRows = showCalculations ? formatBreakdown(items, total) : "";
+  line.innerHTML = buffRows;
+  line.classList.remove("d-none");
+}
+
+function numericTotalText(currentTotal, bonusValue, statName = "") {
+  const text = String(currentTotal ?? "").trim();
+  const value = Number(bonusValue || 0);
+  const abilityStats = new Set(["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"]);
+  if (abilityStats.has(statName)) {
+    const score = Number((text.match(/-?\d+/) || [0])[0]) + value;
+    return `${score} (${signed(mod(score))})`;
+  }
+  if (/^[+-]?\d+(\/[+-]?\d+)+$/.test(text)) {
+    return text.split("/").map(part => signed(Number(part) + value)).join("/");
+  }
+  const diceMatch = text.match(/^(.+?)([+-]\d+)$/);
+  if (diceMatch) {
+    return `${diceMatch[1]}${signed(Number(diceMatch[2]) + value)}`;
+  }
+  if (/^[+-]?\d+$/.test(text)) {
+    const total = Number(text) + value;
+    if (["cmb", "cmd"].includes(String(statName || "").toLowerCase())) return String(total);
+    return text.startsWith("+") || text.startsWith("-") ? signed(total) : String(total);
+  }
+  if (text) return `${text} ${signed(value)}`;
+  return signed(value);
+}
+
+function formatBreakdown(items = [], currentTotal = "") {
+  const buffItems = items.filter(b => {
+    if (["Formula", "Base"].includes(b.source)) return false;
+    if (["derived", "score", "temporary"].includes(b.type)) return false;
+    return true;
+  });
+  if (!buffItems.length) return "";
+  const conditionalItems = buffItems.filter(b => b.conditional || b.applied === "conditional");
+  const normalItems = buffItems.filter(b => !(b.conditional || b.applied === "conditional"));
+  const conditionalRows = conditionalItems.map(b => {
+    const target = b.targetLabel ? `<span class="badge text-bg-secondary me-1">${escapeHtml(b.targetLabel)}</span>` : "";
+    const value = Number(b.value || 0);
+    const valueClass = value > 0 ? "calc-value-positive" : value < 0 ? "calc-value-negative" : "calc-value-neutral";
+    const total = numericTotalText(currentTotal, value, b.stat);
+    const appliesWhen = b.detail ? ` (${escapeHtml(b.detail)})` : "";
+    return `<div class="calc-conditional">${target}<strong>${escapeHtml(total)}</strong>${appliesWhen}: <span class="calc-buff-name ${valueClass}">${escapeHtml(b.source)}</span> <span class="${valueClass}">${signed(value)}</span> (${escapeHtml(b.type)})</div>`;
+  }).join("");
+  const normalRows = normalItems.map(b => {
+    const detail = b.detail ? ` | ${escapeHtml(b.detail)}` : "";
+    const target = b.targetLabel ? `<span class="badge text-bg-secondary me-1">${escapeHtml(b.targetLabel)}</span>` : "";
+    const label = b.applied === false ? "overridden" : "applied";
+    const className = b.applied === false ? "calc-overridden" : "calc-applied";
+    const value = Number(b.value || 0);
+    const valueClass = value > 0 ? "calc-value-positive" : value < 0 ? "calc-value-negative" : "calc-value-neutral";
+    return `<div class="${className}">${target}${label}: <span class="calc-buff-name ${valueClass}">${escapeHtml(b.source)}</span> <span class="${valueClass}">${signed(value)}</span> (${escapeHtml(b.type)})${detail}</div>`;
+  }).join("");
+  return `<div class="calc-buffs">${conditionalRows ? `<div class="calc-conditional-block"><div class="small text-warning-emphasis fw-semibold">Conditional Effects</div>${conditionalRows}</div>` : ""}${normalRows ? `<div class="calc-buff-block">${normalRows}</div>` : ""}</div>`;
+}
+
+function updateAppliedBuffsToggle() {
+  const btn = el("showAppliedBuffsToggle");
+  if (!btn) return;
+  btn.textContent = showCalculations ? "Hide Applied Buffs" : "Show Applied Buffs";
+  btn.classList.toggle("btn-info", showCalculations);
+  btn.classList.toggle("btn-outline-info", !showCalculations);
+}
+
+function toggleAppliedBuffs() {
+  showCalculations = !showCalculations;
+  updateAppliedBuffsToggle();
+  recalculateSheet();
+  queueSheetSave();
+}
+
+function recalculateSheet() {
+  const gearAc = calculateGearAc();
+  el("acArmor").value = gearAc.armor;
+  el("acShield").value = gearAc.shield;
+  const buffed = window.PFBuffs?.calculateStatsDetailed(activeBuffs, sheetToBaseline());
+  const buffTotals = buffed?.totals || {};
+  const buffBonuses = buffed?.bonuses || {};
+  const buffBreakdown = buffed?.breakdown || {};
+  ABILITIES.forEach(([key]) => {
+    const score = num(`${key}Score`);
+    const statName = ABILITY_STAT_NAMES[key];
+    el(`${key}Buff`).value = signed(buffBonuses[statName] || 0);
+    el(`${key}Total`).value = buffTotals[statName] || score;
+    el(`${key}Mod`).value = signed(abilityModFor(key, buffed));
+    setCalc(`${key}Total`, `base ${score} + buffs ${signed(buffBonuses[statName] || 0)}`, buffBreakdown[statName]);
+  });
+
+  const str = abilityModFor("str", buffed);
+  const dex = abilityModFor("dex", buffed);
+  const con = abilityModFor("con", buffed);
+  const wis = abilityModFor("wis", buffed);
+  el("hitPointsBuff").value = signed(buffBonuses["hit points"] || 0);
+  el("hitPointsTotal").value = buffTotals["hit points"] ?? num("hitPoints");
+  setCalc("hitPointsTotal", `Base HP ${num("hitPoints")} + CON modifier changes x level ${Math.max(1, num("characterLevel"))}`, combinedBreakdowns(buffed, [
+    { stat: "constitution", detail: "affects HP through CON" },
+    "hit points"
+  ]));
+  el("initDexMod").value = signed(dex);
+  el("initBuff").value = signed(buffBonuses.initiative || 0);
+  el("initTotal").value = buffTotals.initiative !== undefined ? signed(buffTotals.initiative) : signed(dex + num("initMisc"));
+  setCalc("initTotal", `DEX ${signed(dex)} + misc ${signed(num("initMisc"))}`, combinedBreakdowns(buffed, [
+    { stat: "dexterity", detail: "affects initiative through DEX" },
+    "initiative"
+  ]));
+  el("acDex").value = signed(dex);
+  el("acTotal").value = buffTotals.ac ?? (10 + num("acArmor") + num("acShield") + dex + num("acNatural") + num("acDeflection") + num("acMisc"));
+  el("acBuff").value = signed(buffBonuses.ac || 0);
+  el("acTouch").value = buffTotals["touch ac"] ?? (10 + dex + num("acDeflection") + num("acMisc"));
+  el("acTouchBuff").value = signed(buffBonuses["touch ac"] || 0);
+  el("acFlat").value = buffTotals["flat-footed ac"] ?? (Number(el("acTotal").value) - Math.max(0, dex));
+  el("acFlatBuff").value = signed(buffBonuses["flat-footed ac"] || 0);
+  setCalc("acTotal", `10 + armor ${gearAc.armor} + shield ${gearAc.shield} + DEX ${signed(dex)} + natural ${num("acNatural")} + deflection ${num("acDeflection")} + misc ${num("acMisc")}`, buffBreakdown.ac);
+
+  [["fort","con",con],["reflex","dex",dex],["will","wis",wis]].forEach(([key, abilityKey, abilityValue]) => {
+    el(`${key}Ability`).value = signed(abilityValue);
+    const buffKey = { fort: "fortitude", reflex: "reflex", will: "will" }[key];
+    el(`${key}Buff`).value = signed(buffBonuses[buffKey] || 0);
+    el(`${key}Total`).value = buffTotals[buffKey] !== undefined ? signed(buffTotals[buffKey]) : signed(num(`${key}Base`) + abilityValue);
+    setCalc(`${key}Total`, `base ${signed(num(`${key}Base`))} + ${abilityKey.toUpperCase()} ${signed(abilityValue)} + buffs ${signed(buffBonuses[buffKey] || 0)}`, combinedBreakdowns(buffed, [
+      { stat: ABILITY_STAT_NAMES[abilityKey], detail: `affects ${buffKey} through ${abilityKey.toUpperCase()}` },
+      buffKey
+    ]));
+  });
+
+  el("cmbTotal").value = buffTotals.cmb !== undefined ? String(buffTotals.cmb) : String(num("bab") + str);
+  el("cmbBuff").value = signed(buffBonuses.cmb || 0);
+  el("cmdTotal").value = buffTotals.cmd ?? (10 + num("bab") + str + dex);
+  el("cmdBuff").value = signed(buffBonuses.cmd || 0);
+  setCalc("cmbTotal", `BAB ${signed(num("bab"))} + STR ${signed(str)}`, combinedBreakdowns(buffed, [
+    { stat: "strength", target: "CMB via STR", detail: "affects CMB through STR" },
+    { stat: "cmb", target: "CMB" },
+    { stat: "attack", target: "CMB via attack", detail: "applies to CMB" }
+  ]));
+  setCalc("cmdTotal", `10 + BAB ${signed(num("bab"))} + STR ${signed(str)} + DEX ${signed(dex)}`, combinedBreakdowns(buffed, [
+    { stat: "strength", target: "CMD via STR", detail: "affects CMD through STR" },
+    { stat: "dexterity", target: "CMD via DEX", detail: "affects CMD through DEX" },
+    { stat: "cmd", target: "CMD" },
+    { stat: "ac", target: "CMD via AC", detail: "only CMD-valid AC bonus types apply" },
+    { stat: "deflection", target: "CMD via deflection", detail: "applies to CMD" }
+  ]));
+  recalculateWeapons(buffed, buffBonuses);
+
+  allSkills().forEach(([skill]) => {
+    const id = skillId(skill);
+    const abilityKey = el(`${id}Ability`)?.dataset.ability;
+    const abilityValue = abilityModFor(abilityKey, buffed);
+    const skillAbilityBuffKey = skillBuffKeyForAbility(abilityKey);
+    const specificSkillKey = skillStatKey(skill);
+    const skillBuff =
+      Number(buffBonuses["skill checks"] || 0) +
+      Number(buffBonuses[skillAbilityBuffKey] || 0) +
+      Number(buffBonuses[specificSkillKey] || 0);
+    el(`${id}Ability`).value = signed(abilityValue);
+    el(`${id}Buff`).value = signed(skillBuff);
+    el(`${id}Total`).value = signed(abilityValue + num(`${id}Ranks`) + num(`${id}Misc`) + skillBuff);
+    setCalc(`${id}Total`, "", combinedBreakdowns(buffed, [
+      { stat: ABILITY_STAT_NAMES[abilityKey], target: `${skill} via ${abilityKey.toUpperCase()}`, detail: `affects ${skill} through ${abilityKey.toUpperCase()}` },
+      { stat: "skill checks", target: "All skills" },
+      { stat: skillAbilityBuffKey, target: `${abilityKey.toUpperCase()} skills` },
+      { stat: specificSkillKey, target: skill }
+    ]));
+  });
+  if (sheetViewMode === "simplified") renderSimplifiedSheet();
+}
+
+function buffRefreshKey(characterId = currentSheetId) {
+  return characterId
+    ? `pf_buffs_updated_${sheetContextKey}_${characterId}`
+    : `pf_buffs_updated_${sheetContextKey}`;
+}
+
+async function loadActiveBuffs(characterId = currentSheetId) {
+  const savedState = characterId
+    ? await PFApp.loadBuffState(sheetContextKey, characterId)
+    : [];
+  if (Array.isArray(savedState)) activeBuffs = savedState;
+  else activeBuffs = savedState?.buffs || [];
+  lastBuffRefresh = localStorage.getItem(buffRefreshKey(characterId)) || "";
+}
+
+async function refreshBuffsIfChanged(force = false) {
+  const stamp = localStorage.getItem(buffRefreshKey()) || "";
+  if (!force && stamp === lastBuffRefresh) return;
+  await loadActiveBuffs();
+  recalculateSheet();
+}
+
+async function openEffectTrackerModal() {
+  const mount = el("sheetEffectTracker");
+  if (!mount) return;
+  if (!currentSheetId) {
+    mount.innerHTML = `<div class="small-text">Select or create a character before managing effects.</div>`;
+    return;
+  }
+
+  const options = {
+    contextKey: sheetContextKey,
+    characterId: currentSheetId,
+    onChange: async buffs => {
+      activeBuffs = Array.isArray(buffs) ? buffs : [];
+      lastBuffRefresh = localStorage.getItem(buffRefreshKey()) || String(Date.now());
+      recalculateSheet();
+    }
+  };
+
+  if (!effectTrackerInstance) {
+    effectTrackerInstance = PFEffectTracker.mount(mount, options);
+  } else {
+    await effectTrackerInstance.refresh(options);
+  }
+}
+
+function renderInventoryAttributes(item) {
+  const details = item.details || {};
+  const rows = [];
+  if (item.type === "Weapon") {
+    rows.push(["Weapon Type", details.weaponType || "Melee Weapon (One-Handed)"]);
+    rows.push(["Attack Scales", details.attackScale || "STR"]);
+    if (details.damage) rows.push(["Damage", details.damage]);
+    if (details.critical) rows.push(["Critical", details.critical]);
+    rows.push(["Damage Scales", details.damageScale || "STR"]);
+    rows.push(["Enhancement", signed(Number(details.enhancement || 0))]);
+    if (details.enchantment) rows.push(["Enchantment", details.enchantment]);
+    if (details.details) rows.push(["Details", details.details]);
+  } else if (["Armor", "Shield"].includes(item.type)) {
+    rows.push(["Bonus", signed(Number(details.bonus || 0))]);
+    rows.push(["Enhancement", signed(Number(details.enhancement || 0))]);
+    if (details.enchantment) rows.push(["Enchantment", details.enchantment]);
+  }
+
+  if (!rows.length) return "";
+  return `
+    <div class="inventory-attributes">
+      ${rows.map(([label, value]) => `<span class="inventory-attribute"><strong>${escapeHtml(label)}</strong>${escapeHtml(value)}</span>`).join("")}
+    </div>
+  `;
+}
+
+function renderInventoryEffects(item) {
+  const effects = Array.isArray(item.effects) ? item.effects : [];
+  if (!effects.length) return "";
+  return `
+    <div class="inventory-effects">
+      <div class="small-text">Item effects</div>
+      ${effects.map(effect => `
+        <div class="inventory-effect">
+          ${escapeHtml(titleCaseStat(effect.stat || "effect"))} ${signed(Number(effect.value || 0))} (${escapeHtml(effect.type || "untyped")})${effect.conditional ? ` (${escapeHtml(effect.appliesWhen || "conditional")})` : ""}${effect.stacks ? " stacks" : ""}
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+
+function toggleInventoryDetailFields() {
+  const type = el("inventoryItemType")?.value || "Item";
+  el("inventoryWeaponFields")?.classList.toggle("d-none", type !== "Weapon");
+  el("inventoryArmorFields")?.classList.toggle("d-none", !["Armor", "Shield"].includes(type));
+  if (el("inventoryArmorEnchantment")) el("inventoryArmorEnchantment").innerHTML = armorEnchantmentOptions(el("inventoryArmorEnchantment").value);
+}
+
+function setInventoryDamageScale(value = "STR") {
+  const selected = parseScalingKeys(value).map(key => key.toUpperCase());
+  const activeSet = new Set(selected.length ? selected : ["STR"]);
+  el("inventoryDamageScale").value = [...activeSet].join(" + ");
+  el("inventoryDamageScaleOptions").querySelectorAll("[data-inventory-scale-ability]").forEach(button => {
+    const active = activeSet.has(button.dataset.inventoryScaleAbility);
+    button.classList.toggle("btn-primary", active);
+    button.classList.toggle("btn-outline-light", !active);
+  });
+}
+
+function setInventoryAttackScale(value = "STR") {
+  const selected = parseScalingKeys(value).map(key => key.toUpperCase());
+  const activeSet = new Set(selected.length ? selected : ["STR"]);
+  el("inventoryAttackScale").value = [...activeSet].join(" + ");
+  el("inventoryAttackScaleOptions").querySelectorAll("[data-inventory-attack-scale-ability]").forEach(button => {
+    const active = activeSet.has(button.dataset.inventoryAttackScaleAbility);
+    button.classList.toggle("btn-primary", active);
+    button.classList.toggle("btn-outline-light", !active);
+  });
+}
+
+function setupInventoryScalingControls() {
+  el("inventoryDamageScaleOptions")?.querySelectorAll("[data-inventory-scale-ability]").forEach(button => {
+    if (button.dataset.bound === "true") return;
+    button.dataset.bound = "true";
+    button.addEventListener("click", () => {
+      button.classList.toggle("btn-primary");
+      button.classList.toggle("btn-outline-light");
+      const selected = [...el("inventoryDamageScaleOptions").querySelectorAll(".btn-primary")].map(btn => btn.dataset.inventoryScaleAbility);
+      el("inventoryDamageScale").value = (selected.length ? selected : ["STR"]).join(" + ");
+    });
+  });
+  el("inventoryAttackScaleOptions")?.querySelectorAll("[data-inventory-attack-scale-ability]").forEach(button => {
+    if (button.dataset.bound === "true") return;
+    button.dataset.bound = "true";
+    button.addEventListener("click", () => {
+      button.classList.toggle("btn-primary");
+      button.classList.toggle("btn-outline-light");
+      const selected = [...el("inventoryAttackScaleOptions").querySelectorAll(".btn-primary")].map(btn => btn.dataset.inventoryAttackScaleAbility);
+      el("inventoryAttackScale").value = (selected.length ? selected : ["STR"]).join(" + ");
+    });
+  });
+}
+
+function addInventoryEffectRow(data = {}) {
+  const row = document.createElement("div");
+  row.className = "inventory-effect-row";
+  const selectedStat = String(data.skillName || "").toLowerCase().startsWith("profession")
+    ? "skill:profession"
+    : String(data.skillName || "").toLowerCase().startsWith("craft")
+      ? "skill:craft"
+      : data.stat || "";
+  row.innerHTML = `
+    <div>
+      <label>Stat</label>
+      <select data-inventory-effect-field="stat" class="form-select form-select-sm">
+        ${lootEffectStatOptions(selectedStat)}
+      </select>
+    </div>
+    <div class="inventory-named-skill-field d-none"><label>Skill Name</label><input data-inventory-effect-field="skillName" class="form-control form-control-sm" value="${escapeHtml(data.skillName || "")}" placeholder="Alchemy"></div>
+    <div><label>Value</label><input data-inventory-effect-field="value" class="form-control form-control-sm" type="number" value="${data.value ?? 0}"></div>
+    <div>
+      <label>Type</label>
+      <select data-inventory-effect-field="type" class="form-select form-select-sm">
+        ${LOOT_BONUS_TYPES.map(type => `<option value="${type}" ${(data.type || "untyped") === type ? "selected" : ""}>${escapeHtml(type)}</option>`).join("")}
+      </select>
+    </div>
+    <div>
+      <label>Stacks</label>
+      <div class="form-check form-switch">
+        <input data-inventory-effect-field="stacks" class="form-check-input" type="checkbox" ${data.stacks ? "checked" : ""}>
+      </div>
+    </div>
+    <div class="inventory-condition-inline">
+      <div>
+        <label>Conditional</label>
+        <div class="form-check form-switch">
+          <input data-inventory-effect-field="conditional" class="form-check-input" type="checkbox" ${data.conditional ? "checked" : ""}>
+        </div>
+      </div>
+      <div><label>Applies When</label><input data-inventory-effect-field="appliesWhen" class="form-control form-control-sm" value="${escapeHtml(data.appliesWhen || "")}" placeholder="vs undead"></div>
+    </div>
+    <button class="btn btn-danger btn-sm" type="button" aria-label="Delete effect"><i class="bi bi-trash"></i></button>
+  `;
+  const statSelect = row.querySelector('[data-inventory-effect-field="stat"]');
+  const namedSkillField = row.querySelector(".inventory-named-skill-field");
+  const skillNameInput = row.querySelector('[data-inventory-effect-field="skillName"]');
+  const syncNamedSkill = () => {
+    const named = ["skill:craft", "skill:profession"].includes(statSelect.value);
+    namedSkillField.classList.toggle("d-none", !named);
+    skillNameInput.placeholder = statSelect.value === "skill:profession" ? "Sailor" : "Alchemy";
+  };
+  statSelect.addEventListener("change", syncNamedSkill);
+  syncNamedSkill();
+  row.querySelector("button").addEventListener("click", () => row.remove());
+  el("inventoryEffectRows").appendChild(row);
+}
+
+function collectInventoryEffects() {
+  return [...el("inventoryEffectRows").querySelectorAll(".inventory-effect-row")].map(row => {
+    const selectedStat = row.querySelector('[data-inventory-effect-field="stat"]').value;
+    const skillName = ["skill:craft", "skill:profession"].includes(selectedStat)
+      ? namedSkill(selectedStat, row.querySelector('[data-inventory-effect-field="skillName"]')?.value)
+      : "";
+    const effect = {
+      stat: skillName ? skillKey(skillName) : selectedStat,
+      value: Number(row.querySelector('[data-inventory-effect-field="value"]').value || 0),
+      type: row.querySelector('[data-inventory-effect-field="type"]').value || "untyped",
+      stacks: row.querySelector('[data-inventory-effect-field="stacks"]').checked,
+      conditional: row.querySelector('[data-inventory-effect-field="conditional"]').checked,
+      appliesWhen: row.querySelector('[data-inventory-effect-field="appliesWhen"]').value.trim()
+    };
+    if (skillName) effect.skillName = skillName;
+    return effect;
+  });
+}
+
+function collectInventoryDetails() {
+  const type = el("inventoryItemType").value;
+  if (type === "Weapon") {
+    return {
+      weaponType: el("inventoryWeaponType").value || "Melee Weapon (One-Handed)",
+      attackScale: el("inventoryAttackScale").value.trim() || "STR",
+      damage: el("inventoryDamageDice").value.trim(),
+      critical: el("inventoryWeaponCritical").value.trim(),
+      damageScale: el("inventoryDamageScale").value.trim() || "STR",
+      enhancement: el("inventoryWeaponEnhancement").value || "0",
+      enchantment: el("inventoryWeaponEnchantment").value.trim(),
+      details: el("inventoryWeaponDetails").value.trim()
+    };
+  }
+  if (["Armor", "Shield"].includes(type)) {
+    return {
+      bonus: el("inventoryArmorBonus").value || "0",
+      enhancement: el("inventoryArmorEnhancement").value || "0",
+      enchantment: el("inventoryArmorEnchantment").value.trim()
+    };
+  }
+  return {};
+}
+
+function openInventoryItemEditor(itemId) {
+  const item = characterInventoryItems.find(entry => entry.id === itemId);
+  if (!item) return;
+
+  editingInventoryItemId = item.id;
+  el("inventoryItemName").value = item.name || "";
+  el("inventoryItemDescription").value = item.description || "";
+  el("inventoryItemCount").value = item.count || 1;
+  el("inventoryItemType").value = item.type || "Item";
+  const details = item.details || {};
+  el("inventoryWeaponType").value = details.weaponType || "Melee Weapon (One-Handed)";
+  setInventoryAttackScale(details.attackScale || "STR");
+  el("inventoryDamageDice").value = details.damage || "";
+  el("inventoryWeaponCritical").value = details.critical || "";
+  setInventoryDamageScale(details.damageScale || "STR");
+  el("inventoryWeaponEnhancement").value = details.enhancement || "0";
+  el("inventoryWeaponEnchantment").value = details.enchantment || "";
+  el("inventoryWeaponDetails").value = details.details || "";
+  el("inventoryArmorBonus").value = details.bonus || "0";
+  el("inventoryArmorEnhancement").value = details.enhancement || "0";
+  el("inventoryArmorEnchantment").value = details.enchantment || "";
+  el("inventoryEffectRows").innerHTML = "";
+  (Array.isArray(item.effects) ? item.effects : []).forEach(effect => addInventoryEffectRow(effect));
+  toggleInventoryDetailFields();
+  inventoryItemModal = bootstrap.Modal.getOrCreateInstance(el("inventoryItemModal"));
+  inventoryItemModal.show();
+}
+
+async function submitInventoryItemEdit(event) {
+  event.preventDefault();
+  const item = characterInventoryItems.find(entry => entry.id === editingInventoryItemId);
+  if (!item) return;
+  const name = el("inventoryItemName").value.trim();
+  if (!name) return;
+
+  const saved = await PFApp.saveLootItem({
+    id: item.id,
+    name,
+    description: el("inventoryItemDescription").value.trim(),
+    count: el("inventoryItemCount").value,
+    type: el("inventoryItemType").value,
+    assignedCharacterId: item.assigned_character_id || currentSheetId,
+    details: collectInventoryDetails(),
+    effects: collectInventoryEffects()
+  }, sheetContextKey);
+
+  if (!saved) {
+    setStatus("Could not update inventory item.", "danger");
+    return;
+  }
+
+  updateWornCardFromLoot(saved);
+  recalculateSheet();
+  queueSheetSave();
+  const wornIndex = activeBuffs.findIndex(buff => buff.sourceLootId === item.id);
+  if (wornIndex >= 0) {
+    if (saved.effects?.length) {
+      activeBuffs[wornIndex] = {
+        ...activeBuffs[wornIndex],
+        name: saved.name,
+        bonuses: saved.effects
+      };
+    } else {
+      activeBuffs.splice(wornIndex, 1);
+    }
+    await PFApp.saveBuffState(activeBuffs, sheetContextKey, currentSheetId);
+    localStorage.setItem(buffRefreshKey(), String(Date.now()));
+    recalculateSheet();
+  }
+
+  inventoryItemModal?.hide();
+  editingInventoryItemId = null;
+  await loadCharacterInventory();
+  setStatus("Inventory item updated.", "success");
+}
+
+function requestInventoryItemDelete(itemId) {
+  const item = characterInventoryItems.find(entry => entry.id === itemId);
+  if (!item) return;
+  const total = Number(item.count || 1);
+  pendingInventoryDeleteId = item.id;
+  el("deleteInventoryItemSummary").textContent = `${item.name} is assigned to this character. If fully deleted, equipped copies and item effects will be removed.`;
+  el("deleteInventoryItemCount").max = String(total);
+  el("deleteInventoryItemCount").value = String(total);
+  el("deleteInventoryItemMax").textContent = `Max: ${total}`;
+  deleteInventoryItemModal = bootstrap.Modal.getOrCreateInstance(el("deleteInventoryItemModal"));
+  deleteInventoryItemModal.show();
+}
+
+async function submitInventoryItemDelete(event) {
+  event.preventDefault();
+  const item = characterInventoryItems.find(entry => entry.id === pendingInventoryDeleteId);
+  if (!item) return;
+
+  const total = Number(item.count || 1);
+  const amount = Math.max(1, Math.min(total, Number.parseInt(el("deleteInventoryItemCount").value, 10) || 1));
+  let ok = false;
+
+  if (amount >= total) {
+    removeEquippedLoot(item.id);
+    ok = await PFApp.deleteLootItem(item.id);
+    if (ok) {
+      await PFApp.saveBuffState(activeBuffs, sheetContextKey, currentSheetId);
+      localStorage.setItem(buffRefreshKey(), String(Date.now()));
+      recalculateSheet();
+      queueSheetSave();
+    }
+  } else {
+    ok = Boolean(await PFApp.saveLootItem({
+      id: item.id,
+      name: item.name,
+      description: item.description,
+      count: total - amount,
+      type: item.type,
+      assignedCharacterId: item.assigned_character_id || currentSheetId,
+      details: item.details,
+      effects: item.effects
+    }, sheetContextKey));
+  }
+
+  if (!ok) {
+    setStatus("Could not delete inventory item.", "danger");
+    return;
+  }
+
+  pendingInventoryDeleteId = null;
+  deleteInventoryItemModal?.hide();
+  await loadCharacterInventory();
+  setStatus("Inventory item deleted.", "success");
+}
+
+function renderCharacterInventory(items = []) {
+  const container = el("characterInventory");
+  if (!container) return;
+
+  if (!currentSheetId) {
+    container.innerHTML = `<div class="small-text">Save or select a character to show assigned loot.</div>`;
+    return;
+  }
+
+  if (!items.length) {
+    container.innerHTML = `<div class="small-text">No loot assigned to this character.</div>`;
+    return;
+  }
+
+  const groups = [
+    ["Weapon", "Weapons"],
+    ["Armor", "Armor"],
+    ["Shield", "Shields"],
+    ["Item", "Items"]
+  ];
+  container.innerHTML = groups.map(([type, label]) => {
+    const groupItems = items.filter(item => (["Weapon", "Armor", "Shield"].includes(item.type) ? item.type : "Item") === type);
+    if (!groupItems.length) return "";
+    return `
+      <div class="inventory-group">
+        <div class="inventory-group-title">${label}</div>
+        <div class="inventory-group-grid">
+          ${groupItems.map(item => `
+            <article class="inventory-item" data-loot-id="${escapeHtml(item.id)}" role="button" tabindex="0" aria-label="View ${escapeHtml(item.name)} details">
+              <div class="inventory-card-head">
+                <div class="inventory-card-title">
+                  <div class="fw-semibold text-truncate"><i class="bi ${lootIcon(item.type)} me-1"></i>${escapeHtml(item.name)}</div>
+                  <div class="small-text">${escapeHtml(item.type || "Item")}</div>
+                </div>
+                <span class="inventory-count-actions">
+                  <span class="inventory-count">x${escapeHtml(item.count || 1)}</span>
+                  <button class="btn btn-outline-danger btn-sm inventory-icon-btn" type="button" data-delete-inventory-loot="${escapeHtml(item.id)}" aria-label="Delete ${escapeHtml(item.name)}">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </span>
+              </div>
+              ${item.description ? `<div class="small mt-1 inventory-description">${escapeHtml(item.description)}</div>` : ""}
+              <div class="d-flex flex-wrap gap-2 mt-2">
+                <button class="btn btn-outline-success btn-sm" type="button" data-wear-loot="${escapeHtml(item.id)}">Equip</button>
+              </div>
+            </article>
+          `).join("")}
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  container.querySelectorAll("[data-wear-loot]").forEach(button => {
+    button.addEventListener("click", event => {
+      event.stopPropagation();
+      wearLootItem(items.find(item => item.id === button.dataset.wearLoot));
+    });
+  });
+  container.querySelectorAll("[data-delete-inventory-loot]").forEach(button => {
+    button.addEventListener("click", event => {
+      event.stopPropagation();
+      requestInventoryItemDelete(button.dataset.deleteInventoryLoot);
+    });
+  });
+  container.querySelectorAll(".inventory-item").forEach(card => {
+    card.addEventListener("click", () => openInventoryItemEditor(card.dataset.lootId));
+    card.addEventListener("keydown", event => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        openInventoryItemEditor(card.dataset.lootId);
+      }
+    });
+  });
+}
+
+async function wearLootItem(item) {
+  if (!item) return;
+  const details = item.details || {};
+  if (isLootEquipped(item.id)) {
+    updateWornCardFromLoot(item);
+    if (Array.isArray(item.effects) && item.effects.length) {
+      const existing = activeBuffs.find(buff => buff.sourceLootId === item.id);
+      if (existing) {
+        existing.name = item.name;
+        existing.bonuses = item.effects;
+      } else {
+        activeBuffs.push({
+          name: item.name,
+          category: "Item",
+          sourceLootId: item.id,
+          permanent: true,
+          durationLabel: "Equipped",
+          bonuses: item.effects
+        });
+      }
+      await PFApp.saveBuffState(activeBuffs, sheetContextKey, currentSheetId);
+      localStorage.setItem(buffRefreshKey(), String(Date.now()));
+    }
+    recalculateSheet();
+    queueSheetSave();
+    setStatus(`${item.name} is already equipped. Updated equipped item.`, "info");
+    return;
+  }
+
+  if (item.type === "Weapon") {
+    addWeapon({
+      name: item.name,
+      sourceLootId: item.id,
+      weaponType: details.weaponType || "Melee Weapon (One-Handed)",
+      attackScale: details.attackScale || "STR",
+      damage: details.damage || "",
+      damageScale: details.damageScale || "STR",
+      enhancement: details.enhancement || "0",
+      enchantment: details.enchantment || "",
+      type: details.details || "",
+      critical: details.critical || ""
+    });
+  } else if (["Armor", "Shield"].includes(item.type)) {
+    addArmor({
+      item: item.name,
+      sourceLootId: item.id,
+      type: item.type === "Shield" ? "Shield" : item.type === "Armor" ? "Armor" : "Gear",
+      bonus: details.bonus || "0",
+      enhancement: details.enhancement || "0",
+      enchantment: details.enchantment || ""
+    });
+  } else {
+    addGear({
+      item: item.name,
+      sourceLootId: item.id,
+      details: details.details || item.description || ""
+    });
+  }
+
+  if (Array.isArray(item.effects) && item.effects.length) {
+    activeBuffs = activeBuffs.filter(buff => buff.sourceLootId !== item.id);
+    activeBuffs.push({
+      name: item.name,
+      category: "Item",
+      sourceLootId: item.id,
+      permanent: true,
+      durationLabel: "Equipped",
+      bonuses: item.effects
+    });
+    await PFApp.saveBuffState(activeBuffs, sheetContextKey, currentSheetId);
+    localStorage.setItem(buffRefreshKey(), String(Date.now()));
+  }
+
+  recalculateSheet();
+  queueSheetSave();
+}
+
+async function loadCharacterInventory() {
+  if (!currentSheetId) {
+    characterInventoryItems = [];
+    renderCharacterInventory([]);
+    return;
+  }
+
+  const loot = await PFApp.loadLootItems(sheetContextKey);
+  characterInventoryItems = loot.filter(item => item.assigned_character_id === currentSheetId);
+  reconcileEquippedLoot(loot);
+  renderCharacterInventory(characterInventoryItems);
+}
+
+async function reconcileEquippedLoot(allLoot = []) {
+  const validIds = new Set((allLoot || []).map(item => item.id));
+  let changed = false;
+  ["weaponRows", "armorRows", "gearRows"].forEach(containerId => {
+    el(containerId).querySelectorAll(".sheet-card").forEach(card => {
+      const sourceLootId = card.querySelector('[data-field="sourceLootId"]')?.value || "";
+      if (sourceLootId && !validIds.has(sourceLootId)) {
+        card.remove();
+        changed = true;
+      }
+    });
+  });
+  const nextBuffs = activeBuffs.filter(buff => !buff.sourceLootId || validIds.has(buff.sourceLootId));
+  if (nextBuffs.length !== activeBuffs.length) {
+    activeBuffs = nextBuffs;
+    await PFApp.saveBuffState(activeBuffs, sheetContextKey, currentSheetId);
+    localStorage.setItem(buffRefreshKey(), String(Date.now()));
+    changed = true;
+  }
+  if (changed) {
+    recalculateSheet();
+    queueSheetSave();
+  }
+}
+
+function collectCards(containerId) {
+  return [...el(containerId).querySelectorAll(".sheet-card")].map(card => {
+    const data = {};
+    card.querySelectorAll("[data-field]").forEach(input => {
+      data[input.dataset.field] = input.type === "checkbox"
+        ? (input.checked ? "yes" : "no")
+        : input.value;
+    });
+    return data;
+  });
+}
+
+function collectCalculatedSummary() {
+  const abilityRows = ABILITIES.map(([key, label]) => ({
+    key,
+    label,
+    total: el(`${key}Total`)?.value || el(`${key}Score`)?.value || "",
+    mod: el(`${key}Mod`)?.value || ""
+  }));
+  const saveRows = SAVES.map(([key, label]) => ({
+    key,
+    label,
+    total: el(`${key}Total`)?.value || ""
+  }));
+  const weaponRows = [...el("weaponRows").querySelectorAll(".sheet-card")].map(card => ({
+    name: card.querySelector('[data-field="name"]')?.value || "Weapon",
+    attack: card.querySelector("[data-attack-total]")?.value || "",
+    damage: card.querySelector("[data-damage-total]")?.value || "",
+    critical: card.querySelector('[data-field="critical"]')?.value || ""
+  }));
+
+  return {
+    hp: {
+      current: el("currentHitPoints")?.value || "",
+      total: el("hitPointsTotal")?.value || el("hitPoints")?.value || ""
+    },
+    initiative: el("initTotal")?.value || "",
+    abilities: abilityRows,
+    armorClass: {
+      ac: el("acTotal")?.value || "",
+      touch: el("acTouch")?.value || "",
+      flat: el("acFlat")?.value || ""
+    },
+    combat: {
+      cmb: el("cmbTotal")?.value || "",
+      cmd: el("cmdTotal")?.value || ""
+    },
+    saves: saveRows,
+    weapons: weaponRows
+  };
+}
+
+function renderSimplifiedSheet() {
+  const container = el("simplifiedSheetView");
+  if (!container) return;
+
+  const conditionalGroups = simpleConditionalsByStat();
+  const abilityRows = ABILITIES.flatMap(([key, label]) => [
+    [label, fieldValue(`${key}Total`, fieldValue(`${key}Score`))],
+    ...conditionalTableRows(ABILITY_STAT_NAMES[key], conditionalGroups)
+  ]);
+  const saveRows = SAVES.flatMap(([key, label]) => [
+    [label, fieldValue(`${key}Total`)],
+    ...conditionalTableRows({ fort: "fortitude", reflex: "reflex", will: "will" }[key], conditionalGroups)
+  ]);
+  const skillRows = simpleSkillRows(conditionalGroups);
+  const weaponRows = [...el("weaponRows").querySelectorAll(".sheet-card")].map(card => {
+    const name = card.querySelector('[data-field="name"]')?.value || "Unnamed weapon";
+    const attackTotal = card.querySelector("[data-attack-total]")?.value || "";
+    const damageTotal = card.querySelector("[data-damage-total]")?.value || "";
+    const critical = card.querySelector('[data-field="critical"]')?.value || "";
+    const range = card.querySelector('[data-field="range"]')?.value || "";
+    const attackScale = card.querySelector('[data-field="attackScale"]')?.value || "";
+    const weaponType = card.querySelector('[data-field="weaponType"]')?.value || "";
+    const isRanged = isRangedWeaponType(weaponType) || Boolean(range.trim()) || parseScalingKeys(attackScale).includes("dex");
+    const attackConditionals = simpleConditionalListRows(
+      "Attack",
+      attackTotal,
+      ["attack", isRanged ? "ranged attack" : "melee attack"],
+      conditionalGroups
+    );
+    const damageConditionals = simpleConditionalListRows(
+      "Damage",
+      damageTotal,
+      ["damage", isRanged ? "ranged damage" : "melee damage"],
+      conditionalGroups
+    );
+    return [name, attackTotal, damageTotal, critical, attackConditionals, damageConditionals];
+  });
+  const armorRows = [...el("armorRows").querySelectorAll(".sheet-card")].map(card => [
+    card.querySelector('[data-field="item"]')?.value || "Unnamed item",
+    card.querySelector('[data-field="bonus"]')?.value || ""
+  ]);
+  const gearRows = [...el("gearRows").querySelectorAll(".sheet-card")].map(card => ({
+    main: card.querySelector('[data-field="item"]')?.value || "Unnamed gear",
+    sub: card.querySelector('[data-field="details"]')?.value || ""
+  }));
+  const inventoryRows = [...el("characterInventory").querySelectorAll(".inventory-item")].map(item => ({
+    main: item.querySelector(".inventory-card-title .fw-semibold")?.textContent?.trim() || "Item",
+    sub: item.querySelector(".inventory-count")?.textContent?.trim() || "x1"
+  }));
+
+  container.innerHTML = `
+    <section class="simple-section">
+      <div class="simple-grid">
+        ${simpleStat("Character", fieldValue("characterName"))}
+        ${simpleStat("Level", fieldValue("characterLevel"))}
+        ${simpleStat("HP", `${fieldValue("currentHitPoints", "0")}/${fieldValue("hitPointsTotal", "0")}`)}
+        ${simpleConditionalStats("hit points", conditionalGroups)}
+        ${simpleStat("Initiative", fieldValue("initTotal"))}
+        ${simpleConditionalStats("initiative", conditionalGroups)}
+        ${simpleStat("GP", fieldValue("GP", "0"))}
+        ${simpleStat("SP", fieldValue("SP", "0"))}
+        ${simpleStat("CP", fieldValue("CP", "0"))}
+      </div>
+    </section>
+
+    <div class="row g-2">
+      <div class="col-xl-3 col-lg-4">
+        <section class="simple-section">
+          <div class="sheet-title">Abilities</div>
+          ${simpleTable(["Ability", "Total"], abilityRows)}
+        </section>
+      </div>
+      <div class="col-xl-3 col-lg-4">
+        <section class="simple-section">
+          <div class="sheet-title">Armor Class</div>
+          <div class="simple-grid-tight">
+            ${simpleStat("AC", fieldValue("acTotal"))}
+            ${simpleConditionalStats("ac", conditionalGroups)}
+            ${simpleStat("Touch", fieldValue("acTouch"))}
+            ${simpleConditionalStats("touch ac", conditionalGroups)}
+            ${simpleStat("Flat-Footed", fieldValue("acFlat"))}
+            ${simpleConditionalStats("flat-footed ac", conditionalGroups)}
+          </div>
+        </section>
+        <section class="simple-section">
+          <div class="sheet-title">Combat Maneuvers</div>
+          <div class="simple-grid-tight">
+            ${simpleStat("CMB", fieldValue("cmbTotal"))}
+            ${simpleConditionalStats("cmb", conditionalGroups)}
+            ${simpleStat("CMD", fieldValue("cmdTotal"))}
+            ${simpleConditionalStats("cmd", conditionalGroups)}
+          </div>
+        </section>
+      </div>
+      <div class="col-xl-3 col-lg-4">
+        <section class="simple-section">
+          <div class="sheet-title">Saving Throws</div>
+          ${simpleTable(["Save", "Total"], saveRows)}
+        </section>
+      </div>
+    </div>
+
+    <section class="simple-section">
+      <div class="sheet-title">Weapons</div>
+      ${simpleWeaponCards(weaponRows)}
+    </section>
+
+    <section class="simple-section">
+      <div class="sheet-title">Armor & Shields</div>
+      ${simpleChips(armorRows.map(row => ({ main: row[0], sub: `Bonus ${row[1] || "-"}` })), "No armor or shields.")}
+    </section>
+
+    <section class="simple-section">
+      <div class="sheet-title">Gear</div>
+      ${simpleChips(gearRows, "No gear.")}
+    </section>
+
+    <section class="simple-section">
+      <div class="sheet-title">Skills</div>
+      ${simpleList(skillRows, "No skills.")}
+    </section>
+
+    <section class="simple-section">
+      <div class="sheet-title">Inventory</div>
+      ${simpleChips(inventoryRows, "No inventory.")}
+    </section>
+  `;
+}
+
+function collectSheet() {
+  const sheet = { fields: {}, abilities: {}, saves: {}, skills: {}, weapons: collectCards("weaponRows"), armor: collectCards("armorRows"), gear: collectCards("gearRows") };
+  sheet.preferences = { showAppliedBuffs: showCalculations };
+  sheet.customSkills = customSkills;
+  sheet.calculated = collectCalculatedSummary();
+  SIMPLE_FIELDS.forEach(id => sheet.fields[id] = el(id)?.value || "");
+  ABILITIES.forEach(([key]) => sheet.abilities[key] = { score: el(`${key}Score`).value });
+  SAVES.forEach(([key]) => sheet.saves[key] = { base: el(`${key}Base`).value });
+  allSkills().forEach(([skill]) => {
+    const id = skillId(skill);
+    sheet.skills[id] = {
+      ranks: el(`${id}Ranks`).value,
+      misc: el(`${id}Misc`).value
+    };
+  });
+  return sheet;
+}
+
+function restoreSheet(sheet) {
+  isRestoringSheet = true;
+  const data = sheet || {};
+  showCalculations = Boolean(data.preferences?.showAppliedBuffs ?? data.showAppliedBuffs ?? false);
+  updateAppliedBuffsToggle();
+  Object.entries(data.fields || {}).forEach(([id, value]) => { if (el(id)) el(id).value = value; });
+  Object.entries(data).forEach(([id, value]) => {
+    if (typeof value !== "object" && el(id)) el(id).value = value;
+  });
+  if (el("currentHitPoints") && data.fields?.currentHitPoints === undefined && data.currentHitPoints === undefined) {
+    el("currentHitPoints").value = data.fields?.hitPointsTotal || data.fields?.hitPoints || 0;
+  }
+  Object.entries(data.abilities || {}).forEach(([key, value]) => { if (el(`${key}Score`)) el(`${key}Score`).value = value.score || 10; });
+  Object.entries(data.saves || {}).forEach(([key, value]) => { if (el(`${key}Base`)) el(`${key}Base`).value = value.base || 0; });
+  customSkills = Array.isArray(data.customSkills) ? data.customSkills : [];
+  renderSkillRows(data.skills || {});
+  Object.entries(data.skills || {}).forEach(([id, value]) => {
+    if (el(`${id}Ability`)) el(`${id}Ability`).value = value.ability || 0;
+    if (el(`${id}Ranks`)) el(`${id}Ranks`).value = value.ranks || 0;
+    if (el(`${id}Misc`)) el(`${id}Misc`).value = value.misc || 0;
+  });
+  el("weaponRows").innerHTML = "";
+  el("armorRows").innerHTML = "";
+  el("gearRows").innerHTML = "";
+  weaponCount = 0;
+  armorCount = 0;
+  gearCount = 0;
+  (data.weapons || []).forEach(addWeapon);
+  (data.armor || []).forEach(item => {
+    if (["Gear", "Item"].includes(item.type)) addGear({ ...item, details: item.details || item.weight || "" });
+    else addArmor(item);
+  });
+  (data.gear || []).forEach(addGear);
+  if (!data.weapons?.length) addWeapon();
+  if (!data.armor?.length) {
+    const armorBonus = data.fields?.acArmor || data.acArmor;
+    const shieldBonus = data.fields?.acShield || data.acShield;
+    if (Number(armorBonus || 0)) addArmor({ item: "Saved armor", bonus: armorBonus, type: "Armor" });
+    if (Number(shieldBonus || 0)) addArmor({ item: "Saved shield", bonus: shieldBonus, type: "Shield" });
+    if (!Number(armorBonus || 0) && !Number(shieldBonus || 0)) addArmor();
+  }
+  recalculateSheet();
+  isRestoringSheet = false;
+}
+
+function loadSampleValues() {
+  Object.entries(PDF_SAMPLE).forEach(([id, value]) => { if (el(id)) el(id).value = value; });
+  addWeapon({ name: "Elven curve blade", attack: "+13/+8", damage: "1d10", damageScale: "STR", twoHanded: "yes", critical: "18-20/x2", type: "S" });
+  addArmor({ item: "Darkwood Breastplate +2", bonus: "6", enhancement: "2", type: "Armor", penalty: "-2", failure: "25%", weight: "30 lbs." });
+}
+
+function attachInputListeners(root = document) {
+  root.querySelectorAll(".sheet-input, #characterName").forEach(input => {
+    input.addEventListener("input", () => {
+      recalculateSheet();
+      queueSheetSave();
+    });
+    input.addEventListener("change", () => {
+      recalculateSheet();
+      queueSheetSave();
+    });
+  });
+}
+
+function queueSheetSave() {
+  if (isRestoringSheet) return;
+  if (currentSheetOwnerId && currentSheetOwnerId !== currentUserId) return;
+  clearTimeout(sheetSaveTimer);
+  sheetSaveTimer = setTimeout(() => saveSheetNow(true), 500);
+}
+
+async function saveSheetNow(silent = false) {
+  if (currentSheetOwnerId && currentSheetOwnerId !== currentUserId) {
+    if (!silent) setStatus("You can view this campaign character, but only its owner can save changes.", "warning");
+    return;
+  }
+
+  const name = el("characterName").value.trim();
+  if (!name) {
+    if (!silent) setStatus("Character name is required before saving.", "warning");
+    return;
+  }
+  recalculateSheet();
+  const saved = await PFApp.saveCharacterSheet(name, collectSheet(), sheetContextKey, currentSheetId);
+  if (saved?.id) currentSheetId = saved.id;
+  if (currentSheetId) rememberSelectedCharacter(currentSheetId);
+  await PFApp.setupCharacterSelect("navCharacterSelect", sheetContextKey, null, { dispatch: false });
+  const navCharacterSelect = el("navCharacterSelect");
+  if (navCharacterSelect && currentSheetId) navCharacterSelect.value = currentSheetId;
+  await loadCharacterInventory();
+  if (!silent) setStatus("Character sheet saved.", "success");
+}
+
+async function loadCurrentSheet(sheetId = currentSheetId) {
+  const name = el("characterName").value.trim();
+  if (!name && !sheetId) return;
+  const saved = await PFApp.loadCharacterSheet(name, sheetContextKey, sheetId);
+  if (saved?.sheet) {
+    currentSheetId = saved.id;
+    currentSheetOwnerId = saved.user_id || currentUserId;
+    rememberSelectedCharacter(currentSheetId);
+    await loadActiveBuffs(currentSheetId);
+    restoreSheet(saved.sheet);
+    el("characterName").value = saved.character_name;
+    const navCharacterSelect = el("navCharacterSelect");
+    if (navCharacterSelect) navCharacterSelect.value = saved.id;
+    await loadCharacterInventory();
+    setStatus(
+      currentSheetOwnerId !== currentUserId
+        ? "Campaign character loaded in view-only mode."
+        : "Character sheet loaded.",
+      "info"
+    );
+  } else {
+    setStatus("Could not load that character sheet.", "warning");
+  }
+}
+
+async function loadCharacterList(selectedId = currentSheetId) {
+  await PFApp.setupCharacterSelect("navCharacterSelect", sheetContextKey, null, { dispatch: false });
+  const select = el("navCharacterSelect");
+  if (selectedId && select && [...select.options].some(option => option.value === selectedId)) select.value = selectedId;
+}
+
+function resetForNewCharacter() {
+  currentSheetId = null;
+  currentSheetOwnerId = currentUserId;
+  activeBuffs = [];
+  lastBuffRefresh = "";
+  customSkills = [];
+  renderSkillRows();
+  isRestoringSheet = true;
+  document.querySelectorAll(".sheet-input, #characterName, textarea").forEach(input => {
+    input.value = input.defaultValue || "";
+  });
+  el("weaponRows").innerHTML = "";
+  el("armorRows").innerHTML = "";
+  el("gearRows").innerHTML = "";
+  weaponCount = 0;
+  armorCount = 0;
+  gearCount = 0;
+  addWeapon();
+  addArmor();
+  showCalculations = false;
+  updateAppliedBuffsToggle();
+  isRestoringSheet = false;
+  recalculateSheet();
+  renderCharacterInventory([]);
+}
+
+async function createNewCharacter(name) {
+  resetForNewCharacter();
+  el("characterName").value = name;
+  currentSheetId = null;
+  currentSheetOwnerId = currentUserId;
+  await saveSheetNow(true);
+  if (currentSheetId) {
+    rememberSelectedCharacter(currentSheetId);
+    const navCharacterSelect = el("navCharacterSelect");
+    if (navCharacterSelect) navCharacterSelect.value = currentSheetId;
+    setStatus("Character created. You can keep editing this sheet.", "success");
+  }
+}
+
+async function initCharacterSheet() {
+  const user = await PFApp.requireAuth();
+  if (!user) return;
+  sheetContextKey = await PFApp.requireGameContext();
+  if (!sheetContextKey) return;
+  currentUserId = user.id;
+  currentSheetOwnerId = user.id;
+  buildSheet();
+  updateAppliedBuffsToggle();
+  setSheetView(sheetViewMode);
+  window.addEventListener("pf-context-change", async event => {
+    if (!event.detail.contextKey || event.detail.contextKey === "general") return;
+    sheetContextKey = event.detail.contextKey;
+    currentSheetId = null;
+    activeBuffs = [];
+    lastBuffRefresh = "";
+    resetForNewCharacter();
+    await loadCharacterList();
+  });
+  window.addEventListener("pf-character-change", async event => {
+    if (event.detail.contextKey !== sheetContextKey) return;
+    if (event.detail.characterId) await loadCurrentSheet(event.detail.characterId);
+    else resetForNewCharacter();
+  });
+  window.addEventListener("focus", () => refreshBuffsIfChanged());
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) refreshBuffsIfChanged();
+  });
+  await loadCharacterList();
+  const rememberedId = PFApp.getSelectedCharacterId(sheetContextKey);
+  if (rememberedId) {
+    await loadCurrentSheet(rememberedId);
+  } else {
+    loadSampleValues();
+    renderCharacterInventory([]);
+  }
+  attachInputListeners();
+  el("characterName").addEventListener("change", async () => {
+    const saved = await PFApp.loadCharacterSheet(el("characterName").value.trim(), sheetContextKey);
+    currentSheetId = saved?.id || null;
+    if (saved?.sheet) await loadCurrentSheet(saved.id);
+  });
+  el("newCharacterForm").addEventListener("submit", async event => {
+    event.preventDefault();
+    const name = el("newCharacterName").value.trim();
+    if (!name) return;
+    await createNewCharacter(name);
+    bootstrap.Modal.getInstance(el("newCharacterModal"))?.hide();
+    event.target.reset();
+  });
+  el("inventoryItemType").addEventListener("change", toggleInventoryDetailFields);
+  el("inventoryWeaponType").innerHTML = optionList(WEAPON_TYPES, "Melee Weapon (One-Handed)");
+  el("inventoryWeaponEnchantment").innerHTML = optionList(WEAPON_ENCHANTMENTS);
+  el("inventoryArmorEnchantment").innerHTML = armorEnchantmentOptions();
+  el("inventoryItemForm").addEventListener("submit", submitInventoryItemEdit);
+  el("deleteInventoryItemForm").addEventListener("submit", submitInventoryItemDelete);
+  el("addInventoryEffect").addEventListener("click", () => addInventoryEffectRow());
+  setupInventoryScalingControls();
+  recalculateSheet();
+}
+
+initCharacterSheet();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

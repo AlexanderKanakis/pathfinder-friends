@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html><head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="description" content="A free online calculator for using the Craft skill in Pathfinder RPG.">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- TensorFlow.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.17.0/dist/tf.min.js"></script>
+
+    <!-- Universal Sentence Encoder -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/universal-sentence-encoder"></script>
+
+
+    <script src="spells.js" defer></script>
+    <script src="wondrous.js" defer></script>
+    <script src="scripts.js" defer></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <title>Pathfinder Crafting Calculator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="appNavbar"></div>
+
+    <div class="w-100 my-3" style="text-align: center;">
+        <h1>Pathfinder Crafting Guide</h1>
+        <sub>Gotta craft 'em all!</sub>
+    </div>
+    
+    <!-- ============================================================== -->
+    <!-- -------------------------- NEW ITEM -------------------------- -->
+    <!-- ============================================================== -->
+
+    <div class="d-flex flex-wrap gap-5 m-4">
+        <label class="text-wrap" title="Create New Item"><h5><b>Create New Item:</h5></b></label>
+        <i class="bi bi-caret-down-fill" id="new-toggle-down" onclick="toggleNew()" style="cursor: pointer;"></i>
+        <i class="bi bi-caret-up-fill" id="new-toggle-up" onclick="toggleNew()" style="cursor: pointer; display: none;"></i>
+    </div>
+    <div class="d-flex row gap-2 justify-content-between m-3"  >
+
+        <!-- -------------------------- DISPLAY --------------------------- -->
+
+        <div class="itemdesc col-md-5" id="new-wrapper-1" style="display: none;">
+            <div class="itemname d-flex justify-content-between">
+                <div class="d-flex gap-1">
+                    <input class="w-100 form-control" placeholder="Item Name">
+                </div>
+            </div>
+            <div id="w-item-id-${index}">
+                <div class="d-flex flex-wrap gap-2 mt-2">
+                    <div class="text-wrap d-flex" id="new-aura"><b>Aura:</b>&nbsp;-</div>
+                    <div class="text-wrap d-flex" id="caster-level-label"><b>CL:</b>&nbsp;-</div>
+                </div>
+                <div class="d-flex flex-wrap gap-2 mt-2">
+                    <div class="text-wrap d-flex"><b>Slot:</b>&nbsp;<select class="form-select form-select-sm" name="slot" id="new-slot">
+                        <option value="none">none</option>
+                        <option value="belt">belt</option>
+                        <option value="body">body</option>
+                        <option value="chest">chest</option>
+                        <option value="eyes">eyes</option>
+                        <option value="feet">feet</option>
+                        <option value="hands">hands</option>
+                        <option value="head">head</option>
+                        <option value="headband">headband</option>
+                        <option value="neck">neck</option>
+                        <option value="shoulders">shoulders</option>
+                        <option value="wrist">wrist</option>
+                    </select></div>
+                    <div class="text-wrap d-flex" id="new-price"><b>Price:</b>&nbsp;-</div>
+                    <div class="text-wrap d-flex"><b>Weight:</b>&nbsp;<input>&nbsp;lbs</div>
+                </div>
+                <div class="catlabel">
+                    <b>DESCRIPTION</b>
+                </div>
+                <div class="description">
+                    <textarea type="text" class="w-100 form-control" id="new-description" style="min-height: 400px;"></textarea>
+                </div>
+                <div class="catlabel">
+                    <b>CONSTRUCTION</b>
+                </div>
+                <div class="d-flex flex-wrap gap-2">
+                    <div class="text-wrap"><b>Requirements:</b></div>
+                    <div class="ms-3">
+                        <div class="d-flex flex-wrap gap-2">
+                            <select class="form-select form-select-sm w-auto" name="craft-slot" id="craft-feet-slot">
+                                <option value="Craft Wondrous Item">Craft Wondrous Item</option>
+                                <option value="Craft Magic Arms and Armor">Craft Magic Arms and Armor</option>
+                                <option value="Forge Ring">Forge Ring</option>
+                                <option value="Brew Potion">Brew Potion</option>
+                                <option value="Craft Rod">Craft Rod</option>
+                                <option value="Craft Wand">Craft Wand</option>
+                                <option value="Craft Staff">Craft Staff</option>
+                                <option value="Scribe Scroll">Scribe Scroll</option>
+                                <option value="Brew Fleshcrafting Poison">Brew Fleshcrafting Poison</option>
+                                <option value="Craft Construct">Craft Construct</option>
+                                <option value="Craft Ooze">Craft Ooze</option>
+                                <option value="Craft Poppet">Craft Poppet</option>
+                                <option value="Craft Shadow Piercing">Craft Shadow Piercing</option>
+                                <option value="Cultivate Magic Plants">Cultivate Magic Plants</option>
+                                <option value="Fleshwarper">Fleshwarper</option>
+                                <option value="Grisly Ornament">Grisly Ornament</option>
+                                <option value="Grow Plant Creature">Grow Plant Creature</option>
+                                <option value="Infuse Poison">Infuse Poison</option>
+                                <option value="Inscribe Magical Tattoo">Inscribe Magical Tattoo</option>
+                                <option value="Haunt Scavenger">Haunt Scavenger</option>
+                                <option value="Inscribe Rune">Inscribe Rune</option>
+                                <option value="Monstrous Crafter">Monstrous Crafter</option>
+                            </select>
+                        </div>
+                        <div id="new-item-spells-wrapper"></div>
+                    </div> 
+                </div>
+                <div class="text-wrap" id="new-cost"><b>Cost:</b>&nbsp;-</div>
+            </div>
+        </div>
+
+        <!-- -------------------------- CALCULATOR ------------------------ -->
+
+        <div class="flex-column col-md-6 col-12" id="new-wrapper-2" style="display: none;">
+            <div class="flex-column p-3">
+                <div class="d-flex row">
+                    <label class="col-5" title="Restrictions">Crafter Class:</label>
+                    <select class="form-select form-select-sm w-auto" onchange="handleChangeClass(this)" name="craft-class" id="craft-class">
+                        <option value=""></option>
+                        <!-- FILLED BY LOAD FILTERS -->
+                    </select>
+                </div>
+                <div class="d-flex row">
+                    <label class="col-5" title="Restrictions">Restrictions:</label>
+                    <div class="col-7 d-flex flex-wrap gap-3">
+                        <button class="btn btn-primary">Add Spell</button>
+                        <button class="btn btn-primary">Add Restriction</button>
+                        <button class="btn btn-primary" onclick="addNewBonus()">Add Bonus</button>
+                    </div>
+                </div>
+                <div class="itemdesc-light" id="spell-req-details" style="display: none;">
+                    <h5><b>Spells</b></h5>
+                    <br>
+                    <div id="spell-req-details-items"></div>
+                    
+                </div>
+                <div class="itemdesc-light" id="bonus-req-details" style="display: none;">
+                    <h5><b>Bonuses</b></h5>
+                    <br>
+                    <div id="bonus-req-details-items"></div>
+                    
+                </div>
+                <div class="costrow d-flex row gap-1 mt-3">
+                    <span class="col-5" title="Market cost of the item being crafted">Item Cost:</span>
+                    <div class="flex-column row col-7" style="padding-left: 0;">
+                        <div class="d-flex gap-2">
+                            <input class="col-5" id="GP" title="Market cost of the item being crafted, GP part" value="120" type="text">
+                            <label class="col-7" for="GP" title="Market cost of the item being crafted, GP part">GP</label>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <input class="col-5" id="SP" title="Market cost of the item being crafted, SP part" value="0" type="text">
+                            <label class="col-7" for="SP" title="Market cost of the item being crafted, SP part">SP</label>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <input class="col-5" id="CP" title="Market cost of the item being crafted, CP part" value="0" type="text">
+                            <label class="col-7" for="CP" title="Market cost of the item being crafted, CP part">CP</label>
+                        </div>       
+                    </div>
+                </div>
+                <div class="d-flex row gap-1 mt-4">
+                    <label class="col-5" for="DC" title="Craft DC of the item being created">Item DC:</label>
+                    <input class="col-3" id="DC" value="13" title="Craft DC of the item being created" type="text">
+                </div>
+                <div class="d-flex row gap-1 mt-4">
+                    <label class="col-5" for="PriorWork" title="Work already done toward item creation">Prior Work:</label>
+                    <input class="col-3" id="PriorWork" value="0" title="Work already done toward item creation" type="text">
+                </div>
+                <div class="d-flex row gap-1 mt-4">
+                    <label class="col-5" for="Check" title="Craft (alchemy) skill check result">Check Result:</label>
+                    <input class="col-3" id="Check" value="15" title="Craft (alchemy) skill check result" type="text">
+                </div>
+                <div class="d-flex row gap-1 mt-4">
+                    <label class="col-5" for="IsByDay" title="Calculate progress by day (instead of by week)">Show By Day:</label>
+                    <div class="d-flex col-3 checkbox-input">
+                        <input id="IsByDay" title="Calculate progress by day (instead of by week)" type="checkbox">
+                    </div>
+                </div>
+                <div class="d-flex row gap-1 mt-4">
+                    <label class="text-wrap col-5 d-flex" for="IsSwift" title="Character is Alchemist with Swift Alchemy (3rd level)">Swift Alchemy (2x speed):</label>
+                    <div class="d-flex col-3 checkbox-input">
+                        <input id="IsSwift" title="Character is Alchemist with Swift Alchemy (3rd level)" type="checkbox">
+                    </div>
+                </div>
+                <div class="d-flex row gap-1 mt-4">
+                    <label class="text-wrap col-5 d-flex" for="IsMaster" title="Character has the Master Alchemist feat">Master Alchemist (10x speed):</label>
+                    <div class="d-flex col-3 checkbox-input">
+                        <input id="IsMaster" onchange="setItemCountState()" title="Character has the Master Alchemist feat" type="checkbox">
+                    </div>
+                </div>
+                <div class="d-flex row gap-1 mt-4">
+                    <label class="col-5" for="ItemMultiple" title="Number of items to create in parallel (requires Master Alchemist)">Item Count:</label>
+                    <input class="col-3" id="ItemMultiple" title="Number of items to create in parallel (requires Master Alchemist)" disabled="true" value="1" type="text">
+                </div>
+                <div class="d-flex row gap-1 mt-4">
+                    <div class="col-5"></div>
+                    <input class="col-4" value="Recompute" onclick="recompute()" type="button">
+                </div>
+            </div>
+            <div class="result-wrapper p-3 mt-3">
+                <div class="resultsrow d-flex row gap-3">
+                    <label class="col-4 text-wrap" for="Progress" title="Progress made toward item completion on this check">Progress:</label>
+                    <input class="col-7" value="" title="Progress made toward item completion on this check" id="Progress" disabled="true" type="text">
+                </div>
+                <div class="resultsrow d-flex row gap-3 mt-4">
+                    <label class="col-4 text-wrap" for="TotalProgress" title="Total progress made toward item completion">Overall Progress:</label>
+                    <input class="col-7" value="" title="Total progress made toward item completion" id="TotalProgress" disabled="true" type="text">
+                </div>
+                <div class="resultsrow d-flex row gap-3 mt-4">
+                    <label class="col-4 text-wrap" for="TimeTaken" title="Total amount of time taken to make this progress">Time Taken:</label>
+                    <input class="col-7" value="" title="Total amount of time taken to make this progress" id="TimeTaken" disabled="true" type="text">
+                </div>
+                <div class="resultsrow d-flex row gap-3 mt-4">
+                    <label class="col-4 text-wrap" for="AmountToPay" title="Amount to pay for this check (base materials only paid on first check)">Amount To Pay:</label>
+                    <input class="col-7" title="Amount to pay for this check (base materials only paid on first check)" id="AmountToPay" disabled="true" type="text">
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    <hr class="mt-3">
+
+    <!-- ============================================================== -->
+    <!-- -------------------------- SEARCH ITEM ----------------------- -->
+    <!-- ============================================================== -->
+    
+    <div class="d-flex row gap-1 m-4 justify-content-between">
+        <label class="text-wrap col-3" for="Search_W_Item" title="Search Item"><h5><b>Search Wondrous Item:</h5></b></label>
+        <input class="col-5"class="col-3"id="Search_W_Item" title="Search Item"></select>
+        
+        <div class="col-3 d-flex justify-content-end gap-2">
+            <button class="btn btn-primary" onclick="searchWItemFilters()" style="max-width: 250px;">Filters</button>
+            <button class="btn btn-primary" onclick="searchWItem()" style="max-width: 250px;">Search</button>
+        </div>
+    </div>
+    <div  class="m-4" id="item-filters-wrapper" style="display: none;">
+        <div class="d-flex flex-column gap-3">
+            <div class="d-flex flex-wrap gap-3 justify-content-center" id="item-slots-wrapper">
+                <b>Slots:</b>
+                <!-- FILLED BY LOAD FILTERS -->
+            </div>
+            <div class="d-flex flex-wrap gap-3 justify-content-center" id="item-types-wrapper">
+                <b>Types:</b>
+                <!-- FILLED BY LOAD FILTERS -->
+            </div>
+        </div>
+    </div>
+
+    <div id="search_w_item_wrapper" class="d-flex row justify-content-center"></div>
+
+    <hr>
+
+    <!-- ============================================================== -->
+    <!-- -------------------------- SEARCH SPELL ---------------------- -->
+    <!-- ============================================================== -->
+
+    <div class="d-flex row gap-1 m-4 justify-content-between">
+        <label class="text-wrap col-3" for="Search_Item" title="Search Spell"><h5><b>Search Spell:</h5></b></label>
+        <input class="col-5"class="col-3"id="Search_Item" title="Search Spell"></select>
+        
+        <div class="col-3 d-flex justify-content-end gap-2">
+            <button class="btn btn-primary" onclick="searchSpellFilters()" style="max-width: 250px;">Filters</button>
+            <button class="btn btn-primary" onclick="searchItem()" style="max-width: 250px;">Search</button>
+        </div>
+    </div>
+    <div  class=" m-4" id="spell-filters-wrapper" style="display: none;">
+        <div class="d-flex flex-column gap-3">
+            <div class="d-flex flex-wrap gap-3 justify-content-center" id="spell-schools-wrapper">
+                <b>Schools:</b>
+                <!-- FILLED BY LOAD FILTERS -->
+            </div>
+            <div class="d-flex flex-wrap gap-3 justify-content-center" id="spell-class-wrapper">
+                <b>Classes:</b>
+                <!-- FILLED BY LOAD FILTERS -->
+            </div>
+        </div>
+    </div>
+    <div id="search_spell_wrapper" class="d-flex row justify-content-center"></div>
+
+    <hr class="my-3">
+  
+    <div class='justify-content-center w-100 p-2' id="footer" style="display: none; position: fixed; bottom: 0px; height: 50px; background-color: #1e1e1e;" onclick="resetSearch()">
+        <button class="btn btn-primary">Reset</button>
+    </div>
+
+    <button class="btn btn-primary" onclick="exportFiltered()" style="max-width: 250px;">run</button>
+
+
+    <script src="navbar.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="app-supabase.js"></script>
+    <script>PFApp.requireAuth();</script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script type="text/javascript">
+
+        const spellcastingClasses = [
+            { name: "wizard", levelsPerSpellLevel: 2 },
+            { name: "cleric", levelsPerSpellLevel: 2 },
+            { name: "druid", levelsPerSpellLevel: 2 },
+            { name: "sorcerer", levelsPerSpellLevel: 2.5 },
+            { name: "oracle", levelsPerSpellLevel: 2.5 },
+            { name: "witch", levelsPerSpellLevel: 2 },
+            { name: "shaman", levelsPerSpellLevel: 2 },
+            { name: "psychic", levelsPerSpellLevel: 2.5 },
+            { name: "bard", levelsPerSpellLevel: 3 },
+            { name: "inquisitor", levelsPerSpellLevel: 3 },
+            { name: "magus", levelsPerSpellLevel: 3 },
+            { name: "summoner", levelsPerSpellLevel: 3 },
+            { name: "summoner (unchained)", levelsPerSpellLevel: 3 },
+            { name: "alchemist", levelsPerSpellLevel: 3 },
+            { name: "investigator", levelsPerSpellLevel: 3 },
+            { name: "bloodrager", levelsPerSpellLevel: 3 },
+            { name: "hunter", levelsPerSpellLevel: 3 },
+            { name: "skald", levelsPerSpellLevel: 3 },
+            { name: "warpriest", levelsPerSpellLevel: 3 },
+            { name: "paladin", levelsPerSpellLevel: 4},
+            { name: "antipaladin", levelsPerSpellLevel: 4},
+            { name: "ranger", levelsPerSpellLevel: 4 },
+            { name: "adept", levelsPerSpellLevel: 2 },
+            { name: "arcanist", levelsPerSpellLevel: 2.5 }
+        ]
+
+        var itemSlots = [
+            "none",
+            "belt",
+            "body",
+            "chest",
+            "eyes",
+            "feet",
+            "hands",
+            "head",
+            "headband",
+            "neck",
+            "shoulders",
+            "wrist",
+            "weapon",
+            "armor",
+            "shield"
+        ]
+
+        var spellSchools = [
+            "abjuration",
+            "conjuration",
+            "divination",
+            "enchantment",
+            "evocation",
+            "illusion",
+            "necromancy",
+            "transmutation",
+            "universal"
+        ]
+
+        var spellClasses = [
+            "adept",
+            "alchemist",
+            "arcanist",
+            "bard",
+            "bloodrager",
+            "cleric",
+            "bard",
+            "bloodrager",
+            "cleric",
+            "druid",
+            "hunter",
+            "inquisitor",
+            "investigator",
+            "magus",
+            "medium",
+            "mesmerist",
+            "occultist",
+            "oracle",
+            "paladin",
+            "antipaladin",
+            "psychic",
+            "ranger",
+            "shaman",
+            "skald",
+            "sorcerer",
+            "spiritualist",
+            "summoner",
+            "summoner (unchained)",
+            "warpriest",
+            "witch",
+            "wizard"
+        ]
+
+        var itemTypes = [
+            "staff",
+            "rod",
+            "cursed"
+        ]
+
+        const bonusEffects = [
+            {
+                name: 'Ability bonus (enhancement)',
+                mult: 1000
+            },
+            {
+                name: 'Armor bonus (enhancement)',
+                mult: 1000
+            },
+            {
+                name: 'Bonus spell',
+                mult: 1000
+            },
+            {
+                name: 'AC bonus (deflection)',
+                mult: 2000
+            },
+            {
+                name: 'AC bonus (other)',
+                mult: 2500
+            },
+            {
+                name: 'Natural armor bonus (enhancement)',
+                mult: 2000
+            },
+            {
+                name: 'Save bonus (resistance)',
+                mult: 1000
+            },
+            {
+                name: 'Save bonus (other)',
+                mult: 2000
+            },
+            {
+                name: 'Skill bonus (competence)',
+                mult: 100
+            },
+            {
+                name: 'Spell resistance',
+                mult: 10000
+            },
+            {
+                name: 'Weapon bonus (enhancement)',
+                mult: 2000
+            }
+        ]
+
+        const skills = [
+            'Acrobatics',
+            'Appraise',
+            'Bluff',
+            'Craft',
+            'Diplomacy',
+            'Disable Device',
+            'Disguise',
+            'Escape Artist',
+            'Fly',
+            'Handle Animal',
+            'Heal',
+            'Intimidate',
+            'Knowledge (arcana)',
+            'Knowledge (dungeoneering)',
+            'Knowledge (engineering)',
+            'Knowledge (geography)',
+            'Knowledge (history)',
+            'Knowledge (local)',
+            'Knowledge (nature)',
+            'Knowledge (nobility)',
+            'Knowledge (planes)',
+            'Knowledge (religion)',
+            'Linguistics',
+            'Perception',
+            'Perform',
+            'Profession',
+            'Ride',
+            'Sense Motive',
+            'Slight of Hand',
+            'Spellcraft',
+            'Stealth',
+            'Survival',
+            'Swim',
+            'UMD'
+        ]
+
+        const spellEffects = [
+            {
+                name: 'Single use, spell completion',
+                mult: 25
+            },
+            {
+                name: 'Single use, user-activated',
+                mult: 50
+            },
+            {
+                name: '50 charges, spell trigger',
+                mult: 750
+            },
+            {
+                name: 'Command word',
+                mult: 1800
+            },
+            {
+                name: 'User Activated or Continuous',
+                mult: 2000
+            },
+            {
+                name: 'Flavor',
+                mult: 0
+            }
+        ]
+
+        const abilityBonuses = [
+            'Constitution',
+            'Strength',
+            'Dexterity',
+            'Intelligence',
+            'Wisdom',
+            'Charisma'
+        ]
+
+        var caster
+
+        var filteredItemSlots = []
+        var filteredItemTypes = []
+        var filteredSchools = []
+        var filteredClasses = []
+        var newItemSpells = []
+        var newItemBonuses = []
+
+        window.onload=loadFilters;
+
+        function loadFilters () {
+
+            for (let slot of itemSlots) {
+                document.getElementById(`item-slots-wrapper`).innerHTML += `
+                    <div class="d-flex flex-wrap gap-1">
+                        <label>${slot}</label>
+                        <input type="checkbox" onclick="wItemSlotCheck()" id="filter-slot-${slot}">
+                    </div>
+                `
+            }
+
+            for (let school of spellSchools) {
+                document.getElementById(`spell-schools-wrapper`).innerHTML += `
+                    <div class="d-flex flex-wrap gap-1">
+                        <label>${school}</label>
+                        <input type="checkbox" onclick="spellSchoolCheck()" id="filter-slot-${school}">
+                    </div>
+                `
+            }
+
+            for (let spellClass of spellClasses) {
+                document.getElementById(`spell-class-wrapper`).innerHTML += `
+                    <div class="d-flex flex-wrap gap-1">
+                        <label>${spellClass}</label>
+                        <input type="checkbox" onclick="spellClassCheck()" id="filter-slot-${spellClass}">
+                    </div>
+                `
+            }
+
+            for (let type of itemTypes) {
+                document.getElementById(`item-types-wrapper`).innerHTML += `
+                    <div class="d-flex flex-wrap gap-1">
+                        <label>${type}</label>
+                        <input type="checkbox" onclick="wItemTypeCheck()" id="filter-slot-${type}">
+                    </div>
+                `
+            }
+
+            for (let castClass of spellcastingClasses) {
+                document.getElementById(`craft-class`).innerHTML += `
+                    <option value="${castClass.name}">${castClass.name.charAt(0).toUpperCase() + castClass.name.slice(1)}</option>
+                `
+            }
+
+        }
+
+        function cleanDescription(htmlString) {
+            // Use a virtual DOM element to parse and strip HTML tags
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = htmlString;
+            let text = tempDiv.textContent || tempDiv.innerText || '';
+
+            // Now clean additional patterns from the plain text:
+            // Remove parenthetical text: ( Pathfinder RPG ... )
+            text = text.replace(/\([^)]*\)/g, '');
+
+            // Collapse extra whitespace
+            text = text.replace(/\s+/g, ' ').trim();
+
+            return text;
+        }
+
+        async function exportMeta() {
+            const description = cleanDescription("</h3>This item appears to be a string or\r cluster of spherical beads, sometimes\r with the ends tied together to form a\r necklace. (It does not count as an item\r worn around the neck for the purpose\r of determining which of a character’s\r worn magic items is effective.) If a\r character holds it, however, all can see the strand as it really\r is—a golden chain from which hang a number of golden\r spheres. The spheres are detachable by the wearer (and only\r by the wearer), who can easily hurl one of them up to 70 feet.\r When a sphere arrives at the end of its trajectory, it detonates\r as a <i>fireball </i>spell (Reflex DC 14 half).<br/><br/>\r Spheres come in different strengths, ranging from those that\r deal 2d6 points of fire damage to those that deal 10d6. The price\r of a sphere is 150 gp for each die of damage it deals.<br/><br/> <table class=\"inner\"><tr><td><b>Necklace</b></td><td><b>10d6</b></td><td><b>9d6</b></td><td><b>8d6</b></td><td><b>7d6</b></td><td><b>6d6</b></td><td><b>5d6</b></td><td><b>4d6</b></td><td><b>3d6</b></td><td><b>2d6</b></td><td><b>cost</b></td></tr> <tr><td>Type I</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>1</td><td>—</td><td>2</td><td>—</td><td>1,650 gp</td></tr> <tr><td>Type II</td><td>—</td><td>—</td><td>—</td><td>—</td><td>1</td><td>—</td><td>2</td><td>—</td><td>2</td><td>2,700 gp</td></tr> <tr><td>Type III</td><td>—</td><td>—</td><td>—</td><td>1</td><td>—</td><td>2</td><td>—</td><td>4</td><td>—</td><td>4,350 gp</td></tr> <tr><td>Type IV</td><td>—</td><td>—</td><td>1</td><td>—</td><td>2</td><td>—</td><td>2</td><td>—</td><td>4</td><td>5,400 gp</td></tr> <tr><td>Type V</td><td>—</td><td>1</td><td>—</td><td>2</td><td>—</td><td>2</td><td>—</td><td>2</td><td>—</td><td>5,850 gp</td></tr> <tr><td>Type VI</td><td>1</td><td>—</td><td>2</td><td>—</td><td>2</td><td>—</td><td>4</td><td>—</td><td>—</td><td>8,100 gp</td></tr> <tr><td>Type VII</td><td>1</td><td>2</td><td>—</td><td>2</td><td>—</td><td>2</td><td>—</td><td>2</td><td>—</td><td>8,700 gp</td></tr></table>Each necklace of fireballs contains a combination of\r spheres of various strengths. Some traditional combinations,\r designated types I through VII, are detailed above.<br/><br/>\r If the necklace is being worn or carried by a character who fails\r her saving throw against a magical fire attack, the item must make\r a saving throw as well (with a save bonus of +7). If the necklace\r fails to save, all its remaining spheres detonate simultaneously,\r often with regrettable consequences for the wearer.")
+
+            findMostSimilar(items, description).then(results => console.log(results));
+        }
+    </script>
+
+</body></html>

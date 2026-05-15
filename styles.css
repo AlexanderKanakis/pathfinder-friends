@@ -1,0 +1,172 @@
+body {
+    background-color: #121212;
+    color: white;
+}
+
+.container,
+.container-fluid {
+    color: white;
+}
+
+.flex-column.p-3 {
+    background: #1e1e1e;
+    border: 1px solid #444;
+    border-radius: 10px;
+}
+
+.m-4,
+.m-3 {
+    color: white;
+}
+.row {
+    margin-top: 10px;
+}
+.row label {
+    white-space: nowrap;
+    vertical-align: bottom;
+}
+
+.costrow input {
+    width: 50px;
+}
+.resultsrow {
+    margin-top: 10px;
+}
+.resultsrow input {
+    border: none;
+    color: #ddd;
+}
+.itemdesc {
+    background-color: #1e1e1e;
+    border: 1px solid #444;
+    margin-top: 20px;
+    padding: 30px;
+    border-radius: 10px;
+}
+
+.itemdesc-light {
+    background-color: #242424;
+    border: 1px solid #444;
+    margin-top: 20px;
+    padding: 20px;
+    border-radius: 10px;
+}
+.itemname {
+    padding: 5px;
+}
+.itemname a {
+    font-weight: bold;
+    text-decoration: none;
+    color: white;
+}
+.description p {
+    margin-top: 6px;
+    text-indent: 10px;
+}
+.howto li {
+    margin-top: 5px;
+}
+#footer {
+    border-top: 1px solid #444;
+    box-shadow: 0px -10px 20px rgba(0,0,0,.45);
+}
+.result-wrapper {
+    background-color: #1e1e1e;
+    border: 1px solid #444;
+    border-radius: 10px;
+}
+.checkbox-input input {
+    width: 25px;
+}
+.catlabel {
+    border-top: #444 solid 1px;
+    border-bottom: #444 solid 1px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    color: #aaa;
+}
+
+input, textarea, select {
+    background-color: #2b2b2b !important;
+    color: white !important;
+    border-color: #555 !important;
+}
+
+input:disabled {
+    background-color: #202020 !important;
+    color: #ddd !important;
+}
+
+label, .text-wrap, span {
+    color: #aaa;
+}
+
+.btn-primary {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+button, input[type="button"] {
+    border-radius: 6px;
+}
+
+hr {
+    border-color: #444;
+    opacity: 1;
+}
+
+h1, h3, h5, b, strong {
+    color: #f4f4f4;
+}
+
+sub,
+.description,
+.howto,
+p,
+li,
+td,
+th {
+    color: #ddd;
+}
+
+a {
+    color: #8ec5ff;
+}
+
+table.descrTable {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table.descrTable tr:nth-child(odd) {
+    background-color: rgba(0,0,0,0.2);
+}
+
+table.descrTable td, 
+table.descrTable th {
+    padding: 8px;
+    border: 1px solid #444;
+}
+
+table.descrTable tr:hover {
+    background-color: #2d2d2d;
+}
+
+table.inner {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table.inner tr:nth-child(odd) {
+    background-color: rgba(0,0,0,0.2);
+}
+
+table.inner td, 
+table.inner th {
+    padding: 8px;
+    border: 1px solid #444;
+}
+
+table.inner tr:hover {
+    background-color: #2d2d2d;
+}
