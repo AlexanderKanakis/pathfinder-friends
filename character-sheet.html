@@ -11,7 +11,7 @@
   <style>
     body { background-color: #121212; color: white; }
     .sheet-section { background: #1e1e1e; border-radius: 10px; padding: 12px; margin-bottom: 12px; }
-    .sheet-card { background: #242424; border: 1px solid #444; border-radius: 8px; padding: 10px; }
+    .sheet-card { background: #242424; border: 1px solid #444; border-radius: 8px; padding: 10px; container-type: inline-size; }
     .sheet-title { font-size: 13px; color: #aaa; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
     .sheet-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
     .sheet-grid-wide { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 8px; }
@@ -31,9 +31,18 @@
     }
     .card-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; align-items: end; }
     .enhancement-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 220px)); gap: 8px; align-items: end; margin-top: 8px; }
-    .weapon-summary { display: grid; grid-template-columns: minmax(220px, 2fr) minmax(150px, 1fr) minmax(130px, 1fr); gap: 8px; align-items: end; margin-top: 8px; }
+    .weapon-summary { display: grid; grid-template-columns: minmax(260px, 2fr) minmax(150px, 1fr) minmax(130px, 1fr); gap: 8px; align-items: end; margin-top: 8px; }
+    .weapon-summary > div { min-width: 0; }
     .weapon-attack-summary input { font-size: 13px; min-width: 0; }
-    @media (max-width: 760px) {
+    @media (max-width: 1120px) {
+      .weapon-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .weapon-attack-summary { grid-column: 1 / -1; }
+    }
+    @container (max-width: 640px) {
+      .weapon-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .weapon-attack-summary { grid-column: 1 / -1; }
+    }
+    @media (max-width: 360px) {
       .weapon-summary { grid-template-columns: 1fr; }
     }
     .card-details.d-none { display: none !important; }
@@ -517,7 +526,7 @@ let armorCount = 0;
 let gearCount = 0;
 let sheetSaveTimer;
 let sheetContextKey = "general";
-let showCalculations = false;
+let showCalculations = true;
 let currentSheetId = null;
 let isRestoringSheet = false;
 let activeBuffs = [];
@@ -2471,7 +2480,7 @@ function collectSheet() {
 function restoreSheet(sheet) {
   isRestoringSheet = true;
   const data = sheet || {};
-  showCalculations = Boolean(data.preferences?.showAppliedBuffs ?? data.showAppliedBuffs ?? false);
+  showCalculations = Boolean(data.preferences?.showAppliedBuffs ?? data.showAppliedBuffs ?? true);
   updateAppliedBuffsToggle();
   Object.entries(data.fields || {}).forEach(([id, value]) => { if (el(id)) el(id).value = value; });
   Object.entries(data).forEach(([id, value]) => {
@@ -2611,7 +2620,7 @@ function resetForNewCharacter() {
   gearCount = 0;
   addWeapon();
   addArmor();
-  showCalculations = false;
+  showCalculations = true;
   updateAppliedBuffsToggle();
   isRestoringSheet = false;
   recalculateSheet();

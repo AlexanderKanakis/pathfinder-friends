@@ -225,6 +225,13 @@
     });
   }
 
+  async function resetUserPasswordAsAdmin(email, password) {
+    if (!client) return { error: new Error("Supabase is not configured") };
+    return client.functions.invoke("admin-create-user", {
+      body: { action: "reset-password", email, password }
+    });
+  }
+
   async function setupAdminPage() {
     const user = await requireAuth();
     if (!user) return;
@@ -262,6 +269,32 @@
       status.className = "alert alert-success py-2";
       status.textContent = `User created for ${data?.email || email}.`;
       form.reset();
+    });
+
+    const resetForm = document.getElementById("adminResetPasswordForm");
+    resetForm?.addEventListener("submit", async event => {
+      event.preventDefault();
+      const email = document.getElementById("adminResetEmail").value.trim();
+      const password = document.getElementById("adminResetPassword").value;
+      const status = document.getElementById("adminStatus");
+      const button = document.getElementById("adminResetPasswordBtn");
+      status.className = "alert alert-info py-2";
+      status.textContent = "Resetting password...";
+      status.classList.remove("d-none");
+      button.disabled = true;
+
+      const { data, error } = await resetUserPasswordAsAdmin(email, password);
+      button.disabled = false;
+
+      if (error || data?.error) {
+        status.className = "alert alert-danger py-2";
+        status.textContent = data?.error || error?.message || "Could not reset password.";
+        return;
+      }
+
+      status.className = "alert alert-success py-2";
+      status.textContent = `Password reset for ${data?.email || email}.`;
+      resetForm.reset();
     });
   }
 
@@ -1110,6 +1143,7 @@
     updatePassword,
     isAppAdmin,
     createUserAsAdmin,
+    resetUserPasswordAsAdmin,
     loadContexts,
     createCampaign,
     findCampaign,

@@ -13,7 +13,7 @@
   <h3>Admin</h3>
   <div id="adminStatus" class="alert d-none" role="alert"></div>
 
-  <section class="card bg-black border-secondary text-white">
+  <section class="card bg-black border-secondary text-white mb-3">
     <div class="card-body">
       <h5 class="card-title">Create User</h5>
       <form id="adminCreateUserForm" class="vstack gap-3">
@@ -27,6 +27,25 @@
         </div>
         <div>
           <button id="adminCreateUserBtn" class="btn btn-primary" type="submit">Create User</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <section class="card bg-black border-secondary text-white">
+    <div class="card-body">
+      <h5 class="card-title">Reset User Password</h5>
+      <form id="adminResetPasswordForm" class="vstack gap-3">
+        <div>
+          <label class="form-label" for="adminResetEmail">Email</label>
+          <input id="adminResetEmail" class="form-control" type="email" autocomplete="off" required>
+        </div>
+        <div>
+          <label class="form-label" for="adminResetPassword">New Password</label>
+          <input id="adminResetPassword" class="form-control" type="password" autocomplete="new-password" required minlength="6">
+        </div>
+        <div>
+          <button id="adminResetPasswordBtn" class="btn btn-outline-info" type="submit">Reset Password</button>
         </div>
       </form>
     </div>

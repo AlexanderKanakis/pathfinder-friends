@@ -91,19 +91,9 @@
         <label for="mapRows">Height</label>
         <input id="mapRows" class="form-control form-control-sm" type="number" min="8" max="80" value="20">
       </div>
-      <div>
-        <label for="backgroundUrl">Background URL</label>
-        <input id="backgroundUrl" class="form-control form-control-sm" placeholder="https://...">
-      </div>
-      <div>
-        <label for="backgroundFit">Fit</label>
-        <select id="backgroundFit" class="form-select form-select-sm">
-          <option value="cover">Cover</option>
-          <option value="contain">Contain</option>
-          <option value="100% 100%">Stretch</option>
-          <option value="auto">Original</option>
-        </select>
-      </div>
+      <button id="openBackgroundOptions" class="btn btn-outline-info btn-sm" type="button">
+        <i class="bi bi-image"></i> Add Background
+      </button>
       <button id="addCharacterToken" class="btn btn-primary btn-sm" type="button"><i class="bi bi-person-plus"></i> Character</button>
       <button id="addEnemyToken" class="btn btn-danger btn-sm" type="button"><i class="bi bi-bug"></i> Enemy</button>
       <button id="addRectShape" class="btn btn-outline-light btn-sm" type="button"><i class="bi bi-square"></i> Rect</button>
@@ -164,6 +154,43 @@
   </button>
 </div>
 
+<div class="modal fade" id="backgroundOptionsModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <form id="backgroundOptionsForm" class="modal-content bg-dark text-white border-secondary">
+      <div class="modal-header border-secondary">
+        <h5 class="modal-title">Map Background</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="backgroundUrl">Background URL</label>
+          <input id="backgroundUrl" class="form-control form-control-sm" placeholder="https://...">
+        </div>
+        <div class="mb-3">
+          <label for="backgroundFit">Fit</label>
+          <select id="backgroundFit" class="form-select form-select-sm">
+            <option value="cover">Cover</option>
+            <option value="contain">Contain</option>
+            <option value="100% 100%">Stretch</option>
+            <option value="auto">Original</option>
+          </select>
+        </div>
+        <!-- <div>
+          <label for="backgroundUpload">Upload Image</label>
+          <input id="backgroundUpload" class="form-control form-control-sm" type="file" accept="image/*">
+          <div class="small text-secondary mt-1">Uploads use Supabase Storage and save only the public URL on the map.</div>
+          <div id="backgroundUploadStatus" class="small text-secondary mt-2"></div>
+        </div> -->
+      </div>
+      <div class="modal-footer border-secondary">
+        <button type="button" class="btn btn-outline-light btn-sm" data-bs-dismiss="modal">Cancel</button>
+        <!-- <button id="uploadBackgroundImage" type="button" class="btn btn-outline-info btn-sm">Upload</button> -->
+        <button class="btn btn-primary btn-sm" type="submit">Save Background</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <div class="modal fade" id="auraOptionsModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <form id="auraOptionsForm" class="modal-content bg-dark text-white border-secondary">
@@ -218,6 +245,7 @@ let movementMeasure = null;
 let suppressNextContextMenu = false;
 let auraModal = null;
 let auraEditingTokenId = "";
+let backgroundModal = null;
 
 const defaultState = {
   settings: { cols: 30, rows: 20, backgroundUrl: "", backgroundFit: "cover" },
@@ -1108,6 +1136,61 @@ function saveAuraOptions(event) {
   renderAll();
 }
 
+function safeStorageName(name) {
+  return String(name || "map-background")
+    .toLowerCase()
+    .replace(/[^a-z0-9._-]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80) || "map-background";
+}
+
+function openBackgroundOptions() {
+  applySettingsToInputs();
+  // el("backgroundUpload").value = "";
+  // el("backgroundUploadStatus").textContent = "";
+  backgroundModal.show();
+}
+
+async function uploadBackgroundImage() {
+  const file = el("backgroundUpload").files?.[0];
+  const status = el("backgroundUploadStatus");
+  if (!file) {
+    status.textContent = "Choose an image first.";
+    return;
+  }
+  if (!PFApp.client) {
+    status.textContent = "Supabase is not available.";
+    return;
+  }
+
+  const gameId = mapContextKey.startsWith("game:") ? mapContextKey.slice(5) : "general";
+  const extension = file.name.includes(".") ? file.name.split(".").pop() : "png";
+  const baseName = safeStorageName(file.name.replace(/\.[^.]+$/, ""));
+  const path = `${gameId}/${Date.now()}-${baseName}.${safeStorageName(extension)}`;
+
+  status.textContent = "Uploading...";
+  const { error } = await PFApp.client.storage
+    .from("map-backgrounds")
+    .upload(path, file, { cacheControl: "3600", upsert: false, contentType: file.type || "image/png" });
+
+  if (error) {
+    status.textContent = error.message || "Could not upload image. Check that the map-backgrounds storage bucket exists.";
+    return;
+  }
+
+  const { data } = PFApp.client.storage.from("map-backgrounds").getPublicUrl(path);
+  el("backgroundUrl").value = data?.publicUrl || "";
+  status.textContent = "Uploaded. Save the background to apply it.";
+}
+
+function saveBackgroundOptions(event) {
+  event.preventDefault();
+  state.settings.backgroundUrl = el("backgroundUrl").value.trim();
+  state.settings.backgroundFit = el("backgroundFit").value;
+  backgroundModal.hide();
+  renderAll();
+}
+
 async function loadMap(contextKey) {
   if (!contextKey || contextKey === "general") return;
   unsubscribeMapRealtime();
@@ -1161,16 +1244,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     renderAll(false);
   });
 
-  ["mapCols", "mapRows", "backgroundUrl", "backgroundFit"].forEach(id => {
+  ["mapCols", "mapRows"].forEach(id => {
     el(id).addEventListener("change", () => {
       state.settings.cols = clamp(Number(el("mapCols").value || 30), 8, 80);
       state.settings.rows = clamp(Number(el("mapRows").value || 20), 8, 80);
-      state.settings.backgroundUrl = el("backgroundUrl").value.trim();
-      state.settings.backgroundFit = el("backgroundFit").value;
       renderAll();
     });
   });
 
+  el("openBackgroundOptions").addEventListener("click", openBackgroundOptions);
+  backgroundModal = new bootstrap.Modal(el("backgroundOptionsModal"));
+  // el("uploadBackgroundImage").addEventListener("click", uploadBackgroundImage);
+  el("backgroundOptionsForm").addEventListener("submit", saveBackgroundOptions);
   el("addCharacterToken").addEventListener("click", () => addToken("character"));
   el("addEnemyToken").addEventListener("click", () => addToken("enemy"));
   el("addRectShape").addEventListener("click", () => addShape("rect"));

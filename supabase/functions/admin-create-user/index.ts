@@ -52,11 +52,37 @@ Deno.serve(async request => {
   }
 
   const body = await request.json().catch(() => ({}));
+  const action = String(body.action || "create-user");
   const email = String(body.email || "").trim().toLowerCase();
   const password = String(body.password || "");
 
   if (!email || !password || password.length < 6) {
     return json({ error: "Email and a password of at least 6 characters are required" }, 400);
+  }
+
+  if (action === "reset-password") {
+    const { user: targetUser, error: lookupError } = await findUserByEmail(adminClient, email);
+    if (lookupError) {
+      return json({ error: lookupError }, 500);
+    }
+
+    if (!targetUser) {
+      return json({ error: "User not found" }, 404);
+    }
+
+    const { data, error } = await adminClient.auth.admin.updateUserById(targetUser.id, {
+      password
+    });
+
+    if (error) {
+      return json({ error: error.message }, 400);
+    }
+
+    return json({ id: data.user?.id, email: data.user?.email });
+  }
+
+  if (action !== "create-user") {
+    return json({ error: "Unsupported admin action" }, 400);
   }
 
   const { data, error } = await adminClient.auth.admin.createUser({
@@ -71,6 +97,23 @@ Deno.serve(async request => {
 
   return json({ id: data.user?.id, email: data.user?.email });
 });
+
+async function findUserByEmail(adminClient: ReturnType<typeof createClient>, email: string) {
+  let page = 1;
+  const perPage = 100;
+
+  while (page <= 20) {
+    const { data, error } = await adminClient.auth.admin.listUsers({ page, perPage });
+    if (error) return { user: null, error: error.message };
+
+    const match = data.users.find(user => user.email?.toLowerCase() === email);
+    if (match) return { user: match, error: "" };
+    if (data.users.length < perPage) return { user: null, error: "" };
+    page += 1;
+  }
+
+  return { user: null, error: "Could not search all users" };
+}
 
 function json(payload: unknown, status = 200) {
   return new Response(JSON.stringify(payload), {
