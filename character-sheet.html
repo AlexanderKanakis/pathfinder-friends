@@ -1756,7 +1756,13 @@ async function openEffectTrackerModal() {
     onChange: async buffs => {
       activeBuffs = Array.isArray(buffs) ? buffs : [];
       lastBuffRefresh = localStorage.getItem(buffRefreshKey()) || String(Date.now());
+      const name = el("characterName").value.trim();
+      if (!name) {
+        if (!silent) setStatus("Character name is required before saving.", "warning");
+        return;
+      }
       recalculateSheet();
+      const saved = await PFApp.saveCharacterSheet(name, collectSheet(), sheetContextKey, currentSheetId);
     }
   };
 
@@ -2302,6 +2308,7 @@ function collectCalculatedSummary() {
     label,
     total: el(`${key}Total`)?.value || ""
   }));
+  
   const weaponRows = [...el("weaponRows").querySelectorAll(".sheet-card")].map(card => ({
     name: card.querySelector('[data-field="name"]')?.value || "Weapon",
     attack: card.querySelector("[data-attack-total]")?.value || "",
@@ -2524,8 +2531,6 @@ function restoreSheet(sheet) {
 
 function loadSampleValues() {
   Object.entries(PDF_SAMPLE).forEach(([id, value]) => { if (el(id)) el(id).value = value; });
-  addWeapon({ name: "Elven curve blade", attack: "+13/+8", damage: "1d10", damageScale: "STR", twoHanded: "yes", critical: "18-20/x2", type: "S" });
-  addArmor({ item: "Darkwood Breastplate +2", bonus: "6", enhancement: "2", type: "Armor", penalty: "-2", failure: "25%", weight: "30 lbs." });
 }
 
 function attachInputListeners(root = document) {
