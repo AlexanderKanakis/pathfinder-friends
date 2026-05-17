@@ -132,6 +132,7 @@
               <select id="customBuffCategory" class="form-select form-select-sm">
                 <option value="Spell" selected>Spell</option>
                 <option value="Special Ability">Special Ability</option>
+                <option value="Feat">Feat</option>
                 <option value="Debuff">Debuff</option>
                 <option value="Condition">Condition</option>
               </select>
@@ -253,6 +254,7 @@ function categoryIcon(category) {
   const key = String(category || "").toLowerCase();
   if (key.includes("condition")) return "bi-activity";
   if (key.includes("debuff")) return "bi-arrow-down-circle";
+  if (key.includes("feat")) return "bi-award";
   if (key.includes("spell")) return "bi-stars";
   return "bi-lightning-charge";
 }

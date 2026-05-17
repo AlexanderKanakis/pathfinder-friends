@@ -16,6 +16,8 @@
       .effect-tracker-inline input[type="number"] { width: 62px; }
       .effect-tracker-chip { display: inline-block; margin: 2px 3px 2px 0; color: #ddd; }
       .effect-tracker-active { background: #242424; border: 1px solid #444; border-radius: 8px; padding: 10px; margin-bottom: 8px; }
+      .effect-active-toolbar { display: flex; justify-content: space-between; align-items: end; gap: 10px; margin-bottom: 8px; }
+      .effect-active-toolbar select { max-width: 180px; }
       .effect-duration-grid { display: grid; grid-template-columns: .75fr 1fr .7fr; gap: 8px; align-items: end; }
       .effect-toggle-field { min-height: 31px; display: flex; align-items: center; margin: 0; padding-left: 0; }
       .effect-toggle-field .form-check-input { width: 2.75rem; height: 1.4rem; margin-left: 0; cursor: pointer; }
@@ -77,6 +79,7 @@
   const SPECIAL_SKILL_STATS = [CRAFT_SKILL_STAT, PROFESSION_SKILL_STAT];
   const BONUS_TYPES = ["untyped","alchemical","condition","penalty","armor","circumstance","competence","deflection","dodge","enhancement","insight","luck","morale","natural armor","profane","resistance","sacred","shield","size"];
   const DURATION_UNITS = ["variable", "turn", "round", "minute", "hour", "day"];
+  const EFFECT_CATEGORIES = ["Spell", "Special Ability", "Feat", "Debuff", "Condition"];
 
   function titleCaseStat(value) {
     const key = String(value || "").toLowerCase().trim();
@@ -128,6 +131,7 @@
     const key = String(category || "").toLowerCase();
     if (key.includes("condition")) return "bi-activity";
     if (key.includes("debuff")) return "bi-arrow-down-circle";
+    if (key.includes("feat")) return "bi-award";
     if (key.includes("spell")) return "bi-stars";
     return "bi-lightning-charge";
   }
@@ -248,6 +252,7 @@
       this.editingEffectId = null;
       this.deletingEffectId = null;
       this.editingScaleRow = null;
+      this.activeTypeFilter = "all";
     }
 
     async mount() {
@@ -296,10 +301,7 @@
                   <div class="col-md-4">
                     <label class="small" for="${this.prefix}CustomCategory">Type</label>
                     <select id="${this.prefix}CustomCategory" class="form-select form-select-sm">
-                      <option value="Spell" selected>Spell</option>
-                      <option value="Special Ability">Special Ability</option>
-                      <option value="Debuff">Debuff</option>
-                      <option value="Condition">Condition</option>
+                      ${EFFECT_CATEGORIES.map(category => `<option value="${category}" ${category === "Spell" ? "selected" : ""}>${category}</option>`).join("")}
                     </select>
                   </div>
                   <div class="col-md-4">
@@ -444,7 +446,9 @@
         return;
       }
       this.effects = await PFApp.loadBuffDefinitions();
-      const saved = await PFApp.loadBuffState(this.options.contextKey, this.options.characterId);
+      const saved = this.options.loadActiveEffects
+        ? await this.options.loadActiveEffects()
+        : await PFApp.loadBuffState(this.options.contextKey, this.options.characterId);
       this.active = Array.isArray(saved) ? saved : saved?.buffs || [];
       this.updateSearchVisibility();
       this.renderResults();
@@ -919,12 +923,39 @@
         this.activeEl.innerHTML = `<div class="small-text">No character selected. Create or select a character to add effects.</div>`;
         return;
       }
+
+      const activeCategories = [...new Set(this.active.map(effect => effect.category || "Effect"))]
+        .sort((a, b) => String(a).localeCompare(String(b)));
+      const filterOptions = ["all", ...activeCategories];
+      if (!filterOptions.includes(this.activeTypeFilter)) this.activeTypeFilter = "all";
+      const filteredActive = this.active
+        .map((effect, index) => ({ effect, index }))
+        .filter(row => this.activeTypeFilter === "all" || row.effect.category === this.activeTypeFilter);
+
+      const toolbar = `
+        <div class="effect-active-toolbar">
+          <div class="small-text">${this.active.length} active effect${this.active.length === 1 ? "" : "s"}</div>
+          <div>
+            <label class="small" for="${this.prefix}ActiveTypeFilter">Type</label>
+            <select id="${this.prefix}ActiveTypeFilter" class="form-select form-select-sm">
+              ${filterOptions.map(type => `<option value="${escapeHtml(type)}" ${this.activeTypeFilter === type ? "selected" : ""}>${escapeHtml(type === "all" ? "All" : type)}</option>`).join("")}
+            </select>
+          </div>
+        </div>
+      `;
+
       if (!this.active.length) {
-        this.activeEl.innerHTML = `<div class="small-text">No active effects.</div>`;
+        this.activeEl.innerHTML = `${toolbar}<div class="small-text">No active effects.</div>`;
+        this.bindActiveFilter();
+        return;
+      }
+      if (!filteredActive.length) {
+        this.activeEl.innerHTML = `${toolbar}<div class="small-text">No active effects match this type.</div>`;
+        this.bindActiveFilter();
         return;
       }
 
-      this.activeEl.innerHTML = this.active.map((effect, index) => {
+      this.activeEl.innerHTML = toolbar + filteredActive.map(({ effect, index }) => {
         const detailsId = `${this.prefix}Details${index}`;
         const bonuses = (effect.bonuses || []).map(bonus => `<div class="small-text">${escapeHtml(bonusText(bonus))}</div>`).join("");
         return `
@@ -932,7 +963,7 @@
             <div class="d-flex justify-content-between align-items-start gap-2">
               <div>
                 <strong>${escapeHtml(effect.name)}</strong>
-                <div class="small-text">${escapeHtml(activeDuration(effect))}</div>
+                <div class="small-text">${escapeHtml(effect.category || "Effect")} | ${escapeHtml(activeDuration(effect))}</div>
               </div>
               <div class="d-flex gap-1">
                 <button class="btn btn-outline-info btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#${detailsId}" aria-label="Show effect details">i</button>
@@ -947,13 +978,26 @@
       this.activeEl.querySelectorAll("[data-remove-effect]").forEach(button => {
         button.addEventListener("click", () => this.removeEffect(Number(button.dataset.removeEffect)));
       });
+      this.bindActiveFilter();
+    }
+
+    bindActiveFilter() {
+      const filter = document.getElementById(`${this.prefix}ActiveTypeFilter`);
+      filter?.addEventListener("change", () => {
+        this.activeTypeFilter = filter.value || "all";
+        this.renderActive();
+      });
     }
 
     queueSave() {
       clearTimeout(this.saveTimer);
       this.saveTimer = setTimeout(async () => {
-        await PFApp.saveBuffState(this.active, this.options.contextKey, this.options.characterId);
-        stamp(this.options.contextKey, this.options.characterId);
+        if (this.options.saveActiveEffects) {
+          await this.options.saveActiveEffects([...this.active]);
+        } else {
+          await PFApp.saveBuffState(this.active, this.options.contextKey, this.options.characterId);
+          stamp(this.options.contextKey, this.options.characterId);
+        }
         this.notifyChange();
       }, 250);
     }

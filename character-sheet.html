@@ -117,7 +117,8 @@
     .simple-list-main { font-weight: 700; }
     .simple-list-sub { color: #ddd; font-weight: 700; white-space: nowrap; }
     .simple-weapon-block { display: grid; gap: 6px; }
-    .simple-weapon-card { width: fit-content; max-width: 100%; }
+    .simple-weapon-card { width: 280px; max-width: 100%; container-type: normal; }
+    .simple-weapon-name { min-width: 0; overflow-wrap: break-word; word-break: normal; white-space: normal; }
     .simple-weapon-block .simple-card,
     .simple-weapon-block .simple-list-row { width: 260px; max-width: 100%; }
     .simple-weapon-block .simple-list { width: fit-content; max-width: 100%; }
@@ -135,9 +136,10 @@
 
 <main class="container-fluid mt-3">
   <div class="d-flex justify-content-between align-items-center mb-2">
-    <h3 class="mb-0">Character Sheet</h3>
+    <h3 id="sheetPageTitle" class="mb-0">Character Sheet</h3>
     <div class="d-flex gap-2">
-      <button class="btn btn-outline-light btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#newCharacterModal">New Character</button>
+      <a id="backToEnemiesBtn" class="btn btn-outline-light btn-sm d-none" href="enemies.html">Back to Enemies</a>
+      <button id="newCharacterBtn" class="btn btn-outline-light btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#newCharacterModal">New Character</button>
       <button class="btn btn-outline-success btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#effectTrackerModal" onclick="openEffectTrackerModal()">Effects</button>
       <button id="showAppliedBuffsToggle" class="btn btn-outline-info btn-sm" type="button" onclick="toggleAppliedBuffs()">Show Applied Buffs</button>
       <button class="btn btn-primary btn-sm" type="button" onclick="saveSheetNow()">Save</button>
@@ -534,6 +536,8 @@ let lastBuffRefresh = "";
 let effectTrackerInstance = null;
 let currentUserId = "";
 let currentSheetOwnerId = "";
+let isEnemySheetMode = false;
+let enemySheetId = "";
 let sheetViewMode = sessionStorage.getItem("pf_character_sheet_view") || "full";
 let customSkills = [];
 let inventoryItemModal = null;
@@ -933,7 +937,7 @@ function simpleWeaponCards(rows) {
     <div class="sheet-card simple-weapon-card">
       <div class="mb-2">
         <div class="simple-label">Name</div>
-        <div class="simple-value">${escapeHtml(row[0] || "-")}</div>
+        <div class="simple-value simple-weapon-name">${escapeHtml(row[0] || "-")}</div>
       </div>
       <div class="simple-weapon-block">
         <div>
@@ -1750,19 +1754,38 @@ async function openEffectTrackerModal() {
     return;
   }
 
+  const enemySaveActiveEffects = isEnemySheetMode
+    ? async buffs => {
+        activeBuffs = Array.isArray(buffs) ? buffs : [];
+        recalculateSheet();
+        const name = el("characterName").value.trim();
+        if (!name) {
+          setStatus("Enemy name is required before saving.", "warning");
+          return;
+        }
+        const sheet = collectSheet();
+        sheet.activeBuffs = activeBuffs;
+        const savedEnemy = await PFApp.saveEnemy({ id: enemySheetId, name, visible: true, sheet }, sheetContextKey);
+        if (savedEnemy?.id) {
+          localStorage.setItem(`pf_enemy_sheet_updated_${sheetContextKey}_${savedEnemy.id}`, String(Date.now()));
+        }
+      }
+    : null;
   const options = {
     contextKey: sheetContextKey,
     characterId: currentSheetId,
+    loadActiveEffects: isEnemySheetMode ? async () => activeBuffs : undefined,
+    saveActiveEffects: enemySaveActiveEffects || undefined,
     onChange: async buffs => {
       activeBuffs = Array.isArray(buffs) ? buffs : [];
       lastBuffRefresh = localStorage.getItem(buffRefreshKey()) || String(Date.now());
       const name = el("characterName").value.trim();
       if (!name) {
-        if (!silent) setStatus("Character name is required before saving.", "warning");
+        setStatus(`${isEnemySheetMode ? "Enemy" : "Character"} name is required before saving.`, "warning");
         return;
       }
       recalculateSheet();
-      const saved = await PFApp.saveCharacterSheet(name, collectSheet(), sheetContextKey, currentSheetId);
+      if (!isEnemySheetMode) await PFApp.saveCharacterSheet(name, collectSheet(), sheetContextKey, currentSheetId);
     }
   };
 
@@ -2247,6 +2270,11 @@ async function wearLootItem(item) {
 }
 
 async function loadCharacterInventory() {
+  if (isEnemySheetMode) {
+    characterInventoryItems = [];
+    renderCharacterInventory([]);
+    return;
+  }
   if (!currentSheetId) {
     characterInventoryItems = [];
     renderCharacterInventory([]);
@@ -2548,13 +2576,13 @@ function attachInputListeners(root = document) {
 
 function queueSheetSave() {
   if (isRestoringSheet) return;
-  if (currentSheetOwnerId && currentSheetOwnerId !== currentUserId) return;
+  if (!isEnemySheetMode && currentSheetOwnerId && currentSheetOwnerId !== currentUserId) return;
   clearTimeout(sheetSaveTimer);
   sheetSaveTimer = setTimeout(() => saveSheetNow(true), 500);
 }
 
 async function saveSheetNow(silent = false) {
-  if (currentSheetOwnerId && currentSheetOwnerId !== currentUserId) {
+  if (!isEnemySheetMode && currentSheetOwnerId && currentSheetOwnerId !== currentUserId) {
     if (!silent) setStatus("You can view this campaign character, but only its owner can save changes.", "warning");
     return;
   }
@@ -2565,6 +2593,24 @@ async function saveSheetNow(silent = false) {
     return;
   }
   recalculateSheet();
+  if (isEnemySheetMode) {
+    const sheet = collectSheet();
+    sheet.activeBuffs = activeBuffs;
+    const savedEnemy = await PFApp.saveEnemy({
+      id: enemySheetId,
+      name,
+      visible: true,
+      sheet
+    }, sheetContextKey);
+    if (savedEnemy?.id) {
+      enemySheetId = savedEnemy.id;
+      currentSheetId = savedEnemy.id;
+    }
+    localStorage.setItem(`pf_enemy_sheet_updated_${sheetContextKey}_${enemySheetId}`, String(Date.now()));
+    if (!silent) setStatus("Enemy sheet saved.", "success");
+    return;
+  }
+
   const saved = await PFApp.saveCharacterSheet(name, collectSheet(), sheetContextKey, currentSheetId);
   if (saved?.id) currentSheetId = saved.id;
   if (currentSheetId) rememberSelectedCharacter(currentSheetId);
@@ -2572,7 +2618,26 @@ async function saveSheetNow(silent = false) {
   const navCharacterSelect = el("navCharacterSelect");
   if (navCharacterSelect && currentSheetId) navCharacterSelect.value = currentSheetId;
   await loadCharacterInventory();
+  if (currentSheetId) localStorage.setItem(`pf_character_sheet_updated_${sheetContextKey}_${currentSheetId}`, String(Date.now()));
   if (!silent) setStatus("Character sheet saved.", "success");
+}
+
+async function loadEnemySheet(enemyId) {
+  const enemy = await PFApp.loadEnemy(enemyId, sheetContextKey);
+  if (!enemy) {
+    setStatus("Could not load that enemy.", "warning");
+    return;
+  }
+
+  isEnemySheetMode = true;
+  enemySheetId = enemy.id;
+  currentSheetId = enemy.id;
+  currentSheetOwnerId = currentUserId;
+  activeBuffs = Array.isArray(enemy.sheet?.activeBuffs) ? enemy.sheet.activeBuffs : [];
+  restoreSheet(enemy.sheet || {});
+  el("characterName").value = enemy.name;
+  renderCharacterInventory([]);
+  setStatus("Enemy sheet loaded.", "info");
 }
 
 async function loadCurrentSheet(sheetId = currentSheetId) {
@@ -2653,10 +2718,28 @@ async function initCharacterSheet() {
   if (!sheetContextKey) return;
   currentUserId = user.id;
   currentSheetOwnerId = user.id;
+  enemySheetId = new URLSearchParams(window.location.search).get("enemyId") || "";
+  isEnemySheetMode = Boolean(enemySheetId);
   buildSheet();
+  if (isEnemySheetMode) {
+    const canManageEnemies = await PFApp.isGameManager(sheetContextKey);
+    if (!canManageEnemies) {
+      document.querySelector("main").innerHTML = `
+        <div class="alert alert-warning">
+          <h5 class="alert-heading">GM access required</h5>
+          <p class="mb-0">Only the GM of this campaign or an app admin can edit enemies.</p>
+        </div>
+      `;
+      return;
+    }
+    el("sheetPageTitle").textContent = "Enemy Sheet";
+    el("newCharacterBtn").classList.add("d-none");
+    el("backToEnemiesBtn").classList.remove("d-none");
+  }
   updateAppliedBuffsToggle();
   setSheetView(sheetViewMode);
   window.addEventListener("pf-context-change", async event => {
+    if (isEnemySheetMode) return;
     if (!event.detail.contextKey || event.detail.contextKey === "general") return;
     sheetContextKey = event.detail.contextKey;
     currentSheetId = null;
@@ -2666,24 +2749,32 @@ async function initCharacterSheet() {
     await loadCharacterList();
   });
   window.addEventListener("pf-character-change", async event => {
+    if (isEnemySheetMode) return;
     if (event.detail.contextKey !== sheetContextKey) return;
     if (event.detail.characterId) await loadCurrentSheet(event.detail.characterId);
     else resetForNewCharacter();
   });
-  window.addEventListener("focus", () => refreshBuffsIfChanged());
-  document.addEventListener("visibilitychange", () => {
-    if (!document.hidden) refreshBuffsIfChanged();
+  window.addEventListener("focus", () => {
+    if (!isEnemySheetMode) refreshBuffsIfChanged();
   });
-  await loadCharacterList();
-  const rememberedId = PFApp.getSelectedCharacterId(sheetContextKey);
-  if (rememberedId) {
-    await loadCurrentSheet(rememberedId);
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden && !isEnemySheetMode) refreshBuffsIfChanged();
+  });
+  if (isEnemySheetMode) {
+    await loadEnemySheet(enemySheetId);
   } else {
-    loadSampleValues();
-    renderCharacterInventory([]);
+    await loadCharacterList();
+    const rememberedId = PFApp.getSelectedCharacterId(sheetContextKey);
+    if (rememberedId) {
+      await loadCurrentSheet(rememberedId);
+    } else {
+      loadSampleValues();
+      renderCharacterInventory([]);
+    }
   }
   attachInputListeners();
   el("characterName").addEventListener("change", async () => {
+    if (isEnemySheetMode) return;
     const saved = await PFApp.loadCharacterSheet(el("characterName").value.trim(), sheetContextKey);
     currentSheetId = saved?.id || null;
     if (saved?.sheet) await loadCurrentSheet(saved.id);

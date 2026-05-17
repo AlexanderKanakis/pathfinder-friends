@@ -9,6 +9,7 @@
       ]
     },
     { href: "character-sheet.html", label: "Character Sheet" },
+    { href: "enemies.html", label: "Enemies" },
     { href: "bag-of-holding.html", label: "Bag of Holding" },
     { href: "map.html", label: "Map" },
     { href: "campaigns.html", label: "Campaigns" }

@@ -369,6 +369,16 @@
     return data || [];
   }
 
+  async function isGameManager(contextKey = getSelectedContextKey()) {
+    if (await isAppAdmin()) return true;
+
+    const context = normalizeContext(contextKey);
+    if (!context.gameId) return false;
+    const campaigns = await loadCampaigns();
+    const campaign = campaigns.find(item => item.id === context.gameId);
+    return ["owner", "gm", "admin"].includes(campaign?.role);
+  }
+
   async function loadCampaignRequests() {
     const user = await getUser();
     if (!user) return [];
@@ -433,7 +443,7 @@
     const keys = contexts.map(context => context.key);
     let selectedKey = getSelectedContextKey();
     const page = window.location.pathname.split("/").pop() || "";
-    const requiresGame = ["map.html", "character-sheet.html", "bag-of-holding.html"].includes(page);
+    const requiresGame = ["map.html", "character-sheet.html", "bag-of-holding.html", "enemies.html"].includes(page);
     const availableContexts = requiresGame ? contexts.filter(context => context.gameId) : contexts;
 
     if (!availableContexts.length) {
@@ -914,6 +924,32 @@
     return Array.isArray(data) ? data[0] || null : data;
   }
 
+  async function updateCharacterCurrentHp(sheetId, currentHp, contextKey = getSelectedContextKey()) {
+    const current = await loadCharacterSheet("", contextKey, sheetId);
+    if (!current?.sheet) return null;
+
+    const sheet = structuredClone(current.sheet || {});
+    sheet.fields = { ...(sheet.fields || {}), currentHitPoints: String(currentHp ?? "") };
+    if (sheet.calculated?.hp) sheet.calculated.hp.current = String(currentHp ?? "");
+
+    const { data, error } = await client
+      .from("character_sheets")
+      .update({
+        sheet,
+        updated_at: new Date().toISOString()
+      })
+      .eq("id", sheetId)
+      .select("id,character_name,user_id,sheet")
+      .single();
+
+    if (error) {
+      console.error(error);
+      return null;
+    }
+
+    return data;
+  }
+
   async function saveCharacterSheet(characterName, sheet, contextKey = getSelectedContextKey(), sheetId = null) {
     const user = await getUser();
     if (!client || !user || !characterName) return null;
@@ -1009,6 +1045,114 @@
       username: character.username || "",
       email: character.email || ""
     }));
+  }
+
+  function normalizeEnemy(row) {
+    return {
+      id: row.id,
+      name: row.name || "Unnamed enemy",
+      visible: row.visible !== false,
+      sheet: row.sheet || {},
+      contextKey: row.context_key || "",
+      gameId: row.game_id || "",
+      createdBy: row.created_by || "",
+      updatedAt: row.updated_at || ""
+    };
+  }
+
+  async function loadEnemies(contextKey = getSelectedContextKey()) {
+    const user = await getUser();
+    if (!client || !user) return [];
+
+    const context = normalizeContext(contextKey);
+    if (!context.gameId) return [];
+
+    const { data, error } = await client
+      .from("enemies")
+      .select("id,name,visible,sheet,context_key,game_id,created_by,updated_at")
+      .eq("context_key", context.contextKey)
+      .order("updated_at", { ascending: false });
+
+    if (error) {
+      console.error(error);
+      return [];
+    }
+
+    return (data || []).map(normalizeEnemy);
+  }
+
+  async function loadEnemy(enemyId, contextKey = getSelectedContextKey()) {
+    const user = await getUser();
+    if (!client || !user || !enemyId) return null;
+
+    let query = client
+      .from("enemies")
+      .select("id,name,visible,sheet,context_key,game_id,created_by,updated_at")
+      .eq("id", enemyId);
+
+    const context = normalizeContext(contextKey);
+    if (context.gameId) query = query.eq("game_id", context.gameId);
+
+    const { data, error } = await query.maybeSingle();
+    if (error) {
+      console.error(error);
+      return null;
+    }
+
+    return data ? normalizeEnemy(data) : null;
+  }
+
+  async function saveEnemy(enemy, contextKey = getSelectedContextKey()) {
+    const user = await getUser();
+    if (!client || !user || !enemy?.name) return null;
+
+    const context = normalizeContext(contextKey);
+    if (!context.gameId) return null;
+
+    const payload = {
+      name: enemy.name,
+      visible: enemy.visible !== false,
+      sheet: enemy.sheet || {},
+      context_key: context.contextKey,
+      game_id: context.gameId,
+      updated_at: new Date().toISOString()
+    };
+
+    const query = enemy.id
+      ? client.from("enemies").update(payload).eq("id", enemy.id)
+      : client.from("enemies").insert({ ...payload, created_by: user.id });
+
+    const { data, error } = await query
+      .select("id,name,visible,sheet,context_key,game_id,created_by,updated_at")
+      .single();
+
+    if (error) {
+      console.error(error);
+      return null;
+    }
+
+    return normalizeEnemy(data);
+  }
+
+  async function updateEnemyCurrentHp(enemyId, currentHp, contextKey = getSelectedContextKey()) {
+    const enemy = await loadEnemy(enemyId, contextKey);
+    if (!enemy) return null;
+
+    const sheet = structuredClone(enemy.sheet || {});
+    sheet.fields = { ...(sheet.fields || {}), currentHitPoints: String(currentHp ?? "") };
+    if (sheet.calculated?.hp) sheet.calculated.hp.current = String(currentHp ?? "");
+    return saveEnemy({ ...enemy, sheet }, contextKey);
+  }
+
+  async function duplicateEnemy(enemyId, contextKey = getSelectedContextKey()) {
+    const enemies = await loadEnemies(contextKey);
+    const source = enemies.find(enemy => enemy.id === enemyId);
+    if (!source) return null;
+    return saveEnemy({
+      name: `${source.name} Copy`,
+      visible: source.visible,
+      sheet: structuredClone(source.sheet || {})
+    }, contextKey);
   }
 
   async function loadLootItems(contextKey = getSelectedContextKey()) {
@@ -1149,6 +1293,7 @@
     findCampaign,
     requestCampaignAccess,
     loadCampaigns,
+    isGameManager,
     requireGameContext,
     loadCampaignRequests,
     respondCampaignRequest,
@@ -1173,8 +1318,14 @@
     loadCharacterSheets,
     loadCharacterSheet,
     saveCharacterSheet,
+    updateCharacterCurrentHp,
     loadContextMembers,
     loadContextCharacters,
+    loadEnemies,
+    loadEnemy,
+    saveEnemy,
+    updateEnemyCurrentHp,
+    duplicateEnemy,
     loadLootItems,
     saveLootItem,
     deleteLootItem,

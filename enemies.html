@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Enemies</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    body { background: #121212; color: #fff; }
+    .enemy-shell { max-width: 1100px; }
+    .enemy-toolbar { display: grid; grid-template-columns: minmax(180px, 1fr) auto; gap: 10px; align-items: end; }
+    .enemy-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+    .enemy-card { background: #242424; border: 1px solid #444; border-radius: 8px; padding: 10px; cursor: pointer; min-width: 0; }
+    .enemy-card:hover { border-color: #777; }
+    .enemy-card-title { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .enemy-card-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+    .enemy-json { min-height: 260px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; }
+    input, textarea, select { background-color: #2b2b2b !important; color: white !important; border-color: #555 !important; }
+    @media (max-width: 520px) {
+      .enemy-toolbar { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div id="appNavbar"></div>
+
+<main class="container enemy-shell mt-4">
+  <div class="d-flex justify-content-between align-items-center gap-2 mb-3">
+    <div>
+      <h3 class="mb-0">Enemies</h3>
+      <div id="enemyContextLabel" class="small text-secondary"></div>
+    </div>
+    <button id="addEnemyBtn" class="btn btn-primary btn-sm" type="button">
+      <i class="bi bi-plus-lg"></i> Add Enemy
+    </button>
+  </div>
+
+  <div id="enemyStatus" class="alert d-none py-2" role="alert"></div>
+
+  <section class="card bg-black border-secondary text-white mb-3">
+    <div class="card-body">
+      <div class="enemy-toolbar">
+        <div>
+          <label for="enemySearch" class="form-label">Search Enemies</label>
+          <input id="enemySearch" class="form-control form-control-sm" placeholder="Name">
+        </div>
+        <button id="refreshEnemiesBtn" class="btn btn-outline-light btn-sm" type="button">
+          <i class="bi bi-arrow-clockwise"></i> Refresh
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div id="enemyList" class="enemy-grid"></div>
+  </section>
+</main>
+
+<div class="modal fade" id="enemyModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <form id="enemyForm" class="modal-content bg-dark text-white border-secondary">
+      <div class="modal-header border-secondary">
+        <h5 id="enemyModalTitle" class="modal-title">Enemy</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <input id="enemyId" type="hidden">
+        <div class="row g-2">
+          <div class="col-md-8">
+            <label for="enemyName" class="form-label">Name</label>
+            <input id="enemyName" class="form-control form-control-sm" required>
+          </div>
+        </div>
+        <div class="small text-secondary mt-3">After creation, the full character sheet editor will open for this enemy.</div>
+      </div>
+      <div class="modal-footer border-secondary">
+        <button id="duplicateEnemyBtn" type="button" class="btn btn-outline-info btn-sm">
+          <i class="bi bi-copy"></i> Duplicate
+        </button>
+        <button type="button" class="btn btn-outline-light btn-sm" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-primary btn-sm" type="submit">Save Enemy</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="navbar.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="app-supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+let enemyContextKey = "";
+let enemies = [];
+let enemyModal = null;
+
+function el(id) { return document.getElementById(id); }
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function setEnemyStatus(message, type = "info") {
+  const status = el("enemyStatus");
+  status.className = `alert alert-${type} py-2`;
+  status.textContent = message;
+  status.classList.remove("d-none");
+}
+
+function defaultEnemySheet(name) {
+  return {
+    fields: {
+      characterName: name || "Enemy",
+      currentHitPoints: "",
+      hitPointsTotal: ""
+    },
+    abilities: {},
+    saves: {},
+    skills: {},
+    weapons: [],
+    armor: [],
+    gear: []
+  };
+}
+
+function filteredEnemies() {
+  const term = el("enemySearch").value.trim().toLowerCase();
+  if (!term) return enemies;
+  return enemies.filter(enemy => enemy.name.toLowerCase().includes(term));
+}
+
+function renderEnemies() {
+  const rows = filteredEnemies();
+  el("enemyList").innerHTML = rows.length
+    ? rows.map(enemy => `
+      <article class="enemy-card" data-enemy-id="${escapeHtml(enemy.id)}">
+        <div class="d-flex justify-content-between gap-2">
+          <div class="enemy-card-title">${escapeHtml(enemy.name)}</div>
+          <span class="badge text-bg-danger">Enemy</span>
+        </div>
+        <div class="small text-secondary mt-1">Updated ${escapeHtml(enemy.updatedAt ? new Date(enemy.updatedAt).toLocaleString() : "-")}</div>
+        <div class="enemy-card-actions">
+          <button class="btn btn-outline-light btn-sm" type="button" data-edit-enemy="${escapeHtml(enemy.id)}">
+            <i class="bi bi-pencil"></i> Edit
+          </button>
+          <button class="btn btn-outline-info btn-sm" type="button" data-duplicate-enemy="${escapeHtml(enemy.id)}">
+            <i class="bi bi-copy"></i> Duplicate
+          </button>
+        </div>
+      </article>
+    `).join("")
+    : `<div class="small text-secondary">No enemies found.</div>`;
+
+  el("enemyList").querySelectorAll("[data-enemy-id]").forEach(card => {
+    card.addEventListener("click", event => {
+      if (event.target.closest("button")) return;
+      openEnemySheet(card.dataset.enemyId);
+    });
+  });
+  el("enemyList").querySelectorAll("[data-edit-enemy]").forEach(button => {
+    button.addEventListener("click", () => openEnemySheet(button.dataset.editEnemy));
+  });
+  el("enemyList").querySelectorAll("[data-duplicate-enemy]").forEach(button => {
+    button.addEventListener("click", async () => duplicateEnemy(button.dataset.duplicateEnemy));
+  });
+}
+
+function openEnemySheet(enemyId) {
+  if (!enemyId) return;
+  window.location.href = `character-sheet.html?enemyId=${encodeURIComponent(enemyId)}`;
+}
+
+async function loadEnemies() {
+  enemies = await PFApp.loadEnemies(enemyContextKey);
+  renderEnemies();
+}
+
+function openEnemyModal(enemyId = "") {
+  const enemy = enemies.find(item => item.id === enemyId);
+  const name = enemy?.name || "";
+  el("enemyId").value = enemy?.id || "";
+  el("enemyName").value = name;
+  el("enemyModalTitle").textContent = enemy ? `Edit ${enemy.name}` : "Add Enemy";
+  el("duplicateEnemyBtn").classList.toggle("d-none", !enemy?.id);
+  enemyModal.show();
+  setTimeout(() => el("enemyName").focus(), 150);
+}
+
+async function saveEnemy(event) {
+  event.preventDefault();
+  const name = el("enemyName").value.trim();
+
+  const enemy = await PFApp.saveEnemy({
+    id: el("enemyId").value || "",
+    name,
+    visible: true,
+    sheet: defaultEnemySheet(name)
+  }, enemyContextKey);
+
+  if (!enemy) {
+    setEnemyStatus("Could not save enemy.", "danger");
+    return;
+  }
+
+  enemyModal.hide();
+  setEnemyStatus("Enemy created.", "success");
+  await loadEnemies();
+  openEnemySheet(enemy.id);
+}
+
+async function duplicateEnemy(enemyId = el("enemyId").value) {
+  if (!enemyId) return;
+  const enemy = await PFApp.duplicateEnemy(enemyId, enemyContextKey);
+  if (!enemy) {
+    setEnemyStatus("Could not duplicate enemy.", "danger");
+    return;
+  }
+  enemyModal.hide();
+  setEnemyStatus("Enemy duplicated.", "success");
+  await loadEnemies();
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+  const user = await PFApp.requireAuth();
+  if (!user) return;
+
+  enemyContextKey = await PFApp.requireGameContext();
+  if (!enemyContextKey) return;
+
+  await PFApp.renderAuthNav(user);
+  const isManager = await PFApp.isGameManager(enemyContextKey);
+  if (!isManager) {
+    document.querySelector("main").innerHTML = `
+      <div class="alert alert-warning">
+        <h5 class="alert-heading">GM access required</h5>
+        <p class="mb-0">Only the GM of this campaign or an app admin can manage enemies.</p>
+      </div>
+    `;
+    return;
+  }
+
+  const contexts = await PFApp.loadContexts();
+  const current = contexts.find(context => context.key === enemyContextKey);
+  el("enemyContextLabel").textContent = current?.label || "Current campaign";
+
+  enemyModal = new bootstrap.Modal(el("enemyModal"));
+  el("enemySearch").addEventListener("input", renderEnemies);
+  el("refreshEnemiesBtn").addEventListener("click", loadEnemies);
+  el("addEnemyBtn").addEventListener("click", () => openEnemyModal());
+  el("enemyForm").addEventListener("submit", saveEnemy);
+  el("duplicateEnemyBtn").addEventListener("click", () => duplicateEnemy());
+
+  await loadEnemies();
+});
+</script>
+</body>
+</html>
