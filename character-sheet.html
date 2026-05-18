@@ -520,7 +520,7 @@ const WEAPON_TYPES = ["Melee Weapon (Light)", "Melee Weapon (One-Handed)", "Mele
 const WEAPON_ENCHANTMENTS = ["", "Adaptive", "Allying", "Anarchic", "Anchoring", "Axiomatic", "Bane", "Brilliant Energy", "Called", "Conductive", "Corrosive", "Corrosive Burst", "Cruel", "Cunning", "Dancing", "Defending", "Disruption", "Distance", "Flaming", "Flaming Burst", "Frost", "Furious", "Ghost Touch", "Holy", "Icy Burst", "Impact", "Keen", "Merciful", "Returning", "Seeking", "Shock", "Shocking Burst", "Speed", "Spell Storing", "Throwing", "Thundering", "Unholy", "Vicious", "Vorpal", "Wounding"];
 const ARMOR_ENCHANTMENTS = ["", "Balanced", "Benevolent", "Bitter", "Bolstering", "Brawling", "Champion", "Dastard", "Deathless", "Defiant", "Determination", "Energy Resistance", "Energy Resistance (Improved)", "Energy Resistance (Greater)", "Etherealness", "Fortification (Light)", "Fortification (Moderate)", "Fortification (Heavy)", "Ghost Touch", "Glamered", "Invulnerability", "Shadow", "Shadow (Improved)", "Shadow (Greater)", "Slick", "Slick (Improved)", "Slick (Greater)", "Spell Resistance (13)", "Spell Resistance (15)", "Spell Resistance (17)", "Spell Resistance (19)", "Wild"];
 const SHIELD_ENCHANTMENTS = ["", "Animated", "Arrow Catching", "Arrow Deflection", "Bashing", "Blinding", "Clangorous", "Defiant", "Determination", "Energy Resistance", "Energy Resistance (Improved)", "Energy Resistance (Greater)", "Fortification (Light)", "Fortification (Moderate)", "Fortification (Heavy)", "Ghost Touch", "Impervious", "Merging", "Mirrored", "Poison-Resistant", "Rallying", "Ramming", "Reflecting", "Spell Resistance (13)", "Spell Resistance (15)", "Spell Resistance (17)", "Spell Resistance (19)", "Wild"];
-const LOOT_EFFECT_STATS = ["strength","dexterity","constitution","intelligence","wisdom","charisma","attack","melee attack","ranged attack","damage","melee damage","ranged damage","ac","touch ac","flat-footed ac","natural armor","deflection","fortitude","reflex","will","initiative","cmb","cmd","hit points","spell resistance"];
+const LOOT_EFFECT_STATS = ["strength","dexterity","constitution","intelligence","wisdom","charisma","attack","melee attack","ranged attack","damage","melee damage","ranged damage","ac","touch ac","flat-footed ac","remove dex bonus to ac","natural armor","deflection","fortitude","reflex","will","initiative","cmb","cmd","hit points","spell resistance"];
 const LOOT_SKILL_STATS = ["skill checks","strength skill checks","dexterity skill checks","constitution skill checks","intelligence skill checks","wisdom skill checks","charisma skill checks"];
 const LOOT_BONUS_TYPES = ["untyped","alchemical","condition","penalty","armor","circumstance","competence","deflection","dodge","enhancement","insight","luck","morale","natural armor","profane","resistance","sacred","shield","size"];
 let weaponCount = 0;
@@ -835,6 +835,7 @@ function statDisplayLabel(stat) {
     ac: "AC",
     "touch ac": "Touch AC",
     "flat-footed ac": "Flat-Footed AC",
+    "remove dex bonus to ac": "Remove DEX Bonus to AC",
     cmb: "CMB",
     cmd: "CMD",
     fortitude: "Fortitude",
@@ -1828,12 +1829,18 @@ function renderInventoryAttributes(item) {
 function renderInventoryEffects(item) {
   const effects = Array.isArray(item.effects) ? item.effects : [];
   if (!effects.length) return "";
+  const effectText = effect => {
+    if (String(effect.stat || "").toLowerCase().trim() === "remove dex bonus to ac") {
+      return `Removes DEX bonus to AC${effect.conditional ? ` (${escapeHtml(effect.appliesWhen || "conditional")})` : ""}${effect.stacks ? " stacks" : ""}`;
+    }
+    return `${escapeHtml(titleCaseStat(effect.stat || "effect"))} ${signed(Number(effect.value || 0))} (${escapeHtml(effect.type || "untyped")})${effect.conditional ? ` (${escapeHtml(effect.appliesWhen || "conditional")})` : ""}${effect.stacks ? " stacks" : ""}`;
+  };
   return `
     <div class="inventory-effects">
       <div class="small-text">Item effects</div>
       ${effects.map(effect => `
         <div class="inventory-effect">
-          ${escapeHtml(titleCaseStat(effect.stat || "effect"))} ${signed(Number(effect.value || 0))} (${escapeHtml(effect.type || "untyped")})${effect.conditional ? ` (${escapeHtml(effect.appliesWhen || "conditional")})` : ""}${effect.stacks ? " stacks" : ""}
+          ${effectText(effect)}
         </div>
       `).join("")}
     </div>
@@ -2328,26 +2335,40 @@ function collectCards(containerId) {
 }
 
 function collectCalculatedSummary() {
+  const conditionalGroups = simpleConditionalsByStat();
   const abilityRows = ABILITIES.map(([key, label]) => ({
     key,
     label,
     total: el(`${key}Total`)?.value || el(`${key}Score`)?.value || "",
-    mod: el(`${key}Mod`)?.value || ""
+    mod: el(`${key}Mod`)?.value || "",
+    conditionals: conditionalGroups[ABILITY_STAT_NAMES[key]] || []
   }));
   const saveRows = SAVES.map(([key, label]) => ({
     key,
     label,
-    total: el(`${key}Total`)?.value || ""
+    total: el(`${key}Total`)?.value || "",
+    conditionals: conditionalGroups[{ fort: "fortitude", reflex: "reflex", will: "will" }[key]] || []
   }));
   
-  const weaponRows = [...el("weaponRows").querySelectorAll(".sheet-card")].map(card => ({
-    name: card.querySelector('[data-field="name"]')?.value || "Weapon",
-    attack: card.querySelector("[data-attack-total]")?.value || "",
-    damage: card.querySelector("[data-damage-total]")?.value || "",
-    critical: card.querySelector('[data-field="critical"]')?.value || ""
-  }));
+  const weaponRows = [...el("weaponRows").querySelectorAll(".sheet-card")].map(card => {
+    const range = card.querySelector('[data-field="range"]')?.value || "";
+    const attackScale = card.querySelector('[data-field="attackScale"]')?.value || "";
+    const weaponType = card.querySelector('[data-field="weaponType"]')?.value || "";
+    const attack = card.querySelector("[data-attack-total]")?.value || "";
+    const damage = card.querySelector("[data-damage-total]")?.value || "";
+    const isRanged = isRangedWeaponType(weaponType) || Boolean(range.trim()) || parseScalingKeys(attackScale).includes("dex");
+    return {
+      name: card.querySelector('[data-field="name"]')?.value || "Weapon",
+      attack,
+      damage,
+      critical: card.querySelector('[data-field="critical"]')?.value || "",
+      attackConditionals: simpleConditionalListRows("Attack", attack, ["attack", isRanged ? "ranged attack" : "melee attack"], conditionalGroups),
+      damageConditionals: simpleConditionalListRows("Damage", damage, ["damage", isRanged ? "ranged damage" : "melee damage"], conditionalGroups)
+    };
+  });
 
   return {
+    conditionals: conditionalGroups,
     hp: {
       current: el("currentHitPoints")?.value || "",
       total: el("hitPointsTotal")?.value || el("hitPoints")?.value || ""
@@ -2357,12 +2378,23 @@ function collectCalculatedSummary() {
     armorClass: {
       ac: el("acTotal")?.value || "",
       touch: el("acTouch")?.value || "",
-      flat: el("acFlat")?.value || ""
+      flat: el("acFlat")?.value || "",
+      conditionals: {
+        ac: conditionalGroups.ac || [],
+        touch: conditionalGroups["touch ac"] || [],
+        flat: conditionalGroups["flat-footed ac"] || []
+      }
     },
     combat: {
       cmb: el("cmbTotal")?.value || "",
-      cmd: el("cmdTotal")?.value || ""
+      cmd: el("cmdTotal")?.value || "",
+      conditionals: {
+        cmb: conditionalGroups.cmb || [],
+        cmd: conditionalGroups.cmd || []
+      }
     },
+    initiativeConditionals: conditionalGroups.initiative || [],
+    hpConditionals: conditionalGroups["hit points"] || [],
     saves: saveRows,
     weapons: weaponRows
   };

@@ -209,12 +209,13 @@ let selectedCharacterSheet = null;
 let baseline = {...EMPTY_BASELINE};
 let customBonusCount = 0;
 
-const BUFF_STATS = ["strength","dexterity","constitution","intelligence","wisdom","charisma","attack","melee attack","ranged attack","damage","melee damage","ranged damage","ac","touch ac","flat-footed ac","natural armor","deflection","fortitude","reflex","will","initiative","cmb","cmd","hit points","skill checks","spell resistance"];
+const BUFF_STATS = ["strength","dexterity","constitution","intelligence","wisdom","charisma","attack","melee attack","ranged attack","damage","melee damage","ranged damage","ac","touch ac","flat-footed ac","remove dex bonus to ac","natural armor","deflection","fortitude","reflex","will","initiative","cmb","cmd","hit points","skill checks","spell resistance"];
 const BONUS_TYPES = ["untyped","alchemical","condition","penalty","armor","circumstance","competence","deflection","dodge","enhancement","insight","luck","morale","natural armor","profane","resistance","sacred","shield","size"];
 const STAT_LABELS = {
   ac: "AC",
   "touch ac": "Touch AC",
   "flat-footed ac": "Flat-Footed AC",
+  "remove dex bonus to ac": "Remove DEX Bonus to AC",
   cmb: "CMB",
   cmd: "CMD",
   str: "STR",
@@ -224,6 +225,22 @@ const STAT_LABELS = {
   wis: "WIS",
   cha: "CHA"
 };
+const ACTIVE_CATEGORY_PRIORITY = ["Spell", "Debuff", "Condition"];
+
+function activeCategoryRank(category) {
+  const index = ACTIVE_CATEGORY_PRIORITY.findIndex(item => item.toLowerCase() === String(category || "").toLowerCase());
+  return index >= 0 ? index : ACTIVE_CATEGORY_PRIORITY.length;
+}
+
+function activeBuffRows() {
+  return activeBuffs
+    .map((buff, index) => ({ buff, index }))
+    .sort((a, b) =>
+      activeCategoryRank(a.buff.category) - activeCategoryRank(b.buff.category) ||
+      String(a.buff.name || "").localeCompare(String(b.buff.name || "")) ||
+      a.index - b.index
+    );
+}
 
 function titleCaseStat(value) {
   const key = String(value || "").toLowerCase().trim();
@@ -260,6 +277,10 @@ function categoryIcon(category) {
 }
 
 function formatBonusText(bonus) {
+  if (String(bonus.stat || "").toLowerCase().trim() === "remove dex bonus to ac") {
+    const text = "Removes DEX bonus to AC";
+    return bonus.appliesWhen ? `${text} (${bonus.appliesWhen})` : text;
+  }
   const value = Number(bonus.value || 0);
   const text = `${fmt(value)} ${bonus.type || "untyped"} ${titleCaseStat(bonus.stat)}`;
   return bonus.appliesWhen ? `${text} (${bonus.appliesWhen})` : text;
@@ -534,13 +555,11 @@ function renderActiveBuffsLegacy(){
   const c=document.getElementById("activeBuffs");
   c.innerHTML="";
 
-  activeBuffs.forEach((b,i)=>{
+  activeBuffRows().forEach(({ buff: b, index: i })=>{
     const d=document.createElement("div");
     d.className="dice-row";
     const detailsId = `buffDetails${i}`;
-    const bonusText = (b.bonuses || []).map(bonus =>
-      `${fmt(Number(bonus.value || 0))} ${escapeHtml(bonus.type || "untyped")} to ${escapeHtml(titleCaseStat(bonus.stat))}${bonus.appliesWhen ? ` (${escapeHtml(bonus.appliesWhen)})` : ""}`
-    );
+    const bonusText = (b.bonuses || []).map(formatBonusText);
 
     d.innerHTML=`
       <div>
@@ -873,13 +892,11 @@ function renderActiveBuffs(){
   const c=document.getElementById("activeBuffs");
   c.innerHTML="";
 
-  activeBuffs.forEach((b,i)=>{
+  activeBuffRows().forEach(({ buff: b, index: i })=>{
     const d=document.createElement("div");
     d.className="dice-row";
     const detailsId = `buffDetails${i}`;
-    const bonusText = (b.bonuses || []).map(bonus =>
-      `${fmt(Number(bonus.value || 0))} ${escapeHtml(bonus.type || "untyped")} to ${escapeHtml(titleCaseStat(bonus.stat))}${bonus.appliesWhen ? ` (${escapeHtml(bonus.appliesWhen)})` : ""}`
-    );
+    const bonusText = (b.bonuses || []).map(formatBonusText);
 
     d.innerHTML=`
       <div class="d-flex justify-content-between align-items-start gap-2">
@@ -897,7 +914,7 @@ function renderActiveBuffs(){
         </div>
       </div>
       <div id="${detailsId}" class="collapse mt-2">
-        ${bonusText.length ? bonusText.map(text => `<div class="small-text">↳ ${text}</div>`).join("") : '<div class="small-text">No mechanical bonuses listed.</div>'}
+        ${bonusText.length ? bonusText.map(text => `<div class="small-text">↳ ${escapeHtml(text)}</div>`).join("") : '<div class="small-text">No mechanical bonuses listed.</div>'}
       </div>
     `;
     c.appendChild(d);

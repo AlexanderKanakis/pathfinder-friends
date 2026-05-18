@@ -18,6 +18,10 @@
       cha: "charisma",
       fort: "fortitude",
       ac: "ac",
+      "remove dex bonus to ac": "remove dex bonus to ac",
+      "remove dexterity bonus to ac": "remove dex bonus to ac",
+      "deny dex bonus to ac": "remove dex bonus to ac",
+      "deny dexterity bonus to ac": "remove dex bonus to ac",
       "str skill checks": "strength skill checks",
       "dex skill checks": "dexterity skill checks",
       "con skill checks": "constitution skill checks",
@@ -131,6 +135,31 @@
     return map;
   }
 
+  function dexDenialBonus(rawBonus, dexBonus) {
+    return {
+      ...rawBonus,
+      value: -Math.max(0, Number(dexBonus || 0)),
+      type: rawBonus.type || "condition",
+      detail: rawBonus.appliesWhen || rawBonus.detail || "removes DEX bonus to AC"
+    };
+  }
+
+  function applyDexDenialToAc(bonuses, dexBonus) {
+    const result = { total: 0, used: [], ignored: [], conditional: [] };
+    const normalized = (bonuses || []).map(bonus => dexDenialBonus(bonus, dexBonus));
+    normalized
+      .filter(bonus => bonus.conditional)
+      .forEach(bonus => result.conditional.push({ ...bonus, conditionalReason: bonus.appliesWhen || "removes DEX bonus to AC" }));
+
+    const active = normalized.filter(bonus => !bonus.conditional);
+    if (!active.length || Math.max(0, Number(dexBonus || 0)) <= 0) return result;
+
+    result.total = active[0].value;
+    result.used.push(active[0]);
+    active.slice(1).forEach(bonus => result.ignored.push({ ...bonus, ignoredReason: `${active[0].source} already removes DEX bonus to AC` }));
+    return result;
+  }
+
   function addBreakdown(breakdown, stat, label, value, type = "derived", detail = "") {
     if (!breakdown[stat]) breakdown[stat] = [];
     breakdown[stat].push({ stat, source: label, value, type, detail, applied: true });
@@ -197,7 +226,7 @@
     const direct = {};
     const directCauses = {};
     Object.keys(buffMap).forEach(stat => {
-      if (abilityKeys[stat] || ["ac", "natural armor", "deflection"].includes(stat)) return;
+      if (abilityKeys[stat] || ["ac", "natural armor", "deflection", "remove dex bonus to ac"].includes(stat)) return;
       const applied = applyBonuses(buffMap[stat]);
       direct[stat] = applied.total;
       directCauses[stat] = describeBonuses(applied.used);
@@ -228,15 +257,19 @@
     const acMisc = Number(baseline.acMisc || 0) + acMiscBuffs;
     const dexMod = abilityMods.dexterity;
     const positiveDex = Math.max(0, dexMod);
+    const dexDeniedApplied = applyDexDenialToAc(buffMap["remove dex bonus to ac"] || [], positiveDex);
     const cmdAcTypes = ["circumstance", "deflection", "dodge", "insight", "luck", "morale", "profane", "sacred"];
     const cmdAcApplied = applyBonuses((buffMap.ac || []).filter(b =>
       cmdAcTypes.includes(b.type) || (b.value < 0 && !["armor", "shield", "natural armor", "size"].includes(b.type))
     ));
     const cmdAcBonus = cmdAcApplied.total + deflectionFromDedicated;
 
-    totals.ac = 10 + armor + shield + dexMod + acSize + naturalArmor + deflection + acMisc;
-    totals["touch ac"] = 10 + dexMod + acSize + deflection + acMisc;
-    totals["flat-footed ac"] = totals.ac - positiveDex - applyBonuses((buffMap.ac || []).filter(b => b.type === "dodge")).total;
+    const acDexMod = dexMod + dexDeniedApplied.total;
+    const flatDexMod = Math.min(0, dexMod);
+    const dodgeAcBuffs = applyBonuses((buffMap.ac || []).filter(b => b.type === "dodge")).total;
+    totals.ac = 10 + armor + shield + acDexMod + acSize + naturalArmor + deflection + acMisc;
+    totals["touch ac"] = 10 + acDexMod + acSize + deflection + acMisc;
+    totals["flat-footed ac"] = 10 + armor + shield + flatDexMod + acSize + naturalArmor + deflection + acMisc - dodgeAcBuffs;
     addBreakdown(breakdown, "ac", "Formula", totals.ac, "10 + armor + shield + Dex + size + natural + deflection + misc", `DEX ${abilityScores.dexterity} (${fmt(dexMod)}): ${abilityCauses.dexterity}`);
     acSizeApplied.used.forEach(b => addBreakdown(breakdown, "ac", b.source, b.value, b.type, "applies as size AC"));
     acSizeApplied.ignored.forEach(b => addIgnoredBreakdown(breakdown, "ac", b));
@@ -262,6 +295,18 @@
     acMiscApplied.used.forEach(b => addBreakdown(breakdown, "ac", b.source, b.value, b.type, "applies to AC"));
     acMiscApplied.ignored.forEach(b => addIgnoredBreakdown(breakdown, "ac", b));
     acMiscApplied.conditional.forEach(b => addConditionalBreakdown(breakdown, "ac", b));
+    dexDeniedApplied.used.forEach(b => {
+      addBreakdown(breakdown, "ac", b.source, b.value, b.type, "removes DEX bonus to AC");
+      addBreakdown(breakdown, "touch ac", b.source, b.value, b.type, "removes DEX bonus to touch AC");
+    });
+    dexDeniedApplied.ignored.forEach(b => {
+      addIgnoredBreakdown(breakdown, "ac", b);
+      addIgnoredBreakdown(breakdown, "touch ac", b);
+    });
+    dexDeniedApplied.conditional.forEach(b => {
+      addConditionalBreakdown(breakdown, "ac", b);
+      addConditionalBreakdown(breakdown, "touch ac", { ...b, appliesWhen: b.appliesWhen || b.detail || "removes DEX bonus to touch AC" });
+    });
     addBreakdown(breakdown, "touch ac", "Formula", totals["touch ac"], "10 + Dex + size + deflection + misc", `DEX ${abilityScores.dexterity} (${fmt(dexMod)}): ${abilityCauses.dexterity}`);
     addBreakdown(breakdown, "flat-footed ac", "Formula", totals["flat-footed ac"], "AC without positive Dex/dodge");
 

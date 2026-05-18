@@ -51,6 +51,7 @@
     ac: "AC",
     "touch ac": "Touch AC",
     "flat-footed ac": "Flat-Footed AC",
+    "remove dex bonus to ac": "Remove DEX Bonus to AC",
     cmb: "CMB",
     cmd: "CMD",
     str: "STR",
@@ -60,7 +61,7 @@
     wis: "WIS",
     cha: "CHA"
   };
-  const EFFECT_STATS = ["strength","dexterity","constitution","intelligence","wisdom","charisma","attack","melee attack","ranged attack","damage","melee damage","ranged damage","ac","touch ac","flat-footed ac","natural armor","deflection","fortitude","reflex","will","initiative","cmb","cmd","hit points","spell resistance"];
+  const EFFECT_STATS = ["strength","dexterity","constitution","intelligence","wisdom","charisma","attack","melee attack","ranged attack","damage","melee damage","ranged damage","ac","touch ac","flat-footed ac","remove dex bonus to ac","natural armor","deflection","fortitude","reflex","will","initiative","cmb","cmd","hit points","spell resistance"];
   const SKILL_STATS = ["skill checks","strength skill checks","dexterity skill checks","constitution skill checks","intelligence skill checks","wisdom skill checks","charisma skill checks"];
   const PF_SKILLS = ["Acrobatics","Appraise","Bluff","Climb","Diplomacy","Disable Device","Disguise","Escape Artist","Fly","Heal","Intimidate","Knowledge (arcana)","Knowledge (dungeoneering)","Knowledge (engineering)","Knowledge (geography)","Knowledge (history)","Knowledge (local)","Knowledge (nature)","Knowledge (nobility)","Knowledge (planes)","Knowledge (religion)","Linguistics","Perception","Ride","Sense Motive","Sleight of Hand","Spellcraft","Stealth","Survival","Swim","Use Magic Device"];
   const SPECIFIC_SKILL_STATS = PF_SKILLS.map(skill => `skill:${skill.replace(/[^a-z0-9]/gi, "").toLowerCase()}`);
@@ -80,6 +81,7 @@
   const BONUS_TYPES = ["untyped","alchemical","condition","penalty","armor","circumstance","competence","deflection","dodge","enhancement","insight","luck","morale","natural armor","profane","resistance","sacred","shield","size"];
   const DURATION_UNITS = ["variable", "turn", "round", "minute", "hour", "day"];
   const EFFECT_CATEGORIES = ["Spell", "Special Ability", "Feat", "Debuff", "Condition"];
+  const ACTIVE_CATEGORY_PRIORITY = ["Spell", "Debuff", "Condition"];
 
   function titleCaseStat(value) {
     const key = String(value || "").toLowerCase().trim();
@@ -89,6 +91,19 @@
       .split(" ")
       .map(word => STAT_LABELS[word] || word.charAt(0).toUpperCase() + word.slice(1))
       .join(" ");
+  }
+
+  function activeCategoryRank(category) {
+    const index = ACTIVE_CATEGORY_PRIORITY.findIndex(item => item.toLowerCase() === String(category || "").toLowerCase());
+    return index >= 0 ? index : ACTIVE_CATEGORY_PRIORITY.length;
+  }
+
+  function sortActiveRows(rows) {
+    return rows.sort((a, b) =>
+      activeCategoryRank(a.effect.category) - activeCategoryRank(b.effect.category) ||
+      String(a.effect.name || "").localeCompare(String(b.effect.name || "")) ||
+      a.index - b.index
+    );
   }
 
   function statOptionValue(data = {}) {
@@ -202,6 +217,10 @@
   }
 
   function bonusText(bonus) {
+    if (String(bonus.stat || "").toLowerCase().trim() === "remove dex bonus to ac") {
+      const text = "Removes DEX bonus to AC";
+      return bonus.appliesWhen ? `${text} (${bonus.appliesWhen})` : text;
+    }
     const value = Number(bonus.value || 0);
     const scale = scaleText(bonus.bonusScale || bonus.scale);
     const statLabel = bonus.skillName || titleCaseStat(bonus.stat);
@@ -924,12 +943,13 @@
       }
 
       const activeCategories = [...new Set(this.active.map(effect => effect.category || "Effect"))]
-        .sort((a, b) => String(a).localeCompare(String(b)));
+        .sort((a, b) => activeCategoryRank(a) - activeCategoryRank(b) || String(a).localeCompare(String(b)));
       const filterOptions = ["all", ...activeCategories];
       if (!filterOptions.includes(this.activeTypeFilter)) this.activeTypeFilter = "all";
       const filteredActive = this.active
         .map((effect, index) => ({ effect, index }))
         .filter(row => this.activeTypeFilter === "all" || row.effect.category === this.activeTypeFilter);
+      sortActiveRows(filteredActive);
 
       const toolbar = `
         <div class="effect-active-toolbar">

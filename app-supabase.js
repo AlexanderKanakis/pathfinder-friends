@@ -27,18 +27,17 @@
       : "";
 
     return `
-      <div class="d-flex flex-wrap align-items-center gap-2">
-        <div>
+      <div class="d-flex flex-wrap align-items-center gap-2 nav-session-controls">
+        <div class="nav-session-field">
           <label class="navbar-text small text-secondary d-block py-0" for="navContextSelect">Campaign</label>
-          <select id="navContextSelect" class="form-select form-select-sm" style="width: auto; min-width: 150px;" aria-label="Context"></select>
+          <select id="navContextSelect" class="form-select form-select-sm" aria-label="Context"></select>
         </div>
-        <div>
+        <div class="nav-session-field">
           <label class="navbar-text small text-secondary d-block py-0" for="navCharacterSelect">Character</label>
-          <select id="navCharacterSelect" class="form-select form-select-sm" style="width: auto; min-width: 150px;" aria-label="Character"></select>
+          <select id="navCharacterSelect" class="form-select form-select-sm" aria-label="Character"></select>
         </div>
       </div>
-      ${isAdmin ? `<a class="btn btn-outline-info btn-sm" href="admin.html">Admin</a>` : ""}
-      <a class="navbar-text small text-light text-decoration-none d-inline-flex align-items-center gap-2" href="profile.html">
+      <a class="navbar-text small text-light text-decoration-none d-inline-flex align-items-center gap-2 nav-profile-link" href="profile.html">
         ${avatar}
         <span>${escapeHtml(displayName)}</span>
       </a>
@@ -172,10 +171,18 @@
 
   async function updateNavbarAccess(contextKey = getSelectedContextKey(), admin = false) {
     const enemiesItem = document.querySelector('[data-nav-item="enemies.html"]');
-    if (!enemiesItem) return;
+    const enemiesOption = document.querySelector('#navPageSelect option[value="enemies.html"]');
 
     const canManageEnemies = admin || await isGameManager(contextKey);
-    enemiesItem.classList.toggle("d-none", !canManageEnemies);
+    enemiesItem?.classList.toggle("d-none", !canManageEnemies);
+    if (enemiesOption) {
+      enemiesOption.hidden = !canManageEnemies;
+      enemiesOption.disabled = !canManageEnemies;
+      if (!canManageEnemies && enemiesOption.selected) {
+        const select = enemiesOption.closest("select");
+        if (select) select.value = "dice-roller.html";
+      }
+    }
   }
 
   function showLockedMessage(message) {

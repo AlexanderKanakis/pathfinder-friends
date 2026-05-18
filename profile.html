@@ -74,6 +74,16 @@
       <button id="passwordBtn" class="btn btn-outline-info" type="submit">Update Password</button>
     </div>
   </form>
+
+  <section id="adminSettingsPanel" class="panel vstack gap-2 mt-3 d-none">
+    <div>
+      <h5 class="mb-1">Admin</h5>
+      <div class="small-text">Create users and reset passwords.</div>
+    </div>
+    <div>
+      <a class="btn btn-outline-info" href="admin.html">Open Admin Panel</a>
+    </div>
+  </section>
 </main>
 
 <script src="navbar.js"></script>
@@ -203,6 +213,9 @@ async function initProfile() {
   document.getElementById("username").value = currentProfile?.username || "";
   document.getElementById("avatarPreview").src =
     currentProfile?.avatar_url || fallbackAvatar(currentProfile?.username || currentUser.email);
+
+  const isAdmin = await PFApp.isAppAdmin();
+  document.getElementById("adminSettingsPanel").classList.toggle("d-none", !isAdmin);
 }
 
 document.getElementById("avatarFile").addEventListener("change", event => {

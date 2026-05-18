@@ -88,6 +88,8 @@
     .mini-sheet-row { display: flex; justify-content: space-between; gap: 8px; background: #242424; border: 1px solid #444; border-radius: 6px; padding: 5px 7px; min-width: 0; }
     .mini-sheet-row span { min-width: 0; overflow-wrap: anywhere; }
     .mini-sheet-row span:last-child { color: #fff; font-weight: 700; text-align: right; }
+    .mini-sheet-conditional { border-left: 3px solid #f0d58c; background: rgba(240, 213, 140, .08); }
+    .mini-sheet-conditional .mini-sheet-value, .mini-sheet-conditional .mini-sheet-row span:last-child { color: #f0d58c; }
     input, textarea, select { background-color: #2b2b2b !important; color: white !important; border-color: #555 !important; }
     textarea { min-height: 72px; }
     .btn-icon { width: 28px; min-width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; padding: 0; }
@@ -479,6 +481,7 @@ function isConditionEffect(effect) {
   return String(effect?.category || "").toLowerCase() === "condition";
 }
 function titleCaseStat(value) {
+  if (String(value || "").toLowerCase().trim() === "remove dex bonus to ac") return "Remove DEX Bonus to AC";
   return String(value || "Stat")
     .replace(/^skill:/i, "Skill:")
     .replace(/[-_]/g, " ")
@@ -499,6 +502,10 @@ function scaleText(scale) {
   return parts.length ? `scales ${parts.join("; ")}` : "";
 }
 function effectBonusText(bonus) {
+  if (String(bonus.stat || "").toLowerCase().trim() === "remove dex bonus to ac") {
+    const text = "Removes DEX bonus to AC";
+    return bonus.appliesWhen ? `${text} (${bonus.appliesWhen})` : text;
+  }
   const scale = scaleText(bonus.bonusScale || bonus.scale);
   const statLabel = bonus.skillName || titleCaseStat(bonus.stat);
   const text = `${fmtSigned(bonus.value || 0)} ${bonus.type || "untyped"} ${statLabel}${scale ? `; ${scale}` : ""}`;
@@ -637,6 +644,23 @@ function compactStat(label, value) {
   return `<div class="mini-sheet-card"><div class="mini-sheet-label">${escapeHtml(label)}</div><div class="mini-sheet-value">${escapeHtml(value)}</div></div>`;
 }
 
+function compactConditionalStat(row) {
+  return `<div class="mini-sheet-card mini-sheet-conditional"><div class="mini-sheet-label">${escapeHtml(row.label || "Conditional")}</div><div class="mini-sheet-value">${escapeHtml(row.total || "")}</div>${row.source ? `<div class="small text-secondary">${escapeHtml(row.source)}</div>` : ""}</div>`;
+}
+
+function compactConditionalStats(rows = []) {
+  return (rows || []).map(compactConditionalStat).join("");
+}
+
+function compactConditionalRows(rows = []) {
+  return (rows || []).map(row => `
+    <div class="mini-sheet-row mini-sheet-conditional">
+      <span>${escapeHtml(row.detail || row.source || "Conditional")}</span>
+      <span>${escapeHtml(row.main || row.total || "")}</span>
+    </div>
+  `).join("");
+}
+
 function compactHpStat(token, calculated = null) {
   const current = calculated?.hp?.current || tokenCurrentHp(token) || "?";
   const total = calculated?.hp?.total || tokenTotalHp(token) || "?";
@@ -669,25 +693,32 @@ function renderCalculatedSheetSummary(token, calculated) {
       ${compactSection("Character", `<div class="mini-sheet-grid">
         ${compactHpStat(token, calculated)}
         ${compactStat("Init", calculated.initiative || "")}
+        ${compactConditionalStats(calculated.hpConditionals || [])}
+        ${compactConditionalStats(calculated.initiativeConditionals || [])}
       </div>`)}
       ${compactSection("Abilities", `<div class="mini-sheet-grid">
-        ${abilities.map(row => compactStat(row.label || row.key?.toUpperCase() || "Ability", compactAbilityValue(row))).join("")}
+        ${abilities.map(row => compactStat(row.label || row.key?.toUpperCase() || "Ability", compactAbilityValue(row)) + compactConditionalStats(row.conditionals || [])).join("")}
       </div>`)}
       ${compactSection("Armor Class", `<div class="mini-sheet-grid">
         ${compactStat("AC", calculated.armorClass?.ac || "")}
+        ${compactConditionalStats(calculated.armorClass?.conditionals?.ac || [])}
         ${compactStat("Touch", calculated.armorClass?.touch || "")}
+        ${compactConditionalStats(calculated.armorClass?.conditionals?.touch || [])}
         ${compactStat("Flat", calculated.armorClass?.flat || "")}
+        ${compactConditionalStats(calculated.armorClass?.conditionals?.flat || [])}
       </div>`)}
       ${compactSection("Combat", `<div class="mini-sheet-grid">
         ${compactStat("CMB", calculated.combat?.cmb || "")}
+        ${compactConditionalStats(calculated.combat?.conditionals?.cmb || [])}
         ${compactStat("CMD", calculated.combat?.cmd || "")}
+        ${compactConditionalStats(calculated.combat?.conditionals?.cmd || [])}
       </div>`)}
       ${compactSection("Saves", `<div class="mini-sheet-grid">
-        ${saves.map(row => compactStat(row.label || row.key || "Save", row.total || "")).join("")}
+        ${saves.map(row => compactStat(row.label || row.key || "Save", row.total || "") + compactConditionalStats(row.conditionals || [])).join("")}
       </div>`)}
       ${compactSection("Weapons", `<div class="mini-sheet-list">${
         weapons.length
-          ? weapons.map(weapon => `<div class="mini-sheet-row"><span>${escapeHtml(weapon.name || "Weapon")}</span><span>${escapeHtml([weapon.attack, weapon.damage, weapon.critical].filter(Boolean).join(" | "))}</span></div>`).join("")
+          ? weapons.map(weapon => `<div class="mini-sheet-row"><span>${escapeHtml(weapon.name || "Weapon")}</span><span>${escapeHtml([weapon.attack, weapon.damage, weapon.critical].filter(Boolean).join(" | "))}</span></div>${compactConditionalRows([...(weapon.attackConditionals || []), ...(weapon.damageConditionals || [])])}`).join("")
           : `<div class="small text-secondary">No weapons.</div>`
       }</div>`)}
     </div>
