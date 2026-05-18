@@ -758,6 +758,8 @@ function renderCompactCharacterSheet(token) {
   const hpCurrent = fields.currentHitPoints ?? "?";
   const hpTotal = fields.hitPointsTotal || fields.hitPoints || "?";
   const initiative = dex + sheetNum(fields.initMisc);
+  const cmbMisc = sheetNum(fields.cmbMisc);
+  const cmdMisc = sheetNum(fields.cmdMisc);
   const saves = [
     ["Fort", sheetNum(sheet.saves?.fort?.base) + con],
     ["Ref", sheetNum(sheet.saves?.reflex?.base) + dex],
@@ -767,9 +769,11 @@ function renderCompactCharacterSheet(token) {
     const attackKey = firstScalingKey(weapon.attackScale, "str");
     const damageKey = firstScalingKey(weapon.damageScale, attackKey);
     const enhancement = sheetNum(weapon.enhancement);
-    const attack = bab + sheetAbilityMod(sheet, attackKey) + enhancement;
-    const attacks = iterativeBabBonuses(bab).map(base => fmtSigned(base + sheetAbilityMod(sheet, attackKey) + enhancement)).join("/");
-    const damageMod = Math.floor(sheetAbilityMod(sheet, damageKey) * (weapon.twoHanded === "yes" ? 1.5 : 1)) + enhancement;
+    const attackMisc = sheetNum(weapon.attackMisc);
+    const damageMisc = sheetNum(weapon.damageMisc);
+    const attack = bab + sheetAbilityMod(sheet, attackKey) + enhancement + attackMisc;
+    const attacks = iterativeBabBonuses(bab).map(base => fmtSigned(base + sheetAbilityMod(sheet, attackKey) + enhancement + attackMisc)).join("/");
+    const damageMod = Math.floor(sheetAbilityMod(sheet, damageKey) * (weapon.twoHanded === "yes" ? 1.5 : 1)) + enhancement + damageMisc;
     const damage = `${weapon.damage || ""}${damageMod ? fmtSigned(damageMod) : ""}` || fmtSigned(damageMod);
     return `<div class="mini-sheet-row"><span>${escapeHtml(weapon.name || "Weapon")}</span><span>${escapeHtml(attacks || fmtSigned(attack))} | ${escapeHtml(damage)} | ${escapeHtml(weapon.critical || "-")}</span></div>`;
   }).join("") || `<div class="small text-secondary">No weapons.</div>`;
@@ -789,8 +793,8 @@ function renderCompactCharacterSheet(token) {
         ${compactStat("Flat", flat)}
       </div>`)}
       ${compactSection("Combat", `<div class="mini-sheet-grid">
-        ${compactStat("CMB", fmtSigned(bab + str))}
-        ${compactStat("CMD", 10 + bab + str + dex)}
+        ${compactStat("CMB", fmtSigned(bab + str + cmbMisc))}
+        ${compactStat("CMD", 10 + bab + str + dex + cmdMisc)}
       </div>`)}
       ${compactSection("Saves", `<div class="mini-sheet-grid">${saves.map(([label, value]) => compactStat(label, fmtSigned(value))).join("")}</div>`)}
       ${compactSection("Weapons", `<div class="mini-sheet-list">${weapons}</div>`)}

@@ -34,6 +34,10 @@
     .weapon-summary { display: grid; grid-template-columns: minmax(260px, 2fr) minmax(150px, 1fr) minmax(130px, 1fr); gap: 8px; align-items: end; margin-top: 8px; }
     .weapon-summary > div { min-width: 0; }
     .weapon-attack-summary input { font-size: 13px; min-width: 0; }
+    .maneuver-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+    .maneuver-block { border: 1px solid #333; border-radius: 8px; padding: 8px; background: #202020; }
+    .maneuver-block-title { font-size: 12px; color: #aaa; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 6px; }
+    .maneuver-fields { display: grid; grid-template-columns: repeat(3, minmax(85px, 1fr)); gap: 8px; }
     @media (max-width: 1120px) {
       .weapon-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .weapon-attack-summary { grid-column: 1 / -1; }
@@ -75,10 +79,12 @@
     .inventory-group-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
     .inventory-item { background: #242424; border: 1px solid #444; border-radius: 8px; padding: 8px; cursor: pointer; }
     .inventory-item:hover { border-color: #666; }
+    .inventory-item.equipped { border-color: #8fd19e; background: rgba(143, 209, 158, .08); }
     .inventory-card-head { display: flex; gap: 8px; align-items: flex-start; }
     .inventory-card-title { min-width: 0; flex: 1 1 auto; }
     .inventory-count-actions { display: inline-flex; align-items: center; gap: 4px; flex: 0 0 auto; }
     .inventory-count { background: #343a40; border: 1px solid #555; border-radius: 999px; padding: 1px 7px; font-size: 12px; font-weight: 700; }
+    .inventory-equipped-badge { display: inline-flex; align-items: center; gap: 4px; width: max-content; margin-top: 3px; border: 1px solid #8fd19e; border-radius: 999px; padding: 1px 7px; color: #8fd19e; font-size: 11px; font-weight: 700; }
     .inventory-icon-btn { width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; padding: 0; }
     .inventory-description { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #ddd; }
     .inventory-attributes { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
@@ -111,6 +117,9 @@
     .simple-card.simple-conditional, .simple-chip.simple-conditional { border-left: 3px solid #f0d58c; background: rgba(240, 213, 140, .08); }
     .simple-chip-main { font-weight: 700; }
     .simple-chip-sub { color: #aaa; font-size: 12px; }
+    .simple-chip-clickable { cursor: pointer; }
+    .simple-chip-clickable:hover { border-color: #666; }
+    .simple-chip-sub.clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; white-space: normal; }
     .simple-list { display: grid; gap: 4px; }
     .simple-list-row { display: flex; justify-content: space-between; gap: 10px; background: #242424; border: 1px solid #444; border-radius: 8px; padding: 5px 8px; }
     .simple-list-row.simple-conditional { border-left: 3px solid #f0d58c; background: rgba(240, 213, 140, .08); }
@@ -260,14 +269,26 @@
     <div class="col-xl-4">
       <section class="sheet-section">
         <div class="sheet-title">Combat Maneuvers</div>
-        <div class="sheet-grid">
-          <div><label for="cmbTotal">CMB</label><input id="cmbTotal" class="form-control form-control-sm" readonly></div>
-          <div><label for="cmbBuff">CMB Buff</label><input id="cmbBuff" class="form-control form-control-sm buff-field" readonly></div>
-          <div><label for="cmdTotal">CMD</label><input id="cmdTotal" class="form-control form-control-sm" readonly></div>
-          <div><label for="cmdBuff">CMD Buff</label><input id="cmdBuff" class="form-control form-control-sm buff-field" readonly></div>
+        <div class="maneuver-grid">
+          <div class="maneuver-block">
+            <div class="maneuver-block-title">CMB</div>
+            <div class="maneuver-fields">
+              <div><label for="cmbTotal">Total</label><input id="cmbTotal" class="form-control form-control-sm" readonly></div>
+              <div><label for="cmbBuff">Buff</label><input id="cmbBuff" class="form-control form-control-sm buff-field" readonly></div>
+              <div><label for="cmbMisc">Misc</label><input id="cmbMisc" class="form-control form-control-sm sheet-input" type="number" value="0"></div>
+            </div>
+            <div class="small-text calc-line" data-calc-for="cmbTotal"></div>
+          </div>
+          <div class="maneuver-block">
+            <div class="maneuver-block-title">CMD</div>
+            <div class="maneuver-fields">
+              <div><label for="cmdTotal">Total</label><input id="cmdTotal" class="form-control form-control-sm" readonly></div>
+              <div><label for="cmdBuff">Buff</label><input id="cmdBuff" class="form-control form-control-sm buff-field" readonly></div>
+              <div><label for="cmdMisc">Misc</label><input id="cmdMisc" class="form-control form-control-sm sheet-input" type="number" value="0"></div>
+            </div>
+            <div class="small-text calc-line" data-calc-for="cmdTotal"></div>
+          </div>
         </div>
-        <div class="small-text calc-line" data-calc-for="cmbTotal"></div>
-        <div class="small-text calc-line" data-calc-for="cmdTotal"></div>
       </section>
 
       <section class="sheet-section">
@@ -513,7 +534,7 @@ const SKILLS = [
   ["Perception", "wis"], ["Ride", "dex"], ["Sense Motive", "wis"], ["Sleight of Hand", "dex"],
   ["Spellcraft", "int"], ["Stealth", "dex"], ["Survival", "wis"], ["Swim", "str"], ["Use Magic Device", "cha"]
 ];
-const SIMPLE_FIELDS = ["characterName","classLevel","characterLevel","race","alignment","deity","homeland","size","gender","age","height","weight","hair","eyes","bab","currentHitPoints","hitPoints","hitPointsTotal","damageReduction","initMisc","speedBase","speedArmor","acNatural","acDeflection","acMisc","lightLoad","mediumLoad","heavyLoad","liftOverHead","liftOffGround","dragOrPush","GP","SP","CP","notes"];
+const SIMPLE_FIELDS = ["characterName","classLevel","characterLevel","race","alignment","deity","homeland","size","gender","age","height","weight","hair","eyes","bab","currentHitPoints","hitPoints","hitPointsTotal","damageReduction","initMisc","speedBase","speedArmor","acNatural","acDeflection","acMisc","cmbMisc","cmdMisc","lightLoad","mediumLoad","heavyLoad","liftOverHead","liftOffGround","dragOrPush","GP","SP","CP","notes"];
 const ABILITY_STAT_NAMES = { str: "strength", dex: "dexterity", con: "constitution", int: "intelligence", wis: "wisdom", cha: "charisma" };
 const SCALE_ABILITIES = ["STR", "DEX", "CON", "INT", "WIS", "CHA"];
 const WEAPON_TYPES = ["Melee Weapon (Light)", "Melee Weapon (One-Handed)", "Melee Weapon (Two-Handed)", "Ranged Weapon", "Firearm (One-Handed)", "Firearm (Two-Handed)", "Natural"];
@@ -807,9 +828,26 @@ function simpleChips(rows, emptyText = "None.") {
   return `<div class="simple-chip-grid">${rows.map(row => `
     <div class="simple-chip">
       <div class="simple-chip-main">${escapeHtml(row.main || "-")}</div>
-      ${row.sub ? `<div class="simple-chip-sub">${escapeHtml(row.sub)}</div>` : ""}
+      ${row.sub ? `<div class="simple-chip-sub clamp-2">${escapeHtml(row.sub)}</div>` : ""}
     </div>
   `).join("")}</div>`;
+}
+
+function simpleInventoryChips(items, emptyText = "No inventory.") {
+  if (!items.length) return `<div class="small-text">${escapeHtml(emptyText)}</div>`;
+  return `<div class="simple-chip-grid">${items.map(item => {
+    const equipped = isLootEquipped(item.id);
+    return `
+      <button class="simple-chip simple-chip-clickable text-start text-white" type="button" data-simple-inventory-loot="${escapeHtml(item.id)}">
+        <div class="simple-chip-main">
+          <i class="bi ${lootIcon(item.type)} me-1"></i>${escapeHtml(item.name || "Item")}
+          <span class="simple-chip-sub ms-1">${escapeHtml(`x${item.count || 1}`)}</span>
+        </div>
+        <div class="simple-chip-sub">${escapeHtml(item.type || "Item")}${equipped ? " | Equipped" : ""}</div>
+        ${item.description ? `<div class="simple-chip-sub clamp-2">${escapeHtml(item.description)}</div>` : ""}
+      </button>
+    `;
+  }).join("")}</div>`;
 }
 
 function simpleList(rows, emptyText = "None.") {
@@ -996,6 +1034,8 @@ function sheetToBaseline() {
     naturalArmor: num("acNatural"),
     deflection: num("acDeflection"),
     acMisc: num("acMisc"),
+    cmbMisc: num("cmbMisc"),
+    cmdMisc: num("cmdMisc"),
     fortBase: num("fortBase"),
     reflexBase: num("reflexBase"),
     willBase: num("willBase"),
@@ -1158,6 +1198,7 @@ function addWeapon(data = {}) {
       <div class="weapon-group-title">Attack</div>
       <div class="sheet-grid-wide">
       <div><label>Attack Buff</label><input data-attack-buff class="form-control form-control-sm buff-field" readonly></div>
+      <div><label>Attack Misc</label><input data-field="attackMisc" class="form-control form-control-sm sheet-input" type="number" value="${data.attackMisc || data.attack_misc || "0"}"></div>
       <div><label>Attack Scales With</label>${scalingOptionButtons("attackScale", attackScale)}</div>
       </div>
     </div>
@@ -1167,6 +1208,7 @@ function addWeapon(data = {}) {
       <div><label>Damage Dice</label><input data-field="damage" class="form-control form-control-sm sheet-input" value="${data.damage || ""}"></div>
       <div><label>Damage Scales With</label>${scalingOptionButtons("damageScale", damageScale)}</div>
       <div><label>Damage Buff</label><input data-damage-buff class="form-control form-control-sm buff-field" readonly></div>
+      <div><label>Damage Misc</label><input data-field="damageMisc" class="form-control form-control-sm sheet-input" type="number" value="${data.damageMisc || data.damage_misc || "0"}"></div>
       <div><label>Scaling Bonus</label><input data-damage-scaling class="form-control form-control-sm" readonly></div>
       <div><label>Damage Bonus</label><input data-damage-bonus class="form-control form-control-sm buff-field" readonly></div>
       </div>
@@ -1480,6 +1522,7 @@ function calculateWeaponDamage(card, buffed, buffBonuses) {
   const isRanged = isRangedWeaponType(weaponType) || Boolean(field("range").trim()) || parseScalingKeys(field("attackScale")).includes("dex");
   const twoHanded = isTwoHandedWeaponType(weaponType) || isYes(field("twoHanded"));
   const enhancement = enhancementValue(field("enhancement"));
+  const miscBonus = Number(field("damageMisc") || 0);
   const feat = weaponFeatAdjustments(card);
   const scalingBonus = scalingTerms.reduce((total, term) => {
     const multiplier = twoHanded && term.key === "str" ? 1.5 : term.multiplier;
@@ -1488,7 +1531,7 @@ function calculateWeaponDamage(card, buffed, buffBonuses) {
   const buffBonus =
     Number(buffBonuses.damage || 0) +
     Number(buffBonuses[isRanged ? "ranged damage" : "melee damage"] || 0);
-  const totalBonus = scalingBonus + enhancement + buffBonus + feat.damageBonus;
+  const totalBonus = scalingBonus + enhancement + miscBonus + buffBonus + feat.damageBonus;
   const totalText = `${dice || "0"}${signed(totalBonus)}`;
   const statItems = scalingTerms.flatMap(term => {
     const statName = ABILITY_STAT_NAMES[term.key];
@@ -1500,7 +1543,7 @@ function calculateWeaponDamage(card, buffed, buffBonuses) {
     ...breakdownForStat(buffed, isRanged ? "ranged damage" : "melee damage").map(item => ({ ...item, targetLabel: isRanged ? "Ranged damage" : "Melee damage" })),
     ...feat.breakdown.filter(item => item.targetLabel === "Damage")
   ];
-  const formula = `${dice || "0"} + scaling ${signed(scalingBonus)} + enhancement ${signed(enhancement)} + buffs ${signed(buffBonus)} + feats ${signed(feat.damageBonus)}`;
+  const formula = `${dice || "0"} + scaling ${signed(scalingBonus)} + enhancement ${signed(enhancement)} + misc ${signed(miscBonus)} + buffs ${signed(buffBonus)} + feats ${signed(feat.damageBonus)}`;
   return { buffBonus, scalingBonus, totalBonus, totalText, formula, breakdown: [...statItems, ...directItems] };
 }
 
@@ -1516,11 +1559,12 @@ function calculateWeaponAttack(card, buffed, buffBonuses) {
   const scalingTerms = parseScalingTerms(field("attackScale"), String(isRanged ? "DEX" : "STR"));
   const scalingBonus = scalingTerms.reduce((total, term) => total + Math.floor(abilityModFor(term.key, buffed) * term.multiplier), 0);
   const enhancement = enhancementValue(field("enhancement"));
+  const miscBonus = Number(field("attackMisc") || 0);
   const feat = weaponFeatAdjustments(card);
   const buffBonus =
     Number(buffBonuses.attack || 0) +
     Number(buffBonuses[isRanged ? "ranged attack" : "melee attack"] || 0);
-  const totalBonus = scalingBonus + enhancement + buffBonus + feat.attackPenalty;
+  const totalBonus = scalingBonus + enhancement + miscBonus + buffBonus + feat.attackPenalty;
   const attacks = iterativeBabBonuses(num("bab")).map(base => signed(base + totalBonus)).join("/");
   const statItems = scalingTerms.flatMap(term => breakdownForStat(buffed, ABILITY_STAT_NAMES[term.key], `${ABILITY_STAT_NAMES[term.key]} attack scaling`).map(item => ({ ...item, targetLabel: "Attack scaling" })));
   const directItems = [
@@ -1528,7 +1572,7 @@ function calculateWeaponAttack(card, buffed, buffBonuses) {
     ...breakdownForStat(buffed, isRanged ? "ranged attack" : "melee attack").map(item => ({ ...item, targetLabel: isRanged ? "Ranged attack" : "Melee attack" })),
     ...feat.breakdown.filter(item => item.targetLabel === "Attack")
   ];
-  const formula = `BAB iteratives + scaling ${signed(scalingBonus)} + enhancement ${signed(enhancement)} + buffs ${signed(buffBonus)} + feats ${signed(feat.attackPenalty)}`;
+  const formula = `BAB iteratives + scaling ${signed(scalingBonus)} + enhancement ${signed(enhancement)} + misc ${signed(miscBonus)} + buffs ${signed(buffBonus)} + feats ${signed(feat.attackPenalty)}`;
   return { buffBonus, attacks, formula, breakdown: [...statItems, ...directItems] };
 }
 
@@ -1686,16 +1730,16 @@ function recalculateSheet() {
     ]));
   });
 
-  el("cmbTotal").value = buffTotals.cmb !== undefined ? String(buffTotals.cmb) : String(num("bab") + str);
+  el("cmbTotal").value = buffTotals.cmb !== undefined ? String(buffTotals.cmb) : String(num("bab") + str + num("cmbMisc"));
   el("cmbBuff").value = signed(buffBonuses.cmb || 0);
-  el("cmdTotal").value = buffTotals.cmd ?? (10 + num("bab") + str + dex);
+  el("cmdTotal").value = buffTotals.cmd ?? (10 + num("bab") + str + dex + num("cmdMisc"));
   el("cmdBuff").value = signed(buffBonuses.cmd || 0);
-  setCalc("cmbTotal", `BAB ${signed(num("bab"))} + STR ${signed(str)}`, combinedBreakdowns(buffed, [
+  setCalc("cmbTotal", `BAB ${signed(num("bab"))} + STR ${signed(str)} + misc ${signed(num("cmbMisc"))}`, combinedBreakdowns(buffed, [
     { stat: "strength", target: "CMB via STR", detail: "affects CMB through STR" },
     { stat: "cmb", target: "CMB" },
     { stat: "attack", target: "CMB via attack", detail: "applies to CMB" }
   ]));
-  setCalc("cmdTotal", `10 + BAB ${signed(num("bab"))} + STR ${signed(str)} + DEX ${signed(dex)}`, combinedBreakdowns(buffed, [
+  setCalc("cmdTotal", `10 + BAB ${signed(num("bab"))} + STR ${signed(str)} + DEX ${signed(dex)} + misc ${signed(num("cmdMisc"))}`, combinedBreakdowns(buffed, [
     { stat: "strength", target: "CMD via STR", detail: "affects CMD through STR" },
     { stat: "dexterity", target: "CMD via DEX", detail: "affects CMD through DEX" },
     { stat: "cmd", target: "CMD" },
@@ -2154,12 +2198,15 @@ function renderCharacterInventory(items = []) {
       <div class="inventory-group">
         <div class="inventory-group-title">${label}</div>
         <div class="inventory-group-grid">
-          ${groupItems.map(item => `
-            <article class="inventory-item" data-loot-id="${escapeHtml(item.id)}" role="button" tabindex="0" aria-label="View ${escapeHtml(item.name)} details">
+          ${groupItems.map(item => {
+            const equipped = isLootEquipped(item.id);
+            return `
+            <article class="inventory-item${equipped ? " equipped" : ""}" data-loot-id="${escapeHtml(item.id)}" role="button" tabindex="0" aria-label="View ${escapeHtml(item.name)} details">
               <div class="inventory-card-head">
                 <div class="inventory-card-title">
                   <div class="fw-semibold text-truncate"><i class="bi ${lootIcon(item.type)} me-1"></i>${escapeHtml(item.name)}</div>
                   <div class="small-text">${escapeHtml(item.type || "Item")}</div>
+                  ${equipped ? `<div class="inventory-equipped-badge"><i class="bi bi-check2-circle"></i> Equipped</div>` : ""}
                 </div>
                 <span class="inventory-count-actions">
                   <span class="inventory-count">x${escapeHtml(item.count || 1)}</span>
@@ -2170,10 +2217,11 @@ function renderCharacterInventory(items = []) {
               </div>
               ${item.description ? `<div class="small mt-1 inventory-description">${escapeHtml(item.description)}</div>` : ""}
               <div class="d-flex flex-wrap gap-2 mt-2">
-                <button class="btn btn-outline-success btn-sm" type="button" data-wear-loot="${escapeHtml(item.id)}">Equip</button>
+                <button class="btn ${equipped ? "btn-success" : "btn-outline-success"} btn-sm" type="button" data-wear-loot="${escapeHtml(item.id)}">${equipped ? "Equipped" : "Equip"}</button>
               </div>
             </article>
-          `).join("")}
+          `;
+          }).join("")}
         </div>
       </div>
     `;
@@ -2283,11 +2331,13 @@ async function loadCharacterInventory() {
   if (isEnemySheetMode) {
     characterInventoryItems = [];
     renderCharacterInventory([]);
+    if (sheetViewMode === "simplified") renderSimplifiedSheet();
     return;
   }
   if (!currentSheetId) {
     characterInventoryItems = [];
     renderCharacterInventory([]);
+    if (sheetViewMode === "simplified") renderSimplifiedSheet();
     return;
   }
 
@@ -2295,6 +2345,7 @@ async function loadCharacterInventory() {
   characterInventoryItems = loot.filter(item => item.assigned_character_id === currentSheetId);
   reconcileEquippedLoot(loot);
   renderCharacterInventory(characterInventoryItems);
+  if (sheetViewMode === "simplified") renderSimplifiedSheet();
 }
 
 async function reconcileEquippedLoot(allLoot = []) {
@@ -2445,10 +2496,7 @@ function renderSimplifiedSheet() {
     main: card.querySelector('[data-field="item"]')?.value || "Unnamed gear",
     sub: card.querySelector('[data-field="details"]')?.value || ""
   }));
-  const inventoryRows = [...el("characterInventory").querySelectorAll(".inventory-item")].map(item => ({
-    main: item.querySelector(".inventory-card-title .fw-semibold")?.textContent?.trim() || "Item",
-    sub: item.querySelector(".inventory-count")?.textContent?.trim() || "x1"
-  }));
+  const inventoryRows = characterInventoryItems.filter(item => item.assigned_character_id === currentSheetId);
 
   container.innerHTML = `
     <section class="simple-section">
@@ -2524,9 +2572,13 @@ function renderSimplifiedSheet() {
 
     <section class="simple-section">
       <div class="sheet-title">Inventory</div>
-      ${simpleChips(inventoryRows, "No inventory.")}
+      ${simpleInventoryChips(inventoryRows, "No inventory.")}
     </section>
   `;
+
+  container.querySelectorAll("[data-simple-inventory-loot]").forEach(button => {
+    button.addEventListener("click", () => openInventoryItemEditor(button.dataset.simpleInventoryLoot));
+  });
 }
 
 function collectSheet() {

@@ -106,6 +106,10 @@
     );
   }
 
+  function isItemSourcedEffect(effect = {}) {
+    return Boolean(effect.sourceLootId || effect.source_loot_id);
+  }
+
   function statOptionValue(data = {}) {
     const skillName = String(data.skillName || "").toLowerCase();
     if (skillName.startsWith("craft")) return CRAFT_SKILL_STAT;
@@ -929,6 +933,7 @@
     }
 
     removeEffect(index) {
+      if (isItemSourcedEffect(this.active[index])) return;
       this.active.splice(index, 1);
       this.renderActive();
       this.notifyChange();
@@ -977,6 +982,7 @@
       this.activeEl.innerHTML = toolbar + filteredActive.map(({ effect, index }) => {
         const detailsId = `${this.prefix}Details${index}`;
         const bonuses = (effect.bonuses || []).map(bonus => `<div class="small-text">${escapeHtml(bonusText(bonus))}</div>`).join("");
+        const lockedToItem = isItemSourcedEffect(effect);
         return `
           <article class="effect-tracker-active">
             <div class="d-flex justify-content-between align-items-start gap-2">
@@ -986,7 +992,9 @@
               </div>
               <div class="d-flex gap-1">
                 <button class="btn btn-outline-info btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#${detailsId}" aria-label="Show effect details">i</button>
-                <button class="btn btn-danger btn-sm" type="button" data-remove-effect="${index}" aria-label="Remove effect"><i class="bi bi-trash"></i></button>
+                ${lockedToItem
+                  ? `<span class="badge text-bg-secondary align-self-center" title="Unequip the item to remove this effect"><i class="bi bi-lock"></i> Item</span>`
+                  : `<button class="btn btn-danger btn-sm" type="button" data-remove-effect="${index}" aria-label="Remove effect"><i class="bi bi-trash"></i></button>`}
               </div>
             </div>
             <div id="${detailsId}" class="collapse mt-2">${bonuses || '<div class="small-text">No mechanical bonuses listed.</div>'}</div>

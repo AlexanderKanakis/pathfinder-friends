@@ -318,8 +318,8 @@
     totals["melee attack"] = Number(baseline.bab || 0) + abilityMods.strength + acSize + (direct.attack || 0) + (direct["melee attack"] || 0);
     totals["ranged attack"] = Number(baseline.bab || 0) + abilityMods.dexterity + acSize + (direct.attack || 0) + (direct["ranged attack"] || 0);
     totals.damage = abilityMods.strength + (direct.damage || 0);
-    totals.cmb = Number(baseline.bab || 0) + abilityMods.strength + combatSize + (direct.cmb || 0) + (direct.attack || 0);
-    totals.cmd = 10 + Number(baseline.bab || 0) + abilityMods.strength + abilityMods.dexterity + combatSize + cmdAcBonus + (direct.cmd || 0);
+    totals.cmb = Number(baseline.bab || 0) + abilityMods.strength + combatSize + Number(baseline.cmbMisc || 0) + (direct.cmb || 0) + (direct.attack || 0);
+    totals.cmd = 10 + Number(baseline.bab || 0) + abilityMods.strength + abilityMods.dexterity + combatSize + Number(baseline.cmdMisc || 0) + cmdAcBonus + (direct.cmd || 0);
     totals["hit points"] = Number(baseline.hitPoints || 0) + (Number(baseline.hitDice || 0) * (abilityMods.constitution - abilityMod(baseline.con))) + (direct["hit points"] || 0);
     totals["skill checks"] = direct["skill checks"] || 0;
     totals["spell resistance"] = direct["spell resistance"] || 0;
@@ -330,8 +330,8 @@
     bonuses.reflex = totals.reflex - (Number(baseline.reflexBase || 0) + abilityMod(baseline.dex));
     bonuses.will = totals.will - (Number(baseline.willBase || 0) + abilityMod(baseline.wis));
     bonuses.initiative = totals.initiative - (abilityMod(baseline.dex) + Number(baseline.initMisc || 0));
-    bonuses.cmb = totals.cmb - (Number(baseline.bab || 0) + abilityMod(baseline.str) + Number(baseline.sizeCombat || 0));
-    bonuses.cmd = totals.cmd - (10 + Number(baseline.bab || 0) + abilityMod(baseline.str) + abilityMod(baseline.dex) + Number(baseline.sizeCombat || 0));
+    bonuses.cmb = totals.cmb - (Number(baseline.bab || 0) + abilityMod(baseline.str) + Number(baseline.sizeCombat || 0) + Number(baseline.cmbMisc || 0));
+    bonuses.cmd = totals.cmd - (10 + Number(baseline.bab || 0) + abilityMod(baseline.str) + abilityMod(baseline.dex) + Number(baseline.sizeCombat || 0) + Number(baseline.cmdMisc || 0));
     bonuses["hit points"] = totals["hit points"] - Number(baseline.hitPoints || 0);
     cmdAcApplied.used.forEach(b => addBreakdown(breakdown, "cmd", b.source, b.value, b.type, "AC bonus applies to CMD"));
     deflectionApplied.used.forEach(b => addBreakdown(breakdown, "cmd", b.source, b.value, b.type, "deflection applies to CMD"));
