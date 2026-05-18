@@ -13,12 +13,13 @@
     .map-main { display: grid; grid-template-rows: auto minmax(0, 1fr); overflow: hidden; }
     .map-toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: end; padding: 10px; border-bottom: 1px solid #333; }
     .map-toolbar .form-control, .map-toolbar .form-select { width: auto; min-width: 96px; }
-    .map-stage-wrap { overflow: auto; padding: 12px; }
+    .map-stage-wrap { position: relative; overflow: auto; padding: 12px; }
     .map-stage { position: relative; width: calc(var(--cols) * var(--cell)); height: calc(var(--rows) * var(--cell)); min-width: calc(var(--cols) * var(--cell)); min-height: calc(var(--rows) * var(--cell)); background-color: #202020; background-image: linear-gradient(to right, rgba(255,255,255,.18) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,.18) 1px, transparent 1px), var(--map-bg); background-size: var(--cell) var(--cell), var(--cell) var(--cell), var(--bg-size); background-position: 0 0, 0 0, center; background-repeat: repeat, repeat, no-repeat; border: 1px solid #555; }
     .map-token, .map-shape { position: absolute; left: calc(var(--x) * var(--cell)); top: calc(var(--y) * var(--cell)); width: calc(var(--w) * var(--cell)); height: calc(var(--h) * var(--cell)); display: grid; place-items: center; user-select: none; touch-action: none; cursor: grab; }
     .map-aura { position: absolute; left: calc(var(--aura-x) * var(--cell)); top: calc(var(--aura-y) * var(--cell)); width: calc(var(--aura-size) * var(--cell)); height: calc(var(--aura-size) * var(--cell)); border: 2px solid var(--aura-color); border-radius: 50%; background: color-mix(in srgb, var(--aura-color) 18%, transparent); pointer-events: none; z-index: 1; box-shadow: 0 0 10px color-mix(in srgb, var(--aura-color) 30%, transparent); }
     .map-token { border-radius: 50%; background: var(--color); border: 2px solid #f8f9fa; color: #111; font-weight: 800; box-shadow: 0 2px 8px rgba(0,0,0,.45); }
     .map-token.enemy { border-color: #ffb3b3; color: #fff; }
+    .map-token.enemy.enemy-hidden { opacity: .45; border-style: dashed; }
     .map-token, .map-shape { z-index: 2; }
     .map-token.selected, .map-shape.selected { outline: 3px solid #8fd19e; outline-offset: 2px; }
     .token-label { max-width: 100%; padding: 0 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; text-shadow: 0 1px 2px rgba(255,255,255,.5); }
@@ -28,6 +29,8 @@
     .map-token:hover .token-hover-card { display: block; }
     .token-hover-name { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .token-hover-hp { color: #8fd19e; }
+    .aura-effect-toasts { position: fixed; top: var(--aura-toast-top, 86px); right: var(--aura-toast-right, 20px); z-index: 1090; display: grid; gap: 8px; width: min(300px, var(--aura-toast-width, calc(100vw - 40px))); max-height: var(--aura-toast-max-height, calc(100vh - 110px)); overflow: auto; pointer-events: none; }
+    .aura-effect-toast { pointer-events: auto; background: rgba(36, 36, 36, .82); backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,.22); border-left: 4px solid #f0d58c; border-radius: 8px; padding: 9px; box-shadow: 0 8px 24px rgba(0,0,0,.45); }
     .map-shape { border: 2px solid var(--color); background: color-mix(in srgb, var(--color) 28%, transparent); }
     .map-shape.shape-grid { display: grid; grid-template-columns: repeat(var(--shape-cols), var(--cell)); grid-template-rows: repeat(var(--shape-rows), var(--cell)); place-items: stretch; border: 0; background: transparent; }
     .shape-cell { background: color-mix(in srgb, var(--color) 28%, transparent); border: 1px solid var(--color); }
@@ -42,19 +45,33 @@
     .movement-ruler-label { position: absolute; transform: translate(-50%, calc(-100% - 8px)); padding: 3px 7px; border: 1px solid #665b35; border-radius: 999px; background: #1e1e1e; color: #f0d58c; font-size: 12px; font-weight: 700; white-space: nowrap; pointer-events: none; box-shadow: 0 4px 10px rgba(0,0,0,.45); }
     .map-side { display: grid; grid-template-rows: auto minmax(0, 1fr); overflow: hidden; }
     .side-tabs { padding: 10px; border-bottom: 1px solid #333; }
-    .side-scroll { overflow: auto; padding: 10px; }
+    .side-scroll { overflow-y: auto; overflow-x: hidden; padding: 10px; min-width: 0; }
     .map-side-nav { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin-top: 10px; }
-    .map-side-nav .nav-link { border: 1px solid #444; color: #ddd; padding: 6px 8px; font-size: 12px; }
+    .map-side-nav .nav-link { border: 1px solid #444; color: #ddd; padding: 6px 4px; font-size: 12px; min-width: 0; white-space: normal; overflow-wrap: anywhere; }
     .map-side-nav .nav-link.active { background: #8fd19e; border-color: #8fd19e; color: #111; font-weight: 700; }
-    .side-section { margin-bottom: 14px; }
+    .side-section { margin-bottom: 14px; min-height: 0; }
     .side-title { color: #aaa; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 6px; }
     .initiative-row, .timeline-row { background: #242424; border: 1px solid #444; border-radius: 8px; padding: 7px; margin-bottom: 6px; }
     .initiative-row.active { border-color: #8fd19e; background: rgba(143, 209, 158, .1); }
+    .initiative-row-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(58px, 66px) minmax(0, auto); gap: 5px; align-items: center; min-width: 0; }
+    .initiative-controls { display: inline-flex; gap: 3px; min-width: 0; }
     .timeline-list { max-height: 260px; overflow: auto; padding-right: 2px; }
+    #mapTimelinePane.active { display: grid; grid-template-rows: auto auto minmax(0, 1fr); min-height: 100%; }
+    #mapTimelinePane.active .timeline-list { max-height: none; min-height: 0; }
+    .timeline-emphasis { color: #f0d58c; font-weight: 800; }
     .map-context-menu { position: fixed; z-index: 1080; min-width: 190px; padding: 6px; background: #1e1e1e; border: 1px solid #555; border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,.45); }
     .map-context-menu.d-none { display: none !important; }
     .map-context-menu-title { padding: 4px 8px 7px; color: #aaa; font-size: 12px; border-bottom: 1px solid #333; margin-bottom: 5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .map-context-menu .btn { width: 100%; justify-content: flex-start; text-align: left; }
+    .quick-effect-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 8px; }
+    .quick-effect-card { position: relative; min-height: 118px; border: 1px solid #444; border-radius: 8px; background: #242424; color: #fff; padding: 10px; text-align: left; }
+    .quick-effect-card:hover { border-color: #777; }
+    .quick-effect-card .effect-type-icon { position: absolute; top: 8px; right: 8px; color: #f0d58c; }
+    .quick-effect-chip { display: inline-block; border: 1px solid #555; border-radius: 999px; padding: 2px 7px; margin: 0 4px 4px 0; color: #ddd; font-size: 11px; }
+    .quick-effect-controls { display: flex; flex-wrap: wrap; align-items: end; gap: 8px; margin-top: 8px; }
+    .quick-effect-controls input[type="number"] { width: 72px; }
+    .quick-target-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 8px; max-height: 55vh; overflow: auto; padding-right: 2px; }
+    .quick-target-card { border: 1px solid #444; border-radius: 8px; background: #242424; padding: 8px 10px; }
     .selected-collapse .accordion-button { background: #242424; color: #ddd; padding: 7px 10px; font-size: 12px; }
     .selected-collapse .accordion-button:not(.collapsed) { background: #2b2b2b; color: #fff; box-shadow: none; }
     .selected-collapse .accordion-body { background: #1e1e1e; border: 1px solid #333; border-top: 0; padding: 8px; }
@@ -68,15 +85,20 @@
     .mini-sheet-label { color: #aaa; font-size: 10px; text-transform: uppercase; }
     .mini-sheet-value { color: #fff; font-weight: 700; overflow-wrap: anywhere; }
     .mini-sheet-list { display: grid; gap: 4px; }
-    .mini-sheet-row { display: flex; justify-content: space-between; gap: 8px; background: #242424; border: 1px solid #444; border-radius: 6px; padding: 5px 7px; }
+    .mini-sheet-row { display: flex; justify-content: space-between; gap: 8px; background: #242424; border: 1px solid #444; border-radius: 6px; padding: 5px 7px; min-width: 0; }
+    .mini-sheet-row span { min-width: 0; overflow-wrap: anywhere; }
     .mini-sheet-row span:last-child { color: #fff; font-weight: 700; text-align: right; }
     input, textarea, select { background-color: #2b2b2b !important; color: white !important; border-color: #555 !important; }
     textarea { min-height: 72px; }
-    .btn-icon { width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center; padding: 0; }
+    .btn-icon { width: 28px; min-width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; padding: 0; }
     @media (max-width: 980px) {
       .map-shell { grid-template-columns: 1fr; height: auto; }
       .map-main { min-height: 70vh; }
       .map-side { min-height: 420px; }
+    }
+    @media (max-width: 380px) {
+      .initiative-row-grid { grid-template-columns: minmax(0, 1fr) minmax(56px, 64px); }
+      .initiative-controls { grid-column: 1 / -1; justify-content: flex-end; }
     }
   </style>
 </head>
@@ -110,6 +132,7 @@
     </div>
 
     <div class="map-stage-wrap">
+      <div id="auraEffectToasts" class="aura-effect-toasts" aria-live="polite"></div>
       <div id="mapStage" class="map-stage" aria-label="Battle map"></div>
     </div>
   </section>
@@ -137,10 +160,13 @@
 
       <section id="mapInitiativePane" class="tab-pane fade side-section" role="tabpanel" aria-labelledby="mapInitiativeTab" tabindex="0">
         <div class="side-title">Initiative</div>
-        <div class="d-flex gap-2 mb-2">
-          <button id="addSelectedInitiative" class="btn btn-outline-light btn-sm" type="button">Add Selected</button>
-          <button id="sortInitiative" class="btn btn-outline-light btn-sm" type="button">Sort</button>
-        </div>
+        <form id="initiativeForm" class="d-grid gap-2 mb-2">
+          <input id="initiativeName" class="form-control form-control-sm" placeholder="Name" autocomplete="off">
+          <div class="d-flex gap-2">
+            <input id="initiativeScore" class="form-control form-control-sm" type="number" value="0" aria-label="Initiative">
+            <button class="btn btn-primary btn-sm" type="submit">Add</button>
+          </div>
+        </form>
         <div id="initiativeList"></div>
       </section>
 
@@ -161,12 +187,55 @@
   <button id="openAuraOptions" class="btn btn-outline-info btn-sm mb-1" type="button" role="menuitem">
     <i class="bi bi-broadcast-pin me-1"></i> Aura options
   </button>
+  <button id="openApplyEffect" class="btn btn-outline-success btn-sm mb-1 d-none" type="button" role="menuitem">
+    <i class="bi bi-magic me-1"></i> Apply effect
+  </button>
   <button id="toggleEnemyVisibility" class="btn btn-outline-warning btn-sm mb-1 d-none" type="button" role="menuitem">
     <i class="bi bi-eye-slash me-1"></i> Hide enemy
   </button>
   <button id="removeTokenFromMap" class="btn btn-outline-danger btn-sm" type="button" role="menuitem">
     <i class="bi bi-box-arrow-right me-1"></i> Remove from map
   </button>
+</div>
+
+<div class="modal fade" id="quickEffectModal" tabindex="-1" aria-labelledby="quickEffectModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content bg-dark text-white border-secondary">
+      <div class="modal-header border-secondary">
+        <h5 class="modal-title" id="quickEffectModalLabel">Apply Effect</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <input id="quickEffectSearch" class="form-control form-control-sm mb-3" placeholder="Search effects">
+        <section id="quickEffectMostUsedWrap" class="mb-4">
+          <div class="side-title">Most Used</div>
+          <div id="quickEffectMostUsed" class="quick-effect-grid"></div>
+        </section>
+        <div class="side-title">All Effects</div>
+        <div id="quickEffectResults" class="quick-effect-grid"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="quickEffectTargetsModal" tabindex="-1" aria-labelledby="quickEffectTargetsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content bg-dark text-white border-secondary">
+      <div class="modal-header border-secondary">
+        <h5 class="modal-title" id="quickEffectTargetsModalLabel">Choose Targets</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="quickEffectTargetHint" class="small text-secondary mb-3"></div>
+        <div id="quickEffectTargetList" class="quick-target-list"></div>
+      </div>
+      <div class="modal-footer border-secondary">
+        <span id="quickEffectApplyStatus" class="small text-secondary me-auto"></span>
+        <button type="button" class="btn btn-outline-light btn-sm" data-bs-dismiss="modal">Cancel</button>
+        <button id="confirmQuickEffectTargets" class="btn btn-success btn-sm" type="button">Apply Effect</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div class="modal fade" id="backgroundOptionsModal" tabindex="-1" aria-hidden="true">
@@ -245,6 +314,22 @@
           <label for="auraColor">Color</label>
           <input id="auraColor" class="form-control form-control-sm" type="color" value="#8fd19e">
         </div>
+        <div class="border-top border-secondary mt-3 pt-3">
+          <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
+            <div>
+              <div class="small text-secondary">Aura Effect</div>
+              <div id="auraEffectSummary" class="fw-semibold">None</div>
+            </div>
+            <div class="d-flex gap-2">
+              <button id="chooseAuraEffect" class="btn btn-outline-success btn-sm" type="button">Apply effect</button>
+              <button id="clearAuraEffect" class="btn btn-outline-danger btn-sm btn-icon" type="button" title="Clear aura effect"><i class="bi bi-x-lg"></i></button>
+            </div>
+          </div>
+          <div id="auraRemoveOutWrap" class="form-check form-switch d-none">
+            <input id="auraRemoveOutOfRange" class="form-check-input" type="checkbox" role="switch">
+            <label class="form-check-label" for="auraRemoveOutOfRange">Remove when out of range</label>
+          </div>
+        </div>
       </div>
       <div class="modal-footer border-secondary">
         <button type="button" class="btn btn-outline-light btn-sm" data-bs-dismiss="modal">Cancel</button>
@@ -278,6 +363,7 @@
 let mapContextKey = "";
 let mapCharacters = [];
 let currentUserId = "";
+let currentUserEmail = "";
 let isGm = false;
 let selectedId = "";
 let saveTimer = null;
@@ -294,11 +380,22 @@ let auraEditingTokenId = "";
 let backgroundModal = null;
 let enemyPickerModal = null;
 let mapEffectsModal = null;
+let quickEffectModal = null;
+let quickEffectTargetsModal = null;
 let mapEffectTrackerInstance = null;
 let mapEnemies = [];
 let pendingTokenHp = new Map();
 let hpSaveTimers = new Map();
 let hpSaveSeq = new Map();
+let characterSheetBridgeFrame = null;
+let characterSheetBridgePromise = null;
+let quickEffectDefinitions = [];
+let quickEffectSourceTokenId = "";
+let quickEffectSelection = null;
+let quickEffectMode = "apply";
+let auraEffectDraft = null;
+let auraEffectDismissed = new Set();
+let auraEffectInside = new Set();
 
 const defaultState = {
   settings: { cols: 30, rows: 20, backgroundUrl: "", backgroundFit: "cover" },
@@ -334,6 +431,96 @@ function showSelectedPanel() {
 function escapeHtml(value) {
   return String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
 }
+function legacyDurationParts(text) {
+  const value = String(text || "").toLowerCase();
+  if (!value || value === "variable" || value === "permanent") return { count: null, unit: "variable", perLevel: false };
+  const count = Number((value.match(/(\d+)/) || [null, 1])[1]) || 1;
+  const unit = ["turn", "round", "minute", "hour", "day"].find(item => value.includes(item)) || "variable";
+  return { count: unit === "variable" ? null : count, unit, perLevel: unit !== "variable" && (value.includes("/level") || value.includes("per level")) };
+}
+function durationParts(effect) {
+  const hasStructured = effect && (effect.durationCount !== undefined || effect.durationUnit || effect.durationPerLevel !== undefined);
+  if (hasStructured) {
+    return {
+      count: effect.durationCount === null || effect.durationCount === undefined || effect.durationCount === "" ? null : Number(effect.durationCount),
+      unit: effect.durationUnit || "variable",
+      perLevel: Boolean(effect.durationPerLevel)
+    };
+  }
+  return legacyDurationParts(effect?.duration);
+}
+function durationUsesCasterLevel(effect) {
+  return durationParts(effect).perLevel;
+}
+function durationLabel(effect) {
+  const parts = durationParts(effect);
+  if (!parts.count || parts.unit === "variable") return "variable";
+  return `${parts.count} ${parts.unit}${Number(parts.count) === 1 ? "" : "s"}${parts.perLevel ? " / level" : ""}`;
+}
+function parseEffectDuration(effect, casterLevel = 1) {
+  const parts = durationParts(effect);
+  if (!parts.count || parts.unit === "variable") return null;
+  const amount = Number(parts.count) || 1;
+  const multiplier = parts.perLevel ? Math.max(1, Number(casterLevel) || 1) : 1;
+  if (parts.unit === "turn" || parts.unit === "round") return amount * multiplier;
+  if (parts.unit === "minute") return amount * 10 * multiplier;
+  if (parts.unit === "hour") return amount * 600 * multiplier;
+  if (parts.unit === "day") return amount * 14400 * multiplier;
+  return null;
+}
+function formatDurationRounds(rounds) {
+  if (rounds === null || rounds === undefined) return "variable";
+  if (rounds === 1) return "1 turn";
+  if (rounds % 600 === 0) return `${rounds / 600} hour${rounds === 600 ? "" : "s"}`;
+  if (rounds % 10 === 0) return `${rounds / 10} minute${rounds === 10 ? "" : "s"}`;
+  return `${rounds} round${rounds === 1 ? "" : "s"}`;
+}
+function isConditionEffect(effect) {
+  return String(effect?.category || "").toLowerCase() === "condition";
+}
+function titleCaseStat(value) {
+  return String(value || "Stat")
+    .replace(/^skill:/i, "Skill:")
+    .replace(/[-_]/g, " ")
+    .replace(/\b\w/g, letter => letter.toUpperCase());
+}
+function scaleText(scale) {
+  if (!scale) return "";
+  const parts = [];
+  const milestones = Array.isArray(scale.milestones) ? scale.milestones : [];
+  const milestoneText = milestones
+    .filter(milestone => milestone.level && milestone.value !== "" && milestone.value !== null && milestone.value !== undefined)
+    .map(milestone => `CL ${milestone.level}: ${fmtSigned(Number(milestone.value || 0))}`);
+  if (milestoneText.length) parts.push(milestoneText.join(", "));
+  const every = scale.every || {};
+  if (every.afterLevel && every.everyLevels && every.increase) {
+    parts.push(`after CL ${every.afterLevel}, every ${every.everyLevels}: ${fmtSigned(Number(every.increase || 0))}`);
+  }
+  return parts.length ? `scales ${parts.join("; ")}` : "";
+}
+function effectBonusText(bonus) {
+  const scale = scaleText(bonus.bonusScale || bonus.scale);
+  const statLabel = bonus.skillName || titleCaseStat(bonus.stat);
+  const text = `${fmtSigned(bonus.value || 0)} ${bonus.type || "untyped"} ${statLabel}${scale ? `; ${scale}` : ""}`;
+  return bonus.appliesWhen ? `${text} (${bonus.appliesWhen})` : text;
+}
+function effectSearchText(effect) {
+  return [
+    effect.name,
+    effect.category,
+    durationLabel(effect),
+    ...(effect.bonuses || []).map(effectBonusText)
+  ].join(" ").toLowerCase();
+}
+function effectCategoryIcon(category) {
+  const key = String(category || "").toLowerCase();
+  if (key === "spell") return "bi-stars";
+  if (key === "feat") return "bi-award";
+  if (key === "debuff") return "bi-arrow-down-circle";
+  if (key === "condition") return "bi-exclamation-diamond";
+  if (key.includes("ability")) return "bi-lightning-charge";
+  return "bi-magic";
+}
 function uid(prefix) { return `${prefix}_${Date.now()}_${Math.random().toString(16).slice(2)}`; }
 function clamp(value, min, max) { return Math.max(min, Math.min(max, value)); }
 function selectedObject() { return [...state.tokens, ...state.shapes].find(item => item.id === selectedId); }
@@ -341,6 +528,23 @@ function tokenById(tokenId) { return state.tokens.find(token => token.id === tok
 function tokenInitials(name) { return String(name || "?").split(/\s+/).slice(0, 2).map(part => part[0] || "").join("").toUpperCase(); }
 function tokenCharacter(token) { return mapCharacters.find(character => character.id === token.characterId); }
 function canSeeToken(token) { return token.kind !== "enemy" || isGm || token.visible !== false; }
+function initiativeNameFromEntry(entry, tokens = state.tokens) {
+  if (entry.name) return entry.name;
+  const token = tokens.find(item => item.id === entry.tokenId);
+  return token?.name || "Unnamed";
+}
+function normalizedInitiativeEntry(entry, tokens = state.tokens) {
+  return {
+    id: entry.id || entry.tokenId || uid("init"),
+    name: initiativeNameFromEntry(entry, tokens),
+    score: Number(entry.score || 0)
+  };
+}
+function normalizeInitiativeRows(rows, tokens = state.tokens) {
+  return (Array.isArray(rows) ? rows : [])
+    .map(entry => normalizedInitiativeEntry(entry, tokens))
+    .filter(entry => entry.name);
+}
 function canEditTokenHp(token) {
   if (!token?.kind) return false;
   if (isGm) return true;
@@ -638,12 +842,14 @@ async function determineGm(contextKey) {
 }
 
 function normalizeState(raw) {
+  const tokens = Array.isArray(raw?.tokens) ? raw.tokens : [];
+  const normalizedInitiative = normalizeInitiativeRows(raw?.initiative, tokens);
   return {
     settings: { ...defaultState.settings, ...(raw?.settings || {}) },
-    tokens: Array.isArray(raw?.tokens) ? raw.tokens : [],
+    tokens,
     shapes: Array.isArray(raw?.shapes) ? raw.shapes : [],
-    initiative: Array.isArray(raw?.initiative) ? raw.initiative : [],
-    activeTurn: Number(raw?.activeTurn || 0),
+    initiative: normalizedInitiative,
+    activeTurn: clamp(Number(raw?.activeTurn || 0), 0, Math.max(0, normalizedInitiative.length - 1)),
     timeline: Array.isArray(raw?.timeline) ? raw.timeline.slice(-20) : []
   };
 }
@@ -673,6 +879,7 @@ function showMapContextMenu(event, item) {
     ? tokenCharacter(item)?.name || item.name || "Character"
     : item.name || "Shape";
   el("openAuraOptions").classList.toggle("d-none", !canManageAura(item));
+  el("openApplyEffect").classList.toggle("d-none", !canManageEffects(item));
   const visibilityButton = el("toggleEnemyVisibility");
   const canToggleEnemy = item.kind === "enemy" && isGm;
   visibilityButton.classList.toggle("d-none", !canToggleEnemy);
@@ -828,6 +1035,91 @@ function renderAura(token) {
   return `<div class="map-aura" style="--aura-x:${centerX - radius};--aura-y:${centerY - radius};--aura-size:${size};--aura-color:${escapeHtml(aura.color || "#8fd19e")};"></div>`;
 }
 
+function tokenCenter(token) {
+  return {
+    x: Number(token.x || 0) + (Number(token.w || 1) / 2),
+    y: Number(token.y || 0) + (Number(token.h || 1) / 2)
+  };
+}
+
+function tokenInAura(token, auraToken) {
+  const aura = auraToken?.aura || {};
+  if (!aura.visible || !aura.effect || token.id === auraToken.id) return false;
+  if (!canSeeToken(token) || !canSeeToken(auraToken)) return false;
+  const radius = Math.max(1, Number(aura.radius || 1));
+  const a = tokenCenter(auraToken);
+  const b = tokenCenter(token);
+  return Math.hypot(a.x - b.x, a.y - b.y) <= radius;
+}
+
+function auraPromptKey(tokenId, auraId) {
+  return `${mapContextKey}|${tokenId}|${auraId}`;
+}
+
+function currentAuraEffectEntries() {
+  const auraTokens = state.tokens.filter(token => token.aura?.visible && token.aura?.effect && canSeeToken(token));
+  return state.tokens
+    .filter(token => (token.kind === "character" || token.kind === "enemy") && canManageEffects(token))
+    .flatMap(token => auraTokens
+      .filter(auraToken => tokenInAura(token, auraToken))
+      .map(auraToken => ({ token, auraToken, key: auraPromptKey(token.id, auraToken.id) }))
+    );
+}
+
+function auraEffectPrompts() {
+  const entries = currentAuraEffectEntries();
+  const currentKeys = new Set(entries.map(entry => entry.key));
+  for (const key of [...auraEffectInside]) {
+    if (!currentKeys.has(key)) {
+      auraEffectInside.delete(key);
+      auraEffectDismissed.delete(key);
+    }
+  }
+  entries.forEach(entry => auraEffectInside.add(entry.key));
+  return entries.filter(entry => !auraEffectDismissed.has(entry.key));
+}
+
+function updateAuraToastPosition() {
+  const container = el("auraEffectToasts");
+  const wrap = document.querySelector(".map-stage-wrap");
+  if (!container || !wrap) return;
+  const rect = wrap.getBoundingClientRect();
+  const top = clamp(rect.top + 8, 8, window.innerHeight - 80);
+  const right = clamp(window.innerWidth - rect.right + 8, 8, window.innerWidth - 80);
+  const width = Math.max(180, Math.min(300, rect.width - 16));
+  const maxHeight = Math.max(80, Math.min(rect.height - 16, window.innerHeight - top - 8));
+  container.style.setProperty("--aura-toast-top", `${top}px`);
+  container.style.setProperty("--aura-toast-right", `${right}px`);
+  container.style.setProperty("--aura-toast-width", `${width}px`);
+  container.style.setProperty("--aura-toast-max-height", `${maxHeight}px`);
+}
+
+function renderAuraEffectToasts() {
+  const container = el("auraEffectToasts");
+  if (!container) return;
+  updateAuraToastPosition();
+  const prompts = auraEffectPrompts();
+  container.innerHTML = prompts.map(({ token, auraToken, key }) => `
+    <div class="aura-effect-toast">
+      <div class="fw-semibold">${escapeHtml(auraToken.aura.effect?.name || "Effect")} aura</div>
+      <div class="small text-secondary mb-2">${escapeHtml(token.name || "Target")}</div>
+      <div class="d-flex justify-content-end gap-2">
+        <button class="btn btn-outline-light btn-sm" type="button" data-dismiss-aura="${escapeHtml(key)}">Dismiss</button>
+        <button class="btn btn-success btn-sm" type="button" data-apply-aura="${escapeHtml(token.id)}" data-aura-source="${escapeHtml(auraToken.id)}">Apply</button>
+      </div>
+    </div>
+  `).join("");
+  container.querySelectorAll("[data-dismiss-aura]").forEach(button => {
+    button.addEventListener("click", () => {
+      auraEffectDismissed.add(button.dataset.dismissAura);
+      renderAuraEffectToasts();
+    });
+  });
+  container.querySelectorAll("[data-apply-aura]").forEach(button => {
+    button.addEventListener("click", () => applyAuraEffectToToken(button.dataset.applyAura, button.dataset.auraSource));
+  });
+}
+
 function renderToken(token) {
   const enemyClass = token.kind === "enemy" ? " enemy" : "";
   const hiddenClass = token.kind === "enemy" && token.visible === false && isGm ? " enemy-hidden" : "";
@@ -981,20 +1273,7 @@ function renderSelectedPanel() {
   }
   const compactSheet = item.kind ? renderCompactCharacterSheet(item) : "";
   const effectsSection = item.kind && canManageEffects(item)
-    ? `<div class="accordion selected-collapse mt-2" id="selectedEffectsAccordion">
-        <div class="accordion-item bg-dark border-secondary">
-          <h2 class="accordion-header">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#selectedEffectsCollapse" aria-expanded="false" aria-controls="selectedEffectsCollapse">
-              Effects
-            </button>
-          </h2>
-          <div id="selectedEffectsCollapse" class="accordion-collapse collapse" data-bs-parent="#selectedEffectsAccordion">
-            <div class="accordion-body">
-              <button class="btn btn-outline-success btn-sm w-100" type="button" data-open-token-effects="${escapeHtml(item.id)}">Open Effects</button>
-            </div>
-          </div>
-        </div>
-      </div>`
+    ? `<button class="btn btn-outline-success btn-sm w-100 mt-2" type="button" data-open-token-effects="${escapeHtml(item.id)}">Effects</button>`
     : "";
   const textureFields = item.shape
     ? `<div class="mt-2">
@@ -1077,31 +1356,61 @@ function renderInitiative() {
     return;
   }
   list.innerHTML = state.initiative.map((entry, index) => {
-    const token = state.tokens.find(item => item.id === entry.tokenId);
-    if (!token) return "";
     const active = index === state.activeTurn ? " active" : "";
     return `
       <div class="initiative-row${active}">
-        <div class="d-flex justify-content-between gap-2">
-          <strong>${escapeHtml(token.name || "Unnamed")}</strong>
-          <input class="form-control form-control-sm" data-init-score="${escapeHtml(entry.tokenId)}" type="number" value="${entry.score || 0}" style="width:72px;">
+        <div class="initiative-row-grid">
+          <input class="form-control form-control-sm" data-init-name="${escapeHtml(entry.id)}" value="${escapeHtml(entry.name || "")}" aria-label="Initiative name">
+          <input class="form-control form-control-sm" data-init-score="${escapeHtml(entry.id)}" type="number" value="${entry.score || 0}" aria-label="Initiative score">
+          <span class="initiative-controls">
+            <button class="btn btn-outline-light btn-sm btn-icon" type="button" data-init-up="${escapeHtml(entry.id)}" title="Move up" aria-label="Move up"><i class="bi bi-arrow-up"></i></button>
+            <button class="btn btn-outline-light btn-sm btn-icon" type="button" data-init-down="${escapeHtml(entry.id)}" title="Move down" aria-label="Move down"><i class="bi bi-arrow-down"></i></button>
+            <button class="btn btn-outline-danger btn-sm btn-icon" type="button" data-init-remove="${escapeHtml(entry.id)}" title="Remove" aria-label="Remove"><i class="bi bi-trash"></i></button>
+          </span>
         </div>
       </div>
     `;
   }).join("");
-  list.querySelectorAll("[data-init-score]").forEach(input => {
+  list.querySelectorAll("[data-init-name]").forEach(input => {
+    input.addEventListener("input", () => {
+      const row = state.initiative.find(entry => entry.id === input.dataset.initName);
+      if (row) row.name = input.value;
+      queueSave();
+    });
     input.addEventListener("change", () => {
-      const row = state.initiative.find(entry => entry.tokenId === input.dataset.initScore);
+      const row = state.initiative.find(entry => entry.id === input.dataset.initName);
+      if (row) row.name = input.value.trim() || "Unnamed";
+      renderAll();
+    });
+  });
+  list.querySelectorAll("[data-init-score]").forEach(input => {
+    input.addEventListener("input", () => {
+      const row = state.initiative.find(entry => entry.id === input.dataset.initScore);
       if (row) row.score = Number(input.value || 0);
       queueSave();
     });
+    input.addEventListener("change", () => {
+      const row = state.initiative.find(entry => entry.id === input.dataset.initScore);
+      if (row) row.score = Number(input.value || 0);
+      placeInitiativeRow(row);
+      renderAll();
+    });
+  });
+  list.querySelectorAll("[data-init-up]").forEach(button => {
+    button.addEventListener("click", () => moveInitiativeRow(button.dataset.initUp, -1));
+  });
+  list.querySelectorAll("[data-init-down]").forEach(button => {
+    button.addEventListener("click", () => moveInitiativeRow(button.dataset.initDown, 1));
+  });
+  list.querySelectorAll("[data-init-remove]").forEach(button => {
+    button.addEventListener("click", () => removeInitiativeRow(button.dataset.initRemove));
   });
 }
 
 function renderTimeline() {
   const rows = state.timeline.slice(-20);
   el("timelineList").innerHTML = state.timeline.length
-    ? rows.slice().reverse().map(row => `<div class="timeline-row"><div>${escapeHtml(row.text)}</div><div class="small text-secondary">${escapeHtml(row.time || "")}</div></div>`).join("")
+    ? rows.slice().reverse().map(row => `<div class="timeline-row"><div>${timelineRowContent(row)}</div><div class="small text-secondary">${escapeHtml(row.time || "")}</div></div>`).join("")
     : `<div class="small text-secondary">No events yet.</div>`;
 }
 
@@ -1110,6 +1419,7 @@ function renderAll(save = true) {
   renderSelectedPanel();
   renderInitiative();
   renderTimeline();
+  renderAuraEffectToasts();
   if (save) queueSave();
 }
 
@@ -1204,6 +1514,7 @@ function endDrag() {
   dragState = null;
   window.removeEventListener("pointermove", moveDrag);
   renderAll();
+  removeOutOfRangeAuraEffects();
 }
 
 function addToken(kind) {
@@ -1329,7 +1640,6 @@ function removeMapItem(itemId) {
   const name = item.name || "Token";
   state.tokens = state.tokens.filter(token => token.id !== itemId);
   state.shapes = state.shapes.filter(shape => shape.id !== itemId);
-  state.initiative = state.initiative.filter(entry => entry.tokenId !== itemId);
   selectedId = "";
   contextMenuTokenId = "";
   state.activeTurn = clamp(state.activeTurn, 0, Math.max(0, state.initiative.length - 1));
@@ -1391,7 +1701,6 @@ async function updateTokenCurrentHp(tokenId, value, seq = nextHpSaveSeq(tokenId)
     if (saved) {
       pendingTokenHp.delete(tokenId);
       syncTokenFromSheet(token, saved);
-      addTimeline(`${token.name || "Enemy"} HP set to ${value}.`);
     }
   } else {
     const saved = await PFApp.updateCharacterCurrentHp(token.characterId, value, mapContextKey);
@@ -1407,7 +1716,6 @@ async function updateTokenCurrentHp(tokenId, value, seq = nextHpSaveSeq(tokenId)
       pendingTokenHp.delete(tokenId);
       character.sheet = { ...(character.sheet || {}), ...(await PFApp.loadCharacterSheet("", mapContextKey, token.characterId))?.sheet };
       syncTokenFromSheet(token, character);
-      addTimeline(`${token.name || "Character"} HP set to ${value}.`);
     }
   }
 
@@ -1438,11 +1746,34 @@ async function openMapEffects(tokenId) {
           return token.sheet?.activeBuffs || [];
         }
       : undefined,
-    saveActiveEffects: token.kind === "enemy"
-      ? async effects => {
+    saveActiveEffects: async effects => {
+      const activeEffects = Array.isArray(effects) ? effects : [];
+      if (token.kind === "character") {
+        const savedBuffs = await PFApp.saveBuffState(activeEffects, mapContextKey, token.characterId);
+        if (savedBuffs?.ok === false) {
+          console.error(savedBuffs.error);
+          el("mapStatus").textContent = "Could not save effects";
+          return;
+        }
+        const stamp = String(Date.now());
+        localStorage.setItem(`pf_buffs_updated_${mapContextKey}`, stamp);
+        localStorage.setItem(`pf_buffs_updated_${mapContextKey}_${token.characterId}`, stamp);
+        await recalculateCharacterSheetFromMap(token.characterId);
+        const character = tokenCharacter(token);
+        if (character) {
+          const saved = await PFApp.loadCharacterSheet("", mapContextKey, token.characterId);
+          if (saved?.sheet) character.sheet = saved.sheet;
+          syncTokenFromSheet(token, character);
+          renderAll();
+        }
+        await refetchMapSheetState();
+        return;
+      }
+
+      if (token.kind === "enemy") {
           const enemy = await PFApp.loadEnemy(token.enemyId, mapContextKey);
           const sheet = structuredClone(enemy?.sheet || token.sheet || {});
-          sheet.activeBuffs = Array.isArray(effects) ? effects : [];
+          sheet.activeBuffs = activeEffects;
           const saved = await PFApp.saveEnemy({
             id: token.enemyId,
             name: enemy?.name || token.name || "Enemy",
@@ -1450,19 +1781,28 @@ async function openMapEffects(tokenId) {
             sheet
           }, mapContextKey);
           if (saved) {
-            syncTokenFromSheet(token, saved);
-            token.sheet = structuredClone(saved.sheet || sheet);
-            mapEnemies = mapEnemies.map(item => item.id === saved.id ? saved : item);
-            if (!mapEnemies.some(item => item.id === saved.id)) mapEnemies.push(saved);
-            localStorage.setItem(`pf_enemy_sheet_updated_${mapContextKey}_${saved.id}`, String(Date.now()));
+            await recalculateEnemySheetFromMap(saved.id);
+            const refreshed = await PFApp.loadEnemy(saved.id, mapContextKey);
+            const nextEnemy = refreshed || saved;
+            syncTokenFromSheet(token, nextEnemy);
+            token.sheet = structuredClone(nextEnemy.sheet || sheet);
+            mapEnemies = mapEnemies.map(item => item.id === nextEnemy.id ? nextEnemy : item);
+            if (!mapEnemies.some(item => item.id === nextEnemy.id)) mapEnemies.push(nextEnemy);
+            localStorage.setItem(`pf_enemy_sheet_updated_${mapContextKey}_${nextEnemy.id}`, String(Date.now()));
             renderAll();
+            await refetchMapSheetState();
           }
         }
-      : undefined,
-    onChange: async () => {
+    },
+    onChange: async effects => {
       if (token.kind === "character") {
-        localStorage.setItem(`pf_buffs_updated_${mapContextKey}_${token.characterId}`, String(Date.now()));
-        await refreshMapTokenSheets({ save: false });
+        const character = tokenCharacter(token);
+        if (character) {
+          syncTokenFromSheet(token, character);
+          renderAll(false);
+        }
+      } else if (token.kind === "enemy") {
+        renderAll(false);
       }
     }
   };
@@ -1475,6 +1815,381 @@ async function openMapEffects(tokenId) {
   mapEffectsModal.show();
 }
 
+function quickEffectUsageKey() {
+  return `pf_map_quick_effect_usage_${mapContextKey || "general"}`;
+}
+
+function quickEffectUsageCounts() {
+  try {
+    return JSON.parse(localStorage.getItem(quickEffectUsageKey()) || "{}") || {};
+  } catch {
+    return {};
+  }
+}
+
+function incrementQuickEffectUsage(effect) {
+  const key = effect?.id || effect?.name;
+  if (!key) return;
+  const counts = quickEffectUsageCounts();
+  counts[key] = Number(counts[key] || 0) + 1;
+  localStorage.setItem(quickEffectUsageKey(), JSON.stringify(counts));
+}
+
+function tokenLevel(token) {
+  const sheet = token?.kind === "enemy" ? token.sheet || {} : tokenCharacter(token)?.sheet || {};
+  const fields = sheet.fields || {};
+  return Math.max(1, Number(fields.characterLevel || fields.classLevel || fields.level || 1) || 1);
+}
+
+function effectCardHtml(effect, index, prefix, defaultCl) {
+  const bonuses = (effect.bonuses || []).slice(0, 8);
+  const bonusHtml = bonuses.length
+    ? bonuses.map(bonus => `<span class="quick-effect-chip">${escapeHtml(effectBonusText(bonus))}</span>`).join("")
+    : `<span class="small text-secondary">No numerical changes</span>`;
+  const more = (effect.bonuses || []).length > bonuses.length
+    ? `<span class="small text-secondary">+${(effect.bonuses || []).length - bonuses.length} more</span>`
+    : "";
+  const needsCl = durationUsesCasterLevel(effect);
+  const condition = isConditionEffect(effect);
+  return `
+    <article class="quick-effect-card" role="button" tabindex="0" data-quick-effect-index="${index}">
+      <span class="effect-type-icon" title="${escapeHtml(effect.category || "Effect")}"><i class="bi ${effectCategoryIcon(effect.category)}"></i></span>
+      <div class="fw-semibold pe-4">${escapeHtml(effect.name || "Effect")}</div>
+      <div class="small text-secondary mb-2">${escapeHtml(effect.category || "Effect")} | ${escapeHtml(durationLabel(effect))}</div>
+      <div>${bonusHtml}${more}</div>
+      <div class="quick-effect-controls">
+        ${needsCl ? `
+          <label class="small">CL
+            <input id="${prefix}Cl${index}" class="form-control form-control-sm" data-quick-cl type="number" min="1" value="${defaultCl}">
+          </label>
+        ` : ""}
+        ${condition ? `
+          <label class="small">Turns
+            <input id="${prefix}Turns${index}" class="form-control form-control-sm" data-quick-turns type="number" min="1" value="1">
+          </label>
+        ` : ""}
+        <label class="form-check small mb-1">
+          <input id="${prefix}Permanent${index}" class="form-check-input" data-quick-permanent type="checkbox">
+          <span class="form-check-label">Permanent</span>
+        </label>
+      </div>
+    </article>
+  `;
+}
+
+function bindQuickEffectCards(container, effects) {
+  container.querySelectorAll("[data-quick-effect-index]").forEach(card => {
+    const choose = () => {
+      const effect = effects[Number(card.dataset.quickEffectIndex)];
+      if (!effect) return;
+      const casterLevel = Math.max(1, Number.parseInt(card.querySelector("[data-quick-cl]")?.value, 10) || tokenLevel(tokenById(quickEffectSourceTokenId)));
+      const turns = Math.max(1, Number.parseInt(card.querySelector("[data-quick-turns]")?.value, 10) || 1);
+      const permanent = Boolean(card.querySelector("[data-quick-permanent]")?.checked);
+      if (quickEffectMode === "aura") {
+        auraEffectDraft = appliedEffectFromQuickSelection(effect, { casterLevel, turns, permanent });
+        updateAuraEffectSummary();
+        quickEffectModal.hide();
+        auraModal.show();
+        return;
+      }
+      openQuickEffectTargets(effect, { casterLevel, turns, permanent });
+    };
+    card.addEventListener("click", event => {
+      if (event.target.closest(".quick-effect-controls")) return;
+      choose();
+    });
+    card.addEventListener("keydown", event => {
+      if (event.target.closest(".quick-effect-controls")) return;
+      if (event.key !== "Enter" && event.key !== " ") return;
+      event.preventDefault();
+      choose();
+    });
+  });
+}
+
+function renderQuickEffects() {
+  const sourceToken = tokenById(quickEffectSourceTokenId);
+  const defaultCl = tokenLevel(sourceToken);
+  const term = el("quickEffectSearch").value.trim().toLowerCase();
+  const matches = quickEffectDefinitions.filter(effect => !term || effectSearchText(effect).includes(term));
+  const counts = quickEffectUsageCounts();
+  const mostUsed = quickEffectDefinitions
+    .filter(effect => Number(counts[effect.id] || counts[effect.name] || 0) > 0)
+    .sort((a, b) => Number(counts[b.id] || counts[b.name] || 0) - Number(counts[a.id] || counts[a.name] || 0))
+    .slice(0, 7);
+
+  el("quickEffectMostUsedWrap").classList.toggle("d-none", !mostUsed.length);
+  el("quickEffectMostUsed").innerHTML = mostUsed
+    .map((effect, index) => effectCardHtml(effect, index, "quickMost", defaultCl))
+    .join("");
+  el("quickEffectResults").innerHTML = matches.length
+    ? matches.map((effect, index) => effectCardHtml(effect, index, "quickAll", defaultCl)).join("")
+    : `<div class="small text-secondary">No matching effects found.</div>`;
+
+  bindQuickEffectCards(el("quickEffectMostUsed"), mostUsed);
+  bindQuickEffectCards(el("quickEffectResults"), matches);
+}
+
+async function openQuickApplyEffect() {
+  const token = tokenById(contextMenuTokenId);
+  if (!token || !canManageEffects(token)) return;
+  hideContextMenu();
+  quickEffectMode = "apply";
+  quickEffectSourceTokenId = token.id;
+  el("quickEffectModalLabel").textContent = `Apply Effect from ${token.name || "Token"}`;
+  el("quickEffectSearch").value = "";
+  el("quickEffectResults").innerHTML = `<div class="small text-secondary">Loading effects...</div>`;
+  el("quickEffectMostUsedWrap").classList.add("d-none");
+  quickEffectModal.show();
+  setTimeout(() => el("quickEffectSearch").focus(), 150);
+  quickEffectDefinitions = await PFApp.loadBuffDefinitions();
+  renderQuickEffects();
+}
+
+async function openAuraEffectPicker() {
+  const token = tokenById(auraEditingTokenId);
+  if (!token || !canManageAura(token)) return;
+  quickEffectMode = "aura";
+  quickEffectSourceTokenId = token.id;
+  el("quickEffectModalLabel").textContent = `Aura Effect for ${token.name || "Token"}`;
+  el("quickEffectSearch").value = "";
+  el("quickEffectResults").innerHTML = `<div class="small text-secondary">Loading effects...</div>`;
+  el("quickEffectMostUsedWrap").classList.add("d-none");
+  auraModal.hide();
+  quickEffectModal.show();
+  setTimeout(() => el("quickEffectSearch").focus(), 150);
+  quickEffectDefinitions = await PFApp.loadBuffDefinitions();
+  renderQuickEffects();
+}
+
+function quickEffectTargets() {
+  return state.tokens
+    .filter(token => token.kind === "character" || token.kind === "enemy")
+    .filter(token => isGm ? true : token.kind === "character" || (token.kind === "enemy" && token.visible !== false))
+    .map(token => ({
+      token,
+      name: token.kind === "character" ? tokenCharacter(token)?.name || token.name || "Character" : token.name || "Enemy"
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name));
+}
+
+function openQuickEffectTargets(effect, options) {
+  quickEffectSelection = { effect, options, sourceTokenId: quickEffectSourceTokenId };
+  const targets = quickEffectTargets();
+  el("quickEffectTargetsModalLabel").textContent = `Apply ${effect.name || "Effect"}`;
+  el("quickEffectTargetHint").textContent = "Choose one or more tokens on the current map.";
+  el("quickEffectApplyStatus").textContent = "";
+  el("quickEffectTargetList").innerHTML = targets.length
+    ? targets.map(({ token, name }) => `
+      <label class="quick-target-card">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" data-quick-target-token="${escapeHtml(token.id)}" ${token.id === quickEffectSourceTokenId ? "checked" : ""}>
+          <span class="form-check-label">
+            <strong>${escapeHtml(name)}</strong>
+            <span class="small text-secondary d-block">${escapeHtml(token.kind === "enemy" ? "Enemy" : "Character")}${token.visible === false ? " | hidden" : ""}</span>
+          </span>
+        </div>
+      </label>
+    `).join("")
+    : `<div class="small text-secondary">No valid targets on the map.</div>`;
+  quickEffectModal.hide();
+  quickEffectTargetsModal.show();
+}
+
+function appliedEffectFromQuickSelection(effect, options) {
+  const casterLevel = Math.max(1, Number(options?.casterLevel || 1) || 1);
+  const turns = Math.max(1, Number(options?.turns || 1) || 1);
+  const permanent = Boolean(options?.permanent);
+  const condition = isConditionEffect(effect);
+  const baseDurationLabel = durationLabel(effect);
+  const calculatedDuration = condition ? turns : parseEffectDuration(effect, casterLevel);
+  const appliedDurationLabel = permanent
+    ? "Permanent"
+    : condition
+      ? `${turns} turn${turns === 1 ? "" : "s"}`
+      : calculatedDuration === null
+        ? baseDurationLabel
+        : durationUsesCasterLevel(effect)
+          ? `${baseDurationLabel} | CL ${casterLevel}: ${formatDurationRounds(calculatedDuration)}`
+          : `${baseDurationLabel} | ${formatDurationRounds(calculatedDuration)}`;
+
+  return {
+    ...effect,
+    casterLevel,
+    turns: condition ? turns : undefined,
+    permanent,
+    remaining: permanent ? null : calculatedDuration,
+    computedDuration: calculatedDuration,
+    durationLabel: appliedDurationLabel
+  };
+}
+
+async function applyQuickEffectToToken(token, appliedEffect) {
+  if (token.kind === "character") {
+    const savedBuffs = await PFApp.applyCharacterMapEffect?.(token.characterId, appliedEffect, mapContextKey);
+    if (savedBuffs?.ok === false) {
+      console.error(savedBuffs.error);
+      return false;
+    }
+    const stamp = String(Date.now());
+    localStorage.setItem(`pf_buffs_updated_${mapContextKey}`, stamp);
+    localStorage.setItem(`pf_buffs_updated_${mapContextKey}_${token.characterId}`, stamp);
+    await recalculateCharacterSheetFromMap(token.characterId);
+    const character = tokenCharacter(token);
+    if (character) {
+      const saved = await PFApp.loadCharacterSheet("", mapContextKey, token.characterId);
+      if (saved?.sheet) character.sheet = saved.sheet;
+      syncTokenFromSheet(token, character);
+    }
+    return true;
+  }
+
+  if (token.kind === "enemy") {
+    const saved = await PFApp.applyEnemyMapEffect?.(token.enemyId, appliedEffect, mapContextKey);
+    if (!saved) return false;
+    await recalculateEnemySheetFromMap(saved.id);
+    const refreshed = await PFApp.loadEnemyForEffectApplication?.(saved.id, mapContextKey) || await PFApp.loadEnemy(saved.id, mapContextKey);
+    const nextEnemy = refreshed || saved;
+    token.sheet = structuredClone(nextEnemy.sheet || token.sheet || {});
+    syncTokenFromSheet(token, nextEnemy);
+    mapEnemies = mapEnemies.map(item => item.id === nextEnemy.id ? nextEnemy : item);
+    if (!mapEnemies.some(item => item.id === nextEnemy.id)) mapEnemies.push(nextEnemy);
+    localStorage.setItem(`pf_enemy_sheet_updated_${mapContextKey}_${nextEnemy.id}`, String(Date.now()));
+    return true;
+  }
+
+  return false;
+}
+
+async function loadTokenActiveEffects(token) {
+  if (token.kind === "character") return await PFApp.loadCharacterBuffStateForRecalculation?.(token.characterId, mapContextKey) || await PFApp.loadBuffState(mapContextKey, token.characterId) || [];
+  if (token.kind === "enemy") {
+    const enemy = await PFApp.loadEnemyForEffectApplication?.(token.enemyId, mapContextKey) || await PFApp.loadEnemy(token.enemyId, mapContextKey);
+    return Array.isArray(enemy?.sheet?.activeBuffs) ? enemy.sheet.activeBuffs : [];
+  }
+  return [];
+}
+
+async function saveTokenActiveEffects(token, effects) {
+  const activeEffects = Array.isArray(effects) ? effects : [];
+  if (token.kind === "character") {
+    const savedBuffs = await PFApp.saveBuffState(activeEffects, mapContextKey, token.characterId);
+    if (savedBuffs?.ok === false) return false;
+    await recalculateCharacterSheetFromMap(token.characterId);
+    return true;
+  }
+  if (token.kind === "enemy") {
+    const calculated = token.sheet?.calculated || {};
+    const saved = await PFApp.updateEnemyEffectSummary?.(token.enemyId, activeEffects, calculated, mapContextKey);
+    if (!saved) return false;
+    token.sheet = structuredClone(saved.sheet || token.sheet || {});
+    await recalculateEnemySheetFromMap(token.enemyId);
+    return true;
+  }
+  return false;
+}
+
+async function removeOutOfRangeAuraEffects() {
+  const managedTokens = state.tokens.filter(token => (token.kind === "character" || token.kind === "enemy") && canManageEffects(token));
+  let anyChanged = false;
+  for (const token of managedTokens) {
+    const active = await loadTokenActiveEffects(token);
+    const next = [];
+    let changed = false;
+    for (const effect of active) {
+      if (!effect.auraSourceId || !effect.auraTokenId) {
+        next.push(effect);
+        continue;
+      }
+      const auraToken = tokenById(effect.auraTokenId);
+      const shouldRemove = auraToken?.aura?.removeWhenOutOfRange && !tokenInAura(token, auraToken);
+      if (shouldRemove) changed = true;
+      else next.push(effect);
+    }
+    if (changed) {
+      await saveTokenActiveEffects(token, next);
+      anyChanged = true;
+    }
+  }
+  if (anyChanged) {
+    await refetchMapSheetState();
+    renderAll();
+  }
+}
+
+async function applyAuraEffectToToken(tokenId, auraId) {
+  const token = tokenById(tokenId);
+  const auraToken = tokenById(auraId);
+  const effect = auraToken?.aura?.effect;
+  if (!token || !effect || !canManageEffects(token)) return;
+  const active = await loadTokenActiveEffects(token);
+  const sourceId = `${auraId}:${effect.id || effect.name || "effect"}`;
+  const promptKey = auraPromptKey(tokenId, auraId);
+  if (active.some(item => item.auraSourceId === sourceId)) {
+    auraEffectDismissed.add(promptKey);
+    renderAuraEffectToasts();
+    return;
+  }
+  const applied = { ...structuredClone(effect), auraSourceId: sourceId, auraTokenId: auraId };
+  if (await applyQuickEffectToToken(token, applied)) {
+    auraEffectDismissed.add(promptKey);
+    await refetchMapSheetState();
+    renderAll();
+  }
+}
+
+async function currentActorName() {
+  const profile = await PFApp.loadProfile(currentUserId);
+  return profile?.username || profile?.email || currentUserEmail || "User";
+}
+
+async function confirmQuickEffectTargets() {
+  if (!quickEffectSelection?.effect) return;
+  const selectedTokenIds = [...el("quickEffectTargetList").querySelectorAll("[data-quick-target-token]:checked")]
+    .map(input => input.dataset.quickTargetToken);
+  const targets = selectedTokenIds.map(tokenById).filter(Boolean);
+  if (!targets.length) {
+    el("quickEffectApplyStatus").textContent = "Select at least one target.";
+    return;
+  }
+
+  el("confirmQuickEffectTargets").disabled = true;
+  el("quickEffectApplyStatus").textContent = "Applying...";
+  const appliedEffect = appliedEffectFromQuickSelection(quickEffectSelection.effect, quickEffectSelection.options);
+  const appliedTargets = [];
+  for (const token of targets) {
+    if (await applyQuickEffectToToken(token, structuredClone(appliedEffect))) {
+      appliedTargets.push(token.kind === "character" ? tokenCharacter(token)?.name || token.name || "Character" : token.name || "Enemy");
+    }
+  }
+
+  el("confirmQuickEffectTargets").disabled = false;
+  if (!appliedTargets.length) {
+    el("quickEffectApplyStatus").textContent = "Could not apply effect.";
+    return;
+  }
+
+  incrementQuickEffectUsage(quickEffectSelection.effect);
+  const actor = await currentActorName();
+  const effectName = quickEffectSelection.effect.name || "Effect";
+  const targetsText = appliedTargets.join(", ");
+  addTimeline(
+    `${actor} applied ${effectName} on ${targetsText}.`,
+    [
+      { text: actor, emphasis: true },
+      { text: " applied " },
+      { text: effectName, emphasis: true },
+      { text: " on " },
+      { text: targetsText, emphasis: true },
+      { text: "." }
+    ]
+  );
+  quickEffectTargetsModal.hide();
+  quickEffectSelection = null;
+  await refetchMapSheetState();
+  renderAll();
+}
+
 function toggleContextEnemyVisibility() {
   const token = tokenById(contextMenuTokenId);
   if (!token || token.kind !== "enemy" || !isGm) return;
@@ -1483,29 +2198,160 @@ function toggleContextEnemyVisibility() {
   renderAll();
 }
 
-function addSelectedToInitiative() {
-  const token = state.tokens.find(item => item.id === selectedId);
-  if (!token || state.initiative.some(entry => entry.tokenId === token.id)) return;
-  state.initiative.push({ tokenId: token.id, score: 0 });
+function initiativeInsertIndex(score, ignoreId = "") {
+  const value = Number(score || 0);
+  let insertIndex = 0;
+  state.initiative.forEach((entry, index) => {
+    if (entry.id !== ignoreId && Number(entry.score || 0) >= value) insertIndex = index + 1;
+  });
+  return insertIndex;
+}
+
+function placeInitiativeRow(entry) {
+  if (!entry) return;
+  const activeId = state.initiative[state.activeTurn]?.id || "";
+  const currentIndex = state.initiative.findIndex(row => row.id === entry.id);
+  if (currentIndex >= 0) state.initiative.splice(currentIndex, 1);
+  const insertIndex = initiativeInsertIndex(entry.score, entry.id);
+  state.initiative.splice(insertIndex, 0, entry);
+  if (activeId) state.activeTurn = Math.max(0, state.initiative.findIndex(row => row.id === activeId));
+}
+
+function addInitiativeEntry(event) {
+  event.preventDefault();
+  const name = el("initiativeName").value.trim();
+  if (!name) return;
+  const entry = {
+    id: uid("init"),
+    name,
+    score: Number(el("initiativeScore").value || 0)
+  };
+  placeInitiativeRow(entry);
+  el("initiativeName").value = "";
+  el("initiativeScore").value = 0;
+  state.activeTurn = clamp(state.activeTurn, 0, Math.max(0, state.initiative.length - 1));
+  renderAll();
+  el("initiativeName").focus();
+}
+
+function moveInitiativeRow(entryId, direction) {
+  const index = state.initiative.findIndex(entry => entry.id === entryId);
+  if (index < 0) return;
+  const nextIndex = clamp(index + direction, 0, state.initiative.length - 1);
+  if (nextIndex === index) return;
+  const activeId = state.initiative[state.activeTurn]?.id || "";
+  const [entry] = state.initiative.splice(index, 1);
+  state.initiative.splice(nextIndex, 0, entry);
+  if (activeId) state.activeTurn = Math.max(0, state.initiative.findIndex(row => row.id === activeId));
+  renderAll();
+}
+
+function removeInitiativeRow(entryId) {
+  const index = state.initiative.findIndex(entry => entry.id === entryId);
+  if (index < 0) return;
+  state.initiative.splice(index, 1);
+  if (state.activeTurn >= state.initiative.length) state.activeTurn = Math.max(0, state.initiative.length - 1);
   renderAll();
 }
 
 function nextTurn() {
   if (!state.initiative.length) return;
   state.activeTurn = (state.activeTurn + 1) % state.initiative.length;
-  const token = state.tokens.find(item => item.id === state.initiative[state.activeTurn]?.tokenId);
-  if (token) addTimeline(`${token.name || "Token"} begins their turn.`);
+  const row = state.initiative[state.activeTurn];
+  if (row) addTimeline(`${row.name || "Entry"} begins their turn.`);
   renderAll();
 }
 
-function addTimeline(text) {
-  state.timeline.push({ id: uid("event"), text, time: new Date().toLocaleString() });
+function timelineRowContent(row) {
+  if (Array.isArray(row.parts)) {
+    return row.parts.map(part => part?.emphasis
+      ? `<span class="timeline-emphasis">${escapeHtml(part.text)}</span>`
+      : escapeHtml(part?.text || "")
+    ).join("");
+  }
+  return escapeHtml(row.text);
+}
+
+function addTimeline(text, parts = null) {
+  state.timeline.push({ id: uid("event"), text, parts, time: new Date().toLocaleString() });
   state.timeline = state.timeline.slice(-20);
+}
+
+async function refetchMapSheetState(delay = 0) {
+  if (delay > 0) {
+    window.setTimeout(() => refreshMapTokenSheets({ save: false }), delay);
+    return;
+  }
+  await refreshMapTokenSheets({ save: false });
+}
+
+function waitForCharacterSheetBridge(frame, startedAt = Date.now()) {
+  return new Promise((resolve, reject) => {
+    const check = () => {
+      const bridge = frame.contentWindow?.PFCharacterSheetBridge;
+      if (bridge?.recalculateAndSaveCharacter && bridge?.recalculateAndSaveEnemy) {
+        resolve(bridge);
+        return;
+      }
+      if (Date.now() - startedAt > 8000) {
+        reject(new Error("Character sheet recalculation bridge did not load."));
+        return;
+      }
+      window.setTimeout(check, 100);
+    };
+    check();
+  });
+}
+
+async function characterSheetBridge() {
+  if (characterSheetBridgePromise) return characterSheetBridgePromise;
+  characterSheetBridgePromise = new Promise((resolve, reject) => {
+    characterSheetBridgeFrame = document.createElement("iframe");
+    characterSheetBridgeFrame.src = "character-sheet.html?bridge=1";
+    characterSheetBridgeFrame.tabIndex = -1;
+    characterSheetBridgeFrame.style.cssText = "position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;left:-9999px;top:-9999px;";
+    characterSheetBridgeFrame.addEventListener("load", () => {
+      waitForCharacterSheetBridge(characterSheetBridgeFrame).then(resolve).catch(reject);
+    }, { once: true });
+    document.body.appendChild(characterSheetBridgeFrame);
+  }).catch(error => {
+    characterSheetBridgePromise = null;
+    throw error;
+  });
+  return characterSheetBridgePromise;
+}
+
+async function recalculateCharacterSheetFromMap(characterId) {
+  try {
+    const bridge = await characterSheetBridge();
+    return await bridge.recalculateAndSaveCharacter(mapContextKey, characterId);
+  } catch (error) {
+    console.error(error);
+    el("mapStatus").textContent = "Could not recalculate sheet";
+    return null;
+  }
+}
+
+async function recalculateEnemySheetFromMap(enemyId) {
+  try {
+    const bridge = await characterSheetBridge();
+    return await bridge.recalculateAndSaveEnemy(mapContextKey, enemyId);
+  } catch (error) {
+    console.error(error);
+    el("mapStatus").textContent = "Could not recalculate enemy";
+    return null;
+  }
 }
 
 function updateAuraRadiusText() {
   const cells = Math.max(1, Number(el("auraRadiusCells").value || 1));
   el("auraRadiusText").textContent = `${cells} cell${cells === 1 ? "" : "s"} / ${cells * 5} ft`;
+}
+
+function updateAuraEffectSummary() {
+  const hasEffect = Boolean(auraEffectDraft?.name);
+  el("auraEffectSummary").textContent = hasEffect ? auraEffectDraft.name : "None";
+  el("auraRemoveOutWrap").classList.toggle("d-none", !hasEffect);
 }
 
 function openAuraOptions() {
@@ -1514,10 +2360,13 @@ function openAuraOptions() {
   hideContextMenu();
   auraEditingTokenId = token.id;
   const aura = token.aura || {};
+  auraEffectDraft = aura.effect ? structuredClone(aura.effect) : null;
   el("auraVisible").checked = Boolean(aura.visible);
   el("auraRadiusCells").value = Math.max(1, Number(aura.radius || 1));
   el("auraColor").value = aura.color || (token.kind === "enemy" ? "#b02a37" : "#8fd19e");
+  el("auraRemoveOutOfRange").checked = Boolean(aura.removeWhenOutOfRange);
   updateAuraRadiusText();
+  updateAuraEffectSummary();
   auraModal.show();
 }
 
@@ -1528,10 +2377,13 @@ function saveAuraOptions(event) {
   token.aura = {
     visible: el("auraVisible").checked,
     radius: Math.max(1, Number(el("auraRadiusCells").value || 1)),
-    color: el("auraColor").value || "#8fd19e"
+    color: el("auraColor").value || "#8fd19e",
+    effect: auraEffectDraft ? structuredClone(auraEffectDraft) : null,
+    removeWhenOutOfRange: Boolean(auraEffectDraft && el("auraRemoveOutOfRange").checked)
   };
   auraModal.hide();
   auraEditingTokenId = "";
+  auraEffectDraft = null;
   renderAll();
 }
 
@@ -1605,6 +2457,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const user = await PFApp.requireAuth();
   if (!user) return;
   currentUserId = user.id;
+  currentUserEmail = user.email || "";
 
   el("gridSize").addEventListener("change", () => {
     localGridSize = clamp(Number(el("gridSize").value || 48), 24, 96);
@@ -1628,6 +2481,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!mapContextKey) return;
     if (event.key?.startsWith(`pf_character_sheet_updated_${mapContextKey}_`) ||
         event.key?.startsWith(`pf_enemy_sheet_updated_${mapContextKey}_`) ||
+        event.key?.startsWith(`pf_buffs_updated_${mapContextKey}_`) ||
         event.key?.startsWith(`pf_map_sheet_hp_updated_${mapContextKey}_`)) {
       refreshMapTokenSheets({ save: false });
     }
@@ -1638,24 +2492,29 @@ document.addEventListener("DOMContentLoaded", async () => {
   el("backgroundOptionsForm").addEventListener("submit", saveBackgroundOptions);
   enemyPickerModal = new bootstrap.Modal(el("enemyPickerModal"));
   mapEffectsModal = new bootstrap.Modal(el("mapEffectsModal"));
+  quickEffectModal = new bootstrap.Modal(el("quickEffectModal"));
+  quickEffectTargetsModal = new bootstrap.Modal(el("quickEffectTargetsModal"));
   el("enemyPickerSearch").addEventListener("input", renderEnemyPicker);
+  el("quickEffectSearch").addEventListener("input", renderQuickEffects);
   el("addCharacterToken").addEventListener("click", () => addToken("character"));
   el("addEnemyToken").addEventListener("click", () => addToken("enemy"));
   el("addRectShape").addEventListener("click", () => addShape("rect"));
   el("addCircleShape").addEventListener("click", () => addShape("circle"));
   el("deleteSelected").addEventListener("click", deleteSelected);
   el("openAuraOptions").addEventListener("click", openAuraOptions);
+  el("openApplyEffect").addEventListener("click", openQuickApplyEffect);
+  el("chooseAuraEffect").addEventListener("click", openAuraEffectPicker);
+  el("clearAuraEffect").addEventListener("click", () => {
+    auraEffectDraft = null;
+    updateAuraEffectSummary();
+  });
   el("toggleEnemyVisibility").addEventListener("click", toggleContextEnemyVisibility);
   el("removeTokenFromMap").addEventListener("click", removeContextMenuToken);
+  el("confirmQuickEffectTargets").addEventListener("click", confirmQuickEffectTargets);
   auraModal = new bootstrap.Modal(el("auraOptionsModal"));
   el("auraRadiusCells").addEventListener("input", updateAuraRadiusText);
   el("auraOptionsForm").addEventListener("submit", saveAuraOptions);
-  el("addSelectedInitiative").addEventListener("click", addSelectedToInitiative);
-  el("sortInitiative").addEventListener("click", () => {
-    state.initiative.sort((a, b) => Number(b.score || 0) - Number(a.score || 0));
-    state.activeTurn = 0;
-    renderAll();
-  });
+  el("initiativeForm").addEventListener("submit", addInitiativeEntry);
   el("nextTurn").addEventListener("click", nextTurn);
   el("timelineForm").addEventListener("submit", event => {
     event.preventDefault();
@@ -1671,8 +2530,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.addEventListener("keydown", event => {
     if (event.key === "Escape") hideContextMenu();
   });
-  window.addEventListener("resize", hideContextMenu);
-  window.addEventListener("scroll", hideContextMenu, true);
+  window.addEventListener("resize", () => {
+    hideContextMenu();
+    updateAuraToastPosition();
+  });
+  window.addEventListener("scroll", () => {
+    hideContextMenu();
+    updateAuraToastPosition();
+  }, true);
 
   const requiredContext = await PFApp.requireGameContext();
   if (!requiredContext) return;

@@ -279,8 +279,7 @@ function renderBuffPickerResults() {
   if (!container) return;
   const term = document.getElementById("buffPickerSearch")?.value.trim().toLowerCase() || "";
   const matches = buffs
-    .filter(buff => !term || buffSearchText(buff).includes(term))
-    .slice(0, 80);
+    .filter(buff => !term || buffSearchText(buff).includes(term));
 
   if (!matches.length) {
     container.innerHTML = `<div class="small-text">No matching effects found.</div>`;

@@ -538,6 +538,8 @@ let currentUserId = "";
 let currentSheetOwnerId = "";
 let isEnemySheetMode = false;
 let enemySheetId = "";
+let characterSheetReadyResolve = null;
+const characterSheetReady = new Promise(resolve => { characterSheetReadyResolve = resolve; });
 let sheetViewMode = sessionStorage.getItem("pf_character_sheet_view") || "full";
 let customSkills = [];
 let inventoryItemModal = null;
@@ -1739,11 +1741,12 @@ async function loadActiveBuffs(characterId = currentSheetId) {
   lastBuffRefresh = localStorage.getItem(buffRefreshKey(characterId)) || "";
 }
 
-async function refreshBuffsIfChanged(force = false) {
+async function refreshBuffsIfChanged(force = false, saveAfterRefresh = false) {
   const stamp = localStorage.getItem(buffRefreshKey()) || "";
   if (!force && stamp === lastBuffRefresh) return;
   await loadActiveBuffs();
   recalculateSheet();
+  if (saveAfterRefresh && currentSheetId && !isEnemySheetMode) await saveSheetNow(true);
 }
 
 async function openEffectTrackerModal() {
@@ -2665,6 +2668,67 @@ async function loadCurrentSheet(sheetId = currentSheetId) {
   }
 }
 
+async function recalculateAndSaveCharacterSheet(contextKey, characterId) {
+  await characterSheetReady;
+  if (!contextKey || !characterId) return null;
+  isEnemySheetMode = false;
+  enemySheetId = "";
+  sheetContextKey = contextKey;
+  const saved = await PFApp.loadCharacterSheetForRecalculation?.(characterId, sheetContextKey)
+    || await PFApp.loadCharacterSheet("", sheetContextKey, characterId);
+  if (!saved?.sheet) return null;
+  currentSheetId = saved.id;
+  currentSheetOwnerId = saved.user_id || currentUserId;
+  activeBuffs = await PFApp.loadCharacterBuffStateForRecalculation?.(currentSheetId, sheetContextKey) || [];
+  lastBuffRefresh = localStorage.getItem(buffRefreshKey(currentSheetId)) || "";
+  restoreSheet(saved.sheet);
+  el("characterName").value = saved.character_name;
+  recalculateSheet();
+  const nextSheet = collectSheet();
+  const updated = await PFApp.updateCharacterCalculatedSummary?.(currentSheetId, nextSheet.calculated || {}, sheetContextKey);
+  if (updated?.id) {
+    localStorage.setItem(`pf_character_sheet_updated_${sheetContextKey}_${updated.id}`, String(Date.now()));
+    return nextSheet.calculated || null;
+  }
+  return null;
+}
+
+async function recalculateAndSaveEnemySheet(contextKey, enemyId) {
+  await characterSheetReady;
+  if (!contextKey || !enemyId) return null;
+  sheetContextKey = contextKey;
+  const enemy = await PFApp.loadEnemyForEffectApplication?.(enemyId, sheetContextKey)
+    || await PFApp.loadEnemy(enemyId, sheetContextKey);
+  if (!enemy?.sheet) return null;
+  isEnemySheetMode = true;
+  enemySheetId = enemy.id;
+  currentSheetId = enemy.id;
+  currentSheetOwnerId = currentUserId;
+  activeBuffs = Array.isArray(enemy.sheet.activeBuffs) ? enemy.sheet.activeBuffs : [];
+  restoreSheet(enemy.sheet);
+  el("characterName").value = enemy.name;
+  recalculateSheet();
+  const nextSheet = collectSheet();
+  nextSheet.activeBuffs = activeBuffs;
+  const savedEnemy = await PFApp.updateEnemyEffectSummary?.(enemy.id, activeBuffs, nextSheet.calculated || {}, sheetContextKey)
+    || await PFApp.saveEnemy({
+      id: enemy.id,
+      name: enemy.name || el("characterName").value.trim() || "Enemy",
+      visible: enemy.visible !== false,
+      sheet: nextSheet
+    }, sheetContextKey);
+  if (savedEnemy?.id) {
+    localStorage.setItem(`pf_enemy_sheet_updated_${sheetContextKey}_${savedEnemy.id}`, String(Date.now()));
+    return nextSheet.calculated || null;
+  }
+  return null;
+}
+
+window.PFCharacterSheetBridge = {
+  recalculateAndSaveCharacter: recalculateAndSaveCharacterSheet,
+  recalculateAndSaveEnemy: recalculateAndSaveEnemySheet
+};
+
 async function loadCharacterList(selectedId = currentSheetId) {
   await PFApp.setupCharacterSelect("navCharacterSelect", sheetContextKey, null, { dispatch: false });
   const select = el("navCharacterSelect");
@@ -2755,10 +2819,14 @@ async function initCharacterSheet() {
     else resetForNewCharacter();
   });
   window.addEventListener("focus", () => {
-    if (!isEnemySheetMode) refreshBuffsIfChanged();
+    if (!isEnemySheetMode) refreshBuffsIfChanged(false, true);
   });
   document.addEventListener("visibilitychange", () => {
-    if (!document.hidden && !isEnemySheetMode) refreshBuffsIfChanged();
+    if (!document.hidden && !isEnemySheetMode) refreshBuffsIfChanged(false, true);
+  });
+  window.addEventListener("storage", event => {
+    if (isEnemySheetMode || !currentSheetId) return;
+    if (event.key === buffRefreshKey(currentSheetId)) refreshBuffsIfChanged(true, true);
   });
   if (isEnemySheetMode) {
     await loadEnemySheet(enemySheetId);
@@ -2796,6 +2864,7 @@ async function initCharacterSheet() {
   el("addInventoryEffect").addEventListener("click", () => addInventoryEffectRow());
   setupInventoryScalingControls();
   recalculateSheet();
+  characterSheetReadyResolve?.(true);
 }
 
 initCharacterSheet();

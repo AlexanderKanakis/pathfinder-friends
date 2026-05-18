@@ -23,6 +23,10 @@
     const mount = document.getElementById("appNavbar");
     if (!mount) return;
     const page = currentPage();
+    if (page === "auth.html") {
+      mount.innerHTML = "";
+      return;
+    }
 
     mount.innerHTML = `
       <nav class="navbar navbar-expand-lg navbar-dark bg-black border-bottom">
@@ -52,7 +56,7 @@
                 }
 
                 return `
-                  <li class="nav-item">
+                  <li class="nav-item ${link.href === "enemies.html" ? "d-none" : ""}" data-nav-item="${link.href}">
                     <a class="nav-link ${link.href === page ? "active" : ""}" href="${link.href}">${link.label}</a>
                   </li>
                 `;

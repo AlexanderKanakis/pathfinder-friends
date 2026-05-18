@@ -161,9 +161,21 @@
     if (currentUser) {
       await setupContextSelect("navContextSelect", async contextKey => {
         await setupCharacterSelect("navCharacterSelect", contextKey);
+        await updateNavbarAccess(contextKey, admin);
       });
       await setupCharacterSelect("navCharacterSelect", getSelectedContextKey(), null, { dispatch: false });
+      await updateNavbarAccess(getSelectedContextKey(), admin);
+    } else {
+      await updateNavbarAccess(getSelectedContextKey(), false);
     }
+  }
+
+  async function updateNavbarAccess(contextKey = getSelectedContextKey(), admin = false) {
+    const enemiesItem = document.querySelector('[data-nav-item="enemies.html"]');
+    if (!enemiesItem) return;
+
+    const canManageEnemies = admin || await isGameManager(contextKey);
+    enemiesItem.classList.toggle("d-none", !canManageEnemies);
   }
 
   function showLockedMessage(message) {
@@ -658,7 +670,7 @@
 
   async function saveBuffState(activeBuffs, contextKey = getSelectedContextKey(), characterId = "") {
     const user = await getUser();
-    if (!client || !user) return;
+    if (!client || !user) return { ok: false, error: new Error("Not signed in") };
     const context = normalizeContext(contextKey);
 
     const payload = {
@@ -683,14 +695,56 @@
     const { data: existing, error: existingError } = await existingQuery;
     if (existingError) {
       console.error(existingError);
-      return;
+      return { ok: false, error: existingError };
     }
 
     const { error } = existing?.[0]?.id
       ? await client.from("user_buff_state").update(payload).eq("id", existing[0].id)
       : await client.from("user_buff_state").insert(payload);
 
-    if (error) console.error(error);
+    if (error) {
+      console.error(error);
+      return { ok: false, error };
+    }
+
+    return { ok: true };
+  }
+
+  async function loadCharacterBuffStateForRecalculation(characterId, contextKey = getSelectedContextKey()) {
+    const context = normalizeContext(contextKey);
+    if (!client || !characterId) return [];
+
+    const { data, error } = await client.rpc("get_character_buff_state_for_recalculation", {
+      target_sheet_id: characterId,
+      target_context_key: context.contextKey
+    });
+
+    if (error) {
+      console.error(error);
+      return [];
+    }
+
+    const row = Array.isArray(data) ? data[0] : data;
+    return normalizeActiveBuffState(row?.active_buffs);
+  }
+
+  async function applyCharacterMapEffect(characterId, effect, contextKey = getSelectedContextKey()) {
+    const context = normalizeContext(contextKey);
+    if (!client || !characterId || !effect) return { ok: false, error: new Error("Missing character or effect") };
+
+    const { data, error } = await client.rpc("apply_character_map_effect", {
+      target_sheet_id: characterId,
+      target_context_key: context.contextKey,
+      effect
+    });
+
+    if (error) {
+      console.error(error);
+      return { ok: false, error };
+    }
+
+    const row = Array.isArray(data) ? data[0] : data;
+    return { ok: true, activeBuffs: normalizeActiveBuffState(row?.active_buffs) };
   }
 
   function normalizeBuffDefinition(row) {
@@ -924,6 +978,23 @@
     return Array.isArray(data) ? data[0] || null : data;
   }
 
+  async function loadCharacterSheetForRecalculation(sheetId, contextKey = getSelectedContextKey()) {
+    const context = normalizeContext(contextKey);
+    if (!client || !sheetId) return null;
+
+    const { data, error } = await client.rpc("get_character_sheet_for_recalculation", {
+      target_sheet_id: sheetId,
+      target_context_key: context.contextKey
+    });
+
+    if (error) {
+      console.error(error);
+      return null;
+    }
+
+    return Array.isArray(data) ? data[0] || null : data;
+  }
+
   async function updateCharacterCurrentHp(sheetId, currentHp, contextKey = getSelectedContextKey()) {
     const current = await loadCharacterSheet("", contextKey, sheetId);
     if (!current?.sheet) return null;
@@ -948,6 +1019,24 @@
     }
 
     return data;
+  }
+
+  async function updateCharacterCalculatedSummary(sheetId, calculated, contextKey = getSelectedContextKey()) {
+    const context = normalizeContext(contextKey);
+    if (!client || !sheetId) return null;
+
+    const { data, error } = await client.rpc("update_character_calculated_summary", {
+      target_sheet_id: sheetId,
+      target_context_key: context.contextKey,
+      calculated
+    });
+
+    if (error) {
+      console.error(error);
+      return null;
+    }
+
+    return Array.isArray(data) ? data[0] || null : data;
   }
 
   async function saveCharacterSheet(characterName, sheet, contextKey = getSelectedContextKey(), sheetId = null) {
@@ -1100,6 +1189,63 @@
     }
 
     return data ? normalizeEnemy(data) : null;
+  }
+
+  async function loadEnemyForEffectApplication(enemyId, contextKey = getSelectedContextKey()) {
+    const context = normalizeContext(contextKey);
+    if (!client || !enemyId) return null;
+
+    const { data, error } = await client.rpc("get_enemy_for_effect_application", {
+      target_enemy_id: enemyId,
+      target_context_key: context.contextKey
+    });
+
+    if (error) {
+      console.error(error);
+      return null;
+    }
+
+    const row = Array.isArray(data) ? data[0] : data;
+    return row ? normalizeEnemy(row) : null;
+  }
+
+  async function applyEnemyMapEffect(enemyId, effect, contextKey = getSelectedContextKey()) {
+    const context = normalizeContext(contextKey);
+    if (!client || !enemyId || !effect) return null;
+
+    const { data, error } = await client.rpc("apply_enemy_map_effect", {
+      target_enemy_id: enemyId,
+      target_context_key: context.contextKey,
+      effect
+    });
+
+    if (error) {
+      console.error(error);
+      return null;
+    }
+
+    const row = Array.isArray(data) ? data[0] : data;
+    return row ? normalizeEnemy(row) : null;
+  }
+
+  async function updateEnemyEffectSummary(enemyId, activeBuffs, calculated, contextKey = getSelectedContextKey()) {
+    const context = normalizeContext(contextKey);
+    if (!client || !enemyId) return null;
+
+    const { data, error } = await client.rpc("update_enemy_effect_summary", {
+      target_enemy_id: enemyId,
+      target_context_key: context.contextKey,
+      active_buffs: activeBuffs || [],
+      calculated: calculated || {}
+    });
+
+    if (error) {
+      console.error(error);
+      return null;
+    }
+
+    const row = Array.isArray(data) ? data[0] : data;
+    return row ? normalizeEnemy(row) : null;
   }
 
   async function saveEnemy(enemy, contextKey = getSelectedContextKey()) {
@@ -1311,18 +1457,25 @@
     saveDiceState,
     loadBuffState,
     saveBuffState,
+    loadCharacterBuffStateForRecalculation,
+    applyCharacterMapEffect,
     loadBuffDefinitions,
     saveBuffDefinition,
     updateBuffDefinition,
     deleteBuffDefinition,
     loadCharacterSheets,
     loadCharacterSheet,
+    loadCharacterSheetForRecalculation,
     saveCharacterSheet,
+    updateCharacterCalculatedSummary,
     updateCharacterCurrentHp,
     loadContextMembers,
     loadContextCharacters,
     loadEnemies,
     loadEnemy,
+    loadEnemyForEffectApplication,
+    applyEnemyMapEffect,
+    updateEnemyEffectSummary,
     saveEnemy,
     updateEnemyCurrentHp,
     duplicateEnemy,

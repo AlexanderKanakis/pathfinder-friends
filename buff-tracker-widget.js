@@ -793,8 +793,7 @@
       if (!this.resultsEl) return;
       const term = this.searchEl?.value.trim().toLowerCase() || "";
       const matches = this.effects
-        .filter(effect => !term || searchText(effect).includes(term))
-        .slice(0, 80);
+        .filter(effect => !term || searchText(effect).includes(term));
 
       if (!matches.length) {
         this.resultsEl.innerHTML = `<div class="small-text">No matching effects found.</div>`;
