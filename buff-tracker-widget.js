@@ -16,8 +16,15 @@
       .effect-tracker-inline input[type="number"] { width: 62px; }
       .effect-tracker-chip { display: inline-block; margin: 2px 3px 2px 0; color: #ddd; }
       .effect-tracker-active { background: #242424; border: 1px solid #444; border-radius: 8px; padding: 10px; margin-bottom: 8px; }
+      .effect-active-group { margin-top: 10px; }
+      .effect-active-group-title { color: #bbb; font-size: 12px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; margin: 0 0 6px; }
       .effect-active-toolbar { display: flex; justify-content: space-between; align-items: end; gap: 10px; margin-bottom: 8px; }
       .effect-active-toolbar select { max-width: 180px; }
+      .effect-active-head { display: grid; grid-template-columns: minmax(0, 1fr) 68px; gap: 10px; align-items: start; }
+      .effect-active-actions { display: grid; grid-template-columns: 30px 30px; gap: 4px; justify-content: end; }
+      .effect-active-actions .btn { width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center; padding: 0; }
+      .effect-active-adjustments { display: flex; flex-wrap: wrap; gap: 8px; align-items: end; margin-top: 8px; }
+      .effect-active-adjustments .effect-tracker-inline input[type="number"] { width: 68px; }
       .effect-duration-grid { display: grid; grid-template-columns: .75fr 1fr .7fr; gap: 8px; align-items: end; }
       .effect-toggle-field { min-height: 31px; display: flex; align-items: center; margin: 0; padding-left: 0; }
       .effect-toggle-field .form-check-input { width: 2.75rem; height: 1.4rem; margin-left: 0; cursor: pointer; }
@@ -81,7 +88,7 @@
   const BONUS_TYPES = ["untyped","alchemical","condition","penalty","armor","circumstance","competence","deflection","dodge","enhancement","insight","luck","morale","natural armor","profane","resistance","sacred","shield","size"];
   const DURATION_UNITS = ["variable", "turn", "round", "minute", "hour", "day"];
   const EFFECT_CATEGORIES = ["Spell", "Special Ability", "Feat", "Debuff", "Condition"];
-  const ACTIVE_CATEGORY_PRIORITY = ["Spell", "Debuff", "Condition"];
+  const ACTIVE_CATEGORY_PRIORITY = ["Spell", "Special Ability", "Feat", "Debuff", "Condition", "Item"];
 
   function titleCaseStat(value) {
     const key = String(value || "").toLowerCase().trim();
@@ -108,6 +115,16 @@
 
   function isItemSourcedEffect(effect = {}) {
     return Boolean(effect.sourceLootId || effect.source_loot_id);
+  }
+
+  function groupedActiveRows(rows) {
+    return rows.reduce((groups, row) => {
+      const category = row.effect.category || "Effect";
+      const group = groups.find(entry => entry.category === category);
+      if (group) group.rows.push(row);
+      else groups.push({ category, rows: [row] });
+      return groups;
+    }, []);
   }
 
   function statOptionValue(data = {}) {
@@ -218,6 +235,20 @@
     if (effect.durationLabel) return effect.durationLabel;
     if (effect.computedDuration !== undefined && effect.computedDuration !== null) return formatDurationRounds(effect.computedDuration);
     return durationLabel(effect);
+  }
+
+  function appliedDurationLabel(effect) {
+    if (effect.permanent) return "Permanent";
+    if (isCondition(effect)) {
+      const turns = Math.max(1, Number(effect.turns || effect.remaining || 1));
+      return `${turns} turn${turns === 1 ? "" : "s"}`;
+    }
+    const baseDurationLabel = durationLabel(effect);
+    const computedDuration = parseDuration(effect, effect.casterLevel || 1);
+    if (computedDuration === null) return baseDurationLabel;
+    return durationUsesCasterLevel(effect)
+      ? `${baseDurationLabel} | CL ${effect.casterLevel || 1}: ${formatDurationRounds(computedDuration)}`
+      : `${baseDurationLabel} | ${formatDurationRounds(computedDuration)}`;
   }
 
   function bonusText(bonus) {
@@ -940,6 +971,49 @@
       this.queueSave();
     }
 
+    updateActiveDuration(index, patch = {}) {
+      const effect = this.active[index];
+      if (!effect) return;
+      Object.assign(effect, patch);
+      if (effect.permanent) {
+        effect.remaining = null;
+        effect.computedDuration = null;
+      } else if (isCondition(effect)) {
+        const turns = Math.max(1, Number(effect.turns || 1));
+        effect.turns = turns;
+        effect.remaining = turns;
+        effect.computedDuration = turns;
+      } else {
+        const computedDuration = parseDuration(effect, effect.casterLevel || 1);
+        effect.remaining = computedDuration;
+        effect.computedDuration = computedDuration;
+      }
+      effect.durationLabel = appliedDurationLabel(effect);
+      this.renderActive();
+      this.notifyChange();
+      this.queueSave();
+    }
+
+    activeAdjustmentControls(effect, index) {
+      const needsCl = durationUsesCasterLevel(effect);
+      const condition = isCondition(effect);
+      if (!needsCl && !condition) return "";
+      return `
+        <div class="effect-active-adjustments">
+          ${needsCl ? `
+            <label class="small effect-tracker-inline">CL
+              <input class="form-control form-control-sm" type="number" min="1" value="${escapeHtml(effect.casterLevel || 1)}" data-active-cl="${index}">
+            </label>
+          ` : ""}
+          ${condition ? `
+            <label class="small effect-tracker-inline">Turns
+              <input class="form-control form-control-sm" type="number" min="1" value="${escapeHtml(effect.turns || effect.remaining || 1)}" data-active-turns="${index}">
+            </label>
+          ` : ""}
+        </div>
+      `;
+    }
+
     renderActive() {
       if (!this.activeEl) return;
       if (!this.options.characterId) {
@@ -979,31 +1053,50 @@
         return;
       }
 
-      this.activeEl.innerHTML = toolbar + filteredActive.map(({ effect, index }) => {
+      const renderRow = ({ effect, index }) => {
         const detailsId = `${this.prefix}Details${index}`;
         const bonuses = (effect.bonuses || []).map(bonus => `<div class="small-text">${escapeHtml(bonusText(bonus))}</div>`).join("");
         const lockedToItem = isItemSourcedEffect(effect);
         return `
           <article class="effect-tracker-active">
-            <div class="d-flex justify-content-between align-items-start gap-2">
+            <div class="effect-active-head">
               <div>
                 <strong>${escapeHtml(effect.name)}</strong>
                 <div class="small-text">${escapeHtml(effect.category || "Effect")} | ${escapeHtml(activeDuration(effect))}</div>
+                ${this.activeAdjustmentControls(effect, index)}
               </div>
-              <div class="d-flex gap-1">
+              <div class="effect-active-actions">
                 <button class="btn btn-outline-info btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#${detailsId}" aria-label="Show effect details">i</button>
-                ${lockedToItem
-                  ? `<span class="badge text-bg-secondary align-self-center" title="Unequip the item to remove this effect"><i class="bi bi-lock"></i> Item</span>`
-                  : `<button class="btn btn-danger btn-sm" type="button" data-remove-effect="${index}" aria-label="Remove effect"><i class="bi bi-trash"></i></button>`}
+                ${lockedToItem ? "" : `<button class="btn btn-danger btn-sm" type="button" data-remove-effect="${index}" aria-label="Remove effect"><i class="bi bi-trash"></i></button>`}
               </div>
             </div>
             <div id="${detailsId}" class="collapse mt-2">${bonuses || '<div class="small-text">No mechanical bonuses listed.</div>'}</div>
           </article>
         `;
-      }).join("");
+      };
+      this.activeEl.innerHTML = toolbar + groupedActiveRows(filteredActive).map(group => `
+        <section class="effect-active-group">
+          <div class="effect-active-group-title">${escapeHtml(group.category)}</div>
+          ${group.rows.map(renderRow).join("")}
+        </section>
+      `).join("");
 
       this.activeEl.querySelectorAll("[data-remove-effect]").forEach(button => {
         button.addEventListener("click", () => this.removeEffect(Number(button.dataset.removeEffect)));
+      });
+      this.activeEl.querySelectorAll("[data-active-cl]").forEach(input => {
+        input.addEventListener("change", () => {
+          this.updateActiveDuration(Number(input.dataset.activeCl), {
+            casterLevel: Math.max(1, Number.parseInt(input.value, 10) || 1)
+          });
+        });
+      });
+      this.activeEl.querySelectorAll("[data-active-turns]").forEach(input => {
+        input.addEventListener("change", () => {
+          this.updateActiveDuration(Number(input.dataset.activeTurns), {
+            turns: Math.max(1, Number.parseInt(input.value, 10) || 1)
+          });
+        });
       });
       this.bindActiveFilter();
     }

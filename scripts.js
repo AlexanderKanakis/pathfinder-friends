@@ -164,10 +164,10 @@ function val(name) {
 return elem(name).value;
 }
 
-var errorColor = "#FA5858";
-var baseColor = "white";
-var boxes = ["DC", "GP", "SP", "CP", "PriorWork", "Check", "ItemMultiple"];
-var bools = ["IsMaster", "IsSwift", "IsByDay"];
+var errorColor = "#5f2323";
+var baseColor = "#2b2b2b";
+var boxes = ["DC", "GP", "SP", "CP", "PriorWork", "Check", "ItemMultiple", "MissingPrereqs", "ItemCostGP", "ComponentCostGP"];
+var bools = ["IsMaster", "IsSwift", "IsByDay", "RestrictSkill", "RestrictClassAlignment", "AcceleratedCrafting", "CooperativeCrafting", "ArcaneBuilder", "FathersForgehammer", "HedgeMagician"];
 
 function getDistinctItemsByName() {
     const seen = new Set();
@@ -391,16 +391,44 @@ function removeBonus(idx) {
     calculateCost()
 }
 
+function moneyToCp(gp = 0, sp = 0, cp = 0) {
+    return Math.round((Number(gp) || 0) * 100 + (Number(sp) || 0) * 10 + (Number(cp) || 0))
+}
+
+function cpToMoney(cpValue = 0) {
+    const cost = { GP: 0, SP: 0, CP: Math.max(0, Math.round(Number(cpValue) || 0)) }
+    normalizeCost(cost)
+    return cost
+}
+
+function moneyStringFromCp(cpValue = 0) {
+    const cost = cpToMoney(cpValue)
+    const parts = []
+    if (cost.GP) parts.push(`${cost.GP} GP`)
+    if (cost.SP) parts.push(`${cost.SP} SP`)
+    if (cost.CP) parts.push(`${cost.CP} CP`)
+    return parts.length ? parts.join(", ") : "0 GP"
+}
+
+function toggleRestrictions() {
+    const detailDiv = document.getElementById(`restriction-details`);
+    if (detailDiv) detailDiv.style.display = detailDiv.style.display === 'none' ? 'block' : 'none';
+}
+
 function calculateCost() {
     const spells = calculateSpellCost()
     const bonus = calculateBonuses()
-    const spellResistance = 0
-
     const finalCost = spells + bonus
     const costDiv = document.getElementById(`new-cost`);
-    costDiv.innerHTML = `<b>Cost:</b>&nbsp;${finalCost/2}&nbsp;gp`
+    costDiv.innerHTML = `<b>Cost:</b>&nbsp;${moneyStringFromCp((finalCost / 2) * 100)}`
     const priceDiv = document.getElementById(`new-price`);
-    priceDiv.innerHTML = `<b>Cost:</b>&nbsp;${finalCost}&nbsp;gp`
+    priceDiv.innerHTML = `<b>Price:</b>&nbsp;${moneyStringFromCp(finalCost * 100)}`
+    if (elem("GP")) {
+        const price = cpToMoney(finalCost * 100)
+        elem("GP").value = price.GP
+        elem("SP").value = price.SP
+        elem("CP").value = price.CP
+    }
 }
 
 function calculateSpellCost() {
@@ -804,12 +832,14 @@ function isInt(formValue) {
 
 function resetState() {
     for (var i = 0; i < boxes.length; ++i) {
-        elem(boxes[i]).style.backgroundColor = baseColor;
+        if (elem(boxes[i])) elem(boxes[i]).style.backgroundColor = baseColor;
     }
     elem("Progress").value = "";
     elem("TotalProgress").value = "";
     elem("TimeTaken").value = "";
     elem("AmountToPay").value = "";
+    if (elem("MagicCraftDc")) elem("MagicCraftDc").value = "";
+    if (elem("MagicFinalPrice")) elem("MagicFinalPrice").value = "";
     }
 
     function setItemCountState() {
@@ -827,6 +857,7 @@ function getValues() {
     var values = {};
     var hasError = false;
     for (var i = 0; i < boxes.length; ++i) {
+        if (!elem(boxes[i])) continue;
         var value = val(boxes[i]);
         if (!isInt(value) || parseInt(value) < 0) {
         elem(boxes[i]).style.backgroundColor = errorColor;
@@ -841,7 +872,7 @@ function getValues() {
         return;
     }
     for (var i = 0; i < bools.length; ++i) {
-        values[bools[i]] = elem(bools[i]).checked;
+        values[bools[i]] = Boolean(elem(bools[i])?.checked);
     }
     if (values["GP"] == 0 && values["SP"] == 0 && values["CP"] == 0) {
         elem("GP").style.backgroundColor = errorColor;
@@ -853,17 +884,21 @@ function getValues() {
 }
 
 function computeWorkNeeded(values) {
-    if (values["IsMaster"]) {
-        values["WorkNeeded"] = values["GP"];
-    } else {
-        values["WorkNeeded"] = values["GP"] * 10 + values["SP"];
-    }
-    if (values["IsSwift"]) {
-        values["WorkNeeded"] = parseInt(values["WorkNeeded"] / 2);
-    }
-    if (values["WorkNeeded"] < 1) {
-        values["WorkNeeded"] = 1;
-    }
+    const basePriceCp = moneyToCp(values["GP"], values["SP"], values["CP"]);
+    let restrictedBaseCp = basePriceCp;
+    if (values["RestrictSkill"]) restrictedBaseCp *= 0.9;
+    if (values["RestrictClassAlignment"]) restrictedBaseCp *= 0.7;
+    values["BasePriceCp"] = Math.round(basePriceCp);
+    values["RestrictedBaseCp"] = Math.round(restrictedBaseCp);
+    values["ItemCostCp"] = moneyToCp(values["ItemCostGP"] || 0, 0, 0);
+    values["ComponentCostCp"] = moneyToCp(values["ComponentCostGP"] || 0, 0, 0);
+    values["FinalPriceCp"] = values["RestrictedBaseCp"] + values["ItemCostCp"] + values["ComponentCostCp"];
+    values["CreationCostCp"] = Math.round((values["RestrictedBaseCp"] / 2) + values["ItemCostCp"] + values["ComponentCostCp"]);
+    if (values["HedgeMagician"]) values["CreationCostCp"] = Math.round(values["CreationCostCp"] * 0.95);
+    values["WorkNeeded"] = Math.max(1, Math.ceil(values["FinalPriceCp"] / 100));
+    values["CraftDc"] = 5 + Math.max(1, Number(values["DC"] || 1)) + (Math.max(0, Number(values["MissingPrereqs"] || 0)) * 5) + (values["AcceleratedCrafting"] ? 5 : 0);
+    values["CheckBonus"] = (values["CooperativeCrafting"] ? 2 : 0) + (values["ArcaneBuilder"] ? 4 : 0);
+    values["EffectiveCheck"] = Number(values["Check"] || 0) + values["CheckBonus"];
     }
 
     function multiplyCost(cost, multiple) {
@@ -884,56 +919,34 @@ function addCosts(cost, newCost) {
     }
 
     function normalizeCost(cost) {
-    if (cost["CP"] > 10) {
+    if (cost["CP"] >= 10) {
         cost["SP"] += parseInt(cost["CP"] / 10);
         cost["CP"] = parseInt(cost["CP"] % 10);
     }
-    if (cost["SP"] > 10) {
+    if (cost["SP"] >= 10) {
         cost["GP"] += parseInt(cost["SP"] / 10);
         cost["SP"] = parseInt(cost["SP"] % 10);
     } 
 }
 
 function setStatus(values) {
-    // Set progress
-    if (values["TotalWorkDone"] >= values["WorkNeeded"]) {
-        var extraWork = values["TotalWorkDone"] - values["WorkNeeded"];
-        var workDone = values["WorkDone"] - extraWork;
-        var percentWorkDone = parseInt(100 * workDone / values["WorkNeeded"]);
-        elem("Progress").value = percentWorkDone + "% Progress (" + workDone + ")";
-        elem("TotalProgress").value = "100% Complete (" + values["WorkNeeded"]
-            + "/" + values["WorkNeeded"] + ")";
-    } else {
-        var percentWorkDone = parseInt(100 * values["WorkDone"] / values["WorkNeeded"]);
-        elem("Progress").value = percentWorkDone + "% Progress (" + values["WorkDone"] + ")";
-        var percentComplete = parseInt(100 * values["TotalWorkDone"] / values["WorkNeeded"]);
-        elem("TotalProgress").value = percentComplete + "% Complete (" + values["TotalWorkDone"]
-            + "/" + values["WorkNeeded"] + ")";
-    }
+    const checkResult = values["EffectiveCheck"] >= values["CraftDc"]
+        ? "check succeeds"
+        : values["CraftDc"] - values["EffectiveCheck"] >= 5
+          ? "fails by 5+: cursed item risk"
+          : "check fails";
+    elem("Progress").value = `${values["DailyProgressGp"]} gp/day | ${checkResult}`;
+    var percentComplete = parseInt(100 * values["TotalWorkDone"] / values["WorkNeeded"]);
+    elem("TotalProgress").value = `${Math.min(100, percentComplete)}% Complete (${Math.min(values["TotalWorkDone"], values["WorkNeeded"])}/${values["WorkNeeded"]} gp)`;
+    if (elem("MagicCraftDc")) elem("MagicCraftDc").value = `${values["CraftDc"]} (effective check ${values["EffectiveCheck"]})`;
+    if (elem("MagicFinalPrice")) elem("MagicFinalPrice").value = moneyStringFromCp(values["FinalPriceCp"]);
     var timeTaken = values["TimeTaken"];
     var weeks = timeTaken["Weeks"];
     var weeksStr = (weeks > 0) ? (weeks + " week" + (weeks > 1 ? "s" : "")) : "";
     var days = timeTaken["Days"];
     var daysStr = (days == 0 && weeks > 0) ? "" : (days + " day" + (days == 1 ? "" : "s"));
-    elem("TimeTaken").value = weeksStr + (weeksStr == "" || daysStr == "" ? "" : ", ") + daysStr + " | Hours: " + parseInt(days * 20);
-    var cost = values["Cost"];
-    var costStr = "";
-    if (cost["GP"] == 0 && cost["SP"] == 0 && cost["CP"] == 0) {
-        costStr = "0 GP";
-    } else {
-        if (cost["GP"] > 0) {
-        costStr = cost["GP"] + " GP";
-        }
-        if (cost["SP"] > 0) {
-        var spStr = cost["SP"] + " SP";
-        costStr += costStr == "" ? spStr : ", " + spStr;
-        }
-        if (cost["CP"] > 0) {
-        var cpStr = cost["CP"] + " CP";
-        costStr += costStr == "" ? cpStr : ", " + cpStr;
-        }
-    }
-    elem("AmountToPay").value = costStr;
+    elem("TimeTaken").value = weeksStr + (weeksStr == "" || daysStr == "" ? "" : ", ") + daysStr + " | Hours: " + parseInt(days * 8);
+    elem("AmountToPay").value = moneyStringFromCp(values["CostCp"]);
 }
 
 function computeTimeTaken(values) {
@@ -942,27 +955,12 @@ function computeTimeTaken(values) {
         values["TimeTaken"] = { "Weeks": 0, "Days": 0 };
         return;
     }
-    var baseTime = {
-        "Weeks": (values["IsByDay"] ? 0 : 1),
-        "Days": (values["IsByDay"] ? 1 : 0),
-    };
-    values["TimeTaken"] = baseTime;
-    if (values["TotalWorkDone"] <= values["WorkNeeded"]) {
-        // We're not done, or we used exactly all our effort
-        return;
-    }
-    // It didn't take us the full amount of time to finish
     var remainingWork = values["WorkNeeded"] - values["PriorWork"];
-    var fractionEffortUsed = remainingWork / values["WorkDone"];
-    var daysUsed = fractionEffortUsed * (baseTime["Weeks"] * 7 + baseTime["Days"]);
-    if (daysUsed > 7) {
-        // This pretty much can't happen, but for completeness...
-        baseTime["Weeks"] = parseInt(daysUsed / 7);
-        baseTime["Days"] = (daysUsed % 7).toFixed(1);
-    } else {
-        baseTime["Weeks"] = 0;
-        baseTime["Days"] = parseFloat(daysUsed.toFixed(3));
-    }
+    const daysUsed = remainingWork / values["DailyProgressGp"];
+    values["TimeTaken"] = {
+        "Weeks": parseInt(daysUsed / 7),
+        "Days": parseFloat((daysUsed % 7).toFixed(2))
+    };
 }
 
 function recompute() {
@@ -980,42 +978,22 @@ function recompute() {
     elem("CP").value = values["CP"];
     computeWorkNeeded(values);
     if (values["PriorWork"] >= values["WorkNeeded"]) {
-        // We're already done...
         values["WorkDone"] = 0;
         values["TotalWorkDone"] = values["WorkNeeded"];
-        values["Cost"] = { "GP": 0, "SP": 0, "CP": 0 };
+        values["CostCp"] = 0;
     } else {
-        if (values["PriorWork"] > 0) {
-        values["Cost"] = { "GP": 0, "SP": 0, "CP": 0 };
-        } else {
-        values["Cost"] = { "GP": values["GP"], "SP": values["SP"], "CP": values["CP"] };
-        multiplyCost(values["Cost"], values["ItemMultiple"] / 3);
-        }
-        if (values["Check"] < values["DC"]) {
-        // Check if failed check by 5 or more
-        if (values["DC"] - values["Check"] >= 5) {
-            // Repay half base material cost
-            var addedCost = { "GP": values["GP"], "SP": values["SP"], "CP": values["CP"] };
-            if (values["IsByDay"]) {
-            // Half cost (1/6th base cost) divided by 7 for 1 day fraction
-            multiplyCost(addedCost, values["ItemMultiple"] / 42);
-            } else {
-            // Half cost (1/6th base cost)
-            multiplyCost(addedCost, values["ItemMultiple"] / 6);
-            }
-            console.log(addedCost);
-            addCosts(values["Cost"], addedCost);
-        }
-        // No work done
-        values["WorkDone"] = 0;
-        } else {
-        values["WorkDone"] = values["Check"] * values["DC"];
-        if (values["IsByDay"]) {
-            values["WorkDone"] = parseInt(values["WorkDone"] / 7);
-        }
-        }
+        let dailyProgressGp = 1000;
+        if (values["FinalPriceCp"] < 25000) dailyProgressGp = values["WorkNeeded"];
+        if (values["CooperativeCrafting"]) dailyProgressGp *= 2;
+        if (values["ArcaneBuilder"]) dailyProgressGp *= 4 / 3;
+        if (values["FathersForgehammer"]) dailyProgressGp *= 4 / 3;
+        if (values["AcceleratedCrafting"]) dailyProgressGp *= 2;
+        values["DailyProgressGp"] = Math.max(1, Math.round(dailyProgressGp));
+        values["WorkDone"] = Math.min(values["DailyProgressGp"], values["WorkNeeded"] - values["PriorWork"]);
         values["TotalWorkDone"] = values["PriorWork"] + values["WorkDone"];
+        values["CostCp"] = values["PriorWork"] > 0 ? 0 : values["CreationCostCp"];
     }
+    values["DailyProgressGp"] = values["DailyProgressGp"] || 0;
     computeTimeTaken(values);
     console.log(values);
     setStatus(values);

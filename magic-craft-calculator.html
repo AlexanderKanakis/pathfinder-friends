@@ -129,8 +129,41 @@
                     <label class="col-5" title="Restrictions">Restrictions:</label>
                     <div class="col-7 d-flex flex-wrap gap-3">
                         <button class="btn btn-primary">Add Spell</button>
-                        <button class="btn btn-primary">Add Restriction</button>
+                        <button class="btn btn-primary" type="button" onclick="toggleRestrictions()">Restrictions</button>
                         <button class="btn btn-primary" onclick="addNewBonus()">Add Bonus</button>
+                    </div>
+                </div>
+                <div class="itemdesc-light" id="restriction-details" style="display: none;">
+                    <h5><b>Restrictions & Crafting Modifiers</b></h5>
+                    <div class="d-grid gap-2">
+                        <label class="form-check">
+                            <input id="RestrictSkill" class="form-check-input" type="checkbox" onchange="calculateCost()">
+                            <span class="form-check-label">Item requires a specific skill to use (-10% base price)</span>
+                        </label>
+                        <label class="form-check">
+                            <input id="RestrictClassAlignment" class="form-check-input" type="checkbox" onchange="calculateCost()">
+                            <span class="form-check-label">Item requires a specific class or alignment to use (-30% base price)</span>
+                        </label>
+                        <label class="form-check">
+                            <input id="AcceleratedCrafting" class="form-check-input" type="checkbox" onchange="calculateCost()">
+                            <span class="form-check-label">Accelerated crafting (+5 DC, craft in half the time)</span>
+                        </label>
+                        <label class="form-check">
+                            <input id="CooperativeCrafting" class="form-check-input" type="checkbox" onchange="calculateCost()">
+                            <span class="form-check-label">Cooperative Crafting (+2 check, doubles daily progress)</span>
+                        </label>
+                        <label class="form-check">
+                            <input id="ArcaneBuilder" class="form-check-input" type="checkbox" onchange="calculateCost()">
+                            <span class="form-check-label">Arcane Builder (+4 check, 25% faster for one item type)</span>
+                        </label>
+                        <label class="form-check">
+                            <input id="FathersForgehammer" class="form-check-input" type="checkbox" onchange="calculateCost()">
+                            <span class="form-check-label">Father's Forgehammer / similar 25% faster effect</span>
+                        </label>
+                        <label class="form-check">
+                            <input id="HedgeMagician" class="form-check-input" type="checkbox" onchange="calculateCost()">
+                            <span class="form-check-label">Hedge Magician / Spark of Creation (-5% crafting cost)</span>
+                        </label>
                     </div>
                 </div>
                 <div class="itemdesc-light" id="spell-req-details" style="display: none;">
@@ -146,11 +179,11 @@
                     
                 </div>
                 <div class="costrow d-flex row gap-1 mt-3">
-                    <span class="col-5" title="Market cost of the item being crafted">Item Cost:</span>
+                    <span class="col-5" title="Market price before construction-cost reductions">Base Price:</span>
                     <div class="flex-column row col-7" style="padding-left: 0;">
                         <div class="d-flex gap-2">
-                            <input class="col-5" id="GP" title="Market cost of the item being crafted, GP part" value="120" type="text">
-                            <label class="col-7" for="GP" title="Market cost of the item being crafted, GP part">GP</label>
+                            <input class="col-5" id="GP" title="Base market price, GP part" value="120" type="text">
+                            <label class="col-7" for="GP" title="Base market price, GP part">GP</label>
                         </div>
                         <div class="d-flex gap-2">
                             <input class="col-5" id="SP" title="Market cost of the item being crafted, SP part" value="0" type="text">
@@ -163,38 +196,34 @@
                     </div>
                 </div>
                 <div class="d-flex row gap-1 mt-4">
-                    <label class="col-5" for="DC" title="Craft DC of the item being created">Item DC:</label>
-                    <input class="col-3" id="DC" value="13" title="Craft DC of the item being created" type="text">
+                    <label class="col-5" for="DC" title="Caster level of the item">Caster Level:</label>
+                    <input class="col-3" id="DC" value="5" title="Caster level of the item" type="text">
                 </div>
                 <div class="d-flex row gap-1 mt-4">
-                    <label class="col-5" for="PriorWork" title="Work already done toward item creation">Prior Work:</label>
-                    <input class="col-3" id="PriorWork" value="0" title="Work already done toward item creation" type="text">
+                    <label class="col-5" for="PriorWork" title="GP of crafting progress already completed">Prior Progress:</label>
+                    <input class="col-3" id="PriorWork" value="0" title="GP of crafting progress already completed" type="text">
                 </div>
                 <div class="d-flex row gap-1 mt-4">
-                    <label class="col-5" for="Check" title="Craft (alchemy) skill check result">Check Result:</label>
-                    <input class="col-3" id="Check" value="15" title="Craft (alchemy) skill check result" type="text">
+                    <label class="col-5" for="Check" title="Spellcraft or relevant Craft check result">Check Result:</label>
+                    <input class="col-3" id="Check" value="15" title="Spellcraft or relevant Craft check result" type="text">
                 </div>
                 <div class="d-flex row gap-1 mt-4">
-                    <label class="col-5" for="IsByDay" title="Calculate progress by day (instead of by week)">Show By Day:</label>
-                    <div class="d-flex col-3 checkbox-input">
-                        <input id="IsByDay" title="Calculate progress by day (instead of by week)" type="checkbox">
-                    </div>
+                    <label class="col-5" for="MissingPrereqs" title="Each missing prerequisite increases DC by 5">Missing Prereqs:</label>
+                    <input class="col-3" id="MissingPrereqs" value="0" title="Each missing prerequisite increases DC by 5" type="text">
                 </div>
                 <div class="d-flex row gap-1 mt-4">
-                    <label class="text-wrap col-5 d-flex" for="IsSwift" title="Character is Alchemist with Swift Alchemy (3rd level)">Swift Alchemy (2x speed):</label>
-                    <div class="d-flex col-3 checkbox-input">
-                        <input id="IsSwift" title="Character is Alchemist with Swift Alchemy (3rd level)" type="checkbox">
-                    </div>
+                    <label class="col-5" for="ItemCostGP" title="Cost of the mundane item being enchanted">Mundane Item Cost:</label>
+                    <input class="col-3" id="ItemCostGP" value="0" title="Cost of the mundane item being enchanted" type="text">
                 </div>
                 <div class="d-flex row gap-1 mt-4">
-                    <label class="text-wrap col-5 d-flex" for="IsMaster" title="Character has the Master Alchemist feat">Master Alchemist (10x speed):</label>
-                    <div class="d-flex col-3 checkbox-input">
-                        <input id="IsMaster" onchange="setItemCountState()" title="Character has the Master Alchemist feat" type="checkbox">
-                    </div>
+                    <label class="col-5" for="ComponentCostGP" title="Extra material component costs">Component Cost:</label>
+                    <input class="col-3" id="ComponentCostGP" value="0" title="Extra material component costs" type="text">
                 </div>
                 <div class="d-flex row gap-1 mt-4">
-                    <label class="col-5" for="ItemMultiple" title="Number of items to create in parallel (requires Master Alchemist)">Item Count:</label>
-                    <input class="col-3" id="ItemMultiple" title="Number of items to create in parallel (requires Master Alchemist)" disabled="true" value="1" type="text">
+                    <input id="ItemMultiple" value="1" type="hidden">
+                    <input id="IsByDay" type="hidden">
+                    <input id="IsSwift" type="hidden">
+                    <input id="IsMaster" type="hidden">
                 </div>
                 <div class="d-flex row gap-1 mt-4">
                     <div class="col-5"></div>
@@ -205,6 +234,14 @@
                 <div class="resultsrow d-flex row gap-3">
                     <label class="col-4 text-wrap" for="Progress" title="Progress made toward item completion on this check">Progress:</label>
                     <input class="col-7" value="" title="Progress made toward item completion on this check" id="Progress" disabled="true" type="text">
+                </div>
+                <div class="resultsrow d-flex row gap-3 mt-4">
+                    <label class="col-4 text-wrap" for="MagicCraftDc" title="Magic item creation DC">Craft DC:</label>
+                    <input class="col-7" value="" title="Magic item creation DC" id="MagicCraftDc" disabled="true" type="text">
+                </div>
+                <div class="resultsrow d-flex row gap-3 mt-4">
+                    <label class="col-4 text-wrap" for="MagicFinalPrice" title="Final market price after allowed restrictions">Final Price:</label>
+                    <input class="col-7" value="" title="Final market price after allowed restrictions" id="MagicFinalPrice" disabled="true" type="text">
                 </div>
                 <div class="resultsrow d-flex row gap-3 mt-4">
                     <label class="col-4 text-wrap" for="TotalProgress" title="Total progress made toward item completion">Overall Progress:</label>

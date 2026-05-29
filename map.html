@@ -20,6 +20,7 @@
     .map-token { border-radius: 50%; background: var(--color); border: 2px solid #f8f9fa; color: #111; font-weight: 800; box-shadow: 0 2px 8px rgba(0,0,0,.45); }
     .map-token.enemy { border-color: #ffb3b3; color: #fff; }
     .map-token.enemy.enemy-hidden { opacity: .45; border-style: dashed; }
+    .map-token.token-hidden { opacity: .42; border-style: dashed; filter: saturate(.75); }
     .map-token, .map-shape { z-index: 2; }
     .map-token.selected, .map-shape.selected { outline: 3px solid #8fd19e; outline-offset: 2px; }
     .token-label { max-width: 100%; padding: 0 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; text-shadow: 0 1px 2px rgba(255,255,255,.5); }
@@ -191,6 +192,9 @@
   </button>
   <button id="openApplyEffect" class="btn btn-outline-success btn-sm mb-1 d-none" type="button" role="menuitem">
     <i class="bi bi-magic me-1"></i> Apply effect
+  </button>
+  <button id="toggleTokenVisibility" class="btn btn-outline-secondary btn-sm mb-1 d-none" type="button" role="menuitem">
+    <i class="bi bi-eye-slash me-1"></i> Hide
   </button>
   <button id="toggleEnemyVisibility" class="btn btn-outline-warning btn-sm mb-1 d-none" type="button" role="menuitem">
     <i class="bi bi-eye-slash me-1"></i> Hide enemy
@@ -534,7 +538,11 @@ function selectedObject() { return [...state.tokens, ...state.shapes].find(item 
 function tokenById(tokenId) { return state.tokens.find(token => token.id === tokenId); }
 function tokenInitials(name) { return String(name || "?").split(/\s+/).slice(0, 2).map(part => part[0] || "").join("").toUpperCase(); }
 function tokenCharacter(token) { return mapCharacters.find(character => character.id === token.characterId); }
-function canSeeToken(token) { return token.kind !== "enemy" || isGm || token.visible !== false; }
+function canSeeToken(token) {
+  if (token.kind === "enemy" && token.visible === false && !isGm) return false;
+  if (token.hidden === true && !canManageMapItem(token)) return false;
+  return true;
+}
 function initiativeNameFromEntry(entry, tokens = state.tokens) {
   if (entry.name) return entry.name;
   const token = tokens.find(item => item.id === entry.tokenId);
@@ -915,6 +923,14 @@ function showMapContextMenu(event, item) {
     : item.name || "Shape";
   el("openAuraOptions").classList.toggle("d-none", !canManageAura(item));
   el("openApplyEffect").classList.toggle("d-none", !canManageEffects(item));
+  const tokenVisibilityButton = el("toggleTokenVisibility");
+  const canToggleTokenVisibility = Boolean(item.kind && canManageMapItem(item));
+  tokenVisibilityButton.classList.toggle("d-none", !canToggleTokenVisibility);
+  if (canToggleTokenVisibility) {
+    tokenVisibilityButton.innerHTML = item.hidden === true
+      ? `<i class="bi bi-eye me-1"></i> Unhide`
+      : `<i class="bi bi-eye-slash me-1"></i> Hide`;
+  }
   const visibilityButton = el("toggleEnemyVisibility");
   const canToggleEnemy = item.kind === "enemy" && isGm;
   visibilityButton.classList.toggle("d-none", !canToggleEnemy);
@@ -1158,6 +1174,7 @@ function renderAuraEffectToasts() {
 function renderToken(token) {
   const enemyClass = token.kind === "enemy" ? " enemy" : "";
   const hiddenClass = token.kind === "enemy" && token.visible === false && isGm ? " enemy-hidden" : "";
+  const tokenHiddenClass = token.hidden === true && canManageMapItem(token) ? " token-hidden" : "";
   const selectedClass = token.id === selectedId ? " selected" : "";
   const character = token.kind === "character" ? tokenCharacter(token) : null;
   const hoverName = character ? character.name || token.name || "Character" : token.kind === "enemy" && isGm ? token.name || "Enemy" : "";
@@ -1169,7 +1186,7 @@ function renderToken(token) {
     </div>
   ` : "";
   return `
-    <div class="map-token${enemyClass}${hiddenClass}${selectedClass}" data-map-id="${escapeHtml(token.id)}" style="--x:${token.x};--y:${token.y};--w:${token.w || 1};--h:${token.h || 1};--color:${escapeHtml(token.color || "#8fd19e")};">
+    <div class="map-token${enemyClass}${hiddenClass}${tokenHiddenClass}${selectedClass}" data-map-id="${escapeHtml(token.id)}" style="--x:${token.x};--y:${token.y};--w:${token.w || 1};--h:${token.h || 1};--color:${escapeHtml(token.color || "#8fd19e")};">
       <div class="text-center">
         <div class="token-label">${escapeHtml(tokenInitials(token.name))}</div>
       </div>
@@ -2233,6 +2250,14 @@ function toggleContextEnemyVisibility() {
   renderAll();
 }
 
+function toggleContextTokenVisibility() {
+  const token = tokenById(contextMenuTokenId);
+  if (!token || !canManageMapItem(token)) return;
+  token.hidden = token.hidden !== true;
+  hideContextMenu();
+  renderAll();
+}
+
 function initiativeInsertIndex(score, ignoreId = "") {
   const value = Number(score || 0);
   let insertIndex = 0;
@@ -2544,6 +2569,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     updateAuraEffectSummary();
   });
   el("toggleEnemyVisibility").addEventListener("click", toggleContextEnemyVisibility);
+  el("toggleTokenVisibility").addEventListener("click", toggleContextTokenVisibility);
   el("removeTokenFromMap").addEventListener("click", removeContextMenuToken);
   el("confirmQuickEffectTargets").addEventListener("click", confirmQuickEffectTargets);
   auraModal = new bootstrap.Modal(el("auraOptionsModal"));
