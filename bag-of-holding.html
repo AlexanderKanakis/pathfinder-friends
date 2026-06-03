@@ -33,10 +33,17 @@
     .bag-header { display: grid; grid-template-columns: minmax(180px, 1fr) minmax(240px, 420px) minmax(120px, 1fr); gap: 12px; align-items: end; }
     .bag-search { width: 100%; }
     .bag-action { justify-self: end; }
+    .source-results-panel { margin-top: 10px; max-height: min(62vh, 680px); overflow: auto; }
+    .source-results-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .source-result-card { position: relative; background: #242424; border: 1px solid #444; border-radius: 8px; color: #f4f4f4; padding: 10px 42px 10px 10px; text-align: left; cursor: pointer; min-height: 92px; }
+    .source-result-card:hover, .source-result-card:focus { border-color: #0d6efd; outline: none; box-shadow: 0 0 0 2px rgba(13, 110, 253, .25); }
+    .source-result-icon { position: absolute; top: 10px; right: 10px; width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; border-radius: 999px; background: #151515; border: 1px solid #555; color: #9ec5fe; }
+    .source-result-description { color: #ddd; font-size: 13px; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
     @media (max-width: 760px) {
       .bag-header { grid-template-columns: 1fr; align-items: stretch; }
       .bag-action { justify-self: stretch; }
       .bag-action .btn { width: 100%; }
+      .source-results-grid { grid-template-columns: 1fr; }
     }
     .empty-state { color: #777; border: 1px dashed #444; border-radius: 8px; padding: 16px; text-align: center; }
     label { font-size: 12px; color: #aaa; margin-bottom: 2px; }
@@ -72,9 +79,14 @@
       <input id="lootSearch" class="form-control form-control-sm" placeholder="Name or description">
     </div>
     <div class="bag-action">
-      <button class="btn btn-primary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#lootModal">
-        <i class="bi bi-plus-lg"></i> Add Item
-      </button>
+      <div class="d-flex flex-wrap justify-content-end gap-2">
+        <button id="openSourceItems" class="btn btn-outline-info btn-sm" type="button">
+          <i class="bi bi-search"></i> Item List
+        </button>
+        <button class="btn btn-primary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#lootModal">
+          <i class="bi bi-plus-lg"></i> Add Item
+        </button>
+      </div>
     </div>
   </div>
 
@@ -135,6 +147,8 @@
           </div>
           <div><label for="lootDamageDice">Damage Dice</label><input id="lootDamageDice" class="form-control form-control-sm" placeholder="1d8"></div>
           <div><label for="lootWeaponCritical">Critical</label><input id="lootWeaponCritical" class="form-control form-control-sm" placeholder="20/x2"></div>
+          <div class="loot-firearm-field d-none"><label for="lootWeaponCapacity">Capacity</label><input id="lootWeaponCapacity" class="form-control form-control-sm" placeholder="1"></div>
+          <div class="loot-firearm-field d-none"><label for="lootWeaponMisfire">Misfire</label><input id="lootWeaponMisfire" class="form-control form-control-sm" placeholder="1 (5 ft.)"></div>
           <div>
             <label>Damage Scales With</label>
             <input id="lootDamageScale" type="hidden" value="STR">
@@ -225,22 +239,60 @@
   </div>
 </div>
 
+<div class="modal fade" id="sourceItemsModal" tabindex="-1" aria-labelledby="sourceItemsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div>
+          <h5 class="modal-title" id="sourceItemsModalLabel">Item List</h5>
+          <div id="sourceItemCount" class="small text-secondary"></div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <input id="sourceItemSearch" class="form-control form-control-sm mb-3" placeholder="Search weapons, wondrous, and alchemical items">
+        <ul class="nav nav-tabs mb-3" id="sourceItemTabs" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" type="button" data-source-category="all">All</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" type="button" data-source-category="weapons">Weapons</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" type="button" data-source-category="mundane">Mundane Items</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" type="button" data-source-category="wondrous">Wondrous Items</button>
+          </li>
+        </ul>
+        <div id="sourceItemResults" class="source-results-panel"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script src="navbar.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-config.js"></script>
 <script src="app-supabase.js"></script>
+<script src="wondrous.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 let bagContextKey = "general";
 let bagCharacters = [];
 let bagLoot = [];
+let sourceItems = [];
 let lootModal;
+let sourceItemModal;
 let moveLootModal;
 let deleteLootModal;
 let pendingLootMove = null;
 let pendingLootDelete = null;
 let lootSearchTerm = "";
+let sourceItemSearchTerm = "";
+let sourceItemCategory = "all";
 let editingLootId = null;
+let sourceLootTemplateDetails = null;
 
 const typeIcons = {
   Weapon: "bi-crosshair",
@@ -352,6 +404,264 @@ function searchableLoot(item) {
   return `${item.name || ""} ${item.description || ""}`.toLowerCase();
 }
 
+function stripSourceHtml(value) {
+  const div = document.createElement("div");
+  div.innerHTML = String(value || "").replace(/^<\/h3>/i, "");
+  return (div.textContent || div.innerText || "").replace(/\s+/g, " ").trim();
+}
+
+function sourceItemIcon(type) {
+  return typeIcons[type] || typeIcons.Item;
+}
+
+function inferWondrousType(item) {
+  const details = item.details || {};
+  const slot = String(details.slot || "").toLowerCase();
+  const name = String(item.name || "").toLowerCase();
+  if (slot.includes("shield") || name.includes("shield")) return "Shield";
+  if (slot.includes("armor") || name.includes("armor")) return "Armor";
+  if (slot.includes("weapon")) return "Weapon";
+  return "Item";
+}
+
+function normalizeWondrousSourceItem(item, index) {
+  const details = item.details || {};
+  const type = inferWondrousType(item);
+  const description = stripSourceHtml(details.description || item.description || "");
+  return {
+    id: `wondrous:${index}`,
+    sourceType: "Wondrous Item",
+    name: item.name || "Wondrous Item",
+    description,
+    type,
+    count: 1,
+    details: {
+      source: "Wondrous Item",
+      aura: details.aura || "",
+      casterLevel: details.cl || "",
+      slot: details.slot || "",
+      price: details.price || "",
+      weight: details.weight || "",
+      requirements: details.requirements || "",
+      cost: details.cost || "",
+      link: item.link || ""
+    },
+    effects: []
+  };
+}
+
+function normalizeAlchemicalSourceItem(item, index) {
+  const description = [
+    ...(item.desc || []),
+    ...(item.flavor || []),
+    ...(Array.isArray(item.effect) ? item.effect : item.effect ? [item.effect] : []),
+    item.damage || "",
+    item.cure ? `Cure: ${item.cure}` : "",
+    item.addiction ? `Addiction: ${item.addiction}` : ""
+  ].filter(Boolean).join(" ");
+  return {
+    id: `alchemical:${index}`,
+    sourceType: "Alchemical Item",
+    name: item.name || "Alchemical Item",
+    description,
+    type: "Item",
+    count: 1,
+    details: {
+      source: "Alchemical Item",
+      craftDc: item.dc || "",
+      price: `${item.gp || 0} gp${item.sp ? `, ${item.sp} sp` : ""}${item.cp ? `, ${item.cp} cp` : ""}`,
+      subtype: item.type || "",
+      link: item.link || ""
+    },
+    effects: []
+  };
+}
+
+function normalizeWeaponSourceItem(item, index) {
+  const details = item.details || {};
+  return {
+    id: `weapon:${index}`,
+    sourceType: "Weapon",
+    name: item.name || "Weapon",
+    description: item.description || [
+      details.proficiency,
+      details.weaponGroup,
+      details.damageType ? `Damage type: ${details.damageType}` : "",
+      details.special ? `Special: ${details.special}` : ""
+    ].filter(Boolean).join(". "),
+    type: item.type || "Weapon",
+    count: item.count || 1,
+    details: {
+      source: details.source || "d20pfsrd weapons",
+      proficiency: details.proficiency || "",
+      weaponGroup: details.weaponGroup || "",
+      weaponType: details.weaponType || "Melee Weapon (One-Handed)",
+      attackScale: details.attackScale || "STR",
+      damage: details.damage || "",
+      damageSmall: details.damageSmall || "",
+      critical: details.critical || "",
+      damageScale: details.damageScale || "STR",
+      enhancement: details.enhancement || "0",
+      enchantment: details.enchantment || "",
+      range: details.range || "",
+      cost: details.cost || "",
+      weight: details.weight || "",
+      damageType: details.damageType || "",
+      special: details.special || "",
+      sourceBook: details.sourceBook || "",
+      link: details.link || ""
+    },
+    effects: Array.isArray(item.effects) ? item.effects : []
+  };
+}
+
+function normalizeFirearmSourceItem(item, index) {
+  const normalized = normalizeWeaponSourceItem(item, index);
+  normalized.id = `firearm:${index}`;
+  normalized.sourceType = "Firearm";
+  normalized.details = {
+    ...normalized.details,
+    source: item.details?.source || "d20pfsrd firearms",
+    firearmEra: item.details?.firearmEra || "",
+    misfire: item.details?.misfire || "",
+    capacity: item.details?.capacity || ""
+  };
+  return normalized;
+}
+
+async function loadSourceItems() {
+  const rawWondrousItems = typeof wItems === "undefined" ? [] : wItems;
+  const wondrous = Array.isArray(rawWondrousItems)
+    ? rawWondrousItems.map(normalizeWondrousSourceItem)
+    : [];
+  let weapons = [];
+  try {
+    const response = await fetch("./weapons.json", { cache: "no-cache" });
+    if (response.ok) {
+      const data = await response.json();
+      weapons = (Array.isArray(data) ? data : []).map(normalizeWeaponSourceItem);
+    }
+  } catch (error) {
+    console.info("No generated weapons.json found yet.", error);
+  }
+  let firearms = [];
+  try {
+    const response = await fetch("./firearms.json", { cache: "no-cache" });
+    if (response.ok) {
+      const data = await response.json();
+      firearms = (Array.isArray(data) ? data : []).map(normalizeFirearmSourceItem);
+    }
+  } catch (error) {
+    console.info("No generated firearms.json found yet.", error);
+  }
+  let alchemical = [];
+  try {
+    const module = await import("./alchemical-crafts.js");
+    alchemical = (Array.isArray(module.items) ? module.items : [])
+      .filter(item => item.name && item.dc)
+      .map(normalizeAlchemicalSourceItem);
+  } catch (error) {
+    console.error("Could not load alchemical item source data", error);
+  }
+  sourceItems = [...weapons, ...firearms, ...wondrous, ...alchemical].filter(item => item.name && item.description);
+}
+
+function searchableSourceItem(item) {
+  return `${item.name || ""} ${item.sourceType || ""} ${item.description || ""} ${Object.values(item.details || {}).join(" ")}`.toLowerCase();
+}
+
+function sourceItemMatchesCategory(item) {
+  if (sourceItemCategory === "wondrous") return item.sourceType === "Wondrous Item";
+  if (sourceItemCategory === "weapons") return ["Weapon", "Firearm"].includes(item.sourceType);
+  if (sourceItemCategory === "mundane") return item.sourceType === "Alchemical Item";
+  return true;
+}
+
+function renderSourceItemResults() {
+  const wrapper = el("sourceItemResults");
+  const count = el("sourceItemCount");
+  const term = sourceItemSearchTerm.trim().toLowerCase();
+  const results = sourceItems
+    .filter(sourceItemMatchesCategory)
+    .filter(item => searchableSourceItem(item).includes(term))
+    .sort((a, b) => String(a.name || "").localeCompare(String(b.name || "")));
+  count.textContent = `${results.length} item${results.length === 1 ? "" : "s"}`;
+  if (!results.length) {
+    wrapper.innerHTML = `<div class="small text-secondary">No matching source items found.</div>`;
+    return;
+  }
+  wrapper.innerHTML = `
+    <div class="source-results-grid">
+      ${results.map(item => `
+        <button class="source-result-card" type="button" data-source-item="${escapeHtml(item.id)}">
+          <span class="source-result-icon"><i class="bi ${sourceItemIcon(item.type)}"></i></span>
+          <div class="fw-semibold pe-2">${escapeHtml(item.name)}</div>
+          <div class="loot-meta">${escapeHtml(item.sourceType)} | ${escapeHtml(item.type)}</div>
+          <div class="source-result-description mt-1">${escapeHtml(item.description)}</div>
+        </button>
+      `).join("")}
+    </div>
+  `;
+  wrapper.querySelectorAll("[data-source-item]").forEach(button => {
+    button.addEventListener("click", () => openSourceItemEditor(button.dataset.sourceItem));
+  });
+}
+
+function cloneJson(value) {
+  return JSON.parse(JSON.stringify(value || {}));
+}
+
+function populateLootForm(item, selectedCharacterId = "") {
+  el("lootName").value = item.name || "";
+  el("lootDescription").value = item.description || "";
+  el("lootCount").value = item.count || 1;
+  el("lootType").value = item.type || "Item";
+  renderCharacterOptions(el("lootAssignedTo"), selectedCharacterId);
+
+  const details = item.details || {};
+  el("lootWeaponType").value = details.weaponType || "Melee Weapon (One-Handed)";
+  setLootAttackScale(details.attackScale || "STR");
+  el("lootDamageDice").value = details.damage || "";
+  el("lootWeaponCritical").value = details.critical || "";
+  el("lootWeaponCapacity").value = details.capacity || "";
+  el("lootWeaponMisfire").value = details.misfire || "";
+  setLootDamageScale(details.damageScale || "STR");
+  el("lootWeaponEnhancement").value = details.enhancement || "0";
+  el("lootWeaponEnchantment").value = details.enchantment || "";
+  el("lootWeaponDetails").value = details.details || details.summary || details.special || "";
+  el("lootArmorBonus").value = details.bonus || "0";
+  el("lootArmorEnhancement").value = details.enhancement || "0";
+  el("lootArmorEnchantment").value = details.enchantment || "";
+  el("lootEffectRows").innerHTML = "";
+  (Array.isArray(item.effects) ? item.effects : []).forEach(effect => addLootEffectRow(effect));
+  toggleLootDetailFields();
+}
+
+function openSourceItemEditor(sourceItemId) {
+  const source = sourceItems.find(item => item.id === sourceItemId);
+  if (!source) return;
+  resetLootForm();
+  editingLootId = null;
+  sourceLootTemplateDetails = cloneJson(source.details);
+  el("lootModalLabel").textContent = "Add Item";
+  el("lootSubmitButton").textContent = "Add Item";
+  populateLootForm({ ...source, count: 1 }, "");
+  sourceItemModal.hide();
+  lootModal.show();
+}
+
+function openSourceItemsModal() {
+  sourceItemCategory = "all";
+  sourceItemSearchTerm = "";
+  el("sourceItemSearch").value = "";
+  el("sourceItemTabs").querySelectorAll(".nav-link").forEach(tab => {
+    tab.classList.toggle("active", tab.dataset.sourceCategory === "all");
+  });
+  renderSourceItemResults();
+  sourceItemModal.show();
+  setTimeout(() => el("sourceItemSearch").focus(), 150);
+}
+
 function renderLoot() {
   const grid = el("lootGrid");
   const visibleLoot = lootSearchTerm
@@ -403,9 +713,19 @@ function renderLoot() {
 
 function toggleLootDetailFields() {
   const type = el("lootType").value;
+  const firearm = type === "Weapon" && isFirearmWeaponType(el("lootWeaponType").value);
   el("lootWeaponFields").classList.toggle("d-none", type !== "Weapon");
+  document.querySelectorAll(".loot-firearm-field").forEach(field => field.classList.toggle("d-none", !firearm));
+  if (!firearm) {
+    el("lootWeaponCapacity").value = "";
+    el("lootWeaponMisfire").value = "";
+  }
   el("lootArmorFields").classList.toggle("d-none", !["Armor", "Shield"].includes(type));
   el("lootArmorEnchantment").innerHTML = armorEnchantmentOptions(el("lootArmorEnchantment").value);
+}
+
+function isFirearmWeaponType(type) {
+  return String(type || "").includes("Firearm");
 }
 
 function setupLootScalingControls() {
@@ -525,8 +845,9 @@ function collectLootEffects() {
 function collectLootDetails() {
   const type = el("lootType").value;
   if (type === "Weapon") {
-    return {
-      weaponType: el("lootWeaponType").value || "Melee Weapon (One-Handed)",
+    const weaponType = el("lootWeaponType").value || "Melee Weapon (One-Handed)";
+    const details = {
+      weaponType,
       attackScale: el("lootAttackScale").value.trim() || "STR",
       damage: el("lootDamageDice").value.trim(),
       critical: el("lootWeaponCritical").value.trim(),
@@ -535,6 +856,11 @@ function collectLootDetails() {
       enchantment: el("lootWeaponEnchantment").value.trim(),
       details: el("lootWeaponDetails").value.trim()
     };
+    if (isFirearmWeaponType(weaponType)) {
+      details.capacity = el("lootWeaponCapacity").value.trim();
+      details.misfire = el("lootWeaponMisfire").value.trim();
+    }
+    return details;
   }
   if (["Armor", "Shield"].includes(type)) {
     return {
@@ -559,6 +885,8 @@ function renderLootAttributes(item) {
     rows.push(["Attack Scales", details.attackScale || "STR"]);
     if (details.damage) rows.push(["Damage", details.damage]);
     if (details.critical) rows.push(["Critical", details.critical]);
+    if (isFirearmWeaponType(details.weaponType) && details.capacity) rows.push(["Capacity", details.capacity]);
+    if (isFirearmWeaponType(details.weaponType) && details.misfire) rows.push(["Misfire", details.misfire]);
     rows.push(["Damage Scales", details.damageScale || "STR"]);
     rows.push(["Enhancement", signedValue(details.enhancement || 0)]);
     if (details.enchantment) rows.push(["Enchantment", details.enchantment]);
@@ -727,6 +1055,7 @@ async function submitLootMove(event) {
 
 function resetLootForm() {
   editingLootId = null;
+  sourceLootTemplateDetails = null;
   el("lootModalLabel").textContent = "Add Item";
   el("lootSubmitButton").textContent = "Add Item";
   el("lootForm").reset();
@@ -735,6 +1064,8 @@ function resetLootForm() {
   setLootDamageScale("STR");
   el("lootWeaponType").value = "Melee Weapon (One-Handed)";
   el("lootWeaponCritical").value = "";
+  el("lootWeaponCapacity").value = "";
+  el("lootWeaponMisfire").value = "";
   el("lootEffectRows").innerHTML = "";
   toggleLootDetailFields();
   renderCharacterOptions(el("lootAssignedTo"));
@@ -745,29 +1076,10 @@ function openLootEditor(itemId) {
   if (!item) return;
 
   editingLootId = item.id;
+  sourceLootTemplateDetails = null;
   el("lootModalLabel").textContent = "Edit Item";
   el("lootSubmitButton").textContent = "Save Changes";
-  el("lootName").value = item.name || "";
-  el("lootDescription").value = item.description || "";
-  el("lootCount").value = item.count || 1;
-  el("lootType").value = item.type || "Item";
-  renderCharacterOptions(el("lootAssignedTo"), item.assigned_character_id || "");
-
-  const details = item.details || {};
-  el("lootWeaponType").value = details.weaponType || "Melee Weapon (One-Handed)";
-  setLootAttackScale(details.attackScale || "STR");
-  el("lootDamageDice").value = details.damage || "";
-  el("lootWeaponCritical").value = details.critical || "";
-  setLootDamageScale(details.damageScale || "STR");
-  el("lootWeaponEnhancement").value = details.enhancement || "0";
-  el("lootWeaponEnchantment").value = details.enchantment || "";
-  el("lootWeaponDetails").value = details.details || "";
-  el("lootArmorBonus").value = details.bonus || "0";
-  el("lootArmorEnhancement").value = details.enhancement || "0";
-  el("lootArmorEnchantment").value = details.enchantment || "";
-  el("lootEffectRows").innerHTML = "";
-  (Array.isArray(item.effects) ? item.effects : []).forEach(effect => addLootEffectRow(effect));
-  toggleLootDetailFields();
+  populateLootForm(item, item.assigned_character_id || "");
   lootModal.show();
 }
 
@@ -796,26 +1108,13 @@ async function removeLootBuff(item) {
   localStorage.setItem(`pf_buffs_updated_${bagContextKey}_${item.assigned_character_id}`, String(Date.now()));
 }
 
-function requestLootDelete(itemId) {
+async function deleteLootAmount(itemId, amountOverride = null) {
   const item = bagLoot.find(entry => entry.id === itemId);
   if (!item) return;
-  const total = Number(item.count || 1);
-  pendingLootDelete = { itemId };
-  el("deleteLootSummary").textContent = `${item.name}${item.assigned_character_id ? " is assigned. If fully deleted, equipped copies and item effects will be removed." : ""}`;
-  el("deleteLootCount").max = String(total);
-  el("deleteLootCount").value = String(total);
-  el("deleteLootMax").textContent = `Max: ${total}`;
-  deleteLootModal.show();
-}
-
-async function submitLootDelete(event) {
-  event.preventDefault();
-  if (!pendingLootDelete) return;
-  const item = bagLoot.find(entry => entry.id === pendingLootDelete.itemId);
-  if (!item) return;
 
   const total = Number(item.count || 1);
-  const amount = Math.max(1, Math.min(total, Number.parseInt(el("deleteLootCount").value, 10) || 1));
+  const parsedAmount = Number.parseInt(el("deleteLootCount").value, 10) || 1;
+  const amount = Math.max(1, Math.min(total, amountOverride ?? parsedAmount));
   let ok = false;
 
   if (amount >= total) {
@@ -840,24 +1139,52 @@ async function submitLootDelete(event) {
   }
 
   pendingLootDelete = null;
-  deleteLootModal.hide();
+  deleteLootModal?.hide();
   clearLootStatus();
   await loadBagContext(bagContextKey, false);
+}
+
+function requestLootDelete(itemId) {
+  const item = bagLoot.find(entry => entry.id === itemId);
+  if (!item) return;
+  const total = Number(item.count || 1);
+  if (total <= 1) {
+    void deleteLootAmount(itemId, 1);
+    return;
+  }
+  pendingLootDelete = { itemId };
+  el("deleteLootSummary").textContent = `${item.name}${item.assigned_character_id ? " is assigned. If fully deleted, equipped copies and item effects will be removed." : ""}`;
+  el("deleteLootCount").max = String(total);
+  el("deleteLootCount").value = String(total);
+  el("deleteLootMax").textContent = `Max: ${total}`;
+  deleteLootModal.show();
+}
+
+async function submitLootDelete(event) {
+  event.preventDefault();
+  if (!pendingLootDelete) return;
+  await deleteLootAmount(pendingLootDelete.itemId);
 }
 
 async function submitLootForm(event) {
   event.preventDefault();
   const name = el("lootName").value.trim();
   if (!name) return;
+  const existingItem = editingLootId ? bagLoot.find(item => item.id === editingLootId) : null;
+  const selectedType = el("lootType").value;
+  const baseDetails = sourceLootTemplateDetails || existingItem?.details || {};
+  const details = selectedType === "Item"
+    ? cloneJson(baseDetails)
+    : { ...cloneJson(baseDetails), ...collectLootDetails() };
 
   const saved = await PFApp.saveLootItem({
     id: editingLootId,
     name,
     description: el("lootDescription").value.trim(),
     count: el("lootCount").value,
-    type: el("lootType").value,
+    type: selectedType,
     assignedCharacterId: el("lootAssignedTo").value,
-    details: collectLootDetails(),
+    details,
     effects: collectLootEffects()
   }, bagContextKey);
 
@@ -894,6 +1221,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (!user) return;
 
   lootModal = new bootstrap.Modal(el("lootModal"));
+  sourceItemModal = new bootstrap.Modal(el("sourceItemsModal"));
   moveLootModal = new bootstrap.Modal(el("moveLootModal"));
   deleteLootModal = new bootstrap.Modal(el("deleteLootModal"));
   el("lootWeaponType").innerHTML = optionList(WEAPON_TYPES, "Melee Weapon (One-Handed)");
@@ -902,6 +1230,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   el("lootForm").addEventListener("submit", submitLootForm);
   el("lootModal").addEventListener("hidden.bs.modal", resetLootForm);
   el("lootType").addEventListener("change", toggleLootDetailFields);
+  el("lootWeaponType").addEventListener("change", toggleLootDetailFields);
   setupLootScalingControls();
   el("addLootEffect").addEventListener("click", () => addLootEffectRow());
   el("moveLootForm").addEventListener("submit", submitLootMove);
@@ -910,8 +1239,23 @@ document.addEventListener("DOMContentLoaded", async () => {
     lootSearchTerm = event.target.value.trim().toLowerCase();
     renderLoot();
   });
+  el("openSourceItems").addEventListener("click", openSourceItemsModal);
+  el("sourceItemSearch").addEventListener("input", event => {
+    sourceItemSearchTerm = event.target.value.trim();
+    renderSourceItemResults();
+  });
+  el("sourceItemTabs").querySelectorAll("[data-source-category]").forEach(button => {
+    button.addEventListener("click", () => {
+      sourceItemCategory = button.dataset.sourceCategory || "all";
+      el("sourceItemTabs").querySelectorAll(".nav-link").forEach(tab => {
+        tab.classList.toggle("active", tab === button);
+      });
+      renderSourceItemResults();
+    });
+  });
   bagContextKey = await PFApp.requireGameContext();
   if (!bagContextKey) return;
+  await loadSourceItems();
   await loadBagContext(bagContextKey);
   window.addEventListener("pf-context-change", event => {
     if (event.detail.contextKey && event.detail.contextKey !== "general") loadBagContext(event.detail.contextKey);

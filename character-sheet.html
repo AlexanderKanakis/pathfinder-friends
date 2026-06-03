@@ -95,10 +95,17 @@
     .inventory-edit-grid, .inventory-effect-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
     .inventory-effect-row { grid-template-columns: 1.4fr .6fr 1fr .7fr auto; background: #242424; border: 1px solid #444; border-radius: 8px; padding: 8px; align-items: end; }
     .inventory-condition-inline { display: grid; grid-template-columns: auto minmax(140px, 1fr); gap: 8px; align-items: end; grid-column: 1 / -2; }
+    .source-results-panel { margin-top: 10px; max-height: min(62vh, 680px); overflow: auto; }
+    .source-results-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .source-result-card { position: relative; background: #242424; border: 1px solid #444; border-radius: 8px; color: #f4f4f4; padding: 10px 42px 10px 10px; text-align: left; cursor: pointer; min-height: 92px; }
+    .source-result-card:hover, .source-result-card:focus { border-color: #0d6efd; outline: none; box-shadow: 0 0 0 2px rgba(13, 110, 253, .25); }
+    .source-result-icon { position: absolute; top: 10px; right: 10px; width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; border-radius: 999px; background: #151515; border: 1px solid #555; color: #9ec5fe; }
+    .source-result-description { color: #ddd; font-size: 13px; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
     @media (max-width: 760px) {
       .inventory-group-grid { grid-template-columns: 1fr; }
       .inventory-edit-grid, .inventory-effect-row, .inventory-condition-inline { grid-template-columns: 1fr; }
       .inventory-condition-inline { grid-column: auto; }
+      .source-results-grid { grid-template-columns: 1fr; }
     }
     .view-tabs .btn { min-width: 92px; }
     .simple-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, max-content)); gap: 6px; align-items: stretch; }
@@ -334,7 +341,12 @@
   </section>
 
   <section class="sheet-section">
-    <div class="sheet-title">Inventory</div>
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <div class="sheet-title mb-0">Inventory</div>
+      <button id="enemySourceItemButton" class="btn btn-outline-info btn-sm d-none" type="button">
+        <i class="bi bi-search"></i> Item List
+      </button>
+    </div>
     <div id="characterInventory" class="inventory-list"></div>
   </section>
 
@@ -435,6 +447,8 @@
           </div>
           <div><label for="inventoryDamageDice">Damage Dice</label><input id="inventoryDamageDice" class="form-control form-control-sm" placeholder="1d8"></div>
           <div><label for="inventoryWeaponCritical">Critical</label><input id="inventoryWeaponCritical" class="form-control form-control-sm" placeholder="20/x2"></div>
+          <div class="inventory-firearm-field d-none"><label for="inventoryWeaponCapacity">Capacity</label><input id="inventoryWeaponCapacity" class="form-control form-control-sm" placeholder="1"></div>
+          <div class="inventory-firearm-field d-none"><label for="inventoryWeaponMisfire">Misfire</label><input id="inventoryWeaponMisfire" class="form-control form-control-sm" placeholder="1 (5 ft.)"></div>
           <div>
             <label>Damage Scales With</label>
             <input id="inventoryDamageScale" type="hidden" value="STR">
@@ -513,12 +527,38 @@
   </div>
 </div>
 
+<div class="modal fade" id="enemySourceItemsModal" tabindex="-1" aria-labelledby="enemySourceItemsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content bg-dark text-white border-secondary">
+      <div class="modal-header">
+        <div>
+          <h5 class="modal-title" id="enemySourceItemsModalLabel">Item List</h5>
+          <div id="enemySourceItemCount" class="small text-secondary"></div>
+        </div>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <input id="enemySourceItemSearch" class="form-control form-control-sm mb-3" placeholder="Search weapons, wondrous, and alchemical items">
+        <ul class="nav nav-tabs mb-3" id="enemySourceItemTabs" role="tablist">
+          <li class="nav-item" role="presentation"><button class="nav-link active" type="button" data-source-category="all">All</button></li>
+          <li class="nav-item" role="presentation"><button class="nav-link" type="button" data-source-category="weapons">Weapons</button></li>
+          <li class="nav-item" role="presentation"><button class="nav-link" type="button" data-source-category="mundane">Mundane Items</button></li>
+          <li class="nav-item" role="presentation"><button class="nav-link" type="button" data-source-category="wondrous">Wondrous Items</button></li>
+        </ul>
+        <div id="enemySourceItemResults" class="source-results-panel"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script src="navbar.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-config.js"></script>
 <script src="app-supabase.js"></script>
 <script src="buff-calculator.js"></script>
 <script src="buff-tracker-widget.js"></script>
+<script src="wondrous.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 const ABILITIES = [
   ["str", "STR"], ["dex", "DEX"], ["con", "CON"], ["int", "INT"], ["wis", "WIS"], ["cha", "CHA"]
@@ -568,6 +608,10 @@ let deleteInventoryItemModal = null;
 let editingInventoryItemId = null;
 let pendingInventoryDeleteId = null;
 let characterInventoryItems = [];
+let enemySourceItemModal = null;
+let enemySourceItems = [];
+let enemySourceItemSearchTerm = "";
+let enemySourceItemCategory = "all";
 
 const PDF_SAMPLE = {
   characterName: "Choose Name", classLevel: "", race: "", alignment: "",
@@ -631,6 +675,10 @@ function isRangedWeaponType(type) {
   return ["Ranged Weapon", "Firearm (One-Handed)", "Firearm (Two-Handed)"].includes(type);
 }
 
+function isFirearmWeaponType(type) {
+  return String(type || "").includes("Firearm");
+}
+
 function isMeleeWeaponType(type) {
   return !isRangedWeaponType(type);
 }
@@ -642,13 +690,21 @@ function isTwoHandedWeaponType(type) {
 function syncWeaponTypeControls(card, resetToggles = false) {
   const weaponType = card.querySelector('[data-field="weaponType"]')?.value || "Melee Weapon (One-Handed)";
   const melee = isMeleeWeaponType(weaponType);
+  const firearm = isFirearmWeaponType(weaponType);
   card.querySelectorAll("[data-melee-weapon-option]").forEach(node => node.classList.toggle("d-none", !melee));
   card.querySelectorAll("[data-ranged-weapon-option]").forEach(node => node.classList.toggle("d-none", melee));
+  card.querySelectorAll("[data-firearm-weapon-option]").forEach(node => node.classList.toggle("d-none", !firearm));
   if (resetToggles) {
     ["twoHanded", "powerAttack", "deadlyAim"].forEach(field => {
       const input = card.querySelector(`[data-field="${field}"]`);
       if (input) input.checked = false;
     });
+    if (!firearm) {
+      ["capacity", "misfire"].forEach(field => {
+        const input = card.querySelector(`[data-field="${field}"]`);
+        if (input) input.value = "";
+      });
+    }
   }
 }
 
@@ -1006,6 +1062,205 @@ function lootIcon(type) {
   }[type] || "bi-gem";
 }
 
+function stripSourceHtml(value) {
+  const div = document.createElement("div");
+  div.innerHTML = String(value || "").replace(/^<\/h3>/i, "");
+  return (div.textContent || div.innerText || "").replace(/\s+/g, " ").trim();
+}
+
+function inferWondrousType(item) {
+  const details = item.details || {};
+  const slot = String(details.slot || "").toLowerCase();
+  const name = String(item.name || "").toLowerCase();
+  if (slot.includes("shield") || name.includes("shield")) return "Shield";
+  if (slot.includes("armor") || name.includes("armor")) return "Armor";
+  if (slot.includes("weapon")) return "Weapon";
+  return "Item";
+}
+
+function normalizeWondrousSourceItem(item, index) {
+  const details = item.details || {};
+  const type = inferWondrousType(item);
+  return {
+    id: `wondrous:${index}`,
+    sourceType: "Wondrous Item",
+    name: item.name || "Wondrous Item",
+    description: stripSourceHtml(details.description || item.description || ""),
+    type,
+    count: 1,
+    details: {
+      source: "Wondrous Item",
+      aura: details.aura || "",
+      casterLevel: details.cl || "",
+      slot: details.slot || "",
+      price: details.price || "",
+      weight: details.weight || "",
+      requirements: details.requirements || "",
+      cost: details.cost || "",
+      link: item.link || ""
+    },
+    effects: []
+  };
+}
+
+function normalizeAlchemicalSourceItem(item, index) {
+  const description = [
+    ...(item.desc || []),
+    ...(item.flavor || []),
+    ...(Array.isArray(item.effect) ? item.effect : item.effect ? [item.effect] : []),
+    item.damage || "",
+    item.cure ? `Cure: ${item.cure}` : "",
+    item.addiction ? `Addiction: ${item.addiction}` : ""
+  ].filter(Boolean).join(" ");
+  return {
+    id: `alchemical:${index}`,
+    sourceType: "Alchemical Item",
+    name: item.name || "Alchemical Item",
+    description,
+    type: "Item",
+    count: 1,
+    details: {
+      source: "Alchemical Item",
+      craftDc: item.dc || "",
+      price: `${item.gp || 0} gp${item.sp ? `, ${item.sp} sp` : ""}${item.cp ? `, ${item.cp} cp` : ""}`,
+      subtype: item.type || "",
+      link: item.link || ""
+    },
+    effects: []
+  };
+}
+
+function normalizeWeaponSourceItem(item, index) {
+  const details = item.details || {};
+  return {
+    id: `weapon:${index}`,
+    sourceType: "Weapon",
+    name: item.name || "Weapon",
+    description: item.description || [
+      details.proficiency,
+      details.weaponGroup,
+      details.damageType ? `Damage type: ${details.damageType}` : "",
+      details.special ? `Special: ${details.special}` : ""
+    ].filter(Boolean).join(". "),
+    type: item.type || "Weapon",
+    count: item.count || 1,
+    details: {
+      source: details.source || "d20pfsrd weapons",
+      proficiency: details.proficiency || "",
+      weaponGroup: details.weaponGroup || "",
+      weaponType: details.weaponType || "Melee Weapon (One-Handed)",
+      attackScale: details.attackScale || "STR",
+      damage: details.damage || "",
+      damageSmall: details.damageSmall || "",
+      critical: details.critical || "",
+      damageScale: details.damageScale || "STR",
+      enhancement: details.enhancement || "0",
+      enchantment: details.enchantment || "",
+      range: details.range || "",
+      cost: details.cost || "",
+      weight: details.weight || "",
+      damageType: details.damageType || "",
+      special: details.special || "",
+      sourceBook: details.sourceBook || "",
+      link: details.link || ""
+    },
+    effects: Array.isArray(item.effects) ? item.effects : []
+  };
+}
+
+function normalizeFirearmSourceItem(item, index) {
+  const normalized = normalizeWeaponSourceItem(item, index);
+  normalized.id = `firearm:${index}`;
+  normalized.sourceType = "Firearm";
+  normalized.details = {
+    ...normalized.details,
+    source: item.details?.source || "d20pfsrd firearms",
+    firearmEra: item.details?.firearmEra || "",
+    misfire: item.details?.misfire || "",
+    capacity: item.details?.capacity || ""
+  };
+  return normalized;
+}
+
+async function loadEnemySourceItems() {
+  const rawWondrousItems = typeof wItems === "undefined" ? [] : wItems;
+  const wondrous = Array.isArray(rawWondrousItems)
+    ? rawWondrousItems.map(normalizeWondrousSourceItem)
+    : [];
+  let weapons = [];
+  try {
+    const response = await fetch("./weapons.json", { cache: "no-cache" });
+    if (response.ok) weapons = (await response.json()).map(normalizeWeaponSourceItem);
+  } catch (error) {
+    console.info("No generated weapons.json found yet.", error);
+  }
+  let firearms = [];
+  try {
+    const response = await fetch("./firearms.json", { cache: "no-cache" });
+    if (response.ok) firearms = (await response.json()).map(normalizeFirearmSourceItem);
+  } catch (error) {
+    console.info("No generated firearms.json found yet.", error);
+  }
+  let alchemical = [];
+  try {
+    const module = await import("./alchemical-crafts.js");
+    alchemical = (Array.isArray(module.items) ? module.items : [])
+      .filter(item => item.name && item.dc)
+      .map(normalizeAlchemicalSourceItem);
+  } catch (error) {
+    console.error("Could not load alchemical item source data", error);
+  }
+  enemySourceItems = [...weapons, ...firearms, ...wondrous, ...alchemical].filter(item => item.name && item.description);
+}
+
+function enemySourceItemMatchesCategory(item) {
+  if (enemySourceItemCategory === "wondrous") return item.sourceType === "Wondrous Item";
+  if (enemySourceItemCategory === "weapons") return ["Weapon", "Firearm"].includes(item.sourceType);
+  if (enemySourceItemCategory === "mundane") return item.sourceType === "Alchemical Item";
+  return true;
+}
+
+function searchableEnemySourceItem(item) {
+  return `${item.name || ""} ${item.sourceType || ""} ${item.description || ""} ${Object.values(item.details || {}).join(" ")}`.toLowerCase();
+}
+
+function renderEnemySourceItemResults() {
+  const term = enemySourceItemSearchTerm.trim().toLowerCase();
+  const rows = enemySourceItems
+    .filter(enemySourceItemMatchesCategory)
+    .filter(item => searchableEnemySourceItem(item).includes(term))
+    .sort((a, b) => String(a.name || "").localeCompare(String(b.name || "")));
+  el("enemySourceItemCount").textContent = `${rows.length} item${rows.length === 1 ? "" : "s"}`;
+  el("enemySourceItemResults").innerHTML = rows.length ? `
+    <div class="source-results-grid">
+      ${rows.map(item => `
+        <button class="source-result-card" type="button" data-enemy-source-item="${escapeHtml(item.id)}">
+          <span class="source-result-icon"><i class="bi ${lootIcon(item.type)}"></i></span>
+          <div class="fw-semibold pe-2">${escapeHtml(item.name)}</div>
+          <div class="small-text">${escapeHtml(item.sourceType)} | ${escapeHtml(item.type || "Item")}</div>
+          <div class="source-result-description mt-1">${escapeHtml(item.description)}</div>
+        </button>
+      `).join("")}
+    </div>
+  ` : `<div class="small-text">No matching source items found.</div>`;
+  el("enemySourceItemResults").querySelectorAll("[data-enemy-source-item]").forEach(button => {
+    button.addEventListener("click", () => addEnemySourceItemToInventory(button.dataset.enemySourceItem));
+  });
+}
+
+function openEnemySourceItemsModal() {
+  if (!isEnemySheetMode) return;
+  enemySourceItemCategory = "all";
+  enemySourceItemSearchTerm = "";
+  el("enemySourceItemSearch").value = "";
+  el("enemySourceItemTabs").querySelectorAll(".nav-link").forEach(tab => {
+    tab.classList.toggle("active", tab.dataset.sourceCategory === "all");
+  });
+  renderEnemySourceItemResults();
+  enemySourceItemModal.show();
+  setTimeout(() => el("enemySourceItemSearch").focus(), 150);
+}
+
 function rememberSelectedCharacter(characterId, contextKey = sheetContextKey) {
   if (PFApp.setSelectedCharacterId) {
     PFApp.setSelectedCharacterId(characterId, contextKey);
@@ -1241,6 +1496,8 @@ function addWeapon(data = {}) {
       <div class="sheet-grid-wide">
       <div><label>Type</label><input data-field="type" class="form-control form-control-sm sheet-input" value="${data.type || ""}"></div>
       <div><label>Range / Ammo</label><input data-field="range" class="form-control form-control-sm sheet-input" value="${data.range || ""}"></div>
+      <div data-firearm-weapon-option><label>Capacity</label><input data-field="capacity" class="form-control form-control-sm sheet-input" value="${data.capacity || ""}"></div>
+      <div data-firearm-weapon-option><label>Misfire</label><input data-field="misfire" class="form-control form-control-sm sheet-input" value="${data.misfire || ""}"></div>
       </div>
     </div>
     </div>
@@ -1379,6 +1636,8 @@ function updateWornCardFromLoot(item) {
     weaponCard.querySelector('[data-field="name"]').value = item.name || "";
     weaponCard.querySelector('[data-field="damage"]').value = details.damage || "";
     weaponCard.querySelector('[data-field="critical"]').value = details.critical || "";
+    weaponCard.querySelector('[data-field="capacity"]').value = details.capacity || "";
+    weaponCard.querySelector('[data-field="misfire"]').value = details.misfire || "";
     weaponCard.querySelector('[data-field="enhancement"]').value = details.enhancement || "0";
     weaponCard.querySelector('[data-field="enchantment"]').value = details.enchantment || "";
     const previousType = weaponCard.querySelector('[data-field="weaponType"]').value || "";
@@ -1418,7 +1677,9 @@ function updateWornCardFromLoot(item) {
       enhancement: details.enhancement || "0",
       enchantment: details.enchantment || "",
       type: details.details || "",
-      critical: details.critical || ""
+      critical: details.critical || "",
+      capacity: details.capacity || "",
+      misfire: details.misfire || ""
     });
   } else if (["Armor", "Shield"].includes(item.type) && !armorCard) {
     weaponCard?.remove();
@@ -1852,6 +2113,8 @@ function renderInventoryAttributes(item) {
     rows.push(["Attack Scales", details.attackScale || "STR"]);
     if (details.damage) rows.push(["Damage", details.damage]);
     if (details.critical) rows.push(["Critical", details.critical]);
+    if (isFirearmWeaponType(details.weaponType) && details.capacity) rows.push(["Capacity", details.capacity]);
+    if (isFirearmWeaponType(details.weaponType) && details.misfire) rows.push(["Misfire", details.misfire]);
     rows.push(["Damage Scales", details.damageScale || "STR"]);
     rows.push(["Enhancement", signed(Number(details.enhancement || 0))]);
     if (details.enchantment) rows.push(["Enchantment", details.enchantment]);
@@ -1891,9 +2154,48 @@ function renderInventoryEffects(item) {
   `;
 }
 
+function cloneJson(value) {
+  return JSON.parse(JSON.stringify(value || {}));
+}
+
+function makeEnemyInventoryItem(source) {
+  return {
+    id: `enemy-item-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    name: source.name || "Item",
+    description: source.description || "",
+    count: source.count || 1,
+    type: source.type || "Item",
+    details: cloneJson(source.details || {}),
+    effects: cloneJson(source.effects || [])
+  };
+}
+
+async function saveEnemyInventoryItems(message = "Enemy inventory updated.") {
+  characterInventoryItems = characterInventoryItems.map(item => ({ ...item, assigned_character_id: currentSheetId }));
+  await saveSheetNow(true);
+  renderCharacterInventory(characterInventoryItems);
+  if (sheetViewMode === "simplified") renderSimplifiedSheet();
+  localStorage.setItem(`pf_enemy_sheet_updated_${sheetContextKey}_${enemySheetId}`, String(Date.now()));
+  if (message) setStatus(message, "success");
+}
+
+async function addEnemySourceItemToInventory(sourceItemId) {
+  const source = enemySourceItems.find(item => item.id === sourceItemId);
+  if (!source || !isEnemySheetMode || !currentSheetId) return;
+  characterInventoryItems = [...characterInventoryItems, { ...makeEnemyInventoryItem(source), assigned_character_id: currentSheetId }];
+  await saveEnemyInventoryItems(`${source.name} added to enemy inventory.`);
+  enemySourceItemModal.hide();
+}
+
 function toggleInventoryDetailFields() {
   const type = el("inventoryItemType")?.value || "Item";
+  const firearm = type === "Weapon" && isFirearmWeaponType(el("inventoryWeaponType")?.value);
   el("inventoryWeaponFields")?.classList.toggle("d-none", type !== "Weapon");
+  document.querySelectorAll(".inventory-firearm-field").forEach(field => field.classList.toggle("d-none", !firearm));
+  if (!firearm) {
+    if (el("inventoryWeaponCapacity")) el("inventoryWeaponCapacity").value = "";
+    if (el("inventoryWeaponMisfire")) el("inventoryWeaponMisfire").value = "";
+  }
   el("inventoryArmorFields")?.classList.toggle("d-none", !["Armor", "Shield"].includes(type));
   if (el("inventoryArmorEnchantment")) el("inventoryArmorEnchantment").innerHTML = armorEnchantmentOptions(el("inventoryArmorEnchantment").value);
 }
@@ -2019,8 +2321,9 @@ function collectInventoryEffects() {
 function collectInventoryDetails() {
   const type = el("inventoryItemType").value;
   if (type === "Weapon") {
-    return {
-      weaponType: el("inventoryWeaponType").value || "Melee Weapon (One-Handed)",
+    const weaponType = el("inventoryWeaponType").value || "Melee Weapon (One-Handed)";
+    const details = {
+      weaponType,
       attackScale: el("inventoryAttackScale").value.trim() || "STR",
       damage: el("inventoryDamageDice").value.trim(),
       critical: el("inventoryWeaponCritical").value.trim(),
@@ -2029,6 +2332,11 @@ function collectInventoryDetails() {
       enchantment: el("inventoryWeaponEnchantment").value.trim(),
       details: el("inventoryWeaponDetails").value.trim()
     };
+    if (isFirearmWeaponType(weaponType)) {
+      details.capacity = el("inventoryWeaponCapacity").value.trim();
+      details.misfire = el("inventoryWeaponMisfire").value.trim();
+    }
+    return details;
   }
   if (["Armor", "Shield"].includes(type)) {
     return {
@@ -2054,6 +2362,8 @@ function openInventoryItemEditor(itemId) {
   setInventoryAttackScale(details.attackScale || "STR");
   el("inventoryDamageDice").value = details.damage || "";
   el("inventoryWeaponCritical").value = details.critical || "";
+  el("inventoryWeaponCapacity").value = details.capacity || "";
+  el("inventoryWeaponMisfire").value = details.misfire || "";
   setInventoryDamageScale(details.damageScale || "STR");
   el("inventoryWeaponEnhancement").value = details.enhancement || "0";
   el("inventoryWeaponEnchantment").value = details.enchantment || "";
@@ -2074,6 +2384,22 @@ async function submitInventoryItemEdit(event) {
   if (!item) return;
   const name = el("inventoryItemName").value.trim();
   if (!name) return;
+
+  if (isEnemySheetMode) {
+    characterInventoryItems = characterInventoryItems.map(entry => entry.id === editingInventoryItemId ? {
+      ...entry,
+      name,
+      description: el("inventoryItemDescription").value.trim(),
+      count: el("inventoryItemCount").value,
+      type: el("inventoryItemType").value,
+      details: { ...cloneJson(entry.details || {}), ...collectInventoryDetails() },
+      effects: collectInventoryEffects()
+    } : entry);
+    inventoryItemModal?.hide();
+    editingInventoryItemId = null;
+    await saveEnemyInventoryItems("Enemy inventory item updated.");
+    return;
+  }
 
   const saved = await PFApp.saveLootItem({
     id: item.id,
@@ -2116,26 +2442,22 @@ async function submitInventoryItemEdit(event) {
   setStatus("Inventory item updated.", "success");
 }
 
-function requestInventoryItemDelete(itemId) {
+async function deleteInventoryItemAmount(itemId, amountOverride = null) {
   const item = characterInventoryItems.find(entry => entry.id === itemId);
   if (!item) return;
-  const total = Number(item.count || 1);
-  pendingInventoryDeleteId = item.id;
-  el("deleteInventoryItemSummary").textContent = `${item.name} is assigned to this character. If fully deleted, equipped copies and item effects will be removed.`;
-  el("deleteInventoryItemCount").max = String(total);
-  el("deleteInventoryItemCount").value = String(total);
-  el("deleteInventoryItemMax").textContent = `Max: ${total}`;
-  deleteInventoryItemModal = bootstrap.Modal.getOrCreateInstance(el("deleteInventoryItemModal"));
-  deleteInventoryItemModal.show();
-}
-
-async function submitInventoryItemDelete(event) {
-  event.preventDefault();
-  const item = characterInventoryItems.find(entry => entry.id === pendingInventoryDeleteId);
-  if (!item) return;
 
   const total = Number(item.count || 1);
-  const amount = Math.max(1, Math.min(total, Number.parseInt(el("deleteInventoryItemCount").value, 10) || 1));
+  const parsedAmount = Number.parseInt(el("deleteInventoryItemCount").value, 10) || 1;
+  const amount = Math.max(1, Math.min(total, amountOverride ?? parsedAmount));
+  if (isEnemySheetMode) {
+    characterInventoryItems = amount >= total
+      ? characterInventoryItems.filter(entry => entry.id !== itemId)
+      : characterInventoryItems.map(entry => entry.id === itemId ? { ...entry, count: total - amount } : entry);
+    pendingInventoryDeleteId = null;
+    deleteInventoryItemModal?.hide();
+    await saveEnemyInventoryItems("Enemy inventory item deleted.");
+    return;
+  }
   let ok = false;
 
   if (amount >= total) {
@@ -2169,6 +2491,29 @@ async function submitInventoryItemDelete(event) {
   deleteInventoryItemModal?.hide();
   await loadCharacterInventory();
   setStatus("Inventory item deleted.", "success");
+}
+
+function requestInventoryItemDelete(itemId) {
+  const item = characterInventoryItems.find(entry => entry.id === itemId);
+  if (!item) return;
+  const total = Number(item.count || 1);
+  if (total <= 1) {
+    void deleteInventoryItemAmount(item.id, 1);
+    return;
+  }
+  pendingInventoryDeleteId = item.id;
+  el("deleteInventoryItemSummary").textContent = `${item.name} is assigned to this character. If fully deleted, equipped copies and item effects will be removed.`;
+  el("deleteInventoryItemCount").max = String(total);
+  el("deleteInventoryItemCount").value = String(total);
+  el("deleteInventoryItemMax").textContent = `Max: ${total}`;
+  deleteInventoryItemModal = bootstrap.Modal.getOrCreateInstance(el("deleteInventoryItemModal"));
+  deleteInventoryItemModal.show();
+}
+
+async function submitInventoryItemDelete(event) {
+  event.preventDefault();
+  if (!pendingInventoryDeleteId) return;
+  await deleteInventoryItemAmount(pendingInventoryDeleteId);
 }
 
 function renderCharacterInventory(items = []) {
@@ -2270,8 +2615,13 @@ async function wearLootItem(item) {
           bonuses: item.effects
         });
       }
-      await PFApp.saveBuffState(activeBuffs, sheetContextKey, currentSheetId);
-      localStorage.setItem(buffRefreshKey(), String(Date.now()));
+      if (isEnemySheetMode) {
+        await saveSheetNow(true);
+        localStorage.setItem(`pf_enemy_sheet_updated_${sheetContextKey}_${enemySheetId}`, String(Date.now()));
+      } else {
+        await PFApp.saveBuffState(activeBuffs, sheetContextKey, currentSheetId);
+        localStorage.setItem(buffRefreshKey(), String(Date.now()));
+      }
     }
     recalculateSheet();
     queueSheetSave();
@@ -2290,7 +2640,9 @@ async function wearLootItem(item) {
       enhancement: details.enhancement || "0",
       enchantment: details.enchantment || "",
       type: details.details || "",
-      critical: details.critical || ""
+      critical: details.critical || "",
+      capacity: details.capacity || "",
+      misfire: details.misfire || ""
     });
   } else if (["Armor", "Shield"].includes(item.type)) {
     addArmor({
@@ -2319,8 +2671,13 @@ async function wearLootItem(item) {
       durationLabel: "Equipped",
       bonuses: item.effects
     });
-    await PFApp.saveBuffState(activeBuffs, sheetContextKey, currentSheetId);
-    localStorage.setItem(buffRefreshKey(), String(Date.now()));
+    if (isEnemySheetMode) {
+      await saveSheetNow(true);
+      localStorage.setItem(`pf_enemy_sheet_updated_${sheetContextKey}_${enemySheetId}`, String(Date.now()));
+    } else {
+      await PFApp.saveBuffState(activeBuffs, sheetContextKey, currentSheetId);
+      localStorage.setItem(buffRefreshKey(), String(Date.now()));
+    }
   }
 
   recalculateSheet();
@@ -2329,8 +2686,8 @@ async function wearLootItem(item) {
 
 async function loadCharacterInventory() {
   if (isEnemySheetMode) {
-    characterInventoryItems = [];
-    renderCharacterInventory([]);
+    characterInventoryItems = characterInventoryItems.map(item => ({ ...item, assigned_character_id: currentSheetId }));
+    renderCharacterInventory(characterInventoryItems);
     if (sheetViewMode === "simplified") renderSimplifiedSheet();
     return;
   }
@@ -2585,6 +2942,7 @@ function collectSheet() {
   const sheet = { fields: {}, abilities: {}, saves: {}, skills: {}, weapons: collectCards("weaponRows"), armor: collectCards("armorRows"), gear: collectCards("gearRows") };
   sheet.preferences = { showAppliedBuffs: showCalculations };
   sheet.customSkills = customSkills;
+  if (isEnemySheetMode) sheet.enemyInventory = characterInventoryItems.map(item => ({ ...item, assigned_character_id: currentSheetId }));
   sheet.calculated = collectCalculatedSummary();
   SIMPLE_FIELDS.forEach(id => sheet.fields[id] = el(id)?.value || "");
   ABILITIES.forEach(([key]) => sheet.abilities[key] = { score: el(`${key}Score`).value });
@@ -2614,6 +2972,9 @@ function restoreSheet(sheet) {
   Object.entries(data.abilities || {}).forEach(([key, value]) => { if (el(`${key}Score`)) el(`${key}Score`).value = value.score || 10; });
   Object.entries(data.saves || {}).forEach(([key, value]) => { if (el(`${key}Base`)) el(`${key}Base`).value = value.base || 0; });
   customSkills = Array.isArray(data.customSkills) ? data.customSkills : [];
+  characterInventoryItems = isEnemySheetMode && Array.isArray(data.enemyInventory)
+    ? data.enemyInventory.map(item => ({ ...item, assigned_character_id: currentSheetId }))
+    : [];
   renderSkillRows(data.skills || {});
   Object.entries(data.skills || {}).forEach(([id, value]) => {
     if (el(`${id}Ability`)) el(`${id}Ability`).value = value.ability || 0;
@@ -2723,7 +3084,12 @@ async function loadEnemySheet(enemyId) {
   activeBuffs = Array.isArray(enemy.sheet?.activeBuffs) ? enemy.sheet.activeBuffs : [];
   restoreSheet(enemy.sheet || {});
   el("characterName").value = enemy.name;
-  renderCharacterInventory([]);
+  characterInventoryItems = Array.isArray(enemy.sheet?.enemyInventory)
+    ? enemy.sheet.enemyInventory.map(item => ({ ...item, assigned_character_id: currentSheetId }))
+    : [];
+  renderCharacterInventory(characterInventoryItems);
+  if (sheetViewMode === "simplified") renderSimplifiedSheet();
+  el("enemySourceItemButton")?.classList.remove("d-none");
   setStatus("Enemy sheet loaded.", "info");
 }
 
@@ -2757,6 +3123,7 @@ async function recalculateAndSaveCharacterSheet(contextKey, characterId) {
   if (!contextKey || !characterId) return null;
   isEnemySheetMode = false;
   enemySheetId = "";
+  el("enemySourceItemButton")?.classList.add("d-none");
   sheetContextKey = contextKey;
   const saved = await PFApp.loadCharacterSheetForRecalculation?.(characterId, sheetContextKey)
     || await PFApp.loadCharacterSheet("", sheetContextKey, characterId);
@@ -2883,6 +3250,10 @@ async function initCharacterSheet() {
     el("sheetPageTitle").textContent = "Enemy Sheet";
     el("newCharacterBtn").classList.add("d-none");
     el("backToEnemiesBtn").classList.remove("d-none");
+    el("enemySourceItemButton")?.classList.remove("d-none");
+    await loadEnemySourceItems();
+  } else {
+    el("enemySourceItemButton")?.classList.add("d-none");
   }
   updateAppliedBuffsToggle();
   setSheetView(sheetViewMode);
@@ -2940,12 +3311,28 @@ async function initCharacterSheet() {
     event.target.reset();
   });
   el("inventoryItemType").addEventListener("change", toggleInventoryDetailFields);
+  el("inventoryWeaponType").addEventListener("change", toggleInventoryDetailFields);
   el("inventoryWeaponType").innerHTML = optionList(WEAPON_TYPES, "Melee Weapon (One-Handed)");
   el("inventoryWeaponEnchantment").innerHTML = optionList(WEAPON_ENCHANTMENTS);
   el("inventoryArmorEnchantment").innerHTML = armorEnchantmentOptions();
   el("inventoryItemForm").addEventListener("submit", submitInventoryItemEdit);
   el("deleteInventoryItemForm").addEventListener("submit", submitInventoryItemDelete);
   el("addInventoryEffect").addEventListener("click", () => addInventoryEffectRow());
+  enemySourceItemModal = bootstrap.Modal.getOrCreateInstance(el("enemySourceItemsModal"));
+  el("enemySourceItemButton").addEventListener("click", openEnemySourceItemsModal);
+  el("enemySourceItemSearch").addEventListener("input", event => {
+    enemySourceItemSearchTerm = event.target.value.trim();
+    renderEnemySourceItemResults();
+  });
+  el("enemySourceItemTabs").querySelectorAll("[data-source-category]").forEach(button => {
+    button.addEventListener("click", () => {
+      enemySourceItemCategory = button.dataset.sourceCategory || "all";
+      el("enemySourceItemTabs").querySelectorAll(".nav-link").forEach(tab => {
+        tab.classList.toggle("active", tab === button);
+      });
+      renderEnemySourceItemResults();
+    });
+  });
   setupInventoryScalingControls();
   recalculateSheet();
   characterSheetReadyResolve?.(true);
@@ -2953,6 +3340,5 @@ async function initCharacterSheet() {
 
 initCharacterSheet();
 </script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
