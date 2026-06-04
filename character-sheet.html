@@ -153,6 +153,8 @@
     .slot-value i, .source-result-icon i, .inventory-card-title i, .simple-chip-main i { font-size: 18px; line-height: 1; }
     .slot-value svg, .source-result-icon svg, .inventory-card-title svg, .simple-chip-main svg { width: 18px; height: 18px; flex: 0 0 auto; }
     .slot-value i, .slot-value svg { color: #8fd19e; }
+    .search-modal-dialog { width: min(1140px, calc(100vw - 2rem)); max-width: min(1140px, calc(100vw - 2rem)); }
+    .search-modal-results { min-height: min(48vh, 460px); max-height: min(62vh, 680px); overflow: auto; }
     .source-results-panel { margin-top: 10px; max-height: min(62vh, 680px); overflow: auto; }
     .source-results-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
     .source-result-card { position: relative; background: #242424; border: 1px solid #444; border-radius: 8px; color: #f4f4f4; padding: 10px 42px 10px 10px; text-align: left; cursor: pointer; min-height: 92px; }
@@ -582,7 +584,7 @@
 </div>
 
 <div class="modal fade" id="effectTrackerModal" tabindex="-1" aria-labelledby="effectTrackerModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable search-modal-dialog">
     <div class="modal-content bg-dark text-white border-secondary">
       <div class="modal-header">
         <h5 class="modal-title" id="effectTrackerModalLabel">Effects</h5>
@@ -615,7 +617,7 @@
           <li class="nav-item" role="presentation"><button class="nav-link" type="button" data-source-category="mundane">Mundane Items</button></li>
           <li class="nav-item" role="presentation"><button class="nav-link" type="button" data-source-category="wondrous">Wondrous Items</button></li>
         </ul>
-        <div id="enemySourceItemResults" class="source-results-panel"></div>
+        <div id="enemySourceItemResults" class="source-results-panel search-modal-results"></div>
       </div>
     </div>
   </div>
@@ -1700,7 +1702,7 @@ function addArmor(data = {}) {
       </div>
     </div>
     <div class="card-summary">
-      <div><label>Bonus</label><input data-field="bonus" class="form-control form-control-sm sheet-input" value="${data.bonus || ""}"></div>
+      <div><label>Total</label><input data-armor-total class="form-control form-control-sm" readonly></div>
       <input data-field="sourceLootId" class="sheet-input" type="hidden" value="${data.sourceLootId || data.source_loot_id || ""}">
     </div>
     <div class="card-details d-none" data-card-details>
@@ -1721,6 +1723,7 @@ function addArmor(data = {}) {
           <option value="Shield" ${type === "Shield" ? "selected" : ""}>Shield</option>
         </select>
       </div>
+      <div><label data-armor-bonus-label>${type === "Shield" ? "Shield Bonus" : "Armor Bonus"}</label><input data-field="bonus" class="form-control form-control-sm sheet-input" value="${data.bonus || ""}"></div>
       <div><label>Penalty</label><input data-field="penalty" class="form-control form-control-sm sheet-input" value="${data.penalty || ""}"></div>
       <div><label>Failure</label><input data-field="failure" class="form-control form-control-sm sheet-input" value="${data.failure || ""}"></div>
       <div><label>Weight</label><input data-field="weight" class="form-control form-control-sm sheet-input" value="${data.weight || ""}"></div>
@@ -1729,6 +1732,7 @@ function addArmor(data = {}) {
   `;
   el("armorRows").appendChild(card);
   attachInputListeners(card);
+  syncArmorCardDisplay(card);
 }
 
 function addGear(data = {}) {
@@ -1901,6 +1905,22 @@ function calculateGearAc() {
     if (item.type === "Shield") totals.shield = Math.max(totals.shield, bonus);
     return totals;
   }, { armor: 0, shield: 0 });
+}
+
+function syncArmorCardDisplay(card) {
+  if (!card) return;
+  const type = card.querySelector('[data-field="type"]')?.value === "Shield" ? "Shield" : "Armor";
+  const bonus = Number(card.querySelector('[data-field="bonus"]')?.value || 0);
+  const enhancement = enhancementValue(card.querySelector('[data-field="enhancement"]')?.value || 0);
+  const total = bonus + enhancement;
+  const label = card.querySelector("[data-armor-bonus-label]");
+  const totalInput = card.querySelector("[data-armor-total]");
+  if (label) label.textContent = type === "Shield" ? "Shield Bonus" : "Armor Bonus";
+  if (totalInput) totalInput.value = String(total);
+}
+
+function syncArmorCardsDisplay() {
+  el("armorRows").querySelectorAll(".sheet-card").forEach(syncArmorCardDisplay);
 }
 
 function powerFeatStep() {
@@ -2113,6 +2133,7 @@ function toggleAppliedBuffs() {
 
 function recalculateSheet() {
   const gearAc = calculateGearAc();
+  syncArmorCardsDisplay();
   el("acArmor").value = gearAc.armor;
   el("acShield").value = gearAc.shield;
   const buffed = window.PFBuffs?.calculateStatsDetailed(activeBuffs, sheetToBaseline());
@@ -3033,7 +3054,7 @@ function renderSimplifiedSheet() {
   });
   const armorRows = [...el("armorRows").querySelectorAll(".sheet-card")].map(card => [
     card.querySelector('[data-field="item"]')?.value || "Unnamed item",
-    card.querySelector('[data-field="bonus"]')?.value || ""
+    card.querySelector("[data-armor-total]")?.value || ""
   ]);
   const gearRows = [...el("gearRows").querySelectorAll(".sheet-card")].map(card => ({
     main: card.querySelector('[data-field="item"]')?.value || "Unnamed gear",
@@ -3100,7 +3121,7 @@ function renderSimplifiedSheet() {
 
     <section class="simple-section">
       <div class="sheet-title">Armor & Shields</div>
-      ${simpleChips(armorRows.map(row => ({ main: row[0], sub: `Bonus ${row[1] || "-"}` })), "No armor or shields.")}
+      ${simpleChips(armorRows.map(row => ({ main: row[0], sub: `Total ${row[1] || "-"}` })), "No armor or shields.")}
     </section>
 
     <section class="simple-section">

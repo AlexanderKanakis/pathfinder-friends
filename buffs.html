@@ -17,6 +17,8 @@
     .calc-applied { color: #e7f7ec; font-weight: 600; }
     .calc-overridden { color: #8a8a8a; }
     .custom-bonus-row { display: grid; grid-template-columns: 1.5fr .7fr 1fr .7fr auto; gap: 6px; align-items: end; }
+    .search-modal-dialog { width: min(1140px, calc(100vw - 2rem)); max-width: min(1140px, calc(100vw - 2rem)); }
+    .search-modal-results { min-height: min(48vh, 460px); max-height: min(62vh, 680px); overflow: auto; }
     .buff-picker-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
     .buff-picker-card {
       position: relative;
@@ -95,7 +97,7 @@
   </div>
 
   <div class="modal fade" id="buffPickerModal" tabindex="-1" aria-labelledby="buffPickerModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable search-modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="buffPickerModalLabel">Add Effect</h5>
@@ -108,7 +110,7 @@
               <input id="buffPickerSearch" class="form-control form-control-sm" placeholder="Name, type, or stat change">
             </div>
           </div>
-          <div id="buffPickerResults" class="buff-picker-grid"></div>
+          <div id="buffPickerResults" class="buff-picker-grid search-modal-results"></div>
         </div>
       </div>
     </div>

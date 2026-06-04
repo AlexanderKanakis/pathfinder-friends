@@ -7,6 +7,10 @@
     style.id = STYLE_ID;
     style.textContent = `
       .effect-tracker-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+      .effect-search-modal-dialog { width: min(1140px, calc(100vw - 2rem)); max-width: min(1140px, calc(100vw - 2rem)); min-width: min(860px, calc(100vw - 2rem)); }
+      .effect-search-modal-dialog .modal-content { width: 100%; height: min(82vh, 820px); }
+      .effect-search-modal-body { display: grid; grid-template-rows: auto minmax(0, 1fr); min-height: 0; }
+      .effect-search-results { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; align-content: start; height: 100%; min-height: 0; overflow: auto; }
       .effect-tracker-search-trigger { cursor: pointer; }
       .effect-tracker-card { position: relative; min-height: 116px; background: #242424; border: 1px solid #444; border-radius: 8px; padding: 12px 44px 12px 12px; text-align: left; color: #f4f4f4; cursor: pointer; }
       .effect-tracker-card:hover, .effect-tracker-card:focus { border-color: #0d6efd; outline: none; box-shadow: 0 0 0 2px rgba(13, 110, 253, .25); }
@@ -36,7 +40,11 @@
       .effect-scale-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: 6px; align-items: end; }
       @media (max-width: 700px) { .effect-duration-grid { grid-template-columns: 1fr 1fr; } }
       @media (max-width: 700px) { .effect-custom-row { grid-template-columns: 1fr 1fr; } }
-      @media (max-width: 700px) { .effect-tracker-grid { grid-template-columns: 1fr; } }
+      @media (max-width: 700px) {
+        .effect-search-modal-dialog { min-width: 0; }
+        .effect-tracker-grid,
+        .effect-search-results { grid-template-columns: 1fr; }
+      }
     `;
     document.head.appendChild(style);
   }
@@ -323,18 +331,18 @@
         <h6>Active Effects</h6>
         <div id="${this.prefix}Active"></div>
         <div class="modal fade" id="${this.prefix}PickerModal" tabindex="-1" aria-labelledby="${this.prefix}PickerLabel" aria-hidden="true">
-          <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+          <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable effect-search-modal-dialog">
             <div class="modal-content bg-dark text-white border-secondary">
               <div class="modal-header">
                 <h5 class="modal-title" id="${this.prefix}PickerLabel">Add Effect</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
-              <div class="modal-body">
+              <div class="modal-body effect-search-modal-body">
                 <div class="mb-3">
                   <label class="small" for="${this.prefix}Search">Search</label>
                   <input id="${this.prefix}Search" class="form-control form-control-sm" placeholder="Name, type, or stat change">
                 </div>
-                <div id="${this.prefix}Results" class="effect-tracker-grid"></div>
+                <div id="${this.prefix}Results" class="effect-tracker-grid effect-search-results"></div>
               </div>
             </div>
           </div>
