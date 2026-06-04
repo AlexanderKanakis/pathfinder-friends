@@ -53,6 +53,59 @@
     .ac-primary-grid { display: grid; grid-template-columns: repeat(2, minmax(120px, 180px)); gap: 8px; margin-bottom: 8px; }
     .compact-table { font-size: 13px; }
     .compact-table input { min-width: 58px; }
+    .save-table,
+    .skill-table {
+      width: max-content;
+      min-width: min(100%, 560px);
+    }
+    .save-table input,
+    .skill-table input {
+      width: 4.5rem;
+      min-width: 4.5rem;
+    }
+    .save-table .total-first-input,
+    .skill-table .total-first-input {
+      width: 5rem;
+      min-width: 5rem;
+      font-weight: 700;
+    }
+    .skill-table .skill-name-cell {
+      min-width: 180px;
+      max-width: 320px;
+      white-space: normal;
+    }
+    .skill-table-wrap {
+      width: 100%;
+      max-width: 100%;
+    }
+    .skill-table {
+      width: 100%;
+      min-width: 0;
+      table-layout: fixed;
+    }
+    .skill-table th,
+    .skill-table td {
+      padding-left: .25rem;
+      padding-right: .25rem;
+    }
+    .skill-table th:first-child {
+      width: 34%;
+    }
+    .skill-table th:not(:first-child) {
+      width: 13.2%;
+    }
+    .skill-table input,
+    .skill-table .total-first-input {
+      width: 100%;
+      min-width: 0;
+      padding-left: .3rem;
+      padding-right: .3rem;
+    }
+    .skill-table .skill-name-cell {
+      min-width: 0;
+      max-width: none;
+      overflow-wrap: anywhere;
+    }
     .no-spinner::-webkit-outer-spin-button,
     .no-spinner::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
     .no-spinner { appearance: textfield; -moz-appearance: textfield; }
@@ -95,11 +148,17 @@
     .inventory-edit-grid, .inventory-effect-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
     .inventory-effect-row { grid-template-columns: 1.4fr .6fr 1fr .7fr auto; background: #242424; border: 1px solid #444; border-radius: 8px; padding: 8px; align-items: end; }
     .inventory-condition-inline { display: grid; grid-template-columns: auto minmax(140px, 1fr); gap: 8px; align-items: end; grid-column: 1 / -2; }
+    .slot-field { border: 1px solid #444; background: #242424; border-radius: 8px; padding: 7px 9px; }
+    .slot-value { display: inline-flex; align-items: center; gap: 6px; color: #e8f1ff; font-weight: 700; }
+    .slot-value i, .source-result-icon i, .inventory-card-title i, .simple-chip-main i { font-size: 18px; line-height: 1; }
+    .slot-value svg, .source-result-icon svg, .inventory-card-title svg, .simple-chip-main svg { width: 18px; height: 18px; flex: 0 0 auto; }
+    .slot-value i, .slot-value svg { color: #8fd19e; }
     .source-results-panel { margin-top: 10px; max-height: min(62vh, 680px); overflow: auto; }
     .source-results-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
     .source-result-card { position: relative; background: #242424; border: 1px solid #444; border-radius: 8px; color: #f4f4f4; padding: 10px 42px 10px 10px; text-align: left; cursor: pointer; min-height: 92px; }
     .source-result-card:hover, .source-result-card:focus { border-color: #0d6efd; outline: none; box-shadow: 0 0 0 2px rgba(13, 110, 253, .25); }
-    .source-result-icon { position: absolute; top: 10px; right: 10px; width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; border-radius: 999px; background: #151515; border: 1px solid #555; color: #9ec5fe; }
+    .source-result-icon { position: absolute; top: 10px; right: 10px; width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; border-radius: 999px; background: #151515; border: 1px solid #555; color: #8fd19e; }
+    .inventory-card-title i, .inventory-card-title svg, .simple-chip-main i, .simple-chip-main svg { color: #8fd19e; }
     .source-result-description { color: #ddd; font-size: 13px; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
     @media (max-width: 760px) {
       .inventory-group-grid { grid-template-columns: 1fr; }
@@ -238,6 +297,24 @@
           <div><label for="speedArmor">Armor Speed</label><input id="speedArmor" class="form-control form-control-sm sheet-input"></div>
         </div>
       </section>
+
+      <section class="sheet-section">
+        <div class="skill-table-wrap">
+          <div class="d-flex justify-content-between align-items-center gap-2 flex-wrap mb-2">
+            <div class="sheet-title mb-0">Skills</div>
+            <div class="d-flex gap-2 flex-wrap">
+              <button class="btn btn-outline-light btn-sm" type="button" onclick="addNamedSkill('Craft', 'int')">Add Craft</button>
+              <button class="btn btn-outline-light btn-sm" type="button" onclick="addNamedSkill('Profession', 'wis')">Add Profession</button>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-dark table-sm align-middle compact-table skill-table">
+              <thead><tr><th>Skill</th><th>Total</th><th>Ability</th><th>Ranks</th><th>Misc</th><th>Buff</th></tr></thead>
+              <tbody id="skillRows"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
     </div>
 
     <div class="col-xl-4">
@@ -265,8 +342,8 @@
       <section class="sheet-section">
         <div class="sheet-title">Saving Throws</div>
         <div class="table-responsive">
-          <table class="table table-dark table-sm align-middle compact-table">
-            <thead><tr><th>Save</th><th>Base</th><th>Ability</th><th>Buff</th><th>Total</th></tr></thead>
+          <table class="table table-dark table-sm align-middle compact-table save-table">
+            <thead><tr><th>Save</th><th>Total</th><th>Base</th><th>Ability</th><th>Buff</th></tr></thead>
             <tbody id="saveRows"></tbody>
           </table>
         </div>
@@ -326,22 +403,6 @@
 
   <section class="sheet-section">
     <div class="d-flex justify-content-between align-items-center mb-2">
-      <div class="sheet-title mb-0">Skills</div>
-      <div class="d-flex gap-2">
-        <button class="btn btn-outline-light btn-sm" type="button" onclick="addNamedSkill('Craft', 'int')">Add Craft</button>
-        <button class="btn btn-outline-light btn-sm" type="button" onclick="addNamedSkill('Profession', 'wis')">Add Profession</button>
-      </div>
-    </div>
-    <div class="table-responsive">
-      <table class="table table-dark table-sm align-middle compact-table">
-        <thead><tr><th>Skill</th><th>Ability</th><th>Ranks</th><th>Misc</th><th>Buff</th><th>Total</th></tr></thead>
-        <tbody id="skillRows"></tbody>
-      </table>
-    </div>
-  </section>
-
-  <section class="sheet-section">
-    <div class="d-flex justify-content-between align-items-center mb-2">
       <div class="sheet-title mb-0">Inventory</div>
       <button id="enemySourceItemButton" class="btn btn-outline-info btn-sm d-none" type="button">
         <i class="bi bi-search"></i> Item List
@@ -398,7 +459,7 @@
 </div>
 
 <div class="modal fade" id="inventoryItemModal" tabindex="-1" aria-labelledby="inventoryItemModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
     <form id="inventoryItemForm" class="modal-content bg-dark text-white border-secondary">
       <div class="modal-header">
         <h5 class="modal-title" id="inventoryItemModalLabel">Edit Item</h5>
@@ -426,6 +487,13 @@
               <option>Shield</option>
               <option>Item</option>
             </select>
+          </div>
+        </div>
+        <div id="inventorySlotField" class="slot-field mt-2">
+          <label for="inventorySlotInput">Slot</label>
+          <div class="d-flex align-items-center gap-2">
+            <select id="inventorySlotInput" class="form-select form-select-sm"></select>
+            <span id="inventorySlotValue" class="slot-value"></span>
           </div>
         </div>
         <div id="inventoryWeaponFields" class="inventory-edit-grid mt-2 d-none">
@@ -538,10 +606,12 @@
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <input id="enemySourceItemSearch" class="form-control form-control-sm mb-3" placeholder="Search weapons, wondrous, and alchemical items">
+        <input id="enemySourceItemSearch" class="form-control form-control-sm mb-3" placeholder="Search weapons, armor, shields, wondrous, and alchemical items">
         <ul class="nav nav-tabs mb-3" id="enemySourceItemTabs" role="tablist">
           <li class="nav-item" role="presentation"><button class="nav-link active" type="button" data-source-category="all">All</button></li>
           <li class="nav-item" role="presentation"><button class="nav-link" type="button" data-source-category="weapons">Weapons</button></li>
+          <li class="nav-item" role="presentation"><button class="nav-link" type="button" data-source-category="armor">Armor</button></li>
+          <li class="nav-item" role="presentation"><button class="nav-link" type="button" data-source-category="shields">Shields</button></li>
           <li class="nav-item" role="presentation"><button class="nav-link" type="button" data-source-category="mundane">Mundane Items</button></li>
           <li class="nav-item" role="presentation"><button class="nav-link" type="button" data-source-category="wondrous">Wondrous Items</button></li>
         </ul>
@@ -558,6 +628,8 @@
 <script src="buff-calculator.js"></script>
 <script src="buff-tracker-widget.js"></script>
 <script src="wondrous.js"></script>
+<script src="scripts.js"></script>
+<script src="item-editor.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 const ABILITIES = [
@@ -578,6 +650,7 @@ const SIMPLE_FIELDS = ["characterName","classLevel","characterLevel","race","ali
 const ABILITY_STAT_NAMES = { str: "strength", dex: "dexterity", con: "constitution", int: "intelligence", wis: "wisdom", cha: "charisma" };
 const SCALE_ABILITIES = ["STR", "DEX", "CON", "INT", "WIS", "CHA"];
 const WEAPON_TYPES = ["Melee Weapon (Light)", "Melee Weapon (One-Handed)", "Melee Weapon (Two-Handed)", "Ranged Weapon", "Firearm (One-Handed)", "Firearm (Two-Handed)", "Natural"];
+const ITEM_SLOTS = PFItemEditor.DEFAULT_SLOTS;
 const WEAPON_ENCHANTMENTS = ["", "Adaptive", "Allying", "Anarchic", "Anchoring", "Axiomatic", "Bane", "Brilliant Energy", "Called", "Conductive", "Corrosive", "Corrosive Burst", "Cruel", "Cunning", "Dancing", "Defending", "Disruption", "Distance", "Flaming", "Flaming Burst", "Frost", "Furious", "Ghost Touch", "Holy", "Icy Burst", "Impact", "Keen", "Merciful", "Returning", "Seeking", "Shock", "Shocking Burst", "Speed", "Spell Storing", "Throwing", "Thundering", "Unholy", "Vicious", "Vorpal", "Wounding"];
 const ARMOR_ENCHANTMENTS = ["", "Balanced", "Benevolent", "Bitter", "Bolstering", "Brawling", "Champion", "Dastard", "Deathless", "Defiant", "Determination", "Energy Resistance", "Energy Resistance (Improved)", "Energy Resistance (Greater)", "Etherealness", "Fortification (Light)", "Fortification (Moderate)", "Fortification (Heavy)", "Ghost Touch", "Glamered", "Invulnerability", "Shadow", "Shadow (Improved)", "Shadow (Greater)", "Slick", "Slick (Improved)", "Slick (Greater)", "Spell Resistance (13)", "Spell Resistance (15)", "Spell Resistance (17)", "Spell Resistance (19)", "Wild"];
 const SHIELD_ENCHANTMENTS = ["", "Animated", "Arrow Catching", "Arrow Deflection", "Bashing", "Blinding", "Clangorous", "Defiant", "Determination", "Energy Resistance", "Energy Resistance (Improved)", "Energy Resistance (Greater)", "Fortification (Light)", "Fortification (Moderate)", "Fortification (Heavy)", "Ghost Touch", "Impervious", "Merging", "Mirrored", "Poison-Resistant", "Rallying", "Ramming", "Reflecting", "Spell Resistance (13)", "Spell Resistance (15)", "Spell Resistance (17)", "Spell Resistance (19)", "Wild"];
@@ -896,7 +969,7 @@ function simpleInventoryChips(items, emptyText = "No inventory.") {
     return `
       <button class="simple-chip simple-chip-clickable text-start text-white" type="button" data-simple-inventory-loot="${escapeHtml(item.id)}">
         <div class="simple-chip-main">
-          <i class="bi ${lootIcon(item.type)} me-1"></i>${escapeHtml(item.name || "Item")}
+          <span class="me-1">${sourceItemIcon(item)}</span>${escapeHtml(item.name || "Item")}
           <span class="simple-chip-sub ms-1">${escapeHtml(`x${item.count || 1}`)}</span>
         </div>
         <div class="simple-chip-sub">${escapeHtml(item.type || "Item")}${equipped ? " | Equipped" : ""}</div>
@@ -1055,11 +1128,69 @@ function simpleWeaponCards(rows) {
 
 function lootIcon(type) {
   return {
-    Weapon: "bi-crosshair",
-    Armor: "bi-shield-fill",
-    Shield: "bi-shield",
-    Item: "bi-gem"
-  }[type] || "bi-gem";
+    Weapon: "bi bi-crosshair",
+    Armor: "bi bi-shield-fill",
+    Shield: "bi bi-shield",
+    Item: "bi bi-gem"
+  }[type] || "bi bi-gem";
+}
+
+function normalizeWondrousSlot(value = "") {
+  const slot = String(value || "").toLowerCase().trim();
+  if (!slot || slot === "-") return "none";
+  if (slot.includes("armor")) return "armor";
+  if (slot.includes("shield")) return "shield";
+  if (slot.includes("weapon")) return "weapon";
+  if (slot.includes("ring")) return "ring";
+  if (slot.includes("rod") || slot.includes("wand")) return "rod";
+  if (slot.includes("staff")) return "staff";
+  if (slot.includes("headband")) return "headband";
+  if (slot.includes("head") || slot.includes("helm")) return "head";
+  if (slot.includes("eye") || slot.includes("goggle")) return "eyes";
+  if (slot.includes("neck") || slot.includes("amulet") || slot.includes("necklace")) return "neck";
+  if (slot.includes("shoulder") || slot.includes("cloak") || slot.includes("mantle") || slot.includes("back")) return "shoulders";
+  if (slot.includes("wrist")) return "wrists";
+  if (slot.includes("hand") || slot.includes("glove") || slot.includes("gauntlet")) return "hands";
+  if (slot.includes("feet") || slot.includes("boot")) return "feet";
+  if (slot.includes("belt")) return "belt";
+  if (slot.includes("chest") || slot.includes("torso")) return "chest";
+  if (slot.includes("body")) return "body";
+  if (slot.includes("held")) return "held";
+  if (slot.includes("none")) return "none";
+  if (slot.includes("special") || slot.includes("see text")) return "special";
+  return "other";
+}
+
+function typeIconHtml(type) {
+  return `<i class="${lootIcon(type)}"></i>`;
+}
+
+function wondrousSlotIcon(slot) {
+  return getIconName(normalizeWondrousSlot(slot)) || typeIconHtml("Item");
+}
+
+function sourceItemIcon(item) {
+  const slot = itemSlotLabel(item);
+  if (slot) return wondrousSlotIcon(slot);
+  return typeIconHtml(item?.type);
+}
+
+function itemSlotLabel(item) {
+  return String(item?.details?.slot || "").trim();
+}
+
+function renderSlotValue(item) {
+  const slot = itemSlotLabel(item);
+  return slot ? `${wondrousSlotIcon(slot)}<span>${escapeHtml(slot)}</span>` : "";
+}
+
+function updateInventorySlotPreview() {
+  const slot = el("inventorySlotInput").value.trim();
+  el("inventorySlotValue").innerHTML = slot ? wondrousSlotIcon(slot) : "";
+}
+
+function syncInventorySlotForType() {
+  PFItemEditor.syncSlotForType(inventoryEditorConfig());
 }
 
 function stripSourceHtml(value) {
@@ -1182,6 +1313,37 @@ function normalizeFirearmSourceItem(item, index) {
   return normalized;
 }
 
+function normalizeArmorShieldSourceItem(item, index) {
+  const details = item.details || {};
+  const type = item.type === "Shield" ? "Shield" : "Armor";
+  return {
+    id: `${type.toLowerCase()}:${index}`,
+    sourceType: type,
+    name: item.name || type,
+    description: item.description || details.summary || "",
+    type,
+    count: item.count || 1,
+    details: {
+      source: details.source || "d20pfsrd armor",
+      armorGroup: details.armorGroup || type,
+      bonus: details.bonus || "0",
+      enhancement: details.enhancement || "0",
+      enchantment: details.enchantment || "",
+      maxDex: details.maxDex || "",
+      penalty: details.penalty || "",
+      failure: details.failure || "",
+      speed30: details.speed30 || "",
+      speed20: details.speed20 || "",
+      cost: details.cost || "",
+      weight: details.weight || "",
+      sourceBook: details.sourceBook || "",
+      link: details.link || "",
+      summary: details.summary || ""
+    },
+    effects: Array.isArray(item.effects) ? item.effects : []
+  };
+}
+
 async function loadEnemySourceItems() {
   const rawWondrousItems = typeof wItems === "undefined" ? [] : wItems;
   const wondrous = Array.isArray(rawWondrousItems)
@@ -1201,6 +1363,16 @@ async function loadEnemySourceItems() {
   } catch (error) {
     console.info("No generated firearms.json found yet.", error);
   }
+  let armorShields = [];
+  try {
+    const response = await fetch("./armor-shields.json", { cache: "no-cache" });
+    if (response.ok) {
+      const data = await response.json();
+      armorShields = (Array.isArray(data) ? data : []).map(normalizeArmorShieldSourceItem);
+    }
+  } catch (error) {
+    console.info("No generated armor-shields.json found yet.", error);
+  }
   let alchemical = [];
   try {
     const module = await import("./alchemical-crafts.js");
@@ -1210,12 +1382,14 @@ async function loadEnemySourceItems() {
   } catch (error) {
     console.error("Could not load alchemical item source data", error);
   }
-  enemySourceItems = [...weapons, ...firearms, ...wondrous, ...alchemical].filter(item => item.name && item.description);
+  enemySourceItems = [...weapons, ...firearms, ...armorShields, ...wondrous, ...alchemical].filter(item => item.name && item.description);
 }
 
 function enemySourceItemMatchesCategory(item) {
   if (enemySourceItemCategory === "wondrous") return item.sourceType === "Wondrous Item";
   if (enemySourceItemCategory === "weapons") return ["Weapon", "Firearm"].includes(item.sourceType);
+  if (enemySourceItemCategory === "armor") return item.type === "Armor";
+  if (enemySourceItemCategory === "shields") return item.type === "Shield";
   if (enemySourceItemCategory === "mundane") return item.sourceType === "Alchemical Item";
   return true;
 }
@@ -1235,9 +1409,9 @@ function renderEnemySourceItemResults() {
     <div class="source-results-grid">
       ${rows.map(item => `
         <button class="source-result-card" type="button" data-enemy-source-item="${escapeHtml(item.id)}">
-          <span class="source-result-icon"><i class="bi ${lootIcon(item.type)}"></i></span>
+          <span class="source-result-icon">${sourceItemIcon(item)}</span>
           <div class="fw-semibold pe-2">${escapeHtml(item.name)}</div>
-          <div class="small-text">${escapeHtml(item.sourceType)} | ${escapeHtml(item.type || "Item")}</div>
+          <div class="small-text">${escapeHtml(item.sourceType)} | ${escapeHtml(item.type || "Item")}${itemSlotLabel(item) ? ` | Slot: ${escapeHtml(itemSlotLabel(item))}` : ""}</div>
           <div class="source-result-description mt-1">${escapeHtml(item.description)}</div>
         </button>
       `).join("")}
@@ -1324,10 +1498,10 @@ function buildSheet() {
   el("saveRows").innerHTML = SAVES.map(([key, label]) => `
     <tr>
       <th>${label}</th>
+      <td><input id="${key}Total" class="form-control form-control-sm total-first-input" readonly></td>
       <td><input id="${key}Base" class="form-control form-control-sm sheet-input" type="number" value="0"></td>
       <td><input id="${key}Ability" class="form-control form-control-sm" readonly></td>
       <td><input id="${key}Buff" class="form-control form-control-sm buff-field" readonly></td>
-      <td><input id="${key}Total" class="form-control form-control-sm" readonly></td>
     </tr>
     <tr>
       <td colspan="5"><div class="small-text calc-line" data-calc-for="${key}Total"></div></td>
@@ -1343,15 +1517,15 @@ function renderSkillRows(saved = {}) {
     const values = saved[id] || {};
     return `
       <tr>
-        <th>
+        <th class="skill-name-cell">
           ${escapeHtml(skill)}
           ${custom ? `<button class="btn btn-outline-danger btn-sm ms-2 py-0 px-1" type="button" onclick="removeNamedSkillByKey('${normalizeSkillName(skill)}')" aria-label="Remove ${escapeHtml(skill)}"><i class="bi bi-trash"></i></button>` : ""}
         </th>
+        <td><input id="${id}Total" class="form-control form-control-sm total-first-input" readonly></td>
         <td><input id="${id}Ability" class="form-control form-control-sm no-spinner" value="0" data-ability="${ability}" readonly></td>
         <td><input id="${id}Ranks" class="form-control form-control-sm sheet-input" type="number" value="${values.ranks || 0}"></td>
         <td><input id="${id}Misc" class="form-control form-control-sm sheet-input" type="number" value="${values.misc || 0}"></td>
         <td><input id="${id}Buff" class="form-control form-control-sm buff-field" readonly></td>
-        <td><input id="${id}Total" class="form-control form-control-sm" readonly></td>
       </tr>
       <tr>
         <td colspan="6"><div class="small-text calc-line" data-calc-for="${id}Total"></div></td>
@@ -2198,6 +2372,7 @@ function toggleInventoryDetailFields() {
   }
   el("inventoryArmorFields")?.classList.toggle("d-none", !["Armor", "Shield"].includes(type));
   if (el("inventoryArmorEnchantment")) el("inventoryArmorEnchantment").innerHTML = armorEnchantmentOptions(el("inventoryArmorEnchantment").value);
+  syncInventorySlotForType();
 }
 
 function setInventoryDamageScale(value = "STR") {
@@ -2320,9 +2495,12 @@ function collectInventoryEffects() {
 
 function collectInventoryDetails() {
   const type = el("inventoryItemType").value;
+  const slot = el("inventorySlotInput").value.trim();
+  const slotDetails = { slot };
   if (type === "Weapon") {
     const weaponType = el("inventoryWeaponType").value || "Melee Weapon (One-Handed)";
     const details = {
+      ...slotDetails,
       weaponType,
       attackScale: el("inventoryAttackScale").value.trim() || "STR",
       damage: el("inventoryDamageDice").value.trim(),
@@ -2340,12 +2518,13 @@ function collectInventoryDetails() {
   }
   if (["Armor", "Shield"].includes(type)) {
     return {
+      ...slotDetails,
       bonus: el("inventoryArmorBonus").value || "0",
       enhancement: el("inventoryArmorEnhancement").value || "0",
       enchantment: el("inventoryArmorEnchantment").value.trim()
     };
   }
-  return {};
+  return slotDetails;
 }
 
 function openInventoryItemEditor(itemId) {
@@ -2358,6 +2537,9 @@ function openInventoryItemEditor(itemId) {
   el("inventoryItemCount").value = item.count || 1;
   el("inventoryItemType").value = item.type || "Item";
   const details = item.details || {};
+  PFItemEditor.setSlot(inventoryEditorConfig(), details.slot || "");
+  updateInventorySlotPreview();
+  PFItemEditor.refreshDescription(inventoryEditorConfig());
   el("inventoryWeaponType").value = details.weaponType || "Melee Weapon (One-Handed)";
   setInventoryAttackScale(details.attackScale || "STR");
   el("inventoryDamageDice").value = details.damage || "";
@@ -2374,6 +2556,7 @@ function openInventoryItemEditor(itemId) {
   el("inventoryEffectRows").innerHTML = "";
   (Array.isArray(item.effects) ? item.effects : []).forEach(effect => addInventoryEffectRow(effect));
   toggleInventoryDetailFields();
+  syncInventorySlotForType();
   inventoryItemModal = bootstrap.Modal.getOrCreateInstance(el("inventoryItemModal"));
   inventoryItemModal.show();
 }
@@ -2395,6 +2578,7 @@ async function submitInventoryItemEdit(event) {
       details: { ...cloneJson(entry.details || {}), ...collectInventoryDetails() },
       effects: collectInventoryEffects()
     } : entry);
+    renderCharacterInventory(characterInventoryItems);
     inventoryItemModal?.hide();
     editingInventoryItemId = null;
     await saveEnemyInventoryItems("Enemy inventory item updated.");
@@ -2408,7 +2592,7 @@ async function submitInventoryItemEdit(event) {
     count: el("inventoryItemCount").value,
     type: el("inventoryItemType").value,
     assignedCharacterId: item.assigned_character_id || currentSheetId,
-    details: collectInventoryDetails(),
+    details: { ...cloneJson(item.details || {}), ...collectInventoryDetails() },
     effects: collectInventoryEffects()
   }, sheetContextKey);
 
@@ -2417,6 +2601,8 @@ async function submitInventoryItemEdit(event) {
     return;
   }
 
+  characterInventoryItems = characterInventoryItems.map(entry => entry.id === item.id ? saved : entry);
+  renderCharacterInventory(characterInventoryItems);
   updateWornCardFromLoot(saved);
   recalculateSheet();
   queueSheetSave();
@@ -2549,7 +2735,7 @@ function renderCharacterInventory(items = []) {
             <article class="inventory-item${equipped ? " equipped" : ""}" data-loot-id="${escapeHtml(item.id)}" role="button" tabindex="0" aria-label="View ${escapeHtml(item.name)} details">
               <div class="inventory-card-head">
                 <div class="inventory-card-title">
-                  <div class="fw-semibold text-truncate"><i class="bi ${lootIcon(item.type)} me-1"></i>${escapeHtml(item.name)}</div>
+                  <div class="fw-semibold text-truncate"><span class="me-1">${sourceItemIcon(item)}</span>${escapeHtml(item.name)}</div>
                   <div class="small-text">${escapeHtml(item.type || "Item")}</div>
                   ${equipped ? `<div class="inventory-equipped-badge"><i class="bi bi-check2-circle"></i> Equipped</div>` : ""}
                 </div>
@@ -3226,6 +3412,23 @@ async function createNewCharacter(name) {
   }
 }
 
+function inventoryEditorConfig() {
+  return {
+    formId: "inventoryItemForm",
+    effectsRootId: "inventoryEffectRows",
+    generalTabId: "inventoryEditorGeneralTab",
+    effectsTabId: "inventoryEditorEffectsTab",
+    generalPanelId: "inventoryEditorGeneralPanel",
+    effectsPanelId: "inventoryEditorEffectsPanel",
+    slotInputId: "inventorySlotInput",
+    slotFieldId: "inventorySlotField",
+    typeInputId: "inventoryItemType",
+    descriptionId: "inventoryItemDescription",
+    slots: ITEM_SLOTS,
+    onSlotChange: updateInventorySlotPreview
+  };
+}
+
 async function initCharacterSheet() {
   const user = await PFApp.requireAuth();
   if (!user) return;
@@ -3296,6 +3499,7 @@ async function initCharacterSheet() {
     }
   }
   attachInputListeners();
+  PFItemEditor.init(inventoryEditorConfig());
   el("characterName").addEventListener("change", async () => {
     if (isEnemySheetMode) return;
     const saved = await PFApp.loadCharacterSheet(el("characterName").value.trim(), sheetContextKey);
@@ -3316,6 +3520,8 @@ async function initCharacterSheet() {
   el("inventoryWeaponEnchantment").innerHTML = optionList(WEAPON_ENCHANTMENTS);
   el("inventoryArmorEnchantment").innerHTML = armorEnchantmentOptions();
   el("inventoryItemForm").addEventListener("submit", submitInventoryItemEdit);
+  el("inventoryItemModal").addEventListener("hidden.bs.modal", () => PFItemEditor.resetTabs(inventoryEditorConfig()));
+  el("inventoryItemModal").addEventListener("shown.bs.modal", () => PFItemEditor.refreshDescription(inventoryEditorConfig()));
   el("deleteInventoryItemForm").addEventListener("submit", submitInventoryItemDelete);
   el("addInventoryEffect").addEventListener("click", () => addInventoryEffectRow());
   enemySourceItemModal = bootstrap.Modal.getOrCreateInstance(el("enemySourceItemsModal"));

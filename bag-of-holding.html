@@ -37,7 +37,7 @@
     .source-results-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
     .source-result-card { position: relative; background: #242424; border: 1px solid #444; border-radius: 8px; color: #f4f4f4; padding: 10px 42px 10px 10px; text-align: left; cursor: pointer; min-height: 92px; }
     .source-result-card:hover, .source-result-card:focus { border-color: #0d6efd; outline: none; box-shadow: 0 0 0 2px rgba(13, 110, 253, .25); }
-    .source-result-icon { position: absolute; top: 10px; right: 10px; width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; border-radius: 999px; background: #151515; border: 1px solid #555; color: #9ec5fe; }
+    .source-result-icon { position: absolute; top: 10px; right: 10px; width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; border-radius: 999px; background: #151515; border: 1px solid #555; color: #8fd19e; }
     .source-result-description { color: #ddd; font-size: 13px; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
     @media (max-width: 760px) {
       .bag-header { grid-template-columns: 1fr; align-items: stretch; }
@@ -56,6 +56,11 @@
     .loot-detail-grid, .loot-effect-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
     .loot-effect-row { grid-template-columns: 1.4fr .6fr 1fr .7fr auto; background: #242424; border: 1px solid #444; border-radius: 8px; padding: 8px; align-items: end; }
     .loot-condition-inline { display: grid; grid-template-columns: auto minmax(140px, 1fr); gap: 8px; align-items: end; grid-column: 1 / -2; }
+    .slot-field { border: 1px solid #444; background: #242424; border-radius: 8px; padding: 7px 9px; }
+    .slot-value { display: inline-flex; align-items: center; gap: 6px; color: #e8f1ff; font-weight: 700; }
+    .slot-value i, .source-result-icon i, .loot-icon i { font-size: 18px; line-height: 1; }
+    .slot-value svg, .source-result-icon svg, .loot-icon svg { width: 18px; height: 18px; flex: 0 0 auto; }
+    .slot-value i, .slot-value svg { color: #8fd19e; }
     .scale-options { display: grid; grid-template-columns: repeat(3, minmax(44px, 1fr)); gap: 6px; max-width: 170px; }
     .scale-options .btn { min-width: 0; }
     @media (max-width: 760px) {
@@ -98,7 +103,7 @@
 </main>
 
 <div class="modal fade" id="lootModal" tabindex="-1" aria-labelledby="lootModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
     <form class="modal-content" id="lootForm">
       <div class="modal-header">
         <h5 class="modal-title" id="lootModalLabel">Add Item</h5>
@@ -126,6 +131,13 @@
               <option>Shield</option>
               <option selected>Item</option>
             </select>
+          </div>
+        </div>
+        <div id="lootSlotField" class="slot-field mt-2">
+          <label for="lootSlotInput">Slot</label>
+          <div class="d-flex align-items-center gap-2">
+            <select id="lootSlotInput" class="form-select form-select-sm"></select>
+            <span id="lootSlotValue" class="slot-value"></span>
           </div>
         </div>
         <div id="lootWeaponFields" class="loot-detail-grid mt-2 d-none">
@@ -250,13 +262,19 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <input id="sourceItemSearch" class="form-control form-control-sm mb-3" placeholder="Search weapons, wondrous, and alchemical items">
+        <input id="sourceItemSearch" class="form-control form-control-sm mb-3" placeholder="Search weapons, armor, shields, wondrous, and alchemical items">
         <ul class="nav nav-tabs mb-3" id="sourceItemTabs" role="tablist">
           <li class="nav-item" role="presentation">
             <button class="nav-link active" type="button" data-source-category="all">All</button>
           </li>
           <li class="nav-item" role="presentation">
             <button class="nav-link" type="button" data-source-category="weapons">Weapons</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" type="button" data-source-category="armor">Armor</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" type="button" data-source-category="shields">Shields</button>
           </li>
           <li class="nav-item" role="presentation">
             <button class="nav-link" type="button" data-source-category="mundane">Mundane Items</button>
@@ -276,6 +294,8 @@
 <script src="supabase-config.js"></script>
 <script src="app-supabase.js"></script>
 <script src="wondrous.js"></script>
+<script src="scripts.js"></script>
+<script src="item-editor.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 let bagContextKey = "general";
@@ -295,10 +315,10 @@ let editingLootId = null;
 let sourceLootTemplateDetails = null;
 
 const typeIcons = {
-  Weapon: "bi-crosshair",
-  Armor: "bi-shield-fill",
-  Shield: "bi-shield",
-  Item: "bi-gem"
+  Weapon: "bi bi-crosshair",
+  Armor: "bi bi-shield-fill",
+  Shield: "bi bi-shield",
+  Item: "bi bi-gem"
 };
 const EFFECT_STATS = ["strength","dexterity","constitution","intelligence","wisdom","charisma","attack","melee attack","ranged attack","damage","melee damage","ranged damage","ac","touch ac","flat-footed ac","natural armor","deflection","fortitude","reflex","will","initiative","cmb","cmd","hit points","spell resistance"];
 const SKILL_STATS = ["skill checks","strength skill checks","dexterity skill checks","constitution skill checks","intelligence skill checks","wisdom skill checks","charisma skill checks"];
@@ -306,6 +326,7 @@ const PF_SKILLS = ["Acrobatics","Appraise","Bluff","Climb","Diplomacy","Disable 
 const SPECIFIC_SKILL_STATS = PF_SKILLS.map(skill => `skill:${skill.replace(/[^a-z0-9]/gi, "").toLowerCase()}`);
 const BONUS_TYPES = ["untyped","alchemical","condition","penalty","armor","circumstance","competence","deflection","dodge","enhancement","insight","luck","morale","natural armor","profane","resistance","sacred","shield","size"];
 const WEAPON_TYPES = ["Melee Weapon (Light)", "Melee Weapon (One-Handed)", "Melee Weapon (Two-Handed)", "Ranged Weapon", "Firearm (One-Handed)", "Firearm (Two-Handed)", "Natural"];
+const ITEM_SLOTS = PFItemEditor.DEFAULT_SLOTS;
 const WEAPON_ENCHANTMENTS = ["", "Adaptive", "Allying", "Anarchic", "Anchoring", "Axiomatic", "Bane", "Brilliant Energy", "Called", "Conductive", "Corrosive", "Corrosive Burst", "Cruel", "Cunning", "Dancing", "Defending", "Disruption", "Distance", "Flaming", "Flaming Burst", "Frost", "Furious", "Ghost Touch", "Holy", "Icy Burst", "Impact", "Keen", "Merciful", "Returning", "Seeking", "Shock", "Shocking Burst", "Speed", "Spell Storing", "Throwing", "Thundering", "Unholy", "Vicious", "Vorpal", "Wounding"];
 const ARMOR_ENCHANTMENTS = ["", "Balanced", "Benevolent", "Bitter", "Bolstering", "Brawling", "Champion", "Dastard", "Deathless", "Defiant", "Determination", "Energy Resistance", "Energy Resistance (Improved)", "Energy Resistance (Greater)", "Etherealness", "Fortification (Light)", "Fortification (Moderate)", "Fortification (Heavy)", "Ghost Touch", "Glamered", "Invulnerability", "Shadow", "Shadow (Improved)", "Shadow (Greater)", "Slick", "Slick (Improved)", "Slick (Greater)", "Spell Resistance (13)", "Spell Resistance (15)", "Spell Resistance (17)", "Spell Resistance (19)", "Wild"];
 const SHIELD_ENCHANTMENTS = ["", "Animated", "Arrow Catching", "Arrow Deflection", "Bashing", "Blinding", "Clangorous", "Defiant", "Determination", "Energy Resistance", "Energy Resistance (Improved)", "Energy Resistance (Greater)", "Fortification (Light)", "Fortification (Moderate)", "Fortification (Heavy)", "Ghost Touch", "Impervious", "Merging", "Mirrored", "Poison-Resistant", "Rallying", "Ramming", "Reflecting", "Spell Resistance (13)", "Spell Resistance (15)", "Spell Resistance (17)", "Spell Resistance (19)", "Wild"];
@@ -410,8 +431,66 @@ function stripSourceHtml(value) {
   return (div.textContent || div.innerText || "").replace(/\s+/g, " ").trim();
 }
 
-function sourceItemIcon(type) {
-  return typeIcons[type] || typeIcons.Item;
+function normalizeWondrousSlot(value = "") {
+  const slot = String(value || "").toLowerCase().trim();
+  if (!slot || slot === "-") return "none";
+  if (slot.includes("armor")) return "armor";
+  if (slot.includes("shield")) return "shield";
+  if (slot.includes("weapon")) return "weapon";
+  if (slot.includes("ring")) return "ring";
+  if (slot.includes("rod") || slot.includes("wand")) return "rod";
+  if (slot.includes("staff")) return "staff";
+  if (slot.includes("headband")) return "headband";
+  if (slot.includes("head") || slot.includes("helm")) return "head";
+  if (slot.includes("eye") || slot.includes("goggle")) return "eyes";
+  if (slot.includes("neck") || slot.includes("amulet") || slot.includes("necklace")) return "neck";
+  if (slot.includes("shoulder") || slot.includes("cloak") || slot.includes("mantle") || slot.includes("back")) return "shoulders";
+  if (slot.includes("wrist")) return "wrists";
+  if (slot.includes("hand") || slot.includes("glove") || slot.includes("gauntlet")) return "hands";
+  if (slot.includes("feet") || slot.includes("boot")) return "feet";
+  if (slot.includes("belt")) return "belt";
+  if (slot.includes("chest") || slot.includes("torso")) return "chest";
+  if (slot.includes("body")) return "body";
+  if (slot.includes("held")) return "held";
+  if (slot.includes("none")) return "none";
+  if (slot.includes("special") || slot.includes("see text")) return "special";
+  return "other";
+}
+
+function typeIconHtml(type) {
+  return `<i class="${typeIcons[type] || typeIcons.Item}"></i>`;
+}
+
+function wondrousSlotIcon(slot) {
+  return getIconName(normalizeWondrousSlot(slot)) || typeIconHtml("Item");
+}
+
+function itemSlotLabel(item) {
+  const slot = item?.details?.slot || "";
+  return String(slot || "").trim();
+}
+
+function renderSlotValue(item) {
+  const slot = itemSlotLabel(item);
+  return slot ? `${wondrousSlotIcon(slot)}<span>${escapeHtml(slot)}</span>` : "";
+}
+
+function updateLootSlotPreview() {
+  const slot = el("lootSlotInput").value.trim();
+  el("lootSlotValue").innerHTML = slot ? wondrousSlotIcon(slot) : "";
+}
+
+function syncLootSlotForType() {
+  PFItemEditor.syncSlotForType(lootEditorConfig());
+}
+
+function sourceItemIcon(itemOrType) {
+  if (typeof itemOrType === "object") {
+    const slot = itemSlotLabel(itemOrType);
+    if (slot) return wondrousSlotIcon(slot);
+  }
+  const type = typeof itemOrType === "object" ? itemOrType?.type : itemOrType;
+  return typeIconHtml(type);
 }
 
 function inferWondrousType(item) {
@@ -529,6 +608,37 @@ function normalizeFirearmSourceItem(item, index) {
   return normalized;
 }
 
+function normalizeArmorShieldSourceItem(item, index) {
+  const details = item.details || {};
+  const type = item.type === "Shield" ? "Shield" : "Armor";
+  return {
+    id: `${type.toLowerCase()}:${index}`,
+    sourceType: type,
+    name: item.name || type,
+    description: item.description || details.summary || "",
+    type,
+    count: item.count || 1,
+    details: {
+      source: details.source || "d20pfsrd armor",
+      armorGroup: details.armorGroup || type,
+      bonus: details.bonus || "0",
+      enhancement: details.enhancement || "0",
+      enchantment: details.enchantment || "",
+      maxDex: details.maxDex || "",
+      penalty: details.penalty || "",
+      failure: details.failure || "",
+      speed30: details.speed30 || "",
+      speed20: details.speed20 || "",
+      cost: details.cost || "",
+      weight: details.weight || "",
+      sourceBook: details.sourceBook || "",
+      link: details.link || "",
+      summary: details.summary || ""
+    },
+    effects: Array.isArray(item.effects) ? item.effects : []
+  };
+}
+
 async function loadSourceItems() {
   const rawWondrousItems = typeof wItems === "undefined" ? [] : wItems;
   const wondrous = Array.isArray(rawWondrousItems)
@@ -554,6 +664,16 @@ async function loadSourceItems() {
   } catch (error) {
     console.info("No generated firearms.json found yet.", error);
   }
+  let armorShields = [];
+  try {
+    const response = await fetch("./armor-shields.json", { cache: "no-cache" });
+    if (response.ok) {
+      const data = await response.json();
+      armorShields = (Array.isArray(data) ? data : []).map(normalizeArmorShieldSourceItem);
+    }
+  } catch (error) {
+    console.info("No generated armor-shields.json found yet.", error);
+  }
   let alchemical = [];
   try {
     const module = await import("./alchemical-crafts.js");
@@ -563,7 +683,7 @@ async function loadSourceItems() {
   } catch (error) {
     console.error("Could not load alchemical item source data", error);
   }
-  sourceItems = [...weapons, ...firearms, ...wondrous, ...alchemical].filter(item => item.name && item.description);
+  sourceItems = [...weapons, ...firearms, ...armorShields, ...wondrous, ...alchemical].filter(item => item.name && item.description);
 }
 
 function searchableSourceItem(item) {
@@ -573,6 +693,8 @@ function searchableSourceItem(item) {
 function sourceItemMatchesCategory(item) {
   if (sourceItemCategory === "wondrous") return item.sourceType === "Wondrous Item";
   if (sourceItemCategory === "weapons") return ["Weapon", "Firearm"].includes(item.sourceType);
+  if (sourceItemCategory === "armor") return item.type === "Armor";
+  if (sourceItemCategory === "shields") return item.type === "Shield";
   if (sourceItemCategory === "mundane") return item.sourceType === "Alchemical Item";
   return true;
 }
@@ -594,9 +716,9 @@ function renderSourceItemResults() {
     <div class="source-results-grid">
       ${results.map(item => `
         <button class="source-result-card" type="button" data-source-item="${escapeHtml(item.id)}">
-          <span class="source-result-icon"><i class="bi ${sourceItemIcon(item.type)}"></i></span>
+          <span class="source-result-icon">${sourceItemIcon(item)}</span>
           <div class="fw-semibold pe-2">${escapeHtml(item.name)}</div>
-          <div class="loot-meta">${escapeHtml(item.sourceType)} | ${escapeHtml(item.type)}</div>
+          <div class="loot-meta">${escapeHtml(item.sourceType)} | ${escapeHtml(item.type)}${itemSlotLabel(item) ? ` | Slot: ${escapeHtml(itemSlotLabel(item))}` : ""}</div>
           <div class="source-result-description mt-1">${escapeHtml(item.description)}</div>
         </button>
       `).join("")}
@@ -619,6 +741,9 @@ function populateLootForm(item, selectedCharacterId = "") {
   renderCharacterOptions(el("lootAssignedTo"), selectedCharacterId);
 
   const details = item.details || {};
+  PFItemEditor.setSlot(lootEditorConfig(), details.slot || "");
+  updateLootSlotPreview();
+  PFItemEditor.refreshDescription(lootEditorConfig());
   el("lootWeaponType").value = details.weaponType || "Melee Weapon (One-Handed)";
   setLootAttackScale(details.attackScale || "STR");
   el("lootDamageDice").value = details.damage || "";
@@ -635,6 +760,7 @@ function populateLootForm(item, selectedCharacterId = "") {
   el("lootEffectRows").innerHTML = "";
   (Array.isArray(item.effects) ? item.effects : []).forEach(effect => addLootEffectRow(effect));
   toggleLootDetailFields();
+  syncLootSlotForType();
 }
 
 function openSourceItemEditor(sourceItemId) {
@@ -722,6 +848,7 @@ function toggleLootDetailFields() {
   }
   el("lootArmorFields").classList.toggle("d-none", !["Armor", "Shield"].includes(type));
   el("lootArmorEnchantment").innerHTML = armorEnchantmentOptions(el("lootArmorEnchantment").value);
+  syncLootSlotForType();
 }
 
 function isFirearmWeaponType(type) {
@@ -844,9 +971,12 @@ function collectLootEffects() {
 
 function collectLootDetails() {
   const type = el("lootType").value;
+  const slot = el("lootSlotInput").value.trim();
+  const slotDetails = { slot };
   if (type === "Weapon") {
     const weaponType = el("lootWeaponType").value || "Melee Weapon (One-Handed)";
     const details = {
+      ...slotDetails,
       weaponType,
       attackScale: el("lootAttackScale").value.trim() || "STR",
       damage: el("lootDamageDice").value.trim(),
@@ -864,12 +994,13 @@ function collectLootDetails() {
   }
   if (["Armor", "Shield"].includes(type)) {
     return {
+      ...slotDetails,
       bonus: el("lootArmorBonus").value || "0",
       enhancement: el("lootArmorEnhancement").value || "0",
       enchantment: el("lootArmorEnchantment").value.trim()
     };
   }
-  return {};
+  return slotDetails;
 }
 
 function signedValue(value) {
@@ -921,7 +1052,7 @@ function renderLootEffects(item) {
 }
 
 function renderLootCard(item) {
-  const icon = typeIcons[item.type] || typeIcons.Item;
+  const icon = sourceItemIcon(item);
   const options = [
     `<option value="">Unassigned</option>`,
     ...bagCharacters.map(character => `<option value="${escapeHtml(character.id)}"${character.id === item.assigned_character_id ? " selected" : ""}>${escapeHtml(characterLabel(character))}</option>`)
@@ -930,10 +1061,10 @@ function renderLootCard(item) {
   return `
     <article class="loot-card" data-loot-id="${escapeHtml(item.id)}" role="button" tabindex="0" aria-label="Edit ${escapeHtml(item.name)}">
       <div class="loot-card-head">
-        <span class="loot-icon"><i class="bi ${icon}"></i></span>
+        <span class="loot-icon">${icon}</span>
         <div class="loot-title flex-grow-1">
           <div class="loot-name">${escapeHtml(item.name)}</div>
-          <div class="loot-meta">${escapeHtml(item.type)}</div>
+          <div class="loot-meta">${escapeHtml(item.type)}${itemSlotLabel(item) ? ` | Slot: ${escapeHtml(itemSlotLabel(item))}` : ""}</div>
         </div>
         <span class="loot-count-actions">
           <span class="loot-count">x${escapeHtml(item.count)}</span>
@@ -1060,6 +1191,7 @@ function resetLootForm() {
   el("lootSubmitButton").textContent = "Add Item";
   el("lootForm").reset();
   el("lootCount").value = "1";
+  PFItemEditor.reset(lootEditorConfig());
   setLootAttackScale("STR");
   setLootDamageScale("STR");
   el("lootWeaponType").value = "Melee Weapon (One-Handed)";
@@ -1173,9 +1305,7 @@ async function submitLootForm(event) {
   const existingItem = editingLootId ? bagLoot.find(item => item.id === editingLootId) : null;
   const selectedType = el("lootType").value;
   const baseDetails = sourceLootTemplateDetails || existingItem?.details || {};
-  const details = selectedType === "Item"
-    ? cloneJson(baseDetails)
-    : { ...cloneJson(baseDetails), ...collectLootDetails() };
+  const details = { ...cloneJson(baseDetails), ...collectLootDetails() };
 
   const saved = await PFApp.saveLootItem({
     id: editingLootId,
@@ -1216,6 +1346,23 @@ async function loadBagContext(contextKey, showLoading = true) {
   clearLootStatus();
 }
 
+function lootEditorConfig() {
+  return {
+    formId: "lootForm",
+    effectsRootId: "lootEffectRows",
+    generalTabId: "lootEditorGeneralTab",
+    effectsTabId: "lootEditorEffectsTab",
+    generalPanelId: "lootEditorGeneralPanel",
+    effectsPanelId: "lootEditorEffectsPanel",
+    slotInputId: "lootSlotInput",
+    slotFieldId: "lootSlotField",
+    typeInputId: "lootType",
+    descriptionId: "lootDescription",
+    slots: ITEM_SLOTS,
+    onSlotChange: updateLootSlotPreview
+  };
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
   const user = await PFApp.requireAuth();
   if (!user) return;
@@ -1224,11 +1371,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   sourceItemModal = new bootstrap.Modal(el("sourceItemsModal"));
   moveLootModal = new bootstrap.Modal(el("moveLootModal"));
   deleteLootModal = new bootstrap.Modal(el("deleteLootModal"));
+  PFItemEditor.init(lootEditorConfig());
   el("lootWeaponType").innerHTML = optionList(WEAPON_TYPES, "Melee Weapon (One-Handed)");
   el("lootWeaponEnchantment").innerHTML = optionList(WEAPON_ENCHANTMENTS);
   el("lootArmorEnchantment").innerHTML = armorEnchantmentOptions();
   el("lootForm").addEventListener("submit", submitLootForm);
   el("lootModal").addEventListener("hidden.bs.modal", resetLootForm);
+  el("lootModal").addEventListener("hidden.bs.modal", () => PFItemEditor.resetTabs(lootEditorConfig()));
+  el("lootModal").addEventListener("shown.bs.modal", () => PFItemEditor.refreshDescription(lootEditorConfig()));
   el("lootType").addEventListener("change", toggleLootDetailFields);
   el("lootWeaponType").addEventListener("change", toggleLootDetailFields);
   setupLootScalingControls();

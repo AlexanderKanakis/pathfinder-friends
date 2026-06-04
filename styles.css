@@ -59,6 +59,9 @@ body {
     text-decoration: none;
     color: white;
 }
+.itemname svg {
+    color: #8fd19e;
+}
 .description p {
     margin-top: 6px;
     text-indent: 10px;
