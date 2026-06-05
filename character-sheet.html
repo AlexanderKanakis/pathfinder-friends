@@ -637,6 +637,7 @@
           <li class="nav-item" role="presentation"><button class="nav-link" type="button" data-source-category="mundane">Mundane Items</button></li>
           <li class="nav-item" role="presentation"><button class="nav-link" type="button" data-source-category="wondrous">Wondrous Items</button></li>
         </ul>
+        <ul class="nav nav-pills mb-3 d-none" id="enemySourceMundaneTabs" role="tablist"></ul>
         <div id="enemySourceItemResults" class="source-results-panel search-modal-results"></div>
       </div>
     </div>
@@ -707,6 +708,8 @@ let enemySourceItemModal = null;
 let enemySourceItems = [];
 let enemySourceItemSearchTerm = "";
 let enemySourceItemCategory = "all";
+let enemySourceItemMundaneCategory = "Adventuring Gear";
+const MUNDANE_CATEGORIES = ["Adventuring Gear", "Alchemical Creations", "Books, Paper, & Writing Supplies", "Clothing & Containers", "Locks, Keys, Tools & Kits", "Religious Items", "Toys & Games"];
 
 const PDF_SAMPLE = {
   characterName: "Choose Name", classLevel: "", race: "", alignment: "",
@@ -782,6 +785,156 @@ function isTwoHandedWeaponType(type) {
   return ["Melee Weapon (Two-Handed)", "Firearm (Two-Handed)"].includes(type);
 }
 
+function isLightOffHandWeaponType(type) {
+  return ["Melee Weapon (Light)", "Natural"].includes(type);
+}
+
+const TWF_MODE_FIELDS = ["twfNoFeatPrimary", "twfNoFeatOff", "twfFeatPrimary", "twfFeatOff"];
+const TWF_PRIMARY_FIELDS = ["twfNoFeatPrimary", "twfFeatPrimary"];
+const TWF_OFFHAND_FIELDS = ["twfNoFeatOff", "twfFeatOff"];
+
+function twfMode(card) {
+  const active = TWF_MODE_FIELDS.find(field => card.querySelector(`[data-field="${field}"]`)?.checked);
+  if (!active) return { field: "", primary: false, offhand: false, feat: false };
+  return {
+    field: active,
+    primary: TWF_PRIMARY_FIELDS.includes(active),
+    offhand: TWF_OFFHAND_FIELDS.includes(active),
+    feat: ["twfFeatPrimary", "twfFeatOff"].includes(active)
+  };
+}
+
+function twfPenalty(mode, offHandLight) {
+  if (!mode?.field) return 0;
+  if (mode.feat) return offHandLight ? -2 : -4;
+  if (mode.primary) return offHandLight ? -4 : -6;
+  return offHandLight ? -8 : -10;
+}
+
+function activeOffhandWeaponCards() {
+  return [...el("weaponRows").querySelectorAll(".sheet-card")].filter(card => twfMode(card).offhand);
+}
+
+function activePrimaryWeaponCards() {
+  return [...el("weaponRows").querySelectorAll(".sheet-card")].filter(card => twfMode(card).primary);
+}
+
+function activeRapidShotCard() {
+  return [...el("weaponRows").querySelectorAll(".sheet-card")].find(card => {
+    const rapidShot = card.querySelector('[data-field="rapidShot"]');
+    return Boolean(rapidShot?.checked);
+  }) || null;
+}
+
+function syncTwfFeatControls(card) {
+  const mode = twfMode(card);
+  const eligible = mode.offhand && mode.feat;
+  card.querySelectorAll("[data-twf-offhand-feat-option]").forEach(node => node.classList.toggle("d-none", !eligible));
+  if (!eligible) {
+    ["improvedTwf", "greaterTwf"].forEach(field => {
+      const input = card.querySelector(`[data-field="${field}"]`);
+      if (input) input.checked = false;
+    });
+  }
+}
+
+function enforceTwfChoice(input) {
+  const card = input.closest(".sheet-card");
+  if (!card || !input.checked) {
+    if (card) syncTwfFeatControls(card);
+    return;
+  }
+  const field = input.dataset.field;
+  if (field === "twoHanded") {
+    [...TWF_MODE_FIELDS, "improvedTwf", "greaterTwf"].forEach(twfField => {
+      const twfInput = card.querySelector(`[data-field="${twfField}"]`);
+      if (twfInput) twfInput.checked = false;
+    });
+    syncTwfFeatControls(card);
+    return;
+  }
+  if (TWF_MODE_FIELDS.includes(field)) {
+    const twoHanded = card.querySelector('[data-field="twoHanded"]');
+    if (twoHanded) twoHanded.checked = false;
+    TWF_MODE_FIELDS.forEach(otherField => {
+      if (otherField === field) return;
+      const other = card.querySelector(`[data-field="${otherField}"]`);
+      if (other) other.checked = false;
+    });
+    if (TWF_PRIMARY_FIELDS.includes(field)) {
+      el("weaponRows").querySelectorAll(".sheet-card").forEach(otherCard => {
+        if (otherCard === card) return;
+        TWF_PRIMARY_FIELDS.forEach(primaryField => {
+          const other = otherCard.querySelector(`[data-field="${primaryField}"]`);
+          if (other) other.checked = false;
+        });
+      });
+    }
+  }
+  if (field === "greaterTwf") {
+    const improved = card.querySelector('[data-field="improvedTwf"]');
+    if (improved) improved.checked = true;
+  }
+  syncTwfFeatControls(card);
+}
+
+function enforceRapidShotChoice(input) {
+  const card = input.closest(".sheet-card");
+  if (!card || !input.checked) return;
+  el("weaponRows").querySelectorAll(".sheet-card").forEach(otherCard => {
+    if (otherCard === card) return;
+    const rapidShot = otherCard.querySelector('[data-field="rapidShot"]');
+    if (rapidShot) rapidShot.checked = false;
+  });
+}
+
+function attachTwfControls(card) {
+  card.querySelectorAll("[data-twf-option], [data-field='twoHanded']").forEach(input => {
+    if (input.dataset.twfBound === "true") return;
+    input.dataset.twfBound = "true";
+    input.addEventListener("change", () => {
+      enforceTwfChoice(input);
+      recalculateSheet();
+      queueSheetSave();
+    });
+  });
+  syncTwfFeatControls(card);
+}
+
+function attachRapidShotControls(card) {
+  const input = card.querySelector('[data-field="rapidShot"]');
+  if (!input || input.dataset.rapidShotBound === "true") return;
+  input.dataset.rapidShotBound = "true";
+  input.addEventListener("change", () => {
+    enforceRapidShotChoice(input);
+    recalculateSheet();
+    queueSheetSave();
+  });
+}
+
+function normalizeTwfWeaponChoices() {
+  let primarySeen = false;
+  el("weaponRows").querySelectorAll(".sheet-card").forEach(card => {
+    const activeModes = TWF_MODE_FIELDS.filter(field => card.querySelector(`[data-field="${field}"]`)?.checked);
+    activeModes.slice(1).forEach(field => {
+      const input = card.querySelector(`[data-field="${field}"]`);
+      if (input) input.checked = false;
+    });
+    const mode = twfMode(card);
+    if (mode.primary) {
+      if (primarySeen) {
+        TWF_PRIMARY_FIELDS.forEach(field => {
+          const input = card.querySelector(`[data-field="${field}"]`);
+          if (input) input.checked = false;
+        });
+      } else {
+        primarySeen = true;
+      }
+    }
+    syncTwfFeatControls(card);
+  });
+}
+
 function syncWeaponTypeControls(card, resetToggles = false) {
   const weaponType = card.querySelector('[data-field="weaponType"]')?.value || "Melee Weapon (One-Handed)";
   const melee = isMeleeWeaponType(weaponType);
@@ -790,7 +943,7 @@ function syncWeaponTypeControls(card, resetToggles = false) {
   card.querySelectorAll("[data-ranged-weapon-option]").forEach(node => node.classList.toggle("d-none", melee));
   card.querySelectorAll("[data-firearm-weapon-option]").forEach(node => node.classList.toggle("d-none", !firearm));
   if (resetToggles) {
-    ["twoHanded", "powerAttack", "deadlyAim"].forEach(field => {
+    ["twoHanded", "powerAttack", "deadlyAim", "rapidShot", ...TWF_MODE_FIELDS, "improvedTwf", "greaterTwf"].forEach(field => {
       const input = card.querySelector(`[data-field="${field}"]`);
       if (input) input.checked = false;
     });
@@ -1275,12 +1428,36 @@ function normalizeAlchemicalSourceItem(item, index) {
     count: 1,
     details: {
       source: "Alchemical Item",
+      mundaneCategory: "Alchemical Creations",
       craftDc: item.dc || "",
       price: `${item.gp || 0} gp${item.sp ? `, ${item.sp} sp` : ""}${item.cp ? `, ${item.cp} cp` : ""}`,
       subtype: item.type || "",
       link: item.link || ""
     },
     effects: []
+  };
+}
+
+function normalizeMundaneSourceItem(item, index) {
+  const details = item.details || {};
+  return {
+    id: `mundane:${index}`,
+    sourceType: "Mundane Item",
+    name: item.name || "Mundane Item",
+    description: item.description || details.summary || "",
+    type: "Item",
+    count: item.count || 1,
+    details: {
+      source: "Mundane Item",
+      mundaneCategory: details.mundaneCategory || "Adventuring Gear",
+      mundaneGroup: details.mundaneGroup || "",
+      price: details.price || "",
+      weight: details.weight || "",
+      sourceBook: details.sourceBook || "",
+      link: details.link || "",
+      summary: details.summary || ""
+    },
+    effects: Array.isArray(item.effects) ? item.effects : []
   };
 }
 
@@ -1405,7 +1582,17 @@ async function loadEnemySourceItems() {
   } catch (error) {
     console.error("Could not load alchemical item source data", error);
   }
-  enemySourceItems = [...weapons, ...firearms, ...armorShields, ...wondrous, ...alchemical].filter(item => item.name && item.description);
+  let mundane = [];
+  try {
+    const response = await fetch("./mundane-items.json", { cache: "no-cache" });
+    if (response.ok) {
+      const data = await response.json();
+      mundane = (Array.isArray(data) ? data : []).map(normalizeMundaneSourceItem);
+    }
+  } catch (error) {
+    console.info("No generated mundane-items.json found yet.", error);
+  }
+  enemySourceItems = [...weapons, ...firearms, ...armorShields, ...wondrous, ...mundane, ...alchemical].filter(item => item.name && item.description);
 }
 
 function enemySourceItemMatchesCategory(item) {
@@ -1413,7 +1600,10 @@ function enemySourceItemMatchesCategory(item) {
   if (enemySourceItemCategory === "weapons") return ["Weapon", "Firearm"].includes(item.sourceType);
   if (enemySourceItemCategory === "armor") return item.type === "Armor";
   if (enemySourceItemCategory === "shields") return item.type === "Shield";
-  if (enemySourceItemCategory === "mundane") return item.sourceType === "Alchemical Item";
+  if (enemySourceItemCategory === "mundane") {
+    return ["Mundane Item", "Alchemical Item"].includes(item.sourceType) &&
+      (item.details?.mundaneCategory || "") === enemySourceItemMundaneCategory;
+  }
   return true;
 }
 
@@ -1422,6 +1612,7 @@ function searchableEnemySourceItem(item) {
 }
 
 function renderEnemySourceItemResults() {
+  renderEnemySourceMundaneTabs();
   const term = enemySourceItemSearchTerm.trim().toLowerCase();
   const rows = enemySourceItems
     .filter(enemySourceItemMatchesCategory)
@@ -1445,9 +1636,29 @@ function renderEnemySourceItemResults() {
   });
 }
 
+function renderEnemySourceMundaneTabs() {
+  const tabs = el("enemySourceMundaneTabs");
+  if (!tabs) return;
+  const show = enemySourceItemCategory === "mundane";
+  tabs.classList.toggle("d-none", !show);
+  if (!show) return;
+  tabs.innerHTML = MUNDANE_CATEGORIES.map(category => `
+    <li class="nav-item" role="presentation">
+      <button class="nav-link${enemySourceItemMundaneCategory === category ? " active" : ""}" type="button" data-enemy-source-mundane-category="${escapeHtml(category)}">${escapeHtml(category)}</button>
+    </li>
+  `).join("");
+  tabs.querySelectorAll("[data-enemy-source-mundane-category]").forEach(button => {
+    button.addEventListener("click", () => {
+      enemySourceItemMundaneCategory = button.dataset.enemySourceMundaneCategory || MUNDANE_CATEGORIES[0];
+      renderEnemySourceItemResults();
+    });
+  });
+}
+
 function openEnemySourceItemsModal() {
   if (!isEnemySheetMode) return;
   enemySourceItemCategory = "all";
+  enemySourceItemMundaneCategory = MUNDANE_CATEGORIES[0];
   enemySourceItemSearchTerm = "";
   el("enemySourceItemSearch").value = "";
   el("enemySourceItemTabs").querySelectorAll(".nav-link").forEach(tab => {
@@ -1600,33 +1811,44 @@ function addWeapon(data = {}) {
   const card = document.createElement("div");
   card.className = "sheet-card";
   card.dataset.weaponIndex = i;
+  const sourceLootId = data.sourceLootId || data.source_loot_id || "";
+  const inventoryBacked = Boolean(sourceLootId);
   const name = data.name || `Weapon ${i + 1}`;
   const attackScale = data.attackScale || data.attack_scale || "STR";
   const damageScale = data.damageScale || data.damage_scale || "STR";
   const twoHanded = isYes(data.twoHanded || data.two_handed) ? "yes" : "no";
   const powerAttack = isYes(data.powerAttack || data.power_attack) ? "yes" : "no";
   const deadlyAim = isYes(data.deadlyAim || data.deadly_aim) ? "yes" : "no";
+  const rapidShot = isYes(data.rapidShot || data.rapid_shot) ? "yes" : "no";
+  const twfNoFeatPrimary = isYes(data.twfNoFeatPrimary || data.twf_no_feat_primary) ? "yes" : "no";
+  const twfNoFeatOff = isYes(data.twfNoFeatOff || data.twf_no_feat_off) ? "yes" : "no";
+  const twfFeatPrimary = isYes(data.twfFeatPrimary || data.twf_feat_primary) ? "yes" : "no";
+  const twfFeatOff = isYes(data.twfFeatOff || data.twf_feat_off) ? "yes" : "no";
+  const improvedTwf = isYes(data.improvedTwf || data.improved_twf) ? "yes" : "no";
+  const greaterTwf = isYes(data.greaterTwf || data.greater_twf) ? "yes" : "no";
   const weaponType = data.weaponType || data.weapon_type || "Melee Weapon (One-Handed)";
   const enhancement = data.enhancement || "0";
   const enchantment = data.enchantment || "";
   card.innerHTML = `
     <div class="equipment-card-header">
-      <input data-field="name" class="form-control form-control-sm sheet-input fw-semibold equipment-name-input" value="${escapeHtml(name)}">
+      ${inventoryBacked
+        ? `<div class="fw-semibold equipment-name-input">${escapeHtml(name)}</div><input data-field="name" class="sheet-input" type="hidden" value="${escapeHtml(name)}">`
+        : `<input data-field="name" class="form-control form-control-sm sheet-input fw-semibold equipment-name-input" value="${escapeHtml(name)}">`}
       <div class="equipment-actions">
         <button class="btn btn-outline-light btn-sm" type="button" onclick="toggleCardDetails(this)">More</button>
         <button class="btn btn-danger btn-sm" type="button" onclick="removeCard(this)">Remove</button>
       </div>
     </div>
-    <input data-field="sourceLootId" class="sheet-input" type="hidden" value="${data.sourceLootId || data.source_loot_id || ""}">
+    <input data-field="sourceLootId" class="sheet-input" type="hidden" value="${sourceLootId}">
     <div class="weapon-summary">
       <div class="weapon-attack-summary"><label>Attack Bonus</label><input data-attack-total class="form-control form-control-sm" readonly></div>
       <div><label>Damage</label><input data-damage-total class="form-control form-control-sm" readonly></div>
-      <div><label>Critical</label><input data-field="critical" class="form-control form-control-sm sheet-input" value="${data.critical || ""}"></div>
+      <div><label>Critical</label><input data-field="critical" class="form-control form-control-sm ${inventoryBacked ? "" : "sheet-input"}" value="${data.critical || ""}" ${inventoryBacked ? "readonly" : ""}></div>
     </div>
     <div class="small-text calc-line" data-weapon-attack-calc></div>
     <div class="small-text calc-line" data-weapon-damage-calc></div>
     <div class="card-details d-none" data-card-details>
-    <div class="enhancement-summary">
+    <div class="enhancement-summary${inventoryBacked ? " d-none" : ""}">
       <div><label>Enhancement</label><input data-field="enhancement" class="form-control form-control-sm sheet-input" type="number" min="0" max="5" value="${enhancement}"></div>
       <div>
         <label>Enchantment</label>
@@ -1635,7 +1857,7 @@ function addWeapon(data = {}) {
         </select>
       </div>
     </div>
-    <div class="weapon-group">
+    <div class="weapon-group${inventoryBacked ? " d-none" : ""}">
       <div class="weapon-group-title">Weapon Type</div>
       <div class="sheet-grid-wide">
         <div>
@@ -1651,14 +1873,14 @@ function addWeapon(data = {}) {
       <div class="sheet-grid-wide">
       <div><label>Attack Buff</label><input data-attack-buff class="form-control form-control-sm buff-field" readonly></div>
       <div><label>Attack Misc</label><input data-field="attackMisc" class="form-control form-control-sm sheet-input" type="number" value="${data.attackMisc || data.attack_misc || "0"}"></div>
-      <div><label>Attack Scales With</label>${scalingOptionButtons("attackScale", attackScale)}</div>
+      <div class="${inventoryBacked ? "d-none" : ""}"><label>Attack Scales With</label>${scalingOptionButtons("attackScale", attackScale)}</div>
       </div>
     </div>
     <div class="weapon-group">
       <div class="weapon-group-title">Damage</div>
       <div class="sheet-grid-wide">
-      <div><label>Damage Dice</label><input data-field="damage" class="form-control form-control-sm sheet-input" value="${data.damage || ""}"></div>
-      <div><label>Damage Scales With</label>${scalingOptionButtons("damageScale", damageScale)}</div>
+      <div class="${inventoryBacked ? "d-none" : ""}"><label>Damage Dice</label><input data-field="damage" class="form-control form-control-sm sheet-input" value="${data.damage || ""}"></div>
+      <div class="${inventoryBacked ? "d-none" : ""}"><label>Damage Scales With</label>${scalingOptionButtons("damageScale", damageScale)}</div>
       <div><label>Damage Buff</label><input data-damage-buff class="form-control form-control-sm buff-field" readonly></div>
       <div><label>Damage Misc</label><input data-field="damageMisc" class="form-control form-control-sm sheet-input" type="number" value="${data.damageMisc || data.damage_misc || "0"}"></div>
       <div><label>Scaling Bonus</label><input data-damage-scaling class="form-control form-control-sm" readonly></div>
@@ -1686,9 +1908,54 @@ function addWeapon(data = {}) {
             <input id="weaponDeadlyAim${i}" data-field="deadlyAim" class="form-check-input sheet-input" type="checkbox" value="yes" ${deadlyAim === "yes" ? "checked" : ""}>
           </div>
         </div>
+        <div data-ranged-weapon-option>
+          <label class="d-block" for="weaponRapidShot${i}">Rapid Shot</label>
+          <div class="form-check form-switch mt-1">
+            <input id="weaponRapidShot${i}" data-field="rapidShot" class="form-check-input sheet-input" type="checkbox" value="yes" ${rapidShot === "yes" ? "checked" : ""}>
+          </div>
+        </div>
+      </div>
+      <div class="weapon-group-title mt-2">Two-Weapon Fighting</div>
+      <div class="weapon-toggle-grid">
+        <div>
+          <label class="d-block" for="weaponTwfNoFeatPrimary${i}">No Feat Primary</label>
+          <div class="form-check form-switch mt-1">
+            <input id="weaponTwfNoFeatPrimary${i}" data-field="twfNoFeatPrimary" data-twf-option class="form-check-input sheet-input" type="checkbox" value="yes" ${twfNoFeatPrimary === "yes" ? "checked" : ""}>
+          </div>
+        </div>
+        <div>
+          <label class="d-block" for="weaponTwfNoFeatOff${i}">No Feat Off</label>
+          <div class="form-check form-switch mt-1">
+            <input id="weaponTwfNoFeatOff${i}" data-field="twfNoFeatOff" data-twf-option class="form-check-input sheet-input" type="checkbox" value="yes" ${twfNoFeatOff === "yes" ? "checked" : ""}>
+          </div>
+        </div>
+        <div>
+          <label class="d-block" for="weaponTwfFeatPrimary${i}">Feat Primary</label>
+          <div class="form-check form-switch mt-1">
+            <input id="weaponTwfFeatPrimary${i}" data-field="twfFeatPrimary" data-twf-option class="form-check-input sheet-input" type="checkbox" value="yes" ${twfFeatPrimary === "yes" ? "checked" : ""}>
+          </div>
+        </div>
+        <div>
+          <label class="d-block" for="weaponTwfFeatOff${i}">Feat Off</label>
+          <div class="form-check form-switch mt-1">
+            <input id="weaponTwfFeatOff${i}" data-field="twfFeatOff" data-twf-option class="form-check-input sheet-input" type="checkbox" value="yes" ${twfFeatOff === "yes" ? "checked" : ""}>
+          </div>
+        </div>
+        <div data-twf-offhand-feat-option>
+          <label class="d-block" for="weaponImprovedTwf${i}">Improved TWF</label>
+          <div class="form-check form-switch mt-1">
+            <input id="weaponImprovedTwf${i}" data-field="improvedTwf" data-twf-option class="form-check-input sheet-input" type="checkbox" value="yes" ${improvedTwf === "yes" ? "checked" : ""}>
+          </div>
+        </div>
+        <div data-twf-offhand-feat-option>
+          <label class="d-block" for="weaponGreaterTwf${i}">Greater TWF</label>
+          <div class="form-check form-switch mt-1">
+            <input id="weaponGreaterTwf${i}" data-field="greaterTwf" data-twf-option class="form-check-input sheet-input" type="checkbox" value="yes" ${greaterTwf === "yes" ? "checked" : ""}>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="weapon-group">
+    <div class="weapon-group${inventoryBacked ? " d-none" : ""}">
       <div class="weapon-group-title">Details</div>
       <div class="sheet-grid-wide">
       <div><label>Type</label><input data-field="type" class="form-control form-control-sm sheet-input" value="${data.type || ""}"></div>
@@ -1703,6 +1970,8 @@ function addWeapon(data = {}) {
   attachInputListeners(card);
   attachScalingControls(card);
   attachWeaponTypeControls(card);
+  attachTwfControls(card);
+  attachRapidShotControls(card);
 }
 
 function addArmor(data = {}) {
@@ -1902,6 +2171,31 @@ function updateWornCardFromLoot(item) {
   }
 }
 
+function syncEquippedLootBuffFromItem(item) {
+  const index = activeBuffs.findIndex(buff => buff.sourceLootId === item.id);
+  const effects = Array.isArray(item.effects) ? item.effects : [];
+  if (!effects.length) {
+    if (index >= 0) {
+      activeBuffs.splice(index, 1);
+      return true;
+    }
+    return false;
+  }
+  const next = {
+    ...(index >= 0 ? activeBuffs[index] : {}),
+    name: item.name,
+    category: "Item",
+    sourceLootId: item.id,
+    permanent: true,
+    durationLabel: "Equipped",
+    bonuses: effects
+  };
+  if (index >= 0 && JSON.stringify(activeBuffs[index]) === JSON.stringify(next)) return false;
+  if (index >= 0) activeBuffs[index] = next;
+  else activeBuffs.push(next);
+  return true;
+}
+
 function isLootEquipped(sourceLootId) {
   return ["weaponRows", "armorRows", "gearRows"].some(containerId =>
     [...el(containerId).querySelectorAll(".sheet-card")].some(card =>
@@ -2041,20 +2335,52 @@ function calculateWeaponAttack(card, buffed, buffBonuses) {
     Number(buffBonuses.attack || 0) +
     Number(buffBonuses[isRanged ? "ranged attack" : "melee attack"] || 0);
   const extraAttacks = Math.max(0, Math.floor(Number(buffBonuses["extra attack"] || 0)));
-  const totalBonus = scalingBonus + enhancement + miscBonus + buffBonus + feat.attackPenalty;
-  const attackValues = iterativeBabBonuses(num("bab")).map(base => signed(base + totalBonus));
-  if (extraAttacks && attackValues.length) {
-    attackValues.splice(1, 0, ...Array(extraAttacks).fill(attackValues[0]));
+  const twf = twfMode(card);
+  const offhandCards = activeOffhandWeaponCards();
+  const hasPrimaryWeapon = activePrimaryWeaponCards().length > 0;
+  const twfSetActive = hasPrimaryWeapon && offhandCards.length > 0;
+  const effectExtraAttacks = twfSetActive && !twf.primary ? 0 : extraAttacks;
+  const rapidShotCard = activeRapidShotCard();
+  const rapidShotActive = Boolean(rapidShotCard);
+  const rapidShotOnThisWeapon = rapidShotCard === card;
+  const primaryOffhandLight = offhandCards.some(offhandCard => {
+    const offhandType = offhandCard.querySelector('[data-field="weaponType"]')?.value || "";
+    return isLightOffHandWeaponType(offhandType);
+  });
+  const selfOffhandLight = isLightOffHandWeaponType(weaponType);
+  const twfActive = (twf.offhand && hasPrimaryWeapon) || (twf.primary && offhandCards.length > 0);
+  const twfAttackPenalty = twfActive ? twfPenalty(twf, twf.primary ? primaryOffhandLight : selfOffhandLight) : 0;
+  const rapidShotPenalty = rapidShotActive ? -2 : 0;
+  const totalBonus = scalingBonus + enhancement + miscBonus + buffBonus + feat.attackPenalty + twfAttackPenalty + rapidShotPenalty;
+  const baseIteratives = iterativeBabBonuses(num("bab"));
+  const attackValues = twf.offhand && hasPrimaryWeapon
+    ? [baseIteratives[0] || 0, ...(isYes(field("improvedTwf")) ? [(baseIteratives[0] || 0) - 5] : []), ...(isYes(field("greaterTwf")) ? [(baseIteratives[0] || 0) - 10] : [])].map(base => signed(base + totalBonus))
+    : baseIteratives.map(base => signed(base + totalBonus));
+  if (rapidShotOnThisWeapon && attackValues.length) {
+    attackValues.splice(1, 0, attackValues[0]);
+  }
+  if (effectExtraAttacks && attackValues.length) {
+    attackValues.splice(1, 0, ...Array(effectExtraAttacks).fill(attackValues[0]));
   }
   const attacks = attackValues.join("/");
   const statItems = scalingTerms.flatMap(term => breakdownForStat(buffed, ABILITY_STAT_NAMES[term.key], `${ABILITY_STAT_NAMES[term.key]} attack scaling`).map(item => ({ ...item, targetLabel: "Attack scaling" })));
   const directItems = [
     ...breakdownForStat(buffed, "attack").map(item => ({ ...item, targetLabel: "Attack" })),
     ...breakdownForStat(buffed, isRanged ? "ranged attack" : "melee attack").map(item => ({ ...item, targetLabel: isRanged ? "Ranged attack" : "Melee attack" })),
-    ...breakdownForStat(buffed, "extra attack").map(item => ({ ...item, targetLabel: "Extra attack" })),
+    ...(effectExtraAttacks ? breakdownForStat(buffed, "extra attack").map(item => ({ ...item, targetLabel: "Extra attack" })) : []),
     ...feat.breakdown.filter(item => item.targetLabel === "Attack")
   ];
-  const formula = `BAB iteratives + extra attacks ${extraAttacks} + scaling ${signed(scalingBonus)} + enhancement ${signed(enhancement)} + misc ${signed(miscBonus)} + buffs ${signed(buffBonus)} + feats ${signed(feat.attackPenalty)}`;
+  if (twfAttackPenalty) {
+    const source = twf.offhand
+      ? `TWF ${twf.feat ? "feat" : "no feat"} off-hand${selfOffhandLight ? " light" : ""}`
+      : `TWF ${twf.feat ? "feat" : "no feat"} primary${primaryOffhandLight ? " light off-hand" : ""}`;
+    directItems.push({ source, value: twfAttackPenalty, type: "feat", applied: true, targetLabel: "Attack" });
+  }
+  if (rapidShotPenalty) directItems.push({ source: "Rapid Shot", value: rapidShotPenalty, type: "feat", applied: true, targetLabel: "Attack" });
+  if (rapidShotOnThisWeapon) directItems.push({ source: "Rapid Shot", value: 1, type: "feat", applied: true, targetLabel: "Extra attack" });
+  if (twf.offhand && hasPrimaryWeapon && isYes(field("improvedTwf"))) directItems.push({ source: "Improved Two-Weapon Fighting", value: -5, type: "feat", applied: true, targetLabel: "Extra off-hand attack" });
+  if (twf.offhand && hasPrimaryWeapon && isYes(field("greaterTwf"))) directItems.push({ source: "Greater Two-Weapon Fighting", value: -10, type: "feat", applied: true, targetLabel: "Extra off-hand attack" });
+  const formula = `BAB ${twf.offhand && hasPrimaryWeapon ? "off-hand" : "iteratives"} + extra attacks ${effectExtraAttacks + (rapidShotOnThisWeapon ? 1 : 0)} + scaling ${signed(scalingBonus)} + enhancement ${signed(enhancement)} + misc ${signed(miscBonus)} + buffs ${signed(buffBonus)} + feats ${signed(feat.attackPenalty)} + TWF ${signed(twfAttackPenalty)} + Rapid Shot ${signed(rapidShotPenalty)}`;
   return { buffBonus, attacks, formula, breakdown: [...statItems, ...directItems] };
 }
 
@@ -2618,16 +2944,22 @@ async function submitInventoryItemEdit(event) {
   if (!name) return;
 
   if (isEnemySheetMode) {
-    characterInventoryItems = characterInventoryItems.map(entry => entry.id === editingInventoryItemId ? {
-      ...entry,
+    const updatedEnemyItem = {
+      ...item,
       name,
       description: el("inventoryItemDescription").value.trim(),
       count: el("inventoryItemCount").value,
       type: el("inventoryItemType").value,
-      details: { ...cloneJson(entry.details || {}), ...collectInventoryDetails() },
+      details: { ...cloneJson(item.details || {}), ...collectInventoryDetails() },
       effects: collectInventoryEffects()
+    };
+    characterInventoryItems = characterInventoryItems.map(entry => entry.id === editingInventoryItemId ? {
+      ...entry,
+      ...updatedEnemyItem
     } : entry);
     renderCharacterInventory(characterInventoryItems);
+    updateWornCardFromLoot(updatedEnemyItem);
+    if (isLootEquipped(updatedEnemyItem.id)) syncEquippedLootBuffFromItem(updatedEnemyItem);
     inventoryItemModal?.hide();
     editingInventoryItemId = null;
     await saveEnemyInventoryItems("Enemy inventory item updated.");
@@ -2655,17 +2987,7 @@ async function submitInventoryItemEdit(event) {
   updateWornCardFromLoot(saved);
   recalculateSheet();
   queueSheetSave();
-  const wornIndex = activeBuffs.findIndex(buff => buff.sourceLootId === item.id);
-  if (wornIndex >= 0) {
-    if (saved.effects?.length) {
-      activeBuffs[wornIndex] = {
-        ...activeBuffs[wornIndex],
-        name: saved.name,
-        bonuses: saved.effects
-      };
-    } else {
-      activeBuffs.splice(wornIndex, 1);
-    }
+  if (isLootEquipped(saved.id) && syncEquippedLootBuffFromItem(saved)) {
     await PFApp.saveBuffState(activeBuffs, sheetContextKey, currentSheetId);
     localStorage.setItem(buffRefreshKey(), String(Date.now()));
     recalculateSheet();
@@ -2941,8 +3263,15 @@ async function loadCharacterInventory() {
 }
 
 async function reconcileEquippedLoot(allLoot = []) {
-  const validIds = new Set((allLoot || []).map(item => item.id));
+  const ownedLoot = (allLoot || []).filter(item => item.assigned_character_id === currentSheetId);
+  const validIds = new Set(ownedLoot.map(item => item.id));
   let changed = false;
+  ownedLoot.forEach(item => {
+    if (isLootEquipped(item.id)) {
+      updateWornCardFromLoot(item);
+      if (syncEquippedLootBuffFromItem(item)) changed = true;
+    }
+  });
   ["weaponRows", "armorRows", "gearRows"].forEach(containerId => {
     el(containerId).querySelectorAll(".sheet-card").forEach(card => {
       const sourceLootId = card.querySelector('[data-field="sourceLootId"]')?.value || "";
@@ -2960,6 +3289,8 @@ async function reconcileEquippedLoot(allLoot = []) {
     changed = true;
   }
   if (changed) {
+    await PFApp.saveBuffState(activeBuffs, sheetContextKey, currentSheetId);
+    localStorage.setItem(buffRefreshKey(), String(Date.now()));
     recalculateSheet();
     queueSheetSave();
   }
@@ -3239,6 +3570,7 @@ function restoreSheet(sheet) {
   armorCount = 0;
   gearCount = 0;
   (data.weapons || []).forEach(addWeapon);
+  normalizeTwfWeaponChoices();
   (data.armor || []).forEach(item => {
     if (["Gear", "Item"].includes(item.type)) addGear({ ...item, details: item.details || item.weight || "" });
     else addArmor(item);
@@ -3571,6 +3903,12 @@ async function initCharacterSheet() {
   window.addEventListener("storage", event => {
     if (isEnemySheetMode || !currentSheetId) return;
     if (event.key === buffRefreshKey(currentSheetId)) refreshBuffsIfChanged(true, true);
+    if (event.key === `pf_loot_updated_${sheetContextKey}_${currentSheetId}`) {
+      loadCharacterInventory().then(() => {
+        recalculateSheet();
+        queueSheetSave();
+      });
+    }
   });
   if (isEnemySheetMode) {
     await loadEnemySheet(enemySheetId);
@@ -3625,6 +3963,9 @@ async function initCharacterSheet() {
   el("enemySourceItemTabs").querySelectorAll("[data-source-category]").forEach(button => {
     button.addEventListener("click", () => {
       enemySourceItemCategory = button.dataset.sourceCategory || "all";
+      if (enemySourceItemCategory === "mundane" && !MUNDANE_CATEGORIES.includes(enemySourceItemMundaneCategory)) {
+        enemySourceItemMundaneCategory = MUNDANE_CATEGORIES[0];
+      }
       el("enemySourceItemTabs").querySelectorAll(".nav-link").forEach(tab => {
         tab.classList.toggle("active", tab === button);
       });

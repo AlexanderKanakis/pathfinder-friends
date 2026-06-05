@@ -294,6 +294,7 @@
             <button class="nav-link" type="button" data-source-category="wondrous">Wondrous Items</button>
           </li>
         </ul>
+        <ul class="nav nav-pills mb-3 d-none" id="sourceMundaneTabs" role="tablist"></ul>
         <div id="sourceItemResults" class="source-results-panel search-modal-results"></div>
       </div>
     </div>
@@ -322,6 +323,7 @@ let pendingLootDelete = null;
 let lootSearchTerm = "";
 let sourceItemSearchTerm = "";
 let sourceItemCategory = "all";
+let sourceItemMundaneCategory = "Adventuring Gear";
 let editingLootId = null;
 let sourceLootTemplateDetails = null;
 let collapsedLootGroups = new Set();
@@ -342,6 +344,7 @@ const ITEM_SLOTS = PFItemEditor.DEFAULT_SLOTS;
 const WEAPON_ENCHANTMENTS = ["", "Adaptive", "Allying", "Anarchic", "Anchoring", "Axiomatic", "Bane", "Brilliant Energy", "Called", "Conductive", "Corrosive", "Corrosive Burst", "Cruel", "Cunning", "Dancing", "Defending", "Disruption", "Distance", "Flaming", "Flaming Burst", "Frost", "Furious", "Ghost Touch", "Holy", "Icy Burst", "Impact", "Keen", "Merciful", "Returning", "Seeking", "Shock", "Shocking Burst", "Speed", "Spell Storing", "Throwing", "Thundering", "Unholy", "Vicious", "Vorpal", "Wounding"];
 const ARMOR_ENCHANTMENTS = ["", "Balanced", "Benevolent", "Bitter", "Bolstering", "Brawling", "Champion", "Dastard", "Deathless", "Defiant", "Determination", "Energy Resistance", "Energy Resistance (Improved)", "Energy Resistance (Greater)", "Etherealness", "Fortification (Light)", "Fortification (Moderate)", "Fortification (Heavy)", "Ghost Touch", "Glamered", "Invulnerability", "Shadow", "Shadow (Improved)", "Shadow (Greater)", "Slick", "Slick (Improved)", "Slick (Greater)", "Spell Resistance (13)", "Spell Resistance (15)", "Spell Resistance (17)", "Spell Resistance (19)", "Wild"];
 const SHIELD_ENCHANTMENTS = ["", "Animated", "Arrow Catching", "Arrow Deflection", "Bashing", "Blinding", "Clangorous", "Defiant", "Determination", "Energy Resistance", "Energy Resistance (Improved)", "Energy Resistance (Greater)", "Fortification (Light)", "Fortification (Moderate)", "Fortification (Heavy)", "Ghost Touch", "Impervious", "Merging", "Mirrored", "Poison-Resistant", "Rallying", "Ramming", "Reflecting", "Spell Resistance (13)", "Spell Resistance (15)", "Spell Resistance (17)", "Spell Resistance (19)", "Wild"];
+const MUNDANE_CATEGORIES = ["Adventuring Gear", "Alchemical Creations", "Books, Paper, & Writing Supplies", "Clothing & Containers", "Locks, Keys, Tools & Kits", "Religious Items", "Toys & Games"];
 
 function el(id) {
   return document.getElementById(id);
@@ -583,12 +586,36 @@ function normalizeAlchemicalSourceItem(item, index) {
     count: 1,
     details: {
       source: "Alchemical Item",
+      mundaneCategory: "Alchemical Creations",
       craftDc: item.dc || "",
       price: `${item.gp || 0} gp${item.sp ? `, ${item.sp} sp` : ""}${item.cp ? `, ${item.cp} cp` : ""}`,
       subtype: item.type || "",
       link: item.link || ""
     },
     effects: []
+  };
+}
+
+function normalizeMundaneSourceItem(item, index) {
+  const details = item.details || {};
+  return {
+    id: `mundane:${index}`,
+    sourceType: "Mundane Item",
+    name: item.name || "Mundane Item",
+    description: item.description || details.summary || "",
+    type: "Item",
+    count: item.count || 1,
+    details: {
+      source: "Mundane Item",
+      mundaneCategory: details.mundaneCategory || "Adventuring Gear",
+      mundaneGroup: details.mundaneGroup || "",
+      price: details.price || "",
+      weight: details.weight || "",
+      sourceBook: details.sourceBook || "",
+      link: details.link || "",
+      summary: details.summary || ""
+    },
+    effects: Array.isArray(item.effects) ? item.effects : []
   };
 }
 
@@ -719,7 +746,17 @@ async function loadSourceItems() {
   } catch (error) {
     console.error("Could not load alchemical item source data", error);
   }
-  sourceItems = [...weapons, ...firearms, ...armorShields, ...wondrous, ...alchemical].filter(item => item.name && item.description);
+  let mundane = [];
+  try {
+    const response = await fetch("./mundane-items.json", { cache: "no-cache" });
+    if (response.ok) {
+      const data = await response.json();
+      mundane = (Array.isArray(data) ? data : []).map(normalizeMundaneSourceItem);
+    }
+  } catch (error) {
+    console.info("No generated mundane-items.json found yet.", error);
+  }
+  sourceItems = [...weapons, ...firearms, ...armorShields, ...wondrous, ...mundane, ...alchemical].filter(item => item.name && item.description);
 }
 
 function searchableSourceItem(item) {
@@ -731,13 +768,17 @@ function sourceItemMatchesCategory(item) {
   if (sourceItemCategory === "weapons") return ["Weapon", "Firearm"].includes(item.sourceType);
   if (sourceItemCategory === "armor") return item.type === "Armor";
   if (sourceItemCategory === "shields") return item.type === "Shield";
-  if (sourceItemCategory === "mundane") return item.sourceType === "Alchemical Item";
+  if (sourceItemCategory === "mundane") {
+    return ["Mundane Item", "Alchemical Item"].includes(item.sourceType) &&
+      (item.details?.mundaneCategory || "") === sourceItemMundaneCategory;
+  }
   return true;
 }
 
 function renderSourceItemResults() {
   const wrapper = el("sourceItemResults");
   const count = el("sourceItemCount");
+  renderSourceMundaneTabs();
   const term = sourceItemSearchTerm.trim().toLowerCase();
   const results = sourceItems
     .filter(sourceItemMatchesCategory)
@@ -762,6 +803,25 @@ function renderSourceItemResults() {
   `;
   wrapper.querySelectorAll("[data-source-item]").forEach(button => {
     button.addEventListener("click", () => openSourceItemEditor(button.dataset.sourceItem));
+  });
+}
+
+function renderSourceMundaneTabs() {
+  const tabs = el("sourceMundaneTabs");
+  if (!tabs) return;
+  const show = sourceItemCategory === "mundane";
+  tabs.classList.toggle("d-none", !show);
+  if (!show) return;
+  tabs.innerHTML = MUNDANE_CATEGORIES.map(category => `
+    <li class="nav-item" role="presentation">
+      <button class="nav-link${sourceItemMundaneCategory === category ? " active" : ""}" type="button" data-source-mundane-category="${escapeHtml(category)}">${escapeHtml(category)}</button>
+    </li>
+  `).join("");
+  tabs.querySelectorAll("[data-source-mundane-category]").forEach(button => {
+    button.addEventListener("click", () => {
+      sourceItemMundaneCategory = button.dataset.sourceMundaneCategory || MUNDANE_CATEGORIES[0];
+      renderSourceItemResults();
+    });
   });
 }
 
@@ -814,6 +874,7 @@ function openSourceItemEditor(sourceItemId) {
 
 function openSourceItemsModal() {
   sourceItemCategory = "all";
+  sourceItemMundaneCategory = MUNDANE_CATEGORIES[0];
   sourceItemSearchTerm = "";
   el("sourceItemSearch").value = "";
   el("sourceItemTabs").querySelectorAll(".nav-link").forEach(tab => {
@@ -1135,6 +1196,7 @@ function renderLootCard(item) {
 function lootTypeBucket(item) {
   if (item.type === "Weapon") return "weapons";
   if (["Armor", "Shield"].includes(item.type)) return "armor";
+  if (String(item.details?.source || item.sourceType || "").toLowerCase() === "wondrous item") return "wondrous";
   return "other";
 }
 
@@ -1143,6 +1205,7 @@ function renderLootTypeSections(items) {
   const sections = [
     { key: "weapons", label: "Weapons" },
     { key: "armor", label: "Armor / Shields" },
+    { key: "wondrous", label: "Wondrous Items" },
     { key: "other", label: "Other" }
   ];
   return sections.map(section => {
@@ -1196,6 +1259,8 @@ async function assignLoot(itemId, assignedTo) {
   }
 
   clearLootStatus();
+  notifyLootUpdated({ ...item, assigned_character_id: previous || null });
+  notifyLootUpdated(saved);
   await loadBagContext(bagContextKey, false);
 }
 
@@ -1221,7 +1286,7 @@ async function submitLootMove(event) {
 
   if (amount >= total) {
     item.assigned_character_id = target;
-    await PFApp.saveLootItem({
+    const saved = await PFApp.saveLootItem({
       id: item.id,
       name: item.name,
       description: item.description,
@@ -1231,8 +1296,12 @@ async function submitLootMove(event) {
       details: item.details,
       effects: item.effects
     }, bagContextKey);
+    if (saved) {
+      notifyLootUpdated({ ...item, assigned_character_id: pendingLootMove.previous || null });
+      notifyLootUpdated(saved);
+    }
   } else {
-    await PFApp.saveLootItem({
+    const remaining = await PFApp.saveLootItem({
       id: item.id,
       name: item.name,
       description: item.description,
@@ -1242,7 +1311,7 @@ async function submitLootMove(event) {
       details: item.details,
       effects: item.effects
     }, bagContextKey);
-    await PFApp.saveLootItem({
+    const moved = await PFApp.saveLootItem({
       name: item.name,
       description: item.description,
       count: amount,
@@ -1251,6 +1320,8 @@ async function submitLootMove(event) {
       details: item.details,
       effects: item.effects
     }, bagContextKey);
+    if (remaining) notifyLootUpdated(remaining);
+    if (moved) notifyLootUpdated(moved);
   }
 
   pendingLootMove = null;
@@ -1303,6 +1374,12 @@ async function syncEditedLootBuff(item) {
   }
   await PFApp.saveBuffState(buffs, bagContextKey, item.assigned_character_id);
   localStorage.setItem(`pf_buffs_updated_${bagContextKey}_${item.assigned_character_id}`, String(Date.now()));
+  localStorage.setItem(`pf_loot_updated_${bagContextKey}_${item.assigned_character_id}`, JSON.stringify({ itemId: item.id, at: Date.now() }));
+}
+
+function notifyLootUpdated(item) {
+  if (!item?.assigned_character_id) return;
+  localStorage.setItem(`pf_loot_updated_${bagContextKey}_${item.assigned_character_id}`, JSON.stringify({ itemId: item.id, at: Date.now() }));
 }
 
 async function removeLootBuff(item) {
@@ -1347,6 +1424,7 @@ async function deleteLootAmount(itemId, amountOverride = null) {
 
   pendingLootDelete = null;
   deleteLootModal?.hide();
+  notifyLootUpdated(item);
   clearLootStatus();
   await loadBagContext(bagContextKey, false);
 }
@@ -1401,6 +1479,7 @@ async function submitLootForm(event) {
   resetLootForm();
   lootModal.hide();
   await syncEditedLootBuff(saved);
+  notifyLootUpdated(saved);
   clearLootStatus();
   await loadBagContext(bagContextKey, false);
 }
@@ -1473,6 +1552,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   el("sourceItemTabs").querySelectorAll("[data-source-category]").forEach(button => {
     button.addEventListener("click", () => {
       sourceItemCategory = button.dataset.sourceCategory || "all";
+      if (sourceItemCategory === "mundane" && !MUNDANE_CATEGORIES.includes(sourceItemMundaneCategory)) {
+        sourceItemMundaneCategory = MUNDANE_CATEGORIES[0];
+      }
       el("sourceItemTabs").querySelectorAll(".nav-link").forEach(tab => {
         tab.classList.toggle("active", tab === button);
       });

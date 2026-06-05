@@ -14427,7 +14427,8 @@ const wItems = [
         "slot": "ring",
         "price": "1,500 gp (+1), 6,000 gp (+2), 13,500 gp (+3), 24,000 gp (+4), 37,500 gp (+5)",
         "weight": "—",
-        "requirements": "Forge Ring , resistance , creator’s caster level must be at least three times the ring’s bonus",
+        "requirements": "Forge Ring , resistance , creator’s caster level must be at least three times the ring’s bonus",        
+        "bonus": "1-5",
         "cost": "750 gp (+1), 3,000 gp (+2), 6,750 gp (+3), 12,000 gp (+4), 17,750 gp (+5)",
         "description": "</h3>Protective symbols adorn this magic ring. It functions as a <a href=\"MagicWondrousDisplay.aspx?FinalName=Cloak of Resistance1\" style=\"text-decoration:underline\"><i>cloak of resistance</i></a> with an equivalent bonus."
       },
@@ -14497,6 +14498,7 @@ const wItems = [
         "slot": "ring",
         "price": "2,000 gp (+1), 8,000 gp (+2), 18,000 gp (+3), 32,000 gp (+4), 50,000 gp (+5)",
         "weight": "—",
+        "bonus": "1-5",
         "requirements": "Forge Ring, shield of faith , caster must be of a level at least three times higher than the bonus of the ring",
         "cost": "1,000 gp (+1), 4,000 gp (+2), 9,000 gp (+3), 16,000 gp (+4), 25,000 gp (+5)",
         "description": "</h3>This ring offers continual magical protection in the form of a deflection bonus of +1 to +5 to AC."
@@ -15225,6 +15227,7 @@ const wItems = [
         "slot": "ring",
         "price": "8,000 gp (+1), 17,000 gp (+2), 27,000 gp (+3), 38,000 gp (+4), 50,000 gp (+5)",
         "weight": "—",
+        "bonus": "1-5",
         "requirements": "Forge Ring, arcane sight , detect magic , spell resistance , creator cannot be a divine spellcaster, creator must be of a level at least three times higher than the bonus of the ring",
         "cost": "4,000 gp (+1), 8,500 gp (+2), 13,500 gp (+3), 19,000 gp (+4), 25,000 gp (+5)",
         "description": "</h3>These rings are said to have first been forged in Rahadoum by the Council of Elders to help root out the hidden faithful and other practitioners of the divine. A <i>ring of the godless </i>grants a luck bonus on saving throws against divine spells. This bonus does not apply to spell-like or supernatural abilities unless they are class abilities of a divine spellcasting class, such as channel energy or domain powers, or unless they are used by a creature that has been called, created, or summoned by divine magic. The wearer’s spell resistance (if any) increases by an amount equal to the ring’s luck bonus, though this increase applies only against divine spells (and spell-like abilities as described above).<br/><br/> A <i>ring of the godless </i>also allows the wearer to use <i>detect magic </i>at will, though it detects only divine magic. In addition, the wearer can use a specialized form of <i>arcane sight </i>a number of times per day equal to the ring’s luck bonus. This ability can be activated as a swift action, its effect lasts until the end of the wearer’s turn, and it detects only divine magic or divine spellcasting ability."
@@ -16863,6 +16866,7 @@ const wItems = [
         "price": "2,000 gp",
         "weight": "—",
         "requirements": "Craft Wondrous Item, divine favor , creator's caster level must be at least triple the belt's bonus",
+        "bonus": "1-5",
         "cost": "1,000 gp (+1), 4,000 gp (+2), 9,000 gp (+3), 16,000 gp (+4), 25,000 gp (+5)",
         "description": "</h3>This thin, black canvas belt is typically tied loosely about the waist to secure a robe, kimono, or martial artist’s dobok. Three times per day as a free action, the wearer can select a combat maneuver and receive an enhancement bonus of +1 to +5 on combat maneuver checks for this combat maneuver and a +1 to +5 bonus to CMD when defending against this maneuver for 1 round. Additionally, when worn by a brawler, the belt grants one additional use of her martial flexibility class feature each day."
       },
@@ -16989,6 +16993,7 @@ const wItems = [
         "price": "4,000 gp",
         "weight": "1 lb.",
         "requirements": "Craft Wondrous Item, bear's endurance",
+        "bonus": "2,4,6",
         "cost": "2,000 gp (+2), 8,000 gp (+4), 18,000 gp (+6)",
         "description": "</h3>This belt’s golden buckle depicts a\r bear’s head. The belt grants the wearer\r an enhancement bonus to Constitution\r of +2, +4, or +6. Treat this as a temporary\r ability bonus for the first 24 hours the belt is worn."
       },
@@ -17003,6 +17008,7 @@ const wItems = [
         "price": "4,000 gp",
         "weight": "1 lb.",
         "requirements": "Craft Wondrous Item, bull's strength",
+        "bonus": "2,4,6",
         "cost": "2,000 gp (+2), 8,000 gp (+4), 18,000 gp (+6)",
         "description": "</h3>This belt is a thick leather affair,\r often decorated with huge metal\r buckles. The belt grants the wearer\r an enhancement bonus to Strength of\r +2, +4, or +6. Treat this as a temporary\r ability bonus for the first 24 hours the belt is worn."
       },
@@ -17017,6 +17023,7 @@ const wItems = [
         "price": "4,000 gp",
         "weight": "1 lb.",
         "requirements": "Craft Wondrous Item, cat's grace",
+        "bonus": "2,4,6",
         "cost": "2,000 gp (+2), 8,000 gp (+4), 18,000 gp (+6)",
         "description": "</h3>This belt has a large silver buckle,\r usually depicting the image of a\r tiger. The belt grants the wearer an\r enhancement bonus to Dexterity\r of +2, +4, or +6. Treat this as a\r temporary ability bonus for the first 24 hours the belt is worn."
       },
@@ -17269,6 +17276,7 @@ const wItems = [
         "price": "10,000 gp",
         "weight": "1 lb.",
         "requirements": "Craft Wondrous Item, bear's endurance , bull's strength , and/or cat's grace",
+        "bonus": "2,4,6",
         "cost": "5,000 gp (+2), 20,000 gp (+4), 45,000 gp (+6)",
         "description": "</h3>This belt grants the wearer an\r enhancement bonus to two physical\r ability scores (Strength, Dexterity, or\r Constitution) of +2, +4, or +6. Treat\r this as a temporary ability bonus for\r the first 24 hours the belt is worn. These bonuses are chosen\r when the belt is created and cannot be changed."
       },
@@ -17465,6 +17473,7 @@ const wItems = [
         "price": "16,000 gp",
         "weight": "1 lb.",
         "requirements": "Craft Wondrous Item, bear's endurance , bull's strength , cat's grace",
+        "bonus": "2,4,6",
         "cost": "8,000 gp (+2), 32,000 gp (+4), 77,000 gp (+6)",
         "description": "</h3>This belt has a large platinum buckle\r and grants the wearer an enhancement\r bonus to all physical ability scores\r (Strength, Dexterity, and Constitution)\r of +2, +4, or +6. Treat this as a temporary\r ability bonus for the first 24 hours the belt is worn."
       },
@@ -17884,6 +17893,7 @@ const wItems = [
         "slot": "body",
         "price": "3,000 gp",
         "weight": "1 lb.",
+        "bonus": "1-7",
         "requirements": "Craft Wondrous Item, greater magic fang , creator's caster level must be at least three times the bodywrap's bonus, plus any requirements of the melee weapon special abilities",
         "cost": "1,500 gp (+1), 6,000 gp (+2), 13,500 gp (+3), 24,000 gp (+4), 37,500 gp (+5), 54,000 gp (+6), 73,500 gp (+7)",
         "description": "</h3>This long cloth is wrapped around the chest multiple times\r like a bandage. Once per round, the wearer may add an\r enhancement bonus of +1 to +5 on one attack and damage\r roll for an unarmed strike or natural attack (for one specific\r attack, not all attacks made with an unarmed strike that\r round). The wearer may use this item an additional time per\r round when his BAB reaches +6, +11, and +16.<br/><br/>\r Choosing to enhance an unarmed strike is not an action\r and may occur when it is not the wearer’s turn (such as when\r making an attack of opportunity). The wearer must decide\r to use the item before the attack roll is made, but does not\r have to expend all uses at the same time. For example, if the\r wearer can use the item twice per round, he can use it once\r on his turn when making an attack and save the second for\r the possibility of making an attack of opportunity.<br/><br/>\r Additionally, the bodywrap can grant melee weapon\r special abilities to a creature’s unarmed attacks, so long\r as those special abilities to be added apply to unarmed\r attacks. See Table 3–8: Melee Weapon Special Abilities\r (page 137) for a list of abilities. Special abilities count as\r additional bonuses for determining the market value of\r the item, but do not modify attack or damage bonuses.\r Any special abilities are set at the time of creation. A <i>bodywrap of mighty strikes</i> cannot have a modified\r bonus (enhancement bonus plus special ability bonus\r equivalents) higher than +7. Unlike an<i> amulet of mighty\r fists</i>, a bodywrap needs to have a +1 enhancement bonus\r to grant a melee weapon special ability."
@@ -20852,6 +20862,7 @@ const wItems = [
         "slot": "feet",
         "price": "4,000 gp",
         "weight": "4 lbs.",
+        "bonus": "1-5",
         "requirements": "Craft Magic Arms and Armor, Craft Wondrous Item, creator's caster level must be at least three times the horseshoes' bonus, plus any requirements of the melee weapon special abilities",
         "cost": "2,000 gp (+1), 8,000 gp (+2), 18,000 gp (+3), 32,000 gp (+4), 50,000 gp (+5)",
         "description": "</h3><i>Horseshoes of crushing blows</i> grant an enhancement bonus\r on attack and damage rolls made with hoof attacks; this bonus\r varies based on the item’s price. Alternatively, as described\r for the <i>amulet of mighty fists</i>, they can grant hooves melee\r weapon special abilities so long as they can be applied to\r unarmed attacks. <i>Horseshoes of crushing blows</i> cannot have a\r modified bonus (enhancement bonus plus special ability bonus\r equivalents) higher than +5. <i>Horseshoes of crushing blows</i> are\r crafted as sets of four, with each shoe in the set bearing the\r same enhancements. All four shoes must be worn by the same\r animal to be effective.<br/><br/> <i>Horseshoes of crushing blows</i> may be crafted out of special\r materials, gaining the usual benefits. For purposes of pricing,\r they count as a single one-handed weapon weighing 4\r pounds (for example, <i>adamantine horseshoes of crushing\r blows</i> would cost an additional 3,000 gp). The materials\r needed to make <i>cold iron horseshoes of crushing blows</i> add\r no extra costs in and of themselves, but enhancing cold iron\r horseshoes of crushing blows increases the price by the usual\r 2,000 gp."
@@ -22140,6 +22151,7 @@ const wItems = [
         "slot": "hands",
         "price": "4,000 gp",
         "weight": "1 lb.",
+        "bonus": "1-5",
         "requirements": "Craft Wondrous Item, greater magic weapon , creator’s caster level must be at least three times the gloves’ bonus, plus any requirements of the melee weapon special abilities",
         "cost": "2,000 gp (+1), 8,000 gp (+2), 18,000 gp (+3), 32,000 gp (+4), 50,000 gp (+5)",
         "description": "</h3>These rough leather gloves grant an enhancement bonus of +1 to +5 on attack and damage rolls with improvised weapons. Alternatively, the gloves can grant melee weapon special abilities, so long as they can be applied to melee or thrown weapons (see pages 136– 137 of <i>Pathfinder RPG Ultimate Equipment</i> for a list of abilities). Special abilities count as additional bonuses for determining the market value of the item, but do not modify attack or damage bonuses. <i>Gloves of improvised might</i> cannot have a modified bonus (enhancement bonus plus special ability bonus equivalents) higher than +5. Unlike an <i>amulet of mighty fists</i>, <i>gloves of improvised might</i> must have a +1 enhancement bonus to grant a melee weapon special ability.<br/><br/> Normal weapons are unaffected by <i>gloves of improvised might</i> except when used as an improvised weapon in a way specifically permitted by the weapon description, such as using an arrow or bolt as a melee weapon (or if the user has an ability that allows the use of normal weapons as improvised weapons). The wearer still takes a –4 nonproficiency penalty on attack rolls with improvised weapons, as normal, unless he has the Catch Off-Guard feat or a similar ability."
@@ -23247,6 +23259,7 @@ const wItems = [
         "price": "4,000 gp",
         "weight": "1 lb.",
         "requirements": "Craft Wondrous Item, owl's wisdom",
+        "bonus": "2,4,6",
         "cost": "2,000 gp (+2), 8,000 gp (+4), 18,000 gp (+6)",
         "description": "</h3>This simple bronze headband\r is decorated with an intricate\r pattern of fine green etchings. The\r headband grants the wearer an\r enhancement bonus to Wisdom of +2, +4, or +6. Treat this as\r a temporary ability bonus for the first 24 hours the headband\r is worn."
       },
@@ -23261,6 +23274,7 @@ const wItems = [
         "price": "4,000 gp",
         "weight": "1 lb.",
         "requirements": "Craft Wondrous Item, fox's cunning",
+        "bonus": "2,4,6",
         "cost": "2,000 gp (+2), 8,000 gp (+4), 18,000 gp (+6)",
         "description": "</h3>This intricate gold headband is\r decorated with several small blue\r and deep purple gemstones. The\r headband grants the wearer an\r enhancement bonus to Intelligence of +2, +4, or +6. Treat this as a temporary ability bonus for the first 24 hours the\r headband is worn. A <i>headband of vast intelligence</i> has one\r skill associated with it per +2 bonus it grants. After being worn\r for 24 hours, the headband grants a number of skill ranks in\r those skills equal to the wearer’s total Hit Dice. These ranks\r do not stack with the ranks a creature already possesses.\r These skills are chosen when the headband is created. If no\r skill is listed, the headband is assumed to grant skill ranks in\r randomly determined Knowledge skills."
       },
@@ -23275,6 +23289,7 @@ const wItems = [
         "price": "4,000 gp",
         "weight": "1 lb.",
         "requirements": "Craft Wondrous Item, eagle's splendor",
+        "bonus": "2,4,6",
         "cost": "2,000 gp (+2), 8,000 gp (+4), 18,000 gp (+6)",
         "description": "</h3>This attractive silver headband is\r decorated with a number of small red\r and orange gemstones. The headband\r grants the wearer an enhancement\r bonus to Charisma of +2, +4, or +6. Treat this as a temporary\r ability bonus for the first 24 hours the headband is worn."
       },
@@ -23303,6 +23318,7 @@ const wItems = [
         "price": "4,500 gp",
         "weight": "—",
         "requirements": "Craft Wondrous Item, Extend Spell, fly",
+        "bonus": "2,4,6",
         "cost": "2,250 gp (+2), 21,000 gp (+4), 40,500 gp (+6)",
         "description": "</h3>This headband is decorated with\r feathers from a number of colorful\r birds. It grants boons to flying magic,\r and more powerful versions grant\r the power of flight. The wearer of a\r <i>headband of aerial agility +2</i> treats\r his caster level as if it were one level higher when casting spells\r or creating extracts that grant flight. A <i>headband of aerial\r agility +4</i> gains the same benefits and, on command, grants the\r wearer the ability to fly (as the <i>fly </i>spell) three times per day. A\r <i>headband of aerial agility +6</i> functions like a +4 version, but the\r headband grants the ability to use <i>fly </i>at will.<br/><br/>All versions also grant the wearer an enhancement\r bonus to one mental ability score (Intelligence, Wisdom,\r or Charisma) of +2, +4, or +6. Treat this as a temporary\r ability bonus for the first 24 hours the headband is worn.\r This bonus is chosen when the headband is created and\r cannot be changed. If the headband grants a bonus to\r Intelligence, it also grants skill ranks as a <i>headband of\r vast intelligence</i>, usually granting ranks in Fly, Acrobatics,\r or Knowledge (planes)."
       },
@@ -23317,6 +23333,7 @@ const wItems = [
         "price": "4,500 gp",
         "weight": "—",
         "requirements": "Craft Wondrous Item, polymorph self",
+        "bonus": "2,4,6",
         "cost": "2,250 gp (+2), 8,750 gp (+4), 19,500 gp (+6)",
         "description": "</h3>This band of reddish fox fur\r is marked on the front with a\r distinctive symbol that constantly\r shifts into a different character.\r The headband grants the wearer an\r enhancement bonus to one mental\r ability score (Intelligence, Wisdom, or Charisma) of +2, +4,\r or +6. Treat this as a temporary ability bonus for the first\r 24 hours the headband is worn. This bonus is chosen when\r the headband is created and cannot be changed. If the\r headband grants a bonus to Intelligence, it also grants skill\r ranks as a <i>headband of vast intelligence</i>.<br/><br/>\r If the wearer is a creature who uses magic to change\r form, she gains the following additional benefits.<br/><br/> <i>Shifter’s headband +2</i>: The wearer treats her caster level\r as if it were one level higher when casting spells or creating\r extracts of the polymorph subschool.<br/><br/> <i>Shifter’s headband +4</i>: Once per day while under the\r effect of a polymorph spell or extract, the wearer can\r assume another form allowed by that effect. This is a\r standard action.<br/><br/> <i>Shifter’s headband +6</i>: Whenever the wearer changes her\r shape with a polymorph effect, she gains DR 5/silver for 1\r minute (this ends if she returns to her natural form).<br/><br/>\r These additional shapeshifter abilities are cumulative.\r For example, a creature wearing a <i>shifter’s headband +4</i>\r gains the extra transformation ability and treats her caster\r level as 1 higher than normal for polymorph spells and\r extracts."
       },
@@ -23527,6 +23544,7 @@ const wItems = [
         "price": "10,000 gp",
         "weight": "1 lb.",
         "requirements": "Craft Wondrous Item, eagle's splendor , fox's cunning , owl's wisdom (any two)",
+        "bonus": "2,4,6",
         "cost": "5,000 gp (+2), 20,000 gp (+4), 45,000 gp (+6)",
         "description": "</h3>This simple copper headband\r has a small yellow gem set so\r that when it rests upon the\r forehead of the wearer, the\r yellow gem sits perched on the wearer’s brow as if it\r were a third eye in the middle of her forehead. Often, the\r headband contains additional designs to further accentuate\r the appearance of a third, crystal eye.<br/><br/>\r The headband grants the wearer an enhancement bonus\r to two mental ability scores (Intelligence, Wisdom, or\r Charisma) of +2, +4, or +6. Treat this as a temporary ability\r bonus for the first 24 hours the headband is worn.<br/><br/>\r These bonuses are chosen when the headband is created\r and cannot be changed. If the headband grants a bonus to\r Intelligence, it also grants skill ranks as a <i>headband of vast\r intelligence</i>."
       },
@@ -23653,6 +23671,7 @@ const wItems = [
         "price": "16,000 gp",
         "weight": "1 lb.",
         "requirements": "Craft Wondrous Item, eagle's splendor , fox's cunning , owl's wisdom",
+        "bonus": "2,4,6",
         "cost": "8,000 gp (+2), 32,000 gp (+4), 77,000 gp (+6)",
         "description": "</h3>This ornate headband is decorated\r with numerous clusters of small\r gemstones. The headband grants\r the wearer an enhancement bonus\r to all mental ability scores (Intelligence, Wisdom, and Charisma)\r of +2, +4, or +6. Treat this as a temporary ability bonus for the\r first 24 hours the headband is worn. The headband also grants\r skill ranks as a <i>headband of vast intelligence</i>."
       },
@@ -24072,6 +24091,7 @@ const wItems = [
         "slot": "neck",
         "price": "1,500 gp",
         "weight": "—",
+        "bonus": "1-5",
         "requirements": "Craft Wondrous Item, divine favor , creator's caster level must be at least three times the amulet's bonus",
         "cost": "750 gp (+1), 3,000 gp (+2), 6,750 gp (+3), 12,000 gp (+4), 18,750 gp (+5)",
         "description": "</h3>This amulet, usually crafted from the splintered remains of\r spent firearm bullets shaped into a rough holy symbol or\r clover, grants the wearer a luck bonus to AC against firearm\r attacks that target touch AC."
@@ -24184,6 +24204,7 @@ const wItems = [
         "slot": "neck",
         "price": "2,000 gp",
         "weight": "—",
+        "bonus": "1-5",
         "requirements": "Craft Wondrous Item, barkskin , creator's caster level must be at least three times the amulet's bonus",
         "cost": "1,000 gp (+1), 4,000 gp (+2), 9,000 gp (+3), 16,000 gp (+4), 25,000 gp (+5)",
         "description": "</h3>This amulet, usually containing some\r type of magically preserved monster\r hide or other natural armor—such as\r bone, horn, carapace, or beast scales—\r toughens the wearer’s body and flesh,\r giving him an enhancement bonus\r to his natural armor from +1 to +5,\r depending on the kind of amulet."
@@ -24646,6 +24667,7 @@ const wItems = [
         "slot": "neck",
         "price": "4,000 gp",
         "weight": "—",
+        "bonus": "1-5",
         "requirements": "Craft Wondrous Item, greater magic fang , creator's caster level must be at least three times the amulet's bonus, plus any requirements of the melee weapon special abilities",
         "cost": "2,000 gp (+1), 8,000 gp (+2), 18,000 gp (+3), 32,000 gp (+4), 50,000 gp (+5)",
         "description": "</h3>This amulet grants an enhancement bonus of +1 to +5 on attack\r and damage rolls with unarmed attacks and natural weapons.<br/><br/>Alternatively, this amulet can grant melee weapon\r special abilities, so long as they can be applied to unarmed\r attacks. See Table: Melee Weapon Special Abilities for a list\r of abilities. Special abilities count as additional bonuses for\r determining the market value of the item, but do not modify\r attack or damage bonuses. An <i>amulet of mighty fists</i> cannot\r have a modified bonus (enhancement bonus plus special\r ability bonus equivalents) higher than +5. An amulet of\r mighty fists does not need to have a +1 enhancement bonus\r to grant a melee weapon special ability."
@@ -26758,6 +26780,7 @@ const wItems = [
         "slot": "shoulders",
         "price": "500 gp",
         "weight": "1 lb.",
+        "bonus": "1-5",
         "requirements": "Craft Wondrous Item, entropic shield , resistance , creator must be chaotic, creator’s caster level must be at least three times the cloak’s bonus",
         "cost": "250 gp (+1 bonus), 1,000 gp (+2 bonus), 2,250 gp (+3 bonus), 4,000 gp (+4 bonus), 6,250 gp (+5 bonus)",
         "description": "</h3>These multihued cloaks are as mutable as the proteans that inspired them. The typical <i>protean cloak</i> appears to be crafted from the hide of a naunet protean, but regardless of their apparent source, all <i>protean cloaks</i> shimmer and flicker with a riot of color. While the material feels scaly and rugose to the touch, a <i>protean cloak</i> flows like silk and does not hinder mobility.<br/><br/> A <i>protean cloak</i> provides a +1 to +5 resistance bonus on a single type of saving throw (typically Will saving throws). Once per day as a standard action, the wearer can change the type of saving throw that receives this bonus; the cloak then provides its bonus on the new type of saving throw until its type is changed again. If a <i>protean cloak</i> is unattended for more than 24 hours, the resistance bonus it applies automatically reverts back to Will saves."
@@ -26786,6 +26809,7 @@ const wItems = [
         "slot": "shoulders",
         "price": "1,000 gp",
         "weight": "1 lb.",
+        "bonus": "1-5",
         "requirements": "Craft Wondrous Item, resistance , creator's caster level must be at least three times the cloak's bonus",
         "cost": "500 gp (+1), 2,000 gp (+2), 4,500 gp (+3), 8,000 gp (+4), 12,500 gp (+5)",
         "description": "</h3>Flecks of silver or steel are often sown amid the fabric of\r these magical cloaks. This garment offers magical protection\r in the form of a +1 to +5 resistance bonus on all saving throws\r (Fortitude, Reflex, and Will)."
@@ -26843,6 +26867,7 @@ const wItems = [
         "price": "1,500 gp (+1/+2 Fortitude), 6,000 gp (+2/+3 Fortitude), 13,500 gp (+3/+4 Fortitude), 24,000 gp (+4/+5 Fortitude), 37,500 gp (+5/+6 Fortitude)",
         "weight": "1 lb.",
         "requirements": "Craft Wondrous Item, Mythic Crafter, resistance , the creator must have the mythic saves ability",
+        "bonus": "1-5",
         "cost": "750 gp (+1/+2 Fortitude), 3,000 gp (+2/+3 Fortitude), 6,750 gp (+3/+4 Fortitude), 12,000 gp (+4/+5 Fortitude), 18,750 gp (+5/+6 Fortitude)",
         "description": "</h3>The wearer of these elegant, polished steel pauldrons gains a bonus on all saving throws, as with a <i>cloak of resistance</i>, but the resistance bonus on Fortitude saves is one greater. Furthermore, if the wearer fails a Fortitude saving throw, he can expend one use of mythic power as an immediate action to reroll that saving throw. If the wearer fails the saving throw on the reroll, he can’t use this ability again for 24 hours."
       },
@@ -26858,6 +26883,7 @@ const wItems = [
         "weight": "1 lb.",
         "requirements": "Craft Wondrous Item, Mythic Crafter, resistance , the creator must have the mythic saves ability",
         "cost": "750 gp (+1/+2 Reflex), 3,000 gp (+2/+3 Reflex), 6,750 gp (+3/+4 Reflex), 12,000 gp (+4/+5 Reflex), 18,750 gp (+5/+6 Reflex)",
+        "bonus": "1-5",
         "description": "</h3>The wearer of this light, short cloak gains a bonus on all saving throws, as with a <i>cloak of resistance</i>, but the resistance bonus on Reflex saves is one greater. Furthermore, if the wearer fails a Reflex saving throw, she can expend one use of mythic power as an immediate action to reroll that saving throw. If the wearer fails the saving throw on the reroll, she can’t use this ability again for 24 hours."
       },
       "link": "http://www.aonprd.com/MagicWondrousDisplay.aspx?FinalName=Cloak of Quick Reflexes1/2 Reflex"
@@ -26871,6 +26897,7 @@ const wItems = [
         "price": "1,500 gp (+1/+2 Will), 6,000 gp (+2/+3 Will), 13,500 gp (+3/+4 Will), 24,000 gp (+4/+5 Will), 37,500 gp (+5/+6 Will)",
         "weight": "1 lb.",
         "requirements": "Craft Wondrous Item, Mythic Crafter, resistance , the creator must have the mythic saves ability",
+        "bonus": "1-5",
         "cost": "750 gp (+1/+2 Will), 3,000 gp (+2/+3 Will), 6,750 gp (+3/+4 Will), 12,000 gp (+4/+5 Will), 18,750 gp (+5/+6 Will)",
         "description": "</h3>The wearer of this brightly colored patchwork cape gains a bonus on all saving throws, as with a <i>cloak of resistance</i>, but the resistance bonus on Will saves is one greater. Furthermore, if the wearer fails a Will saving throw, he can expend one use of mythic power as an immediate action to reroll that saving throw. If the wearer fails the saving throw on the reroll, he can’t use this ability again for 24 hours."
       },
@@ -27011,6 +27038,7 @@ const wItems = [
         "price": "2,700 gp",
         "weight": "4 lbs.",
         "requirements": "Craft Wondrous Item, resistance , creator’s caster level must be at least three times the cloak’s bonus",
+        "bonus": "1-5",
         "cost": "1,350 gp (+1 bonus), 5,400 gp (+2 bonus), 12,150 gp (+3 bonus), 21,600 gp (+4 bonus), 33,750 gp (+5 bonus)",
         "description": "</h3>This garment is intended for a horse or similar quadruped, but it can change size and shape to fit any four-legged creature ranging from Small to Huge in size. When worn, a <i>caparison of resistance</i> offers the wearer magic protection in the form of a +1 to +5 resistance bonus on all saving throws (Fortitude, Reflex, and Will). This bonus on saving throws also applies to a single rider who is mounted on the creature (in the case of multiple riders, the resistance bonus is not shared at all and applies only to the mount)."
       },
@@ -27207,6 +27235,7 @@ const wItems = [
         "price": "4,000 gp",
         "weight": "1 lb.",
         "requirements": "Craft Wondrous Item, anticipate perilUM, resistance",
+        "bonus": "1-5",
         "cost": "2,000 gp (+1 bonus), 8,000 gp (+2 bonus), 18,500 gp (+3 bonus), 32,000 gp (+4 bonus), 50,000 gp (+5 bonus)",
         "description": "</h3>This exotic, fur-trimmed cloak is decorated with golden filigree. In addition to offering magical protection, the cloak guides a skilled wearer’s blade to block attacks. Such cloaks are often commissioned by Aldori Academy graduates when they attain swordlord status.<br/><br/> A <i>swordlord’s cloak</i> acts as a <i>cloak of resistance</i>. In addition, whenever the wearer is benefiting from the defensive parry class feature, he receives an insight bonus to his AC equal to the cloak’s resistance bonus."
       },
@@ -28536,6 +28565,7 @@ const wItems = [
         "slot": "wrist",
         "price": "1,000 gp",
         "weight": "1 lb.",
+        "bonus": "1-8",
         "requirements": "Craft Wondrous Item, mage armor , creator’s caster level must\r be at least two times that of the bonus placed on the bracers,\r plus any requirements of the armor special abilities",
         "cost": "500 gp (+1), 2,000 gp (+2), 4,500 gp (+3), 8,000 gp (+4), 12,500 gp (+5), 18,000 gp (+6), 24,500 gp (+7), 32,000 gp (+8)",
         "description": "</h3>These items appear to be wrist or\r arm guards, sometimes etched with\r symbols of protection or depictions of\r vigilant-looking animals. <i>Bracers of\r armor</i> surround the wearer with an\r invisible but tangible field of force,\r granting him an armor bonus of +1\r to +8, just as though he were wearing armor. Both <i>bracers of\r armor</i> must be worn for the magic to be effective.<br/><br/>Alternatively, <i>bracers of armor</i> can be enchanted with\r armor special abilities. See Table 3–3: Armor Special Abilities\r for a list of abilities. Special abilities usually count as\r additional bonuses for determining the market value of an\r item, but do not improve AC. <i>Bracers of armor</i> cannot have a\r modified bonus (armor bonus plus armor special ability bonus\r equivalents) higher than +8. <i>Bracers of armor</i> must have at\r least a +1 armor bonus to grant an armor special ability.\r Bracers of armor cannot have any armor special abilities\r that add a flat gp amount to their cost. <i>Bracers of armor</i> and\r ordinary armor do not stack. If the wearer receives a larger\r armor bonus from another source, the <i>bracers of armor</i> cease\r functioning and do not grant their armor bonus or their armor\r special abilities. If the <i>bracers of armor</i> grant a larger armor\r bonus, the other source of armor ceases functioning."
@@ -41944,6 +41974,7 @@ const wItems = [
         "price": "27,500 gp",
         "weight": "5 lbs.",
         "requirements": "Craft Wondrous Item, wish or miracle",
+        "bonus": "1-5",
         "cost": "26,250 gp (+1), 52,500 gp (+2), 78,750 gp (+3), 105,000 gp (+4), 131,250 gp (+5)",
         "description": "</h3>This thick tome contains tips on\r health and fitness, but entwined\r within the words is a powerful\r magical effect. If anyone reads\r this book, which takes a total of 48\r hours over a minimum of 6 days,\r he gains an inherent bonus from +1 to +5 (depending on the type of manual) to his Constitution\r score. Once the book is read, the magic disappears from the\r pages and it becomes a normal book."
       },
@@ -41958,6 +41989,7 @@ const wItems = [
         "price": "27,500 gp",
         "weight": "5 lbs.",
         "requirements": "Craft Wondrous Item, wish or miracle",
+        "bonus": "1-5",
         "cost": "26,250 gp (+1), 52,500 gp (+2), 78,750 gp (+3), 105,000 gp (+4), 131,250 gp (+5)",
         "description": "</h3>This thick tome contains tips on coordination exercises\r and balance, but entwined within the words is a powerful\r magical effect. If anyone reads this book, which takes a total\r of 48 hours over a minimum of 6 days, he gains an inherent\r bonus from +1 to +5 (depending on the type of manual) to his\r Dexterity score. Once the book is read, the magic disappears\r from the pages and it becomes a normal book."
       },
@@ -41972,6 +42004,7 @@ const wItems = [
         "price": "27,500 gp",
         "weight": "5 lbs.",
         "requirements": "Craft Wondrous Item, wish or miracle",
+        "bonus": "1-5",
         "cost": "26,250 gp (+1), 52,500 gp (+2), 78,750 gp (+3), 105,000 gp (+4), 131,250 gp (+5)",
         "description": "</h3>This thick tome contains exercise descriptions and diet\r suggestions, but entwined within the words is a powerful\r magical effect. If anyone reads this book, which takes a total\r of 48 hours over a minimum of 6 days, she gains an inherent\r bonus from +1 to +5 (depending on the type of manual) to her\r Strength score. Once the book is read, the magic disappears\r from the pages and it becomes a normal book."
       },
@@ -41986,6 +42019,7 @@ const wItems = [
         "price": "27,500 gp",
         "weight": "5 lbs.",
         "requirements": "Craft Wondrous Item, miracle or wish",
+        "bonus": "1-5",
         "cost": "26,250 gp (+1), 52,500 gp (+2), 78,750 gp (+3), 105,000 gp (+4), 131,250 gp (+5)",
         "description": "</h3>This heavy book contains instruction\r on improving memory and logic,\r but entwined within the words is a\r powerful magical effect. If anyone\r reads this book, which takes a total\r of 48 hours over a minimum of 6 days, she gains an inherent\r bonus from +1 to +5 (depending on the type of tome) to her\r Intelligence score. Once the book is read, the magic disappears\r from the pages and it becomes a normal book."
       },
@@ -42000,6 +42034,7 @@ const wItems = [
         "price": "27,500 gp",
         "weight": "5 lbs.",
         "requirements": "Craft Wondrous Item, miracle or wish",
+        "bonus": "1-5",
         "cost": "26,250 gp (+1), 52,500 gp (+2), 78,750 gp (+3), 105,000 gp (+4), 131,250 gp (+5)",
         "description": "</h3>This thick book contains tips for improving instinct and perception,\r but entwined within the words is a powerful magical effect. If\r anyone reads this book, which takes a total of 48 hours over\r a minimum of 6 days, she gains an inherent bonus from +1 to\r +5 (depending on the type of tome) to her Wisdom score. Once\r the book is read, the magic disappears from the pages and it\r becomes a normal book."
       },
@@ -42014,6 +42049,7 @@ const wItems = [
         "price": "27,500 gp",
         "weight": "5 lbs.",
         "requirements": "Craft Wondrous Item, miracle or wish",
+        "bonus": "1-5",
         "cost": "26,250 gp (+1), 52,500 gp (+2), 78,750 gp (+3), 105,000 gp (+4), 131,250 gp (+5)",
         "description": "</h3>This ponderous book details suggestions for persuading and\r inspiring others, but entwined within the words is a powerful\r magical effect. If anyone reads this book, which takes a total of\r 48 hours over a minimum of 6 days, he gains an inherent bonus\r from +1 to +5 (depending on the type of tome) to his Charisma\r score. Once the book is read, the magic disappears from the\r pages and it becomes a normal book."
       },

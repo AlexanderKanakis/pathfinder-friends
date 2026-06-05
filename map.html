@@ -62,6 +62,8 @@
     #mapTimelinePane.active { display: grid; grid-template-rows: auto auto minmax(0, 1fr); min-height: 100%; }
     #mapTimelinePane.active .timeline-list { max-height: none; min-height: 0; }
     .timeline-emphasis { color: #f0d58c; font-weight: 800; }
+    .timeline-positive { color: #8fd19e; font-weight: 800; }
+    .timeline-negative { color: #e05d5d; font-weight: 800; }
     .roll-result-list { display: grid; gap: 10px; }
     .roll-result-card { border: 1px solid #444; border-radius: 8px; background: #202020; padding: 12px; text-align: center; }
     .roll-result-label { color: #bbb; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
@@ -111,6 +113,13 @@
     .mini-sheet-row span:last-child { color: #fff; font-weight: 700; text-align: right; }
     .mini-sheet-conditional { border-left: 3px solid #f0d58c; background: rgba(240, 213, 140, .08); }
     .mini-sheet-conditional .mini-sheet-value, .mini-sheet-conditional .mini-sheet-row span:last-child { color: #f0d58c; }
+    .map-weapon-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(92px, 1fr)); gap: 5px; margin: 4px 0 8px; padding: 6px; border: 1px solid #383838; border-radius: 6px; background: #1f1f1f; }
+    .map-weapon-options-title { grid-column: 1 / -1; display: flex; align-items: center; gap: 6px; color: #aaa; font-size: 10px; text-transform: uppercase; letter-spacing: .04em; }
+    .map-weapon-options-title .bi { color: #f0d58c; cursor: help; }
+    .map-weapon-option { display: flex; align-items: center; justify-content: space-between; gap: 5px; color: #bbb; font-size: 10px; line-height: 1.15; }
+    .map-weapon-option .form-check-input { width: 2.1em; height: 1.05em; margin: 0; flex: 0 0 auto; }
+    .map-weapon-row { cursor: pointer; }
+    .map-weapon-row .bi { color: #aaa; font-size: 12px; }
     input, textarea, select { background-color: #2b2b2b !important; color: white !important; border-color: #555 !important; }
     textarea { min-height: 72px; }
     .btn-icon { width: 28px; min-width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; padding: 0; }
@@ -510,6 +519,7 @@ let rollTokenId = "";
 let rollDetailKind = "";
 let rollAnimationTimer = null;
 let lastRollAction = null;
+let expandedMapWeaponKey = "";
 let mapEffectTrackerInstance = null;
 let mapEnemies = [];
 let pendingTokenHp = new Map();
@@ -788,6 +798,157 @@ function firstScalingKey(value, fallback = "str") {
   return String(value || fallback).toLowerCase().match(/\b(str|dex|con|int|wis|cha)\b/)?.[1] || fallback;
 }
 
+const MAP_TWF_MODE_FIELDS = ["twfNoFeatPrimary", "twfNoFeatOff", "twfFeatPrimary", "twfFeatOff"];
+const MAP_TWF_PRIMARY_FIELDS = ["twfNoFeatPrimary", "twfFeatPrimary"];
+const MAP_TWF_OFFHAND_FIELDS = ["twfNoFeatOff", "twfFeatOff"];
+
+function mapWeaponOptionChecked(weapon, field) {
+  return String(weapon?.[field] || "").toLowerCase() === "yes";
+}
+
+function mapWeaponTwfOffhand(weapon) {
+  return MAP_TWF_OFFHAND_FIELDS.some(field => mapWeaponOptionChecked(weapon, field));
+}
+
+function mapWeaponTwfFeatOffhand(weapon) {
+  return mapWeaponOptionChecked(weapon, "twfFeatOff");
+}
+
+function weaponOptionLabel(field) {
+  return {
+    twoHanded: "Two-Handed",
+    powerAttack: "Power Attack",
+    deadlyAim: "Deadly Aim",
+    rapidShot: "Rapid Shot",
+    twfNoFeatPrimary: "No TWF Primary Hand",
+    twfNoFeatOff: "No TWF Off Hand",
+    twfFeatPrimary: "TWF Primary Hand",
+    twfFeatOff: "TWF Off Hand",
+    improvedTwf: "Improved TWF",
+    greaterTwf: "Greater TWF"
+  }[field] || field;
+}
+
+function mapWeaponTypeIsRanged(type) {
+  return ["Ranged Weapon", "Firearm (One-Handed)", "Firearm (Two-Handed)"].includes(type);
+}
+
+function mapWeaponOptionFields(weapon = {}) {
+  const weaponType = weapon.weaponType || "Melee Weapon (One-Handed)";
+  const ranged = mapWeaponTypeIsRanged(weaponType);
+  const fields = [
+    ...(ranged ? ["deadlyAim", "rapidShot"] : ["twoHanded", "powerAttack"]),
+    ...MAP_TWF_MODE_FIELDS
+  ];
+  if (mapWeaponTwfFeatOffhand(weapon)) fields.push("improvedTwf", "greaterTwf");
+  return fields;
+}
+
+function renderMapWeaponOptions(token, weapon, index) {
+  if (!canManageMapItem(token)) return "";
+  const fields = mapWeaponOptionFields(weapon);
+  const twfHelp = "Two-Weapon Fighting: choose one primary hand weapon and one or more off-hand weapons. No TWF uses the harsher no-feat penalties. TWF uses feat penalties. A light off-hand weapon improves the penalties. Improved/Greater TWF add extra off-hand attacks.";
+  return `
+    <div class="map-weapon-options" data-map-weapon-options="${index}">
+      <div class="map-weapon-options-title">
+        <span>Attack Options</span>
+        <i class="bi bi-info-circle" title="${escapeHtml(twfHelp)}" aria-label="${escapeHtml(twfHelp)}"></i>
+      </div>
+      ${fields.map(field => `
+        <label class="map-weapon-option">
+          <span>${escapeHtml(weaponOptionLabel(field))}</span>
+          <input class="form-check-input" type="checkbox" data-map-weapon-option="${index}" data-map-weapon-field="${escapeHtml(field)}" ${mapWeaponOptionChecked(weapon, field) ? "checked" : ""}>
+        </label>
+      `).join("")}
+    </div>
+  `;
+}
+
+function applyWeaponOptionChangeToSheet(sheet, weaponIndex, field, checked) {
+  const next = structuredClone(sheet || {});
+  next.weapons = Array.isArray(next.weapons) ? next.weapons : [];
+  if (!next.weapons[weaponIndex]) return next;
+  const weapon = next.weapons[weaponIndex];
+
+  if (MAP_TWF_MODE_FIELDS.includes(field) && checked) {
+    weapon.twoHanded = "no";
+    MAP_TWF_MODE_FIELDS.forEach(otherField => {
+      if (otherField !== field) weapon[otherField] = "no";
+    });
+    if (MAP_TWF_PRIMARY_FIELDS.includes(field)) {
+      next.weapons.forEach((otherWeapon, index) => {
+        if (index === weaponIndex) return;
+        MAP_TWF_PRIMARY_FIELDS.forEach(primaryField => { otherWeapon[primaryField] = "no"; });
+      });
+    }
+  }
+  if (field === "twoHanded" && checked) {
+    MAP_TWF_MODE_FIELDS.forEach(twfField => { weapon[twfField] = "no"; });
+    weapon.improvedTwf = "no";
+    weapon.greaterTwf = "no";
+  }
+  if (field === "rapidShot" && checked) {
+    next.weapons.forEach((otherWeapon, index) => {
+      if (index !== weaponIndex) otherWeapon.rapidShot = "no";
+    });
+  }
+
+  weapon[field] = checked ? "yes" : "no";
+  if (field === "greaterTwf" && checked) weapon.improvedTwf = "yes";
+  if (!mapWeaponTwfFeatOffhand(weapon)) {
+    weapon.improvedTwf = "no";
+    weapon.greaterTwf = "no";
+  }
+  return next;
+}
+
+async function saveMapWeaponOption(tokenId, weaponIndex, field, checked) {
+  const token = tokenById(tokenId);
+  if (!token || !canManageMapItem(token)) return;
+  const currentSheet = structuredClone(rollTokenSheet(token) || {});
+  if (!Array.isArray(currentSheet.weapons) || !currentSheet.weapons[weaponIndex]) return;
+  const nextSheet = applyWeaponOptionChangeToSheet(currentSheet, weaponIndex, field, checked);
+
+  if (token.kind === "character") {
+    const character = tokenCharacter(token);
+    if (!character?.id) return;
+    character.sheet = nextSheet;
+    syncTokenFromSheet(token, character);
+    renderAll(false);
+    const saved = await PFApp.updateCharacterSheetRaw?.(character.id, nextSheet, mapContextKey)
+      || await PFApp.saveCharacterSheet(character.name || token.name || "Character", nextSheet, mapContextKey, character.id);
+    if (!saved) {
+      await refreshMapTokenSheets({ save: false });
+      return;
+    }
+    await recalculateCharacterSheetFromMap(character.id);
+    const refreshed = await PFApp.loadCharacterSheet("", mapContextKey, character.id);
+    if (refreshed?.sheet) character.sheet = refreshed.sheet;
+    syncTokenFromSheet(token, character);
+    localStorage.setItem(`pf_character_sheet_updated_${mapContextKey}_${character.id}`, String(Date.now()));
+    renderAll(false);
+    return;
+  }
+
+  if (token.kind === "enemy" && isGm) {
+    token.sheet = nextSheet;
+    renderAll(false);
+    const saved = await PFApp.saveEnemy({ id: token.enemyId, name: token.name || "Enemy", visible: token.visible !== false, sheet: nextSheet }, mapContextKey);
+    if (!saved) {
+      await refreshMapTokenSheets({ save: false });
+      return;
+    }
+    await recalculateEnemySheetFromMap(token.enemyId);
+    const refreshed = await PFApp.loadEnemy(token.enemyId, mapContextKey);
+    const nextEnemy = refreshed || saved;
+    token.sheet = structuredClone(nextEnemy.sheet || nextSheet);
+    syncTokenFromSheet(token, nextEnemy);
+    mapEnemies = mapEnemies.map(enemy => enemy.id === nextEnemy.id ? nextEnemy : enemy);
+    localStorage.setItem(`pf_enemy_sheet_updated_${mapContextKey}_${token.enemyId}`, String(Date.now()));
+    renderAll(false);
+  }
+}
+
 function sheetArmorBonus(sheet, typeName) {
   return (sheet?.armor || []).reduce((total, item) => {
     const type = String(item.type || "").toLowerCase();
@@ -844,6 +1005,7 @@ function renderCalculatedSheetSummary(token, calculated) {
   const abilities = calculated.abilities || [];
   const saves = calculated.saves || [];
   const weapons = calculated.weapons || [];
+  const rawWeapons = rollTokenSheet(token).weapons || [];
   return `
     <div class="mini-sheet">
       ${compactSection("Character", `<div class="mini-sheet-grid">
@@ -874,7 +1036,10 @@ function renderCalculatedSheetSummary(token, calculated) {
       </div>`)}
       ${compactSection("Weapons", `<div class="mini-sheet-list">${
         weapons.length
-          ? weapons.map(weapon => `<div class="mini-sheet-row"><span>${escapeHtml(weapon.name || "Weapon")}</span><span>${escapeHtml([weapon.attack, weapon.damage, weapon.critical].filter(Boolean).join(" | "))}</span></div>${compactConditionalRows([...(weapon.attackConditionals || []), ...(weapon.damageConditionals || [])])}`).join("")
+          ? weapons.map((weapon, index) => {
+              const expanded = expandedMapWeaponKey === `${token.id}:${index}`;
+              return `<div class="mini-sheet-row map-weapon-row" data-map-weapon-expand="${index}"><span><i class="bi ${expanded ? "bi-chevron-down" : "bi-chevron-right"} me-1"></i>${escapeHtml(weapon.name || "Weapon")}</span><span>${escapeHtml([weapon.attack, weapon.damage, weapon.critical].filter(Boolean).join(" | "))}</span></div>${expanded ? renderMapWeaponOptions(token, rawWeapons[index] || {}, index) : ""}${compactConditionalRows([...(weapon.attackConditionals || []), ...(weapon.damageConditionals || [])])}`;
+            }).join("")
           : `<div class="small text-secondary">No weapons.</div>`
       }</div>`)}
     </div>
@@ -921,7 +1086,7 @@ function renderCompactCharacterSheet(token) {
     ["Ref", sheetNum(sheet.saves?.reflex?.base) + dex],
     ["Will", sheetNum(sheet.saves?.will?.base) + wis]
   ];
-  const weapons = (sheet.weapons || []).slice(0, 4).map(weapon => {
+  const weapons = (sheet.weapons || []).slice(0, 4).map((weapon, index) => {
     const attackKey = firstScalingKey(weapon.attackScale, "str");
     const damageKey = firstScalingKey(weapon.damageScale, attackKey);
     const enhancement = sheetNum(weapon.enhancement);
@@ -931,7 +1096,8 @@ function renderCompactCharacterSheet(token) {
     const attacks = iterativeBabBonuses(bab).map(base => fmtSigned(base + sheetAbilityMod(sheet, attackKey) + enhancement + attackMisc)).join("/");
     const damageMod = Math.floor(sheetAbilityMod(sheet, damageKey) * (weapon.twoHanded === "yes" ? 1.5 : 1)) + enhancement + damageMisc;
     const damage = `${weapon.damage || ""}${damageMod ? fmtSigned(damageMod) : ""}` || fmtSigned(damageMod);
-    return `<div class="mini-sheet-row"><span>${escapeHtml(weapon.name || "Weapon")}</span><span>${escapeHtml(attacks || fmtSigned(attack))} | ${escapeHtml(damage)} | ${escapeHtml(weapon.critical || "-")}</span></div>`;
+    const expanded = expandedMapWeaponKey === `${token.id}:${index}`;
+    return `<div class="mini-sheet-row map-weapon-row" data-map-weapon-expand="${index}"><span><i class="bi ${expanded ? "bi-chevron-down" : "bi-chevron-right"} me-1"></i>${escapeHtml(weapon.name || "Weapon")}</span><span>${escapeHtml(attacks || fmtSigned(attack))} | ${escapeHtml(damage)} | ${escapeHtml(weapon.critical || "-")}</span></div>${expanded ? renderMapWeaponOptions(token, weapon, index) : ""}`;
   }).join("") || `<div class="small text-secondary">No weapons.</div>`;
 
   return `
@@ -1625,6 +1791,23 @@ function renderSelectedPanel() {
   });
   el("selectedPanel").querySelectorAll("[data-open-token-effects]").forEach(button => {
     button.addEventListener("click", () => openMapEffects(button.dataset.openTokenEffects));
+  });
+  el("selectedPanel").querySelectorAll("[data-map-weapon-expand]").forEach(row => {
+    row.addEventListener("click", () => {
+      const key = `${item.id}:${row.dataset.mapWeaponExpand}`;
+      expandedMapWeaponKey = expandedMapWeaponKey === key ? "" : key;
+      renderSelectedPanel();
+    });
+  });
+  el("selectedPanel").querySelectorAll("[data-map-weapon-option]").forEach(input => {
+    input.addEventListener("change", () => {
+      saveMapWeaponOption(
+        item.id,
+        Number(input.dataset.mapWeaponOption || 0),
+        input.dataset.mapWeaponField,
+        input.checked
+      );
+    });
   });
   el("selectedPanel").querySelectorAll("[data-shape-texture]").forEach(button => {
     button.addEventListener("click", () => {
@@ -2590,10 +2773,11 @@ function nextTurn() {
 
 function timelineRowContent(row) {
   if (Array.isArray(row.parts)) {
-    return row.parts.map(part => part?.emphasis
-      ? `<span class="timeline-emphasis">${escapeHtml(part.text)}</span>`
-      : escapeHtml(part?.text || "")
-    ).join("");
+    return row.parts.map(part => {
+      if (!part?.emphasis) return escapeHtml(part?.text || "");
+      const className = part.className || "timeline-emphasis";
+      return `<span class="${escapeHtml(className)}">${escapeHtml(part.text)}</span>`;
+    }).join("");
   }
   return escapeHtml(row.text);
 }
@@ -2667,7 +2851,8 @@ function rollWeaponsForToken(token) {
       attackText,
       critical: weapon.critical || raw.critical || "20/x2",
       misfire: raw.misfire || weapon.misfire || "",
-      weaponType: raw.weaponType || weapon.weaponType || ""
+      weaponType: raw.weaponType || weapon.weaponType || "",
+      raw
     };
   }).filter(weapon => weapon.attacks.length);
 }
@@ -2678,19 +2863,38 @@ function selectedRollWeapon(token) {
   return weapons[index] || weapons[0] || null;
 }
 
+function twfRollWeapons(token) {
+  const weapons = rollWeaponsForToken(token);
+  const primary = weapons.find(weapon => MAP_TWF_PRIMARY_FIELDS.some(field => mapWeaponOptionChecked(weapon.raw, field)));
+  const offhands = weapons.filter(weapon => MAP_TWF_OFFHAND_FIELDS.some(field => mapWeaponOptionChecked(weapon.raw, field)));
+  if (!primary || !offhands.length) return [];
+  return [primary, ...offhands];
+}
+
 function rollTimeline(text, emphasized = []) {
   const parts = [];
   let remaining = text;
-  const needles = emphasized.filter(Boolean).map(String);
+  const needles = emphasized.filter(Boolean).map(value => {
+    const textValue = String(value);
+    const noteClass = rollNoteClass(textValue);
+    return {
+      text: textValue,
+      className: noteClass === "roll-note-positive"
+        ? "timeline-positive"
+        : noteClass === "roll-note-negative"
+          ? "timeline-negative"
+          : "timeline-emphasis"
+    };
+  });
   while (remaining) {
     const next = needles
-      .map(needle => ({ needle, index: remaining.indexOf(needle) }))
+      .map(needle => ({ ...needle, index: remaining.indexOf(needle.text) }))
       .filter(entry => entry.index >= 0)
-      .sort((a, b) => a.index - b.index || b.needle.length - a.needle.length)[0];
+      .sort((a, b) => a.index - b.index || b.text.length - a.text.length)[0];
     if (!next) break;
     if (next.index > 0) parts.push({ text: remaining.slice(0, next.index) });
-    parts.push({ text: next.needle, emphasis: true });
-    remaining = remaining.slice(next.index + next.needle.length);
+    parts.push({ text: next.text, emphasis: true, className: next.className });
+    remaining = remaining.slice(next.index + next.text.length);
   }
   if (remaining) parts.push({ text: remaining });
   addTimeline(text, parts.length ? parts : null);
@@ -2788,8 +2992,16 @@ function rollAttack(full = false) {
     el("rollModalStatus").textContent = "No weapon attack bonus found.";
     return;
   }
-  const bonuses = full ? weapon.attacks : weapon.attacks.slice(0, 1);
-  const rows = bonuses.map((bonus, index) => makeAttackRollData(token, weapon, bonus, full ? `Full Attack ${index + 1}` : "Attack"));
+  const attackWeapons = full ? (twfRollWeapons(token).length ? twfRollWeapons(token) : [weapon]) : [weapon];
+  const rows = attackWeapons.flatMap(attackWeapon => {
+    const bonuses = full ? attackWeapon.attacks : attackWeapon.attacks.slice(0, 1);
+    return bonuses.map((bonus, index) => makeAttackRollData(
+      token,
+      attackWeapon,
+      bonus,
+      full ? `${attackWeapon.name} ${index + 1}` : "Attack"
+    ));
+  });
   rows.forEach(recordAttackRoll);
   rollModal?.hide();
   showRollResultModal(`${rollTokenName(token)}: ${full ? "Full Attack" : "Attack"}`, rows);

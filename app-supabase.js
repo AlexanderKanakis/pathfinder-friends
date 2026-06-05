@@ -1028,6 +1028,33 @@
     return data;
   }
 
+  async function updateCharacterSheetRaw(sheetId, sheet, contextKey = getSelectedContextKey()) {
+    const context = normalizeContext(contextKey);
+    if (!client || !sheetId || !sheet) return null;
+
+    let query = client
+      .from("character_sheets")
+      .update({
+        sheet,
+        updated_at: new Date().toISOString()
+      })
+      .eq("id", sheetId)
+      .eq("context_key", context.contextKey);
+
+    if (context.gameId) query = query.eq("game_id", context.gameId);
+
+    const { data, error } = await query
+      .select("id,character_name,user_id,sheet")
+      .single();
+
+    if (error) {
+      console.error(error);
+      return null;
+    }
+
+    return data;
+  }
+
   async function updateCharacterCalculatedSummary(sheetId, calculated, contextKey = getSelectedContextKey()) {
     const context = normalizeContext(contextKey);
     if (!client || !sheetId) return null;
@@ -1474,6 +1501,7 @@
     loadCharacterSheet,
     loadCharacterSheetForRecalculation,
     saveCharacterSheet,
+    updateCharacterSheetRaw,
     updateCharacterCalculatedSummary,
     updateCharacterCurrentHp,
     loadContextMembers,
