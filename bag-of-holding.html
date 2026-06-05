@@ -9,10 +9,14 @@
   <style>
     body { background-color: #121212; color: white; }
     .loot-section { background: #1e1e1e; border: 1px solid #333; border-radius: 8px; padding: 12px; }
-    .loot-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr)); gap: 12px; }
-    .loot-group { background: #181818; border: 1px solid #3a3a3a; border-radius: 8px; min-height: 180px; }
+    .loot-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    .loot-group { background: #181818; border: 1px solid #3a3a3a; border-radius: 8px; }
     .loot-group-header { border-bottom: 1px solid #333; padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-    .loot-group-body { padding: 10px; display: grid; gap: 10px; }
+    .loot-group-title { min-width: 0; }
+    .loot-group-actions { display: inline-flex; align-items: center; gap: 8px; flex: 0 0 auto; }
+    .loot-group-toggle { width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center; padding: 0; }
+    .loot-group-body { padding: 10px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .loot-group.collapsed .loot-group-body { display: none; }
     .loot-card { background: #242424; border: 1px solid #444; border-radius: 8px; padding: 10px; cursor: pointer; min-width: 0; max-width: 100%; overflow: hidden; }
     .loot-card:hover { border-color: #666; }
     .loot-card-head { display: flex; gap: 8px; align-items: flex-start; min-width: 0; }
@@ -46,8 +50,9 @@
       .bag-action { justify-self: stretch; }
       .bag-action .btn { width: 100%; }
       .source-results-grid { grid-template-columns: 1fr; }
+      .loot-group-body { grid-template-columns: 1fr; }
     }
-    .empty-state { color: #777; border: 1px dashed #444; border-radius: 8px; padding: 16px; text-align: center; }
+    .empty-state { color: #777; border: 1px dashed #444; border-radius: 8px; padding: 16px; text-align: center; grid-column: 1 / -1; }
     label { font-size: 12px; color: #aaa; margin-bottom: 2px; }
     input, textarea, select { background-color: #2b2b2b !important; color: white !important; border-color: #555 !important; }
     select { min-width: 0; max-width: 100%; }
@@ -315,6 +320,7 @@ let sourceItemSearchTerm = "";
 let sourceItemCategory = "all";
 let editingLootId = null;
 let sourceLootTemplateDetails = null;
+let collapsedLootGroups = new Set();
 
 const typeIcons = {
   Weapon: "bi bi-crosshair",
@@ -422,6 +428,29 @@ function renderCharacterOptions(select, selectedCharacterId = "") {
 
 function itemGroupKey(item) {
   return item.assigned_character_id || "unassigned";
+}
+
+function collapsedLootStorageKey() {
+  return `pf_bag_collapsed_groups_${bagContextKey}`;
+}
+
+function loadCollapsedLootGroups() {
+  try {
+    collapsedLootGroups = new Set(JSON.parse(localStorage.getItem(collapsedLootStorageKey()) || "[]"));
+  } catch {
+    collapsedLootGroups = new Set();
+  }
+}
+
+function saveCollapsedLootGroups() {
+  localStorage.setItem(collapsedLootStorageKey(), JSON.stringify([...collapsedLootGroups]));
+}
+
+function toggleLootGroup(groupKey) {
+  if (collapsedLootGroups.has(groupKey)) collapsedLootGroups.delete(groupKey);
+  else collapsedLootGroups.add(groupKey);
+  saveCollapsedLootGroups();
+  renderLoot();
 }
 
 function searchableLoot(item) {
@@ -803,11 +832,17 @@ function renderLoot() {
 
   grid.innerHTML = groups.map(group => {
     const items = visibleLoot.filter(item => itemGroupKey(item) === group.key);
+    const collapsed = collapsedLootGroups.has(group.key);
     return `
-      <div class="loot-group">
+      <div class="loot-group${collapsed ? " collapsed" : ""}">
         <div class="loot-group-header">
-          <strong>${escapeHtml(group.label)}</strong>
-          <span class="badge text-bg-secondary">${items.length}</span>
+          <strong class="loot-group-title">${escapeHtml(group.label)}</strong>
+          <span class="loot-group-actions">
+            <span class="badge text-bg-secondary">${items.length}</span>
+            <button class="btn btn-outline-light btn-sm loot-group-toggle" type="button" data-toggle-loot-group="${escapeHtml(group.key)}" aria-label="${collapsed ? "Expand" : "Collapse"} ${escapeHtml(group.label)}" title="${collapsed ? "Expand" : "Collapse"}">
+              <i class="bi ${collapsed ? "bi-chevron-down" : "bi-chevron-up"}"></i>
+            </button>
+          </span>
         </div>
         <div class="loot-group-body">
           ${items.length ? items.map(renderLootCard).join("") : `<div class="empty-state">No loot here.</div>`}
@@ -816,6 +851,12 @@ function renderLoot() {
     `;
   }).join("");
 
+  grid.querySelectorAll("[data-toggle-loot-group]").forEach(button => {
+    button.addEventListener("click", event => {
+      event.stopPropagation();
+      toggleLootGroup(button.dataset.toggleLootGroup);
+    });
+  });
   grid.querySelectorAll("[data-loot-assign]").forEach(select => {
     select.addEventListener("click", event => event.stopPropagation());
     select.addEventListener("change", event => {
@@ -1336,6 +1377,7 @@ async function submitLootForm(event) {
 async function loadBagContext(contextKey, showLoading = true) {
   if (!contextKey || contextKey === "general") return;
   bagContextKey = contextKey;
+  loadCollapsedLootGroups();
   if (showLoading) setLootStatus("Loading bag...", "secondary");
 
   bagCharacters = await PFApp.loadContextCharacters(bagContextKey);
