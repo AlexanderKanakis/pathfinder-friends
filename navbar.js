@@ -32,7 +32,7 @@
     mount.innerHTML = `
       <nav class="navbar navbar-expand-md navbar-dark bg-black border-bottom">
         <div class="container-fluid">
-          <a class="navbar-brand" href="dice-roller.html">Pathfinder-friends</a>
+          <a class="navbar-brand" href="dice-roller.html">PathFriends</a>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
