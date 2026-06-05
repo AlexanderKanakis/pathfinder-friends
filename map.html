@@ -55,6 +55,7 @@
     .side-section { margin-bottom: 14px; min-height: 0; }
     .side-title { color: #aaa; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 6px; }
     .initiative-row, .timeline-row { background: #242424; border: 1px solid #444; border-radius: 8px; padding: 7px; margin-bottom: 6px; }
+    .timeline-row { font-size: .7rem; }
     .initiative-row.active { border-color: #8fd19e; background: rgba(143, 209, 158, .1); }
     .initiative-row-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(58px, 66px) minmax(0, auto); gap: 5px; align-items: center; min-width: 0; }
     .initiative-controls { display: inline-flex; gap: 3px; min-width: 0; }
@@ -98,8 +99,9 @@
     .selected-collapse input { color: #fff !important; }
     .size-link-row { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: end; }
     .size-link-toggle { width: 32px; height: 31px; display: inline-flex; align-items: center; justify-content: center; padding: 0; }
-    .enemy-picker-list { display: grid; gap: 8px; max-height: 55vh; overflow: auto; }
-    .enemy-picker-row { background: #242424; border: 1px solid #444; border-radius: 8px; padding: 8px 10px; text-align: left; color: #fff; }
+    .enemy-picker-list { display: grid; gap: 8px; min-height: 0; max-height: 55vh; overflow: auto; align-content: start; }
+    .enemy-picker-list.search-modal-results { min-height: 0; }
+    .enemy-picker-row { background: #242424; border: 1px solid #444; border-radius: 8px; padding: 8px 10px; text-align: left; color: #fff; min-height: 62px; max-height: 92px; overflow: hidden; }
     .enemy-picker-row:hover { border-color: #777; }
     .mini-sheet { display: grid; gap: 8px; margin-bottom: 8px; }
     .mini-sheet-title { color: #aaa; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; }
@@ -421,6 +423,25 @@
   </div>
 </div>
 
+<div class="modal fade" id="characterPickerModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content bg-dark text-white border-secondary">
+      <div class="modal-header border-secondary">
+        <h5 class="modal-title">Add Character</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <input id="characterPickerSearch" class="form-control form-control-sm mb-3" placeholder="Search characters">
+        <div id="characterPickerList" class="enemy-picker-list search-modal-results"></div>
+      </div>
+      <div class="modal-footer border-secondary">
+        <a class="btn btn-outline-info btn-sm" href="characters.html">Manage Characters</a>
+        <button type="button" class="btn btn-outline-light btn-sm" data-bs-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="modal fade" id="auraOptionsModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <form id="auraOptionsForm" class="modal-content bg-dark text-white border-secondary">
@@ -509,6 +530,7 @@ let auraModal = null;
 let auraEditingTokenId = "";
 let backgroundModal = null;
 let enemyPickerModal = null;
+let characterPickerModal = null;
 let genericTokenModal = null;
 let mapEffectsModal = null;
 let quickEffectModal = null;
@@ -1983,6 +2005,10 @@ function endDrag() {
 
 function addToken(kind) {
   if (kind === "enemy" && !isGm) return;
+  if (kind === "character") {
+    openCharacterPicker();
+    return;
+  }
   if (kind === "enemy") {
     openEnemyPicker();
     return;
@@ -1991,23 +2017,11 @@ function addToken(kind) {
     openGenericTokenModal();
     return;
   }
-  const selectedCharacterId = PFApp.getSelectedCharacterId(mapContextKey);
-  const character = mapCharacters.find(item => item.id === selectedCharacterId) || mapCharacters[0];
-  if (kind === "character" && character?.id) {
-    const existingToken = state.tokens.find(token => token.kind === "character" && token.characterId === character.id);
-    if (existingToken) {
-      selectedId = existingToken.id;
-      renderAll(false);
-      showSelectedPanel();
-      return;
-    }
-  }
-  const name = kind === "enemy" ? "Enemy" : character?.name || "Character";
+  const name = "Token";
   const token = {
     id: uid("token"),
     kind,
-    characterId: kind === "character" ? character?.id || "" : "",
-    ownerId: kind === "character" ? character?.userId || currentUserId : "",
+    ownerId: currentUserId,
     name,
     x: 1,
     y: 1,
@@ -2015,9 +2029,7 @@ function addToken(kind) {
     h: 1,
     sizeLinked: true,
     zIndex: nextMapZIndex(),
-    hp: kind === "enemy" ? "?" : "",
-    ac: kind === "enemy" ? "?" : "",
-    color: kind === "enemy" ? "#b02a37" : "#8fd19e"
+    color: "#8fd19e"
   };
   state.tokens.push(token);
   selectedId = token.id;
@@ -2064,6 +2076,89 @@ function enemyHpText(enemy) {
 
 function enemyAcText(enemy) {
   return enemy.sheet?.calculated?.armorClass?.ac || enemy.sheet?.fields?.acTotal || "?";
+}
+
+function characterHpText(character) {
+  const fields = character.sheet?.fields || {};
+  const calculated = character.sheet?.calculated || {};
+  const current = calculated.hp?.current || fields.currentHitPoints || "?";
+  const total = calculated.hp?.total || fields.hitPointsTotal || fields.hitPoints || "?";
+  return `${current}/${total}`;
+}
+
+function characterAcText(character) {
+  return character.sheet?.calculated?.armorClass?.ac || character.sheet?.fields?.acTotal || "?";
+}
+
+function availableCharacterPickerRows() {
+  const term = el("characterPickerSearch").value.trim().toLowerCase();
+  return mapCharacters
+    .filter(character => isGm || character.userId === currentUserId)
+    .filter(character => !term || character.name.toLowerCase().includes(term))
+    .sort((a, b) => String(a.name || "").localeCompare(String(b.name || "")));
+}
+
+function renderCharacterPicker() {
+  const rows = availableCharacterPickerRows();
+  el("characterPickerList").innerHTML = rows.length
+    ? rows.map(character => {
+      const onMap = state.tokens.some(token => token.kind === "character" && token.characterId === character.id);
+      return `
+        <button class="enemy-picker-row" type="button" data-character-id="${escapeHtml(character.id)}">
+          <div class="d-flex justify-content-between gap-2">
+            <strong>${escapeHtml(character.name)}</strong>
+            ${onMap ? `<span class="badge text-bg-secondary">On map</span>` : ""}
+          </div>
+          <div class="small text-secondary">HP ${escapeHtml(characterHpText(character))} | AC ${escapeHtml(characterAcText(character))}${isGm && character.username ? ` | ${escapeHtml(character.username)}` : ""}</div>
+        </button>
+      `;
+    }).join("")
+    : `<div class="small text-secondary">No characters found.</div>`;
+  el("characterPickerList").querySelectorAll("[data-character-id]").forEach(button => {
+    button.addEventListener("click", () => addCharacterTokenFromLibrary(button.dataset.characterId));
+  });
+}
+
+async function openCharacterPicker() {
+  mapCharacters = await PFApp.loadContextCharacters(mapContextKey);
+  await hydrateMapCharacterSheets();
+  el("characterPickerSearch").value = "";
+  renderCharacterPicker();
+  characterPickerModal.show();
+  setTimeout(() => el("characterPickerSearch").focus(), 150);
+}
+
+function addCharacterTokenFromLibrary(characterId) {
+  const character = mapCharacters.find(item => item.id === characterId);
+  if (!character) return;
+  const existingToken = state.tokens.find(token => token.kind === "character" && token.characterId === character.id);
+  if (existingToken) {
+    selectedId = existingToken.id;
+    characterPickerModal.hide();
+    renderAll(false);
+    showSelectedPanel();
+    return;
+  }
+  const token = {
+    id: uid("token"),
+    kind: "character",
+    characterId: character.id,
+    ownerId: character.userId || currentUserId,
+    name: character.name || "Character",
+    x: 1,
+    y: 1,
+    w: 1,
+    h: 1,
+    sizeLinked: true,
+    zIndex: nextMapZIndex(),
+    color: "#8fd19e"
+  };
+  syncTokenFromSheet(token, character);
+  state.tokens.push(token);
+  selectedId = token.id;
+  characterPickerModal.hide();
+  addTimeline(`${token.name} entered the map.`);
+  renderAll();
 }
 
 function renderEnemyPicker() {
@@ -3359,6 +3454,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   backgroundModal = new bootstrap.Modal(el("backgroundOptionsModal"));
   el("backgroundOptionsForm").addEventListener("submit", saveBackgroundOptions);
   enemyPickerModal = new bootstrap.Modal(el("enemyPickerModal"));
+  characterPickerModal = new bootstrap.Modal(el("characterPickerModal"));
   genericTokenModal = new bootstrap.Modal(el("genericTokenModal"));
   el("genericTokenForm").addEventListener("submit", submitGenericToken);
   mapEffectsModal = new bootstrap.Modal(el("mapEffectsModal"));
@@ -3369,6 +3465,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   el("rollResultModal").addEventListener("hidden.bs.modal", () => clearInterval(rollAnimationTimer));
   el("rerollResult").addEventListener("click", () => lastRollAction?.());
   el("enemyPickerSearch").addEventListener("input", renderEnemyPicker);
+  el("characterPickerSearch").addEventListener("input", renderCharacterPicker);
   el("quickEffectSearch").addEventListener("input", renderQuickEffects);
   el("addCharacterToken").addEventListener("click", () => addToken("character"));
   el("addEnemyToken").addEventListener("click", () => addToken("enemy"));

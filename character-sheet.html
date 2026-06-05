@@ -219,12 +219,12 @@
 <body>
 <div id="appNavbar"></div>
 
-<main class="container-fluid mt-3">
+<main id="sheetMain" class="container-fluid mt-3 d-none">
   <div class="d-flex justify-content-between align-items-center mb-2">
     <h3 id="sheetPageTitle" class="mb-0">Character Sheet</h3>
     <div class="d-flex gap-2">
+      <a id="backToCharactersBtn" class="btn btn-outline-light btn-sm" href="characters.html">Back to Characters</a>
       <a id="backToEnemiesBtn" class="btn btn-outline-light btn-sm d-none" href="enemies.html">Back to Enemies</a>
-      <button id="newCharacterBtn" class="btn btn-outline-light btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#newCharacterModal">New Character</button>
       <button class="btn btn-outline-success btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#effectTrackerModal" onclick="openEffectTrackerModal()">Effects</button>
       <button id="showAppliedBuffsToggle" class="btn btn-outline-info btn-sm" type="button" onclick="toggleAppliedBuffs()">Show Applied Buffs</button>
       <button class="btn btn-primary btn-sm" type="button" onclick="saveSheetNow()">Save</button>
@@ -461,25 +461,6 @@
   <div id="simplifiedSheetView" class="simple-wrap d-none"></div>
 </main>
 
-<div class="modal fade" id="newCharacterModal" tabindex="-1" aria-labelledby="newCharacterModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <form id="newCharacterForm" class="modal-content bg-dark text-white border-secondary">
-      <div class="modal-header">
-        <h5 class="modal-title" id="newCharacterModalLabel">New Character</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <label for="newCharacterName">Character Name</label>
-        <input id="newCharacterName" class="form-control form-control-sm" required>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-outline-light btn-sm" data-bs-dismiss="modal">Cancel</button>
-        <button type="submit" class="btn btn-primary btn-sm">Create</button>
-      </div>
-    </form>
-  </div>
-</div>
-
 <div class="modal fade" id="inventoryItemModal" tabindex="-1" aria-labelledby="inventoryItemModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
     <form id="inventoryItemForm" class="modal-content bg-dark text-white border-secondary">
@@ -517,6 +498,10 @@
             <select id="inventorySlotInput" class="form-select form-select-sm"></select>
             <span id="inventorySlotValue" class="slot-value"></span>
           </div>
+        </div>
+        <div class="form-check form-switch mt-2">
+          <input id="inventoryWondrousItem" class="form-check-input" type="checkbox" role="switch">
+          <label class="form-check-label" for="inventoryWondrousItem">Wondrous Item</label>
         </div>
         <div id="inventoryWeaponFields" class="inventory-edit-grid mt-2 d-none">
           <div>
@@ -650,7 +635,7 @@
 <script src="app-supabase.js"></script>
 <script src="buff-calculator.js"></script>
 <script src="buff-tracker-widget.js?v=extra-attack-widget-2"></script>
-<script src="wondrous.js"></script>
+<script src="wondrous.js?v=wondrous-refresh-1"></script>
 <script src="scripts.js"></script>
 <script src="item-editor.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -1369,6 +1354,15 @@ function syncInventorySlotForType() {
   PFItemEditor.syncSlotForType(inventoryEditorConfig());
 }
 
+function applyWondrousSource(details, checked) {
+  if (checked) {
+    details.source = "Wondrous Item";
+  } else if (String(details.source || "").toLowerCase() === "wondrous item") {
+    delete details.source;
+  }
+  return details;
+}
+
 function stripSourceHtml(value) {
   const div = document.createElement("div");
   div.innerHTML = String(value || "").replace(/^<\/h3>/i, "");
@@ -1611,13 +1605,23 @@ function searchableEnemySourceItem(item) {
   return `${item.name || ""} ${item.sourceType || ""} ${item.description || ""} ${Object.values(item.details || {}).join(" ")}`.toLowerCase();
 }
 
+function enemySourceItemSearchRank(item, term) {
+  if (!term) return 0;
+  return String(item.name || "").toLowerCase().includes(term) ? 0 : 1;
+}
+
 function renderEnemySourceItemResults() {
   renderEnemySourceMundaneTabs();
   const term = enemySourceItemSearchTerm.trim().toLowerCase();
+  if (enemySourceItemCategory === "all" && term.length < 3) {
+    el("enemySourceItemCount").textContent = "0 items";
+    el("enemySourceItemResults").innerHTML = `<div class="small-text">Type at least 3 characters to search all source items.</div>`;
+    return;
+  }
   const rows = enemySourceItems
     .filter(enemySourceItemMatchesCategory)
     .filter(item => searchableEnemySourceItem(item).includes(term))
-    .sort((a, b) => String(a.name || "").localeCompare(String(b.name || "")));
+    .sort((a, b) => enemySourceItemSearchRank(a, term) - enemySourceItemSearchRank(b, term) || String(a.name || "").localeCompare(String(b.name || "")));
   el("enemySourceItemCount").textContent = `${rows.length} item${rows.length === 1 ? "" : "s"}`;
   el("enemySourceItemResults").innerHTML = rows.length ? `
     <div class="source-results-grid">
@@ -1670,14 +1674,13 @@ function openEnemySourceItemsModal() {
 }
 
 function rememberSelectedCharacter(characterId, contextKey = sheetContextKey) {
-  if (PFApp.setSelectedCharacterId) {
-    PFApp.setSelectedCharacterId(characterId, contextKey);
-    return;
-  }
-
-  const key = `pf_character_id_${contextKey}`;
+  const key = `pf_last_sheet_character_id_${contextKey}`;
   if (characterId) localStorage.setItem(key, characterId);
   else localStorage.removeItem(key);
+}
+
+function rememberedSheetCharacter(contextKey = sheetContextKey) {
+  return localStorage.getItem(`pf_last_sheet_character_id_${contextKey}`) || "";
 }
 
 function sheetToBaseline() {
@@ -2913,6 +2916,7 @@ function openInventoryItemEditor(itemId) {
   el("inventoryItemType").value = item.type || "Item";
   const details = item.details || {};
   PFItemEditor.setSlot(inventoryEditorConfig(), details.slot || "");
+  el("inventoryWondrousItem").checked = String(details.source || item.sourceType || "").toLowerCase() === "wondrous item";
   updateInventorySlotPreview();
   PFItemEditor.refreshDescription(inventoryEditorConfig());
   el("inventoryWeaponType").value = details.weaponType || "Melee Weapon (One-Handed)";
@@ -2944,13 +2948,17 @@ async function submitInventoryItemEdit(event) {
   if (!name) return;
 
   if (isEnemySheetMode) {
+    const updatedEnemyDetails = applyWondrousSource(
+      { ...cloneJson(item.details || {}), ...collectInventoryDetails() },
+      el("inventoryWondrousItem").checked
+    );
     const updatedEnemyItem = {
       ...item,
       name,
       description: el("inventoryItemDescription").value.trim(),
       count: el("inventoryItemCount").value,
       type: el("inventoryItemType").value,
-      details: { ...cloneJson(item.details || {}), ...collectInventoryDetails() },
+      details: updatedEnemyDetails,
       effects: collectInventoryEffects()
     };
     characterInventoryItems = characterInventoryItems.map(entry => entry.id === editingInventoryItemId ? {
@@ -2966,6 +2974,10 @@ async function submitInventoryItemEdit(event) {
     return;
   }
 
+  const savedDetails = applyWondrousSource(
+    { ...cloneJson(item.details || {}), ...collectInventoryDetails() },
+    el("inventoryWondrousItem").checked
+  );
   const saved = await PFApp.saveLootItem({
     id: item.id,
     name,
@@ -2973,7 +2985,7 @@ async function submitInventoryItemEdit(event) {
     count: el("inventoryItemCount").value,
     type: el("inventoryItemType").value,
     assignedCharacterId: item.assigned_character_id || currentSheetId,
-    details: { ...cloneJson(item.details || {}), ...collectInventoryDetails() },
+    details: savedDetails,
     effects: collectInventoryEffects()
   }, sheetContextKey);
 
@@ -3073,6 +3085,14 @@ async function submitInventoryItemDelete(event) {
   await deleteInventoryItemAmount(pendingInventoryDeleteId);
 }
 
+function inventoryItemGroupType(item) {
+  if (item.type === "Weapon") return "Weapon";
+  if (item.type === "Armor") return "Armor";
+  if (item.type === "Shield") return "Shield";
+  if (String(item.details?.source || item.sourceType || "").toLowerCase() === "wondrous item") return "Wondrous";
+  return "Item";
+}
+
 function renderCharacterInventory(items = []) {
   const container = el("characterInventory");
   if (!container) return;
@@ -3091,10 +3111,11 @@ function renderCharacterInventory(items = []) {
     ["Weapon", "Weapons"],
     ["Armor", "Armor"],
     ["Shield", "Shields"],
+    ["Wondrous", "Wondrous Items"],
     ["Item", "Items"]
   ];
   container.innerHTML = groups.map(([type, label]) => {
-    const groupItems = items.filter(item => (["Weapon", "Armor", "Shield"].includes(item.type) ? item.type : "Item") === type);
+    const groupItems = items.filter(item => inventoryItemGroupType(item) === type);
     if (!groupItems.length) return "";
     return `
       <div class="inventory-group">
@@ -3665,9 +3686,6 @@ async function saveSheetNow(silent = false) {
   const saved = await PFApp.saveCharacterSheet(name, collectSheet(), sheetContextKey, currentSheetId);
   if (saved?.id) currentSheetId = saved.id;
   if (currentSheetId) rememberSelectedCharacter(currentSheetId);
-  await PFApp.setupCharacterSelect("navCharacterSelect", sheetContextKey, null, { dispatch: false });
-  const navCharacterSelect = el("navCharacterSelect");
-  if (navCharacterSelect && currentSheetId) navCharacterSelect.value = currentSheetId;
   await loadCharacterInventory();
   if (currentSheetId) localStorage.setItem(`pf_character_sheet_updated_${sheetContextKey}_${currentSheetId}`, String(Date.now()));
   if (!silent) setStatus("Character sheet saved.", "success");
@@ -3707,8 +3725,6 @@ async function loadCurrentSheet(sheetId = currentSheetId) {
     await loadActiveBuffs(currentSheetId);
     restoreSheet(saved.sheet);
     el("characterName").value = saved.character_name;
-    const navCharacterSelect = el("navCharacterSelect");
-    if (navCharacterSelect) navCharacterSelect.value = saved.id;
     await loadCharacterInventory();
     setStatus(
       currentSheetOwnerId !== currentUserId
@@ -3783,53 +3799,6 @@ window.PFCharacterSheetBridge = {
   recalculateAndSaveEnemy: recalculateAndSaveEnemySheet
 };
 
-async function loadCharacterList(selectedId = currentSheetId) {
-  await PFApp.setupCharacterSelect("navCharacterSelect", sheetContextKey, null, { dispatch: false });
-  const select = el("navCharacterSelect");
-  if (selectedId && select && [...select.options].some(option => option.value === selectedId)) select.value = selectedId;
-}
-
-function resetForNewCharacter() {
-  currentSheetId = null;
-  currentSheetOwnerId = currentUserId;
-  activeBuffs = [];
-  lastBuffRefresh = "";
-  customSkills = [];
-  renderSkillRows();
-  isRestoringSheet = true;
-  document.querySelectorAll(".sheet-input, #characterName, textarea").forEach(input => {
-    input.value = input.defaultValue || "";
-  });
-  el("weaponRows").innerHTML = "";
-  el("armorRows").innerHTML = "";
-  el("gearRows").innerHTML = "";
-  weaponCount = 0;
-  armorCount = 0;
-  gearCount = 0;
-  addWeapon();
-  addArmor();
-  showCalculations = true;
-  updateAppliedBuffsToggle();
-  isRestoringSheet = false;
-  updateCharacterImagePreview();
-  recalculateSheet();
-  renderCharacterInventory([]);
-}
-
-async function createNewCharacter(name) {
-  resetForNewCharacter();
-  el("characterName").value = name;
-  currentSheetId = null;
-  currentSheetOwnerId = currentUserId;
-  await saveSheetNow(true);
-  if (currentSheetId) {
-    rememberSelectedCharacter(currentSheetId);
-    const navCharacterSelect = el("navCharacterSelect");
-    if (navCharacterSelect) navCharacterSelect.value = currentSheetId;
-    setStatus("Character created. You can keep editing this sheet.", "success");
-  }
-}
-
 function inventoryEditorConfig() {
   return {
     formId: "inventoryItemForm",
@@ -3854,7 +3823,10 @@ async function initCharacterSheet() {
   if (!sheetContextKey) return;
   currentUserId = user.id;
   currentSheetOwnerId = user.id;
-  enemySheetId = new URLSearchParams(window.location.search).get("enemyId") || "";
+  const params = new URLSearchParams(window.location.search);
+  const bridgeMode = params.get("bridge") === "1";
+  const requestedCharacterId = params.get("characterId") || "";
+  enemySheetId = params.get("enemyId") || "";
   isEnemySheetMode = Boolean(enemySheetId);
   buildSheet();
   if (isEnemySheetMode) {
@@ -3866,10 +3838,11 @@ async function initCharacterSheet() {
           <p class="mb-0">Only the GM of this campaign or an app admin can edit enemies.</p>
         </div>
       `;
+      el("sheetMain")?.classList.remove("d-none");
       return;
     }
     el("sheetPageTitle").textContent = "Enemy Sheet";
-    el("newCharacterBtn").classList.add("d-none");
+    el("backToCharactersBtn")?.classList.add("d-none");
     el("backToEnemiesBtn").classList.remove("d-none");
     el("enemySourceItemButton")?.classList.remove("d-none");
     await loadEnemySourceItems();
@@ -3881,18 +3854,7 @@ async function initCharacterSheet() {
   window.addEventListener("pf-context-change", async event => {
     if (isEnemySheetMode) return;
     if (!event.detail.contextKey || event.detail.contextKey === "general") return;
-    sheetContextKey = event.detail.contextKey;
-    currentSheetId = null;
-    activeBuffs = [];
-    lastBuffRefresh = "";
-    resetForNewCharacter();
-    await loadCharacterList();
-  });
-  window.addEventListener("pf-character-change", async event => {
-    if (isEnemySheetMode) return;
-    if (event.detail.contextKey !== sheetContextKey) return;
-    if (event.detail.characterId) await loadCurrentSheet(event.detail.characterId);
-    else resetForNewCharacter();
+    window.location.href = "characters.html";
   });
   window.addEventListener("focus", () => {
     if (!isEnemySheetMode) refreshBuffsIfChanged(false, true);
@@ -3912,16 +3874,16 @@ async function initCharacterSheet() {
   });
   if (isEnemySheetMode) {
     await loadEnemySheet(enemySheetId);
+  } else if (requestedCharacterId) {
+    await loadCurrentSheet(requestedCharacterId);
+  } else if (bridgeMode) {
+    loadSampleValues();
+    renderCharacterInventory([]);
   } else {
-    await loadCharacterList();
-    const rememberedId = PFApp.getSelectedCharacterId(sheetContextKey);
-    if (rememberedId) {
-      await loadCurrentSheet(rememberedId);
-    } else {
-      loadSampleValues();
-      renderCharacterInventory([]);
-    }
+    window.location.href = "characters.html";
+    return;
   }
+  el("sheetMain")?.classList.remove("d-none");
   attachInputListeners();
   el("characterImagePreview")?.addEventListener("error", () => {
     el("characterImagePreview").classList.add("d-none");
@@ -3935,14 +3897,6 @@ async function initCharacterSheet() {
     const saved = await PFApp.loadCharacterSheet(el("characterName").value.trim(), sheetContextKey);
     currentSheetId = saved?.id || null;
     if (saved?.sheet) await loadCurrentSheet(saved.id);
-  });
-  el("newCharacterForm").addEventListener("submit", async event => {
-    event.preventDefault();
-    const name = el("newCharacterName").value.trim();
-    if (!name) return;
-    await createNewCharacter(name);
-    bootstrap.Modal.getInstance(el("newCharacterModal"))?.hide();
-    event.target.reset();
   });
   el("inventoryItemType").addEventListener("change", toggleInventoryDetailFields);
   el("inventoryWeaponType").addEventListener("change", toggleInventoryDetailFields);

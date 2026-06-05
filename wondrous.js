@@ -17000,6 +17000,21 @@ const wItems = [
       "link": "http://www.aonprd.com/MagicWondrousDisplay.aspx?FinalName=Belt of Mighty Constitution2"
     },
     {
+      "name": "Gloves of Dexterity",
+      "details": {
+        "aura": "moderate transmutation",
+        "cl": "8th",
+        "slot": "belt",
+        "price": "4,000 gp",
+        "weight": "1 lb.",
+        "requirements": "Craft Wondrous Item, cat's grace",
+        "bonus": "2,4,6",
+        "cost": "2,000 gp (+2), 8,000 gp (+4), 18,000 gp (+6)",
+        "description": "</h3> The gloves grant the wearer\r an enhancement bonus to Dexterity\r of +2, +4, or +6. Treat this as a temporary\r ability bonus for the first 24 hours the gloves are worn."
+      },
+      "link": "http://www.aonprd.com/MagicWondrousDisplay.aspx?FinalName=Belt of Mighty Constitution2"
+    },
+    {
       "name": "Belt of Giant Strength",
       "details": {
         "aura": "moderate transmutation",

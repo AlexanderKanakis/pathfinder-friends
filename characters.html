@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Characters</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+  <style>
+    body { background: #121212; color: #fff; }
+    .character-shell { max-width: 1100px; }
+    .characters-toolbar { display: grid; grid-template-columns: minmax(180px, 1fr) auto; gap: 10px; align-items: end; }
+    .character-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+    .character-card { position: relative; background: #242424; border: 1px solid #444; border-radius: 8px; padding: 10px; color: #fff; text-align: left; cursor: pointer; min-width: 0; min-height: 92px; }
+    .character-card:hover, .character-card:focus { border-color: #777; outline: none; }
+    .character-card-name { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .character-card-meta { color: #aaa; font-size: 12px; margin-top: 4px; }
+    .character-card-actions { position: absolute; right: 8px; bottom: 8px; display: flex; gap: 6px; }
+    .character-icon-btn { width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; padding: 0; }
+    input { background-color: #2b2b2b !important; color: white !important; border-color: #555 !important; }
+    @media (max-width: 520px) {
+      .characters-toolbar { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div id="appNavbar"></div>
+
+<main class="container character-shell mt-4">
+  <div class="d-flex justify-content-between align-items-center gap-2 mb-3">
+    <div>
+      <h3 class="mb-0">Characters</h3>
+      <div id="characterContextLabel" class="small text-secondary"></div>
+    </div>
+    <button class="btn btn-primary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#newCharacterModal">
+      <i class="bi bi-plus-lg"></i> Add Character
+    </button>
+  </div>
+
+  <section class="card bg-black border-secondary text-white mb-3">
+    <div class="card-body">
+      <div class="characters-toolbar">
+        <div>
+          <label for="characterSearch" class="form-label">Search Characters</label>
+          <input id="characterSearch" class="form-control form-control-sm" placeholder="Name">
+        </div>
+        <button id="refreshCharactersBtn" class="btn btn-outline-light btn-sm" type="button">
+          <i class="bi bi-arrow-clockwise"></i> Refresh
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <div id="characterStatus" class="alert d-none py-2"></div>
+  <div id="characterList" class="character-grid"></div>
+</main>
+
+<div class="modal fade" id="newCharacterModal" tabindex="-1" aria-labelledby="newCharacterModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <form id="newCharacterForm" class="modal-content bg-dark text-white border-secondary">
+      <div class="modal-header border-secondary">
+        <h5 class="modal-title" id="newCharacterModalLabel">Add Character</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <label for="newCharacterName">Character Name</label>
+        <input id="newCharacterName" class="form-control form-control-sm" required maxlength="120">
+      </div>
+      <div class="modal-footer border-secondary">
+        <span id="newCharacterStatus" class="small text-secondary me-auto"></span>
+        <button type="button" class="btn btn-outline-light btn-sm" data-bs-dismiss="modal">Cancel</button>
+        <button id="createCharacterButton" class="btn btn-primary btn-sm" type="submit">Create</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal fade" id="deleteCharacterModal" tabindex="-1" aria-labelledby="deleteCharacterModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <form id="deleteCharacterForm" class="modal-content bg-dark text-white border-secondary">
+      <div class="modal-header border-secondary">
+        <h5 class="modal-title" id="deleteCharacterModalLabel">Delete Character</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="mb-1">Delete <strong id="deleteCharacterName"></strong>?</p>
+        <div class="small text-secondary">This removes the character sheet and unassigns any loot tied to it.</div>
+      </div>
+      <div class="modal-footer border-secondary">
+        <span id="deleteCharacterStatus" class="small text-secondary me-auto"></span>
+        <button type="button" class="btn btn-outline-light btn-sm" data-bs-dismiss="modal">Cancel</button>
+        <button id="confirmDeleteCharacterBtn" class="btn btn-danger btn-sm" type="submit">
+          <i class="bi bi-trash"></i> Delete
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="navbar.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="app-supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+let characterContextKey = "";
+let characters = [];
+let characterSearchTerm = "";
+let currentUserId = "";
+let canViewCampaignCharacters = false;
+let isAppAdminUser = false;
+let newCharacterModal = null;
+let deleteCharacterModal = null;
+let pendingDeleteCharacterId = "";
+
+function el(id) { return document.getElementById(id); }
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function status(message, type = "info") {
+  const box = el("characterStatus");
+  box.className = `alert alert-${type} py-2`;
+  box.textContent = message;
+  box.classList.toggle("d-none", !message);
+}
+
+function rememberCharacter(characterId) {
+  if (characterId) localStorage.setItem(`pf_last_sheet_character_id_${characterContextKey}`, characterId);
+}
+
+function openCharacter(characterId) {
+  rememberCharacter(characterId);
+  window.location.href = `character-sheet.html?characterId=${encodeURIComponent(characterId)}`;
+}
+
+function characterLevelText(sheet = {}) {
+  const value = sheet.fields?.characterLevel
+    ?? sheet.characterLevel
+    ?? sheet.fields?.level
+    ?? sheet.level
+    ?? "";
+  const text = String(value || "").trim();
+  return text && text !== "0" ? text : "-";
+}
+
+function characterOwnerLabel(character) {
+  if (!canViewCampaignCharacters || character.user_id === currentUserId) return "";
+  return character.username || character.email || "Other player";
+}
+
+function canDeleteCharacter(character) {
+  return isAppAdminUser || character.user_id === currentUserId;
+}
+
+function renderCharacters() {
+  const term = characterSearchTerm.trim().toLowerCase();
+  const rows = characters
+    .filter(character => !term || String(character.character_name || "").toLowerCase().includes(term))
+    .sort((a, b) => String(a.character_name || "").localeCompare(String(b.character_name || "")));
+
+  el("characterList").innerHTML = rows.length
+    ? rows.map(character => `
+      <article class="character-card" role="button" tabindex="0" data-character-id="${escapeHtml(character.id)}">
+        <div class="d-flex justify-content-between gap-2">
+          <div class="character-card-name">${escapeHtml(character.character_name || "Unnamed character")}</div>
+          <span class="badge text-bg-primary">Character</span>
+        </div>
+        <div class="character-card-meta">
+          Level ${escapeHtml(characterLevelText(character.sheet || {}))}
+          ${characterOwnerLabel(character) ? ` | ${escapeHtml(characterOwnerLabel(character))}` : ""}
+        </div>
+        ${canDeleteCharacter(character) ? `
+          <div class="character-card-actions">
+            <button class="btn btn-outline-danger btn-sm character-icon-btn" type="button" data-delete-character="${escapeHtml(character.id)}" aria-label="Delete ${escapeHtml(character.character_name || "character")}">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+        ` : ""}
+      </article>
+    `).join("")
+    : `<div class="text-secondary small">No characters found.</div>`;
+
+  el("characterList").querySelectorAll("[data-character-id]").forEach(button => {
+    button.addEventListener("click", event => {
+      if (event.target.closest("[data-delete-character]")) return;
+      openCharacter(button.dataset.characterId);
+    });
+  });
+  el("characterList").querySelectorAll("[data-delete-character]").forEach(button => {
+    button.addEventListener("click", () => openDeleteCharacterModal(button.dataset.deleteCharacter));
+  });
+}
+
+async function loadCharacters() {
+  canViewCampaignCharacters = await PFApp.isGameManager(characterContextKey);
+  characters = await PFApp.loadCharacterSheets(characterContextKey, { ownOnly: !canViewCampaignCharacters, includeSheet: true });
+  if (canViewCampaignCharacters) {
+    const contextCharacters = await PFApp.loadContextCharacters(characterContextKey);
+    const metaById = new Map(contextCharacters.map(character => [character.id, character]));
+    characters = characters.map(character => {
+      const meta = metaById.get(character.id);
+      return meta ? { ...character, username: meta.username, email: meta.email } : character;
+    });
+  }
+  await Promise.all(characters.map(async character => {
+    if (character.sheet) return;
+    const saved = await PFApp.loadCharacterSheet("", characterContextKey, character.id);
+    if (saved?.sheet) character.sheet = saved.sheet;
+  }));
+  await updateCharacterContextLabel();
+  renderCharacters();
+}
+
+async function updateCharacterContextLabel() {
+  const contexts = await PFApp.loadContexts();
+  const context = contexts.find(item => item.key === characterContextKey);
+  el("characterContextLabel").textContent = context?.label || "";
+}
+
+function defaultCharacterSheet(name) {
+  return {
+    fields: {
+      characterName: name,
+      characterLevel: "1",
+      currentHitPoints: "0",
+      hitPointsTotal: "0"
+    },
+    abilities: {},
+    saves: {},
+    skills: {},
+    weapons: [],
+    armor: [],
+    gear: [],
+    preferences: { showAppliedBuffs: true }
+  };
+}
+
+async function createCharacter(event) {
+  event.preventDefault();
+  const name = el("newCharacterName").value.trim();
+  if (!name) return;
+
+  const button = el("createCharacterButton");
+  const modalStatus = el("newCharacterStatus");
+  button.disabled = true;
+  modalStatus.textContent = "Creating...";
+
+  const saved = await PFApp.saveCharacterSheet(name, defaultCharacterSheet(name), characterContextKey);
+  button.disabled = false;
+
+  if (!saved?.id) {
+    modalStatus.textContent = "Could not create character.";
+    return;
+  }
+
+  newCharacterModal.hide();
+  event.target.reset();
+  openCharacter(saved.id);
+}
+
+function openDeleteCharacterModal(characterId) {
+  const character = characters.find(item => item.id === characterId);
+  if (!character || !canDeleteCharacter(character)) return;
+  pendingDeleteCharacterId = character.id;
+  el("deleteCharacterName").textContent = character.character_name || "Unnamed character";
+  el("deleteCharacterStatus").textContent = "";
+  deleteCharacterModal.show();
+}
+
+async function deleteCharacter(event) {
+  event.preventDefault();
+  if (!pendingDeleteCharacterId) return;
+
+  const button = el("confirmDeleteCharacterBtn");
+  button.disabled = true;
+  el("deleteCharacterStatus").textContent = "Deleting...";
+
+  const { error } = await PFApp.deleteCharacterSheet(pendingDeleteCharacterId, characterContextKey);
+  button.disabled = false;
+
+  if (error) {
+    el("deleteCharacterStatus").textContent = error.message || "Could not delete character.";
+    return;
+  }
+
+  if (localStorage.getItem(`pf_last_sheet_character_id_${characterContextKey}`) === pendingDeleteCharacterId) {
+    localStorage.removeItem(`pf_last_sheet_character_id_${characterContextKey}`);
+  }
+  pendingDeleteCharacterId = "";
+  deleteCharacterModal.hide();
+  status("Character deleted.", "success");
+  await loadCharacters();
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+  const user = await PFApp.requireAuth();
+  if (!user) return;
+  currentUserId = user.id;
+  isAppAdminUser = await PFApp.isAppAdmin();
+  characterContextKey = await PFApp.requireGameContext();
+  if (!characterContextKey) return;
+
+  newCharacterModal = bootstrap.Modal.getOrCreateInstance(el("newCharacterModal"));
+  deleteCharacterModal = bootstrap.Modal.getOrCreateInstance(el("deleteCharacterModal"));
+  el("newCharacterForm").addEventListener("submit", createCharacter);
+  el("deleteCharacterForm").addEventListener("submit", deleteCharacter);
+  el("characterSearch").addEventListener("input", event => {
+    characterSearchTerm = event.target.value.trim();
+    renderCharacters();
+  });
+  el("refreshCharactersBtn").addEventListener("click", loadCharacters);
+  window.addEventListener("pf-context-change", async event => {
+    if (!event.detail.contextKey || event.detail.contextKey === "general") return;
+    characterContextKey = event.detail.contextKey;
+    await loadCharacters();
+  });
+
+  await loadCharacters();
+});
+</script>
+</body>
+</html>

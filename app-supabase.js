@@ -32,10 +32,6 @@
           <label class="navbar-text small text-secondary d-block py-0" for="navContextSelect">Campaign</label>
           <select id="navContextSelect" class="form-select form-select-sm" aria-label="Context"></select>
         </div>
-        <div class="nav-session-field">
-          <label class="navbar-text small text-secondary d-block py-0" for="navCharacterSelect">Character</label>
-          <select id="navCharacterSelect" class="form-select form-select-sm" aria-label="Character"></select>
-        </div>
       </div>
       <a class="navbar-text small text-light text-decoration-none d-inline-flex align-items-center gap-2 nav-profile-link" href="profile.html">
         ${avatar}
@@ -159,10 +155,8 @@
     slot.innerHTML = authLinkHtml(currentUser, profile, admin);
     if (currentUser) {
       await setupContextSelect("navContextSelect", async contextKey => {
-        await setupCharacterSelect("navCharacterSelect", contextKey);
         await updateNavbarAccess(contextKey, admin);
       });
-      await setupCharacterSelect("navCharacterSelect", getSelectedContextKey(), null, { dispatch: false });
       await updateNavbarAccess(getSelectedContextKey(), admin);
     } else {
       await updateNavbarAccess(getSelectedContextKey(), false);
@@ -462,7 +456,7 @@
     const keys = contexts.map(context => context.key);
     let selectedKey = getSelectedContextKey();
     const page = window.location.pathname.split("/").pop() || "";
-    const requiresGame = ["map.html", "character-sheet.html", "bag-of-holding.html", "enemies.html"].includes(page);
+    const requiresGame = ["map.html", "characters.html", "character-sheet.html", "bag-of-holding.html", "enemies.html"].includes(page);
     const availableContexts = requiresGame ? contexts.filter(context => context.gameId) : contexts;
 
     if (!availableContexts.length) {
@@ -924,18 +918,18 @@
     return { ok: true };
   }
 
-  async function loadCharacterSheets(contextKey = getSelectedContextKey()) {
+  async function loadCharacterSheets(contextKey = getSelectedContextKey(), options = {}) {
     const user = await getUser();
     if (!user) return [];
 
     const context = normalizeContext(contextKey);
     let query = client
       .from("character_sheets")
-      .select("id,character_name,user_id,updated_at")
+      .select(options.includeSheet ? "id,character_name,user_id,updated_at,sheet" : "id,character_name,user_id,updated_at")
       .eq("context_key", context.contextKey)
       .order("updated_at", { ascending: false });
 
-    if (!context.gameId) query = query.eq("user_id", user.id);
+    if (!context.gameId || options.ownOnly) query = query.eq("user_id", user.id);
 
     const { data, error } = await query;
 
@@ -1112,6 +1106,24 @@
 
     if (error) console.error(error);
     return data;
+  }
+
+  async function deleteCharacterSheet(sheetId, contextKey = getSelectedContextKey()) {
+    const user = await getUser();
+    if (!client || !user || !sheetId) return { error: new Error("Missing character") };
+    const context = normalizeContext(contextKey);
+
+    let query = client
+      .from("character_sheets")
+      .delete()
+      .eq("id", sheetId)
+      .eq("context_key", context.contextKey);
+
+    if (context.gameId) query = query.eq("game_id", context.gameId);
+
+    const { error } = await query;
+    if (error) console.error(error);
+    return { error };
   }
 
   async function loadContextMembers(contextKey = getSelectedContextKey()) {
@@ -1501,6 +1513,7 @@
     loadCharacterSheet,
     loadCharacterSheetForRecalculation,
     saveCharacterSheet,
+    deleteCharacterSheet,
     updateCharacterSheetRaw,
     updateCharacterCalculatedSummary,
     updateCharacterCurrentHp,

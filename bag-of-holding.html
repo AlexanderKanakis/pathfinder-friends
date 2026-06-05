@@ -38,6 +38,7 @@
     .loot-effect-display { background: rgba(143, 209, 158, .08); border-left: 3px solid #8fd19e; border-radius: 4px; padding: 4px 7px; font-size: 12px; overflow-wrap: anywhere; }
     .bag-subtitle { color: #aaa; font-size: 14px; }
     .bag-header { display: grid; grid-template-columns: minmax(180px, 1fr) minmax(240px, 420px) minmax(120px, 1fr); gap: 12px; align-items: end; }
+    .bag-view-tabs .btn { min-width: 92px; }
     .bag-search { width: 100%; }
     .bag-action { justify-self: end; }
     .search-modal-dialog { width: min(1140px, calc(100vw - 2rem)); max-width: min(1140px, calc(100vw - 2rem)); }
@@ -106,6 +107,11 @@
     </div>
   </div>
 
+  <div class="btn-group btn-group-sm bag-view-tabs mt-3" role="group" aria-label="Bag view">
+    <button id="bagFullViewBtn" class="btn btn-primary" type="button" onclick="setBagView('full')">Full</button>
+    <button id="bagSimplifiedViewBtn" class="btn btn-outline-primary" type="button" onclick="setBagView('simplified')">Simplified</button>
+  </div>
+
   <div id="lootStatus" class="alert d-none py-2"></div>
 
   <section class="loot-section">
@@ -150,6 +156,10 @@
             <select id="lootSlotInput" class="form-select form-select-sm"></select>
             <span id="lootSlotValue" class="slot-value"></span>
           </div>
+        </div>
+        <div class="form-check form-switch mt-2">
+          <input id="lootWondrousItem" class="form-check-input" type="checkbox" role="switch">
+          <label class="form-check-label" for="lootWondrousItem">Wondrous Item</label>
         </div>
         <div id="lootWeaponFields" class="loot-detail-grid mt-2 d-none">
           <div>
@@ -305,7 +315,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-config.js"></script>
 <script src="app-supabase.js"></script>
-<script src="wondrous.js"></script>
+<script src="wondrous.js?v=wondrous-refresh-1"></script>
 <script src="scripts.js"></script>
 <script src="item-editor.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -324,6 +334,7 @@ let lootSearchTerm = "";
 let sourceItemSearchTerm = "";
 let sourceItemCategory = "all";
 let sourceItemMundaneCategory = "Adventuring Gear";
+let bagViewMode = sessionStorage.getItem("pf_bag_view") || "full";
 let editingLootId = null;
 let sourceLootTemplateDetails = null;
 let collapsedLootGroups = new Set();
@@ -357,6 +368,17 @@ function escapeHtml(value) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
+}
+
+function setBagView(mode) {
+  bagViewMode = mode === "simplified" ? "simplified" : "full";
+  sessionStorage.setItem("pf_bag_view", bagViewMode);
+  const simple = bagViewMode === "simplified";
+  el("bagFullViewBtn")?.classList.toggle("btn-primary", !simple);
+  el("bagFullViewBtn")?.classList.toggle("btn-outline-primary", simple);
+  el("bagSimplifiedViewBtn")?.classList.toggle("btn-primary", simple);
+  el("bagSimplifiedViewBtn")?.classList.toggle("btn-outline-primary", !simple);
+  renderLoot();
 }
 
 function optionList(options, selected = "") {
@@ -521,6 +543,15 @@ function updateLootSlotPreview() {
 
 function syncLootSlotForType() {
   PFItemEditor.syncSlotForType(lootEditorConfig());
+}
+
+function applyWondrousSource(details, checked) {
+  if (checked) {
+    details.source = "Wondrous Item";
+  } else if (String(details.source || "").toLowerCase() === "wondrous item") {
+    delete details.source;
+  }
+  return details;
 }
 
 function sourceItemIcon(itemOrType) {
@@ -763,6 +794,11 @@ function searchableSourceItem(item) {
   return `${item.name || ""} ${item.sourceType || ""} ${item.description || ""} ${Object.values(item.details || {}).join(" ")}`.toLowerCase();
 }
 
+function sourceItemSearchRank(item, term) {
+  if (!term) return 0;
+  return String(item.name || "").toLowerCase().includes(term) ? 0 : 1;
+}
+
 function sourceItemMatchesCategory(item) {
   if (sourceItemCategory === "wondrous") return item.sourceType === "Wondrous Item";
   if (sourceItemCategory === "weapons") return ["Weapon", "Firearm"].includes(item.sourceType);
@@ -780,10 +816,15 @@ function renderSourceItemResults() {
   const count = el("sourceItemCount");
   renderSourceMundaneTabs();
   const term = sourceItemSearchTerm.trim().toLowerCase();
+  if (sourceItemCategory === "all" && term.length < 3) {
+    count.textContent = "0 items";
+    wrapper.innerHTML = `<div class="small text-secondary">Type at least 3 characters to search all source items.</div>`;
+    return;
+  }
   const results = sourceItems
     .filter(sourceItemMatchesCategory)
     .filter(item => searchableSourceItem(item).includes(term))
-    .sort((a, b) => String(a.name || "").localeCompare(String(b.name || "")));
+    .sort((a, b) => sourceItemSearchRank(a, term) - sourceItemSearchRank(b, term) || String(a.name || "").localeCompare(String(b.name || "")));
   count.textContent = `${results.length} item${results.length === 1 ? "" : "s"}`;
   if (!results.length) {
     wrapper.innerHTML = `<div class="small text-secondary">No matching source items found.</div>`;
@@ -838,6 +879,7 @@ function populateLootForm(item, selectedCharacterId = "") {
 
   const details = item.details || {};
   PFItemEditor.setSlot(lootEditorConfig(), details.slot || "");
+  el("lootWondrousItem").checked = String(details.source || item.sourceType || "").toLowerCase() === "wondrous item";
   updateLootSlotPreview();
   PFItemEditor.refreshDescription(lootEditorConfig());
   el("lootWeaponType").value = details.weaponType || "Melee Weapon (One-Handed)";
@@ -1161,6 +1203,28 @@ function renderLootEffects(item) {
 }
 
 function renderLootCard(item) {
+  return bagViewMode === "simplified" ? renderSimplifiedLootCard(item) : renderFullLootCard(item);
+}
+
+function renderSimplifiedLootCard(item) {
+  return `
+    <article class="loot-card" data-loot-id="${escapeHtml(item.id)}" role="button" tabindex="0" aria-label="Edit ${escapeHtml(item.name)}">
+      <div class="loot-card-head">
+        <div class="loot-title flex-grow-1">
+          <div class="loot-name">${escapeHtml(item.name)}</div>
+        </div>
+        <span class="loot-count-actions">
+          <span class="loot-count">x${escapeHtml(item.count)}</span>
+          <button class="btn btn-outline-danger btn-sm loot-icon-btn" type="button" data-delete-loot="${escapeHtml(item.id)}" aria-label="Delete ${escapeHtml(item.name)}">
+            <i class="bi bi-trash"></i>
+          </button>
+        </span>
+      </div>
+    </article>
+  `;
+}
+
+function renderFullLootCard(item) {
   const icon = sourceItemIcon(item);
   const options = [
     `<option value="">Unassigned</option>`,
@@ -1337,6 +1401,7 @@ function resetLootForm() {
   el("lootSubmitButton").textContent = "Add Item";
   el("lootForm").reset();
   el("lootCount").value = "1";
+  el("lootWondrousItem").checked = false;
   PFItemEditor.reset(lootEditorConfig());
   setLootAttackScale("STR");
   setLootDamageScale("STR");
@@ -1458,7 +1523,10 @@ async function submitLootForm(event) {
   const existingItem = editingLootId ? bagLoot.find(item => item.id === editingLootId) : null;
   const selectedType = el("lootType").value;
   const baseDetails = sourceLootTemplateDetails || existingItem?.details || {};
-  const details = { ...cloneJson(baseDetails), ...collectLootDetails() };
+  const details = applyWondrousSource(
+    { ...cloneJson(baseDetails), ...collectLootDetails() },
+    el("lootWondrousItem").checked
+  );
 
   const saved = await PFApp.saveLootItem({
     id: editingLootId,
@@ -1565,6 +1633,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (!bagContextKey) return;
   await loadSourceItems();
   await loadBagContext(bagContextKey);
+  setBagView(bagViewMode);
   window.addEventListener("pf-context-change", event => {
     if (event.detail.contextKey && event.detail.contextKey !== "general") loadBagContext(event.detail.contextKey);
   });
