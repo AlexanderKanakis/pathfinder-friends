@@ -62,6 +62,16 @@
     #mapTimelinePane.active { display: grid; grid-template-rows: auto auto minmax(0, 1fr); min-height: 100%; }
     #mapTimelinePane.active .timeline-list { max-height: none; min-height: 0; }
     .timeline-emphasis { color: #f0d58c; font-weight: 800; }
+    .roll-result-list { display: grid; gap: 10px; }
+    .roll-result-card { border: 1px solid #444; border-radius: 8px; background: #202020; padding: 12px; text-align: center; }
+    .roll-result-label { color: #bbb; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
+    .roll-die-value { font-size: 56px; line-height: 1; font-weight: 800; color: #f0d58c; font-variant-numeric: tabular-nums; }
+    .roll-breakdown { display: grid; gap: 4px; margin-top: 10px; }
+    .roll-breakdown-row { display: flex; justify-content: center; gap: 8px; align-items: baseline; color: #ddd; }
+    .roll-breakdown-row strong { color: #fff; font-size: 18px; }
+    .roll-result-note { color: #f0d58c; font-weight: 700; margin-top: 8px; }
+    .roll-note-positive, .roll-die-value.roll-note-positive { color: #8fd19e; }
+    .roll-note-negative, .roll-die-value.roll-note-negative { color: #e05d5d; }
     .map-context-menu { position: fixed; z-index: 1080; min-width: 190px; padding: 6px; background: #1e1e1e; border: 1px solid #555; border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,.45); }
     .map-context-menu.d-none { display: none !important; }
     .map-context-menu-title { padding: 4px 8px 7px; color: #aaa; font-size: 12px; border-bottom: 1px solid #333; margin-bottom: 5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -194,6 +204,9 @@
   <button id="openApplyEffect" class="btn btn-outline-success btn-sm mb-1 d-none" type="button" role="menuitem">
     <i class="bi bi-magic me-1"></i> Apply effect
   </button>
+  <button id="openRollMenu" class="btn btn-outline-primary btn-sm mb-1 d-none" type="button" role="menuitem">
+    <i class="bi bi-dice-5 me-1"></i> Roll
+  </button>
   <button id="toggleTokenVisibility" class="btn btn-outline-secondary btn-sm mb-1 d-none" type="button" role="menuitem">
     <i class="bi bi-eye-slash me-1"></i> Hide
   </button>
@@ -220,6 +233,56 @@
   <button id="removeTokenFromMap" class="btn btn-outline-danger btn-sm" type="button" role="menuitem">
     <i class="bi bi-box-arrow-right me-1"></i> Remove from map
   </button>
+</div>
+
+<div class="modal fade" id="rollModal" tabindex="-1" aria-labelledby="rollModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content bg-dark text-white border-secondary">
+      <div class="modal-header border-secondary">
+        <h5 id="rollModalLabel" class="modal-title">Roll</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="rollWeaponWrap" class="mb-3 d-none">
+          <label for="rollWeaponSelect">Weapon</label>
+          <select id="rollWeaponSelect" class="form-select form-select-sm"></select>
+        </div>
+        <div class="d-grid gap-2">
+          <button class="btn btn-outline-light btn-sm text-start" type="button" data-roll-action="attack"><i class="bi bi-crosshair me-1"></i> Attack</button>
+          <button class="btn btn-outline-light btn-sm text-start" type="button" data-roll-action="fullAttack"><i class="bi bi-crosshair2 me-1"></i> Full Attack</button>
+          <button class="btn btn-outline-light btn-sm text-start" type="button" data-roll-panel="save"><i class="bi bi-shield-check me-1"></i> Saving Throw</button>
+          <button class="btn btn-outline-light btn-sm text-start" type="button" data-roll-panel="skill"><i class="bi bi-list-check me-1"></i> Skill Check</button>
+          <button class="btn btn-outline-light btn-sm text-start" type="button" data-roll-panel="ability"><i class="bi bi-person-arms-up me-1"></i> Attribute Check</button>
+        </div>
+        <div id="rollDetailPanel" class="border-top border-secondary mt-3 pt-3 d-none">
+          <label id="rollDetailLabel" for="rollDetailSelect">Choose</label>
+          <div class="d-flex gap-2">
+            <select id="rollDetailSelect" class="form-select form-select-sm"></select>
+            <button id="confirmRollDetail" class="btn btn-primary btn-sm" type="button">Roll</button>
+          </div>
+        </div>
+        <div id="rollModalStatus" class="small text-secondary mt-3"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="rollResultModal" tabindex="-1" aria-labelledby="rollResultModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content bg-dark text-white border-secondary">
+      <div class="modal-header border-secondary">
+        <h5 id="rollResultModalLabel" class="modal-title">Roll Result</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="rollResultList" class="roll-result-list"></div>
+      </div>
+      <div class="modal-footer border-secondary">
+        <button id="rerollResult" class="btn btn-outline-warning btn-sm" type="button"><i class="bi bi-arrow-repeat me-1"></i> Reroll</button>
+        <button type="button" class="btn btn-outline-light btn-sm" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div class="modal fade" id="quickEffectModal" tabindex="-1" aria-labelledby="quickEffectModalLabel" aria-hidden="true">
@@ -415,7 +478,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-config.js"></script>
 <script src="app-supabase.js"></script>
-<script src="buff-tracker-widget.js"></script>
+<script src="buff-tracker-widget.js?v=extra-attack-widget-2"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 let mapContextKey = "";
@@ -441,6 +504,12 @@ let genericTokenModal = null;
 let mapEffectsModal = null;
 let quickEffectModal = null;
 let quickEffectTargetsModal = null;
+let rollModal = null;
+let rollResultModal = null;
+let rollTokenId = "";
+let rollDetailKind = "";
+let rollAnimationTimer = null;
+let lastRollAction = null;
 let mapEffectTrackerInstance = null;
 let mapEnemies = [];
 let pendingTokenHp = new Map();
@@ -465,6 +534,16 @@ const defaultState = {
   timeline: []
 };
 let state = structuredClone(defaultState);
+const MAP_SKILLS = [
+  ["Acrobatics", "dex"], ["Appraise", "int"], ["Bluff", "cha"], ["Climb", "str"], ["Diplomacy", "cha"],
+  ["Disable Device", "dex"], ["Disguise", "cha"], ["Escape Artist", "dex"], ["Fly", "dex"], ["Heal", "wis"],
+  ["Intimidate", "cha"], ["Knowledge (arcana)", "int"], ["Knowledge (dungeoneering)", "int"],
+  ["Knowledge (engineering)", "int"], ["Knowledge (geography)", "int"], ["Knowledge (history)", "int"],
+  ["Knowledge (local)", "int"], ["Knowledge (nature)", "int"], ["Knowledge (nobility)", "int"],
+  ["Knowledge (planes)", "int"], ["Knowledge (religion)", "int"], ["Linguistics", "int"],
+  ["Perception", "wis"], ["Ride", "dex"], ["Sense Motive", "wis"], ["Sleight of Hand", "dex"],
+  ["Spellcraft", "int"], ["Stealth", "dex"], ["Survival", "wis"], ["Swim", "str"], ["Use Magic Device", "cha"]
+];
 const SHAPE_TEXTURES = [
   { id: "flames", name: "Flames", url: "assets/shape icons/flames.png" },
   { id: "grass", name: "Grass", url: "assets/shape icons/grass.png" },
@@ -539,6 +618,7 @@ function isConditionEffect(effect) {
 }
 function titleCaseStat(value) {
   if (String(value || "").toLowerCase().trim() === "remove dex bonus to ac") return "Remove DEX Bonus to AC";
+  if (String(value || "").toLowerCase().trim() === "extra attack") return "Extra Attack at Highest BAB";
   return String(value || "Stat")
     .replace(/^skill:/i, "Skill:")
     .replace(/[-_]/g, " ")
@@ -643,6 +723,11 @@ function canManageAura(token) {
 function canManageEffects(token) {
   if (!token?.kind) return false;
   if (isGm) return true;
+  return token.kind === "character" && token.ownerId === currentUserId;
+}
+function canRollToken(token) {
+  if (!token?.kind) return false;
+  if (isGm) return token.kind === "character" || token.kind === "enemy";
   return token.kind === "character" && token.ownerId === currentUserId;
 }
 function tokenHpText(token) {
@@ -901,9 +986,14 @@ function syncTokenFromSheet(token, source) {
   const totalHp = sheet.calculated?.hp?.total || sheet.fields?.hitPointsTotal || sheet.fields?.hitPoints || "";
   const nextHp = currentHp || totalHp ? `${currentHp || "?"}/${totalHp || "?"}` : token.hp || "";
   const nextAc = sheet.calculated?.armorClass?.ac || sheet.fields?.acTotal || token.ac || "";
+  const sheetImageUrl = String(sheet.fields?.imageUrl || sheet.imageUrl || "").trim();
 
   if (name && token.name !== name) {
     token.name = name;
+    changed = true;
+  }
+  if (!token.imageUrl && sheetImageUrl) {
+    token.imageUrl = sheetImageUrl;
     changed = true;
   }
   if (token.kind === "enemy" && token.sheet !== sheet) {
@@ -989,6 +1079,7 @@ function showMapContextMenu(event, item) {
     : item.name || "Shape";
   el("openAuraOptions").classList.toggle("d-none", !canManageAura(item));
   el("openApplyEffect").classList.toggle("d-none", !canManageEffects(item));
+  el("openRollMenu").classList.toggle("d-none", !canRollToken(item));
   const tokenVisibilityButton = el("toggleTokenVisibility");
   const canToggleTokenVisibility = Boolean(item.kind && canManageMapItem(item));
   tokenVisibilityButton.classList.toggle("d-none", !canToggleTokenVisibility);
@@ -2512,6 +2603,335 @@ function addTimeline(text, parts = null) {
   state.timeline = state.timeline.slice(-20);
 }
 
+function d20() {
+  return Math.floor(Math.random() * 20) + 1;
+}
+
+function signedNumberText(value) {
+  const number = Number(value || 0);
+  return number >= 0 ? `+${number}` : String(number);
+}
+
+function firstNumber(value, fallback = 0) {
+  const match = String(value ?? "").match(/[+-]?\d+/);
+  return match ? Number(match[0]) : fallback;
+}
+
+function mapRollToken() {
+  const token = tokenById(contextMenuTokenId || rollTokenId);
+  return token && canRollToken(token) ? token : null;
+}
+
+function rollTokenName(token) {
+  if (token.kind === "character") return tokenCharacter(token)?.name || token.name || "Character";
+  return token.name || "Enemy";
+}
+
+function rollTokenSheet(token) {
+  if (token.kind === "enemy") return token.sheet || {};
+  return tokenCharacter(token)?.sheet || {};
+}
+
+function attackNumbers(text) {
+  return String(text || "")
+    .split("/")
+    .map(part => firstNumber(part, null))
+    .filter(value => Number.isFinite(value));
+}
+
+function parseThreatStart(critical) {
+  const text = String(critical || "").trim();
+  const range = text.match(/(\d+)\s*-\s*20/);
+  if (range) return clamp(Number(range[1]), 1, 20);
+  const single = text.match(/\b(20)\b/);
+  return single ? 20 : 20;
+}
+
+function parseMisfireMax(misfire) {
+  const values = String(misfire || "").match(/\d+/g)?.map(Number) || [];
+  return values.length ? Math.max(...values) : 0;
+}
+
+function rollWeaponsForToken(token) {
+  const sheet = rollTokenSheet(token);
+  const calculatedWeapons = sheet.calculated?.weapons || [];
+  const rawWeapons = sheet.weapons || [];
+  return (calculatedWeapons.length ? calculatedWeapons : rawWeapons).map((weapon, index) => {
+    const raw = rawWeapons[index] || {};
+    const attackText = weapon.attack || raw.attack || "";
+    const attacks = attackNumbers(attackText);
+    return {
+      index,
+      name: weapon.name || raw.name || `Weapon ${index + 1}`,
+      attacks,
+      attackText,
+      critical: weapon.critical || raw.critical || "20/x2",
+      misfire: raw.misfire || weapon.misfire || "",
+      weaponType: raw.weaponType || weapon.weaponType || ""
+    };
+  }).filter(weapon => weapon.attacks.length);
+}
+
+function selectedRollWeapon(token) {
+  const weapons = rollWeaponsForToken(token);
+  const index = Number(el("rollWeaponSelect")?.value || 0);
+  return weapons[index] || weapons[0] || null;
+}
+
+function rollTimeline(text, emphasized = []) {
+  const parts = [];
+  let remaining = text;
+  const needles = emphasized.filter(Boolean).map(String);
+  while (remaining) {
+    const next = needles
+      .map(needle => ({ needle, index: remaining.indexOf(needle) }))
+      .filter(entry => entry.index >= 0)
+      .sort((a, b) => a.index - b.index || b.needle.length - a.needle.length)[0];
+    if (!next) break;
+    if (next.index > 0) parts.push({ text: remaining.slice(0, next.index) });
+    parts.push({ text: next.needle, emphasis: true });
+    remaining = remaining.slice(next.index + next.needle.length);
+  }
+  if (remaining) parts.push({ text: remaining });
+  addTimeline(text, parts.length ? parts : null);
+}
+
+function attackRollNotes(die, weapon) {
+  const notes = [];
+  if (die === 1) notes.push("critical failure");
+  if (die >= parseThreatStart(weapon.critical)) notes.push("threat");
+  const misfireMax = parseMisfireMax(weapon.misfire);
+  const firearm = String(weapon.weaponType || "").toLowerCase().includes("firearm") || Boolean(weapon.misfire);
+  if (firearm && misfireMax && die <= misfireMax) notes.push("misfire");
+  return notes;
+}
+
+function rollNoteClass(note) {
+  const key = String(note || "").toLowerCase();
+  if (key === "threat" || key === "critical success") return "roll-note-positive";
+  if (key === "critical failure" || key === "misfire") return "roll-note-negative";
+  return "";
+}
+
+function rollRowClass(row) {
+  const notes = row.notes || [];
+  if (notes.some(note => rollNoteClass(note) === "roll-note-negative")) return "roll-note-negative";
+  if (notes.some(note => rollNoteClass(note) === "roll-note-positive")) return "roll-note-positive";
+  return "";
+}
+
+function rollNoteHtml(notes = []) {
+  return notes.map(note => {
+    const className = rollNoteClass(note);
+    return `<span class="${className}">${escapeHtml(note)}</span>`;
+  }).join(notes.length > 1 ? ", " : "");
+}
+
+function showRollResultModal(title, rows) {
+  clearInterval(rollAnimationTimer);
+  el("rollResultModalLabel").textContent = title;
+  el("rollResultList").innerHTML = rows.map((row, index) => `
+    <div class="roll-result-card" data-roll-result-row="${index}">
+      <div class="roll-result-label">${escapeHtml(row.label || "Roll")}</div>
+      <div class="roll-die-value" data-roll-die>${d20()}</div>
+      <div class="roll-breakdown">
+        <div class="roll-breakdown-row"><span>Bonus</span><strong data-roll-bonus>...</strong></div>
+        <div class="roll-breakdown-row"><span>Total</span><strong data-roll-total>...</strong></div>
+      </div>
+      <div class="roll-result-note" data-roll-note></div>
+    </div>
+  `).join("");
+  rollResultModal?.show();
+
+  const dieNodes = [...el("rollResultList").querySelectorAll("[data-roll-die]")];
+  rollAnimationTimer = setInterval(() => {
+    dieNodes.forEach(node => { node.textContent = d20(); });
+  }, 55);
+
+  window.setTimeout(() => {
+    clearInterval(rollAnimationTimer);
+    rows.forEach((row, index) => {
+      const card = el("rollResultList").querySelector(`[data-roll-result-row="${index}"]`);
+      if (!card) return;
+      const dieNode = card.querySelector("[data-roll-die]");
+      dieNode.textContent = row.die;
+      dieNode.classList.remove("roll-note-positive", "roll-note-negative");
+      const dieClass = rollRowClass(row);
+      if (dieClass) dieNode.classList.add(dieClass);
+      card.querySelector("[data-roll-bonus]").textContent = signedNumberText(row.bonus);
+      card.querySelector("[data-roll-total]").textContent = row.total;
+      card.querySelector("[data-roll-note]").innerHTML = row.notes?.length ? rollNoteHtml(row.notes) : "";
+    });
+  }, 1000);
+}
+
+function makeAttackRollData(token, weapon, bonus, label = "Attack") {
+  const die = d20();
+  const total = die + Number(bonus || 0);
+  const notes = attackRollNotes(die, weapon);
+  const actor = rollTokenName(token);
+  return { actor, label, target: weapon.name, die, bonus: Number(bonus || 0), total, notes };
+}
+
+function recordAttackRoll(row) {
+  const noteText = row.notes.length ? ` (${row.notes.join(", ")})` : "";
+  const text = `${row.actor} rolled ${row.label} with ${row.target}: ${row.die} ${signedNumberText(row.bonus)} = ${row.total}${noteText}`;
+  rollTimeline(text, [row.actor, row.label, row.target, String(row.total), ...row.notes]);
+}
+
+function rollAttack(full = false) {
+  const token = mapRollToken();
+  if (!token) return;
+  lastRollAction = () => rollAttack(full);
+  const weapon = selectedRollWeapon(token);
+  if (!weapon) {
+    el("rollModalStatus").textContent = "No weapon attack bonus found.";
+    return;
+  }
+  const bonuses = full ? weapon.attacks : weapon.attacks.slice(0, 1);
+  const rows = bonuses.map((bonus, index) => makeAttackRollData(token, weapon, bonus, full ? `Full Attack ${index + 1}` : "Attack"));
+  rows.forEach(recordAttackRoll);
+  rollModal?.hide();
+  showRollResultModal(`${rollTokenName(token)}: ${full ? "Full Attack" : "Attack"}`, rows);
+  renderAll();
+}
+
+function rollSaveOptions(token) {
+  const sheet = rollTokenSheet(token);
+  const rows = sheet.calculated?.saves || [];
+  const byKey = Object.fromEntries(rows.map(row => [String(row.key || row.label || "").toLowerCase(), row]));
+  return [
+    { key: "fort", label: "Fortitude", bonus: firstNumber(byKey.fort?.total ?? sheet.saves?.fort?.total ?? sheet.saves?.fort?.base) },
+    { key: "reflex", label: "Reflex", bonus: firstNumber(byKey.reflex?.total ?? sheet.saves?.reflex?.total ?? sheet.saves?.reflex?.base) },
+    { key: "will", label: "Will", bonus: firstNumber(byKey.will?.total ?? sheet.saves?.will?.total ?? sheet.saves?.will?.base) }
+  ];
+}
+
+function rollAbilityOptions(token) {
+  const sheet = rollTokenSheet(token);
+  const labels = { str: "Strength", dex: "Dexterity", con: "Constitution", int: "Intelligence", wis: "Wisdom", cha: "Charisma" };
+  const calculated = Object.fromEntries((sheet.calculated?.abilities || []).map(row => [row.key, row]));
+  return Object.entries(labels).map(([key, label]) => ({
+    key,
+    label,
+    bonus: firstNumber(calculated[key]?.mod ?? calculated[key]?.total?.match(/\(([+-]?\d+)\)/)?.[1] ?? sheet.abilities?.[key]?.mod)
+  }));
+}
+
+function mapSkillId(skill) {
+  return String(skill || "").replace(/[^a-z0-9]/gi, "");
+}
+
+function mapSkillNameFromId(id) {
+  const key = String(id || "").toLowerCase();
+  const base = MAP_SKILLS.find(([name]) => mapSkillId(name).toLowerCase() === key);
+  if (base) return base[0];
+  return String(id || "")
+    .replace(/^skill/i, "")
+    .replace(/([A-Z])/g, " $1")
+    .replace(/^./, char => char.toUpperCase())
+    .trim() || String(id || "Skill");
+}
+
+function mapSkillAbility(sheet, id, label) {
+  const key = String(id || "").toLowerCase();
+  const base = MAP_SKILLS.find(([name]) => mapSkillId(name).toLowerCase() === key || name.toLowerCase() === String(label || "").toLowerCase());
+  if (base) return base[1];
+  const custom = (sheet.customSkills || []).find(skill => mapSkillId(skill.name).toLowerCase() === key || skill.name === label);
+  return custom?.ability || "int";
+}
+
+function rollSkillOptions(token) {
+  const sheet = rollTokenSheet(token);
+  const calculated = sheet.calculated?.skills || [];
+  if (calculated.length) {
+    return calculated
+      .map(row => ({ key: row.key || row.label, label: row.label || row.key, bonus: firstNumber(row.total) }))
+      .sort((a, b) => String(a.label).localeCompare(String(b.label)));
+  }
+  return Object.entries(sheet.skills || {})
+    .map(([key, value]) => {
+      const label = mapSkillNameFromId(key);
+      const ability = mapSkillAbility(sheet, key, label);
+      const abilityBonus = sheetAbilityMod(sheet, ability);
+      const total = value.total !== undefined && value.total !== ""
+        ? firstNumber(value.total)
+        : abilityBonus + Number(value.ranks || 0) + Number(value.misc || 0);
+      return { key, label, bonus: total };
+    })
+    .sort((a, b) => String(a.label).localeCompare(String(b.label)));
+}
+
+function showRollDetail(kind) {
+  const token = mapRollToken();
+  if (!token) return;
+  const optionSets = {
+    save: { label: "Saving Throw", options: rollSaveOptions(token), crit: true },
+    skill: { label: "Skill Check", options: rollSkillOptions(token), crit: false },
+    ability: { label: "Attribute Check", options: rollAbilityOptions(token), crit: true }
+  };
+  const config = optionSets[kind];
+  if (!config) return;
+  rollDetailKind = kind;
+  el("rollDetailLabel").textContent = config.label;
+  el("rollDetailSelect").innerHTML = config.options
+    .map(option => `<option value="${escapeHtml(option.key)}">${escapeHtml(option.label)} (${signedNumberText(option.bonus)})</option>`)
+    .join("");
+  el("rollDetailPanel").classList.remove("d-none");
+  el("rollModalStatus").textContent = config.options.length ? "" : `No ${config.label.toLowerCase()} data found.`;
+}
+
+function confirmDetailRoll() {
+  const token = mapRollToken();
+  if (!token || !rollDetailKind) return;
+  lastRollAction = () => confirmDetailRoll();
+  const options = rollDetailKind === "save"
+    ? rollSaveOptions(token)
+    : rollDetailKind === "skill"
+      ? rollSkillOptions(token)
+      : rollAbilityOptions(token);
+  const selected = options.find(option => option.key === el("rollDetailSelect").value) || options[0];
+  if (!selected) return;
+  const die = d20();
+  const total = die + Number(selected.bonus || 0);
+  const notes = rollDetailKind !== "skill" && die === 1
+    ? ["critical failure"]
+    : rollDetailKind !== "skill" && die === 20
+      ? ["critical success"]
+      : [];
+  const noteText = notes.length ? ` (${notes.join(", ")})` : "";
+  const actor = rollTokenName(token);
+  const label = rollDetailKind === "save" ? "Saving Throw" : rollDetailKind === "skill" ? "Skill Check" : "Attribute Check";
+  const text = `${actor} rolled ${label} (${selected.label}): ${die} ${signedNumberText(selected.bonus)} = ${total}${noteText}`;
+  rollTimeline(text, [actor, label, selected.label, String(total), ...notes]);
+  rollModal?.hide();
+  showRollResultModal(`${actor}: ${label}`, [{
+    label: selected.label,
+    die,
+    bonus: Number(selected.bonus || 0),
+    total,
+    notes
+  }]);
+  renderAll();
+}
+
+function openRollModal() {
+  const token = mapRollToken();
+  if (!token) return;
+  hideContextMenu();
+  rollTokenId = token.id;
+  rollDetailKind = "";
+  const weapons = rollWeaponsForToken(token);
+  el("rollModalLabel").textContent = `Roll: ${rollTokenName(token)}`;
+  el("rollWeaponWrap").classList.toggle("d-none", !weapons.length);
+  el("rollWeaponSelect").innerHTML = weapons.map((weapon, index) =>
+    `<option value="${index}">${escapeHtml(weapon.name)} (${escapeHtml(weapon.attackText || weapon.attacks.map(signedNumberText).join("/"))})</option>`
+  ).join("");
+  el("rollDetailPanel").classList.add("d-none");
+  el("rollModalStatus").textContent = "";
+  rollModal?.show();
+}
+
 async function refetchMapSheetState(delay = 0) {
   if (delay > 0) {
     window.setTimeout(() => refreshMapTokenSheets({ save: false }), delay);
@@ -2665,7 +3085,7 @@ function subscribeMapRealtime() {
       { event: "*", schema: "public", table: "map_state", filter: `context_key=eq.${mapContextKey}` },
       payload => {
         const row = payload.new;
-        if (!row?.state || row.updated_by === currentUserId) return;
+        if (!row?.state) return;
         applyRemoteMapState(row.state);
       }
     )
@@ -2732,6 +3152,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   mapEffectsModal = new bootstrap.Modal(el("mapEffectsModal"));
   quickEffectModal = new bootstrap.Modal(el("quickEffectModal"));
   quickEffectTargetsModal = new bootstrap.Modal(el("quickEffectTargetsModal"));
+  rollModal = new bootstrap.Modal(el("rollModal"));
+  rollResultModal = new bootstrap.Modal(el("rollResultModal"));
+  el("rollResultModal").addEventListener("hidden.bs.modal", () => clearInterval(rollAnimationTimer));
+  el("rerollResult").addEventListener("click", () => lastRollAction?.());
   el("enemyPickerSearch").addEventListener("input", renderEnemyPicker);
   el("quickEffectSearch").addEventListener("input", renderQuickEffects);
   el("addCharacterToken").addEventListener("click", () => addToken("character"));
@@ -2741,6 +3165,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   el("addCircleShape").addEventListener("click", () => addShape("circle"));
   el("openAuraOptions").addEventListener("click", openAuraOptions);
   el("openApplyEffect").addEventListener("click", openQuickApplyEffect);
+  el("openRollMenu").addEventListener("click", openRollModal);
+  el("rollModal").querySelectorAll("[data-roll-action]").forEach(button => {
+    button.addEventListener("click", () => rollAttack(button.dataset.rollAction === "fullAttack"));
+  });
+  el("rollModal").querySelectorAll("[data-roll-panel]").forEach(button => {
+    button.addEventListener("click", () => showRollDetail(button.dataset.rollPanel));
+  });
+  el("confirmRollDetail").addEventListener("click", confirmDetailRoll);
   el("chooseAuraEffect").addEventListener("click", openAuraEffectPicker);
   el("clearAuraEffect").addEventListener("click", () => {
     auraEffectDraft = null;

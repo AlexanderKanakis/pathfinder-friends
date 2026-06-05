@@ -12,9 +12,11 @@
       .effect-search-modal-body { display: grid; grid-template-rows: auto minmax(0, 1fr); min-height: 0; }
       .effect-search-results { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; align-content: start; height: 100%; min-height: 0; overflow: auto; }
       .effect-tracker-search-trigger { cursor: pointer; }
-      .effect-tracker-card { position: relative; min-height: 116px; background: #242424; border: 1px solid #444; border-radius: 8px; padding: 12px 44px 12px 12px; text-align: left; color: #f4f4f4; cursor: pointer; }
+      .effect-tracker-card { position: relative; min-height: 116px; background: #242424; border: 1px solid #444; border-radius: 8px; padding: 12px 52px 12px 12px; text-align: left; color: #f4f4f4; cursor: pointer; }
       .effect-tracker-card:hover, .effect-tracker-card:focus { border-color: #0d6efd; outline: none; box-shadow: 0 0 0 2px rgba(13, 110, 253, .25); }
       .effect-tracker-icon { position: absolute; top: 10px; right: 10px; width: 28px; height: 28px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; background: #151515; border: 1px solid #555; color: #9ec5fe; }
+      .effect-card-admin-actions { position: absolute; top: 44px; right: 10px; display: grid; gap: 4px; }
+      .effect-card-admin-actions .btn { width: 28px; height: 28px; min-width: 0; display: inline-flex; align-items: center; justify-content: center; padding: 0; }
       .effect-tracker-controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 10px; }
       .effect-tracker-inline { display: inline-flex; align-items: center; gap: 4px; }
       .effect-tracker-inline input[type="number"] { width: 62px; }
@@ -69,6 +71,7 @@
     "remove dex bonus to ac": "Remove DEX Bonus to AC",
     cmb: "CMB",
     cmd: "CMD",
+    "extra attack": "Extra Attack at Highest BAB",
     str: "STR",
     dex: "DEX",
     con: "CON",
@@ -76,7 +79,7 @@
     wis: "WIS",
     cha: "CHA"
   };
-  const EFFECT_STATS = ["strength","dexterity","constitution","intelligence","wisdom","charisma","attack","melee attack","ranged attack","damage","melee damage","ranged damage","ac","touch ac","flat-footed ac","remove dex bonus to ac","natural armor","deflection","fortitude","reflex","will","initiative","cmb","cmd","hit points","spell resistance"];
+  const EFFECT_STATS = ["strength","dexterity","constitution","intelligence","wisdom","charisma","attack","melee attack","ranged attack","extra attack","damage","melee damage","ranged damage","ac","touch ac","flat-footed ac","remove dex bonus to ac","natural armor","deflection","fortitude","reflex","will","initiative","cmb","cmd","hit points","spell resistance"];
   const SKILL_STATS = ["skill checks","strength skill checks","dexterity skill checks","constitution skill checks","intelligence skill checks","wisdom skill checks","charisma skill checks"];
   const PF_SKILLS = ["Acrobatics","Appraise","Bluff","Climb","Diplomacy","Disable Device","Disguise","Escape Artist","Fly","Heal","Intimidate","Knowledge (arcana)","Knowledge (dungeoneering)","Knowledge (engineering)","Knowledge (geography)","Knowledge (history)","Knowledge (local)","Knowledge (nature)","Knowledge (nobility)","Knowledge (planes)","Knowledge (religion)","Linguistics","Perception","Ride","Sense Motive","Sleight of Hand","Spellcraft","Stealth","Survival","Swim","Use Magic Device"];
   const SPECIFIC_SKILL_STATS = PF_SKILLS.map(skill => `skill:${skill.replace(/[^a-z0-9]/gi, "").toLowerCase()}`);
@@ -142,13 +145,13 @@
     return data.stat || "";
   }
 
-  function statOptions(data = {}) {
+  function statOptions(data = {}, effectStats = EFFECT_STATS) {
     const selected = statOptionValue(data);
     const option = (stat, label = titleCaseStat(stat)) =>
       `<option value="${stat}" ${selected === stat ? "selected" : ""}>${escapeHtml(label)}</option>`;
     return `
       <optgroup label="Stats">
-        ${EFFECT_STATS.map(stat => option(stat)).join("")}
+        ${effectStats.map(stat => option(stat)).join("")}
       </optgroup>
       <optgroup label="Skills">
         ${SKILL_STATS.map(stat => option(stat)).join("")}
@@ -597,7 +600,7 @@
         <div>
           <label class="small">Stat</label>
           <select data-field="stat" class="form-select form-select-sm">
-            ${statOptions(data)}
+            ${statOptions(data, this.options.effectStats || EFFECT_STATS)}
           </select>
         </div>
         <div class="effect-named-skill-field d-none">
@@ -878,9 +881,9 @@
             <div class="small-text mb-2">${escapeHtml(effect.category || "Effect")} | ${escapeHtml(durationLabel(effect))}</div>
             <div>${bonusHtml}${more}</div>
             ${this.isAdmin ? `
-              <div class="d-flex gap-2 mt-2">
-                <button class="btn btn-outline-warning btn-sm" type="button" data-edit-bonuses="${index}"><i class="bi bi-pencil-square"></i> Edit</button>
-                <button class="btn btn-outline-danger btn-sm" type="button" data-delete-effect="${index}" aria-label="Delete effect"><i class="bi bi-trash"></i></button>
+              <div class="effect-card-admin-actions">
+                <button class="btn btn-outline-warning btn-sm" type="button" data-edit-bonuses="${index}" aria-label="Edit effect" title="Edit effect"><i class="bi bi-pencil-square"></i></button>
+                <button class="btn btn-outline-danger btn-sm" type="button" data-delete-effect="${index}" aria-label="Delete effect" title="Delete effect"><i class="bi bi-trash"></i></button>
               </div>
             ` : ""}
             ${this.controls(effect, index)}
@@ -890,11 +893,11 @@
 
       this.resultsEl.querySelectorAll("[data-effect-index]").forEach(card => {
         card.addEventListener("click", event => {
-          if (event.target.closest(".effect-tracker-controls")) return;
+          if (event.target.closest(".effect-tracker-controls, .effect-card-admin-actions")) return;
           this.addEffect(Number(card.dataset.effectIndex));
         });
         card.addEventListener("keydown", event => {
-          if (event.target.closest(".effect-tracker-controls")) return;
+          if (event.target.closest(".effect-tracker-controls, .effect-card-admin-actions")) return;
           if (event.key !== "Enter" && event.key !== " ") return;
           event.preventDefault();
           this.addEffect(Number(card.dataset.effectIndex));

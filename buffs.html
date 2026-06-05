@@ -211,13 +211,14 @@ let selectedCharacterSheet = null;
 let baseline = {...EMPTY_BASELINE};
 let customBonusCount = 0;
 
-const BUFF_STATS = ["strength","dexterity","constitution","intelligence","wisdom","charisma","attack","melee attack","ranged attack","damage","melee damage","ranged damage","ac","touch ac","flat-footed ac","remove dex bonus to ac","natural armor","deflection","fortitude","reflex","will","initiative","cmb","cmd","hit points","skill checks","spell resistance"];
+const BUFF_STATS = ["strength","dexterity","constitution","intelligence","wisdom","charisma","attack","melee attack","ranged attack","extra attack","damage","melee damage","ranged damage","ac","touch ac","flat-footed ac","remove dex bonus to ac","natural armor","deflection","fortitude","reflex","will","initiative","cmb","cmd","hit points","skill checks","spell resistance"];
 const BONUS_TYPES = ["untyped","alchemical","condition","penalty","armor","circumstance","competence","deflection","dodge","enhancement","insight","luck","morale","natural armor","profane","resistance","sacred","shield","size"];
 const STAT_LABELS = {
   ac: "AC",
   "touch ac": "Touch AC",
   "flat-footed ac": "Flat-Footed AC",
   "remove dex bonus to ac": "Remove DEX Bonus to AC",
+  "extra attack": "Extra Attack at Highest BAB",
   cmb: "CMB",
   cmd: "CMD",
   str: "STR",

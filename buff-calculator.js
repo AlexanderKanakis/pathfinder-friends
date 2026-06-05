@@ -33,7 +33,10 @@
       "con skills": "constitution skill checks",
       "int skills": "intelligence skill checks",
       "wis skills": "wisdom skill checks",
-      "cha skills": "charisma skill checks"
+      "cha skills": "charisma skill checks",
+      "extra attacks": "extra attack",
+      "extra attack at highest bab": "extra attack",
+      "extra attacks at highest bab": "extra attack"
     };
     return aliases[key] || key;
   }

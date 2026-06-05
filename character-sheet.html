@@ -15,6 +15,14 @@
     .sheet-title { font-size: 13px; color: #aaa; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
     .sheet-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
     .sheet-grid-wide { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 8px; }
+    .character-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(88px, 100px); gap: 12px; align-items: start; }
+    .character-image-panel { display: grid; gap: 8px; }
+    .character-image-frame { aspect-ratio: 1 / 1; border: 1px solid #444; border-radius: 8px; background: #181818; display: grid; place-items: center; overflow: hidden; color: #777; font-size: 12px; text-align: center; }
+    .character-image-frame img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    @media (max-width: 900px) {
+      .character-layout { grid-template-columns: 1fr; }
+      .character-image-panel { max-width: 160px; }
+    }
     .scale-options { display: grid; grid-template-columns: repeat(3, minmax(44px, 1fr)); gap: 6px; max-width: 170px; }
     .scale-options .btn { min-width: 0; }
     .weapon-toggle-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, max-content)); gap: 12px; align-items: end; }
@@ -232,21 +240,33 @@
   <div id="fullSheetView">
   <section class="sheet-section">
     <div class="sheet-title">Character</div>
-    <div class="sheet-grid-wide">
-      <div><label for="characterName">Character Name</label><input id="characterName" class="form-control form-control-sm sheet-input" required></div>
-      <div><label for="classLevel">Class / Level</label><input id="classLevel" class="form-control form-control-sm sheet-input"></div>
-      <div><label for="characterLevel">Character Level</label><input id="characterLevel" class="form-control form-control-sm sheet-input" type="number" min="1" value="1"></div>
-      <div><label for="race">Race</label><input id="race" class="form-control form-control-sm sheet-input"></div>
-      <div><label for="alignment">Alignment</label><input id="alignment" class="form-control form-control-sm sheet-input"></div>
-      <div><label for="deity">Deity</label><input id="deity" class="form-control form-control-sm sheet-input"></div>
-      <div><label for="homeland">Homeland</label><input id="homeland" class="form-control form-control-sm sheet-input"></div>
-      <div><label for="size">Size</label><input id="size" class="form-control form-control-sm sheet-input" value="Medium"></div>
-      <div><label for="gender">Gender</label><input id="gender" class="form-control form-control-sm sheet-input"></div>
-      <div><label for="age">Age</label><input id="age" class="form-control form-control-sm sheet-input"></div>
-      <div><label for="height">Height</label><input id="height" class="form-control form-control-sm sheet-input"></div>
-      <div><label for="weight">Weight</label><input id="weight" class="form-control form-control-sm sheet-input"></div>
-      <div><label for="hair">Hair</label><input id="hair" class="form-control form-control-sm sheet-input"></div>
-      <div><label for="eyes">Eyes</label><input id="eyes" class="form-control form-control-sm sheet-input"></div>
+    <div class="character-layout">
+      <div class="sheet-grid-wide">
+        <div><label for="characterName">Character Name</label><input id="characterName" class="form-control form-control-sm sheet-input" required></div>
+        <div><label for="classLevel">Class / Level</label><input id="classLevel" class="form-control form-control-sm sheet-input"></div>
+        <div><label for="characterLevel">Character Level</label><input id="characterLevel" class="form-control form-control-sm sheet-input" type="number" min="1" value="1"></div>
+        <div><label for="race">Race</label><input id="race" class="form-control form-control-sm sheet-input"></div>
+        <div><label for="alignment">Alignment</label><input id="alignment" class="form-control form-control-sm sheet-input"></div>
+        <div><label for="deity">Deity</label><input id="deity" class="form-control form-control-sm sheet-input"></div>
+        <div><label for="homeland">Homeland</label><input id="homeland" class="form-control form-control-sm sheet-input"></div>
+        <div><label for="size">Size</label><input id="size" class="form-control form-control-sm sheet-input" value="Medium"></div>
+        <div><label for="gender">Gender</label><input id="gender" class="form-control form-control-sm sheet-input"></div>
+        <div><label for="age">Age</label><input id="age" class="form-control form-control-sm sheet-input"></div>
+        <div><label for="height">Height</label><input id="height" class="form-control form-control-sm sheet-input"></div>
+        <div><label for="weight">Weight</label><input id="weight" class="form-control form-control-sm sheet-input"></div>
+        <div><label for="hair">Hair</label><input id="hair" class="form-control form-control-sm sheet-input"></div>
+        <div><label for="eyes">Eyes</label><input id="eyes" class="form-control form-control-sm sheet-input"></div>
+      </div>
+      <div class="character-image-panel">
+        <div class="character-image-frame">
+          <img id="characterImagePreview" alt="Character image preview" class="d-none">
+          <span id="characterImagePlaceholder">No image</span>
+        </div>
+        <div>
+          <label for="imageUrl">Image URL</label>
+          <input id="imageUrl" class="form-control form-control-sm sheet-input" placeholder="https://...">
+        </div>
+      </div>
     </div>
   </section>
 
@@ -628,7 +648,7 @@
 <script src="supabase-config.js"></script>
 <script src="app-supabase.js"></script>
 <script src="buff-calculator.js"></script>
-<script src="buff-tracker-widget.js"></script>
+<script src="buff-tracker-widget.js?v=extra-attack-widget-2"></script>
 <script src="wondrous.js"></script>
 <script src="scripts.js"></script>
 <script src="item-editor.js"></script>
@@ -648,7 +668,7 @@ const SKILLS = [
   ["Perception", "wis"], ["Ride", "dex"], ["Sense Motive", "wis"], ["Sleight of Hand", "dex"],
   ["Spellcraft", "int"], ["Stealth", "dex"], ["Survival", "wis"], ["Swim", "str"], ["Use Magic Device", "cha"]
 ];
-const SIMPLE_FIELDS = ["characterName","classLevel","characterLevel","race","alignment","deity","homeland","size","gender","age","height","weight","hair","eyes","bab","currentHitPoints","hitPoints","hitPointsTotal","damageReduction","initMisc","speedBase","speedArmor","acNatural","acDeflection","acMisc","cmbMisc","cmdMisc","lightLoad","mediumLoad","heavyLoad","liftOverHead","liftOffGround","dragOrPush","GP","SP","CP","notes"];
+const SIMPLE_FIELDS = ["characterName","imageUrl","classLevel","characterLevel","race","alignment","deity","homeland","size","gender","age","height","weight","hair","eyes","bab","currentHitPoints","hitPoints","hitPointsTotal","damageReduction","initMisc","speedBase","speedArmor","acNatural","acDeflection","acMisc","cmbMisc","cmdMisc","lightLoad","mediumLoad","heavyLoad","liftOverHead","liftOffGround","dragOrPush","GP","SP","CP","notes"];
 const ABILITY_STAT_NAMES = { str: "strength", dex: "dexterity", con: "constitution", int: "intelligence", wis: "wisdom", cha: "charisma" };
 const SCALE_ABILITIES = ["STR", "DEX", "CON", "INT", "WIS", "CHA"];
 const WEAPON_TYPES = ["Melee Weapon (Light)", "Melee Weapon (One-Handed)", "Melee Weapon (Two-Handed)", "Ranged Weapon", "Firearm (One-Handed)", "Firearm (Two-Handed)", "Natural"];
@@ -656,7 +676,7 @@ const ITEM_SLOTS = PFItemEditor.DEFAULT_SLOTS;
 const WEAPON_ENCHANTMENTS = ["", "Adaptive", "Allying", "Anarchic", "Anchoring", "Axiomatic", "Bane", "Brilliant Energy", "Called", "Conductive", "Corrosive", "Corrosive Burst", "Cruel", "Cunning", "Dancing", "Defending", "Disruption", "Distance", "Flaming", "Flaming Burst", "Frost", "Furious", "Ghost Touch", "Holy", "Icy Burst", "Impact", "Keen", "Merciful", "Returning", "Seeking", "Shock", "Shocking Burst", "Speed", "Spell Storing", "Throwing", "Thundering", "Unholy", "Vicious", "Vorpal", "Wounding"];
 const ARMOR_ENCHANTMENTS = ["", "Balanced", "Benevolent", "Bitter", "Bolstering", "Brawling", "Champion", "Dastard", "Deathless", "Defiant", "Determination", "Energy Resistance", "Energy Resistance (Improved)", "Energy Resistance (Greater)", "Etherealness", "Fortification (Light)", "Fortification (Moderate)", "Fortification (Heavy)", "Ghost Touch", "Glamered", "Invulnerability", "Shadow", "Shadow (Improved)", "Shadow (Greater)", "Slick", "Slick (Improved)", "Slick (Greater)", "Spell Resistance (13)", "Spell Resistance (15)", "Spell Resistance (17)", "Spell Resistance (19)", "Wild"];
 const SHIELD_ENCHANTMENTS = ["", "Animated", "Arrow Catching", "Arrow Deflection", "Bashing", "Blinding", "Clangorous", "Defiant", "Determination", "Energy Resistance", "Energy Resistance (Improved)", "Energy Resistance (Greater)", "Fortification (Light)", "Fortification (Moderate)", "Fortification (Heavy)", "Ghost Touch", "Impervious", "Merging", "Mirrored", "Poison-Resistant", "Rallying", "Ramming", "Reflecting", "Spell Resistance (13)", "Spell Resistance (15)", "Spell Resistance (17)", "Spell Resistance (19)", "Wild"];
-const LOOT_EFFECT_STATS = ["strength","dexterity","constitution","intelligence","wisdom","charisma","attack","melee attack","ranged attack","damage","melee damage","ranged damage","ac","touch ac","flat-footed ac","remove dex bonus to ac","natural armor","deflection","fortitude","reflex","will","initiative","cmb","cmd","hit points","spell resistance"];
+const LOOT_EFFECT_STATS = ["strength","dexterity","constitution","intelligence","wisdom","charisma","attack","melee attack","ranged attack","extra attack","damage","melee damage","ranged damage","ac","touch ac","flat-footed ac","remove dex bonus to ac","natural armor","deflection","fortitude","reflex","will","initiative","cmb","cmd","hit points","spell resistance"];
 const LOOT_SKILL_STATS = ["skill checks","strength skill checks","dexterity skill checks","constitution skill checks","intelligence skill checks","wisdom skill checks","charisma skill checks"];
 const LOOT_BONUS_TYPES = ["untyped","alchemical","condition","penalty","armor","circumstance","competence","deflection","dodge","enhancement","insight","luck","morale","natural armor","profane","resistance","sacred","shield","size"];
 let weaponCount = 0;
@@ -1005,6 +1025,7 @@ function statDisplayLabel(stat) {
     "touch ac": "Touch AC",
     "flat-footed ac": "Flat-Footed AC",
     "remove dex bonus to ac": "Remove DEX Bonus to AC",
+    "extra attack": "Extra Attack at Highest BAB",
     cmb: "CMB",
     cmd: "CMD",
     fortitude: "Fortitude",
@@ -2019,15 +2040,21 @@ function calculateWeaponAttack(card, buffed, buffBonuses) {
   const buffBonus =
     Number(buffBonuses.attack || 0) +
     Number(buffBonuses[isRanged ? "ranged attack" : "melee attack"] || 0);
+  const extraAttacks = Math.max(0, Math.floor(Number(buffBonuses["extra attack"] || 0)));
   const totalBonus = scalingBonus + enhancement + miscBonus + buffBonus + feat.attackPenalty;
-  const attacks = iterativeBabBonuses(num("bab")).map(base => signed(base + totalBonus)).join("/");
+  const attackValues = iterativeBabBonuses(num("bab")).map(base => signed(base + totalBonus));
+  if (extraAttacks && attackValues.length) {
+    attackValues.splice(1, 0, ...Array(extraAttacks).fill(attackValues[0]));
+  }
+  const attacks = attackValues.join("/");
   const statItems = scalingTerms.flatMap(term => breakdownForStat(buffed, ABILITY_STAT_NAMES[term.key], `${ABILITY_STAT_NAMES[term.key]} attack scaling`).map(item => ({ ...item, targetLabel: "Attack scaling" })));
   const directItems = [
     ...breakdownForStat(buffed, "attack").map(item => ({ ...item, targetLabel: "Attack" })),
     ...breakdownForStat(buffed, isRanged ? "ranged attack" : "melee attack").map(item => ({ ...item, targetLabel: isRanged ? "Ranged attack" : "Melee attack" })),
+    ...breakdownForStat(buffed, "extra attack").map(item => ({ ...item, targetLabel: "Extra attack" })),
     ...feat.breakdown.filter(item => item.targetLabel === "Attack")
   ];
-  const formula = `BAB iteratives + scaling ${signed(scalingBonus)} + enhancement ${signed(enhancement)} + misc ${signed(miscBonus)} + buffs ${signed(buffBonus)} + feats ${signed(feat.attackPenalty)}`;
+  const formula = `BAB iteratives + extra attacks ${extraAttacks} + scaling ${signed(scalingBonus)} + enhancement ${signed(enhancement)} + misc ${signed(miscBonus)} + buffs ${signed(buffBonus)} + feats ${signed(feat.attackPenalty)}`;
   return { buffBonus, attacks, formula, breakdown: [...statItems, ...directItems] };
 }
 
@@ -2278,6 +2305,7 @@ async function openEffectTrackerModal() {
   const options = {
     contextKey: sheetContextKey,
     characterId: currentSheetId,
+    effectStats: LOOT_EFFECT_STATS,
     loadActiveEffects: isEnemySheetMode ? async () => activeBuffs : undefined,
     saveActiveEffects: enemySaveActiveEffects || undefined,
     onChange: async buffs => {
@@ -2964,6 +2992,18 @@ function collectCalculatedSummary() {
     total: el(`${key}Total`)?.value || "",
     conditionals: conditionalGroups[{ fort: "fortitude", reflex: "reflex", will: "will" }[key]] || []
   }));
+  const skillRows = allSkills().map(([skill]) => {
+    const id = skillId(skill);
+    return {
+      key: id,
+      label: skill,
+      total: el(`${id}Total`)?.value || "",
+      conditionals: [
+        ...conditionalTableRows("skill checks", conditionalGroups),
+        ...conditionalTableRows(skillStatKey(skill), conditionalGroups)
+      ]
+    };
+  });
   
   const weaponRows = [...el("weaponRows").querySelectorAll(".sheet-card")].map(card => {
     const range = card.querySelector('[data-field="range"]')?.value || "";
@@ -3011,6 +3051,7 @@ function collectCalculatedSummary() {
     initiativeConditionals: conditionalGroups.initiative || [],
     hpConditionals: conditionalGroups["hit points"] || [],
     saves: saveRows,
+    skills: skillRows,
     weapons: weaponRows
   };
 }
@@ -3169,6 +3210,9 @@ function restoreSheet(sheet) {
   const data = sheet || {};
   showCalculations = Boolean(data.preferences?.showAppliedBuffs ?? data.showAppliedBuffs ?? true);
   updateAppliedBuffsToggle();
+  SIMPLE_FIELDS.forEach(id => {
+    if (el(id)) el(id).value = el(id).defaultValue || "";
+  });
   Object.entries(data.fields || {}).forEach(([id, value]) => { if (el(id)) el(id).value = value; });
   Object.entries(data).forEach(([id, value]) => {
     if (typeof value !== "object" && el(id)) el(id).value = value;
@@ -3208,6 +3252,7 @@ function restoreSheet(sheet) {
     if (Number(shieldBonus || 0)) addArmor({ item: "Saved shield", bonus: shieldBonus, type: "Shield" });
     if (!Number(armorBonus || 0) && !Number(shieldBonus || 0)) addArmor();
   }
+  updateCharacterImagePreview();
   recalculateSheet();
   isRestoringSheet = false;
 }
@@ -3216,13 +3261,32 @@ function loadSampleValues() {
   Object.entries(PDF_SAMPLE).forEach(([id, value]) => { if (el(id)) el(id).value = value; });
 }
 
+function updateCharacterImagePreview() {
+  const url = el("imageUrl")?.value.trim() || "";
+  const preview = el("characterImagePreview");
+  const placeholder = el("characterImagePlaceholder");
+  if (!preview || !placeholder) return;
+  if (!url) {
+    preview.classList.add("d-none");
+    preview.removeAttribute("src");
+    placeholder.classList.remove("d-none");
+    placeholder.textContent = "No image";
+    return;
+  }
+  preview.classList.remove("d-none");
+  placeholder.classList.add("d-none");
+  preview.src = url;
+}
+
 function attachInputListeners(root = document) {
   root.querySelectorAll(".sheet-input, #characterName").forEach(input => {
     input.addEventListener("input", () => {
+      if (input.id === "imageUrl") updateCharacterImagePreview();
       recalculateSheet();
       queueSheetSave();
     });
     input.addEventListener("change", () => {
+      if (input.id === "imageUrl") updateCharacterImagePreview();
       recalculateSheet();
       queueSheetSave();
     });
@@ -3415,6 +3479,7 @@ function resetForNewCharacter() {
   showCalculations = true;
   updateAppliedBuffsToggle();
   isRestoringSheet = false;
+  updateCharacterImagePreview();
   recalculateSheet();
   renderCharacterInventory([]);
 }
@@ -3520,6 +3585,12 @@ async function initCharacterSheet() {
     }
   }
   attachInputListeners();
+  el("characterImagePreview")?.addEventListener("error", () => {
+    el("characterImagePreview").classList.add("d-none");
+    el("characterImagePlaceholder").classList.remove("d-none");
+    el("characterImagePlaceholder").textContent = "Image unavailable";
+  });
+  updateCharacterImagePreview();
   PFItemEditor.init(inventoryEditorConfig());
   el("characterName").addEventListener("change", async () => {
     if (isEnemySheetMode) return;
