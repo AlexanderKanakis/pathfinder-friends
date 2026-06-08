@@ -748,6 +748,46 @@
     return { ok: true, activeBuffs: normalizeActiveBuffState(row?.active_buffs) };
   }
 
+  async function updateCharacterEffectState(characterId, activeBuffs, contextKey = getSelectedContextKey()) {
+    const context = normalizeContext(contextKey);
+    if (!client || !characterId) return { ok: false, error: new Error("Missing character") };
+
+    const { data, error } = await client.rpc("update_character_effect_state", {
+      target_sheet_id: characterId,
+      target_context_key: context.contextKey,
+      next_active_buffs: activeBuffs || []
+    });
+
+    if (error) {
+      console.error(error);
+      return { ok: false, error };
+    }
+
+    const row = Array.isArray(data) ? data[0] : data;
+    return { ok: true, activeBuffs: normalizeActiveBuffState(row?.active_buffs) };
+  }
+
+  async function advanceMapEffectTurn(endingTokenId, turnEventId, contextKey = getSelectedContextKey()) {
+    const context = normalizeContext(contextKey);
+    if (!client || !endingTokenId || !turnEventId) {
+      return { ok: false, unavailable: false, error: new Error("Missing turn information") };
+    }
+
+    const { data, error } = await client.rpc("advance_map_effect_turn", {
+      target_context_key: context.contextKey,
+      ending_token_id: endingTokenId,
+      turn_event_id: turnEventId
+    });
+
+    if (error) {
+      const unavailable = error.code === "PGRST202" || String(error.message || "").includes("advance_map_effect_turn");
+      if (!unavailable) console.error(error);
+      return { ok: false, unavailable, error };
+    }
+
+    return { ok: true, changes: Array.isArray(data) ? data : [] };
+  }
+
   function normalizeBuffDefinition(row) {
     const legacyDuration = parseDurationLabel(row.duration);
     const durationCount = row.duration_count === undefined ? legacyDuration.count : row.duration_count;
@@ -1505,6 +1545,8 @@
     saveBuffState,
     loadCharacterBuffStateForRecalculation,
     applyCharacterMapEffect,
+    updateCharacterEffectState,
+    advanceMapEffectTurn,
     loadBuffDefinitions,
     saveBuffDefinition,
     updateBuffDefinition,

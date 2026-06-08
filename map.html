@@ -15,6 +15,21 @@
     .map-toolbar .form-control, .map-toolbar .form-select { width: auto; min-width: 96px; }
     .map-settings-button { margin-left: auto; }
     .map-settings-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+    .map-docs-modal-content { max-height: calc(100vh - 32px); overflow: hidden; }
+    .map-docs-modal-body { min-height: 0; overflow: hidden; }
+    .map-docs-layout { display: grid; grid-template-columns: minmax(190px, 240px) minmax(0, 1fr); height: min(68vh, 620px); min-height: 0; overflow: hidden; }
+    .map-docs-list { min-height: 0; border-right: 1px solid #444; padding: 12px; overflow-y: auto; }
+    .map-docs-list-button { width: 100%; display: flex; align-items: center; gap: 9px; padding: 9px 10px; border: 0; border-radius: 6px; background: transparent; color: #ddd; text-align: left; }
+    .map-docs-list-button:hover, .map-docs-list-button.active { background: #303030; color: #fff; }
+    .map-docs-list-button.active { box-shadow: inset 3px 0 #8fd19e; }
+    .map-docs-list-button .bi { width: 18px; color: #8fd19e; text-align: center; }
+    .map-docs-group { margin: 14px 10px 5px; color: #888; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+    .map-docs-group:first-child { margin-top: 2px; }
+    .map-docs-detail { min-width: 0; min-height: 0; padding: 20px 22px; overflow-y: auto; }
+    .map-docs-detail h3 { font-size: 21px; margin-bottom: 12px; }
+    .map-docs-detail h4 { margin-top: 20px; color: #aaa; font-size: 12px; text-transform: uppercase; }
+    .map-docs-detail p, .map-docs-detail li { color: #ddd; line-height: 1.55; }
+    .map-docs-back { display: none; }
     .map-stage-wrap { position: relative; overflow: auto; padding: 12px; }
     .map-stage { position: relative; width: calc(var(--cols) * var(--cell)); height: calc(var(--rows) * var(--cell)); min-width: calc(var(--cols) * var(--cell)); min-height: calc(var(--rows) * var(--cell)); background-color: #202020; background-image: linear-gradient(to right, rgba(255,255,255,.18) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,.18) 1px, transparent 1px), var(--map-bg); background-size: var(--cell) var(--cell), var(--cell) var(--cell), var(--bg-size); background-position: 0 0, 0 0, center; background-repeat: repeat, repeat, no-repeat; border: 1px solid #555; }
     .map-token, .map-shape { position: absolute; left: calc(var(--x) * var(--cell)); top: calc(var(--y) * var(--cell)); width: calc(var(--w) * var(--cell)); height: calc(var(--h) * var(--cell)); display: grid; place-items: center; user-select: none; touch-action: none; cursor: grab; z-index: var(--z, 2); }
@@ -26,10 +41,12 @@
     .map-token.enemy.enemy-hidden { opacity: .45; border-style: dashed; }
     .map-token.token-hidden { opacity: .42; border-style: dashed; filter: saturate(.75); }
     .map-token.selected, .map-shape.selected { outline: 3px solid #8fd19e; outline-offset: 2px; }
+    .map-token.turn-active { outline: 4px solid #f0d58c; outline-offset: 3px; box-shadow: 0 0 0 3px rgba(240, 213, 140, .28), 0 2px 8px rgba(0,0,0,.45); }
     .token-label { max-width: 100%; padding: 0 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; text-shadow: 0 1px 2px rgba(255,255,255,.5); }
     .token-hover-card { display: none; position: absolute; bottom: calc(100% + 7px); left: 50%; transform: translateX(-50%); min-width: 150px; max-width: 220px; padding: 6px 8px; border: 1px solid #555; border-radius: 6px; background: #1e1e1e; color: #f8f9fa; box-shadow: 0 4px 12px rgba(0,0,0,.45); font-size: 12px; line-height: 1.25; z-index: 80; pointer-events: none; }
     .token-hover-card::after { content: ""; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border: 6px solid transparent; border-top-color: #555; }
-    .map-token:hover .token-hover-card { display: block; }
+    .token-hover-layer { position: absolute; inset: 0; z-index: 2147483000; pointer-events: none; }
+    .token-hover-layer .token-hover-card { display: block; bottom: auto; }
     .token-hover-name { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .token-hover-hp { color: #8fd19e; }
     .aura-effect-toasts { position: fixed; top: var(--aura-toast-top, 86px); right: var(--aura-toast-right, 20px); z-index: 1090; display: grid; gap: 8px; width: min(300px, var(--aura-toast-width, calc(100vw - 40px))); max-height: var(--aura-toast-max-height, calc(100vh - 110px)); overflow: auto; pointer-events: none; }
@@ -57,8 +74,16 @@
     .initiative-row, .timeline-row { background: #242424; border: 1px solid #444; border-radius: 8px; padding: 7px; margin-bottom: 6px; }
     .timeline-row { font-size: .7rem; }
     .initiative-row.active { border-color: #8fd19e; background: rgba(143, 209, 158, .1); }
+    .initiative-row.disabled { opacity: .48; filter: grayscale(.7); }
+    .initiative-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 700; }
     .initiative-row-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(58px, 66px) minmax(0, auto); gap: 5px; align-items: center; min-width: 0; }
     .initiative-controls { display: inline-flex; gap: 3px; min-width: 0; }
+    .initiative-meta { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+    .initiative-custom .accordion-button { background: #242424; color: #ddd; padding: 7px 10px; font-size: 12px; }
+    .initiative-custom .accordion-button:not(.collapsed) { background: #2b2b2b; color: #fff; box-shadow: none; }
+    .initiative-custom .accordion-body { background: #1e1e1e; border: 1px solid #333; border-top: 0; padding: 8px; }
+    .turn-effect-notices { position: fixed; z-index: 1100; left: 50%; top: 88px; transform: translateX(-50%); display: grid; gap: 7px; width: min(360px, calc(100vw - 24px)); pointer-events: none; }
+    .turn-effect-notice { border: 1px solid rgba(224,93,93,.75); border-left: 4px solid #e05d5d; border-radius: 8px; background: rgba(36,36,36,.9); color: #fff; padding: 9px 11px; box-shadow: 0 8px 24px rgba(0,0,0,.45); text-align: center; }
     .timeline-list { max-height: 260px; overflow: auto; padding-right: 2px; }
     #mapTimelinePane.active { display: grid; grid-template-rows: auto auto minmax(0, 1fr); min-height: 100%; }
     #mapTimelinePane.active .timeline-list { max-height: none; min-height: 0; }
@@ -68,10 +93,13 @@
     .roll-result-list { display: grid; gap: 10px; }
     .roll-result-card { border: 1px solid #444; border-radius: 8px; background: #202020; padding: 12px; text-align: center; }
     .roll-result-label { color: #bbb; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
-    .roll-die-value { font-size: 56px; line-height: 1; font-weight: 800; color: #f0d58c; font-variant-numeric: tabular-nums; }
+    .roll-die-value { font-size: 46px; line-height: 1; font-weight: 800; color: #f0d58c; font-variant-numeric: tabular-nums; }
     .roll-breakdown { display: grid; gap: 4px; margin-top: 10px; }
     .roll-breakdown-row { display: flex; justify-content: center; gap: 8px; align-items: baseline; color: #ddd; }
     .roll-breakdown-row strong { color: #fff; font-size: 18px; }
+    .roll-total-divider { width: min(220px, 80%); margin: 8px auto 4px; border-color: #555; opacity: 1; }
+    .roll-total-row { gap: 10px; color: #f0d58c; font-size: 16px; font-weight: 700; text-transform: uppercase; }
+    .roll-total-row strong { color: #fff; font-size: 30px; line-height: 1.1; }
     .roll-result-note { color: #f0d58c; font-weight: 700; margin-top: 8px; }
     .roll-note-positive, .roll-die-value.roll-note-positive { color: #8fd19e; }
     .roll-note-negative, .roll-die-value.roll-note-negative { color: #e05d5d; }
@@ -115,6 +143,8 @@
     .mini-sheet-row span:last-child { color: #fff; font-weight: 700; text-align: right; }
     .mini-sheet-conditional { border-left: 3px solid #f0d58c; background: rgba(240, 213, 140, .08); }
     .mini-sheet-conditional .mini-sheet-value, .mini-sheet-conditional .mini-sheet-row span:last-child { color: #f0d58c; }
+    .hp-number-input { appearance: textfield; -moz-appearance: textfield; }
+    .hp-number-input::-webkit-inner-spin-button, .hp-number-input::-webkit-outer-spin-button { appearance: none; -webkit-appearance: none; margin: 0; }
     .map-weapon-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(92px, 1fr)); gap: 5px; margin: 4px 0 8px; padding: 6px; border: 1px solid #383838; border-radius: 6px; background: #1f1f1f; }
     .map-weapon-options-title { grid-column: 1 / -1; display: flex; align-items: center; gap: 6px; color: #aaa; font-size: 10px; text-transform: uppercase; letter-spacing: .04em; }
     .map-weapon-options-title .bi { color: #f0d58c; cursor: help; }
@@ -133,6 +163,12 @@
     @media (max-width: 620px) {
       .map-settings-button { margin-left: 0; }
       .map-settings-grid { grid-template-columns: 1fr; }
+      .map-docs-layout { display: block; height: min(72vh, 600px); min-height: 0; }
+      .map-docs-list { height: 100%; border-right: 0; overflow-y: auto; }
+      .map-docs-detail { display: none; height: 100%; padding: 14px; }
+      .map-docs-layout.detail-open .map-docs-list { display: none; }
+      .map-docs-layout.detail-open .map-docs-detail { display: block; }
+      .map-docs-back { display: inline-flex; margin-bottom: 14px; }
     }
     @media (max-width: 380px) {
       .initiative-row-grid { grid-template-columns: minmax(0, 1fr) minmax(56px, 64px); }
@@ -158,6 +194,7 @@
 
     <div class="map-stage-wrap">
       <div id="auraEffectToasts" class="aura-effect-toasts" aria-live="polite"></div>
+      <div id="turnEffectNotices" class="turn-effect-notices" aria-live="polite"></div>
       <div id="mapStage" class="map-stage" aria-label="Battle map"></div>
     </div>
   </section>
@@ -185,14 +222,32 @@
 
       <section id="mapInitiativePane" class="tab-pane fade side-section" role="tabpanel" aria-labelledby="mapInitiativeTab" tabindex="0">
         <div class="side-title">Initiative</div>
-        <form id="initiativeForm" class="d-grid gap-2 mb-2">
-          <input id="initiativeName" class="form-control form-control-sm" placeholder="Name" autocomplete="off">
-          <div class="d-flex gap-2">
-            <input id="initiativeScore" class="form-control form-control-sm" type="number" value="0" aria-label="Initiative">
-            <button class="btn btn-primary btn-sm" type="submit">Add</button>
-          </div>
-        </form>
+        <div class="initiative-meta">
+          <strong id="roundCounter">Round 0</strong>
+          <button id="resetRounds" class="btn btn-outline-light btn-sm" type="button"><i class="bi bi-arrow-counterclockwise me-1"></i>Reset</button>
+        </div>
+        <div id="initiativeNotice" class="small text-warning mb-2"></div>
         <div id="initiativeList"></div>
+        <div class="accordion initiative-custom mt-2" id="customInitiativeAccordion">
+          <div class="accordion-item bg-transparent border-0">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#customInitiativeBody" aria-expanded="false" aria-controls="customInitiativeBody">
+                Custom entry
+              </button>
+            </h2>
+            <div id="customInitiativeBody" class="accordion-collapse collapse" data-bs-parent="#customInitiativeAccordion">
+              <div class="accordion-body">
+                <form id="initiativeForm" class="d-grid gap-2">
+                  <input id="initiativeName" class="form-control form-control-sm" placeholder="Name" autocomplete="off">
+                  <div class="d-flex gap-2">
+                    <input id="initiativeScore" class="form-control form-control-sm" type="number" value="0" aria-label="Initiative">
+                    <button class="btn btn-primary btn-sm" type="submit">Add</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
 
       <section id="mapTimelinePane" class="tab-pane fade side-section" role="tabpanel" aria-labelledby="mapTimelineTab" tabindex="0">
@@ -223,6 +278,9 @@
   </button>
   <button id="toggleEnemyVisibility" class="btn btn-outline-warning btn-sm mb-1 d-none" type="button" role="menuitem">
     <i class="bi bi-eye-slash me-1"></i> Hide enemy
+  </button>
+  <button id="toggleTokenNameVisibility" class="btn btn-outline-warning btn-sm mb-1 d-none" type="button" role="menuitem">
+    <i class="bi bi-incognito me-1"></i> Hide name
   </button>
   <button id="toggleZIndexMenu" class="btn btn-outline-light btn-sm mb-1" type="button" role="menuitem" aria-expanded="false">
     <i class="bi bi-layers me-1"></i> Z-index
@@ -346,7 +404,7 @@
       <div class="modal-body">
         <div class="map-settings-grid mb-3">
           <div>
-            <label for="gridSize">Grid Size</label>
+            <label for="gridSize">Map Size</label>
             <input id="gridSize" class="form-control form-control-sm" type="number" min="24" max="96" value="48">
           </div>
           <div>
@@ -374,10 +432,31 @@
         </div>
       </div>
       <div class="modal-footer border-secondary">
+        <button id="openMapDocumentation" type="button" class="btn btn-outline-info btn-sm me-auto"><i class="bi bi-book me-1"></i>Documentation</button>
         <button type="button" class="btn btn-outline-light btn-sm" data-bs-dismiss="modal">Cancel</button>
         <button class="btn btn-primary btn-sm" type="submit">Save Settings</button>
       </div>
     </form>
+  </div>
+</div>
+
+<div class="modal fade" id="mapDocumentationModal" tabindex="-1" aria-labelledby="mapDocumentationModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content map-docs-modal-content bg-dark text-white border-secondary">
+      <div class="modal-header border-secondary">
+        <h5 class="modal-title" id="mapDocumentationModalLabel">Map Documentation</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body map-docs-modal-body p-0">
+        <div id="mapDocsLayout" class="map-docs-layout">
+          <nav id="mapDocsList" class="map-docs-list" aria-label="Map function documentation"></nav>
+          <article id="mapDocsDetail" class="map-docs-detail">
+            <button id="mapDocsBack" class="btn btn-outline-light btn-sm map-docs-back" type="button"><i class="bi bi-arrow-left me-1"></i>Back</button>
+            <div id="mapDocsContent"></div>
+          </article>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -391,6 +470,10 @@
       <div class="modal-body">
         <label for="genericTokenName">Name</label>
         <input id="genericTokenName" class="form-control form-control-sm" required maxlength="80" placeholder="Token name">
+        <div class="form-check form-switch mt-3">
+          <input id="genericTokenHideName" class="form-check-input" type="checkbox" role="switch">
+          <label class="form-check-label" for="genericTokenHideName">Hide name from players</label>
+        </div>
       </div>
       <div class="modal-footer border-secondary">
         <button type="button" class="btn btn-outline-light btn-sm" data-bs-dismiss="modal">Cancel</button>
@@ -412,6 +495,10 @@
         <div class="form-check form-switch mb-3">
           <input id="enemyTokenVisible" class="form-check-input" type="checkbox" role="switch" checked>
           <label class="form-check-label" for="enemyTokenVisible">Visible to players</label>
+        </div>
+        <div class="form-check form-switch mb-3">
+          <input id="enemyTokenHideName" class="form-check-input" type="checkbox" role="switch">
+          <label class="form-check-label" for="enemyTokenHideName">Hide name from players</label>
         </div>
         <div id="enemyPickerList" class="enemy-picker-list search-modal-results"></div>
       </div>
@@ -529,6 +616,7 @@ let suppressNextContextMenu = false;
 let auraModal = null;
 let auraEditingTokenId = "";
 let backgroundModal = null;
+let mapDocumentationModal = null;
 let enemyPickerModal = null;
 let characterPickerModal = null;
 let genericTokenModal = null;
@@ -556,6 +644,8 @@ let quickEffectMode = "apply";
 let auraEffectDraft = null;
 let auraEffectDismissed = new Set();
 let auraEffectInside = new Set();
+let turnAdvanceBusy = false;
+let seenTurnEffectNotices = new Set();
 
 const defaultState = {
   settings: { cols: 30, rows: 20, backgroundUrl: "", backgroundFit: "cover" },
@@ -563,6 +653,9 @@ const defaultState = {
   shapes: [],
   initiative: [],
   activeTurn: 0,
+  roundsPassed: 0,
+  turnSequence: 0,
+  effectNotices: [],
   timeline: []
 };
 let state = structuredClone(defaultState);
@@ -582,6 +675,189 @@ const SHAPE_TEXTURES = [
   { id: "pit", name: "Pit", url: "assets/shape icons/pit.png" },
   { id: "stone", name: "Stone", url: "assets/shape icons/stone.png" }
 ];
+const MAP_CONTEXT_DOCUMENTATION = [
+  {
+    id: "initiative",
+    group: "Combat & Turns",
+    title: "Initiative & Rounds",
+    icon: "bi-list-ol",
+    summary: "Track combat order, the active turn, delayed positions, disabled entries, and completed rounds.",
+    usage: [
+      "Characters, enemies, and generic tokens are added to initiative automatically. Shapes are not.",
+      "Initiative initially sorts from highest to lowest. You can change a score or manually reorder entries to represent Delay without changing their names.",
+      "Next ends the highlighted entry's turn and highlights the next enabled entry. Disabled entries are greyed out and skipped. If every entry is disabled, combat cannot advance.",
+      "A round is completed when the active turn wraps from the bottom of the enabled order back to the top. Reset clears only the round count.",
+      "Custom entry is available below the list for combatants or events that do not have a map token."
+    ],
+    access: "Initiative state is shared by every connected user in the campaign."
+  },
+  {
+    id: "timeline",
+    group: "Combat & Turns",
+    title: "Timeline",
+    icon: "bi-clock-history",
+    summary: "A shared recent history of important map and combat events.",
+    usage: [
+      "The timeline records turn changes, rolls, effect applications, expired effects, and manually entered events.",
+      "Roll entries include the die, bonus, total, and critical threat, failure, success, or firearm misfire status where relevant.",
+      "Hidden enemy and token names are masked for regular players while remaining identifiable to the GM and admin.",
+      "Only the latest 20 entries are retained. Routine HP changes are intentionally not recorded."
+    ],
+    access: "Every campaign member can view the timeline and add a manual event."
+  },
+  {
+    id: "multiattack",
+    group: "Combat & Rolls",
+    title: "Attack & Full Attack",
+    icon: "bi-crosshair2",
+    summary: "Understand how the app calculates one attack, BAB iteratives, and multiweapon full attacks.",
+    usage: [
+      "Attack rolls only the selected weapon's first and highest attack bonus.",
+      "Full Attack starts with BAB iteratives for a normal or primary weapon: BAB, BAB -5, BAB -10, and BAB -15, stopping before the next value would fall below +1. For example, BAB +11 produces three base attacks: +11, +6, and +1.",
+      "Every attack then receives the weapon's attack-scaling ability modifier, enhancement, manual attack misc, applicable effects, and active attack-option penalties.",
+      "An effect that grants an extra attack at highest BAB inserts another copy of the first attack. When TWF is active, these effect-granted attacks apply only to the primary weapon.",
+      "Rapid Shot inserts one extra attack at the selected ranged weapon's highest bonus and applies -2 to all weapon attacks while active.",
+      "Full Attack results are displayed as Attack 1, Attack 2, Attack 3, and so on across the complete sequence."
+    ],
+    access: "Roll permissions follow the selected token: owners roll their characters, while GM and admin can roll all characters and enemies."
+  },
+  {
+    id: "twf",
+    group: "Combat & Rolls",
+    title: "Two-Weapon Fighting",
+    icon: "bi-intersect",
+    summary: "Build a full attack from one primary weapon and one or more off-hand weapons.",
+    usage: [
+      "Mark exactly one equipped weapon as the TWF primary hand and mark each participating secondary weapon as an off hand. TWF and Two-Handed are mutually exclusive.",
+      "The primary weapon keeps its normal BAB iterative attacks. Each off-hand weapon receives one attack at highest BAB.",
+      "Improved TWF adds a second attack to that off-hand weapon at highest BAB -5. Greater TWF adds a third at highest BAB -10. These options require an off-hand weapon using the TWF feat mode.",
+      "With the TWF feat, primary and off-hand attacks take -2 when an off-hand weapon is Light or Natural, otherwise -4.",
+      "Without the feat, the primary takes -4 with a light off hand or -6 otherwise. The off hand takes -8 when light or natural, or -10 otherwise.",
+      "During Full Attack, the app rolls the primary sequence first and then each participating off-hand sequence. Effects granting an extra highest-BAB attack are not repeated on off-hand weapons."
+    ],
+    access: "Attack options can be changed from the equipped weapon on the sheet or from that weapon's expandable row in the Map Character panel."
+  },
+  {
+    id: "attack-options",
+    group: "Combat & Rolls",
+    title: "Attack Options",
+    icon: "bi-sliders",
+    summary: "Temporarily configure combat choices that alter weapon attack and damage calculations.",
+    usage: [
+      "Open a weapon in the Map Character panel to show Attack Options. Changes are saved to the same weapon used by the character or enemy sheet.",
+      "Two-Handed causes Strength damage scaling to use x1.5 and is mutually exclusive with every TWF mode.",
+      "Power Attack applies -1 attack and +2 damage for the first four BAB, increasing by another -1/+2 for every four BAB. Two-handed melee damage receives x1.5 of that damage bonus; light melee weapons receive no Power Attack damage bonus.",
+      "Deadly Aim uses the same BAB progression for ranged weapons: -1 attack and +2 damage per step.",
+      "Rapid Shot grants one highest-bonus attack and applies -2 to all weapon attacks. Only one weapon can have Rapid Shot active.",
+      "Changing weapon type clears attack options that are no longer compatible with the new type."
+    ],
+    access: "Players can edit options for their own character. GM and admin can edit options for every character and enemy."
+  },
+  {
+    id: "aura",
+    group: "Right-Click Actions",
+    title: "Aura Options",
+    icon: "bi-broadcast-pin",
+    summary: "Create a visible radius around a token and optionally offer an effect to creatures inside it.",
+    usage: [
+      "Set whether the aura is visible, its radius in grid cells, and its color. One cell represents 5 feet.",
+      "An aura can carry an effect. Eligible characters inside the radius receive a prompt and choose whether to apply it.",
+      "Remove when out of range removes an accepted aura effect after its target leaves the radius."
+    ],
+    access: "Characters can manage their own auras. The GM and admin can manage every character or enemy aura."
+  },
+  {
+    id: "apply-effect",
+    group: "Right-Click Actions",
+    title: "Apply Effect",
+    icon: "bi-magic",
+    summary: "Apply a spell, ability, feat, debuff, or condition to one or more map targets.",
+    usage: [
+      "Search or choose a frequently used effect, then select any number of characters or enemies.",
+      "Caster level defaults to the source token's level when the effect uses caster level.",
+      "Finite durations are tied to the source token's turn and are reduced when that token ends its turn."
+    ],
+    access: "A character owner can start the action from their character. GM and admin can also start it from enemies."
+  },
+  {
+    id: "roll",
+    group: "Right-Click Actions",
+    title: "Roll",
+    icon: "bi-dice-5",
+    summary: "Roll attacks, saves, skills, or attributes using the selected token's calculated sheet values.",
+    usage: [
+      "Attack rolls the highest attack for the selected weapon. Full Attack rolls every available attack.",
+      "Threat ranges, firearm misfires, critical successes, and critical failures are identified automatically.",
+      "Every result is added to the timeline. The result modal can reroll the same action."
+    ],
+    access: "Players can roll their own characters. GM and admin can roll for every character and enemy."
+  },
+  {
+    id: "hide-token",
+    group: "Right-Click Actions",
+    title: "Hide / Unhide",
+    icon: "bi-eye-slash",
+    summary: "Temporarily conceal the entire token from users who cannot manage it.",
+    usage: [
+      "A hidden token cannot be seen or selected by other regular players.",
+      "Its owner, GM, and admin see it as semi-transparent so its position remains manageable.",
+      "This is separate from an enemy's initial Visible setting and from Hide Name."
+    ],
+    access: "Character owners can hide their own characters. GM and admin can hide any token."
+  },
+  {
+    id: "enemy-visibility",
+    group: "Right-Click Actions",
+    title: "Hide / Show Enemy",
+    icon: "bi-person-slash",
+    summary: "Control whether an enemy exists visibly for regular players.",
+    usage: [
+      "Hidden enemies remain semi-transparent and selectable for the GM and admin.",
+      "Regular players cannot see or select the enemy while it is hidden.",
+      "This uses the same visibility state selected when the enemy was first added to the map."
+    ],
+    access: "GM and admin only."
+  },
+  {
+    id: "hide-name",
+    group: "Right-Click Actions",
+    title: "Hide / Unhide Name",
+    icon: "bi-incognito",
+    summary: "Keep an enemy or generic token visible while concealing its identity.",
+    usage: [
+      "Regular players see ? anywhere the name would appear, including the map, initiative, timeline, and effect prompts.",
+      "GM and admin continue to see the real name with a [?] marker.",
+      "This does not hide the token itself."
+    ],
+    access: "GM and admin only. Available for enemies and generic tokens."
+  },
+  {
+    id: "z-index",
+    group: "Right-Click Actions",
+    title: "Z-Index",
+    icon: "bi-layers",
+    summary: "Change which map entity is drawn in front when tokens or shapes overlap.",
+    usage: [
+      "Move to top places the entity above every other map entity. Move to bottom places it behind them.",
+      "Move up and Move down shift it by one layer.",
+      "Layer changes affect presentation only; they do not change position, initiative, or permissions."
+    ],
+    access: "Available to anyone who can manage the selected entity."
+  },
+  {
+    id: "remove",
+    group: "Right-Click Actions",
+    title: "Remove From Map",
+    icon: "bi-box-arrow-right",
+    summary: "Remove the selected token or shape from the current map.",
+    usage: [
+      "Removing a character, enemy, or generic token also removes its linked initiative entry.",
+      "The underlying character or enemy sheet is not deleted.",
+      "Removing a shape only removes that map shape."
+    ],
+    access: "Players can remove their own characters and tokens. GM and admin can remove all map entities."
+  }
+];
 
 function el(id) { return document.getElementById(id); }
 function canViewSelectedDetails(item) {
@@ -593,10 +869,10 @@ function activateSideTab(tabId) {
   bootstrap.Tab.getOrCreateInstance(tabButton).show();
 }
 function showSelectedPanel() {
-  const item = selectedObject();
-  if (canViewSelectedDetails(item)) activateSideTab("mapCharacterTab");
   const sideScroll = document.querySelector(".side-scroll");
-  if (sideScroll) sideScroll.scrollTo({ top: 0, behavior: "smooth" });
+  if (sideScroll && el("mapCharacterPane")?.classList.contains("active")) {
+    sideScroll.scrollTo({ top: 0, behavior: "smooth" });
+  }
 }
 function escapeHtml(value) {
   return String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
@@ -703,6 +979,31 @@ function selectedObject() { return [...state.tokens, ...state.shapes].find(item 
 function tokenById(tokenId) { return state.tokens.find(token => token.id === tokenId); }
 function tokenInitials(name) { return String(name || "?").split(/\s+/).slice(0, 2).map(part => part[0] || "").join("").toUpperCase(); }
 function tokenCharacter(token) { return mapCharacters.find(character => character.id === token.characterId); }
+function tokenActualName(token) {
+  if (!token) return "Unnamed";
+  if (token.kind === "character") return tokenCharacter(token)?.name || token.name || "Character";
+  return token.name || (token.kind === "enemy" ? "Enemy" : "Token");
+}
+function tokenNameIsHidden(token) {
+  return Boolean(token?.hideName && (token.kind === "enemy" || token.kind === "token"));
+}
+function tokenInitiativeScore(token) {
+  const sheet = token?.kind === "enemy" ? token.sheet || {} : tokenCharacter(token)?.sheet || {};
+  const fields = sheet.fields || {};
+  return firstNumber(
+    sheet.calculated?.initiative
+      ?? fields.initiativeTotal
+      ?? fields.initTotal
+      ?? fields.initiative
+      ?? token?.initiative
+      ?? 0
+  );
+}
+function displayTokenName(token) {
+  const actual = tokenActualName(token);
+  if (!tokenNameIsHidden(token)) return actual;
+  return isGm ? `[?] ${actual}` : "?";
+}
 function mapLayerItems() { return [...state.shapes, ...state.tokens]; }
 function normalizeZIndexes() {
   mapLayerItems()
@@ -718,21 +1019,43 @@ function canSeeToken(token) {
   return true;
 }
 function initiativeNameFromEntry(entry, tokens = state.tokens) {
-  if (entry.name) return entry.name;
   const token = tokens.find(item => item.id === entry.tokenId);
-  return token?.name || "Unnamed";
+  if (token) return displayTokenName(token);
+  return entry.name || "Unnamed";
 }
 function normalizedInitiativeEntry(entry, tokens = state.tokens) {
   return {
     id: entry.id || entry.tokenId || uid("init"),
-    name: initiativeNameFromEntry(entry, tokens),
-    score: Number(entry.score || 0)
+    tokenId: entry.tokenId || "",
+    name: entry.name || initiativeNameFromEntry(entry, tokens),
+    score: Number(entry.score || 0),
+    disabled: Boolean(entry.disabled),
+    custom: Boolean(entry.custom || !entry.tokenId)
   };
 }
 function normalizeInitiativeRows(rows, tokens = state.tokens) {
   return (Array.isArray(rows) ? rows : [])
     .map(entry => normalizedInitiativeEntry(entry, tokens))
-    .filter(entry => entry.name);
+    .filter(entry => entry.name && (!entry.tokenId || tokens.some(token => token.id === entry.tokenId)));
+}
+function initiativeTokenEligible(token) {
+  return token && (token.kind === "character" || token.kind === "enemy" || token.kind === "token");
+}
+function syncInitiativeWithTokens(tokens, rows) {
+  const normalized = normalizeInitiativeRows(rows, tokens);
+  const linked = new Set(normalized.map(entry => entry.tokenId).filter(Boolean));
+  tokens.filter(initiativeTokenEligible).forEach(token => {
+    if (linked.has(token.id)) return;
+    normalized.push({
+      id: `init_${token.id}`,
+      tokenId: token.id,
+      name: tokenActualName(token),
+      score: tokenInitiativeScore(token),
+      disabled: false,
+      custom: false
+    });
+  });
+  return normalized;
 }
 function canEditTokenHp(token) {
   if (!token?.kind) return false;
@@ -1005,7 +1328,7 @@ function compactHpStat(token, calculated = null) {
   const total = calculated?.hp?.total || tokenTotalHp(token) || "?";
   const value = canEditTokenHp(token)
     ? `<div class="mini-sheet-value d-flex align-items-center gap-1">
-        <input data-token-current-hp="${escapeHtml(token.id)}" class="form-control form-control-sm" type="number" value="${escapeHtml(current)}" style="width:70px;">
+        <input data-token-current-hp="${escapeHtml(token.id)}" class="form-control form-control-sm hp-number-input" type="number" value="${escapeHtml(current)}" style="width:70px;">
         <span>/ ${escapeHtml(total)}</span>
       </div>`
     : `<div class="mini-sheet-value">${escapeHtml(`${current}/${total}`)}</div>`;
@@ -1227,13 +1550,16 @@ async function determineGm(contextKey) {
 
 function normalizeState(raw) {
   const tokens = Array.isArray(raw?.tokens) ? raw.tokens : [];
-  const normalizedInitiative = normalizeInitiativeRows(raw?.initiative, tokens);
+  const normalizedInitiative = syncInitiativeWithTokens(tokens, raw?.initiative);
   const nextState = {
     settings: { ...defaultState.settings, ...(raw?.settings || {}) },
     tokens,
     shapes: Array.isArray(raw?.shapes) ? raw.shapes : [],
     initiative: normalizedInitiative,
     activeTurn: clamp(Number(raw?.activeTurn || 0), 0, Math.max(0, normalizedInitiative.length - 1)),
+    roundsPassed: Math.max(0, Number(raw?.roundsPassed || 0)),
+    turnSequence: Math.max(0, Number(raw?.turnSequence || 0)),
+    effectNotices: Array.isArray(raw?.effectNotices) ? raw.effectNotices.slice(-10) : [],
     timeline: Array.isArray(raw?.timeline) ? raw.timeline.slice(-20) : []
   };
   state = nextState;
@@ -1263,8 +1589,8 @@ function showMapContextMenu(event, item) {
   renderAll(false);
   const menu = el("mapContextMenu");
   el("mapContextMenuTitle").textContent = item.kind === "character"
-    ? tokenCharacter(item)?.name || item.name || "Character"
-    : item.name || "Shape";
+    ? displayTokenName(item)
+    : item.kind ? displayTokenName(item) : item.name || "Shape";
   el("openAuraOptions").classList.toggle("d-none", !canManageAura(item));
   el("openApplyEffect").classList.toggle("d-none", !canManageEffects(item));
   el("openRollMenu").classList.toggle("d-none", !canRollToken(item));
@@ -1283,6 +1609,14 @@ function showMapContextMenu(event, item) {
     visibilityButton.innerHTML = item.visible === false
       ? `<i class="bi bi-eye me-1"></i> Show enemy`
       : `<i class="bi bi-eye-slash me-1"></i> Hide enemy`;
+  }
+  const nameVisibilityButton = el("toggleTokenNameVisibility");
+  const canToggleName = isGm && (item.kind === "enemy" || item.kind === "token");
+  nameVisibilityButton.classList.toggle("d-none", !canToggleName);
+  if (canToggleName) {
+    nameVisibilityButton.innerHTML = item.hideName
+      ? `<i class="bi bi-eye me-1"></i> Unhide name`
+      : `<i class="bi bi-incognito me-1"></i> Hide name`;
   }
   el("zIndexMenu").classList.add("d-none");
   el("toggleZIndexMenu").setAttribute("aria-expanded", "false");
@@ -1400,12 +1734,15 @@ function renderMap() {
   stage.innerHTML = [
     ...state.tokens.filter(canSeeToken).map(renderAura),
     ...state.shapes.map(renderShape),
-    ...state.tokens.filter(canSeeToken).map(renderToken)
+    ...state.tokens.filter(canSeeToken).map(renderToken),
+    `<div id="tokenHoverLayer" class="token-hover-layer"></div>`
   ].join("");
 
   stage.onpointerdown = startMovementMeasure;
   stage.querySelectorAll("[data-map-id]").forEach(node => {
     node.addEventListener("pointerdown", startDrag);
+    node.addEventListener("mouseenter", () => showTokenHover(node.dataset.mapId));
+    node.addEventListener("mouseleave", hideTokenHover);
     node.addEventListener("click", event => {
       event.stopPropagation();
       suppressStageClick = true;
@@ -1523,7 +1860,7 @@ function renderAuraEffectToasts() {
   container.innerHTML = prompts.map(({ token, auraToken, key }) => `
     <div class="aura-effect-toast">
       <div class="fw-semibold">${escapeHtml(auraToken.aura.effect?.name || "Effect")} aura</div>
-      <div class="small text-secondary mb-2">${escapeHtml(token.name || "Target")}</div>
+      <div class="small text-secondary mb-2">${escapeHtml(displayTokenName(token))}</div>
       <div class="d-flex justify-content-end gap-2">
         <button class="btn btn-outline-light btn-sm" type="button" data-dismiss-aura="${escapeHtml(key)}">Dismiss</button>
         <button class="btn btn-success btn-sm" type="button" data-apply-aura="${escapeHtml(token.id)}" data-aura-source="${escapeHtml(auraToken.id)}">Apply</button>
@@ -1550,27 +1887,42 @@ function renderToken(token) {
   const hiddenClass = token.kind === "enemy" && token.visible === false && isGm ? " enemy-hidden" : "";
   const tokenHiddenClass = token.hidden === true && canManageMapItem(token) ? " token-hidden" : "";
   const selectedClass = token.id === selectedId ? " selected" : "";
-  const character = token.kind === "character" ? tokenCharacter(token) : null;
-  const hoverName = character
-    ? character.name || token.name || "Character"
-    : token.kind === "enemy" && isGm
-    ? token.name || "Enemy"
-    : token.kind === "token"
-    ? token.name || "Token"
-    : "";
-  const hoverHp = character ? tokenHpText(token) : token.kind === "enemy" && isGm ? `${tokenCurrentHp(token) || "?"}/${tokenTotalHp(token) || "?"} HP` : "";
-  const hover = hoverName ? `
-    <div class="token-hover-card">
-      <div class="token-hover-name">${escapeHtml(hoverName)}</div>
-      <div class="token-hover-hp">${escapeHtml(hoverHp)}</div>
-    </div>
-  ` : "";
+  const activeEntry = state.initiative[state.activeTurn];
+  const activeClass = activeEntry?.tokenId === token.id && !activeEntry.disabled ? " turn-active" : "";
   return `
-    <div class="map-token${enemyClass}${genericClass}${imageClass}${hiddenClass}${tokenHiddenClass}${selectedClass}" data-map-id="${escapeHtml(token.id)}" style="--x:${token.x};--y:${token.y};--w:${token.w || 1};--h:${token.h || 1};--z:${Number(token.zIndex || 2)};--color:${escapeHtml(token.color || "#8fd19e")};--token-image:${tokenImage};">
+    <div class="map-token${enemyClass}${genericClass}${imageClass}${hiddenClass}${tokenHiddenClass}${selectedClass}${activeClass}" data-map-id="${escapeHtml(token.id)}" style="--x:${token.x};--y:${token.y};--w:${token.w || 1};--h:${token.h || 1};--z:${Number(token.zIndex || 2)};--color:${escapeHtml(token.color || "#8fd19e")};--token-image:${tokenImage};">
       <div class="text-center">
-        <div class="token-label">${escapeHtml(tokenInitials(token.name))}</div>
+        <div class="token-label">${escapeHtml(tokenNameIsHidden(token) ? (isGm ? `? ${tokenInitials(tokenActualName(token))}` : "?") : tokenInitials(tokenActualName(token)))}</div>
       </div>
-      ${hover}
+    </div>
+  `;
+}
+
+function hideTokenHover() {
+  const layer = el("tokenHoverLayer");
+  if (layer) layer.innerHTML = "";
+}
+
+function showTokenHover(tokenId) {
+  const token = tokenById(tokenId);
+  const layer = el("tokenHoverLayer");
+  if (!token || !layer) return;
+  const character = token.kind === "character" ? tokenCharacter(token) : null;
+  const hoverName = character || token.kind === "token" || (token.kind === "enemy" && isGm)
+    ? displayTokenName(token)
+    : "";
+  if (!hoverName) return;
+  const hoverHp = character
+    ? tokenHpText(token)
+    : token.kind === "enemy" && isGm
+      ? `${tokenCurrentHp(token) || "?"}/${tokenTotalHp(token) || "?"} HP`
+      : "";
+  const centerX = (Number(token.x || 0) + (Number(token.w || 1) / 2)) * Number(localGridSize || 48);
+  const top = Number(token.y || 0) * Number(localGridSize || 48) - 7;
+  layer.innerHTML = `
+    <div class="token-hover-card" style="left:${centerX}px;top:${top}px;transform:translate(-50%, -100%);">
+      <div class="token-hover-name">${escapeHtml(hoverName)}</div>
+      ${hoverHp ? `<div class="token-hover-hp">${escapeHtml(hoverHp)}</div>` : ""}
     </div>
   `;
 }
@@ -1736,9 +2088,10 @@ function renderSelectedPanel() {
     : "";
   const sizeLinked = item.sizeLinked !== false;
   const sizeLinkIcon = sizeLinked ? "bi-link-45deg" : "bi-unlink";
+  const concealedName = item.kind && tokenNameIsHidden(item) && !isGm;
   el("selectedPanel").innerHTML = `
     <label>Name</label>
-    <input data-selected-field="name" class="form-control form-control-sm" value="${escapeHtml(item.name || "")}">
+    <input data-selected-field="name" class="form-control form-control-sm" value="${escapeHtml(concealedName ? "?" : item.name || "")}" ${concealedName ? "readonly" : ""}>
     ${compactSheet}
     ${effectsSection}
     <div class="accordion selected-collapse mt-2" id="selectedDetailsAccordion">
@@ -1841,38 +2194,29 @@ function renderSelectedPanel() {
 
 function renderInitiative() {
   const list = el("initiativeList");
+  el("roundCounter").textContent = `Round ${state.roundsPassed || 0}`;
   if (!state.initiative.length) {
     list.innerHTML = `<div class="small text-secondary">No initiative entries.</div>`;
     return;
   }
   list.innerHTML = state.initiative.map((entry, index) => {
-    const active = index === state.activeTurn ? " active" : "";
+    const active = index === state.activeTurn && !entry.disabled ? " active" : "";
+    const disabled = entry.disabled ? " disabled" : "";
+    const name = initiativeNameFromEntry(entry);
     return `
-      <div class="initiative-row${active}">
+      <div class="initiative-row${active}${disabled}">
         <div class="initiative-row-grid">
-          <input class="form-control form-control-sm" data-init-name="${escapeHtml(entry.id)}" value="${escapeHtml(entry.name || "")}" aria-label="Initiative name">
+          <div class="initiative-name" title="${escapeHtml(name)}">${escapeHtml(name)}</div>
           <input class="form-control form-control-sm" data-init-score="${escapeHtml(entry.id)}" type="number" value="${entry.score || 0}" aria-label="Initiative score">
           <span class="initiative-controls">
             <button class="btn btn-outline-light btn-sm btn-icon" type="button" data-init-up="${escapeHtml(entry.id)}" title="Move up" aria-label="Move up"><i class="bi bi-arrow-up"></i></button>
             <button class="btn btn-outline-light btn-sm btn-icon" type="button" data-init-down="${escapeHtml(entry.id)}" title="Move down" aria-label="Move down"><i class="bi bi-arrow-down"></i></button>
-            <button class="btn btn-outline-danger btn-sm btn-icon" type="button" data-init-remove="${escapeHtml(entry.id)}" title="Remove" aria-label="Remove"><i class="bi bi-trash"></i></button>
+            <button class="btn ${entry.disabled ? "btn-outline-success" : "btn-outline-warning"} btn-sm btn-icon" type="button" data-init-disable="${escapeHtml(entry.id)}" title="${entry.disabled ? "Enable" : "Disable"}" aria-label="${entry.disabled ? "Enable" : "Disable"}"><i class="bi ${entry.disabled ? "bi-play-fill" : "bi-pause-fill"}"></i></button>
           </span>
         </div>
       </div>
     `;
   }).join("");
-  list.querySelectorAll("[data-init-name]").forEach(input => {
-    input.addEventListener("input", () => {
-      const row = state.initiative.find(entry => entry.id === input.dataset.initName);
-      if (row) row.name = input.value;
-      queueSave();
-    });
-    input.addEventListener("change", () => {
-      const row = state.initiative.find(entry => entry.id === input.dataset.initName);
-      if (row) row.name = input.value.trim() || "Unnamed";
-      renderAll();
-    });
-  });
   list.querySelectorAll("[data-init-score]").forEach(input => {
     input.addEventListener("input", () => {
       const row = state.initiative.find(entry => entry.id === input.dataset.initScore);
@@ -1892,9 +2236,29 @@ function renderInitiative() {
   list.querySelectorAll("[data-init-down]").forEach(button => {
     button.addEventListener("click", () => moveInitiativeRow(button.dataset.initDown, 1));
   });
-  list.querySelectorAll("[data-init-remove]").forEach(button => {
-    button.addEventListener("click", () => removeInitiativeRow(button.dataset.initRemove));
+  list.querySelectorAll("[data-init-disable]").forEach(button => {
+    button.addEventListener("click", () => toggleInitiativeRow(button.dataset.initDisable));
   });
+}
+
+function maskHiddenTokenNames(value) {
+  let text = String(value ?? "");
+  state.tokens
+    .filter(tokenNameIsHidden)
+    .sort((a, b) => tokenActualName(b).length - tokenActualName(a).length)
+    .forEach(token => {
+    const actual = tokenActualName(token);
+    if (!actual || actual === "?") return;
+    const replacement = isGm ? `[?] ${actual}` : "?";
+    if (isGm) {
+      text = text.split(`[?] ${actual}`).join(`\u0000${actual}\u0000`);
+      text = text.split(actual).join(replacement);
+      text = text.split(`\u0000${actual}\u0000`).join(replacement);
+    } else {
+      text = text.split(actual).join(replacement);
+    }
+    });
+  return text;
 }
 
 function renderTimeline() {
@@ -1910,6 +2274,7 @@ function renderAll(save = true) {
   renderInitiative();
   renderTimeline();
   renderAuraEffectToasts();
+  renderTurnEffectNotices();
   if (save) queueSave();
 }
 
@@ -1925,7 +2290,6 @@ function applyRemoteMapState(remoteState) {
   applySettingsToInputs();
   renderAll(false);
   refreshMapTokenSheets({ save: false });
-  if (selectedId) showSelectedPanel();
 }
 
 function flushPendingRemoteState() {
@@ -1940,7 +2304,6 @@ function flushPendingRemoteState() {
     if (selectedId && !selectedObject()) selectedId = "";
     applySettingsToInputs();
     renderAll(false);
-    if (selectedId) showSelectedPanel();
     return;
   }
 
@@ -1955,7 +2318,6 @@ function flushPendingRemoteState() {
   if (selectedId && !selectedObject()) selectedId = "";
   applySettingsToInputs();
   renderAll(false);
-  if (selectedId) showSelectedPanel();
 }
 
 function queueSave() {
@@ -2039,6 +2401,7 @@ function addToken(kind) {
 
 function openGenericTokenModal() {
   el("genericTokenName").value = "";
+  el("genericTokenHideName").checked = false;
   genericTokenModal.show();
   setTimeout(() => el("genericTokenName").focus(), 150);
 }
@@ -2051,6 +2414,7 @@ function submitGenericToken(event) {
     kind: "token",
     ownerId: currentUserId,
     name,
+    hideName: el("genericTokenHideName").checked,
     x: 1,
     y: 1,
     w: 1,
@@ -2060,6 +2424,7 @@ function submitGenericToken(event) {
     color: "#3d8bfd"
   };
   state.tokens.push(token);
+  ensureTokenInitiative(token);
   selectedId = token.id;
   genericTokenModal.hide();
   addTimeline(`${name} entered the map.`);
@@ -2155,6 +2520,7 @@ function addCharacterTokenFromLibrary(characterId) {
   };
   syncTokenFromSheet(token, character);
   state.tokens.push(token);
+  ensureTokenInitiative(token);
   selectedId = token.id;
   characterPickerModal.hide();
   addTimeline(`${token.name} entered the map.`);
@@ -2184,6 +2550,7 @@ async function openEnemyPicker() {
   mapEnemies = await PFApp.loadEnemies(mapContextKey);
   el("enemyPickerSearch").value = "";
   el("enemyTokenVisible").checked = true;
+  el("enemyTokenHideName").checked = false;
   renderEnemyPicker();
   enemyPickerModal.show();
   setTimeout(() => el("enemyPickerSearch").focus(), 150);
@@ -2206,10 +2573,12 @@ function addEnemyTokenFromLibrary(enemyId) {
     hp: enemyHpText(enemy),
     ac: enemyAcText(enemy),
     visible: el("enemyTokenVisible").checked,
+    hideName: el("enemyTokenHideName").checked,
     sheet: structuredClone(enemy.sheet || {}),
     color: "#b02a37"
   };
   state.tokens.push(token);
+  ensureTokenInitiative(token);
   selectedId = token.id;
   enemyPickerModal.hide();
   if (token.visible !== false) addTimeline(`${enemy.name} entered the map.`);
@@ -2236,6 +2605,7 @@ function removeMapItem(itemId) {
   const name = item.name || "Token";
   state.tokens = state.tokens.filter(token => token.id !== itemId);
   state.shapes = state.shapes.filter(shape => shape.id !== itemId);
+  state.initiative = state.initiative.filter(entry => entry.tokenId !== itemId);
   selectedId = "";
   contextMenuTokenId = "";
   state.activeTurn = clamp(state.activeTurn, 0, Math.max(0, state.initiative.length - 1));
@@ -2331,7 +2701,7 @@ async function openMapEffects(tokenId) {
     return;
   }
 
-  el("mapEffectsModalLabel").textContent = `${token.name || "Token"} Effects`;
+  el("mapEffectsModalLabel").textContent = `${displayTokenName(token)} Effects`;
   const options = {
     contextKey: mapContextKey,
     characterId: effectTargetId,
@@ -2532,7 +2902,7 @@ async function openQuickApplyEffect() {
   hideContextMenu();
   quickEffectMode = "apply";
   quickEffectSourceTokenId = token.id;
-  el("quickEffectModalLabel").textContent = `Apply Effect from ${token.name || "Token"}`;
+  el("quickEffectModalLabel").textContent = `Apply Effect from ${displayTokenName(token)}`;
   el("quickEffectSearch").value = "";
   el("quickEffectResults").innerHTML = `<div class="small text-secondary">Loading effects...</div>`;
   el("quickEffectMostUsedWrap").classList.add("d-none");
@@ -2547,7 +2917,7 @@ async function openAuraEffectPicker() {
   if (!token || !canManageAura(token)) return;
   quickEffectMode = "aura";
   quickEffectSourceTokenId = token.id;
-  el("quickEffectModalLabel").textContent = `Aura Effect for ${token.name || "Token"}`;
+  el("quickEffectModalLabel").textContent = `Aura Effect for ${displayTokenName(token)}`;
   el("quickEffectSearch").value = "";
   el("quickEffectResults").innerHTML = `<div class="small text-secondary">Loading effects...</div>`;
   el("quickEffectMostUsedWrap").classList.add("d-none");
@@ -2564,7 +2934,7 @@ function quickEffectTargets() {
     .filter(token => isGm ? true : token.kind === "character" || (token.kind === "enemy" && token.visible !== false))
     .map(token => ({
       token,
-      name: token.kind === "character" ? tokenCharacter(token)?.name || token.name || "Character" : token.name || "Enemy"
+      name: displayTokenName(token)
     }))
     .sort((a, b) => a.name.localeCompare(b.name));
 }
@@ -2669,9 +3039,16 @@ async function loadTokenActiveEffects(token) {
 async function saveTokenActiveEffects(token, effects) {
   const activeEffects = Array.isArray(effects) ? effects : [];
   if (token.kind === "character") {
-    const savedBuffs = await PFApp.saveBuffState(activeEffects, mapContextKey, token.characterId);
+    const savedBuffs = await PFApp.updateCharacterEffectState?.(token.characterId, activeEffects, mapContextKey)
+      || await PFApp.saveBuffState(activeEffects, mapContextKey, token.characterId);
     if (savedBuffs?.ok === false) return false;
     await recalculateCharacterSheetFromMap(token.characterId);
+    const character = tokenCharacter(token);
+    if (character) {
+      const saved = await PFApp.loadCharacterSheet("", mapContextKey, token.characterId);
+      if (saved?.sheet) character.sheet = saved.sheet;
+      syncTokenFromSheet(token, character);
+    }
     return true;
   }
   if (token.kind === "enemy") {
@@ -2726,7 +3103,13 @@ async function applyAuraEffectToToken(tokenId, auraId) {
     renderAuraEffectToasts();
     return;
   }
-  const applied = { ...structuredClone(effect), auraSourceId: sourceId, auraTokenId: auraId };
+  const applied = {
+    ...structuredClone(effect),
+    auraSourceId: sourceId,
+    auraTokenId: auraId,
+    sourceTokenId: auraId,
+    durationAnchorTokenId: auraId
+  };
   if (await applyQuickEffectToToken(token, applied)) {
     auraEffectDismissed.add(promptKey);
     await refetchMapSheetState();
@@ -2752,10 +3135,16 @@ async function confirmQuickEffectTargets() {
   el("confirmQuickEffectTargets").disabled = true;
   el("quickEffectApplyStatus").textContent = "Applying...";
   const appliedEffect = appliedEffectFromQuickSelection(quickEffectSelection.effect, quickEffectSelection.options);
+  const sourceTokenId = quickEffectSelection.sourceTokenId || quickEffectSourceTokenId || "";
   const appliedTargets = [];
   for (const token of targets) {
-    if (await applyQuickEffectToToken(token, structuredClone(appliedEffect))) {
-      appliedTargets.push(token.kind === "character" ? tokenCharacter(token)?.name || token.name || "Character" : token.name || "Enemy");
+    const targetEffect = {
+      ...structuredClone(appliedEffect),
+      sourceTokenId: sourceTokenId || token.id,
+      durationAnchorTokenId: sourceTokenId || token.id
+    };
+    if (await applyQuickEffectToToken(token, targetEffect)) {
+      appliedTargets.push(tokenActualName(token));
     }
   }
 
@@ -2802,6 +3191,143 @@ function toggleContextTokenVisibility() {
   renderAll();
 }
 
+function showExpiredEffectNotice(token, effect) {
+  const tokenName = tokenActualName(token);
+  const effectName = effect.name || "an effect";
+  state.effectNotices.push({
+    id: uid("effect_notice"),
+    tokenId: token.id,
+    tokenName,
+    effectName,
+    createdAt: Date.now()
+  });
+  state.effectNotices = state.effectNotices.slice(-10);
+  addTimeline(
+    `${tokenName} lost ${effectName}.`,
+    [
+      { text: tokenName, emphasis: true },
+      { text: " lost " },
+      { text: effectName, emphasis: true, className: "timeline-negative" },
+      { text: "." }
+    ]
+  );
+  renderTurnEffectNotices();
+  renderTimeline();
+  queueSave();
+}
+
+function renderTurnEffectNotices() {
+  const container = el("turnEffectNotices");
+  if (!container) return;
+  const now = Date.now();
+  state.effectNotices
+    .filter(notice => notice?.id && !seenTurnEffectNotices.has(notice.id) && now - Number(notice.createdAt || 0) < 10000)
+    .forEach(notice => {
+      seenTurnEffectNotices.add(notice.id);
+      const token = tokenById(notice.tokenId);
+      const name = token ? displayTokenName(token) : maskHiddenTokenNames(notice.tokenName || "Token");
+      const node = document.createElement("div");
+      node.className = "turn-effect-notice";
+      node.textContent = `${name} lost ${notice.effectName || "an effect"}.`;
+      container.appendChild(node);
+      setTimeout(() => node.remove(), 2000);
+    });
+}
+
+async function processEndedTurnEffectsLegacy(endingRow) {
+  const endingTokenId = endingRow?.tokenId;
+  if (!endingTokenId) return;
+  let changed = false;
+  const targets = state.tokens.filter(token => token.kind === "character" || token.kind === "enemy");
+  for (const token of targets) {
+    const active = await loadTokenActiveEffects(token);
+    if (!active.length) continue;
+    const next = [];
+    const expired = [];
+    for (const effect of active) {
+      const remaining = effect.remaining;
+      const anchorTokenId = effect.durationAnchorTokenId || effect.sourceTokenId || token.id;
+      if (effect.permanent || remaining === null || remaining === undefined || anchorTokenId !== endingTokenId) {
+        next.push(effect);
+        continue;
+      }
+      const nextRemaining = Number(remaining) - 1;
+      if (nextRemaining <= 0) {
+        expired.push(effect);
+      } else {
+        next.push({
+          ...effect,
+          remaining: nextRemaining,
+          turns: isConditionEffect(effect) ? nextRemaining : effect.turns,
+          durationLabel: formatDurationRounds(nextRemaining)
+        });
+      }
+    }
+    if (!expired.length && next.length === active.length && next.every((effect, index) => effect === active[index])) continue;
+    if (await saveTokenActiveEffects(token, next)) {
+      changed = true;
+      expired.forEach(effect => showExpiredEffectNotice(token, effect));
+    }
+  }
+  if (changed) await refetchMapSheetState();
+}
+
+function tokenForEffectChange(change) {
+  if (change?.target_token_id) return tokenById(change.target_token_id);
+  if (change?.target_type === "character") {
+    return state.tokens.find(token => token.kind === "character" && token.characterId === change.target_id);
+  }
+  if (change?.target_type === "enemy") {
+    return state.tokens.find(token => token.kind === "enemy" && token.enemyId === change.target_id);
+  }
+  return null;
+}
+
+async function refreshTurnEffectChanges(changes) {
+  const unique = new Map();
+  (Array.isArray(changes) ? changes : []).forEach(change => {
+    if (change?.target_type && change?.target_id) unique.set(`${change.target_type}:${change.target_id}`, change);
+  });
+  await Promise.all([...unique.values()].map(change => {
+    if (change.target_type === "character") return recalculateCharacterSheetFromMap(change.target_id);
+    if (change.target_type === "enemy") return recalculateEnemySheetFromMap(change.target_id);
+    return Promise.resolve();
+  }));
+  if (unique.size) {
+    await refetchMapSheetState();
+    renderAll(false);
+  }
+}
+
+async function processEndedTurnEffects(endingRow, turnEventId) {
+  if (!endingRow?.tokenId) return;
+  const result = await PFApp.advanceMapEffectTurn?.(endingRow.tokenId, turnEventId, mapContextKey);
+  if (!result?.ok) {
+    if (result?.unavailable || !PFApp.advanceMapEffectTurn) {
+      await processEndedTurnEffectsLegacy(endingRow);
+    } else {
+      console.error("Could not advance effect durations.", result?.error);
+    }
+    return;
+  }
+
+  result.changes.forEach(change => {
+    const token = tokenForEffectChange(change);
+    if (!token) return;
+    (Array.isArray(change.expired_effects) ? change.expired_effects : [])
+      .forEach(effect => showExpiredEffectNotice(token, effect));
+  });
+  await refreshTurnEffectChanges(result.changes);
+}
+
+function toggleContextTokenNameVisibility() {
+  const token = tokenById(contextMenuTokenId);
+  if (!token || !isGm || (token.kind !== "enemy" && token.kind !== "token")) return;
+  token.hideName = !token.hideName;
+  hideContextMenu();
+  renderAll();
+}
+
 function initiativeInsertIndex(score, ignoreId = "") {
   const value = Number(score || 0);
   let insertIndex = 0;
@@ -2809,6 +3335,19 @@ function initiativeInsertIndex(score, ignoreId = "") {
     if (entry.id !== ignoreId && Number(entry.score || 0) >= value) insertIndex = index + 1;
   });
   return insertIndex;
+}
+
+function ensureTokenInitiative(token) {
+  if (!initiativeTokenEligible(token) || state.initiative.some(entry => entry.tokenId === token.id)) return;
+  const entry = {
+    id: `init_${token.id}`,
+    tokenId: token.id,
+    name: tokenActualName(token),
+    score: tokenInitiativeScore(token),
+    disabled: false,
+    custom: false
+  };
+  placeInitiativeRow(entry);
 }
 
 function placeInitiativeRow(entry) {
@@ -2828,7 +3367,9 @@ function addInitiativeEntry(event) {
   const entry = {
     id: uid("init"),
     name,
-    score: Number(el("initiativeScore").value || 0)
+    score: Number(el("initiativeScore").value || 0),
+    disabled: false,
+    custom: true
   };
   placeInitiativeRow(entry);
   el("initiativeName").value = "";
@@ -2850,31 +3391,67 @@ function moveInitiativeRow(entryId, direction) {
   renderAll();
 }
 
-function removeInitiativeRow(entryId) {
-  const index = state.initiative.findIndex(entry => entry.id === entryId);
-  if (index < 0) return;
-  state.initiative.splice(index, 1);
-  if (state.activeTurn >= state.initiative.length) state.activeTurn = Math.max(0, state.initiative.length - 1);
+function toggleInitiativeRow(entryId) {
+  const entry = state.initiative.find(row => row.id === entryId);
+  if (!entry) return;
+  entry.disabled = !entry.disabled;
+  el("initiativeNotice").textContent = "";
   renderAll();
 }
 
-function nextTurn() {
-  if (!state.initiative.length) return;
-  state.activeTurn = (state.activeTurn + 1) % state.initiative.length;
-  const row = state.initiative[state.activeTurn];
-  if (row) addTimeline(`${row.name || "Entry"} begins their turn.`);
-  renderAll();
+async function nextTurn() {
+  if (turnAdvanceBusy || !state.initiative.length) return;
+  const enabled = state.initiative.map((entry, index) => ({ entry, index })).filter(item => !item.entry.disabled);
+  if (!enabled.length) {
+    el("initiativeNotice").textContent = "All initiative entries are disabled.";
+    renderAll(false);
+    return;
+  }
+  turnAdvanceBusy = true;
+  el("nextTurn").disabled = true;
+  el("initiativeNotice").textContent = "";
+  try {
+    const endingRow = state.initiative[state.activeTurn];
+    const nextSequence = Math.max(0, Number(state.turnSequence || 0)) + 1;
+    const turnEventId = `${nextSequence}:${endingRow?.id || "entry"}`;
+    let nextIndex = state.activeTurn;
+    for (let offset = 1; offset <= state.initiative.length; offset += 1) {
+      const candidate = (state.activeTurn + offset) % state.initiative.length;
+      if (!state.initiative[candidate].disabled) {
+        nextIndex = candidate;
+        break;
+      }
+    }
+    state.turnSequence = nextSequence;
+    if (nextIndex <= state.activeTurn) state.roundsPassed = Math.max(0, Number(state.roundsPassed || 0)) + 1;
+    state.activeTurn = nextIndex;
+    const row = state.initiative[state.activeTurn];
+    if (row) {
+      const token = row.tokenId ? tokenById(row.tokenId) : null;
+      addTimeline(`${token ? tokenActualName(token) : row.name || "Entry"} begins their turn.`);
+    }
+    renderAll();
+    if (endingRow && !endingRow.disabled) {
+      await processEndedTurnEffects(endingRow, turnEventId);
+    }
+  } catch (error) {
+    console.error(error);
+  } finally {
+    turnAdvanceBusy = false;
+    el("nextTurn").disabled = false;
+  }
 }
 
 function timelineRowContent(row) {
   if (Array.isArray(row.parts)) {
     return row.parts.map(part => {
-      if (!part?.emphasis) return escapeHtml(part?.text || "");
+      const text = maskHiddenTokenNames(part?.text || "");
+      if (!part?.emphasis) return escapeHtml(text);
       const className = part.className || "timeline-emphasis";
-      return `<span class="${escapeHtml(className)}">${escapeHtml(part.text)}</span>`;
+      return `<span class="${escapeHtml(className)}">${escapeHtml(text)}</span>`;
     }).join("");
   }
-  return escapeHtml(row.text);
+  return escapeHtml(maskHiddenTokenNames(row.text));
 }
 
 function addTimeline(text, parts = null) {
@@ -2902,8 +3479,7 @@ function mapRollToken() {
 }
 
 function rollTokenName(token) {
-  if (token.kind === "character") return tokenCharacter(token)?.name || token.name || "Character";
-  return token.name || "Enemy";
+  return displayTokenName(token);
 }
 
 function rollTokenSheet(token) {
@@ -3035,7 +3611,8 @@ function showRollResultModal(title, rows) {
       <div class="roll-die-value" data-roll-die>${d20()}</div>
       <div class="roll-breakdown">
         <div class="roll-breakdown-row"><span>Bonus</span><strong data-roll-bonus>...</strong></div>
-        <div class="roll-breakdown-row"><span>Total</span><strong data-roll-total>...</strong></div>
+        <hr class="roll-total-divider">
+        <div class="roll-breakdown-row roll-total-row"><span>Total</span><strong data-roll-total>...</strong></div>
       </div>
       <div class="roll-result-note" data-roll-note></div>
     </div>
@@ -3090,13 +3667,14 @@ function rollAttack(full = false) {
   const attackWeapons = full ? (twfRollWeapons(token).length ? twfRollWeapons(token) : [weapon]) : [weapon];
   const rows = attackWeapons.flatMap(attackWeapon => {
     const bonuses = full ? attackWeapon.attacks : attackWeapon.attacks.slice(0, 1);
-    return bonuses.map((bonus, index) => makeAttackRollData(
+    return bonuses.map(bonus => makeAttackRollData(
       token,
       attackWeapon,
       bonus,
-      full ? `${attackWeapon.name} ${index + 1}` : "Attack"
+      "Attack"
     ));
   });
+  if (full) rows.forEach((row, index) => { row.label = `Attack ${index + 1}`; });
   rows.forEach(recordAttackRoll);
   rollModal?.hide();
   showRollResultModal(`${rollTokenName(token)}: ${full ? "Full Attack" : "Attack"}`, rows);
@@ -3352,6 +3930,48 @@ function openBackgroundOptions() {
   backgroundModal.show();
 }
 
+function renderMapDocumentation(selectedId = MAP_CONTEXT_DOCUMENTATION[0]?.id) {
+  const selected = MAP_CONTEXT_DOCUMENTATION.find(entry => entry.id === selectedId) || MAP_CONTEXT_DOCUMENTATION[0];
+  if (!selected) return;
+  let currentGroup = "";
+  el("mapDocsList").innerHTML = MAP_CONTEXT_DOCUMENTATION.map(entry => {
+    const group = entry.group || "General";
+    const groupHeading = group !== currentGroup
+      ? `<div class="map-docs-group">${escapeHtml(group)}</div>`
+      : "";
+    currentGroup = group;
+    return `${groupHeading}
+      <button class="map-docs-list-button${entry.id === selected.id ? " active" : ""}" type="button" data-map-doc="${escapeHtml(entry.id)}">
+        <i class="bi ${escapeHtml(entry.icon)}"></i>
+        <span>${escapeHtml(entry.title)}</span>
+      </button>`;
+  }).join("");
+  el("mapDocsContent").innerHTML = `
+    <h3><i class="bi ${escapeHtml(selected.icon)} me-2 text-success"></i>${escapeHtml(selected.title)}</h3>
+    <p>${escapeHtml(selected.summary)}</p>
+    <h4>How To Use It</h4>
+    <ul class="ps-3 mb-0">
+      ${selected.usage.map(item => `<li class="mb-2">${escapeHtml(item)}</li>`).join("")}
+    </ul>
+    <h4>Access</h4>
+    <p class="mb-0">${escapeHtml(selected.access)}</p>
+  `;
+  el("mapDocsList").querySelectorAll("[data-map-doc]").forEach(button => {
+    button.addEventListener("click", () => {
+      renderMapDocumentation(button.dataset.mapDoc);
+      el("mapDocsLayout").classList.add("detail-open");
+      el("mapDocsDetail").scrollTop = 0;
+    });
+  });
+}
+
+function openMapDocumentation() {
+  renderMapDocumentation();
+  el("mapDocsLayout").classList.remove("detail-open");
+  backgroundModal.hide();
+  window.setTimeout(() => mapDocumentationModal.show(), 160);
+}
+
 function saveBackgroundOptions(event) {
   event.preventDefault();
   localGridSize = clamp(Number(el("gridSize").value || 48), 24, 96);
@@ -3452,6 +4072,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   el("openBackgroundOptions").addEventListener("click", openBackgroundOptions);
   backgroundModal = new bootstrap.Modal(el("backgroundOptionsModal"));
+  mapDocumentationModal = new bootstrap.Modal(el("mapDocumentationModal"));
+  el("openMapDocumentation").addEventListener("click", openMapDocumentation);
+  el("mapDocsBack").addEventListener("click", () => {
+    el("mapDocsLayout").classList.remove("detail-open");
+  });
+  el("mapDocumentationModal").addEventListener("hidden.bs.modal", () => {
+    el("mapDocsLayout").classList.remove("detail-open");
+  });
   el("backgroundOptionsForm").addEventListener("submit", saveBackgroundOptions);
   enemyPickerModal = new bootstrap.Modal(el("enemyPickerModal"));
   characterPickerModal = new bootstrap.Modal(el("characterPickerModal"));
@@ -3489,6 +4117,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
   el("toggleEnemyVisibility").addEventListener("click", toggleContextEnemyVisibility);
   el("toggleTokenVisibility").addEventListener("click", toggleContextTokenVisibility);
+  el("toggleTokenNameVisibility").addEventListener("click", toggleContextTokenNameVisibility);
   el("toggleZIndexMenu").addEventListener("click", event => {
     event.preventDefault();
     event.stopPropagation();
@@ -3506,6 +4135,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   el("auraOptionsForm").addEventListener("submit", saveAuraOptions);
   el("initiativeForm").addEventListener("submit", addInitiativeEntry);
   el("nextTurn").addEventListener("click", nextTurn);
+  el("resetRounds").addEventListener("click", () => {
+    state.roundsPassed = 0;
+    renderAll();
+  });
   el("timelineForm").addEventListener("submit", event => {
     event.preventDefault();
     const text = el("timelineText").value.trim();
