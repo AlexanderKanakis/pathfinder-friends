@@ -1,0 +1,277 @@
+{
+  "name": "Master Chymist",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/apg/master-chymist/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 0,
+      "classFeatures": [
+        {
+          "name": "Bomb-Thrower",
+          "description": "The destructive power of bombs appeals to the violent urges of a master chymist. Add the characterÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s alchemist and master chymist levels together to determine the damage done by her bombs."
+        },
+        {
+          "name": "Mutagenic Form",
+          "description": "A master chymistÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s mutagenic form is an alter ego that has a different personality than her normal form, an outgrowth of the mental changes caused by the mutagenic potions she has consumed over the course of her career. The mutagenic form shares memories and basic goals with the chymistÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s normal personality but goes about meeting those goals in a different manner. The mutagenic form is often ugly and monstrous and may even appear to be a different race or gender than her normal form; they may look as different as two unrelated people. Indeed, the mutagenic form often has his or her own name, and may attempt to maintain independent relationships and strongholds (though the alter egoÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s limited time in existence often makes this difficult). The mutagenic form even has his or her own alignment (which is selected by the player, but must be different from the master chymistÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s normal alignment ). The change in alignment only affects the master chymist while in her mutagenic form. Example : Darabont is a neutral good gnome alchemist 7/master chymist 4. Her mutagenic form is a deformed, twisted creature called Butcher. Butcher is neutral , and more interested in seeing the world kept in balance than promoting the greatest good. Butcher is aware she exists only when called on by Darabont, but seeks to build her own circle of like-minded friends during the hours she exists. Butcher does not dislike Darabont, but feels her gnome form is too soft and innocent to survive in the harsh world the chymist lives in. As Darabont, the character detects as good and is affected as a good characte"
+        },
+        {
+          "name": "Mutate 2/Day",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Extracts per Day": "-"
+      }
+    },
+    {
+      "level": 2,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Advanced Mutagen",
+          "description": "At 2nd level, the mutagenic form of the master chymist continues to evolve and develop as she grows in power. The master chymist selects an advanced mutagen, a power that changes how her mutagen form works or can only be accessed in her mutagenic form. She gains additional advanced mutagens at 4th, 6th, 8th, and 10th level. The chymist cannot select the same advanced mutagen more than once. Burly (Ex) : In her mutagenic form, the master chymistÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s heavy physical frame gives her an alchemical bonus on Strength checks, Constitution checks, and Strength -based skill checks as well as a bonus to CMB and CMD . The bonus is equal to half the master chymistÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s class level. Disguise (Ex) : When in her mutagenic form, the chymist can temporarily change her appearance to her normal form and still retain most of the abilities of her mutagenic form. As a standard action , she may make a Will saving throw (DC 20) to assume the appearance of her normal form for one minute. Each additional minute beyond the first requires a new saving throw with a +1 increase to the DC. Failure means the chymist assumes her normal form (as if ending the use of mutagenic form) or reverts fully to her mutagenic form. At any time while using this ability, the chymist can resume her normal form as a standard action or relax her will and revert to her mutagenic form as a free action . Once this ability ends, the chymist cannot use it again until 10 minutes have passed. Obvious physical changes in mutagenic form such as draconic mutagen, feral mutagen, and growth mutagen do not work while the chymist is disguised"
+        }
+      ],
+      "spellcasting": {
+        "Extracts per Day": "+1 level of alchemist"
+      }
+    },
+    {
+      "level": 3,
+      "bab": 3,
+      "fort": 2,
+      "ref": 2,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Brutality (+2)",
+          "description": "At 3rd level, a master chymistÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s taste for violence leads her to strike more powerful blows with weapons easily mastered by her bestial mind. At 3rd level, a chymist in her mutagenic form deals +2 damage when attacking with simple weapons and natural attacks . This bonus increases to +4 at 7th level and to +6 at 9th level. Section 15: Copyright Notice Advanced Player's Guide . Copyright 2010, Paizo Publishing, LLC; Author: Jason Bulmahn."
+        }
+      ],
+      "spellcasting": {
+        "Extracts per Day": "+1 level of alchemist"
+      }
+    },
+    {
+      "level": 4,
+      "bab": 4,
+      "fort": 2,
+      "ref": 2,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Advanced Mutagen",
+          "description": "At 2nd level, the mutagenic form of the master chymist continues to evolve and develop as she grows in power. The master chymist selects an advanced mutagen, a power that changes how her mutagen form works or can only be accessed in her mutagenic form. She gains additional advanced mutagens at 4th, 6th, 8th, and 10th level. The chymist cannot select the same advanced mutagen more than once. Burly (Ex) : In her mutagenic form, the master chymistÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s heavy physical frame gives her an alchemical bonus on Strength checks, Constitution checks, and Strength -based skill checks as well as a bonus to CMB and CMD . The bonus is equal to half the master chymistÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s class level. Disguise (Ex) : When in her mutagenic form, the chymist can temporarily change her appearance to her normal form and still retain most of the abilities of her mutagenic form. As a standard action , she may make a Will saving throw (DC 20) to assume the appearance of her normal form for one minute. Each additional minute beyond the first requires a new saving throw with a +1 increase to the DC. Failure means the chymist assumes her normal form (as if ending the use of mutagenic form) or reverts fully to her mutagenic form. At any time while using this ability, the chymist can resume her normal form as a standard action or relax her will and revert to her mutagenic form as a free action . Once this ability ends, the chymist cannot use it again until 10 minutes have passed. Obvious physical changes in mutagenic form such as draconic mutagen, feral mutagen, and growth mutagen do not work while the chymist is disguised"
+        }
+      ],
+      "spellcasting": {
+        "Extracts per Day": "-"
+      }
+    },
+    {
+      "level": 5,
+      "bab": 5,
+      "fort": 3,
+      "ref": 3,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Mutate 3/Day",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Extracts per Day": "+1 level of alchemist"
+      }
+    },
+    {
+      "level": 6,
+      "bab": 6,
+      "fort": 3,
+      "ref": 3,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Advanced Mutagen",
+          "description": "At 2nd level, the mutagenic form of the master chymist continues to evolve and develop as she grows in power. The master chymist selects an advanced mutagen, a power that changes how her mutagen form works or can only be accessed in her mutagenic form. She gains additional advanced mutagens at 4th, 6th, 8th, and 10th level. The chymist cannot select the same advanced mutagen more than once. Burly (Ex) : In her mutagenic form, the master chymistÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s heavy physical frame gives her an alchemical bonus on Strength checks, Constitution checks, and Strength -based skill checks as well as a bonus to CMB and CMD . The bonus is equal to half the master chymistÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s class level. Disguise (Ex) : When in her mutagenic form, the chymist can temporarily change her appearance to her normal form and still retain most of the abilities of her mutagenic form. As a standard action , she may make a Will saving throw (DC 20) to assume the appearance of her normal form for one minute. Each additional minute beyond the first requires a new saving throw with a +1 increase to the DC. Failure means the chymist assumes her normal form (as if ending the use of mutagenic form) or reverts fully to her mutagenic form. At any time while using this ability, the chymist can resume her normal form as a standard action or relax her will and revert to her mutagenic form as a free action . Once this ability ends, the chymist cannot use it again until 10 minutes have passed. Obvious physical changes in mutagenic form such as draconic mutagen, feral mutagen, and growth mutagen do not work while the chymist is disguised"
+        }
+      ],
+      "spellcasting": {
+        "Extracts per Day": "+1 level of alchemist"
+      }
+    },
+    {
+      "level": 7,
+      "bab": 7,
+      "fort": 4,
+      "ref": 4,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Brutality (+4)",
+          "description": "At 3rd level, a master chymistÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s taste for violence leads her to strike more powerful blows with weapons easily mastered by her bestial mind. At 3rd level, a chymist in her mutagenic form deals +2 damage when attacking with simple weapons and natural attacks . This bonus increases to +4 at 7th level and to +6 at 9th level. Section 15: Copyright Notice Advanced Player's Guide . Copyright 2010, Paizo Publishing, LLC; Author: Jason Bulmahn."
+        }
+      ],
+      "spellcasting": {
+        "Extracts per Day": "+1 level of alchemist"
+      }
+    },
+    {
+      "level": 8,
+      "bab": 8,
+      "fort": 4,
+      "ref": 4,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Advanced Mutagen",
+          "description": "At 2nd level, the mutagenic form of the master chymist continues to evolve and develop as she grows in power. The master chymist selects an advanced mutagen, a power that changes how her mutagen form works or can only be accessed in her mutagenic form. She gains additional advanced mutagens at 4th, 6th, 8th, and 10th level. The chymist cannot select the same advanced mutagen more than once. Burly (Ex) : In her mutagenic form, the master chymistÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s heavy physical frame gives her an alchemical bonus on Strength checks, Constitution checks, and Strength -based skill checks as well as a bonus to CMB and CMD . The bonus is equal to half the master chymistÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s class level. Disguise (Ex) : When in her mutagenic form, the chymist can temporarily change her appearance to her normal form and still retain most of the abilities of her mutagenic form. As a standard action , she may make a Will saving throw (DC 20) to assume the appearance of her normal form for one minute. Each additional minute beyond the first requires a new saving throw with a +1 increase to the DC. Failure means the chymist assumes her normal form (as if ending the use of mutagenic form) or reverts fully to her mutagenic form. At any time while using this ability, the chymist can resume her normal form as a standard action or relax her will and revert to her mutagenic form as a free action . Once this ability ends, the chymist cannot use it again until 10 minutes have passed. Obvious physical changes in mutagenic form such as draconic mutagen, feral mutagen, and growth mutagen do not work while the chymist is disguised"
+        },
+        {
+          "name": "Mutate 4/Day",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Extracts per Day": "-"
+      }
+    },
+    {
+      "level": 9,
+      "bab": 9,
+      "fort": 5,
+      "ref": 5,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Brutality (+6)",
+          "description": "At 3rd level, a master chymistÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s taste for violence leads her to strike more powerful blows with weapons easily mastered by her bestial mind. At 3rd level, a chymist in her mutagenic form deals +2 damage when attacking with simple weapons and natural attacks . This bonus increases to +4 at 7th level and to +6 at 9th level. Section 15: Copyright Notice Advanced Player's Guide . Copyright 2010, Paizo Publishing, LLC; Author: Jason Bulmahn."
+        }
+      ],
+      "spellcasting": {
+        "Extracts per Day": "+1 level of alchemist"
+      }
+    },
+    {
+      "level": 10,
+      "bab": 10,
+      "fort": 5,
+      "ref": 5,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Advanced Mutagen",
+          "description": "At 2nd level, the mutagenic form of the master chymist continues to evolve and develop as she grows in power. The master chymist selects an advanced mutagen, a power that changes how her mutagen form works or can only be accessed in her mutagenic form. She gains additional advanced mutagens at 4th, 6th, 8th, and 10th level. The chymist cannot select the same advanced mutagen more than once. Burly (Ex) : In her mutagenic form, the master chymistÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s heavy physical frame gives her an alchemical bonus on Strength checks, Constitution checks, and Strength -based skill checks as well as a bonus to CMB and CMD . The bonus is equal to half the master chymistÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s class level. Disguise (Ex) : When in her mutagenic form, the chymist can temporarily change her appearance to her normal form and still retain most of the abilities of her mutagenic form. As a standard action , she may make a Will saving throw (DC 20) to assume the appearance of her normal form for one minute. Each additional minute beyond the first requires a new saving throw with a +1 increase to the DC. Failure means the chymist assumes her normal form (as if ending the use of mutagenic form) or reverts fully to her mutagenic form. At any time while using this ability, the chymist can resume her normal form as a standard action or relax her will and revert to her mutagenic form as a free action . Once this ability ends, the chymist cannot use it again until 10 minutes have passed. Obvious physical changes in mutagenic form such as draconic mutagen, feral mutagen, and growth mutagen do not work while the chymist is disguised"
+        },
+        {
+          "name": "Mutate 5/Day",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Extracts per Day": "+1 level of alchemist"
+      }
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": {
+    "summary": "See level progression spell columns."
+  },
+  "spellcastingClass": true
+}

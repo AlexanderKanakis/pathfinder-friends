@@ -1,0 +1,525 @@
+{
+  "name": "Barbarian (Unchained)",
+  "type": "unchained",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/unchained-classes/barbarian-unchained/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 1,
+      "fort": 2,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [
+        {
+          "name": "Fast Movement",
+          "description": "A barbarian's base speed is faster than the norm for her race by 10 feet. This benefit applies only when she is wearing no armor , light armor , or medium armor , and not carrying a heavy load. Apply this bonus before modifying the barbarian's speed because of any load carried or armor worn. This bonus stacks with any other bonuses to the barbarian's base speed."
+        },
+        {
+          "name": "Rage",
+          "description": "A barbarian can call upon inner reserves of strength and ferocity, granting her additional combat prowess. At 1st level, a barbarian can rage for a number of rounds per day equal to 4 + her Constitution modifier. For each level after 1st she possesses, the barbarian can rage for 2 additional rounds per day. Temporary increases to Constitution , such as that gained from bear's endurance , do not increase the total number of rounds that a barbarian can rage per day. A barbarian can enter a rage as a free action . The total number of rounds of rage per day is renewed after resting for 8 hours, although these hours need not be consecutive. While in a rage, a barbarian gains a +2 bonus on melee attack rolls , melee damage rolls, thrown weapon damage rolls, and Will saving throws. In addition, she takes a -2 penalty to Armor Class . She also gains 2 temporary hit points per Hit Die . These temporary hit points are lost first when a character takes damage, disappear when the rage ends, and are not replenished if the barbarian enters a rage again within 1 minute of her previous rage . While in a rage , a barbarian cannot use any Charisma -, Dexterity -, or Intelligence -based skill (except Acrobatics , Fly , Intimidate , and Ride ) or any ability that requires patience or concentration (such as spellcasting). A barbarian can end her rage as a free action , and is fatigued for 1 minute after a rage ends. A barbarian can't enter a new rage while fatigued or exhausted , but can otherwise enter a rage multiple times per day. If a barbarian falls unconscious , her rage immed"
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 2,
+      "bab": 2,
+      "fort": 3,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [
+        {
+          "name": "Rage Power",
+          "description": "",
+          "pools": [
+            {
+              "name": "Rage Power",
+              "description": "",
+              "requirements": {},
+              "options": [
+                {
+                  "name": "Rage Powers",
+                  "description": "As a barbarian gains levels, she learns to use her rage in new ways. At 2nd level and every 2 levels thereafter, the barbarian gains a rage power . A barbarian gains the benefits of rage powers only while raging . Some of these powers are always active during a rage, and others require the barbarian to take an action to use them. Unless otherwise noted, a barbarian cannot select an individual power more than once. Unmodified Rage Powers The following rage powers can be used unaltered: Beast totem , beast totem (greater) , beast totem (lesser) , boasting taunt , body bludgeon , brawler , brawler (greater) , chaos totem , chaos totem (greater) , chaos totem (lesser) , disruptive , dragon totem , dragon totem resilience , ferocious mount , ferocious mount (greater) , ferocious trample , ferocious trample (greater) , fiend totem , fiend totem (greater) , fiend totem (lesser) , ghost rager , good for what ails you , guarded life , guarded life (greater) , hive totem , hive totem resilience , hive totem toxicity , hurling , hurling (greater) , hurling (lesser) , hurling charge , liquid courage , overbearing advance , overbearing onslaught , primal scent , roaring drunk , spirit steed , spirit totem , spirit totem (greater) , spirit totem (lesser) , staggering drunk , sunder enchantment , world serpent spirit , world serpent totem , world serpent totem unity . Some of the following rage powers are stances. Activating a stance rage power is a move action . A barbarian can&#8217;t have more than one stance rage power active at a time. If she activates a stance rage power while another one is active, the current stance immediately ends. The stance can be intentionally ended at the beginning of the barbarian&#8217;s turn as a free action ; otherwise, it lasts until the rage ends. ",
+                  "requirements": {
+                    "minClassLevel": 2,
+                    "text": "As a barbarian gains levels, she learns to use her rage in new ways. At 2nd level and every 2 levels thereafter, the barbarian gains a rage power ."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/unchained-classes/barbarian-unchained/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        },
+        {
+          "name": "Uncanny Dodge",
+          "description": "At 2nd level, a barbarian gains the ability to react to danger before her senses would normally allow her to do so. She cannot be caught flat-footed , nor does she lose her Dexterity bonus to AC if immobilized. A barbarian with this ability can still lose her Dexterity bonus to AC if an opponent successfully uses the feint action against her. If a barbarian already has uncanny dodge from a different class, she automatically gains improved uncanny dodge (see below) instead."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 3,
+      "bab": 3,
+      "fort": 3,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Danger Sense +1",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 4,
+      "bab": 4,
+      "fort": 4,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Rage Power",
+          "description": "",
+          "pools": [
+            {
+              "name": "Rage Power",
+              "description": "",
+              "requirements": {},
+              "options": [
+                {
+                  "name": "Rage Powers",
+                  "description": "As a barbarian gains levels, she learns to use her rage in new ways. At 2nd level and every 2 levels thereafter, the barbarian gains a rage power . A barbarian gains the benefits of rage powers only while raging . Some of these powers are always active during a rage, and others require the barbarian to take an action to use them. Unless otherwise noted, a barbarian cannot select an individual power more than once. Unmodified Rage Powers The following rage powers can be used unaltered: Beast totem , beast totem (greater) , beast totem (lesser) , boasting taunt , body bludgeon , brawler , brawler (greater) , chaos totem , chaos totem (greater) , chaos totem (lesser) , disruptive , dragon totem , dragon totem resilience , ferocious mount , ferocious mount (greater) , ferocious trample , ferocious trample (greater) , fiend totem , fiend totem (greater) , fiend totem (lesser) , ghost rager , good for what ails you , guarded life , guarded life (greater) , hive totem , hive totem resilience , hive totem toxicity , hurling , hurling (greater) , hurling (lesser) , hurling charge , liquid courage , overbearing advance , overbearing onslaught , primal scent , roaring drunk , spirit steed , spirit totem , spirit totem (greater) , spirit totem (lesser) , staggering drunk , sunder enchantment , world serpent spirit , world serpent totem , world serpent totem unity . Some of the following rage powers are stances. Activating a stance rage power is a move action . A barbarian can&#8217;t have more than one stance rage power active at a time. If she activates a stance rage power while another one is active, the current stance immediately ends. The stance can be intentionally ended at the beginning of the barbarian&#8217;s turn as a free action ; otherwise, it lasts until the rage ends. ",
+                  "requirements": {
+                    "minClassLevel": 2,
+                    "text": "As a barbarian gains levels, she learns to use her rage in new ways. At 2nd level and every 2 levels thereafter, the barbarian gains a rage power ."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/unchained-classes/barbarian-unchained/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 5,
+      "bab": 5,
+      "fort": 4,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Improved Uncanny Dodge",
+          "description": "At 5th level, a barbarian can no longer be flanked . This defense denies enemies the ability to sneak attack the barbarian by flanking her, unless the attacker has at least 4 more levels in a class that provides sneak attack than the barbarian has barbarian levels. If the barbarian also has uncanny dodge from another class, levels from the classes that grant uncanny dodge stack to determine the minimum level required to flank the barbarian."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 6,
+      "bab": 6,
+      "fort": 5,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Danger Sense +2",
+          "description": ""
+        },
+        {
+          "name": "Rage Power",
+          "description": "",
+          "pools": [
+            {
+              "name": "Rage Power",
+              "description": "",
+              "requirements": {},
+              "options": [
+                {
+                  "name": "Rage Powers",
+                  "description": "As a barbarian gains levels, she learns to use her rage in new ways. At 2nd level and every 2 levels thereafter, the barbarian gains a rage power . A barbarian gains the benefits of rage powers only while raging . Some of these powers are always active during a rage, and others require the barbarian to take an action to use them. Unless otherwise noted, a barbarian cannot select an individual power more than once. Unmodified Rage Powers The following rage powers can be used unaltered: Beast totem , beast totem (greater) , beast totem (lesser) , boasting taunt , body bludgeon , brawler , brawler (greater) , chaos totem , chaos totem (greater) , chaos totem (lesser) , disruptive , dragon totem , dragon totem resilience , ferocious mount , ferocious mount (greater) , ferocious trample , ferocious trample (greater) , fiend totem , fiend totem (greater) , fiend totem (lesser) , ghost rager , good for what ails you , guarded life , guarded life (greater) , hive totem , hive totem resilience , hive totem toxicity , hurling , hurling (greater) , hurling (lesser) , hurling charge , liquid courage , overbearing advance , overbearing onslaught , primal scent , roaring drunk , spirit steed , spirit totem , spirit totem (greater) , spirit totem (lesser) , staggering drunk , sunder enchantment , world serpent spirit , world serpent totem , world serpent totem unity . Some of the following rage powers are stances. Activating a stance rage power is a move action . A barbarian can&#8217;t have more than one stance rage power active at a time. If she activates a stance rage power while another one is active, the current stance immediately ends. The stance can be intentionally ended at the beginning of the barbarian&#8217;s turn as a free action ; otherwise, it lasts until the rage ends. ",
+                  "requirements": {
+                    "minClassLevel": 2,
+                    "text": "As a barbarian gains levels, she learns to use her rage in new ways. At 2nd level and every 2 levels thereafter, the barbarian gains a rage power ."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/unchained-classes/barbarian-unchained/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 7,
+      "bab": 7,
+      "fort": 5,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Damage Reduction 1/-",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 8,
+      "bab": 8,
+      "fort": 6,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Rage Power",
+          "description": "",
+          "pools": [
+            {
+              "name": "Rage Power",
+              "description": "",
+              "requirements": {},
+              "options": [
+                {
+                  "name": "Rage Powers",
+                  "description": "As a barbarian gains levels, she learns to use her rage in new ways. At 2nd level and every 2 levels thereafter, the barbarian gains a rage power . A barbarian gains the benefits of rage powers only while raging . Some of these powers are always active during a rage, and others require the barbarian to take an action to use them. Unless otherwise noted, a barbarian cannot select an individual power more than once. Unmodified Rage Powers The following rage powers can be used unaltered: Beast totem , beast totem (greater) , beast totem (lesser) , boasting taunt , body bludgeon , brawler , brawler (greater) , chaos totem , chaos totem (greater) , chaos totem (lesser) , disruptive , dragon totem , dragon totem resilience , ferocious mount , ferocious mount (greater) , ferocious trample , ferocious trample (greater) , fiend totem , fiend totem (greater) , fiend totem (lesser) , ghost rager , good for what ails you , guarded life , guarded life (greater) , hive totem , hive totem resilience , hive totem toxicity , hurling , hurling (greater) , hurling (lesser) , hurling charge , liquid courage , overbearing advance , overbearing onslaught , primal scent , roaring drunk , spirit steed , spirit totem , spirit totem (greater) , spirit totem (lesser) , staggering drunk , sunder enchantment , world serpent spirit , world serpent totem , world serpent totem unity . Some of the following rage powers are stances. Activating a stance rage power is a move action . A barbarian can&#8217;t have more than one stance rage power active at a time. If she activates a stance rage power while another one is active, the current stance immediately ends. The stance can be intentionally ended at the beginning of the barbarian&#8217;s turn as a free action ; otherwise, it lasts until the rage ends. ",
+                  "requirements": {
+                    "minClassLevel": 2,
+                    "text": "As a barbarian gains levels, she learns to use her rage in new ways. At 2nd level and every 2 levels thereafter, the barbarian gains a rage power ."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/unchained-classes/barbarian-unchained/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 9,
+      "bab": 9,
+      "fort": 6,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Danger Sense +3",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 10,
+      "bab": 10,
+      "fort": 7,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Damage Reduction 2/-",
+          "description": ""
+        },
+        {
+          "name": "Rage Power",
+          "description": "",
+          "pools": [
+            {
+              "name": "Rage Power",
+              "description": "",
+              "requirements": {},
+              "options": [
+                {
+                  "name": "Rage Powers",
+                  "description": "As a barbarian gains levels, she learns to use her rage in new ways. At 2nd level and every 2 levels thereafter, the barbarian gains a rage power . A barbarian gains the benefits of rage powers only while raging . Some of these powers are always active during a rage, and others require the barbarian to take an action to use them. Unless otherwise noted, a barbarian cannot select an individual power more than once. Unmodified Rage Powers The following rage powers can be used unaltered: Beast totem , beast totem (greater) , beast totem (lesser) , boasting taunt , body bludgeon , brawler , brawler (greater) , chaos totem , chaos totem (greater) , chaos totem (lesser) , disruptive , dragon totem , dragon totem resilience , ferocious mount , ferocious mount (greater) , ferocious trample , ferocious trample (greater) , fiend totem , fiend totem (greater) , fiend totem (lesser) , ghost rager , good for what ails you , guarded life , guarded life (greater) , hive totem , hive totem resilience , hive totem toxicity , hurling , hurling (greater) , hurling (lesser) , hurling charge , liquid courage , overbearing advance , overbearing onslaught , primal scent , roaring drunk , spirit steed , spirit totem , spirit totem (greater) , spirit totem (lesser) , staggering drunk , sunder enchantment , world serpent spirit , world serpent totem , world serpent totem unity . Some of the following rage powers are stances. Activating a stance rage power is a move action . A barbarian can&#8217;t have more than one stance rage power active at a time. If she activates a stance rage power while another one is active, the current stance immediately ends. The stance can be intentionally ended at the beginning of the barbarian&#8217;s turn as a free action ; otherwise, it lasts until the rage ends. ",
+                  "requirements": {
+                    "minClassLevel": 2,
+                    "text": "As a barbarian gains levels, she learns to use her rage in new ways. At 2nd level and every 2 levels thereafter, the barbarian gains a rage power ."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/unchained-classes/barbarian-unchained/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 11,
+      "bab": 11,
+      "fort": 7,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Greater Rage",
+          "description": "At 11th level, a barbarian's bonus on melee attack rolls , melee damage rolls, thrown weapon damage rolls, and Will saves while raging increases to +3. In addition, the amount of temporary hit points gained when entering a rage increases to 3 per Hit Die ."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 12,
+      "fort": 8,
+      "ref": 4,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Danger Sense +4",
+          "description": ""
+        },
+        {
+          "name": "Rage Power",
+          "description": "",
+          "pools": [
+            {
+              "name": "Rage Power",
+              "description": "",
+              "requirements": {},
+              "options": [
+                {
+                  "name": "Rage Powers",
+                  "description": "As a barbarian gains levels, she learns to use her rage in new ways. At 2nd level and every 2 levels thereafter, the barbarian gains a rage power . A barbarian gains the benefits of rage powers only while raging . Some of these powers are always active during a rage, and others require the barbarian to take an action to use them. Unless otherwise noted, a barbarian cannot select an individual power more than once. Unmodified Rage Powers The following rage powers can be used unaltered: Beast totem , beast totem (greater) , beast totem (lesser) , boasting taunt , body bludgeon , brawler , brawler (greater) , chaos totem , chaos totem (greater) , chaos totem (lesser) , disruptive , dragon totem , dragon totem resilience , ferocious mount , ferocious mount (greater) , ferocious trample , ferocious trample (greater) , fiend totem , fiend totem (greater) , fiend totem (lesser) , ghost rager , good for what ails you , guarded life , guarded life (greater) , hive totem , hive totem resilience , hive totem toxicity , hurling , hurling (greater) , hurling (lesser) , hurling charge , liquid courage , overbearing advance , overbearing onslaught , primal scent , roaring drunk , spirit steed , spirit totem , spirit totem (greater) , spirit totem (lesser) , staggering drunk , sunder enchantment , world serpent spirit , world serpent totem , world serpent totem unity . Some of the following rage powers are stances. Activating a stance rage power is a move action . A barbarian can&#8217;t have more than one stance rage power active at a time. If she activates a stance rage power while another one is active, the current stance immediately ends. The stance can be intentionally ended at the beginning of the barbarian&#8217;s turn as a free action ; otherwise, it lasts until the rage ends. ",
+                  "requirements": {
+                    "minClassLevel": 2,
+                    "text": "As a barbarian gains levels, she learns to use her rage in new ways. At 2nd level and every 2 levels thereafter, the barbarian gains a rage power ."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/unchained-classes/barbarian-unchained/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 13,
+      "fort": 8,
+      "ref": 4,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Damage Reduction 3/-",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 14,
+      "fort": 9,
+      "ref": 4,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Indomitable Will",
+          "description": "At 14th level, the barbarian gains a +4 bonus on Will saves to resist enchantment spells while raging . This bonus stacks with all other modifiers, including the morale bonus on Will saves she gains during her rage."
+        },
+        {
+          "name": "Rage Power",
+          "description": "",
+          "pools": [
+            {
+              "name": "Rage Power",
+              "description": "",
+              "requirements": {},
+              "options": [
+                {
+                  "name": "Rage Powers",
+                  "description": "As a barbarian gains levels, she learns to use her rage in new ways. At 2nd level and every 2 levels thereafter, the barbarian gains a rage power . A barbarian gains the benefits of rage powers only while raging . Some of these powers are always active during a rage, and others require the barbarian to take an action to use them. Unless otherwise noted, a barbarian cannot select an individual power more than once. Unmodified Rage Powers The following rage powers can be used unaltered: Beast totem , beast totem (greater) , beast totem (lesser) , boasting taunt , body bludgeon , brawler , brawler (greater) , chaos totem , chaos totem (greater) , chaos totem (lesser) , disruptive , dragon totem , dragon totem resilience , ferocious mount , ferocious mount (greater) , ferocious trample , ferocious trample (greater) , fiend totem , fiend totem (greater) , fiend totem (lesser) , ghost rager , good for what ails you , guarded life , guarded life (greater) , hive totem , hive totem resilience , hive totem toxicity , hurling , hurling (greater) , hurling (lesser) , hurling charge , liquid courage , overbearing advance , overbearing onslaught , primal scent , roaring drunk , spirit steed , spirit totem , spirit totem (greater) , spirit totem (lesser) , staggering drunk , sunder enchantment , world serpent spirit , world serpent totem , world serpent totem unity . Some of the following rage powers are stances. Activating a stance rage power is a move action . A barbarian can&#8217;t have more than one stance rage power active at a time. If she activates a stance rage power while another one is active, the current stance immediately ends. The stance can be intentionally ended at the beginning of the barbarian&#8217;s turn as a free action ; otherwise, it lasts until the rage ends. ",
+                  "requirements": {
+                    "minClassLevel": 2,
+                    "text": "As a barbarian gains levels, she learns to use her rage in new ways. At 2nd level and every 2 levels thereafter, the barbarian gains a rage power ."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/unchained-classes/barbarian-unchained/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 15,
+      "fort": 9,
+      "ref": 5,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Danger Sense +5",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 16,
+      "fort": 10,
+      "ref": 5,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Damage Reduction 4/-",
+          "description": ""
+        },
+        {
+          "name": "Rage Power",
+          "description": "",
+          "pools": [
+            {
+              "name": "Rage Power",
+              "description": "",
+              "requirements": {},
+              "options": [
+                {
+                  "name": "Rage Powers",
+                  "description": "As a barbarian gains levels, she learns to use her rage in new ways. At 2nd level and every 2 levels thereafter, the barbarian gains a rage power . A barbarian gains the benefits of rage powers only while raging . Some of these powers are always active during a rage, and others require the barbarian to take an action to use them. Unless otherwise noted, a barbarian cannot select an individual power more than once. Unmodified Rage Powers The following rage powers can be used unaltered: Beast totem , beast totem (greater) , beast totem (lesser) , boasting taunt , body bludgeon , brawler , brawler (greater) , chaos totem , chaos totem (greater) , chaos totem (lesser) , disruptive , dragon totem , dragon totem resilience , ferocious mount , ferocious mount (greater) , ferocious trample , ferocious trample (greater) , fiend totem , fiend totem (greater) , fiend totem (lesser) , ghost rager , good for what ails you , guarded life , guarded life (greater) , hive totem , hive totem resilience , hive totem toxicity , hurling , hurling (greater) , hurling (lesser) , hurling charge , liquid courage , overbearing advance , overbearing onslaught , primal scent , roaring drunk , spirit steed , spirit totem , spirit totem (greater) , spirit totem (lesser) , staggering drunk , sunder enchantment , world serpent spirit , world serpent totem , world serpent totem unity . Some of the following rage powers are stances. Activating a stance rage power is a move action . A barbarian can&#8217;t have more than one stance rage power active at a time. If she activates a stance rage power while another one is active, the current stance immediately ends. The stance can be intentionally ended at the beginning of the barbarian&#8217;s turn as a free action ; otherwise, it lasts until the rage ends. ",
+                  "requirements": {
+                    "minClassLevel": 2,
+                    "text": "As a barbarian gains levels, she learns to use her rage in new ways. At 2nd level and every 2 levels thereafter, the barbarian gains a rage power ."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/unchained-classes/barbarian-unchained/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 17,
+      "fort": 10,
+      "ref": 5,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Tireless Rage",
+          "description": "At 17th level, a barbarian is no longer fatigued at the end of her rage . If she enters a rage again within 1 minute of ending a rage, she doesn't gain any temporary hit points from her rage."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 18,
+      "fort": 11,
+      "ref": 6,
+      "will": 6,
+      "classFeatures": [
+        {
+          "name": "Danger Sense +6",
+          "description": ""
+        },
+        {
+          "name": "Rage Power",
+          "description": "",
+          "pools": [
+            {
+              "name": "Rage Power",
+              "description": "",
+              "requirements": {},
+              "options": [
+                {
+                  "name": "Rage Powers",
+                  "description": "As a barbarian gains levels, she learns to use her rage in new ways. At 2nd level and every 2 levels thereafter, the barbarian gains a rage power . A barbarian gains the benefits of rage powers only while raging . Some of these powers are always active during a rage, and others require the barbarian to take an action to use them. Unless otherwise noted, a barbarian cannot select an individual power more than once. Unmodified Rage Powers The following rage powers can be used unaltered: Beast totem , beast totem (greater) , beast totem (lesser) , boasting taunt , body bludgeon , brawler , brawler (greater) , chaos totem , chaos totem (greater) , chaos totem (lesser) , disruptive , dragon totem , dragon totem resilience , ferocious mount , ferocious mount (greater) , ferocious trample , ferocious trample (greater) , fiend totem , fiend totem (greater) , fiend totem (lesser) , ghost rager , good for what ails you , guarded life , guarded life (greater) , hive totem , hive totem resilience , hive totem toxicity , hurling , hurling (greater) , hurling (lesser) , hurling charge , liquid courage , overbearing advance , overbearing onslaught , primal scent , roaring drunk , spirit steed , spirit totem , spirit totem (greater) , spirit totem (lesser) , staggering drunk , sunder enchantment , world serpent spirit , world serpent totem , world serpent totem unity . Some of the following rage powers are stances. Activating a stance rage power is a move action . A barbarian can&#8217;t have more than one stance rage power active at a time. If she activates a stance rage power while another one is active, the current stance immediately ends. The stance can be intentionally ended at the beginning of the barbarian&#8217;s turn as a free action ; otherwise, it lasts until the rage ends. ",
+                  "requirements": {
+                    "minClassLevel": 2,
+                    "text": "As a barbarian gains levels, she learns to use her rage in new ways. At 2nd level and every 2 levels thereafter, the barbarian gains a rage power ."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/unchained-classes/barbarian-unchained/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 19,
+      "fort": 11,
+      "ref": 6,
+      "will": 6,
+      "classFeatures": [
+        {
+          "name": "Damage Reduction 5/-",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 20,
+      "fort": 12,
+      "ref": 6,
+      "will": 6,
+      "classFeatures": [
+        {
+          "name": "Mighty Rage",
+          "description": "At 20th level, a barbarian's bonus on melee attack rolls , melee damage rolls, thrown weapon damage rolls, and Will saves while raging increases to +4. In addition, the amount of temporary hit points gained when entering a rage increases to 4 per Hit Die ."
+        },
+        {
+          "name": "Rage Power",
+          "description": "",
+          "pools": [
+            {
+              "name": "Rage Power",
+              "description": "",
+              "requirements": {},
+              "options": [
+                {
+                  "name": "Rage Powers",
+                  "description": "As a barbarian gains levels, she learns to use her rage in new ways. At 2nd level and every 2 levels thereafter, the barbarian gains a rage power . A barbarian gains the benefits of rage powers only while raging . Some of these powers are always active during a rage, and others require the barbarian to take an action to use them. Unless otherwise noted, a barbarian cannot select an individual power more than once. Unmodified Rage Powers The following rage powers can be used unaltered: Beast totem , beast totem (greater) , beast totem (lesser) , boasting taunt , body bludgeon , brawler , brawler (greater) , chaos totem , chaos totem (greater) , chaos totem (lesser) , disruptive , dragon totem , dragon totem resilience , ferocious mount , ferocious mount (greater) , ferocious trample , ferocious trample (greater) , fiend totem , fiend totem (greater) , fiend totem (lesser) , ghost rager , good for what ails you , guarded life , guarded life (greater) , hive totem , hive totem resilience , hive totem toxicity , hurling , hurling (greater) , hurling (lesser) , hurling charge , liquid courage , overbearing advance , overbearing onslaught , primal scent , roaring drunk , spirit steed , spirit totem , spirit totem (greater) , spirit totem (lesser) , staggering drunk , sunder enchantment , world serpent spirit , world serpent totem , world serpent totem unity . Some of the following rage powers are stances. Activating a stance rage power is a move action . A barbarian can&#8217;t have more than one stance rage power active at a time. If she activates a stance rage power while another one is active, the current stance immediately ends. The stance can be intentionally ended at the beginning of the barbarian&#8217;s turn as a free action ; otherwise, it lasts until the rage ends. ",
+                  "requirements": {
+                    "minClassLevel": 2,
+                    "text": "As a barbarian gains levels, she learns to use her rage in new ways. At 2nd level and every 2 levels thereafter, the barbarian gains a rage power ."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/unchained-classes/barbarian-unchained/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        }
+      ],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": null,
+  "spellcastingClass": false
+}

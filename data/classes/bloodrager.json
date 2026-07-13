@@ -1,0 +1,668 @@
+{
+  "name": "Bloodrager",
+  "type": "hybrid",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/hybrid-classes/bloodrager/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 1,
+      "fort": 2,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [
+        {
+          "name": "Bloodline",
+          "description": "Each bloodrager has a source of magic somewhere in his heritage that empowers his bloodrages, bonus feats, and bonus spells. Sometimes this source reflects a distant blood relationship to a powerful being, or is due to an extreme event involving such a creature somewhere in his family's past. Regardless of the source, this influence manifests in a number of ways. A bloodrager must pick one bloodline upon taking his first level of bloodrager. Once made, this choice cannot be changed. When choosing a bloodline, the bloodrager's alignment doesn't restrict his choices. A good bloodrager could come from an abyssal bloodline , a celestial bloodline could beget an evil bloodrager generations later, a bloodrager from an infernal bloodline could be chaotic, and so on. Though his bloodline empowers him, it doesn't dictate or limit his thoughts and behavior. The bloodrager gains bloodline powers at 1st level, 4th level, and every 4 levels thereafter. The bloodline powers a bloodrager gains are described in his chosen bloodline. For all spell-like bloodline powers, treat the character's bloodrager level as the caster level . At 6th level and every 3 levels thereafter, a bloodrager receives one bonus feat chosen from a list specific to each bloodline. The bloodrager must meet the prerequisites for these bonus feats. At 7th, 10th, 13th, and 16th levels, a bloodrager learns an additional spell derived from his bloodline. These spells are in addition to the number of spells given on Table: Bloodrager . These spells cannot be exchanged for different spells at h"
+        },
+        {
+          "name": "Bloodline Power",
+          "description": ""
+        },
+        {
+          "name": "Bloodrage",
+          "description": "The bloodrager's source of internal power grants him the ability to bloodrage. At 1st level, a bloodrager can bloodrage for a number of rounds per day equal to 4 + his Constitution modifier. At each level after 1st, he can bloodrage for 2 additional rounds per day. Temporary increases to Constitution (such as those gained from bloodraging or spells like bear's endurance ) don't increase the total number of rounds that a bloodrager can bloodrage per day. The total number of rounds of bloodrage per day is renewed after resting for 8 hours, although these hours need not be consecutive. A bloodrager can enter a bloodrage as a free action . While in a bloodrage, a bloodrager gains a +4 morale bonus to his Strength and Constitution , as well as a +2 morale bonus on Will saves. In addition, he takes a -2 penalty to Armor Class . The increase to Constitution grants the bloodrager 2 hit points per Hit Die , but these disappear when the bloodrage ends and are not lost first like temporary hit points . While bloodraging, a bloodrager cannot use any Charisma -, Dexterity -, or Intelligence -based skills (except Acrobatics , Fly , Intimidate , and Ride ) or any ability that requires patience or concentration. A bloodrager can end his bloodrage as a free action . When the bloodrage ends, he's fatigued for a number of rounds equal to twice the number of rounds spent in the bloodrage. A bloodrager cannot enter a new bloodrage while fatigued or exhausted , but can otherwise enter bloodrage multiple times during a single encounter or combat. If a bloodrager falls unco"
+        },
+        {
+          "name": "Fast Movement",
+          "description": "A bloodrager's land speed is faster than is normal for his race by 10 feet. This benefit applies only when he is wearing no armor , light armor , or medium armor , and not carrying a heavy load. Apply this bonus before modifying the bloodrager's speed due to any armor worn or load carried. This bonus stacks with any other bonuses to the bloodrager's land speed."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "-"
+      }
+    },
+    {
+      "level": 2,
+      "bab": 2,
+      "fort": 3,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [
+        {
+          "name": "Uncanny Dodge",
+          "description": "At 2nd level, a bloodrager can react to danger before his senses would normally allow him to do so. He cannot be caught flat-footed , nor does he lose his Dexterity bonus to AC if the attacker is invisible . He still loses his Dexterity bonus to AC if immobilized. A bloodrager with this ability can still lose his Dexterity bonus to AC if an opponent successfully uses the feint action against him. If a bloodrager already possesses uncanny dodge from a different class, he automatically gains improved uncanny dodge (see below) instead."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "-"
+      }
+    },
+    {
+      "level": 3,
+      "bab": 3,
+      "fort": 3,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Blood Sanctuary",
+          "description": "At 3rd level, due to the power of his blood, a bloodrager can stand confidently amid the effects of spells cast by himself or his allies. He gains a +2 bonus on saving throws against spells that he or an ally casts."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "-"
+      }
+    },
+    {
+      "level": 4,
+      "bab": 4,
+      "fort": 4,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Blood Casting",
+          "description": "At 4th level, the bloodrager gains the ability to cast spells even while bloodraging. He can also cast these spells defensively and can make concentration checks for these spells while bloodraging. While bloodraging, he can cast and concentrate on only his bloodrager spells (see below); spells from other classes cannot be cast during this state."
+        },
+        {
+          "name": "Bloodline Power",
+          "description": ""
+        },
+        {
+          "name": "Eschew Materials",
+          "description": "At 4th level, the bloodrager gains Eschew Materials as a bonus feat."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "1"
+      }
+    },
+    {
+      "level": 5,
+      "bab": 5,
+      "fort": 4,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Improved Uncanny Dodge",
+          "description": "At 5th level, a bloodrager can no longer be flanked . This defense denies rogues (or other classes with the sneak attack ability) the ability to sneak attack the bloodrager by flanking him, unless the attacker has at least four more rogue levels (or levels in the class granting sneak attack ) than the target has bloodrager levels. If a character already has uncanny dodge from another class, the levels from the classes that grant uncanny dodge stack when determining the minimum rogue level required to flank the character."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "1"
+      }
+    },
+    {
+      "level": 6,
+      "bab": 6,
+      "fort": 5,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Bloodline Feat",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "1"
+      }
+    },
+    {
+      "level": 7,
+      "bab": 7,
+      "fort": 5,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Bloodline Spell",
+          "description": ""
+        },
+        {
+          "name": "Damage Reduction 1/-",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "1"
+      }
+    },
+    {
+      "level": 8,
+      "bab": 8,
+      "fort": 6,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Bloodline Power",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "1"
+      }
+    },
+    {
+      "level": 9,
+      "bab": 9,
+      "fort": 6,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Bloodline Feat",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "2"
+      }
+    },
+    {
+      "level": 10,
+      "bab": 10,
+      "fort": 7,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Bloodline Spell",
+          "description": ""
+        },
+        {
+          "name": "Damage Reduction 2/-",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "2"
+      }
+    },
+    {
+      "level": 11,
+      "bab": 11,
+      "fort": 7,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Greater Bloodrage",
+          "description": "At 11th level, when a bloodrager enters a bloodrage, the morale bonus to his Strength and Constitution increases to +6 and the morale bonus on his Will saves increases to +3. In addition, upon entering a bloodrage, the bloodrager can apply the effects a bloodrager spell he knows of 2nd level or lower to himself. The spell must have a range of touch or personal. If the spell's duration is greater than 1 round, it instead lasts for the duration of the bloodrage. This use consumes a bloodrager spell slot, as if he had cast the spell; he must have the spell slot available to take advantage of this effect. Greater bloodrage counts as the barbarian's greater rage ability for the purposes of feat prerequisites, feat abilities, magic item abilities, and spell effects."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "2"
+      }
+    },
+    {
+      "level": 12,
+      "bab": 12,
+      "fort": 8,
+      "ref": 4,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Bloodline Feat",
+          "description": ""
+        },
+        {
+          "name": "Bloodline Power",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "2"
+      }
+    },
+    {
+      "level": 13,
+      "bab": 13,
+      "fort": 8,
+      "ref": 4,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Bloodline Spell",
+          "description": ""
+        },
+        {
+          "name": "Damage Reduction 3/-",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "3"
+      }
+    },
+    {
+      "level": 14,
+      "bab": 14,
+      "fort": 9,
+      "ref": 4,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Indomitable Will",
+          "description": "At 14th level, a bloodrager gains a +4 bonus on Will saves to resist enchantment spells while bloodraging. This bonus stacks with all other modifiers, including the morale bonus on Will saves he also receives during his bloodrage."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "3"
+      }
+    },
+    {
+      "level": 15,
+      "bab": 15,
+      "fort": 9,
+      "ref": 5,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Bloodline Feat",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "3"
+      }
+    },
+    {
+      "level": 16,
+      "bab": 16,
+      "fort": 10,
+      "ref": 5,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Bloodline Spell",
+          "description": ""
+        },
+        {
+          "name": "Bloodline Power",
+          "description": ""
+        },
+        {
+          "name": "Damage Reduction 4/-",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "3"
+      }
+    },
+    {
+      "level": 17,
+      "bab": 17,
+      "fort": 10,
+      "ref": 5,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Tireless Bloodrage",
+          "description": "At 17th level, a bloodrager no longer becomes fatigued at the end of his bloodrage."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 18,
+      "bab": 18,
+      "fort": 11,
+      "ref": 6,
+      "will": 6,
+      "classFeatures": [
+        {
+          "name": "Bloodline Feat",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 19,
+      "bab": 19,
+      "fort": 11,
+      "ref": 6,
+      "will": 6,
+      "classFeatures": [
+        {
+          "name": "Damage Reduction 5/-",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 20,
+      "bab": 20,
+      "fort": 12,
+      "ref": 6,
+      "will": 6,
+      "classFeatures": [
+        {
+          "name": "Bloodline Power",
+          "description": ""
+        },
+        {
+          "name": "Mighty Bloodrage",
+          "description": "At 20th level, when a bloodrager enters a bloodrage, the morale bonus to his Strength and Constitution increases to +8, and the morale bonus on his Will saves increases to +4. Furthermore, the spell he can apply to himself at the beginning of a bloodrage due to the greater bloodrage class feature is not limited to only spells of 2nd level or lower."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    }
+  ],
+  "spellcasting": {
+    "summary": "spontaneous 1/2 caster using CHA",
+    "castingType": "spontaneous",
+    "progression": "1/2",
+    "ability": "cha",
+    "preparation": "spontaneous",
+    "maxSpellLevel": 4,
+    "slotsByLevel": [
+      [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        1,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        1,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        1,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        1,
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        1,
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        2,
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        2,
+        1,
+        1,
+        0
+      ],
+      [
+        0,
+        2,
+        1,
+        1,
+        0
+      ],
+      [
+        0,
+        2,
+        2,
+        1,
+        0
+      ],
+      [
+        0,
+        3,
+        2,
+        1,
+        1
+      ],
+      [
+        0,
+        3,
+        2,
+        1,
+        1
+      ],
+      [
+        0,
+        3,
+        2,
+        2,
+        1
+      ],
+      [
+        0,
+        3,
+        3,
+        2,
+        1
+      ],
+      [
+        0,
+        4,
+        3,
+        2,
+        1
+      ],
+      [
+        0,
+        4,
+        3,
+        2,
+        2
+      ],
+      [
+        0,
+        4,
+        3,
+        3,
+        2
+      ],
+      [
+        0,
+        4,
+        4,
+        3,
+        2
+      ]
+    ],
+    "knownByLevel": [
+      [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        2,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        3,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        4,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        4,
+        2,
+        0,
+        0
+      ],
+      [
+        0,
+        4,
+        3,
+        0,
+        0
+      ],
+      [
+        0,
+        5,
+        4,
+        0,
+        0
+      ],
+      [
+        0,
+        5,
+        4,
+        2,
+        0
+      ],
+      [
+        0,
+        5,
+        4,
+        3,
+        0
+      ],
+      [
+        0,
+        6,
+        5,
+        4,
+        0
+      ],
+      [
+        0,
+        6,
+        5,
+        4,
+        2
+      ],
+      [
+        0,
+        6,
+        5,
+        4,
+        3
+      ],
+      [
+        0,
+        6,
+        6,
+        5,
+        4
+      ],
+      [
+        0,
+        6,
+        6,
+        5,
+        4
+      ],
+      [
+        0,
+        6,
+        6,
+        5,
+        4
+      ],
+      [
+        0,
+        6,
+        6,
+        6,
+        5
+      ],
+      [
+        0,
+        6,
+        6,
+        6,
+        5
+      ],
+      [
+        0,
+        6,
+        6,
+        6,
+        5
+      ]
+    ]
+  },
+  "spellcastingClass": true
+}

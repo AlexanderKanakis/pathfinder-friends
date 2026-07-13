@@ -1,0 +1,291 @@
+{
+  "name": "Mammoth Rider",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/i-m/mammoth-rider/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 1,
+      "fort": 1,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [
+        {
+          "name": "Gigantic Steed (+2 Str , +2 Con )",
+          "description": "The size of a mammoth rider's steed (see below) increases to Huge. The creature takes a -1 penalty on attack rolls and to AC, and a -2 penalty to Dexterity (to a minimum of 1); its base damage increases by one size category; and its reach increases to 10 feet. It also gains a +2 size bonus to its Strength and Constitution . At 3rd level and every 2 levels thereafter, the Strength bonus increases by an additional 2; the bonus to Constitution increases by an additional 2 at 5th and again at 9th level."
+        },
+        {
+          "name": "Steed",
+          "description": "A mammoth rider can choose from among the following animal companions to serve as her loyal steed: amargasaurus B6 , arsinoitherium, aurochs , baluchitherium B3 , brontotherium, camel, cat (big), deinotherium, dire polar bear, elasmotherium, elk, horse, kentrosaurus, mastodon , megaloceros, moa, rhinoceros , styracosaurus B4 , triceratops , uintatherium B5 , wolf , woolly mammoth (use the statistics for a mastodon ), or woolly rhinoceros . A GM might expand this list to include other possible steeds. This steed functions as a druid's animal companion , replacing any animal companion or mount gained from another class. The mammoth rider's class levels stack with other classes that grant an animal companion to determine her effective druid level."
+        },
+        {
+          "name": "Wild Coercion",
+          "description": "A mammoth rider gains the wild empathy ability; this functions exactly like the druid ability of the same name. For the purposes of this ability, her class level stacks with all other classes that have the wild empathy ability. In addition, a mammoth rider can use her wild empathy to demoralize an animal or magical beast , or force it to be friendly to her, as if using Intimidate rather than Diplomacy . She adds her Strength modifier to these checks in addition to her Charisma modifier."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 2,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Born Survivor",
+          "description": "At 2nd level and again at 6th level, a mammoth rider gains a bonus feat from the following list: Great Fortitude , Improved Great Fortitude , Improved Iron Will , Improved Lightning Reflexes , Iron Will , Lightning Reflexes . She must meet the prerequisites for these feats."
+        },
+        {
+          "name": "Colossus Hunter",
+          "description": "At 2nd level, a mammoth rider gains a +1 bonus on weapon attacks and damage rolls against Large and Huge creatures, and a +2 bonus on weapon attacks and damage rolls against Gargantuan and Colossal creatures."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 3,
+      "bab": 3,
+      "fort": 2,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Gigantic Steed (+4 Str )",
+          "description": "The size of a mammoth rider's steed (see below) increases to Huge. The creature takes a -1 penalty on attack rolls and to AC, and a -2 penalty to Dexterity (to a minimum of 1); its base damage increases by one size category; and its reach increases to 10 feet. It also gains a +2 size bonus to its Strength and Constitution . At 3rd level and every 2 levels thereafter, the Strength bonus increases by an additional 2; the bonus to Constitution increases by an additional 2 at 5th and again at 9th level."
+        },
+        {
+          "name": "Rapid Straddle",
+          "description": "At 3rd level, a mammoth rider can attempt Ride checks to fast mount or fast dismount her steed even if it's more than one size category larger than her, provided she still has a move action available that round."
+        },
+        {
+          "name": "Rugged Steed +1",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 4,
+      "bab": 4,
+      "fort": 2,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Mistrust Of Magic",
+          "description": "At 4th level, as long as a mammoth rider doesn't have levels in a class that grants arcane spellcasting ability, she gains a +2 morale bonus on saving throws against arcane spells. If she has no levels in classes granting divine spellcasting ability, she gains a +2 morale bonus on saving throws against divine spells. If she has no levels in classes granting psychic spellcasting ability, she gains a +2 morale bonus on saving throws against psychic spells."
+        },
+        {
+          "name": "Undaunted",
+          "description": "At 4th level, a mammoth rider adds her Strength bonus to the DC of Intimidate checks attempted against her. Additionally, creatures attempting to intimidate a mammoth rider don't gain a bonus for being larger than her."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 5,
+      "bab": 5,
+      "fort": 3,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Gigantic Steed (+6 Str , +4 Con )",
+          "description": "The size of a mammoth rider's steed (see below) increases to Huge. The creature takes a -1 penalty on attack rolls and to AC, and a -2 penalty to Dexterity (to a minimum of 1); its base damage increases by one size category; and its reach increases to 10 feet. It also gains a +2 size bonus to its Strength and Constitution . At 3rd level and every 2 levels thereafter, the Strength bonus increases by an additional 2; the bonus to Constitution increases by an additional 2 at 5th and again at 9th level."
+        },
+        {
+          "name": "Rugged Steed +2",
+          "description": ""
+        },
+        {
+          "name": "Valiant Devotion",
+          "description": "At 5th level, a mammoth rider's steed gains a +4 morale bonus against charm , compulsion , and fear effects."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 6,
+      "bab": 6,
+      "fort": 3,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Born Survivor",
+          "description": "At 2nd level and again at 6th level, a mammoth rider gains a bonus feat from the following list: Great Fortitude , Improved Great Fortitude , Improved Iron Will , Improved Lightning Reflexes , Iron Will , Lightning Reflexes . She must meet the prerequisites for these feats."
+        },
+        {
+          "name": "Hunter'S Instinct",
+          "description": "At 6th level, a mammoth rider gains the quarry class feature; this functions exactly like the ranger ability of the same name. If she already has the quarry class feature from another class, she instead gains the improved quarry class feature. A mammoth rider can use these abilities on any creature, not just a favored enemy ."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 7,
+      "bab": 7,
+      "fort": 4,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Gigantic Steed (+8 Str )",
+          "description": "The size of a mammoth rider's steed (see below) increases to Huge. The creature takes a -1 penalty on attack rolls and to AC, and a -2 penalty to Dexterity (to a minimum of 1); its base damage increases by one size category; and its reach increases to 10 feet. It also gains a +2 size bonus to its Strength and Constitution . At 3rd level and every 2 levels thereafter, the Strength bonus increases by an additional 2; the bonus to Constitution increases by an additional 2 at 5th and again at 9th level."
+        },
+        {
+          "name": "Rugged Steed +3",
+          "description": ""
+        },
+        {
+          "name": "Steed'S Reach",
+          "description": "At 7th level, a mammoth rider's steed's reach improves to 15 feet."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 8,
+      "bab": 8,
+      "fort": 4,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Combined Might",
+          "description": "At 8th level, a mounted mammoth rider strikes with the combined power of herself and her steed. Once per round, when the mammoth rider hits with a melee attack from astride her steed during a charge, she adds half her steed's Strength bonus to the damage roll in addition to her own, provided her steed is currently capable of taking a free action ."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 9,
+      "bab": 9,
+      "fort": 5,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Gigantic Steed (+10 Str , +6 Con )",
+          "description": "The size of a mammoth rider's steed (see below) increases to Huge. The creature takes a -1 penalty on attack rolls and to AC, and a -2 penalty to Dexterity (to a minimum of 1); its base damage increases by one size category; and its reach increases to 10 feet. It also gains a +2 size bonus to its Strength and Constitution . At 3rd level and every 2 levels thereafter, the Strength bonus increases by an additional 2; the bonus to Constitution increases by an additional 2 at 5th and again at 9th level."
+        },
+        {
+          "name": "Pulverizing Assault",
+          "description": "At 9th level, if a mammoth rider is mounted on her steed and directs it to charge or make a constrict , powerful charge , or trample attack, then the first time that her steed deals damage with that attack this round, the target must succeed at a Fortitude save (DC = 10 + half the steed's Hit Dice + the steed's Strength modifier) or be staggered for 1d4 rounds."
+        },
+        {
+          "name": "Rugged Steed +4",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 10,
+      "bab": 10,
+      "fort": 5,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Mammoth Lord",
+          "description": "At 10th level, a mammoth rider becomes immune to the dazed , fatigued , shaken , sickened , staggered , and stunned conditions. If she succeeds at a Fortitude or Will save against an attack that has a reduced effect on a successful save, she instead avoids the effect entirely. If a mammoth rider and her steed both hit an opponent on the same turn, the foe must succeed at a Fortitude save (DC = 10 + half the steed's Hit Dice + the steed's Strength modifier) or be stunned for 1 round. Whether or not the target succeeds, it is immune to this ability for 24 hours thereafter. Section 15: Copyright Notice Pathfinder Roleplaying Game Adventurer's Guide Ãƒâ€šÃ‚Â© 2017, Paizo Inc.; Authors: Benjamin Bruck, John Compton, Crystal Frasier, Tim Hitchcock, Jenny Jarzabski, Isabelle Lee, Joe Pasini, Jessica Price, David Schwartz, and Josh Vogt."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": null,
+  "spellcastingClass": false
+}

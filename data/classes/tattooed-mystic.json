@@ -1,0 +1,261 @@
+{
+  "name": "Tattooed Mystic",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/s-z/tattooed-mystic/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Familiar Tattoo",
+          "description": "This ability is exactly like the tattooed sorcerer ability of the same name."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "-"
+      }
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Mystic Tattoo",
+          "description": "A tattooed mystic inscribes ancient symbols of power on his skin to enhance his spellcasting. At 2nd level and every two levels thereafter, the mystic inscribes a new tattoo on his body, chosen from the list below. Mystic tattoos do not occupy magic item or tattoo slots on his body. The mystic can select each tattoo more than once; the effects of multiple tattoos are noted in their descriptions. Binding Trine : This triangular design allows the mystic to transform a hostile spell affecting him into a magical tattoo, similar to a reservoir tattoo. When the mystic fails a saving throw against a spell of 3rd level or lower that targets only him, he gets a chance to identify it with a Spellcraft check (DC 15 + spell level). If he succeeds at this check, he can sacrifice a prepared spell or spell slot of equal or higher level as an immediate action to bind the spell, suppressing its effects and suspending its duration for a number of rounds equal to his level. Only spells with a duration longer than instantaneous can be bound this way, and only one spell can be held at a time. While bound, the spell can be dispelled or removed as normal. The maximum spell level this tattoo can bind increases by 2 each time it's selected, to a maximum of 9th level. Blistering Bands : These glowing, angular markings encircle the mystic's arms. Whenever the mystic casts an evocation spell that deals energy damage, he can spend a swift action to surround himself with an aura of that same energy until the beginning of his next turn. Creatures adjacent to the mystic when he activates the a"
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of spellcasting class"
+      }
+    },
+    {
+      "level": 3,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Magical Tattoo Artist",
+          "description": "At 3rd level, a tattooed mystic gains Inscribe Magical Tattoo as a bonus feat."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of spellcasting class"
+      }
+    },
+    {
+      "level": 4,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Mystic Tattoo",
+          "description": "A tattooed mystic inscribes ancient symbols of power on his skin to enhance his spellcasting. At 2nd level and every two levels thereafter, the mystic inscribes a new tattoo on his body, chosen from the list below. Mystic tattoos do not occupy magic item or tattoo slots on his body. The mystic can select each tattoo more than once; the effects of multiple tattoos are noted in their descriptions. Binding Trine : This triangular design allows the mystic to transform a hostile spell affecting him into a magical tattoo, similar to a reservoir tattoo. When the mystic fails a saving throw against a spell of 3rd level or lower that targets only him, he gets a chance to identify it with a Spellcraft check (DC 15 + spell level). If he succeeds at this check, he can sacrifice a prepared spell or spell slot of equal or higher level as an immediate action to bind the spell, suppressing its effects and suspending its duration for a number of rounds equal to his level. Only spells with a duration longer than instantaneous can be bound this way, and only one spell can be held at a time. While bound, the spell can be dispelled or removed as normal. The maximum spell level this tattoo can bind increases by 2 each time it's selected, to a maximum of 9th level. Blistering Bands : These glowing, angular markings encircle the mystic's arms. Whenever the mystic casts an evocation spell that deals energy damage, he can spend a swift action to surround himself with an aura of that same energy until the beginning of his next turn. Creatures adjacent to the mystic when he activates the a"
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of spellcasting class"
+      }
+    },
+    {
+      "level": 5,
+      "bab": 2,
+      "fort": 2,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Skillful Tattooist",
+          "description": "At 5th level, as long as a tattooed mystic is using his Craft (calligraphy, paintings, or tattoos) skill to craft magical tattoos on his own body, he can do so in half the time it would normally take."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "-"
+      }
+    },
+    {
+      "level": 6,
+      "bab": 3,
+      "fort": 2,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Mystic Tattoo",
+          "description": "A tattooed mystic inscribes ancient symbols of power on his skin to enhance his spellcasting. At 2nd level and every two levels thereafter, the mystic inscribes a new tattoo on his body, chosen from the list below. Mystic tattoos do not occupy magic item or tattoo slots on his body. The mystic can select each tattoo more than once; the effects of multiple tattoos are noted in their descriptions. Binding Trine : This triangular design allows the mystic to transform a hostile spell affecting him into a magical tattoo, similar to a reservoir tattoo. When the mystic fails a saving throw against a spell of 3rd level or lower that targets only him, he gets a chance to identify it with a Spellcraft check (DC 15 + spell level). If he succeeds at this check, he can sacrifice a prepared spell or spell slot of equal or higher level as an immediate action to bind the spell, suppressing its effects and suspending its duration for a number of rounds equal to his level. Only spells with a duration longer than instantaneous can be bound this way, and only one spell can be held at a time. While bound, the spell can be dispelled or removed as normal. The maximum spell level this tattoo can bind increases by 2 each time it's selected, to a maximum of 9th level. Blistering Bands : These glowing, angular markings encircle the mystic's arms. Whenever the mystic casts an evocation spell that deals energy damage, he can spend a swift action to surround himself with an aura of that same energy until the beginning of his next turn. Creatures adjacent to the mystic when he activates the a"
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of spellcasting class"
+      }
+    },
+    {
+      "level": 7,
+      "bab": 3,
+      "fort": 2,
+      "ref": 2,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Tattoo Mastery",
+          "description": "At 7th level, a tattooed mystic can use his own ability score modifier and relevant feats to set the DC for spell tattoos he crafts, and can use his own caster level if it is higher than that of the spell tattoo he is crafting (similar to a caster using a staff.)"
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of spellcasting class"
+      }
+    },
+    {
+      "level": 8,
+      "bab": 4,
+      "fort": 3,
+      "ref": 3,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Mystic Tattoo",
+          "description": "A tattooed mystic inscribes ancient symbols of power on his skin to enhance his spellcasting. At 2nd level and every two levels thereafter, the mystic inscribes a new tattoo on his body, chosen from the list below. Mystic tattoos do not occupy magic item or tattoo slots on his body. The mystic can select each tattoo more than once; the effects of multiple tattoos are noted in their descriptions. Binding Trine : This triangular design allows the mystic to transform a hostile spell affecting him into a magical tattoo, similar to a reservoir tattoo. When the mystic fails a saving throw against a spell of 3rd level or lower that targets only him, he gets a chance to identify it with a Spellcraft check (DC 15 + spell level). If he succeeds at this check, he can sacrifice a prepared spell or spell slot of equal or higher level as an immediate action to bind the spell, suppressing its effects and suspending its duration for a number of rounds equal to his level. Only spells with a duration longer than instantaneous can be bound this way, and only one spell can be held at a time. While bound, the spell can be dispelled or removed as normal. The maximum spell level this tattoo can bind increases by 2 each time it's selected, to a maximum of 9th level. Blistering Bands : These glowing, angular markings encircle the mystic's arms. Whenever the mystic casts an evocation spell that deals energy damage, he can spend a swift action to surround himself with an aura of that same energy until the beginning of his next turn. Creatures adjacent to the mystic when he activates the a"
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of spellcasting class"
+      }
+    },
+    {
+      "level": 9,
+      "bab": 4,
+      "fort": 3,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Potent Tattoos",
+          "description": "At 9th level, when a tattooed mystic uses his caster level to determine the DC of one the spell tattoos he has crafted, he does so at +1 caster level . Section 15: Copyright Notice Pathfinder Campaign Setting: Paths of Prestige Ãƒâ€šÃ‚Â© 2012, Paizo Publishing, LLC; Authors: Benjamin Bruck, Jason Bulmahn, Matt Goodall, and Jason Nelson."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "-"
+      }
+    },
+    {
+      "level": 10,
+      "bab": 5,
+      "fort": 3,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Mystic Tattoo",
+          "description": "A tattooed mystic inscribes ancient symbols of power on his skin to enhance his spellcasting. At 2nd level and every two levels thereafter, the mystic inscribes a new tattoo on his body, chosen from the list below. Mystic tattoos do not occupy magic item or tattoo slots on his body. The mystic can select each tattoo more than once; the effects of multiple tattoos are noted in their descriptions. Binding Trine : This triangular design allows the mystic to transform a hostile spell affecting him into a magical tattoo, similar to a reservoir tattoo. When the mystic fails a saving throw against a spell of 3rd level or lower that targets only him, he gets a chance to identify it with a Spellcraft check (DC 15 + spell level). If he succeeds at this check, he can sacrifice a prepared spell or spell slot of equal or higher level as an immediate action to bind the spell, suppressing its effects and suspending its duration for a number of rounds equal to his level. Only spells with a duration longer than instantaneous can be bound this way, and only one spell can be held at a time. While bound, the spell can be dispelled or removed as normal. The maximum spell level this tattoo can bind increases by 2 each time it's selected, to a maximum of 9th level. Blistering Bands : These glowing, angular markings encircle the mystic's arms. Whenever the mystic casts an evocation spell that deals energy damage, he can spend a swift action to surround himself with an aura of that same energy until the beginning of his next turn. Creatures adjacent to the mystic when he activates the a"
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of spellcasting class"
+      }
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": {
+    "summary": "See level progression spell columns."
+  },
+  "spellcastingClass": true
+}

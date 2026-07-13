@@ -1,0 +1,269 @@
+{
+  "name": "Demoniac",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/c-d/demoniac/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 1,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [
+        {
+          "name": "Damned",
+          "description": "When a demoniac is killed, his soul is instantly claimed by the Abyss . In time, the demoniacÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s soul is transformed into a demon appropriate to the greatest sins the demoniac gloried in while he lived. Any character attempting to resurrect a slain demoniac must succeed at a caster level check equal to 10 + the demoniacÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s level or the spell fails. That character cannot attempt to resurrect the demoniac again until the following day, though other characters can attempt to do so if they please."
+        },
+        {
+          "name": "Demonic Mark",
+          "description": "A demoniac bears the sign of his chosen demon lord as a tattoo-like brand somewhere on his body. Once per day, a demoniac can call upon the profane power of this mark to power a spell as he casts it. Doing so causes the spell to gain the chaotic and evil descriptors, and causes the spell not be expended as it is cast, allowing the demoniac to cast the spell again at a later point in the day."
+        },
+        {
+          "name": "Obedience",
+          "description": "In order to maintain the abilities gained from this prestige class (including all spellcasting abilities that have been augmented by this prestige class), a demoniac must indulge in a daily obedience to his chosen demon lord . This ceremony is incorporated into whatever method the demoniac uses to regain spellcasting abilities (such as praying to a demon lord , meditating, or studying a spellbook)."
+        }
+      ],
+      "spellcasting": {
+        "Spellcasting": "-"
+      }
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Energumen +2",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spellcasting": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 3,
+      "bab": 2,
+      "fort": 2,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Demonic Boon 1",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spellcasting": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 4,
+      "bab": 3,
+      "fort": 2,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Summon Demon 1",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spellcasting": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 5,
+      "bab": 3,
+      "fort": 3,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Energumen +4 (Resistances)",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spellcasting": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 6,
+      "bab": 4,
+      "fort": 3,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Demonic Boon 2",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spellcasting": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 7,
+      "bab": 5,
+      "fort": 4,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Energumen +6 (Immunities)",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spellcasting": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 8,
+      "bab": 6,
+      "fort": 4,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Summon Demon 2",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spellcasting": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 9,
+      "bab": 6,
+      "fort": 5,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Demonic Boon 3",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spellcasting": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 10,
+      "bab": 7,
+      "fort": 5,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Demonic Form",
+          "description": "When a demoniac reaches 10th level, he may undergo a temporary transformation into a unique demon. His type changes to outsider with the chaotic , demon, evil, and native subtypes. He gains damage reduction 10/good and cold iron, resistance to acid 10, cold 10, and fire 10, and telepathy to a range of 100 feet. When he gains this ability, he chooses one additional physical transformation from the following to gain when he transforms: wings (fly speed of 40 feet with good maneuverability), gills (ability to breathe water and a swim speed of 30 feet), or a single natural attack (a claw, bite, gore, slam, or tail sting-damage inflicted as appropriate for the demoniacÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s size). Once this additional physical transformation is chosen, it can never be changed. The newly created demonÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s natural weapons , as well as any weapon it wields, are treated as chaotic and evil for the purpose of resolving damage reduction . The demoniac can remain in this form for a number of minutes per day equal to his caster level ; this duration does not need to be consecutive, but it must be used in 1 minute increments. Returning to his normal form is a free action ."
+        }
+      ],
+      "spellcasting": {
+        "Spellcasting": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": {
+    "summary": "See level progression spell columns."
+  },
+  "spellcastingClass": true
+}

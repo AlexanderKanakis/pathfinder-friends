@@ -1,0 +1,271 @@
+{
+  "name": "Lion Blade",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/i-m/lion-blade/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 0,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Master Of Disguise",
+          "description": "The first skill a lion blade learns is to perfectly alter her appearance in order to blend in to any crowd and any environment. A lion blade no longer suffers penalties to Disguise checks made to change her gender, race, or age."
+        },
+        {
+          "name": "Move With Crowd",
+          "description": "Lion Blades are masters of moving in crowds. When moving through groups of humanoids that would normally count as difficult terrain, the lion blade instead moves normally."
+        },
+        {
+          "name": "Inspire Self +2",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Slowing Strike",
+          "description": "Once per round on a successful sneak attack, a lion blade may choose to deal 1 less die of sneak attack damage and instead reduce the targetÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s ground speed by 5 feet. Once an opponentÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s speed has been reduced to 0 feet, he is immobilized (but not helpless ). If the target uses wings to fly, the lion blade can choose to reduce the creatureÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s flying speed instead of its ground speed. The movement penalties imposed by slowing strike are removed once the creature fully heals or it receives a lesser restoration spell."
+        },
+        {
+          "name": "Sneak Attack +1d6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 3,
+      "bab": 2,
+      "fort": 1,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Hide In Plain Sight",
+          "description": "At 3rd level, a lion blade can use the Stealth skill even while being observed. As long as she is within 10 feet of an area of dim light, a lion blade can hide herself from view in the open without anything to actually hide behind. She cannot, however, hide in her own shadow."
+        },
+        {
+          "name": "Unexpected Suggestion",
+          "description": "At 3rd level, once per day a lion blade can use suggestion on a target she catches flatfooted. Her caster level is equal to her class level."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 4,
+      "bab": 3,
+      "fort": 1,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Expeditious Advance",
+          "description": "At 4th level, a lion bladeÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s land speed is faster than the norm for her race by +10 feet. This benefit applies only when she is wearing no armor or light armor and not carrying a heavy load. Apply this bonus before modifying the lion bladeÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s speed because of any load carried or armor worn."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 5,
+      "bab": 3,
+      "fort": 2,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Inspire Self +4",
+          "description": ""
+        },
+        {
+          "name": "Glean Information",
+          "description": "At 5th level, a lion bladeÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s study of body language gives her an advantage when observing or manipulating others. A lion blade gains a +2 bonus to Bluff , Diplomacy , Intimidate , and Sense Motive checks. Once per day per character level, a lion blade can add a +2 circumstance bonus to any Knowledge skill check (including bardic knowledge) relating to humanoids in her presence."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 6,
+      "bab": 4,
+      "fort": 2,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Sneak Attack +2d6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 7,
+      "bab": 5,
+      "fort": 2,
+      "ref": 4,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Cloud The Mind",
+          "description": "At 7th level, a lion blade becomes incredibly difficult to find. Whenever a lion blade is using Stealth , observers suffer a -5 on their Perception checks. The lion blade gains SR equal to 10 + her class level against divination spells."
+        },
+        {
+          "name": "Secret Step",
+          "description": "A lion blade can slip through crowds with supernatural ease. Once per day per two class levels, a lion blade can take a move action to move up to double her speed through a crowd without provoking attacks of opportunity for this movement. For example, if a lion blade has a movement speed of 40, she can use secret step to move 80 feet as a move action . She can only use this ability to move through humanoid crowds that would otherwise count as Difficulty Class (DC). This is fast, agile movement, not teleportation, so she must physically traverse the intervening space (for example, she cannot use this ability to bypass a trapped floor or wall of fire , even if surrounded by crowds)."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 8,
+      "bab": 6,
+      "fort": 3,
+      "ref": 4,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Narrow Miss",
+          "description": "At 8th level, a lion blade can dodge swiftly and erratically as a swift action , gaining 20% concealment until her next turn. She may use this ability once per day per two class levels."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 9,
+      "bab": 6,
+      "fort": 3,
+      "ref": 5,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Grandmaster Of Disguise",
+          "description": "At 9th level, a lion blade is able to improvise materials for a disguise that are as effective as an actual disguise kit. She gains a +2 circumstance bonus to disguise checks (this overlaps with the bonus from an actual disguise kit). Once per day per class level she can make a Disguise check at a -20 penalty to create a disguise as a full-round action ."
+        },
+        {
+          "name": "Inspire Self +6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 10,
+      "bab": 7,
+      "fort": 3,
+      "ref": 5,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Silent Soul",
+          "description": "At 10th level, a lion blade has mastered the ability to still her thoughts, her movement, and her sounds to such a point that she becomes harder to dominate, harder to see, and harder to hear. All Stealth checks made by the lion blade gain a +10 circumstance bonus (this is in addition to the -5 penalty imposed by cloud the mind ) and the lion blade gains SR 20 against mind-affecting effects. Section 15: Copyright Notice Pathfinder Companion: Taldor, Echoes of Glory . Copyright 2009, Paizo Publishing, LLC; Author: Joshua J. Frost."
+        },
+        {
+          "name": "Sneak Attack +3d6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": null,
+  "spellcastingClass": false
+}

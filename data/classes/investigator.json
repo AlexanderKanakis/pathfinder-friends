@@ -1,0 +1,762 @@
+{
+  "name": "Investigator",
+  "type": "hybrid",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/hybrid-classes/investigator/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 0,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Alchemy",
+          "description": "Investigators are highly trained in the creation of mundane alchemical substances and magical potion-like extracts. When using Craft (alchemy) to create an alchemical item, an investigator gains a competence bonus equal to his class level on the skill check. In addition, an investigator can use Craft (alchemy) to identify potions as if using detect magic . He must hold the potion for 1 round to attempt such a check. Like an alchemist , an investigator prepares his spells by mixing ingredients and a tiny fraction of his own magical power into a number of extracts, and then effectively casts the spell by drinking the extract. These extracts have powerful effects, but they are also bound to their creator. Extracts behave like spells in potion form, and as such their effects can be dispelled by dispel magic and similar effects, using the investigator's level as the caster level . An investigator can create only a certain number of extracts of each level per day. His base daily allotment of extracts per day is given on Table: Investigator . In addition, he receives bonus extracts per day if he has a high Intelligence score, in the same way a wizard receives bonus spells per day. When an investigator mixes an extract, he infuses the chemicals and reagents in the extract with magic siphoned from his own magical aura. An extract immediately become inert if it leaves the investigator's possession, reactivating as soon as it returns to his keeping-an investigator cannot normally pass out his extracts for allies to use. An extract, once created, remains potent for 1 day be"
+        },
+        {
+          "name": "Inspiration",
+          "description": "An investigator is beyond knowledgeable and skilled-he also possesses keen powers of observation and deduction that far surpass the abilities of others. An investigator typically uses these powers to aid in their investigations, but can also use these flashes of inspiration in other situations. An investigator has the ability to augment skill checks and ability checks through his brilliant inspiration. The investigator has an inspiration pool equal to 1/2 his investigator level + his Intelligence modifier (minimum 1). An investigator's inspiration pool refreshes each day, typically after he gets a restful night's sleep. As a free action , he can expend one use of inspiration from his pool to add 1d6 to the result of that check, including any on which he takes 10 or 20. This choice is made after the check is rolled and before the results are revealed. An investigator can only use inspiration once per check or roll. The investigator can use inspiration on any Knowledge , Linguistics , or Spellcraft skill checks without expending a use of inspiration, provided he's trained in the skill. Inspiration can also be used on attack rolls and saving throws, at the cost of expending two uses of inspiration each time from the investigator's pool. In the case of saving throws, using inspiration is an immediate action rather than a free action ."
+        },
+        {
+          "name": "Trapfinding",
+          "description": "An investigator adds 1/2 his level to Perception skill checks made to locate traps and to Disable Device checks (minimum 1). An investigator can use Disable Device to disarm magical traps."
+        }
+      ],
+      "spellcasting": {
+        "Extracts per Day": "1"
+      }
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 0,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Poison Lore",
+          "description": "An investigator has a deep understanding and appreciation for poisons. At 2nd level, he cannot accidentally poison himself when applying poison to a weapon. If the investigator spends 1 minute physically examining the poison , he can attempt a Knowledge (nature) check to identify any natural poison or Knowledge (arcana) check to identify any magical poison (DC = the poison's saving throw DC). Lastly, once a poison is identified, he can spend 1 minute and attempt a Craft (alchemy) check (DC = the poison's saving throw DC) to neutralize 1 dose of the poison . Success renders the dose harmless. The investigator has no chance of accidentally poisoning himself when examining or attempting to neutralize a poison ."
+        },
+        {
+          "name": "Poison Resistance +2",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Extracts per Day": "2"
+      }
+    },
+    {
+      "level": 3,
+      "bab": 2,
+      "fort": 1,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Investigator Talent",
+          "description": "",
+          "pools": [
+            {
+              "name": "Investigator Talent",
+              "description": "",
+              "requirements": {},
+              "options": [
+                {
+                  "name": "Investigator Talent (Ex) Or",
+                  "description": "At 3rd level and every 2 levels thereafter, an investigator gains an investigator talent. Except where otherwise noted, each investigator talent can only be selected once. Investigator talents marked with an asterisk (*) add effects to an investigator&#8217;s studied combat or studied strike. Only one of these talents can be applied to an individual attack, but the decision can be made when the damage is dealt.. A complete listing of investigator talents can be found here: Investigator Talents",
+                  "requirements": {
+                    "minClassLevel": 2,
+                    "text": "At 3rd level and every 2 levels thereafter, an investigator gains an investigator talent. Except where otherwise noted, each investigator talent can only be selected once."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/hybrid-classes/investigator/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        },
+        {
+          "name": "Keen Recollection",
+          "description": "At 3rd level, an investigator can attempt all Knowledge skill checks untrained."
+        },
+        {
+          "name": "Trap Sense +1",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Extracts per Day": "3"
+      }
+    },
+    {
+      "level": 4,
+      "bab": 3,
+      "fort": 1,
+      "ref": 4,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Studied Combat",
+          "description": "With a keen eye and calculating mind, an investigator can assess the mettle of his opponent to take advantage of gaps in talent and training. At 4th level, an investigator can use a move action to study a single enemy that he can see. Upon doing so, he adds 1/2 his investigator level as an insight bonus on melee attack rolls and as a bonus on damage rolls against the creature. This effect lasts for a number of rounds equal to his Intelligence modifier (minimum 1) or until he deals damage with a studied strike, whichever comes first. The bonus on damage rolls is precision damage, and is not multiplied on a critical hit . An investigator can only have one target of studied combat at a time, and once a creature has become the target of an investigator's studied combat, he cannot become the target of the same investigator's studied combat again for 24 hours unless the investigator expends one use of inspiration when taking the move action to use this ability."
+        },
+        {
+          "name": "Studied Strike +1d6",
+          "description": ""
+        },
+        {
+          "name": "Swift Alchemy",
+          "description": "At 4th level, an investigator can create alchemical items with astounding speed. It takes an investigator half the normal amount of time to create alchemical items. He can also apply poison to a weapon as a move action instead of a standard action ."
+        }
+      ],
+      "spellcasting": {
+        "Extracts per Day": "3"
+      }
+    },
+    {
+      "level": 5,
+      "bab": 3,
+      "fort": 1,
+      "ref": 4,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Investigator Talent",
+          "description": "",
+          "pools": [
+            {
+              "name": "Investigator Talent",
+              "description": "",
+              "requirements": {},
+              "options": [
+                {
+                  "name": "Investigator Talent (Ex) Or",
+                  "description": "At 3rd level and every 2 levels thereafter, an investigator gains an investigator talent. Except where otherwise noted, each investigator talent can only be selected once. Investigator talents marked with an asterisk (*) add effects to an investigator&#8217;s studied combat or studied strike. Only one of these talents can be applied to an individual attack, but the decision can be made when the damage is dealt.. A complete listing of investigator talents can be found here: Investigator Talents",
+                  "requirements": {
+                    "minClassLevel": 2,
+                    "text": "At 3rd level and every 2 levels thereafter, an investigator gains an investigator talent. Except where otherwise noted, each investigator talent can only be selected once."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/hybrid-classes/investigator/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        },
+        {
+          "name": "Poison Resistance +4",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Extracts per Day": "4"
+      }
+    },
+    {
+      "level": 6,
+      "bab": 4,
+      "fort": 2,
+      "ref": 5,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Studied Strike +2d6",
+          "description": ""
+        },
+        {
+          "name": "Trap Sense +2",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Extracts per Day": "4"
+      }
+    },
+    {
+      "level": 7,
+      "bab": 5,
+      "fort": 2,
+      "ref": 5,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Investigator Talent",
+          "description": "",
+          "pools": [
+            {
+              "name": "Investigator Talent",
+              "description": "",
+              "requirements": {},
+              "options": [
+                {
+                  "name": "Investigator Talent (Ex) Or",
+                  "description": "At 3rd level and every 2 levels thereafter, an investigator gains an investigator talent. Except where otherwise noted, each investigator talent can only be selected once. Investigator talents marked with an asterisk (*) add effects to an investigator&#8217;s studied combat or studied strike. Only one of these talents can be applied to an individual attack, but the decision can be made when the damage is dealt.. A complete listing of investigator talents can be found here: Investigator Talents",
+                  "requirements": {
+                    "minClassLevel": 2,
+                    "text": "At 3rd level and every 2 levels thereafter, an investigator gains an investigator talent. Except where otherwise noted, each investigator talent can only be selected once."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/hybrid-classes/investigator/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        }
+      ],
+      "spellcasting": {
+        "Extracts per Day": "4"
+      }
+    },
+    {
+      "level": 8,
+      "bab": 6,
+      "fort": 2,
+      "ref": 6,
+      "will": 6,
+      "classFeatures": [
+        {
+          "name": "Poison Resistance +6",
+          "description": ""
+        },
+        {
+          "name": "Studied Strike +3d6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Extracts per Day": "4"
+      }
+    },
+    {
+      "level": 9,
+      "bab": 6,
+      "fort": 3,
+      "ref": 6,
+      "will": 6,
+      "classFeatures": [
+        {
+          "name": "Investigator Talent",
+          "description": "",
+          "pools": [
+            {
+              "name": "Investigator Talent",
+              "description": "",
+              "requirements": {},
+              "options": [
+                {
+                  "name": "Investigator Talent (Ex) Or",
+                  "description": "At 3rd level and every 2 levels thereafter, an investigator gains an investigator talent. Except where otherwise noted, each investigator talent can only be selected once. Investigator talents marked with an asterisk (*) add effects to an investigator&#8217;s studied combat or studied strike. Only one of these talents can be applied to an individual attack, but the decision can be made when the damage is dealt.. A complete listing of investigator talents can be found here: Investigator Talents",
+                  "requirements": {
+                    "minClassLevel": 2,
+                    "text": "At 3rd level and every 2 levels thereafter, an investigator gains an investigator talent. Except where otherwise noted, each investigator talent can only be selected once."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/hybrid-classes/investigator/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        },
+        {
+          "name": "Trap Sense +3",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Extracts per Day": "5"
+      }
+    },
+    {
+      "level": 10,
+      "bab": 7,
+      "fort": 3,
+      "ref": 7,
+      "will": 7,
+      "classFeatures": [
+        {
+          "name": "Studied Strike +4d6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Extracts per Day": "5"
+      }
+    },
+    {
+      "level": 11,
+      "bab": 8,
+      "fort": 3,
+      "ref": 7,
+      "will": 7,
+      "classFeatures": [
+        {
+          "name": "Investigator Talent",
+          "description": "",
+          "pools": [
+            {
+              "name": "Investigator Talent",
+              "description": "",
+              "requirements": {},
+              "options": [
+                {
+                  "name": "Investigator Talent (Ex) Or",
+                  "description": "At 3rd level and every 2 levels thereafter, an investigator gains an investigator talent. Except where otherwise noted, each investigator talent can only be selected once. Investigator talents marked with an asterisk (*) add effects to an investigator&#8217;s studied combat or studied strike. Only one of these talents can be applied to an individual attack, but the decision can be made when the damage is dealt.. A complete listing of investigator talents can be found here: Investigator Talents",
+                  "requirements": {
+                    "minClassLevel": 2,
+                    "text": "At 3rd level and every 2 levels thereafter, an investigator gains an investigator talent. Except where otherwise noted, each investigator talent can only be selected once."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/hybrid-classes/investigator/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        },
+        {
+          "name": "Poison Immunity",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Extracts per Day": "5"
+      }
+    },
+    {
+      "level": 12,
+      "bab": 9,
+      "fort": 4,
+      "ref": 8,
+      "will": 8,
+      "classFeatures": [
+        {
+          "name": "Studied Strike +5d6",
+          "description": ""
+        },
+        {
+          "name": "Trap Sense +4",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Extracts per Day": "5"
+      }
+    },
+    {
+      "level": 13,
+      "bab": 9,
+      "fort": 4,
+      "ref": 8,
+      "will": 8,
+      "classFeatures": [
+        {
+          "name": "Investigator Talent",
+          "description": "",
+          "pools": [
+            {
+              "name": "Investigator Talent",
+              "description": "",
+              "requirements": {},
+              "options": [
+                {
+                  "name": "Investigator Talent (Ex) Or",
+                  "description": "At 3rd level and every 2 levels thereafter, an investigator gains an investigator talent. Except where otherwise noted, each investigator talent can only be selected once. Investigator talents marked with an asterisk (*) add effects to an investigator&#8217;s studied combat or studied strike. Only one of these talents can be applied to an individual attack, but the decision can be made when the damage is dealt.. A complete listing of investigator talents can be found here: Investigator Talents",
+                  "requirements": {
+                    "minClassLevel": 2,
+                    "text": "At 3rd level and every 2 levels thereafter, an investigator gains an investigator talent. Except where otherwise noted, each investigator talent can only be selected once."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/hybrid-classes/investigator/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        }
+      ],
+      "spellcasting": {
+        "Extracts per Day": "5"
+      }
+    },
+    {
+      "level": 14,
+      "bab": 10,
+      "fort": 4,
+      "ref": 9,
+      "will": 9,
+      "classFeatures": [
+        {
+          "name": "Studied Strike +6d6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Extracts per Day": "5"
+      }
+    },
+    {
+      "level": 15,
+      "bab": 11,
+      "fort": 5,
+      "ref": 9,
+      "will": 9,
+      "classFeatures": [
+        {
+          "name": "Investigator Talent",
+          "description": "",
+          "pools": [
+            {
+              "name": "Investigator Talent",
+              "description": "",
+              "requirements": {},
+              "options": [
+                {
+                  "name": "Investigator Talent (Ex) Or",
+                  "description": "At 3rd level and every 2 levels thereafter, an investigator gains an investigator talent. Except where otherwise noted, each investigator talent can only be selected once. Investigator talents marked with an asterisk (*) add effects to an investigator&#8217;s studied combat or studied strike. Only one of these talents can be applied to an individual attack, but the decision can be made when the damage is dealt.. A complete listing of investigator talents can be found here: Investigator Talents",
+                  "requirements": {
+                    "minClassLevel": 2,
+                    "text": "At 3rd level and every 2 levels thereafter, an investigator gains an investigator talent. Except where otherwise noted, each investigator talent can only be selected once."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/hybrid-classes/investigator/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        },
+        {
+          "name": "Trap Sense +5",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Extracts per Day": "5"
+      }
+    },
+    {
+      "level": 16,
+      "bab": 12,
+      "fort": 5,
+      "ref": 10,
+      "will": 10,
+      "classFeatures": [
+        {
+          "name": "Studied Strike +7d6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Extracts per Day": "5"
+      }
+    },
+    {
+      "level": 17,
+      "bab": 12,
+      "fort": 5,
+      "ref": 10,
+      "will": 10,
+      "classFeatures": [
+        {
+          "name": "Investigator Talent",
+          "description": "",
+          "pools": [
+            {
+              "name": "Investigator Talent",
+              "description": "",
+              "requirements": {},
+              "options": [
+                {
+                  "name": "Investigator Talent (Ex) Or",
+                  "description": "At 3rd level and every 2 levels thereafter, an investigator gains an investigator talent. Except where otherwise noted, each investigator talent can only be selected once. Investigator talents marked with an asterisk (*) add effects to an investigator&#8217;s studied combat or studied strike. Only one of these talents can be applied to an individual attack, but the decision can be made when the damage is dealt.. A complete listing of investigator talents can be found here: Investigator Talents",
+                  "requirements": {
+                    "minClassLevel": 2,
+                    "text": "At 3rd level and every 2 levels thereafter, an investigator gains an investigator talent. Except where otherwise noted, each investigator talent can only be selected once."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/hybrid-classes/investigator/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        }
+      ],
+      "spellcasting": {
+        "Extracts per Day": "5"
+      }
+    },
+    {
+      "level": 18,
+      "bab": 13,
+      "fort": 6,
+      "ref": 11,
+      "will": 11,
+      "classFeatures": [
+        {
+          "name": "Studied Strike +8d6",
+          "description": ""
+        },
+        {
+          "name": "Trap Sense +6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Extracts per Day": "5"
+      }
+    },
+    {
+      "level": 19,
+      "bab": 14,
+      "fort": 6,
+      "ref": 11,
+      "will": 11,
+      "classFeatures": [
+        {
+          "name": "Investigator Talent",
+          "description": "",
+          "pools": [
+            {
+              "name": "Investigator Talent",
+              "description": "",
+              "requirements": {},
+              "options": [
+                {
+                  "name": "Investigator Talent (Ex) Or",
+                  "description": "At 3rd level and every 2 levels thereafter, an investigator gains an investigator talent. Except where otherwise noted, each investigator talent can only be selected once. Investigator talents marked with an asterisk (*) add effects to an investigator&#8217;s studied combat or studied strike. Only one of these talents can be applied to an individual attack, but the decision can be made when the damage is dealt.. A complete listing of investigator talents can be found here: Investigator Talents",
+                  "requirements": {
+                    "minClassLevel": 2,
+                    "text": "At 3rd level and every 2 levels thereafter, an investigator gains an investigator talent. Except where otherwise noted, each investigator talent can only be selected once."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/hybrid-classes/investigator/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        }
+      ],
+      "spellcasting": {
+        "Extracts per Day": "5"
+      }
+    },
+    {
+      "level": 20,
+      "bab": 15,
+      "fort": 6,
+      "ref": 12,
+      "will": 12,
+      "classFeatures": [
+        {
+          "name": "Studied Strike +9d6",
+          "description": ""
+        },
+        {
+          "name": "True Inspiration",
+          "description": "At 20th level, an investigator can use inspiration on all skill checks-even ones he isn't trained in-and all ability checks without spending inspiration. In addition, whenever he expends inspiration on an ability check, attack roll, saving throw, or skill check, he adds 2d6 rather than 1d6 to the result. Some talents can affect this. If using the amazing inspiration investigator talent, he rolls 2d8 instead. If using this with empathy, tenacious inspiration, underworld inspiration, or a similar talent, he rolls two sets of inspiration dice and uses the higher of the two results."
+        }
+      ],
+      "spellcasting": {
+        "Extracts per Day": "5"
+      }
+    }
+  ],
+  "spellcasting": {
+    "summary": "prepared 2/3 caster using INT",
+    "castingType": "prepared",
+    "progression": "2/3",
+    "ability": "int",
+    "preparation": "spellbook",
+    "maxSpellLevel": 6,
+    "slotsByLevel": [
+      [
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        3,
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        4,
+        2,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        4,
+        3,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        4,
+        3,
+        1,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        4,
+        4,
+        2,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        5,
+        4,
+        3,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        5,
+        4,
+        3,
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        5,
+        4,
+        4,
+        2,
+        0,
+        0
+      ],
+      [
+        0,
+        5,
+        5,
+        4,
+        3,
+        0,
+        0
+      ],
+      [
+        0,
+        5,
+        5,
+        4,
+        3,
+        1,
+        0
+      ],
+      [
+        0,
+        5,
+        5,
+        4,
+        4,
+        2,
+        0
+      ],
+      [
+        0,
+        5,
+        5,
+        5,
+        4,
+        3,
+        0
+      ],
+      [
+        0,
+        5,
+        5,
+        5,
+        4,
+        3,
+        1
+      ],
+      [
+        0,
+        5,
+        5,
+        5,
+        4,
+        4,
+        2
+      ],
+      [
+        0,
+        5,
+        5,
+        5,
+        5,
+        4,
+        3
+      ],
+      [
+        0,
+        5,
+        5,
+        5,
+        5,
+        5,
+        4
+      ],
+      [
+        0,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5
+      ]
+    ]
+  },
+  "spellcastingClass": true
+}

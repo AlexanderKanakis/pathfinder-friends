@@ -1,0 +1,251 @@
+{
+  "name": "Coastal Pirate",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/c-d/coastal-pirate/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 0,
+      "ref": 1,
+      "will": 0,
+      "classFeatures": [
+        {
+          "name": "Quick Appraise",
+          "description": "A Coastal pirate must at times quickly select the most valuable items to spirit away. She may appraise the value of an item in 1 round."
+        },
+        {
+          "name": "Sodden Stealth +2",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Bogstep",
+          "description": "At 2nd level, a Coastal pirate learns how to move quickly through the treacherous terrain of her home. She moves through shallow bogs normally, and it costs her 2 squares of movement to move into a square with a deep bog. She can use Acrobatics to tumble through shallow bogs with no penalty and can tumble through deep bogs with a -4 penalty (see Marsh Terrain for more information regarding bogs and swamps.)"
+        },
+        {
+          "name": "Deep Breath",
+          "description": "At 2nd level, a Coastal pirate can hold her breath for a number of rounds equal to three times her Constitution score before she must start making Constitution checks."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 3,
+      "bab": 2,
+      "fort": 1,
+      "ref": 2,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Sneak Attack +1d6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 4,
+      "bab": 3,
+      "fort": 1,
+      "ref": 2,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Navigate Maelstrom",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 5,
+      "bab": 3,
+      "fort": 2,
+      "ref": 3,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Sodden Stealth +4",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 6,
+      "bab": 4,
+      "fort": 2,
+      "ref": 3,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Sneak Attack +2d6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 7,
+      "bab": 5,
+      "fort": 2,
+      "ref": 4,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Grapple Ship",
+          "description": "As a Coastal pirateÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s connection to the sea grows stronger, she learns to perform impossible feats. At 7th level, a Coastal pirate gains the ability to stop another ship dead in the water for a short time. To use this ability, the Coastal pirate must hurl a grappling hook at the target ship. The pirate is proficient with the grappling hook, and she throws it with a 20-foot range increment. If the Coastal pirate hits the target ship, she then makes an opposed Strength check. She gains a +1 bonus on her check for every crewmate who also grapples the enemy ship, although crewmates are considered non-proficient with grappling hooks and throw them with 10-foot range increments. For every point by which the Coastal pirate exceeds the shipÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Strength check, she halts its progress for 1 round."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 8,
+      "bab": 6,
+      "fort": 3,
+      "ref": 4,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Shipmind",
+          "description": "At 8th level, a Coastal pirate can, once per day as a standard action , control her ship with a thought. The Coastal pirate must be on the deck of the ship she wishes to control and she must be conscious. Once the Coastal pirate activates her shipmind, she can feel the ship as if it were an extension of her body. She can ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œseeÃƒÂ¢Ã¢â€šÂ¬Ã‚Â from the ship anywhere she wants, and adjusting her point of view is a free action . The Coastal pirate can move the ship as if it were her own body, and it moves over water at her base move or the shipÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s normal speed, whichever is greater. She and her ship can move forward and backward, make right angle turns, and come to a dead stop, despite the shipÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s size or the weather conditions. While the Coastal pirate uses her shipmind ability, her body appears paralyzed and unresponsive. She is considered helpless and cannot defend herself, but she retains an awareness of what goes on around her body (and can see her body from her perspective on the ship if she wishes). She may end the shipmind effect as an immediate action. This ability lasts for 1 round per class level."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 9,
+      "bab": 6,
+      "fort": 3,
+      "ref": 5,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Sneak Attack +3d6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 10,
+      "bab": 7,
+      "fort": 3,
+      "ref": 5,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Fogcraft",
+          "description": "At 10th level, the Coastal pirate gains the incredible power to shape a vessel out of the fog that roils across the boggy landscape. This ability functions only in the Coastal and is usable once per day. Forming a craft takes 10 minutes, and the craftÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s duration lasts for a variable number of hours depending on its size. A fogcraft appears made of swirling gray mist but feels solid to the touch. Its unique composition can make it difficult to spot, and the craft makes no sound, but it does not baffle sounds made by its crew. A fogcraft has a carrying capacity equal to an ordinary ship of its type, but its impermanence makes it a poor cargo ship. It requires the appropriate number of crewmen in order to sail. A fogcraft possesses speed and maneuverability equal to that of an ordinary ship of its type, but unlike ordinary ships, a fogcraft can move over land as easily as water. A Coastal pirate receives a +4 competence bonus on skill checks made to sail her fogcraft. When a Coastal pirate creates a fogcraft, she can chose its size from any of the options listed below. With larger ships comes a trade-off in stealth, Armor Class , and duration. Fogcraft Type AC Strength Carries 1 Duration Stealth Raft 10 18 4 10 hours +12 Rowboat 10 20 6 10 hours +10 Longship 8 24 170 4 hours +8 Keelboat 8 28 115 4 hours +8 Sailing ship 6 30 220 4 hours +8 Warship 6 32 240 2 hours +6 Galley 4 34 450 2 hours +4 1 Including the Coastal pirate herself. Section 15: Copyright Notice Pathfinder Chronicles Campaign Setting . Copyright 2008, Paizo Publishing, LLC; Authors: Mike McArtor, Keith Baker, Wo"
+        },
+        {
+          "name": "Sodden Stealth +6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": null,
+  "spellcastingClass": false
+}

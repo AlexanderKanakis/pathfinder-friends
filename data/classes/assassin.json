@@ -1,0 +1,279 @@
+{
+  "name": "Assassin",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/core-rulebook/assassin/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 0,
+      "ref": 1,
+      "will": 0,
+      "classFeatures": [
+        {
+          "name": "Sneak Attack +1d6",
+          "description": ""
+        },
+        {
+          "name": "Death Attack",
+          "description": "If an assassin studies his victim for 3 rounds and then makes a sneak attack with a melee weapon that successfully deals damage, the sneak attack has the additional effect of possibly either paralyzing or killing the target (assassin's choice). Studying the victim is a standard action. The death attack fails if the target detects the assassin or recognizes the assassin as an enemy (although the attack might still be a sneak attack if the target is denied his Dexterity bonus to his Armor Class or is flanked ). If the victim of such a death attack fails a Fortitude save (DC 10 + the assassin's class level + the assassin's Int modifier) against the kill effect, she dies. If the saving throw fails against the paralysis effect, the victim is rendered helpless and unable to act for 1d6 rounds plus 1 round per level of the assassin. If the victim's saving throw succeeds, the attack is just a normal sneak attack . Once the assassin has completed the 3 rounds of study, he must make the death attack within the next 3 rounds. If a death attack is attempted and fails (the victim makes her save) or if the assassin does not launch the attack within 3 rounds of completing the study, 3 new rounds of study are required before he can attempt another death attack."
+        },
+        {
+          "name": "Poison Use",
+          "description": "Assassins are trained in the use of poison and cannot accidentally poison themselves when applying poison to a blade (see Poison )."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "+1 Save Bonus Against Poison",
+          "description": ""
+        },
+        {
+          "name": "Uncanny Dodge",
+          "description": "At 2nd level, an assassin cannot be caught flat-footed , even if the attacker is invisible . He still loses his Dexterity bonus to AC if immobilized. An assassin with this ability can still lose his Dexterity bonus to AC if an opponent successfully uses the feint action against him. If an assassin already has uncanny dodge from a different class, he automatically gains improved uncanny dodge instead."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 3,
+      "bab": 2,
+      "fort": 1,
+      "ref": 2,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Sneak Attack +2d6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 4,
+      "bab": 3,
+      "fort": 1,
+      "ref": 2,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "+2 Save Bonus Against Poison",
+          "description": ""
+        },
+        {
+          "name": "Hidden Weapons",
+          "description": "At 4th level, an assassin becomes a master at hiding weapons on his body. He adds his assassin level to all Sleight of Hand skill checks made to prevent others from noticing them."
+        },
+        {
+          "name": "True Death",
+          "description": "Starting at 4th level, anyone slain by an assassin's death attack becomes more difficult to bring back from the dead. Spellcasters attempting to bring a creature back from the dead using raise dead or similar magic must make a caster level check with a DC equal to 15 + the assassin's level or the spell fails and the material component is wasted. Casting remove curse the round before attempting to bring the creature back from the dead negates this chance. The DC of the remove curse is 10 + the assassin's level."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 5,
+      "bab": 3,
+      "fort": 2,
+      "ref": 3,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Improved Uncanny Dodge",
+          "description": "At 5th level and higher, an assassin can no longer be flanked . This defense denies a rogue the ability to sneak attack the assassin by flanking him, unless the attacker has at least four more rogue levels than the target has assassin levels. If a character already has uncanny dodge from another class, the levels from the classes that grant uncanny dodge stack to determine the minimum rogue level required to flank the character."
+        },
+        {
+          "name": "Sneak Attack +3d6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 6,
+      "bab": 4,
+      "fort": 2,
+      "ref": 3,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "+3 Save Bonus Against Poison",
+          "description": ""
+        },
+        {
+          "name": "Quiet Death",
+          "description": "At 6th level, whenever an assassin kills a creature using his death attack during a surprise round, he can also make a Stealth check, opposed by Perception checks of those in the vicinity to prevent them from identifying him as the assailant. If successful, those nearby might not even notice that the target is dead for a few moments, allowing the assassin to avoid detection."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 7,
+      "bab": 5,
+      "fort": 2,
+      "ref": 4,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Sneak Attack +4d6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 8,
+      "bab": 6,
+      "fort": 3,
+      "ref": 4,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "+4 Save Bonus Against Poison",
+          "description": ""
+        },
+        {
+          "name": "Hide In Plain Sight",
+          "description": "At 8th level, an assassin can use the Stealth skill even while being observed. As long as he is within 10 feet of some sort of shadow, an assassin can hide himself from view in the open without having anything to actually hide behind. He cannot, however, hide in his own shadow."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 9,
+      "bab": 6,
+      "fort": 3,
+      "ref": 5,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Sneak Attack +5d6",
+          "description": ""
+        },
+        {
+          "name": "Swift Death",
+          "description": "At 9th level, once per day, an assassin can make a death attack against a foe without studying the foe beforehand. He must still sneak attack his foe using a melee weapon that deals damage."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 10,
+      "bab": 7,
+      "fort": 3,
+      "ref": 5,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "+5 Save Bonus Against Poison",
+          "description": ""
+        },
+        {
+          "name": "Angel Of Death",
+          "description": "At 10th level, the assassin becomes a master of death. Once per day, when the assassin makes a successful death attack, he can cause the target's body to crumble to dust. This prevents raise dead and resurrection (although true resurrection works as normal). The assassin must declare the use of this ability before the attack is made. If the attack misses or the target successfully saves against the death attack, this ability is wasted with no effect. Section 15: Copyright Notice Pathfinder RPG Core Rulebook . Copyright 2009, Paizo Publishing, LLC; Author: Jason Bulmahn, based on material by Jonathan Tweet, Monte Cook, and Skip Williams."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": null,
+  "spellcastingClass": false
+}

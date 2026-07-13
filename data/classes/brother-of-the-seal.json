@@ -1,0 +1,247 @@
+{
+  "name": "Brother of the Seal",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/a-b/brother-of-the-seal/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Unarmed Combat",
+          "description": "A Brother of the Seal's class levels stack with any monk levels for the purposes of determining his flurry of blows , stunning fist , and unarmed strike class features (including determining damage dealt by his unarmed strike attacks)."
+        },
+        {
+          "name": "Water Splitting Stone",
+          "description": "When attacking an object, a Brother of the Seal ignores 1 point of hardness per class level."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Gatekeeper",
+          "description": "At 2nd level, a Brother of the Seal may select either hold portal or arcane lock , and he gains the ability to cast the selected spell once per day. Once made, this choice cannot be reversed. At 6th level, and again at 10th level, a Brother of the Seal may cast the selected spell an additional time per day."
+        },
+        {
+          "name": "Trapfinding",
+          "description": "At 2nd level, a Brother of the Seal adds 1/2 his class level on Perception and Disable Device checks made to find or disarm traps, and he can use Disable Device to disarm magical traps."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 3,
+      "bab": 2,
+      "fort": 2,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Runefinding",
+          "description": "At 3rd level, a Brother of the Seal's trapfinding bonus becomes equal to his level while dealing with magical glyphs, symbols, runes, and writings. In addition, he gains the trap spotter rogue talent , but it applies only to trapped magical writings."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 4,
+      "bab": 3,
+      "fort": 2,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Awesome Blow",
+          "description": "At 4th level, a Brother of the Seal gains Awesome Blow as a bonus feat, even if he does not meet the prerequisites, adding his Wisdom modifier on awesome blow combat maneuver checks and dealing damage to his target equal to that dealt by his unarmed strike . Hardness ignored by the Brother of the Seal's water splitting stone ability applies when determining damage dealt to an obstacle while using an awesome blow combat maneuver . A Brother of the Seal can expend 1 ki point or one use of Stunning Fist in conjunction with this ability to affect a creature of his own size with an awesome blow, or 2 ki points or two uses of Stunning Fist to affect a creature one size larger. Using Stunning Fist or ki points in this fashion has no effect other than increasing the size of creature he can affect with his awesome blow. At 8th level, a Brother of the Seal can affect creatures up to his size with his Awesome Blow feat without expending a use of Stunning Fist or a ki point. In addition, he may affect a creature of any size larger than itself by spending 1 ki point or one use of Stunning Fist per size category of difference."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 5,
+      "bab": 3,
+      "fort": 3,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Unsealing",
+          "description": "At 5th level, a Brother of the Seal can attempt to breach magical wards or protections, including abjurations, glyphs, runes, symbols, and other magical writings. He must touch the warded object, creature, or area-which can be done as part of an unarmed strike for normal damage or as a melee touch attack that deals no damage-and expend one use of Stunning Fist to dispel the effect (as dispel magic , caster level equal to his character level). If the unsealing is successful, the effect is destroyed and the Brother of the Seal suffers no harm from it, even if it normally harms those who touch it. If the unsealing fails, the Brother of the Seal suffers any normal effects for touching the warded area, object, or creature, and it remains intact unless it would normally be destroyed upon being interacted with."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 6,
+      "bab": 4,
+      "fort": 3,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Domino Strike",
+          "description": "At 6th level, when a Brother of the Seal's awesome blow combat maneuver succeeds and knocks his target into an obstacle (including another creature), he adds his class level to the normal 1d6 points of damage taken by the target and the obstacle."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 7,
+      "bab": 5,
+      "fort": 4,
+      "ref": 4,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Hands Of Stone",
+          "description": "At 7th level, a Brother of the Seal increases his unarmed strike damage as though he were a creature one size larger."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 8,
+      "bab": 6,
+      "fort": 4,
+      "ref": 4,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Rapid Slam",
+          "description": "At 8th level, a Brother of the Seal can use his Awesome Blow feat once per round as part of a flurry of blows . Alternatively, he can make an awesome blow combat maneuver as part of a charge or as part of the same standard action he uses to perform another combat feat that involves an attack (such as Cleave or Vital Strike ). He can still only make an awesome blow maneuver once per round regardless of how many attacks he makes."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 9,
+      "bab": 6,
+      "fort": 5,
+      "ref": 5,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Cascading Strike",
+          "description": "At 9th level, when a Brother of the Seal's awesome blow maneuver succeeds and knocks the target into another creature of its size or smaller, the Brother of the Seal may attempt an awesome blow combat maneuver at a -2 penalty against this second creature. If successful, the Brother deals his unarmed strike damage to this second target (rather than the normal damage for striking an obstacle) and knocks that target back 10 feet. The Brother of the Seal can make additional awesome blow combat maneuvers each time a target strikes a creature behind it, with a cumulative -2 penalty for each additional target. All targets must be in a straight line. If a target is knocked simultaneously into several smaller creatures, the Brother can choose only one of them to affect with cascading strike."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 10,
+      "bab": 7,
+      "fort": 5,
+      "ref": 5,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Unraveling",
+          "description": "At 10th level, a Brother of the Seal's unsealing ability can destroy force effects and abjuration , conjuration , and evocation effects that create stationary barriers (such as prismatic sphere , tiny hut , or wall of ice ), even if the effect cannot normally be subjected to dispel magic . Section 15: Copyright Notice Pathfinder Campaign Setting: Paths of Prestige Ãƒâ€šÃ‚Â© 2012, Paizo Publishing, LLC; Authors: Benjamin Bruck, Jason Bulmahn, Matt Goodall, and Jason Nelson."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": null,
+  "spellcastingClass": false
+}

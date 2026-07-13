@@ -1,0 +1,273 @@
+{
+  "name": "Natural Alchemist",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/n-r/natural-alchemist/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Healing Solution",
+          "description": "A natural alchemist learns how to convert magical reagents into life-giving admixtures. As a full-round action , she can convert the magical energies of two extracts or spells of 1st level into a special extract of cure light wounds . This acts as an infused extract, but it must be used before the end of her next turn or its power is lost. At 3rd level and every 2 levels thereafter, a natural alchemist gains the ability to convert extracts or spells into more powerful forms of curative magic: 3rd - cure moderate wounds ; 5th - cure serious wounds ; 7th - cure critical wounds ; 9th - breath of life . In all cases, the natural alchemist must expend two extracts or spells of the same level as the curative spell in order to complete the conversion."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of arcane spellcasting class"
+      }
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Natural Discovery",
+          "description": "At 2nd level and again at 4th, 6th, and 8th level, a natural alchemist gains a new alchemist discovery from one of the rare natural discoveries below or from the following list: bottled ooze , combine extracts , dilution , elixir of life , enhance potion , eternal potion , extend potion , healing touch , infusion , mummification , preserve organs , sandstone solution, or spontaneous healing . The natural alchemist must still meet all prerequisites for a natural discovery, including level restrictions. Natural alchemist class levels stack with alchemist levels for the purpose of qualifying for and using these discoveries (but not others). Natural discoveries cannot be selected by characters without natural alchemist levels."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of arcane spellcasting class"
+      }
+    },
+    {
+      "level": 3,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Bombs",
+          "description": "At 3rd level and every 3 levels thereafter, a natural alchemist adds 1d6 points of damage to her bomb damage, gains one additional bomb per day, and treats her alchemist level as 1 higher for the purpose of qualifying for discoveries that affect her bombs. A character without alchemist levels gains the bombs ability of an alchemist whose level is equal to 1/3 her natural alchemist level."
+        },
+        {
+          "name": "Curative Enhancement",
+          "description": "At 3rd level and every 2 levels thereafter, a natural alchemist can select one curative enhancement. Whenever the natural alchemist creates a healing solution by expending two extracts or spells, she may reduce the amount of hit point damage cured by one step (reducing a healing solution of cure moderate wounds to one of cure light wounds , for instance) in order to apply any number of her curative enhancements to her healing solution. These enhancements can remove conditions caused by curses, diseases, or poisons even if they do not remove the underlying affliction itself; the conditions return after 1 hour unless the curative enhancement actually removes the affliction that causes the condition. At 3rd level, a natural alchemist can select one of the following conditions that her healing solution can remove: fatigued , shaken , or sickened . At 5th level, she can also select dazed , diseased (as remove disease ), or staggered . At 7th level, she can also select cursed (as remove curse ), exhausted (must already have selected fatigued ), frightened (must already have selected shaken ), nauseated (must already have selected sickened ), or poisoned (as neutralize poison ). At 9th level, she can also select blinded , deafened , paralyzed , or stunned . Once chosen, a curative enhancement cannot be changed, but the natural alchemist can choose which enhancements (if any) she incorporates each time she prepares a healing solution."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of arcane spellcasting class"
+      }
+    },
+    {
+      "level": 4,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Natural Discovery",
+          "description": "At 2nd level and again at 4th, 6th, and 8th level, a natural alchemist gains a new alchemist discovery from one of the rare natural discoveries below or from the following list: bottled ooze , combine extracts , dilution , elixir of life , enhance potion , eternal potion , extend potion , healing touch , infusion , mummification , preserve organs , sandstone solution, or spontaneous healing . The natural alchemist must still meet all prerequisites for a natural discovery, including level restrictions. Natural alchemist class levels stack with alchemist levels for the purpose of qualifying for and using these discoveries (but not others). Natural discoveries cannot be selected by characters without natural alchemist levels."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of arcane spellcasting class"
+      }
+    },
+    {
+      "level": 5,
+      "bab": 2,
+      "fort": 2,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Curative Enhancement",
+          "description": "At 3rd level and every 2 levels thereafter, a natural alchemist can select one curative enhancement. Whenever the natural alchemist creates a healing solution by expending two extracts or spells, she may reduce the amount of hit point damage cured by one step (reducing a healing solution of cure moderate wounds to one of cure light wounds , for instance) in order to apply any number of her curative enhancements to her healing solution. These enhancements can remove conditions caused by curses, diseases, or poisons even if they do not remove the underlying affliction itself; the conditions return after 1 hour unless the curative enhancement actually removes the affliction that causes the condition. At 3rd level, a natural alchemist can select one of the following conditions that her healing solution can remove: fatigued , shaken , or sickened . At 5th level, she can also select dazed , diseased (as remove disease ), or staggered . At 7th level, she can also select cursed (as remove curse ), exhausted (must already have selected fatigued ), frightened (must already have selected shaken ), nauseated (must already have selected sickened ), or poisoned (as neutralize poison ). At 9th level, she can also select blinded , deafened , paralyzed , or stunned . Once chosen, a curative enhancement cannot be changed, but the natural alchemist can choose which enhancements (if any) she incorporates each time she prepares a healing solution."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of arcane spellcasting class"
+      }
+    },
+    {
+      "level": 6,
+      "bab": 3,
+      "fort": 2,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Bombs",
+          "description": "At 3rd level and every 3 levels thereafter, a natural alchemist adds 1d6 points of damage to her bomb damage, gains one additional bomb per day, and treats her alchemist level as 1 higher for the purpose of qualifying for discoveries that affect her bombs. A character without alchemist levels gains the bombs ability of an alchemist whose level is equal to 1/3 her natural alchemist level."
+        },
+        {
+          "name": "Natural Discovery",
+          "description": "At 2nd level and again at 4th, 6th, and 8th level, a natural alchemist gains a new alchemist discovery from one of the rare natural discoveries below or from the following list: bottled ooze , combine extracts , dilution , elixir of life , enhance potion , eternal potion , extend potion , healing touch , infusion , mummification , preserve organs , sandstone solution, or spontaneous healing . The natural alchemist must still meet all prerequisites for a natural discovery, including level restrictions. Natural alchemist class levels stack with alchemist levels for the purpose of qualifying for and using these discoveries (but not others). Natural discoveries cannot be selected by characters without natural alchemist levels."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of arcane spellcasting class"
+      }
+    },
+    {
+      "level": 7,
+      "bab": 3,
+      "fort": 2,
+      "ref": 2,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Curative Enhancement",
+          "description": "At 3rd level and every 2 levels thereafter, a natural alchemist can select one curative enhancement. Whenever the natural alchemist creates a healing solution by expending two extracts or spells, she may reduce the amount of hit point damage cured by one step (reducing a healing solution of cure moderate wounds to one of cure light wounds , for instance) in order to apply any number of her curative enhancements to her healing solution. These enhancements can remove conditions caused by curses, diseases, or poisons even if they do not remove the underlying affliction itself; the conditions return after 1 hour unless the curative enhancement actually removes the affliction that causes the condition. At 3rd level, a natural alchemist can select one of the following conditions that her healing solution can remove: fatigued , shaken , or sickened . At 5th level, she can also select dazed , diseased (as remove disease ), or staggered . At 7th level, she can also select cursed (as remove curse ), exhausted (must already have selected fatigued ), frightened (must already have selected shaken ), nauseated (must already have selected sickened ), or poisoned (as neutralize poison ). At 9th level, she can also select blinded , deafened , paralyzed , or stunned . Once chosen, a curative enhancement cannot be changed, but the natural alchemist can choose which enhancements (if any) she incorporates each time she prepares a healing solution."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of arcane spellcasting class"
+      }
+    },
+    {
+      "level": 8,
+      "bab": 4,
+      "fort": 3,
+      "ref": 3,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Natural Discovery",
+          "description": "At 2nd level and again at 4th, 6th, and 8th level, a natural alchemist gains a new alchemist discovery from one of the rare natural discoveries below or from the following list: bottled ooze , combine extracts , dilution , elixir of life , enhance potion , eternal potion , extend potion , healing touch , infusion , mummification , preserve organs , sandstone solution, or spontaneous healing . The natural alchemist must still meet all prerequisites for a natural discovery, including level restrictions. Natural alchemist class levels stack with alchemist levels for the purpose of qualifying for and using these discoveries (but not others). Natural discoveries cannot be selected by characters without natural alchemist levels."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of arcane spellcasting class"
+      }
+    },
+    {
+      "level": 9,
+      "bab": 4,
+      "fort": 3,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Bombs",
+          "description": "At 3rd level and every 3 levels thereafter, a natural alchemist adds 1d6 points of damage to her bomb damage, gains one additional bomb per day, and treats her alchemist level as 1 higher for the purpose of qualifying for discoveries that affect her bombs. A character without alchemist levels gains the bombs ability of an alchemist whose level is equal to 1/3 her natural alchemist level."
+        },
+        {
+          "name": "Curative Enhancement",
+          "description": "At 3rd level and every 2 levels thereafter, a natural alchemist can select one curative enhancement. Whenever the natural alchemist creates a healing solution by expending two extracts or spells, she may reduce the amount of hit point damage cured by one step (reducing a healing solution of cure moderate wounds to one of cure light wounds , for instance) in order to apply any number of her curative enhancements to her healing solution. These enhancements can remove conditions caused by curses, diseases, or poisons even if they do not remove the underlying affliction itself; the conditions return after 1 hour unless the curative enhancement actually removes the affliction that causes the condition. At 3rd level, a natural alchemist can select one of the following conditions that her healing solution can remove: fatigued , shaken , or sickened . At 5th level, she can also select dazed , diseased (as remove disease ), or staggered . At 7th level, she can also select cursed (as remove curse ), exhausted (must already have selected fatigued ), frightened (must already have selected shaken ), nauseated (must already have selected sickened ), or poisoned (as neutralize poison ). At 9th level, she can also select blinded , deafened , paralyzed , or stunned . Once chosen, a curative enhancement cannot be changed, but the natural alchemist can choose which enhancements (if any) she incorporates each time she prepares a healing solution."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of arcane spellcasting class"
+      }
+    },
+    {
+      "level": 10,
+      "bab": 5,
+      "fort": 3,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Eternal Youth",
+          "description": "At 10th level, a natural alchemist learns how to formulate an imperfect duplicate of the sun orchid elixir that affects only her. This functions as the eternal youth grand discovery. Section 15: Copyright Notice Pathfinder Player Companion: People of the Sands Ãƒâ€šÃ‚Â© 2013, Paizo Publishing, LLC; Authors: Shaun Hocking, Rob McCreary, and Jason Nelson."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of arcane spellcasting class"
+      }
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": {
+    "summary": "See level progression spell columns."
+  },
+  "spellcastingClass": true
+}

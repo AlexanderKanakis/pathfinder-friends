@@ -1,0 +1,293 @@
+{
+  "name": "Dragon Disciple",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/core-rulebook/dragon-disciple/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 1,
+      "ref": 0,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Blood Of Dragons",
+          "description": "A dragon disciple adds his level to his sorcerer levels when determining the powers gained from his bloodline. If the dragon disciple does not have levels of sorcerer, he instead gains bloodline powers of the draconic bloodline, using his dragon disciple level as his sorcerer level to determine the bonuses gained. He must choose a dragon type upon gaining his first level in this class and that type must be the same as his sorcerer type. This ability does not grant bonus spells to a sorcerer unless he possesses spell slots of an appropriate level. Such bonus spells are automatically granted if the sorcerer gains spell slots of the spell's level. ( According to Paizo, Bloodragers can be Considered Sorcerer When it Relates to this Prestige Class due to it being released after the Prestige Class did. So it would add to Bloodragers Bloodline)"
+        },
+        {
+          "name": "Natural Armor Increase (+1)",
+          "description": "As his skin thickens, a dragon disciple takes on more and more of his progenitor's physical aspect. At 1st, 4th, and 7th level, a dragon disciple gains an increase to the character's existing natural armor (if any), as indicated on Table: Dragon Disciple . These armor bonuses stack."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "-"
+      }
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Ability Boost (Str +2)",
+          "description": "As a dragon disciple gains levels in this prestige class, his ability scores increase as noted on Table: Dragon Disciple . These increases stack and are gained as if through level advancement."
+        },
+        {
+          "name": "Bloodline Feat",
+          "description": "Upon reaching 2nd level, and every three levels thereafter, a dragon disciple receives one bonus feat, chosen from the draconic bloodline's bonus feat list."
+        },
+        {
+          "name": "Dragon Bite",
+          "description": "At 2nd level, whenever the dragon disciple uses his bloodline to grow claws, he also gains a bite attack. This is a primary natural attack that deals 1d6 points of damage (1d4 if the dragon disciple is Small), plus 1-1/2 times the dragon discipleÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Strength modifier. Upon reaching 6th level, this bite also deals 1d6 points of energy damage. The type of damage dealt is determined by the dragon disciple's bloodline."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing arcane spellcasting class"
+      }
+    },
+    {
+      "level": 3,
+      "bab": 2,
+      "fort": 2,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Breath Weapon",
+          "description": "At 3rd level, a dragon disciple gains the breath weapon bloodline power, even if his level does not yet grant that power. Once his level is high enough to grant this ability through the bloodline, the dragon disciple gains an additional use of his breath weapon each day. The type and shape of the breath weapon depends on the type of dragon selected by the dragon disciple, as detailed under the Draconic sorcerer bloodline description."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing arcane spellcasting class"
+      }
+    },
+    {
+      "level": 4,
+      "bab": 3,
+      "fort": 2,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Ability Boost (Str +2)",
+          "description": "As a dragon disciple gains levels in this prestige class, his ability scores increase as noted on Table: Dragon Disciple . These increases stack and are gained as if through level advancement."
+        },
+        {
+          "name": "Natural Armor Increase (+1)",
+          "description": "As his skin thickens, a dragon disciple takes on more and more of his progenitor's physical aspect. At 1st, 4th, and 7th level, a dragon disciple gains an increase to the character's existing natural armor (if any), as indicated on Table: Dragon Disciple . These armor bonuses stack."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing arcane spellcasting class"
+      }
+    },
+    {
+      "level": 5,
+      "bab": 3,
+      "fort": 3,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Blindsense 30 Ft.",
+          "description": ""
+        },
+        {
+          "name": "Bloodline Feat",
+          "description": "Upon reaching 2nd level, and every three levels thereafter, a dragon disciple receives one bonus feat, chosen from the draconic bloodline's bonus feat list."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "-"
+      }
+    },
+    {
+      "level": 6,
+      "bab": 4,
+      "fort": 3,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Ability Boost ( Con +2)",
+          "description": "As a dragon disciple gains levels in this prestige class, his ability scores increase as noted on Table: Dragon Disciple . These increases stack and are gained as if through level advancement."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing arcane spellcasting class"
+      }
+    },
+    {
+      "level": 7,
+      "bab": 5,
+      "fort": 4,
+      "ref": 2,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Dragon Form (1/Day)",
+          "description": "At 7th level, a dragon disciple can assume the form of a dragon. This ability works like form of the dragon I . At 10th level, this ability functions as form of the dragon II and the dragon disciple can use this ability twice per day. His caster level for this effect is equal to his effective sorcerer levels for his draconic bloodline. Whenever he casts form of the dragon , he must assume the form of a dragon of the same type as his bloodline."
+        },
+        {
+          "name": "Natural Armor Increase (+1)",
+          "description": "As his skin thickens, a dragon disciple takes on more and more of his progenitor's physical aspect. At 1st, 4th, and 7th level, a dragon disciple gains an increase to the character's existing natural armor (if any), as indicated on Table: Dragon Disciple . These armor bonuses stack."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing arcane spellcasting class"
+      }
+    },
+    {
+      "level": 8,
+      "bab": 6,
+      "fort": 4,
+      "ref": 3,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Ability Boost (Int +2)",
+          "description": "As a dragon disciple gains levels in this prestige class, his ability scores increase as noted on Table: Dragon Disciple . These increases stack and are gained as if through level advancement."
+        },
+        {
+          "name": "Bloodline Feat",
+          "description": "Upon reaching 2nd level, and every three levels thereafter, a dragon disciple receives one bonus feat, chosen from the draconic bloodline's bonus feat list."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing arcane spellcasting class"
+      }
+    },
+    {
+      "level": 9,
+      "bab": 6,
+      "fort": 5,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Wings",
+          "description": "At 9th level, a dragon disciple gains the wings bloodline power, even if his level does not yet grant that power. Once his level is high enough to grant this ability through the bloodline, the dragon disciple's speed increases to 90 feet. Section 15: Copyright Notice Pathfinder RPG Core Rulebook . Copyright 2009, Paizo Publishing, LLC; Author: Jason Bulmahn, based on material by Jonathan Tweet, Monte Cook, and Skip Williams."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "-"
+      }
+    },
+    {
+      "level": 10,
+      "bab": 7,
+      "fort": 5,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Blindsense 60 Ft.",
+          "description": ""
+        },
+        {
+          "name": "Dragon Form (2/Day)",
+          "description": "At 7th level, a dragon disciple can assume the form of a dragon. This ability works like form of the dragon I . At 10th level, this ability functions as form of the dragon II and the dragon disciple can use this ability twice per day. His caster level for this effect is equal to his effective sorcerer levels for his draconic bloodline. Whenever he casts form of the dragon , he must assume the form of a dragon of the same type as his bloodline."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing arcane spellcasting class"
+      }
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": {
+    "summary": "See level progression spell columns."
+  },
+  "spellcastingClass": true
+}

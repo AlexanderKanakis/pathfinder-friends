@@ -1,0 +1,216 @@
+{
+  "name": "Inheritor's Crusader",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/i-m/inheritor-s-crusader/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 1,
+      "fort": 1,
+      "ref": 0,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Champion Of Honor",
+          "description": "An InheritorÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s crusader follows a code of conduct identical to that of a paladin , with the same penalties. A crusaderÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s class levels stack with paladin class levels for the purpose of determining the effects of the paladin's smite evil ability."
+        },
+        {
+          "name": "Aura Of Great Courage",
+          "description": "At 1st level, the crusader gains an aura of courage equivalent to that of a 3rd-level paladin . If the crusader already has this ability, the auraÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s range increases to 20 feet."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of cleric or paladin"
+      }
+    },
+    {
+      "level": 2,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Destroyer Of Tyranny",
+          "description": "At 2nd level, a crusader can shatter the oppressive influence of others. Any creature targeted by a crusaderÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s channel positive energy ability or lay on hands gains a new saving throw against any ongoing charm or compulsion effect upon him. At the GMÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s discretion, this can also allow the target a new saving throw against effects brought on by the power of belief, intimidation, or trickery, even if not actually a charm or compulsion. A crusader under one of these effects can expend a use of channel energy or lay on hands to attempt another saving throw against the effect; he can do this once per round as a swift action , and may use this ability even if doing so is contrary to the charm or compulsion effect; for example, a crusader charmed to defend an enemy against his own allies can use this ability to break the effect and turn on the enemy who charmed him. The crusader may indirectly benefit from this ability; for example, if the aforementioned enemy asks the crusader to heal him with channel energy , all creatures in the area (including the crusader) may attempt new saving throws against the controlling effects."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of cleric or paladin"
+      }
+    },
+    {
+      "level": 3,
+      "bab": 3,
+      "fort": 2,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Sword Against Injustice",
+          "description": "At 3rd level, a crusader may use his power to judge the guilty and absolve the innocent. As a standard action he may announce he is bringing divine judgment upon a target who is accused of a crime, lie, or other affront to justice; the crusader makes a melee attack with his sword against the target as part of this judgment. If the target is innocent of what he is accused, the attack stops just short of striking him, as if hitting an invisible wall; if the target is guilty, the attack automatically hits with a flash of white light. This attack requires no attack roll and cannot critically hit. If the target is protected by an effect that inhibits divinations (such as mind blank ), the attack bounces off the target with an unpleasant metallic hiss, like quenching a red-hot blade in water. The crusader may use this ability once per day; each additional use beyond the first drains him, causing him to become fatigued . He cannot use this class ability if he is exhausted . He may expend a use of channel energy or lay on hands while activating this ability to prevent fatigue . Sometimes people wrongly accused of great crimes beg for the intercession of an InheritorÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s crusader, knowing this power will exonerate them. Section 15: Copyright Notice Pathfinder Adventure Path volume #26: The Sixfold Trial. Copyright 2009, Paizo Publishing, LLC; Author: Richard Pett."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of cleric or paladin"
+      }
+    },
+    {
+      "level": 4,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 5,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 6,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 7,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 8,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 9,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 10,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": {
+    "summary": "See level progression spell columns."
+  },
+  "spellcastingClass": true
+}

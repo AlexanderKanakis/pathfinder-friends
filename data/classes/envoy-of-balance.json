@@ -1,0 +1,261 @@
+{
+  "name": "Envoy of Balance",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/e-h/envoy-of-balance/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Incisive Spells +1",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Endowment",
+          "description": "At 2nd level and again at 4th, 6th, and 8th level, an envoy of balance gains one of the following endowments. Aligned Annulment : As a standard action , the envoy of balance can expend a spell with an alignment descriptor to automatically (without requiring a caster level check) dispel a spell with the opposite descriptor. The spell she expends must be of the same level or higher than the spell being dispelled. An envoy of balance must have the aligned counter endowment to choose this endowment. Aligned Counter : The envoy of balance can counterspell a spell with an alignment descriptor using a spell with the opposite alignment descriptor. The spell used to counterspell must be higher level than the spell being countered, unless the envoy of balance has the Improved Counterspell feat, in which case it can be the same level or higher. An envoy of balance with the Improved Counterspell feat can use the aligned counter ability as an immediate action instead of a readied action, but must expend an appropriate spell at least 2 levels higher than the spell to be countered. Planar Parity : Protection from chaos/evil/good/law and similar effects no longer prevent bodily contact from creatures summoned by the envoy of balance. Neutral creatures summoned by the envoy of balance also gain the counterpoised simple creature template. Spiritual Equilibrium : The envoy of balance's class levels count as cleric levels for determining the effects of her channel energy ability. If she has the spontaneous casting class feature, she is no longer restricted by the choice made at 1st level"
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 3,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Contravening Armament",
+          "description": "At 3rd level, an envoy of balance's natural and manufactured weapons bypass alignment -based damage reduction . As a standard action , she can touch an ally to transfer this ability to him for 1 minute, during which time the envoy of balance can't benefit from the ability. The envoy of balance can transfer this ability a number of times per day equal to 1/2 her class level."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 4,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Endowment",
+          "description": "At 2nd level and again at 4th, 6th, and 8th level, an envoy of balance gains one of the following endowments. Aligned Annulment : As a standard action , the envoy of balance can expend a spell with an alignment descriptor to automatically (without requiring a caster level check) dispel a spell with the opposite descriptor. The spell she expends must be of the same level or higher than the spell being dispelled. An envoy of balance must have the aligned counter endowment to choose this endowment. Aligned Counter : The envoy of balance can counterspell a spell with an alignment descriptor using a spell with the opposite alignment descriptor. The spell used to counterspell must be higher level than the spell being countered, unless the envoy of balance has the Improved Counterspell feat, in which case it can be the same level or higher. An envoy of balance with the Improved Counterspell feat can use the aligned counter ability as an immediate action instead of a readied action, but must expend an appropriate spell at least 2 levels higher than the spell to be countered. Planar Parity : Protection from chaos/evil/good/law and similar effects no longer prevent bodily contact from creatures summoned by the envoy of balance. Neutral creatures summoned by the envoy of balance also gain the counterpoised simple creature template. Spiritual Equilibrium : The envoy of balance's class levels count as cleric levels for determining the effects of her channel energy ability. If she has the spontaneous casting class feature, she is no longer restricted by the choice made at 1st level"
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 5,
+      "bab": 2,
+      "fort": 2,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Ethical Paradox",
+          "description": "At 5th level, an envoy of balance remains unaffected by effects from spells and magical abilities based on her alignment or faith. She doesn't trigger glyphs, symbols, magical traps, or magical sensors set to activate based on a creature's alignment or religion. She counts as the most favorable alignment or faith for the purposes of any harmful effects these alignment - or faith-based spells or abilities may have, but doesn't gain benefits these effects might grant those of a particular alignment or faith unless she is actually of that alignment or faith."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 6,
+      "bab": 3,
+      "fort": 2,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Endowment",
+          "description": "At 2nd level and again at 4th, 6th, and 8th level, an envoy of balance gains one of the following endowments. Aligned Annulment : As a standard action , the envoy of balance can expend a spell with an alignment descriptor to automatically (without requiring a caster level check) dispel a spell with the opposite descriptor. The spell she expends must be of the same level or higher than the spell being dispelled. An envoy of balance must have the aligned counter endowment to choose this endowment. Aligned Counter : The envoy of balance can counterspell a spell with an alignment descriptor using a spell with the opposite alignment descriptor. The spell used to counterspell must be higher level than the spell being countered, unless the envoy of balance has the Improved Counterspell feat, in which case it can be the same level or higher. An envoy of balance with the Improved Counterspell feat can use the aligned counter ability as an immediate action instead of a readied action, but must expend an appropriate spell at least 2 levels higher than the spell to be countered. Planar Parity : Protection from chaos/evil/good/law and similar effects no longer prevent bodily contact from creatures summoned by the envoy of balance. Neutral creatures summoned by the envoy of balance also gain the counterpoised simple creature template. Spiritual Equilibrium : The envoy of balance's class levels count as cleric levels for determining the effects of her channel energy ability. If she has the spontaneous casting class feature, she is no longer restricted by the choice made at 1st level"
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 7,
+      "bab": 3,
+      "fort": 2,
+      "ref": 2,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Retributive Symmetry",
+          "description": "At 7th level, once per day as an immediate action , an envoy of balance can cause a spell targeting her to affect both herself and the spell's caster at full effect, as if both creatures had spell turning cast on them and then rolled the appropriate result on that spell's table."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 8,
+      "bab": 4,
+      "fort": 3,
+      "ref": 3,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Endowment",
+          "description": "At 2nd level and again at 4th, 6th, and 8th level, an envoy of balance gains one of the following endowments. Aligned Annulment : As a standard action , the envoy of balance can expend a spell with an alignment descriptor to automatically (without requiring a caster level check) dispel a spell with the opposite descriptor. The spell she expends must be of the same level or higher than the spell being dispelled. An envoy of balance must have the aligned counter endowment to choose this endowment. Aligned Counter : The envoy of balance can counterspell a spell with an alignment descriptor using a spell with the opposite alignment descriptor. The spell used to counterspell must be higher level than the spell being countered, unless the envoy of balance has the Improved Counterspell feat, in which case it can be the same level or higher. An envoy of balance with the Improved Counterspell feat can use the aligned counter ability as an immediate action instead of a readied action, but must expend an appropriate spell at least 2 levels higher than the spell to be countered. Planar Parity : Protection from chaos/evil/good/law and similar effects no longer prevent bodily contact from creatures summoned by the envoy of balance. Neutral creatures summoned by the envoy of balance also gain the counterpoised simple creature template. Spiritual Equilibrium : The envoy of balance's class levels count as cleric levels for determining the effects of her channel energy ability. If she has the spontaneous casting class feature, she is no longer restricted by the choice made at 1st level"
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 9,
+      "bab": 4,
+      "fort": 3,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Incisive Spells +2",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 10,
+      "bab": 5,
+      "fort": 3,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Scales Of Mortality",
+          "description": "At 10th level, once per day as a standard action , an envoy of balance can make a melee touch attack , delivering a killing touch against a living creature. If the attack hits and the target is not neutral, the target is subject to a power word kill spell. If the attack misses or the target is neutral, this ability is wasted. If the target dies, its bodily remains (but not its equipment) turn to dust, as disintegrate . If this ability kills the target, the envoy of balance becomes aware of that creature's alignment and may then touch the remains of another dead creature with fewer Hit Dice than or Hit Dice equal to the slain creature's and with an alignment opposite to the slain creature's on the good-evil axis, the lawful-chaotic axis, or both. This revives the second dead creature as if via true resurrection . The envoy of balance can delay using this reviving touch for up to 1 hour after successfully using the killing touch, but after that time the reviving power dissipates. The envoy doesn't need to provide the material component for true resurrection ; the caster level for both the power word kill and the true resurrection effects is equal to her character level."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": {
+    "summary": "See level progression spell columns."
+  },
+  "spellcastingClass": true
+}

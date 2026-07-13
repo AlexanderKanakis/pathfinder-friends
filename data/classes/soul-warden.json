@@ -1,0 +1,301 @@
+{
+  "name": "Soul Warden",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/s-z/soul-warden/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Channel Damage 1d6",
+          "description": ""
+        },
+        {
+          "name": "Focus Item",
+          "description": "A soul warden focuses his powers through an object called a focus item. A soul warden must be able to present his focus item to channel damage or to cast spells that require a divine focus. Common focus items include amulets, bells, holy symbols, and staves."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of spellcasting class"
+      }
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Channel Casting",
+          "description": "Level Spells 2nd Decompose corpse , detect undead , hide from undead , sanctify corpse 4th Command undead , necromantic burden 6th Disrupting weapon , halt undead , searing light 8th Death ward , undeath inversion , wall of fire 10th Breath of life , heal , undeath to death At 2nd level, a soul warden can expend a use of his channel damage ability to spontaneously cast from a select group of spells. At 4th level and every 2 levels thereafter, a soul warden gains access to a number of additional spells he can cast in this manner. The spells a soul warden can cast with this ability (and the soul warden level necessary to cast such spells) are listed below. Starting at 3rd level, a soul warden adds his channel casting spells gained from the previous level to the class spell list of a class he belonged to before adding the prestige class. The spell level is equal to half the soul warden level necessary to channel cast the spell. For example, a 3rd-level spell warden who also has levels in sorcerer adds the decompose corpse , detect undead , hide from undead , and sanctify corpse to his sorcerer spell list, treating them as 1st-level sorcerer spells (since half of 2nd level is 1st level)."
+        },
+        {
+          "name": "Corpse Whisperer",
+          "description": "At 2nd level, a soul warden adds half his soul warden level on Charisma checks and Charisma -based skill checks against undead creatures, including checks to assume control of undead creatures via feats like Command Undead or spells like control undead ."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of spellcasting class"
+      }
+    },
+    {
+      "level": 3,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": ""
+        },
+        {
+          "name": "Channel Damage 2d6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of spellcasting class"
+      }
+    },
+    {
+      "level": 4,
+      "bab": 2,
+      "fort": 2,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Channel Casting",
+          "description": "Level Spells 2nd Decompose corpse , detect undead , hide from undead , sanctify corpse 4th Command undead , necromantic burden 6th Disrupting weapon , halt undead , searing light 8th Death ward , undeath inversion , wall of fire 10th Breath of life , heal , undeath to death At 2nd level, a soul warden can expend a use of his channel damage ability to spontaneously cast from a select group of spells. At 4th level and every 2 levels thereafter, a soul warden gains access to a number of additional spells he can cast in this manner. The spells a soul warden can cast with this ability (and the soul warden level necessary to cast such spells) are listed below. Starting at 3rd level, a soul warden adds his channel casting spells gained from the previous level to the class spell list of a class he belonged to before adding the prestige class. The spell level is equal to half the soul warden level necessary to channel cast the spell. For example, a 3rd-level spell warden who also has levels in sorcerer adds the decompose corpse , detect undead , hide from undead , and sanctify corpse to his sorcerer spell list, treating them as 1st-level sorcerer spells (since half of 2nd level is 1st level)."
+        },
+        {
+          "name": "Harvest",
+          "description": "At 4th level, whenever a soul warden destroys an undead creature using channel positive energy , channel damage, or a spell with an instantaneous duration, he regains a use of channel damage. A soul warden can regain only one use of channel damage per round, and can regain a number of uses of channel damage per day up to his class level. A soul warden cannot use this to exceed his maximum number of uses of channel damage per day."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of spellcasting class"
+      }
+    },
+    {
+      "level": 5,
+      "bab": 2,
+      "fort": 2,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Channel Damage 3d6",
+          "description": ""
+        },
+        {
+          "name": "Undead Imposition",
+          "description": "At 5th level, as a standard action a soul warden may expend one use of channel damage to control an undead creature within 30 feet. The target can negate this effect with a successful Will save (DC = 10 + 1/2 the soul warden's level + the soul warden's Cha modifier). Failure means the creature falls under the soul warden's control, obeying his commands to the best of its ability for a number of rounds equal to the soul warden's class level. This ability is otherwise identical to control undead ."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of spellcasting class"
+      }
+    },
+    {
+      "level": 6,
+      "bab": 3,
+      "fort": 3,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": ""
+        },
+        {
+          "name": "Channel Casting",
+          "description": "Level Spells 2nd Decompose corpse , detect undead , hide from undead , sanctify corpse 4th Command undead , necromantic burden 6th Disrupting weapon , halt undead , searing light 8th Death ward , undeath inversion , wall of fire 10th Breath of life , heal , undeath to death At 2nd level, a soul warden can expend a use of his channel damage ability to spontaneously cast from a select group of spells. At 4th level and every 2 levels thereafter, a soul warden gains access to a number of additional spells he can cast in this manner. The spells a soul warden can cast with this ability (and the soul warden level necessary to cast such spells) are listed below. Starting at 3rd level, a soul warden adds his channel casting spells gained from the previous level to the class spell list of a class he belonged to before adding the prestige class. The spell level is equal to half the soul warden level necessary to channel cast the spell. For example, a 3rd-level spell warden who also has levels in sorcerer adds the decompose corpse , detect undead , hide from undead , and sanctify corpse to his sorcerer spell list, treating them as 1st-level sorcerer spells (since half of 2nd level is 1st level)."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of spellcasting class"
+      }
+    },
+    {
+      "level": 7,
+      "bab": 3,
+      "fort": 3,
+      "ref": 2,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Channel Damage 4d6",
+          "description": ""
+        },
+        {
+          "name": "Negative Energy Ward",
+          "description": "At 7th level, once per day a soul warden can ward a 15-foot-radius area centered on himself to protect it against undead incursions. Any undead creatures with fewer Hit Dice than his caster level cannot enter the warded area. Undead with Hit Dice greater than or equal to the soul warden's caster level must attempt a Will save (DC = 10 + soul warden's level) when entering the area. An undead that succeeds at its save is unharmed, and is immune to the soul warden's negative energy ward for 24 hours. Failure means the creature takes 3d6 points of positive energy damage when it enters the area and it becomes staggered for 1d4 rounds. Once placed, a negative energy ward cannot be moved. The ward lasts 1 minute per soul warden level."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of spellcasting class"
+      }
+    },
+    {
+      "level": 8,
+      "bab": 4,
+      "fort": 4,
+      "ref": 3,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Channel Casting",
+          "description": "Level Spells 2nd Decompose corpse , detect undead , hide from undead , sanctify corpse 4th Command undead , necromantic burden 6th Disrupting weapon , halt undead , searing light 8th Death ward , undeath inversion , wall of fire 10th Breath of life , heal , undeath to death At 2nd level, a soul warden can expend a use of his channel damage ability to spontaneously cast from a select group of spells. At 4th level and every 2 levels thereafter, a soul warden gains access to a number of additional spells he can cast in this manner. The spells a soul warden can cast with this ability (and the soul warden level necessary to cast such spells) are listed below. Starting at 3rd level, a soul warden adds his channel casting spells gained from the previous level to the class spell list of a class he belonged to before adding the prestige class. The spell level is equal to half the soul warden level necessary to channel cast the spell. For example, a 3rd-level spell warden who also has levels in sorcerer adds the decompose corpse , detect undead , hide from undead , and sanctify corpse to his sorcerer spell list, treating them as 1st-level sorcerer spells (since half of 2nd level is 1st level)."
+        },
+        {
+          "name": "Necrotic Resistance",
+          "description": "At 8th level, a soul warden becomes resistant to ability drain and negative levels . Whenever a soul warden is targeted by an effect that would result in ability drain or impose negative levels , he takes 1 point of ability drain fewer and gains 1 negative level fewer than he normally would (to a minimum of 0). At 10th level, he takes 2 fewer points of ability drain and gains 2 fewer negative levels than he normally would."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of spellcasting class"
+      }
+    },
+    {
+      "level": 9,
+      "bab": 4,
+      "fort": 4,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": ""
+        },
+        {
+          "name": "Channel Damage 5d6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of spellcasting class"
+      }
+    },
+    {
+      "level": 10,
+      "bab": 5,
+      "fort": 5,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Channel Casting",
+          "description": "Level Spells 2nd Decompose corpse , detect undead , hide from undead , sanctify corpse 4th Command undead , necromantic burden 6th Disrupting weapon , halt undead , searing light 8th Death ward , undeath inversion , wall of fire 10th Breath of life , heal , undeath to death At 2nd level, a soul warden can expend a use of his channel damage ability to spontaneously cast from a select group of spells. At 4th level and every 2 levels thereafter, a soul warden gains access to a number of additional spells he can cast in this manner. The spells a soul warden can cast with this ability (and the soul warden level necessary to cast such spells) are listed below. Starting at 3rd level, a soul warden adds his channel casting spells gained from the previous level to the class spell list of a class he belonged to before adding the prestige class. The spell level is equal to half the soul warden level necessary to channel cast the spell. For example, a 3rd-level spell warden who also has levels in sorcerer adds the decompose corpse , detect undead , hide from undead , and sanctify corpse to his sorcerer spell list, treating them as 1st-level sorcerer spells (since half of 2nd level is 1st level)."
+        },
+        {
+          "name": "Life Shell",
+          "description": "At 10th level, a soul warden can create a dome of energy that repels undead creatures. This ability functions identically to antilife shell , except it hedges out only undead creatures and not creatures of any other type. Living creatures within the affected area gain fast healing 1 for the duration of the effect. A soul warden can activate this spell-like ability for up to 10 minutes per day. The duration need not be consecutive, but it must be expended in 1-minute increments. Section 15: Copyright Notice Pathfinder Player Companion: Undead Slayer's Handbook Ãƒâ€šÃ‚Â© 2014, Paizo Publishing, LLC; Authors: Dennis Baker, Jay Loomis, Alex Putnam, Adam Roy, Tork Shaw, and Larry Wilhelm."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of spellcasting class"
+      }
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": {
+    "summary": "See level progression spell columns."
+  },
+  "spellcastingClass": true
+}

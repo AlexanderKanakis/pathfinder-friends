@@ -1,0 +1,273 @@
+{
+  "name": "Hell Knight Signifer",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/e-h/hellknight-signifer/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Aura Of Law",
+          "description": "The power of a Hell Knight signifer's aura of law (see detect law ) is equal to his total character level."
+        },
+        {
+          "name": "Catechesis",
+          "description": "If a Hell Knight signifer has the Warrior Priest feat, his Hell Knight signifer level stacks with other divine spellcasting classes for determining the effects of those classes' domain powers, inquisitions, and mysteries. This doesn't grant any new powers or abilities. In addition, a signifer with the Warrior Priest feat gains Alignment Channel (chaos) as a bonus feat, and treats his Hell Knight signifer levels as cleric levels when determining the amount of damage chaotic outsiders are either healed or dealt, and when determining their saving throw DCs to halve this damage."
+        },
+        {
+          "name": "Order",
+          "description": "A Hell Knight signifer chooses a Hell Knight order to join. The most common Hell Knight orders (and their favored weapon or weapons) are: The Order of the Chain : flail The Order of the Gate : dagger The Order of the GodClaw : morningstar The Order of the Nail : lance or halberd The Order of the Pyre : glaive The Order of the Rack : longsword or whip The Order of the Scourge : heavy mace or whip"
+        },
+        {
+          "name": "Signifer Mask",
+          "description": "Upon initiation, a Hell Knight signifer receives a signifer mask , often devoid of eyeholes or other personal features. This mask doesn't obscure the signifer's vision, and while wearing it he gains a +2 competence bonus on Sense Motive checks and on saving throws against spells and abilities that rely on visual effects. A Hell Knight signifer with a bonded object from the arcane bond class feature can perform a special ritual that costs 500 gp and takes 8 hours to complete. This ritual converts the signifer's mask into his new bonded item, which takes up the head slot. In this case, Hell Knight signifer levels stack with levels from the class that grants the bonded item for determining what additional magical abilities can be added to the bonded item."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of spellcasting class"
+      }
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Arcane Armor Expertise",
+          "description": "At 2nd level, if a Hell Knight signifer has the Arcane Armor Training feat, he gains Arcane Armor Mastery as a bonus feat. At 5th level, the action required to use this feat changes from a swift action to an immediate action ."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of spellcasting class"
+      }
+    },
+    {
+      "level": 3,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Signifer Armor Training 1",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of spellcasting class"
+      }
+    },
+    {
+      "level": 4,
+      "bab": 3,
+      "fort": 1,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Assiduous Gaze",
+          "description": "At 4th level and again at 7th level, a Hell Knight signifer gains an assiduous gaze ability chosen from the list below. A Hell Knight signifer can use each assiduous gaze ability he possesses for a number of rounds per day equal to 1/2 his class level. These rounds need not be consecutive. A Hell Knight signifer can activate an assiduous gaze ability as a swift action to examine a single creature, object, or 5-foot square within 30 feet. A Hell Knight signifer must be wearing his signifer mask to use these abilities, and his caster level while using them is equal to his character level. Elucidation (Su) : Discern each active spell on the target, including the spell's effect and caster level . Morality (Sp) : Determine whether the target is chaotic, evil, good, or lawful, as well as the strength of its aura as if having studied it for 3 rounds using detect chaos , detect evil , detect good , and detect law . Scrutiny (Su) : Discern whether the target has spell-like abilities and spellcasting abilities, whether the spellcasting ability is arcane or divine, and the strength (see detect magic ) of the most powerful spell or spell-like ability the target currently has available. Veracity (Sp) : Observe the target as if using true seeing . A Hell Knight signifer must be 7th level to select this ability. Vigilance (Su) : See through up to 5 feet of stone, wood, or similar barriers as if they didn't exist. This effect cannot penetrate metal of any kind."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of spellcasting class"
+      }
+    },
+    {
+      "level": 5,
+      "bab": 3,
+      "fort": 2,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Arcane Armor Expertise (Immediate Action)",
+          "description": "At 2nd level, if a Hell Knight signifer has the Arcane Armor Training feat, he gains Arcane Armor Mastery as a bonus feat. At 5th level, the action required to use this feat changes from a swift action to an immediate action ."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of spellcasting class"
+      }
+    },
+    {
+      "level": 6,
+      "bab": 4,
+      "fort": 2,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Discern Lies",
+          "description": "At 6th level, a Hell Knight signifer can use discern lies as a spell-like ability a number of times per day equal to 3 plus his Charisma modifier. These rounds need not be consecutive. His caster level is equal to his total character level."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of spellcasting class"
+      }
+    },
+    {
+      "level": 7,
+      "bab": 5,
+      "fort": 2,
+      "ref": 2,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Assiduous Gaze",
+          "description": "At 4th level and again at 7th level, a Hell Knight signifer gains an assiduous gaze ability chosen from the list below. A Hell Knight signifer can use each assiduous gaze ability he possesses for a number of rounds per day equal to 1/2 his class level. These rounds need not be consecutive. A Hell Knight signifer can activate an assiduous gaze ability as a swift action to examine a single creature, object, or 5-foot square within 30 feet. A Hell Knight signifer must be wearing his signifer mask to use these abilities, and his caster level while using them is equal to his character level. Elucidation (Su) : Discern each active spell on the target, including the spell's effect and caster level . Morality (Sp) : Determine whether the target is chaotic, evil, good, or lawful, as well as the strength of its aura as if having studied it for 3 rounds using detect chaos , detect evil , detect good , and detect law . Scrutiny (Su) : Discern whether the target has spell-like abilities and spellcasting abilities, whether the spellcasting ability is arcane or divine, and the strength (see detect magic ) of the most powerful spell or spell-like ability the target currently has available. Veracity (Sp) : Observe the target as if using true seeing . A Hell Knight signifer must be 7th level to select this ability. Vigilance (Su) : See through up to 5 feet of stone, wood, or similar barriers as if they didn't exist. This effect cannot penetrate metal of any kind."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of spellcasting class"
+      }
+    },
+    {
+      "level": 8,
+      "bab": 6,
+      "fort": 3,
+      "ref": 3,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Signifer Armor Training 2",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of spellcasting class"
+      }
+    },
+    {
+      "level": 9,
+      "bab": 6,
+      "fort": 3,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Infernal Resilience",
+          "description": "At 9th level, a Hell Knight signifer gains DR 5/ chaotic and becomes immune to poison."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of spellcasting class"
+      }
+    },
+    {
+      "level": 10,
+      "bab": 7,
+      "fort": 3,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Diabolic Harbinger",
+          "description": "At 10th level, as long as the Hell Knight signifer wears his signifer mask , he gains telepathy with a range of 100 feet, and can see perfectly in both magical and mundane darkness. While wearing his signifer mask , he is immune to blindness and dazzling effects and gains a +2 bonus on all Charisma -based checks when interacting with lawful creatures. This bonus increases to +4 if the creature is also an outsider . Section 15: Copyright Notice Pathfinder Campaign Setting: Paths of Prestige Ãƒâ€šÃ‚Â© 2012, Paizo Publishing, LLC; Authors: Benjamin Bruck, Jason Bulmahn, Matt Goodall, and Jason Nelson."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of spellcasting class"
+      }
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": {
+    "summary": "See level progression spell columns."
+  },
+  "spellcastingClass": true
+}

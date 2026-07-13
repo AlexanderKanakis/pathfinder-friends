@@ -1,0 +1,255 @@
+{
+  "name": "Darechaser",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/c-d/darechaser/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 0,
+      "classFeatures": [
+        {
+          "name": "Adrenaline Rush +1",
+          "description": ""
+        },
+        {
+          "name": "Dare +1d6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 2,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Adrenaline Deed",
+          "description": "As a darechaser gains experience, she learns to leverage her adrenaline in new ways. At 2nd level and every 2 levels thereafter, she gains an adrenaline deed from the following list that grants her additional benefits while she is using her adrenaline rush ability. She canÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢t choose an individual adrenaline deed more than once. Dare-Driven : If the darechaser adds 1d8 to a roll as a part of a dare, she can roll again and add the result if she rolls a natural 7 or 8 (not just an 8). If she rolls 1d10, she instead rolls again on a result of a natural 9 or 10. Diehard Performer : The darechaser adds her adrenaline rush bonus on all Perform checks and performance combat checks. Impossible Speed : The darechaserÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s base speed increases by 10 feet. At 6th level, her speed instead increases by 20 feet, and at 10th level it increases by 30 feet. Mounted Adrenaline : The darechaser shares the base effects of her adrenaline surge (but not any adrenaline deeds) with her mount, as long as the darechaser is mounted on it or adjacent to it. Powerful Climber : The darechaser gains a natural climb speed equal to her land speed. Powerful Leaper : The darechaser always counts as having a running start when jumping, and she triples her adrenaline rush bonus on Acrobatics checks to jump. Powerful Swimmer : The darechaser gains a natural swim speed equal to her land speed. Unstoppable : When the darechaser begins her adrenaline rush, she gains a number of temporary hit points equal to 2 ÃƒÆ’Ã¢â‚¬â€ her class level. These temporary hit points last for the duration of her adrenaline rush. In addition, she do"
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 3,
+      "bab": 3,
+      "fort": 2,
+      "ref": 2,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Adrenaline Rush +2",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 4,
+      "bab": 4,
+      "fort": 2,
+      "ref": 2,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Adrenaline Deed",
+          "description": "As a darechaser gains experience, she learns to leverage her adrenaline in new ways. At 2nd level and every 2 levels thereafter, she gains an adrenaline deed from the following list that grants her additional benefits while she is using her adrenaline rush ability. She canÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢t choose an individual adrenaline deed more than once. Dare-Driven : If the darechaser adds 1d8 to a roll as a part of a dare, she can roll again and add the result if she rolls a natural 7 or 8 (not just an 8). If she rolls 1d10, she instead rolls again on a result of a natural 9 or 10. Diehard Performer : The darechaser adds her adrenaline rush bonus on all Perform checks and performance combat checks. Impossible Speed : The darechaserÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s base speed increases by 10 feet. At 6th level, her speed instead increases by 20 feet, and at 10th level it increases by 30 feet. Mounted Adrenaline : The darechaser shares the base effects of her adrenaline surge (but not any adrenaline deeds) with her mount, as long as the darechaser is mounted on it or adjacent to it. Powerful Climber : The darechaser gains a natural climb speed equal to her land speed. Powerful Leaper : The darechaser always counts as having a running start when jumping, and she triples her adrenaline rush bonus on Acrobatics checks to jump. Powerful Swimmer : The darechaser gains a natural swim speed equal to her land speed. Unstoppable : When the darechaser begins her adrenaline rush, she gains a number of temporary hit points equal to 2 ÃƒÆ’Ã¢â‚¬â€ her class level. These temporary hit points last for the duration of her adrenaline rush. In addition, she do"
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 5,
+      "bab": 5,
+      "fort": 3,
+      "ref": 3,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Adrenaline Rush +3",
+          "description": ""
+        },
+        {
+          "name": "Dare +1d8",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 6,
+      "bab": 6,
+      "fort": 3,
+      "ref": 3,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Adrenaline Deed",
+          "description": "As a darechaser gains experience, she learns to leverage her adrenaline in new ways. At 2nd level and every 2 levels thereafter, she gains an adrenaline deed from the following list that grants her additional benefits while she is using her adrenaline rush ability. She canÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢t choose an individual adrenaline deed more than once. Dare-Driven : If the darechaser adds 1d8 to a roll as a part of a dare, she can roll again and add the result if she rolls a natural 7 or 8 (not just an 8). If she rolls 1d10, she instead rolls again on a result of a natural 9 or 10. Diehard Performer : The darechaser adds her adrenaline rush bonus on all Perform checks and performance combat checks. Impossible Speed : The darechaserÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s base speed increases by 10 feet. At 6th level, her speed instead increases by 20 feet, and at 10th level it increases by 30 feet. Mounted Adrenaline : The darechaser shares the base effects of her adrenaline surge (but not any adrenaline deeds) with her mount, as long as the darechaser is mounted on it or adjacent to it. Powerful Climber : The darechaser gains a natural climb speed equal to her land speed. Powerful Leaper : The darechaser always counts as having a running start when jumping, and she triples her adrenaline rush bonus on Acrobatics checks to jump. Powerful Swimmer : The darechaser gains a natural swim speed equal to her land speed. Unstoppable : When the darechaser begins her adrenaline rush, she gains a number of temporary hit points equal to 2 ÃƒÆ’Ã¢â‚¬â€ her class level. These temporary hit points last for the duration of her adrenaline rush. In addition, she do"
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 7,
+      "bab": 7,
+      "fort": 4,
+      "ref": 4,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Adrenaline Rush +4",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 8,
+      "bab": 8,
+      "fort": 4,
+      "ref": 4,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Adrenaline Deed",
+          "description": "As a darechaser gains experience, she learns to leverage her adrenaline in new ways. At 2nd level and every 2 levels thereafter, she gains an adrenaline deed from the following list that grants her additional benefits while she is using her adrenaline rush ability. She canÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢t choose an individual adrenaline deed more than once. Dare-Driven : If the darechaser adds 1d8 to a roll as a part of a dare, she can roll again and add the result if she rolls a natural 7 or 8 (not just an 8). If she rolls 1d10, she instead rolls again on a result of a natural 9 or 10. Diehard Performer : The darechaser adds her adrenaline rush bonus on all Perform checks and performance combat checks. Impossible Speed : The darechaserÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s base speed increases by 10 feet. At 6th level, her speed instead increases by 20 feet, and at 10th level it increases by 30 feet. Mounted Adrenaline : The darechaser shares the base effects of her adrenaline surge (but not any adrenaline deeds) with her mount, as long as the darechaser is mounted on it or adjacent to it. Powerful Climber : The darechaser gains a natural climb speed equal to her land speed. Powerful Leaper : The darechaser always counts as having a running start when jumping, and she triples her adrenaline rush bonus on Acrobatics checks to jump. Powerful Swimmer : The darechaser gains a natural swim speed equal to her land speed. Unstoppable : When the darechaser begins her adrenaline rush, she gains a number of temporary hit points equal to 2 ÃƒÆ’Ã¢â‚¬â€ her class level. These temporary hit points last for the duration of her adrenaline rush. In addition, she do"
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 9,
+      "bab": 9,
+      "fort": 5,
+      "ref": 5,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Adrenaline Rush +5",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 10,
+      "bab": 10,
+      "fort": 5,
+      "ref": 5,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Adrenaline Deed",
+          "description": "As a darechaser gains experience, she learns to leverage her adrenaline in new ways. At 2nd level and every 2 levels thereafter, she gains an adrenaline deed from the following list that grants her additional benefits while she is using her adrenaline rush ability. She canÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢t choose an individual adrenaline deed more than once. Dare-Driven : If the darechaser adds 1d8 to a roll as a part of a dare, she can roll again and add the result if she rolls a natural 7 or 8 (not just an 8). If she rolls 1d10, she instead rolls again on a result of a natural 9 or 10. Diehard Performer : The darechaser adds her adrenaline rush bonus on all Perform checks and performance combat checks. Impossible Speed : The darechaserÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s base speed increases by 10 feet. At 6th level, her speed instead increases by 20 feet, and at 10th level it increases by 30 feet. Mounted Adrenaline : The darechaser shares the base effects of her adrenaline surge (but not any adrenaline deeds) with her mount, as long as the darechaser is mounted on it or adjacent to it. Powerful Climber : The darechaser gains a natural climb speed equal to her land speed. Powerful Leaper : The darechaser always counts as having a running start when jumping, and she triples her adrenaline rush bonus on Acrobatics checks to jump. Powerful Swimmer : The darechaser gains a natural swim speed equal to her land speed. Unstoppable : When the darechaser begins her adrenaline rush, she gains a number of temporary hit points equal to 2 ÃƒÆ’Ã¢â‚¬â€ her class level. These temporary hit points last for the duration of her adrenaline rush. In addition, she do"
+        },
+        {
+          "name": "Dare +1d10",
+          "description": ""
+        },
+        {
+          "name": "Record Breaker",
+          "description": "At 10th level, a darechaser can push herself to surpass known mortal limits. Once per day, she can use her dare ability to add 2 ÃƒÆ’Ã¢â‚¬â€ the normal number of bonus dice to a d20 roll. If she applies this benefit to a check modified by her adrenaline rush, she instead rolls and adds 3 ÃƒÆ’Ã¢â‚¬â€ the number of bonus dice. Section 15: Copyright Notice Pathfinder Player Companion: Paths of the Righteous Ãƒâ€šÃ‚Â© 2016, Paizo Inc.; Authors: Alexander Augunas, John Compton, Jenny Jarzabski, Isabelle Lee, Stephen Rowe, and Owen K.C. Stephens."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": null,
+  "spellcastingClass": false
+}

@@ -1,0 +1,269 @@
+{
+  "name": "Anchorite of Dawn",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/a-b/anchorite/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 0,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Solar Invocation +1",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "-"
+      }
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Credence",
+          "description": "Each anchorite of dawn develops a personal credence that guides his worship. He gains a credence at 2nd level and again every 2 class levels thereafter. Each credence can be chosen only once unless noted otherwise. Dervish Dance : The anchorite of dawn gains Dervish Dance as a bonus feat. Divine Light (Su) : The anchorite of dawn can use solar invocation indoors or underground, provided he is in an area of dim light, normal light, or bright light. He can use solar invocation 2 additional rounds per day. Extra Invocations (Ex) : The anchorite of dawn can use solar invocation for twice as many rounds per day as normal. Focused Class Feature : Choose one of the following class features: animal companion , bane , bardic performance , blessings , channel energy , domain , favored enemy , favored terrain , sacred weapon , or wild shape . The character adds his anchorite of dawn class levels to his effective class level in one class of his choice for the purpose of determining the effects of the chosen class feature. This credence can be selected twice, but the anchorite of dawn must select a different class feature each time. Shining Servants : The anchorite of dawn gains Sunlight Summons as a bonus feat. Solar Defense (Su) : While using solar invocation, the anchorite of dawn adds his competence bonus on attack rolls to his Armor Class as a sacred bonus and to Reflex saving throws as a dodge bonus . The anchorite of dawn can select this credence twice-the second time he does so, the bonus to Armor Class and on Reflex saves also applies to any companions who gain bonuses from the"
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 3,
+      "bab": 2,
+      "fort": 1,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Bask In Radiance",
+          "description": "At 3rd level, when an anchorite of dawn uses his solar invocation ability, he can designate any number of allies within 30 feet to gain the bonuses granted by solar invocation for as long as he maintains the ability."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 4,
+      "bab": 3,
+      "fort": 1,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Credence",
+          "description": "Each anchorite of dawn develops a personal credence that guides his worship. He gains a credence at 2nd level and again every 2 class levels thereafter. Each credence can be chosen only once unless noted otherwise. Dervish Dance : The anchorite of dawn gains Dervish Dance as a bonus feat. Divine Light (Su) : The anchorite of dawn can use solar invocation indoors or underground, provided he is in an area of dim light, normal light, or bright light. He can use solar invocation 2 additional rounds per day. Extra Invocations (Ex) : The anchorite of dawn can use solar invocation for twice as many rounds per day as normal. Focused Class Feature : Choose one of the following class features: animal companion , bane , bardic performance , blessings , channel energy , domain , favored enemy , favored terrain , sacred weapon , or wild shape . The character adds his anchorite of dawn class levels to his effective class level in one class of his choice for the purpose of determining the effects of the chosen class feature. This credence can be selected twice, but the anchorite of dawn must select a different class feature each time. Shining Servants : The anchorite of dawn gains Sunlight Summons as a bonus feat. Solar Defense (Su) : While using solar invocation, the anchorite of dawn adds his competence bonus on attack rolls to his Armor Class as a sacred bonus and to Reflex saving throws as a dodge bonus . The anchorite of dawn can select this credence twice-the second time he does so, the bonus to Armor Class and on Reflex saves also applies to any companions who gain bonuses from the"
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 5,
+      "bab": 3,
+      "fort": 2,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Solar Invocation +2 ( Move Action )",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 6,
+      "bab": 4,
+      "fort": 2,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Credence",
+          "description": "Each anchorite of dawn develops a personal credence that guides his worship. He gains a credence at 2nd level and again every 2 class levels thereafter. Each credence can be chosen only once unless noted otherwise. Dervish Dance : The anchorite of dawn gains Dervish Dance as a bonus feat. Divine Light (Su) : The anchorite of dawn can use solar invocation indoors or underground, provided he is in an area of dim light, normal light, or bright light. He can use solar invocation 2 additional rounds per day. Extra Invocations (Ex) : The anchorite of dawn can use solar invocation for twice as many rounds per day as normal. Focused Class Feature : Choose one of the following class features: animal companion , bane , bardic performance , blessings , channel energy , domain , favored enemy , favored terrain , sacred weapon , or wild shape . The character adds his anchorite of dawn class levels to his effective class level in one class of his choice for the purpose of determining the effects of the chosen class feature. This credence can be selected twice, but the anchorite of dawn must select a different class feature each time. Shining Servants : The anchorite of dawn gains Sunlight Summons as a bonus feat. Solar Defense (Su) : While using solar invocation, the anchorite of dawn adds his competence bonus on attack rolls to his Armor Class as a sacred bonus and to Reflex saving throws as a dodge bonus . The anchorite of dawn can select this credence twice-the second time he does so, the bonus to Armor Class and on Reflex saves also applies to any companions who gain bonuses from the"
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 7,
+      "bab": 5,
+      "fort": 2,
+      "ref": 4,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Sunbeam",
+          "description": "At 7th level, an anchorite of dawn gains the ability to cast sunbeam once per day as a spell-like ability . His caster level is equal to his Hit Dice , and the save DC is Charisma -based. At 10th level, the anchorite of dawn can use this ability twice per day."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 8,
+      "bab": 6,
+      "fort": 3,
+      "ref": 4,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Credence",
+          "description": "Each anchorite of dawn develops a personal credence that guides his worship. He gains a credence at 2nd level and again every 2 class levels thereafter. Each credence can be chosen only once unless noted otherwise. Dervish Dance : The anchorite of dawn gains Dervish Dance as a bonus feat. Divine Light (Su) : The anchorite of dawn can use solar invocation indoors or underground, provided he is in an area of dim light, normal light, or bright light. He can use solar invocation 2 additional rounds per day. Extra Invocations (Ex) : The anchorite of dawn can use solar invocation for twice as many rounds per day as normal. Focused Class Feature : Choose one of the following class features: animal companion , bane , bardic performance , blessings , channel energy , domain , favored enemy , favored terrain , sacred weapon , or wild shape . The character adds his anchorite of dawn class levels to his effective class level in one class of his choice for the purpose of determining the effects of the chosen class feature. This credence can be selected twice, but the anchorite of dawn must select a different class feature each time. Shining Servants : The anchorite of dawn gains Sunlight Summons as a bonus feat. Solar Defense (Su) : While using solar invocation, the anchorite of dawn adds his competence bonus on attack rolls to his Armor Class as a sacred bonus and to Reflex saving throws as a dodge bonus . The anchorite of dawn can select this credence twice-the second time he does so, the bonus to Armor Class and on Reflex saves also applies to any companions who gain bonuses from the"
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 9,
+      "bab": 6,
+      "fort": 3,
+      "ref": 5,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Solar Invocation +3",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 10,
+      "bab": 7,
+      "fort": 3,
+      "ref": 5,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Credence",
+          "description": "Each anchorite of dawn develops a personal credence that guides his worship. He gains a credence at 2nd level and again every 2 class levels thereafter. Each credence can be chosen only once unless noted otherwise. Dervish Dance : The anchorite of dawn gains Dervish Dance as a bonus feat. Divine Light (Su) : The anchorite of dawn can use solar invocation indoors or underground, provided he is in an area of dim light, normal light, or bright light. He can use solar invocation 2 additional rounds per day. Extra Invocations (Ex) : The anchorite of dawn can use solar invocation for twice as many rounds per day as normal. Focused Class Feature : Choose one of the following class features: animal companion , bane , bardic performance , blessings , channel energy , domain , favored enemy , favored terrain , sacred weapon , or wild shape . The character adds his anchorite of dawn class levels to his effective class level in one class of his choice for the purpose of determining the effects of the chosen class feature. This credence can be selected twice, but the anchorite of dawn must select a different class feature each time. Shining Servants : The anchorite of dawn gains Sunlight Summons as a bonus feat. Solar Defense (Su) : While using solar invocation, the anchorite of dawn adds his competence bonus on attack rolls to his Armor Class as a sacred bonus and to Reflex saving throws as a dodge bonus . The anchorite of dawn can select this credence twice-the second time he does so, the bonus to Armor Class and on Reflex saves also applies to any companions who gain bonuses from the"
+        },
+        {
+          "name": "Invocation Of Dawn",
+          "description": "At 10th level, an anchorite of dawn is able to, once per day, use his solar invocation ability for 1 minute. The anchorite of dawn can also use this ability indoors or underground. While using invocation of dawn, all bonuses gained from solar invocation increase by 1. Using this ability doesnÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢t cost rounds per day of solar invocation. Section 15: Copyright Notice Pathfinder Player Companion: Paths of the Righteous Ãƒâ€šÃ‚Â© 2016, Paizo Inc.; Authors: Alexander Augunas, John Compton, Jenny Jarzabski, Isabelle Lee, Stephen Rowe, and Owen K.C. Stephens."
+        },
+        {
+          "name": "Solar Invocation ( Swift Action )",
+          "description": "An anchorite of dawn can harness the sunÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s life-giving warmth to protect the innocent and smite the wicked. At 1st level, he can invoke the sun as a standard action , granting him a +1 competence bonus on attack rolls and damage rolls against evil creatures and adding 1 to the DC of his spells and domain powers (if any) against evil creatures. The bonus on attack rolls and damage rolls increases to +2 at 5th level and +3 at 9th level. If an anchorite has an animal companion , the companion also gains the competence bonus on attack and damage rolls while this ability is active. An anchorite of dawn can invoke the sun for a number of rounds per day equal to twice his anchorite of dawn class level + his Charisma modifier. Maintaining this ability on subsequent rounds is a free action . These bonuses apply only when the anchorite of dawn is standing in an outdoor area of dim light, normal light, or bright light, and only while he is clearly presenting his holy symbol or any scimitar . At 5th level, an anchorite of dawn can invoke the sun as a move action instead of a standard action . At 10th level, he can invoke the sun as a swift action ."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": {
+    "summary": "See level progression spell columns."
+  },
+  "spellcastingClass": true
+}

@@ -1,0 +1,269 @@
+{
+  "name": "Proctor",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/n-r/proctor/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 1,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [
+        {
+          "name": "Monitor Familiar",
+          "description": "The proctor gains the services of an arbiter , nosoi, paracletus , or voidworm familiar , as appropriate for the proctorÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s monitor demigod. This functions as the wizardÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s arcane bond class feature, but as if the proctor had selected the Improved Familiar feat. If the proctor has levels in another class that grants a familiar , levels in that class and the proctor class stack for determining the overall abilities of her familiar ."
+        },
+        {
+          "name": "Obedience",
+          "description": "In order to maintain the abilities granted by this prestige class (including all spellcasting abilities augmented by this prestige class), a proctor must perform a daily obedience to her monitor, as set forth in the description of each monitor demigod."
+        },
+        {
+          "name": "Soultended",
+          "description": "Upon death, a proctorÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s soul appears on one of the neutral Outer Planes that corresponds to her monitor demigod and begins the gradual transformation into an aeon , inevitable , protean , or psychopomp . A character attempting to resurrect a slain proctor must succeed at a caster level check with a DC equal to 10 + the proctorÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s character level or the spell fails. That character cannot attempt to resurrect the proctor again until 24 hours have passed, though other characters can still attempt to do so. The comforting inevitability of this fate grants the proctor a +2 bonus on Will saves."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day/Spells Known": "-"
+      }
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Monitor Expression",
+          "description": "At 2nd level, a proctor must select a specific expression of her role for her monitor demigod. Once made, this choice cannot be changed. Although a proctorÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s expression often aligns with her demigod, this isnÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢t a strict requirement. Each expression provides a different benefit to the proctor. Executors discharge their assigned duties in an efficient and orderly manner, and most often align with the primal inevitables . A proctor with this expression gains a +4 bonus on saving throws against disease , paralysis , poison , sleep , and stunning. At 5th level, this bonus also applies on saves against mind-affecting effects. Fosters work to strengthen existing social relationships, and most often align with the psychopomp ushers. As a swift action , a proctor with this expression can gain the spiritsense ability, and she can end the effect as a free action . The foster can use this ability for a number of rounds per day equal to her proctor level. These rounds need not be consecutive. At 5th level, the duration increases to 1 minute, and the foster can use this ability for a number of minutes per day equal to her proctor level. These minutes need not be consecutive, but they must be used in 1-minute increments. Harmonizers bring balance to opposing factions, and most often align with the Monad. As a swift action , a proctor with this expression can become semitangible and gain a +2 deflection bonus to AC. The harmonizer can use this ability for a number of rounds per day equal to her proctor level, and she can end the effect as a free action . These rounds need not be consecutiv"
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day/Spells Known": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 3,
+      "bab": 2,
+      "fort": 2,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Monitor Boon 1",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day/Spells Known": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 4,
+      "bab": 3,
+      "fort": 2,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Summon Monitor",
+          "description": "At 4th level, a proctor can cast summon monster VI once per day to conjure monitors based on her monitor expression. An executor can summon one axiomite , 1d3 mercanes , or 1d4+1 novenaruts. A foster can summon one vanth, 1d3 morbais, or 1d4+1 catrinas. A harmonizer can summon one theletos , 1d3 othaoses, or 1d4+1 comozant wyrds. An impulsive can summon one naunet , 1d3 azuretzis, or 1d4+1 ourdivars. At 8th level, the proctor also gains the ability to cast summon monster VIII once per day to conjure additional monitors of the same type as her monitor expression. An executor can summon one kolyarut , 1d3 zelekhuts , or 1d4+1 axiomites . A foster can summon one algea, 1d3 shokis, or 1d4+1 vanths. A harmonizer can summon one akhana , 1d3 jyoti , or 1d4+1 theletoses. An impulsive can summon one ibshaunet, 1d3 illureshis, or 1d4+1 naunets . At the GMÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s discretion, specific monitor demigods may allow proctors who worship them to summon other neutral outsiders of equal power with this ability."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day/Spells Known": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 5,
+      "bab": 3,
+      "fort": 3,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Improved Monitor Expression",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day/Spells Known": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 6,
+      "bab": 4,
+      "fort": 3,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Monitor Boon 2",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day/Spells Known": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 7,
+      "bab": 5,
+      "fort": 4,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Solemn Voice",
+          "description": "At 7th level, the proctor gains an ability based on her monitor expression. Executors and impulsives can speak with any creature that has a language, as tongues . A foster can cast speak with dead as a spell-like ability at will. A harmonizer gains telepathy with a range of 30 feet but cannot communicate telepathically with creatures immune to mind-affecting effects."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day/Spells Known": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 8,
+      "bab": 6,
+      "fort": 4,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Summon Monitor",
+          "description": "At 4th level, a proctor can cast summon monster VI once per day to conjure monitors based on her monitor expression. An executor can summon one axiomite , 1d3 mercanes , or 1d4+1 novenaruts. A foster can summon one vanth, 1d3 morbais, or 1d4+1 catrinas. A harmonizer can summon one theletos , 1d3 othaoses, or 1d4+1 comozant wyrds. An impulsive can summon one naunet , 1d3 azuretzis, or 1d4+1 ourdivars. At 8th level, the proctor also gains the ability to cast summon monster VIII once per day to conjure additional monitors of the same type as her monitor expression. An executor can summon one kolyarut , 1d3 zelekhuts , or 1d4+1 axiomites . A foster can summon one algea, 1d3 shokis, or 1d4+1 vanths. A harmonizer can summon one akhana , 1d3 jyoti , or 1d4+1 theletoses. An impulsive can summon one ibshaunet, 1d3 illureshis, or 1d4+1 naunets . At the GMÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s discretion, specific monitor demigods may allow proctors who worship them to summon other neutral outsiders of equal power with this ability."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day/Spells Known": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 9,
+      "bab": 6,
+      "fort": 5,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Monitor Boon 3",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day/Spells Known": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 10,
+      "bab": 7,
+      "fort": 5,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Expression Immunities",
+          "description": "At 10th level, the proctor gains one or more immunities based on her monitor expression. Executors are immune to ability damage , ability drain , and energy drain . Fosters are immune to death effects, disease , and poison . Harmonizers are immune to critical hits. Impulsives are immune to transmutation effects, except those they willingly accept. Section 15: Copyright Notice Pathfinder Campaign Setting: Concordance of Rivals Ãƒâ€šÃ‚Â© 2019, Paizo Inc.; Authors: John Compton, Crystal Frasier, Ron Lundeen, and Amber Stewart."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day/Spells Known": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": {
+    "summary": "See level progression spell columns."
+  },
+  "spellcastingClass": true
+}

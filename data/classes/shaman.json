@@ -1,0 +1,825 @@
+{
+  "name": "Shaman",
+  "type": "hybrid",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/hybrid-classes/shaman/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Orisons",
+          "description": "Shamans can prepare a number of orisons, or 0-level spells, each day as noted on Table: Shaman . These spells are cast like any other spell, but they are not expended when cast and may be used again."
+        },
+        {
+          "name": "Spirit",
+          "description": "A shaman forms a mystical bond with the spirits of the world. She forms a lasting bond with a single spirit, which grants a number of abilities and defines many of her other class features. At 1st level, a shaman gains the spirit ability granted by her chosen spirit. She adds the spells granted by that spirit to the list of spells that she can cast using spirit magic. She also adds the hexes possessed by that spirit to the list of hexes that she can use with the hex and wandering hex class features. At 8th level, the shaman gains the abilities listed in the greater version of her selected spirit. At 16th level, the shaman gains the abilities listed for the true version of her selected spirit. If the shaman takes levels in another class that grants a mystery (such as the oracle ), the spirit and mystery must match, even if that means one of them must change. Subject to GM discretion, the shaman can change her former mystery or spirit to make them conform."
+        },
+        {
+          "name": "Spirit Animal",
+          "description": "By communing with the incredible powers of her spirit, the shaman forges a cherished bond with one specific servant of that spirit-known as a spirit animal. A spirit animal is a creature chosen by a shaman to serve as a conduit, allowing her to more fully access the magic of her spirit on a daily basis. The shaman's spirit animal also grants her special powers. This ability uses the same rules as the wizard's arcane bond class feature and is treated as a familiar , except as noted below. A shaman uses her level as her effective wizard level when determining the abilities of her spirit animal. A shaman can select any familiar available to wizards to serve as her spirit animal, although her spirit animal is augmented by the power of her chosen spirit. Once selected, the spirit animal cannot be changed. Although a shaman's spirit animal uses the statistics of a specific animal, it is treated as an outsider with the native subtype for the purposes of spells and abilities that affect it. Levels of different classes that are entitled to familiars stack with shaman levels for the purpose of determining any spirit animal abilities that depend on the shaman's level. If a shaman possesses such levels in other classes, her spirit animal always uses the shaman rules for spirit animals, not those used by familiars of other classes (such as witches , wizards , or sorcerers with the arcane bloodline ). If the shaman has witch levels, her spirit animal also serves as the conduit to her patron and stores her witch spells. The shaman's spirit animal is treated a"
+        },
+        {
+          "name": "Spirit Magic",
+          "description": "A shaman can spontaneously cast a limited number of spells per day beyond those she prepared ahead of time. She has one spell slot per day of each shaman spell level she can cast, not including orisons. She can choose these spells from the list of spells granted by her spirits (see the spirit class feature and the wandering spirit class feature) at the time she casts them. She can enhance these spells using any metamagic feat that she knows, using up a higher-level spell slot as required by the feat and increasing the time to cast the spell (see Spontaneous Casting and Metamagic Feats )."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "3"
+      }
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 0,
+      "ref": 0,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Hex",
+          "description": "A shaman learns a number of magical tricks, called hexes, which grant her powers or weaken foes. At 2nd level, a shaman learns one hex. At 4th, 8th, 10th, 12th, 16th, 18th, and 20th level, the shaman learns new hexes. A shaman can select from any of the following hexes or from any of the hexes listed in the description of her chosen spirit. A shaman cannot select a hex more than once unless noted otherwise. Using a hex is a standard action that doesn't provoke an attack of opportunity unless otherwise noted. The saving throw DC to resist a hex is equal to 10 + 1/2 the shaman's level + the shaman's Wisdom modifier. Chant (Su) : A shaman can chant as a move action . Any creature that is within 30 feet that is under the effects of the shaman's charm , evil eye , fortune, fury, or misfortune hex has that effect's duration extended by 1 round. A shaman cannot select both this hex and the witch's cackle hex. Charm (Su) : A shaman charms an animal or humanoid creature within 30 feet by beckoning and speaking soothing words. This improves the attitude of an animal or humanoid creature by 1 step, as if the shaman had successfully used the Diplomacy skill. The effect lasts for a number of rounds equal to the shaman's Wisdom modifier (minimum 1). A successful Will saving throw negates this effect. Whether or not the save is successful, the creature cannot be the target of this hex again for 24 hours. At 8th level, this effect improves the attitude of the creature by 2 steps. This is a mind-affecting charm effect. Draconic Resilience (Ex) : The",
+          "pools": [
+            {
+              "name": "Hex",
+              "description": "A shaman learns a number of magical tricks, called hexes, which grant her powers or weaken foes. At 2nd level, a shaman learns one hex. At 4th, 8th, 10th, 12th, 16th, 18th, and 20th level, the shaman learns new hexes. A shaman can select from any of the following hexes or from any of the hexes listed in the description of her chosen spirit. A shaman cannot select a hex more than once unless noted otherwise. Using a hex is a standard action that doesn't provoke an attack of opportunity unless otherwise noted. The saving throw DC to resist a hex is equal to 10 + 1/2 the shaman's level + the shaman's Wisdom modifier. Chant (Su) : A shaman can chant as a move action . Any creature that is within 30 feet that is under the effects of the shaman's charm , evil eye , fortune, fury, or misfortune hex has that effect's duration extended by 1 round. A shaman cannot select both this hex and the witch's cackle hex. Charm (Su) : A shaman charms an animal or humanoid creature within 30 feet by beckoning and speaking soothing words. This improves the attitude of an animal or humanoid creature by 1 step, as if the shaman had successfully used the Diplomacy skill. The effect lasts for a number of rounds equal to the shaman's Wisdom modifier (minimum 1). A successful Will saving throw negates this effect. Whether or not the save is successful, the creature cannot be the target of this hex again for 24 hours. At 8th level, this effect improves the attitude of the creature by 2 steps. This is a mind-affecting charm effect. Draconic Resilience (Ex) : The",
+              "requirements": {
+                "minClassLevel": 2,
+                "text": "At 2nd level, a shaman learns one hex. At 4th, 8th, 10th, 12th, 16th, 18th, and 20th level, the shaman learns new hexes."
+              },
+              "options": [
+                {
+                  "name": "Wandering Hex",
+                  "description": "At 6th level, a shaman can temporarily gain the use of one of the hexes possessed by either one of her spirits. She must make this selection each day when she prepares her spells. For the purposes of this ability, she can select any hex possessed by her spirit or wandering spirit. If she selects it from her wandering spirit, she loses the hex immediately if she bonds with another spirit, although she can then select a different hex to gain using this ability, from either her spirit or her new wandering spirit. At 14th level, a shaman can select two wandering hexes each day instead of one. This ability otherwise functions as the hex class feature.",
+                  "requirements": {
+                    "minClassLevel": 6,
+                    "text": "At 6th level, a shaman can temporarily gain the use of one of the hexes possessed by either one of her spirits. She must make this selection each day when she prepares her spells."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "Hex Mastery",
+                  "description": "At 20th level, the shaman has learned ever more terrible hexes . She can select one grand hex from the list available to witches .",
+                  "requirements": {
+                    "minClassLevel": 20,
+                    "text": "At 20th level, the shaman has learned ever more terrible hexes ."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/hybrid-classes/shaman/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 3,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 3,
+      "classFeatures": [],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 4,
+      "bab": 3,
+      "fort": 1,
+      "ref": 1,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Hex",
+          "description": "A shaman learns a number of magical tricks, called hexes, which grant her powers or weaken foes. At 2nd level, a shaman learns one hex. At 4th, 8th, 10th, 12th, 16th, 18th, and 20th level, the shaman learns new hexes. A shaman can select from any of the following hexes or from any of the hexes listed in the description of her chosen spirit. A shaman cannot select a hex more than once unless noted otherwise. Using a hex is a standard action that doesn't provoke an attack of opportunity unless otherwise noted. The saving throw DC to resist a hex is equal to 10 + 1/2 the shaman's level + the shaman's Wisdom modifier. Chant (Su) : A shaman can chant as a move action . Any creature that is within 30 feet that is under the effects of the shaman's charm , evil eye , fortune, fury, or misfortune hex has that effect's duration extended by 1 round. A shaman cannot select both this hex and the witch's cackle hex. Charm (Su) : A shaman charms an animal or humanoid creature within 30 feet by beckoning and speaking soothing words. This improves the attitude of an animal or humanoid creature by 1 step, as if the shaman had successfully used the Diplomacy skill. The effect lasts for a number of rounds equal to the shaman's Wisdom modifier (minimum 1). A successful Will saving throw negates this effect. Whether or not the save is successful, the creature cannot be the target of this hex again for 24 hours. At 8th level, this effect improves the attitude of the creature by 2 steps. This is a mind-affecting charm effect. Draconic Resilience (Ex) : The",
+          "pools": [
+            {
+              "name": "Hex",
+              "description": "A shaman learns a number of magical tricks, called hexes, which grant her powers or weaken foes. At 2nd level, a shaman learns one hex. At 4th, 8th, 10th, 12th, 16th, 18th, and 20th level, the shaman learns new hexes. A shaman can select from any of the following hexes or from any of the hexes listed in the description of her chosen spirit. A shaman cannot select a hex more than once unless noted otherwise. Using a hex is a standard action that doesn't provoke an attack of opportunity unless otherwise noted. The saving throw DC to resist a hex is equal to 10 + 1/2 the shaman's level + the shaman's Wisdom modifier. Chant (Su) : A shaman can chant as a move action . Any creature that is within 30 feet that is under the effects of the shaman's charm , evil eye , fortune, fury, or misfortune hex has that effect's duration extended by 1 round. A shaman cannot select both this hex and the witch's cackle hex. Charm (Su) : A shaman charms an animal or humanoid creature within 30 feet by beckoning and speaking soothing words. This improves the attitude of an animal or humanoid creature by 1 step, as if the shaman had successfully used the Diplomacy skill. The effect lasts for a number of rounds equal to the shaman's Wisdom modifier (minimum 1). A successful Will saving throw negates this effect. Whether or not the save is successful, the creature cannot be the target of this hex again for 24 hours. At 8th level, this effect improves the attitude of the creature by 2 steps. This is a mind-affecting charm effect. Draconic Resilience (Ex) : The",
+              "requirements": {
+                "minClassLevel": 2,
+                "text": "At 2nd level, a shaman learns one hex. At 4th, 8th, 10th, 12th, 16th, 18th, and 20th level, the shaman learns new hexes."
+              },
+              "options": [
+                {
+                  "name": "Wandering Hex",
+                  "description": "At 6th level, a shaman can temporarily gain the use of one of the hexes possessed by either one of her spirits. She must make this selection each day when she prepares her spells. For the purposes of this ability, she can select any hex possessed by her spirit or wandering spirit. If she selects it from her wandering spirit, she loses the hex immediately if she bonds with another spirit, although she can then select a different hex to gain using this ability, from either her spirit or her new wandering spirit. At 14th level, a shaman can select two wandering hexes each day instead of one. This ability otherwise functions as the hex class feature.",
+                  "requirements": {
+                    "minClassLevel": 6,
+                    "text": "At 6th level, a shaman can temporarily gain the use of one of the hexes possessed by either one of her spirits. She must make this selection each day when she prepares her spells."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "Hex Mastery",
+                  "description": "At 20th level, the shaman has learned ever more terrible hexes . She can select one grand hex from the list available to witches .",
+                  "requirements": {
+                    "minClassLevel": 20,
+                    "text": "At 20th level, the shaman has learned ever more terrible hexes ."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/hybrid-classes/shaman/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        },
+        {
+          "name": "Wandering Spirit",
+          "description": "At 4th level, a shaman can form a temporary bond with a spirit other than the one selected using her spirit class feature. She must make this selection each day when preparing her spells. While this feature is active, she gains the spirit ability granted by the spirit. She also adds the spells granted by that spirit to her list of spells that she can cast using spirit magic. She does not add the hexes from her wandering spirit to her list of hexes that she can choose from with the hex class feature. At 12th level, she gains the abilities listed in the greater version of her wandering spirit. At 20th level, she gains the ability listed in the true version of her wandering spirit."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 5,
+      "bab": 3,
+      "fort": 1,
+      "ref": 1,
+      "will": 4,
+      "classFeatures": [],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 6,
+      "bab": 4,
+      "fort": 2,
+      "ref": 2,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Wandering Hex",
+          "description": "At 6th level, a shaman can temporarily gain the use of one of the hexes possessed by either one of her spirits. She must make this selection each day when she prepares her spells. For the purposes of this ability, she can select any hex possessed by her spirit or wandering spirit. If she selects it from her wandering spirit, she loses the hex immediately if she bonds with another spirit, although she can then select a different hex to gain using this ability, from either her spirit or her new wandering spirit. At 14th level, a shaman can select two wandering hexes each day instead of one. This ability otherwise functions as the hex class feature."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 7,
+      "bab": 5,
+      "fort": 2,
+      "ref": 2,
+      "will": 5,
+      "classFeatures": [],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 8,
+      "bab": 6,
+      "fort": 2,
+      "ref": 2,
+      "will": 6,
+      "classFeatures": [
+        {
+          "name": "Hex",
+          "description": "A shaman learns a number of magical tricks, called hexes, which grant her powers or weaken foes. At 2nd level, a shaman learns one hex. At 4th, 8th, 10th, 12th, 16th, 18th, and 20th level, the shaman learns new hexes. A shaman can select from any of the following hexes or from any of the hexes listed in the description of her chosen spirit. A shaman cannot select a hex more than once unless noted otherwise. Using a hex is a standard action that doesn't provoke an attack of opportunity unless otherwise noted. The saving throw DC to resist a hex is equal to 10 + 1/2 the shaman's level + the shaman's Wisdom modifier. Chant (Su) : A shaman can chant as a move action . Any creature that is within 30 feet that is under the effects of the shaman's charm , evil eye , fortune, fury, or misfortune hex has that effect's duration extended by 1 round. A shaman cannot select both this hex and the witch's cackle hex. Charm (Su) : A shaman charms an animal or humanoid creature within 30 feet by beckoning and speaking soothing words. This improves the attitude of an animal or humanoid creature by 1 step, as if the shaman had successfully used the Diplomacy skill. The effect lasts for a number of rounds equal to the shaman's Wisdom modifier (minimum 1). A successful Will saving throw negates this effect. Whether or not the save is successful, the creature cannot be the target of this hex again for 24 hours. At 8th level, this effect improves the attitude of the creature by 2 steps. This is a mind-affecting charm effect. Draconic Resilience (Ex) : The",
+          "pools": [
+            {
+              "name": "Hex",
+              "description": "A shaman learns a number of magical tricks, called hexes, which grant her powers or weaken foes. At 2nd level, a shaman learns one hex. At 4th, 8th, 10th, 12th, 16th, 18th, and 20th level, the shaman learns new hexes. A shaman can select from any of the following hexes or from any of the hexes listed in the description of her chosen spirit. A shaman cannot select a hex more than once unless noted otherwise. Using a hex is a standard action that doesn't provoke an attack of opportunity unless otherwise noted. The saving throw DC to resist a hex is equal to 10 + 1/2 the shaman's level + the shaman's Wisdom modifier. Chant (Su) : A shaman can chant as a move action . Any creature that is within 30 feet that is under the effects of the shaman's charm , evil eye , fortune, fury, or misfortune hex has that effect's duration extended by 1 round. A shaman cannot select both this hex and the witch's cackle hex. Charm (Su) : A shaman charms an animal or humanoid creature within 30 feet by beckoning and speaking soothing words. This improves the attitude of an animal or humanoid creature by 1 step, as if the shaman had successfully used the Diplomacy skill. The effect lasts for a number of rounds equal to the shaman's Wisdom modifier (minimum 1). A successful Will saving throw negates this effect. Whether or not the save is successful, the creature cannot be the target of this hex again for 24 hours. At 8th level, this effect improves the attitude of the creature by 2 steps. This is a mind-affecting charm effect. Draconic Resilience (Ex) : The",
+              "requirements": {
+                "minClassLevel": 2,
+                "text": "At 2nd level, a shaman learns one hex. At 4th, 8th, 10th, 12th, 16th, 18th, and 20th level, the shaman learns new hexes."
+              },
+              "options": [
+                {
+                  "name": "Wandering Hex",
+                  "description": "At 6th level, a shaman can temporarily gain the use of one of the hexes possessed by either one of her spirits. She must make this selection each day when she prepares her spells. For the purposes of this ability, she can select any hex possessed by her spirit or wandering spirit. If she selects it from her wandering spirit, she loses the hex immediately if she bonds with another spirit, although she can then select a different hex to gain using this ability, from either her spirit or her new wandering spirit. At 14th level, a shaman can select two wandering hexes each day instead of one. This ability otherwise functions as the hex class feature.",
+                  "requirements": {
+                    "minClassLevel": 6,
+                    "text": "At 6th level, a shaman can temporarily gain the use of one of the hexes possessed by either one of her spirits. She must make this selection each day when she prepares her spells."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "Hex Mastery",
+                  "description": "At 20th level, the shaman has learned ever more terrible hexes . She can select one grand hex from the list available to witches .",
+                  "requirements": {
+                    "minClassLevel": 20,
+                    "text": "At 20th level, the shaman has learned ever more terrible hexes ."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/hybrid-classes/shaman/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        },
+        {
+          "name": "Spirit (Greater)",
+          "description": "A shaman forms a mystical bond with the spirits of the world. She forms a lasting bond with a single spirit, which grants a number of abilities and defines many of her other class features. At 1st level, a shaman gains the spirit ability granted by her chosen spirit. She adds the spells granted by that spirit to the list of spells that she can cast using spirit magic. She also adds the hexes possessed by that spirit to the list of hexes that she can use with the hex and wandering hex class features. At 8th level, the shaman gains the abilities listed in the greater version of her selected spirit. At 16th level, the shaman gains the abilities listed for the true version of her selected spirit. If the shaman takes levels in another class that grants a mystery (such as the oracle ), the spirit and mystery must match, even if that means one of them must change. Subject to GM discretion, the shaman can change her former mystery or spirit to make them conform."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 9,
+      "bab": 6,
+      "fort": 3,
+      "ref": 3,
+      "will": 6,
+      "classFeatures": [],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 10,
+      "bab": 7,
+      "fort": 3,
+      "ref": 3,
+      "will": 7,
+      "classFeatures": [
+        {
+          "name": "Hex",
+          "description": "A shaman learns a number of magical tricks, called hexes, which grant her powers or weaken foes. At 2nd level, a shaman learns one hex. At 4th, 8th, 10th, 12th, 16th, 18th, and 20th level, the shaman learns new hexes. A shaman can select from any of the following hexes or from any of the hexes listed in the description of her chosen spirit. A shaman cannot select a hex more than once unless noted otherwise. Using a hex is a standard action that doesn't provoke an attack of opportunity unless otherwise noted. The saving throw DC to resist a hex is equal to 10 + 1/2 the shaman's level + the shaman's Wisdom modifier. Chant (Su) : A shaman can chant as a move action . Any creature that is within 30 feet that is under the effects of the shaman's charm , evil eye , fortune, fury, or misfortune hex has that effect's duration extended by 1 round. A shaman cannot select both this hex and the witch's cackle hex. Charm (Su) : A shaman charms an animal or humanoid creature within 30 feet by beckoning and speaking soothing words. This improves the attitude of an animal or humanoid creature by 1 step, as if the shaman had successfully used the Diplomacy skill. The effect lasts for a number of rounds equal to the shaman's Wisdom modifier (minimum 1). A successful Will saving throw negates this effect. Whether or not the save is successful, the creature cannot be the target of this hex again for 24 hours. At 8th level, this effect improves the attitude of the creature by 2 steps. This is a mind-affecting charm effect. Draconic Resilience (Ex) : The",
+          "pools": [
+            {
+              "name": "Hex",
+              "description": "A shaman learns a number of magical tricks, called hexes, which grant her powers or weaken foes. At 2nd level, a shaman learns one hex. At 4th, 8th, 10th, 12th, 16th, 18th, and 20th level, the shaman learns new hexes. A shaman can select from any of the following hexes or from any of the hexes listed in the description of her chosen spirit. A shaman cannot select a hex more than once unless noted otherwise. Using a hex is a standard action that doesn't provoke an attack of opportunity unless otherwise noted. The saving throw DC to resist a hex is equal to 10 + 1/2 the shaman's level + the shaman's Wisdom modifier. Chant (Su) : A shaman can chant as a move action . Any creature that is within 30 feet that is under the effects of the shaman's charm , evil eye , fortune, fury, or misfortune hex has that effect's duration extended by 1 round. A shaman cannot select both this hex and the witch's cackle hex. Charm (Su) : A shaman charms an animal or humanoid creature within 30 feet by beckoning and speaking soothing words. This improves the attitude of an animal or humanoid creature by 1 step, as if the shaman had successfully used the Diplomacy skill. The effect lasts for a number of rounds equal to the shaman's Wisdom modifier (minimum 1). A successful Will saving throw negates this effect. Whether or not the save is successful, the creature cannot be the target of this hex again for 24 hours. At 8th level, this effect improves the attitude of the creature by 2 steps. This is a mind-affecting charm effect. Draconic Resilience (Ex) : The",
+              "requirements": {
+                "minClassLevel": 2,
+                "text": "At 2nd level, a shaman learns one hex. At 4th, 8th, 10th, 12th, 16th, 18th, and 20th level, the shaman learns new hexes."
+              },
+              "options": [
+                {
+                  "name": "Wandering Hex",
+                  "description": "At 6th level, a shaman can temporarily gain the use of one of the hexes possessed by either one of her spirits. She must make this selection each day when she prepares her spells. For the purposes of this ability, she can select any hex possessed by her spirit or wandering spirit. If she selects it from her wandering spirit, she loses the hex immediately if she bonds with another spirit, although she can then select a different hex to gain using this ability, from either her spirit or her new wandering spirit. At 14th level, a shaman can select two wandering hexes each day instead of one. This ability otherwise functions as the hex class feature.",
+                  "requirements": {
+                    "minClassLevel": 6,
+                    "text": "At 6th level, a shaman can temporarily gain the use of one of the hexes possessed by either one of her spirits. She must make this selection each day when she prepares her spells."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "Hex Mastery",
+                  "description": "At 20th level, the shaman has learned ever more terrible hexes . She can select one grand hex from the list available to witches .",
+                  "requirements": {
+                    "minClassLevel": 20,
+                    "text": "At 20th level, the shaman has learned ever more terrible hexes ."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/hybrid-classes/shaman/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 11,
+      "bab": 8,
+      "fort": 3,
+      "ref": 3,
+      "will": 7,
+      "classFeatures": [],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 12,
+      "bab": 9,
+      "fort": 4,
+      "ref": 4,
+      "will": 8,
+      "classFeatures": [
+        {
+          "name": "Hex",
+          "description": "A shaman learns a number of magical tricks, called hexes, which grant her powers or weaken foes. At 2nd level, a shaman learns one hex. At 4th, 8th, 10th, 12th, 16th, 18th, and 20th level, the shaman learns new hexes. A shaman can select from any of the following hexes or from any of the hexes listed in the description of her chosen spirit. A shaman cannot select a hex more than once unless noted otherwise. Using a hex is a standard action that doesn't provoke an attack of opportunity unless otherwise noted. The saving throw DC to resist a hex is equal to 10 + 1/2 the shaman's level + the shaman's Wisdom modifier. Chant (Su) : A shaman can chant as a move action . Any creature that is within 30 feet that is under the effects of the shaman's charm , evil eye , fortune, fury, or misfortune hex has that effect's duration extended by 1 round. A shaman cannot select both this hex and the witch's cackle hex. Charm (Su) : A shaman charms an animal or humanoid creature within 30 feet by beckoning and speaking soothing words. This improves the attitude of an animal or humanoid creature by 1 step, as if the shaman had successfully used the Diplomacy skill. The effect lasts for a number of rounds equal to the shaman's Wisdom modifier (minimum 1). A successful Will saving throw negates this effect. Whether or not the save is successful, the creature cannot be the target of this hex again for 24 hours. At 8th level, this effect improves the attitude of the creature by 2 steps. This is a mind-affecting charm effect. Draconic Resilience (Ex) : The",
+          "pools": [
+            {
+              "name": "Hex",
+              "description": "A shaman learns a number of magical tricks, called hexes, which grant her powers or weaken foes. At 2nd level, a shaman learns one hex. At 4th, 8th, 10th, 12th, 16th, 18th, and 20th level, the shaman learns new hexes. A shaman can select from any of the following hexes or from any of the hexes listed in the description of her chosen spirit. A shaman cannot select a hex more than once unless noted otherwise. Using a hex is a standard action that doesn't provoke an attack of opportunity unless otherwise noted. The saving throw DC to resist a hex is equal to 10 + 1/2 the shaman's level + the shaman's Wisdom modifier. Chant (Su) : A shaman can chant as a move action . Any creature that is within 30 feet that is under the effects of the shaman's charm , evil eye , fortune, fury, or misfortune hex has that effect's duration extended by 1 round. A shaman cannot select both this hex and the witch's cackle hex. Charm (Su) : A shaman charms an animal or humanoid creature within 30 feet by beckoning and speaking soothing words. This improves the attitude of an animal or humanoid creature by 1 step, as if the shaman had successfully used the Diplomacy skill. The effect lasts for a number of rounds equal to the shaman's Wisdom modifier (minimum 1). A successful Will saving throw negates this effect. Whether or not the save is successful, the creature cannot be the target of this hex again for 24 hours. At 8th level, this effect improves the attitude of the creature by 2 steps. This is a mind-affecting charm effect. Draconic Resilience (Ex) : The",
+              "requirements": {
+                "minClassLevel": 2,
+                "text": "At 2nd level, a shaman learns one hex. At 4th, 8th, 10th, 12th, 16th, 18th, and 20th level, the shaman learns new hexes."
+              },
+              "options": [
+                {
+                  "name": "Wandering Hex",
+                  "description": "At 6th level, a shaman can temporarily gain the use of one of the hexes possessed by either one of her spirits. She must make this selection each day when she prepares her spells. For the purposes of this ability, she can select any hex possessed by her spirit or wandering spirit. If she selects it from her wandering spirit, she loses the hex immediately if she bonds with another spirit, although she can then select a different hex to gain using this ability, from either her spirit or her new wandering spirit. At 14th level, a shaman can select two wandering hexes each day instead of one. This ability otherwise functions as the hex class feature.",
+                  "requirements": {
+                    "minClassLevel": 6,
+                    "text": "At 6th level, a shaman can temporarily gain the use of one of the hexes possessed by either one of her spirits. She must make this selection each day when she prepares her spells."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "Hex Mastery",
+                  "description": "At 20th level, the shaman has learned ever more terrible hexes . She can select one grand hex from the list available to witches .",
+                  "requirements": {
+                    "minClassLevel": 20,
+                    "text": "At 20th level, the shaman has learned ever more terrible hexes ."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/hybrid-classes/shaman/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        },
+        {
+          "name": "Wandering Spirit (Greater)",
+          "description": "At 4th level, a shaman can form a temporary bond with a spirit other than the one selected using her spirit class feature. She must make this selection each day when preparing her spells. While this feature is active, she gains the spirit ability granted by the spirit. She also adds the spells granted by that spirit to her list of spells that she can cast using spirit magic. She does not add the hexes from her wandering spirit to her list of hexes that she can choose from with the hex class feature. At 12th level, she gains the abilities listed in the greater version of her wandering spirit. At 20th level, she gains the ability listed in the true version of her wandering spirit."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 13,
+      "bab": 9,
+      "fort": 4,
+      "ref": 4,
+      "will": 8,
+      "classFeatures": [],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 14,
+      "bab": 10,
+      "fort": 4,
+      "ref": 4,
+      "will": 9,
+      "classFeatures": [
+        {
+          "name": "Wandering Hex (2 Hexes)",
+          "description": "At 6th level, a shaman can temporarily gain the use of one of the hexes possessed by either one of her spirits. She must make this selection each day when she prepares her spells. For the purposes of this ability, she can select any hex possessed by her spirit or wandering spirit. If she selects it from her wandering spirit, she loses the hex immediately if she bonds with another spirit, although she can then select a different hex to gain using this ability, from either her spirit or her new wandering spirit. At 14th level, a shaman can select two wandering hexes each day instead of one. This ability otherwise functions as the hex class feature."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 15,
+      "bab": 11,
+      "fort": 5,
+      "ref": 5,
+      "will": 9,
+      "classFeatures": [],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 16,
+      "bab": 12,
+      "fort": 5,
+      "ref": 5,
+      "will": 10,
+      "classFeatures": [
+        {
+          "name": "Hex",
+          "description": "A shaman learns a number of magical tricks, called hexes, which grant her powers or weaken foes. At 2nd level, a shaman learns one hex. At 4th, 8th, 10th, 12th, 16th, 18th, and 20th level, the shaman learns new hexes. A shaman can select from any of the following hexes or from any of the hexes listed in the description of her chosen spirit. A shaman cannot select a hex more than once unless noted otherwise. Using a hex is a standard action that doesn't provoke an attack of opportunity unless otherwise noted. The saving throw DC to resist a hex is equal to 10 + 1/2 the shaman's level + the shaman's Wisdom modifier. Chant (Su) : A shaman can chant as a move action . Any creature that is within 30 feet that is under the effects of the shaman's charm , evil eye , fortune, fury, or misfortune hex has that effect's duration extended by 1 round. A shaman cannot select both this hex and the witch's cackle hex. Charm (Su) : A shaman charms an animal or humanoid creature within 30 feet by beckoning and speaking soothing words. This improves the attitude of an animal or humanoid creature by 1 step, as if the shaman had successfully used the Diplomacy skill. The effect lasts for a number of rounds equal to the shaman's Wisdom modifier (minimum 1). A successful Will saving throw negates this effect. Whether or not the save is successful, the creature cannot be the target of this hex again for 24 hours. At 8th level, this effect improves the attitude of the creature by 2 steps. This is a mind-affecting charm effect. Draconic Resilience (Ex) : The",
+          "pools": [
+            {
+              "name": "Hex",
+              "description": "A shaman learns a number of magical tricks, called hexes, which grant her powers or weaken foes. At 2nd level, a shaman learns one hex. At 4th, 8th, 10th, 12th, 16th, 18th, and 20th level, the shaman learns new hexes. A shaman can select from any of the following hexes or from any of the hexes listed in the description of her chosen spirit. A shaman cannot select a hex more than once unless noted otherwise. Using a hex is a standard action that doesn't provoke an attack of opportunity unless otherwise noted. The saving throw DC to resist a hex is equal to 10 + 1/2 the shaman's level + the shaman's Wisdom modifier. Chant (Su) : A shaman can chant as a move action . Any creature that is within 30 feet that is under the effects of the shaman's charm , evil eye , fortune, fury, or misfortune hex has that effect's duration extended by 1 round. A shaman cannot select both this hex and the witch's cackle hex. Charm (Su) : A shaman charms an animal or humanoid creature within 30 feet by beckoning and speaking soothing words. This improves the attitude of an animal or humanoid creature by 1 step, as if the shaman had successfully used the Diplomacy skill. The effect lasts for a number of rounds equal to the shaman's Wisdom modifier (minimum 1). A successful Will saving throw negates this effect. Whether or not the save is successful, the creature cannot be the target of this hex again for 24 hours. At 8th level, this effect improves the attitude of the creature by 2 steps. This is a mind-affecting charm effect. Draconic Resilience (Ex) : The",
+              "requirements": {
+                "minClassLevel": 2,
+                "text": "At 2nd level, a shaman learns one hex. At 4th, 8th, 10th, 12th, 16th, 18th, and 20th level, the shaman learns new hexes."
+              },
+              "options": [
+                {
+                  "name": "Wandering Hex",
+                  "description": "At 6th level, a shaman can temporarily gain the use of one of the hexes possessed by either one of her spirits. She must make this selection each day when she prepares her spells. For the purposes of this ability, she can select any hex possessed by her spirit or wandering spirit. If she selects it from her wandering spirit, she loses the hex immediately if she bonds with another spirit, although she can then select a different hex to gain using this ability, from either her spirit or her new wandering spirit. At 14th level, a shaman can select two wandering hexes each day instead of one. This ability otherwise functions as the hex class feature.",
+                  "requirements": {
+                    "minClassLevel": 6,
+                    "text": "At 6th level, a shaman can temporarily gain the use of one of the hexes possessed by either one of her spirits. She must make this selection each day when she prepares her spells."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "Hex Mastery",
+                  "description": "At 20th level, the shaman has learned ever more terrible hexes . She can select one grand hex from the list available to witches .",
+                  "requirements": {
+                    "minClassLevel": 20,
+                    "text": "At 20th level, the shaman has learned ever more terrible hexes ."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/hybrid-classes/shaman/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        },
+        {
+          "name": "Spirit (True)",
+          "description": "A shaman forms a mystical bond with the spirits of the world. She forms a lasting bond with a single spirit, which grants a number of abilities and defines many of her other class features. At 1st level, a shaman gains the spirit ability granted by her chosen spirit. She adds the spells granted by that spirit to the list of spells that she can cast using spirit magic. She also adds the hexes possessed by that spirit to the list of hexes that she can use with the hex and wandering hex class features. At 8th level, the shaman gains the abilities listed in the greater version of her selected spirit. At 16th level, the shaman gains the abilities listed for the true version of her selected spirit. If the shaman takes levels in another class that grants a mystery (such as the oracle ), the spirit and mystery must match, even if that means one of them must change. Subject to GM discretion, the shaman can change her former mystery or spirit to make them conform."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 17,
+      "bab": 12,
+      "fort": 5,
+      "ref": 5,
+      "will": 10,
+      "classFeatures": [],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 18,
+      "bab": 13,
+      "fort": 6,
+      "ref": 6,
+      "will": 11,
+      "classFeatures": [
+        {
+          "name": "Hex",
+          "description": "A shaman learns a number of magical tricks, called hexes, which grant her powers or weaken foes. At 2nd level, a shaman learns one hex. At 4th, 8th, 10th, 12th, 16th, 18th, and 20th level, the shaman learns new hexes. A shaman can select from any of the following hexes or from any of the hexes listed in the description of her chosen spirit. A shaman cannot select a hex more than once unless noted otherwise. Using a hex is a standard action that doesn't provoke an attack of opportunity unless otherwise noted. The saving throw DC to resist a hex is equal to 10 + 1/2 the shaman's level + the shaman's Wisdom modifier. Chant (Su) : A shaman can chant as a move action . Any creature that is within 30 feet that is under the effects of the shaman's charm , evil eye , fortune, fury, or misfortune hex has that effect's duration extended by 1 round. A shaman cannot select both this hex and the witch's cackle hex. Charm (Su) : A shaman charms an animal or humanoid creature within 30 feet by beckoning and speaking soothing words. This improves the attitude of an animal or humanoid creature by 1 step, as if the shaman had successfully used the Diplomacy skill. The effect lasts for a number of rounds equal to the shaman's Wisdom modifier (minimum 1). A successful Will saving throw negates this effect. Whether or not the save is successful, the creature cannot be the target of this hex again for 24 hours. At 8th level, this effect improves the attitude of the creature by 2 steps. This is a mind-affecting charm effect. Draconic Resilience (Ex) : The",
+          "pools": [
+            {
+              "name": "Hex",
+              "description": "A shaman learns a number of magical tricks, called hexes, which grant her powers or weaken foes. At 2nd level, a shaman learns one hex. At 4th, 8th, 10th, 12th, 16th, 18th, and 20th level, the shaman learns new hexes. A shaman can select from any of the following hexes or from any of the hexes listed in the description of her chosen spirit. A shaman cannot select a hex more than once unless noted otherwise. Using a hex is a standard action that doesn't provoke an attack of opportunity unless otherwise noted. The saving throw DC to resist a hex is equal to 10 + 1/2 the shaman's level + the shaman's Wisdom modifier. Chant (Su) : A shaman can chant as a move action . Any creature that is within 30 feet that is under the effects of the shaman's charm , evil eye , fortune, fury, or misfortune hex has that effect's duration extended by 1 round. A shaman cannot select both this hex and the witch's cackle hex. Charm (Su) : A shaman charms an animal or humanoid creature within 30 feet by beckoning and speaking soothing words. This improves the attitude of an animal or humanoid creature by 1 step, as if the shaman had successfully used the Diplomacy skill. The effect lasts for a number of rounds equal to the shaman's Wisdom modifier (minimum 1). A successful Will saving throw negates this effect. Whether or not the save is successful, the creature cannot be the target of this hex again for 24 hours. At 8th level, this effect improves the attitude of the creature by 2 steps. This is a mind-affecting charm effect. Draconic Resilience (Ex) : The",
+              "requirements": {
+                "minClassLevel": 2,
+                "text": "At 2nd level, a shaman learns one hex. At 4th, 8th, 10th, 12th, 16th, 18th, and 20th level, the shaman learns new hexes."
+              },
+              "options": [
+                {
+                  "name": "Wandering Hex",
+                  "description": "At 6th level, a shaman can temporarily gain the use of one of the hexes possessed by either one of her spirits. She must make this selection each day when she prepares her spells. For the purposes of this ability, she can select any hex possessed by her spirit or wandering spirit. If she selects it from her wandering spirit, she loses the hex immediately if she bonds with another spirit, although she can then select a different hex to gain using this ability, from either her spirit or her new wandering spirit. At 14th level, a shaman can select two wandering hexes each day instead of one. This ability otherwise functions as the hex class feature.",
+                  "requirements": {
+                    "minClassLevel": 6,
+                    "text": "At 6th level, a shaman can temporarily gain the use of one of the hexes possessed by either one of her spirits. She must make this selection each day when she prepares her spells."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "Hex Mastery",
+                  "description": "At 20th level, the shaman has learned ever more terrible hexes . She can select one grand hex from the list available to witches .",
+                  "requirements": {
+                    "minClassLevel": 20,
+                    "text": "At 20th level, the shaman has learned ever more terrible hexes ."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/hybrid-classes/shaman/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 19,
+      "bab": 14,
+      "fort": 6,
+      "ref": 6,
+      "will": 11,
+      "classFeatures": [],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 20,
+      "bab": 15,
+      "fort": 6,
+      "ref": 6,
+      "will": 12,
+      "classFeatures": [
+        {
+          "name": "Hex",
+          "description": "A shaman learns a number of magical tricks, called hexes, which grant her powers or weaken foes. At 2nd level, a shaman learns one hex. At 4th, 8th, 10th, 12th, 16th, 18th, and 20th level, the shaman learns new hexes. A shaman can select from any of the following hexes or from any of the hexes listed in the description of her chosen spirit. A shaman cannot select a hex more than once unless noted otherwise. Using a hex is a standard action that doesn't provoke an attack of opportunity unless otherwise noted. The saving throw DC to resist a hex is equal to 10 + 1/2 the shaman's level + the shaman's Wisdom modifier. Chant (Su) : A shaman can chant as a move action . Any creature that is within 30 feet that is under the effects of the shaman's charm , evil eye , fortune, fury, or misfortune hex has that effect's duration extended by 1 round. A shaman cannot select both this hex and the witch's cackle hex. Charm (Su) : A shaman charms an animal or humanoid creature within 30 feet by beckoning and speaking soothing words. This improves the attitude of an animal or humanoid creature by 1 step, as if the shaman had successfully used the Diplomacy skill. The effect lasts for a number of rounds equal to the shaman's Wisdom modifier (minimum 1). A successful Will saving throw negates this effect. Whether or not the save is successful, the creature cannot be the target of this hex again for 24 hours. At 8th level, this effect improves the attitude of the creature by 2 steps. This is a mind-affecting charm effect. Draconic Resilience (Ex) : The",
+          "pools": [
+            {
+              "name": "Hex",
+              "description": "A shaman learns a number of magical tricks, called hexes, which grant her powers or weaken foes. At 2nd level, a shaman learns one hex. At 4th, 8th, 10th, 12th, 16th, 18th, and 20th level, the shaman learns new hexes. A shaman can select from any of the following hexes or from any of the hexes listed in the description of her chosen spirit. A shaman cannot select a hex more than once unless noted otherwise. Using a hex is a standard action that doesn't provoke an attack of opportunity unless otherwise noted. The saving throw DC to resist a hex is equal to 10 + 1/2 the shaman's level + the shaman's Wisdom modifier. Chant (Su) : A shaman can chant as a move action . Any creature that is within 30 feet that is under the effects of the shaman's charm , evil eye , fortune, fury, or misfortune hex has that effect's duration extended by 1 round. A shaman cannot select both this hex and the witch's cackle hex. Charm (Su) : A shaman charms an animal or humanoid creature within 30 feet by beckoning and speaking soothing words. This improves the attitude of an animal or humanoid creature by 1 step, as if the shaman had successfully used the Diplomacy skill. The effect lasts for a number of rounds equal to the shaman's Wisdom modifier (minimum 1). A successful Will saving throw negates this effect. Whether or not the save is successful, the creature cannot be the target of this hex again for 24 hours. At 8th level, this effect improves the attitude of the creature by 2 steps. This is a mind-affecting charm effect. Draconic Resilience (Ex) : The",
+              "requirements": {
+                "minClassLevel": 2,
+                "text": "At 2nd level, a shaman learns one hex. At 4th, 8th, 10th, 12th, 16th, 18th, and 20th level, the shaman learns new hexes."
+              },
+              "options": [
+                {
+                  "name": "Wandering Hex",
+                  "description": "At 6th level, a shaman can temporarily gain the use of one of the hexes possessed by either one of her spirits. She must make this selection each day when she prepares her spells. For the purposes of this ability, she can select any hex possessed by her spirit or wandering spirit. If she selects it from her wandering spirit, she loses the hex immediately if she bonds with another spirit, although she can then select a different hex to gain using this ability, from either her spirit or her new wandering spirit. At 14th level, a shaman can select two wandering hexes each day instead of one. This ability otherwise functions as the hex class feature.",
+                  "requirements": {
+                    "minClassLevel": 6,
+                    "text": "At 6th level, a shaman can temporarily gain the use of one of the hexes possessed by either one of her spirits. She must make this selection each day when she prepares her spells."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "Hex Mastery",
+                  "description": "At 20th level, the shaman has learned ever more terrible hexes . She can select one grand hex from the list available to witches .",
+                  "requirements": {
+                    "minClassLevel": 20,
+                    "text": "At 20th level, the shaman has learned ever more terrible hexes ."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/hybrid-classes/shaman/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        },
+        {
+          "name": "Manifestation",
+          "description": "Upon reaching 20th level, a shaman undergoes a transformation as she manifests as a pinnacle of her main spirit. The nature of this manifestation depends on the shaman's spirit, and is described in its entry."
+        },
+        {
+          "name": "Wandering Spirit (True)",
+          "description": "At 4th level, a shaman can form a temporary bond with a spirit other than the one selected using her spirit class feature. She must make this selection each day when preparing her spells. While this feature is active, she gains the spirit ability granted by the spirit. She also adds the spells granted by that spirit to her list of spells that she can cast using spirit magic. She does not add the hexes from her wandering spirit to her list of hexes that she can choose from with the hex class feature. At 12th level, she gains the abilities listed in the greater version of her wandering spirit. At 20th level, she gains the ability listed in the true version of her wandering spirit."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    }
+  ],
+  "spellcasting": {
+    "summary": "prepared full caster using WIS",
+    "castingType": "prepared",
+    "progression": "full",
+    "ability": "wis",
+    "preparation": "daily-list",
+    "maxSpellLevel": 9,
+    "slotsByLevel": [
+      [
+        3,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        2,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        3,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        3,
+        2,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        3,
+        3,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        4,
+        3,
+        2,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        4,
+        3,
+        3,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        4,
+        4,
+        3,
+        2,
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        4,
+        4,
+        3,
+        3,
+        2,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        4,
+        4,
+        4,
+        3,
+        2,
+        1,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        4,
+        4,
+        4,
+        3,
+        3,
+        2,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        2,
+        1,
+        0,
+        0
+      ],
+      [
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        3,
+        2,
+        0,
+        0
+      ],
+      [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        2,
+        1,
+        0
+      ],
+      [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        3,
+        2,
+        0
+      ],
+      [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        2,
+        1
+      ],
+      [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        3,
+        2
+      ],
+      [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        3
+      ],
+      [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ]
+    ]
+  },
+  "spellcastingClass": true
+}

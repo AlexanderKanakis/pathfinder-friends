@@ -1,0 +1,313 @@
+{
+  "name": "Fighter",
+  "type": "core",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/core-classes/fighter/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 1,
+      "fort": 2,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 2,
+      "bab": 2,
+      "fort": 3,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": ""
+        },
+        {
+          "name": "Bravery +1",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 3,
+      "bab": 3,
+      "fort": 3,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Armor Training",
+          "description": "Starting at 3rd level, a fighter learns to be more maneuverable while wearing armor. Whenever he is wearing armor, he reduces the armor check penalty by 1 (to a minimum of 0) and increases the maximum Dexterity bonus allowed by his armor by 1. Every four levels thereafter (7th, 11th, and 15th), these bonuses increase by +1 each time, to a maximum -4 reduction of the armor check penalty and a +4 increase of the maximum Dexterity bonus allowed. In addition, a fighter can also move at his normal speed while wearing medium armor. At 7th level, a fighter can move at his normal speed while wearing heavy armor. Advanced Armor Training : Beginning at 7th level, instead of increasing the benefits provided by armor training (reducing his armorÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s check penalty by 1 and increasing its maximum Dexterity bonus by 1), a fighter can choose an advanced armor training option (see Advanced Armor Training below) . If the fighter does so, he still gains the ability to move at his normal speed while wearing medium armor at 3rd level, and while wearing heavy armor at 7th level. Source: Pathfinder Player Companion: Armor Master's Handbook"
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 4,
+      "bab": 4,
+      "fort": 4,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 5,
+      "bab": 5,
+      "fort": 4,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Weapon Training",
+          "description": "Starting at 5th level, a fighter can select one group of weapons, as noted below. Whenever he attacks with a weapon from this group, he gains a +1 bonus on attack and damage rolls. Every four levels thereafter (9th*, 13th, and 17th), a fighter becomes further trained in another group of weapons. He gains a +1 bonus on attack and damage rolls when using a weapon from this group. In addition, the bonuses granted by previous weapon groups increase by +1 each. For example, when a fighter reaches 9th level, he receives a +1 bonus on attack and damage rolls with one weapon group and a +2 bonus on attack and damage rolls with the weapon group selected at 5th level. Bonuses granted from overlapping groups do not stack. Take the highest bonus granted for a weapon if it resides in two or more groups. A fighter also adds this bonus to any combat maneuver checks made with weapons from his group. This bonus also applies to the fighter's Combat Maneuver Defense when defending against disarm and sunder attempts made against weapons from this group. Advanced Weapon Training : Beginning at 9th level, instead of selecting an additional fighter weapon group, a fighter can choose an advanced weapon training option (see Advanced Weapon Training below) for one fighter weapon group that he previously selected with the weapon training class feature. Source: Pathfinder Player Companion: Weapon Master's Handbook Weapon groups are defined as follows (GMs may add other weapons to these groups, or add entirely new groups): Axes : axe-gauntlet, dwarven heavy, axe-gauntlet, dwarven light, bar"
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 6,
+      "bab": 6,
+      "fort": 5,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": ""
+        },
+        {
+          "name": "Bravery +2",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 7,
+      "bab": 7,
+      "fort": 5,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Armor Training",
+          "description": "Starting at 3rd level, a fighter learns to be more maneuverable while wearing armor. Whenever he is wearing armor, he reduces the armor check penalty by 1 (to a minimum of 0) and increases the maximum Dexterity bonus allowed by his armor by 1. Every four levels thereafter (7th, 11th, and 15th), these bonuses increase by +1 each time, to a maximum -4 reduction of the armor check penalty and a +4 increase of the maximum Dexterity bonus allowed. In addition, a fighter can also move at his normal speed while wearing medium armor. At 7th level, a fighter can move at his normal speed while wearing heavy armor. Advanced Armor Training : Beginning at 7th level, instead of increasing the benefits provided by armor training (reducing his armorÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s check penalty by 1 and increasing its maximum Dexterity bonus by 1), a fighter can choose an advanced armor training option (see Advanced Armor Training below) . If the fighter does so, he still gains the ability to move at his normal speed while wearing medium armor at 3rd level, and while wearing heavy armor at 7th level. Source: Pathfinder Player Companion: Armor Master's Handbook"
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 8,
+      "bab": 8,
+      "fort": 6,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 9,
+      "bab": 9,
+      "fort": 6,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Weapon Training (Or Advanced Weapon Training* )",
+          "description": "Starting at 5th level, a fighter can select one group of weapons, as noted below. Whenever he attacks with a weapon from this group, he gains a +1 bonus on attack and damage rolls. Every four levels thereafter (9th*, 13th, and 17th), a fighter becomes further trained in another group of weapons. He gains a +1 bonus on attack and damage rolls when using a weapon from this group. In addition, the bonuses granted by previous weapon groups increase by +1 each. For example, when a fighter reaches 9th level, he receives a +1 bonus on attack and damage rolls with one weapon group and a +2 bonus on attack and damage rolls with the weapon group selected at 5th level. Bonuses granted from overlapping groups do not stack. Take the highest bonus granted for a weapon if it resides in two or more groups. A fighter also adds this bonus to any combat maneuver checks made with weapons from his group. This bonus also applies to the fighter's Combat Maneuver Defense when defending against disarm and sunder attempts made against weapons from this group. Advanced Weapon Training : Beginning at 9th level, instead of selecting an additional fighter weapon group, a fighter can choose an advanced weapon training option (see Advanced Weapon Training below) for one fighter weapon group that he previously selected with the weapon training class feature. Source: Pathfinder Player Companion: Weapon Master's Handbook Weapon groups are defined as follows (GMs may add other weapons to these groups, or add entirely new groups): Axes : axe-gauntlet, dwarven heavy, axe-gauntlet, dwarven light, bar"
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 10,
+      "bab": 10,
+      "fort": 7,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": ""
+        },
+        {
+          "name": "Bravery +3",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 11,
+      "bab": 11,
+      "fort": 7,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Armor Training",
+          "description": "Starting at 3rd level, a fighter learns to be more maneuverable while wearing armor. Whenever he is wearing armor, he reduces the armor check penalty by 1 (to a minimum of 0) and increases the maximum Dexterity bonus allowed by his armor by 1. Every four levels thereafter (7th, 11th, and 15th), these bonuses increase by +1 each time, to a maximum -4 reduction of the armor check penalty and a +4 increase of the maximum Dexterity bonus allowed. In addition, a fighter can also move at his normal speed while wearing medium armor. At 7th level, a fighter can move at his normal speed while wearing heavy armor. Advanced Armor Training : Beginning at 7th level, instead of increasing the benefits provided by armor training (reducing his armorÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s check penalty by 1 and increasing its maximum Dexterity bonus by 1), a fighter can choose an advanced armor training option (see Advanced Armor Training below) . If the fighter does so, he still gains the ability to move at his normal speed while wearing medium armor at 3rd level, and while wearing heavy armor at 7th level. Source: Pathfinder Player Companion: Armor Master's Handbook"
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 12,
+      "fort": 8,
+      "ref": 4,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 13,
+      "fort": 8,
+      "ref": 4,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Weapon Training",
+          "description": "Starting at 5th level, a fighter can select one group of weapons, as noted below. Whenever he attacks with a weapon from this group, he gains a +1 bonus on attack and damage rolls. Every four levels thereafter (9th*, 13th, and 17th), a fighter becomes further trained in another group of weapons. He gains a +1 bonus on attack and damage rolls when using a weapon from this group. In addition, the bonuses granted by previous weapon groups increase by +1 each. For example, when a fighter reaches 9th level, he receives a +1 bonus on attack and damage rolls with one weapon group and a +2 bonus on attack and damage rolls with the weapon group selected at 5th level. Bonuses granted from overlapping groups do not stack. Take the highest bonus granted for a weapon if it resides in two or more groups. A fighter also adds this bonus to any combat maneuver checks made with weapons from his group. This bonus also applies to the fighter's Combat Maneuver Defense when defending against disarm and sunder attempts made against weapons from this group. Advanced Weapon Training : Beginning at 9th level, instead of selecting an additional fighter weapon group, a fighter can choose an advanced weapon training option (see Advanced Weapon Training below) for one fighter weapon group that he previously selected with the weapon training class feature. Source: Pathfinder Player Companion: Weapon Master's Handbook Weapon groups are defined as follows (GMs may add other weapons to these groups, or add entirely new groups): Axes : axe-gauntlet, dwarven heavy, axe-gauntlet, dwarven light, bar"
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 14,
+      "fort": 9,
+      "ref": 4,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": ""
+        },
+        {
+          "name": "Bravery +4",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 15,
+      "fort": 9,
+      "ref": 5,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Armor Training",
+          "description": "Starting at 3rd level, a fighter learns to be more maneuverable while wearing armor. Whenever he is wearing armor, he reduces the armor check penalty by 1 (to a minimum of 0) and increases the maximum Dexterity bonus allowed by his armor by 1. Every four levels thereafter (7th, 11th, and 15th), these bonuses increase by +1 each time, to a maximum -4 reduction of the armor check penalty and a +4 increase of the maximum Dexterity bonus allowed. In addition, a fighter can also move at his normal speed while wearing medium armor. At 7th level, a fighter can move at his normal speed while wearing heavy armor. Advanced Armor Training : Beginning at 7th level, instead of increasing the benefits provided by armor training (reducing his armorÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s check penalty by 1 and increasing its maximum Dexterity bonus by 1), a fighter can choose an advanced armor training option (see Advanced Armor Training below) . If the fighter does so, he still gains the ability to move at his normal speed while wearing medium armor at 3rd level, and while wearing heavy armor at 7th level. Source: Pathfinder Player Companion: Armor Master's Handbook"
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 16,
+      "fort": 10,
+      "ref": 5,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 17,
+      "fort": 10,
+      "ref": 5,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Weapon Training",
+          "description": "Starting at 5th level, a fighter can select one group of weapons, as noted below. Whenever he attacks with a weapon from this group, he gains a +1 bonus on attack and damage rolls. Every four levels thereafter (9th*, 13th, and 17th), a fighter becomes further trained in another group of weapons. He gains a +1 bonus on attack and damage rolls when using a weapon from this group. In addition, the bonuses granted by previous weapon groups increase by +1 each. For example, when a fighter reaches 9th level, he receives a +1 bonus on attack and damage rolls with one weapon group and a +2 bonus on attack and damage rolls with the weapon group selected at 5th level. Bonuses granted from overlapping groups do not stack. Take the highest bonus granted for a weapon if it resides in two or more groups. A fighter also adds this bonus to any combat maneuver checks made with weapons from his group. This bonus also applies to the fighter's Combat Maneuver Defense when defending against disarm and sunder attempts made against weapons from this group. Advanced Weapon Training : Beginning at 9th level, instead of selecting an additional fighter weapon group, a fighter can choose an advanced weapon training option (see Advanced Weapon Training below) for one fighter weapon group that he previously selected with the weapon training class feature. Source: Pathfinder Player Companion: Weapon Master's Handbook Weapon groups are defined as follows (GMs may add other weapons to these groups, or add entirely new groups): Axes : axe-gauntlet, dwarven heavy, axe-gauntlet, dwarven light, bar"
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 18,
+      "fort": 11,
+      "ref": 6,
+      "will": 6,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": ""
+        },
+        {
+          "name": "Bravery +5",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 19,
+      "fort": 11,
+      "ref": 6,
+      "will": 6,
+      "classFeatures": [
+        {
+          "name": "Armor Mastery",
+          "description": "At 19th level, a fighter gains damage reduction 5/- whenever he is wearing armor or using a shield."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 20,
+      "fort": 12,
+      "ref": 6,
+      "will": 6,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": ""
+        },
+        {
+          "name": "Weapon Mastery",
+          "description": "At 20th level, a fighter chooses one weapon, such as the longsword, greataxe, or longbow. Any attacks made with that weapon automatically confirm all critical threats and have their damage multiplier increased by 1 (ÃƒÆ’Ã¢â‚¬â€2 becomes ÃƒÆ’Ã¢â‚¬â€3, for example). In addition, he cannot be disarmed while wielding a weapon of this type."
+        }
+      ],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": null,
+  "spellcastingClass": false
+}

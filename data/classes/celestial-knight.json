@@ -1,0 +1,251 @@
+{
+  "name": "Celestial Knight",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/c-d/celestial-knight/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 1,
+      "fort": 1,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [
+        {
+          "name": "Sentinel Against Undeath",
+          "description": "A celestial knight gains a bonus equal to 1/3 his class level (minimum +1) on Perception and Sense Motive checks against undead . He also gains this bonus as a dodge bonus to his AC and CMD against attacks made by undead ."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 2,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Teamwork Feat",
+          "description": "At 2nd level, and every three levels thereafter, a celestial knight gains a bonus feat in addition to those gained from normal advancement. These bonus feats must be selected from those listed as teamwork feats . The celestial knight must meet the prerequisites of the selected bonus feat. In addition, at these levels, a celestial knight may choose to learn a new teamwork feat in place of a teamwork feat he has already learned. In effect, he loses the old teamwork feat in exchange for the new one. The old feat cannot be one that was used as a prerequisite for another feat, prestige class, or other ability, and he can change only one teamwork feat at any given level."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 3,
+      "bab": 3,
+      "fort": 2,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Aegis Feat",
+          "description": "At 3rd level, and every three levels thereafter, a celestial knight gains a bonus feat from the following list: Bashing Finish , Covering Defense , Greater Shield Focus , Greater Shield Specialization , Improved Shield Bash , Missile Shield , Ray Shield , Saving Shield , Shield Focus , Shield Master , Shield Slam , Shield Specialization . A celestial knight must meet the prerequisites for these feats, but his class levels count as fighter levels for the purposes of meeting these prerequisites."
+        },
+        {
+          "name": "Favored Enemy (Undead)",
+          "description": "At 3rd level, a celestial knight gains a favored enemy bonus of +2 against undead , or if the celestial knight already has favored enemy ( undead ) from another class, increases his existing bonus by +2. (This doesn't increase existing favored enemy bonuses against any other creature types.) This otherwise functions as the ranger class ability."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 4,
+      "bab": 4,
+      "fort": 2,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Thwart Foul Magic",
+          "description": "At 4th level, whenever a celestial knight threatens an undead spellcaster, he gains the benefits of the Disruptive and Spellbreaker feats. He counts as having these feats for the purposes of qualifying for feats or other abilities. If he already possesses the Disruptive and/or Spellbreaker feats, the effects do not stack. When he threatens any spellcaster (not just an undead spellcaster), the concentration check DC increases by 2 if the spell being cast is from the necromancy school, has the death descriptor , or has the evil descriptor . For the purpose of this ability, the celestial knight counts as having automatically identified the effect as if he had made a Spellcraft check. This increase only applies if the celestial knight is aware of the spellcaster's location and is capable of making an attack of opportunity ."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 5,
+      "bab": 5,
+      "fort": 3,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Teamwork Feat",
+          "description": "At 2nd level, and every three levels thereafter, a celestial knight gains a bonus feat in addition to those gained from normal advancement. These bonus feats must be selected from those listed as teamwork feats . The celestial knight must meet the prerequisites of the selected bonus feat. In addition, at these levels, a celestial knight may choose to learn a new teamwork feat in place of a teamwork feat he has already learned. In effect, he loses the old teamwork feat in exchange for the new one. The old feat cannot be one that was used as a prerequisite for another feat, prestige class, or other ability, and he can change only one teamwork feat at any given level."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 6,
+      "bab": 6,
+      "fort": 3,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Aegis Feat",
+          "description": "At 3rd level, and every three levels thereafter, a celestial knight gains a bonus feat from the following list: Bashing Finish , Covering Defense , Greater Shield Focus , Greater Shield Specialization , Improved Shield Bash , Missile Shield , Ray Shield , Saving Shield , Shield Focus , Shield Master , Shield Slam , Shield Specialization . A celestial knight must meet the prerequisites for these feats, but his class levels count as fighter levels for the purposes of meeting these prerequisites."
+        },
+        {
+          "name": "Blessed Conviction",
+          "description": "At 6th level, a celestial knight gains a +4 morale bonus on saving throws against spells and effects created by undead creatures."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 7,
+      "bab": 7,
+      "fort": 4,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Purge Malevolence",
+          "description": "At 7th level, a celestial knight can attempt to dispel an ongoing spell effect from the necromancy school or one with the death or evil descriptor as part of a melee attack against a creature or object. The celestial knight must declare the attempt before making the attack, and if he misses, the attempt is wasted. If the attack hits, eligible effects on the target are subject to a targeted dispel magic effect ( caster level equal to the celestial knight's total character level). He can use this ability on any melee attack, but only once per round."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 8,
+      "bab": 8,
+      "fort": 4,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Teamwork Feat",
+          "description": "At 2nd level, and every three levels thereafter, a celestial knight gains a bonus feat in addition to those gained from normal advancement. These bonus feats must be selected from those listed as teamwork feats . The celestial knight must meet the prerequisites of the selected bonus feat. In addition, at these levels, a celestial knight may choose to learn a new teamwork feat in place of a teamwork feat he has already learned. In effect, he loses the old teamwork feat in exchange for the new one. The old feat cannot be one that was used as a prerequisite for another feat, prestige class, or other ability, and he can change only one teamwork feat at any given level."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 9,
+      "bab": 9,
+      "fort": 5,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Aegis Feat",
+          "description": "At 3rd level, and every three levels thereafter, a celestial knight gains a bonus feat from the following list: Bashing Finish , Covering Defense , Greater Shield Focus , Greater Shield Specialization , Improved Shield Bash , Missile Shield , Ray Shield , Saving Shield , Shield Focus , Shield Master , Shield Slam , Shield Specialization . A celestial knight must meet the prerequisites for these feats, but his class levels count as fighter levels for the purposes of meeting these prerequisites."
+        },
+        {
+          "name": "Foil Deathcaster",
+          "description": "At 9th level, once per day as an immediate action , a celestial knight can force an undead spellcaster he threatens to reroll a concentration check made to cast defensively. The spellcaster must take the lower result."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 10,
+      "bab": 10,
+      "fort": 5,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Raiment Of Righteousness",
+          "description": "At 10th level, once per day as a standard action , a celestial knight can transfigure his gear into the embodiment of virtuous valor. His armor (if metallic) turns silver-gray, gaining the material properties of adamantine in addition to any other material properties it may have. His shield (if he wears one) glows like a torch and gains the blinding special ability in addition to any other special abilities it has. The shield's blinding ability has a saving throw DC of 19 (21 vs. undead ). His cloak (if he wears one) turns bright red, becoming a cloak of resistance +5 in addition to any other properties it has. His sword (if he wields one) acts as if it has a holy sword spell cast upon it with caster level equal to his class level. These effects last for 1 minute, and only function while the celestial knight wields or wears these items. A dropped or removed item ceases granting its abilities, but resumes if returned before the duration expires. Section 15: Copyright Notice Pathfinder Campaign Setting: Paths of Prestige Ãƒâ€šÃ‚Â© 2012, Paizo Publishing, LLC; Authors: Benjamin Bruck, Jason Bulmahn, Matt Goodall, and Jason Nelson."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": null,
+  "spellcastingClass": false
+}

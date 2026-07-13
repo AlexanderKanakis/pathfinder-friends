@@ -1,0 +1,249 @@
+{
+  "name": "Bloatmage",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/a-b/bloatmage/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Blood Pool",
+          "description": "At 1st level, a bloatmage gains a pool of blood points, representing an overload of her system with excess blood to extend her arcane abilities beyond their normal level. A bloatmageÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s normal pool of blood points is equal to her bloatmage level. Blood points can be spent at the time of casting to cast a spell without using that spellÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s spell slot. The spell slot remains unused (for spontaneous casters), or the spell is recalled as if it had not been cast (for spellcasters who prepare spells). Retaining a spell or spell slot in this manner costs a number of blood points equal to the spellÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s level, and these points must be spent at the time of casting. Blood points do not give spellcasters access to spells they donÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢t already know or have prepared. In addition, the bloatmage may push herself via her bloodsurge ability in order to gain a number of extra blood points, but such exertion is a dangerous gamble. If the bloatmageÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s current number of blood points is greater than her class level but less than or equal to twice her class level, she gains the sickened condition. If her exertions push her beyond twice her normal blood point level, she immediately flies into a homicidal rage, striking out randomly with her most damaging attacks and abilities at friends and foes alike for 1d6 rounds or until her blood pool is reduced to 0 (whichever comes first). At the end of the rage, her blood points drop to 0, her hit points drop to -1, and she begins dying . Each day, when the bloatmage rests to regain spells, she regains blood points up to her class level but not beyond (so if her blo"
+        },
+        {
+          "name": "Bloodsurge (1/Day, 1d4)",
+          "description": "A bloatmage can exert herself as a free action to instantly gain extra blood points, but doing so puts her at risk of a dangerous collapse. At 1st level, the bloatmage can bloodsurge once per day to gain 1d4 points. At 4th, she can surge twice per day, and the die roll becomes 1d8. At 8th, she can surge three times per day, and the roll becomes 1d12. Editor's Note On the Bloodsurge class ability chart it goes from 1d4 to 2d4 to 3d4 but the text progresses from 1d4 to 1d8 to 1d12. Normally &#8220;Text trumps table&#8221; but is it true in this case?. After discussing this with James, we like the 1d4/1d8/1d12 option in the text better, as it makes it a little more risky for the reckless character-which makes the class more appealing if you're a player who likes to take risks. Note that if you play the class carefully, you'll probably never rage if you use this ability. But sometimes an adventure requires you to push yourself a little harder than you'd planned&#8230;. [ Source ]"
+        },
+        {
+          "name": "Hemophilia",
+          "description": "Bloatmages are particularly susceptible to bleed effects, and the DC of any Heal check made to stop a bleed effect is 5 higher than normal. In addition, anytime a bleeding wound is inflicted on a bloatmage, she loses 1 blood point. This loss of blood points is cumulative for multiple bleed attacks, but not each time she takes damage from the same attack."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing arcane class"
+      }
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 0,
+      "ref": 0,
+      "will": 1,
+      "classFeatures": [],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing arcane class"
+      }
+    },
+    {
+      "level": 3,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Corpulence",
+          "description": "At 3rd level, a bloatmage becomes so massive that her rolls of fatty, blood-laden flesh grant her a +1 natural armor bonus . At 7th level, this bonus increases to +2 but reduces her speed by 10 feet. This penalty stacks with the penalty from the Bloatmage Initiate feat. This reduction in speed can never reduce the bloatmageÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s speed below 5 feet, nor does it affect magical flying effects."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing arcane class"
+      }
+    },
+    {
+      "level": 4,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Bloodsurge (2/Day, 1d8)",
+          "description": "A bloatmage can exert herself as a free action to instantly gain extra blood points, but doing so puts her at risk of a dangerous collapse. At 1st level, the bloatmage can bloodsurge once per day to gain 1d4 points. At 4th, she can surge twice per day, and the die roll becomes 1d8. At 8th, she can surge three times per day, and the roll becomes 1d12. Editor's Note On the Bloodsurge class ability chart it goes from 1d4 to 2d4 to 3d4 but the text progresses from 1d4 to 1d8 to 1d12. Normally &#8220;Text trumps table&#8221; but is it true in this case?. After discussing this with James, we like the 1d4/1d8/1d12 option in the text better, as it makes it a little more risky for the reckless character-which makes the class more appealing if you're a player who likes to take risks. Note that if you play the class carefully, you'll probably never rage if you use this ability. But sometimes an adventure requires you to push yourself a little harder than you'd planned&#8230;. [ Source ]"
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing arcane class"
+      }
+    },
+    {
+      "level": 5,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 3,
+      "classFeatures": [],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing arcane class"
+      }
+    },
+    {
+      "level": 6,
+      "bab": 3,
+      "fort": 2,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing arcane class"
+      }
+    },
+    {
+      "level": 7,
+      "bab": 3,
+      "fort": 2,
+      "ref": 2,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Corpulence",
+          "description": "At 3rd level, a bloatmage becomes so massive that her rolls of fatty, blood-laden flesh grant her a +1 natural armor bonus . At 7th level, this bonus increases to +2 but reduces her speed by 10 feet. This penalty stacks with the penalty from the Bloatmage Initiate feat. This reduction in speed can never reduce the bloatmageÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s speed below 5 feet, nor does it affect magical flying effects."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing arcane class"
+      }
+    },
+    {
+      "level": 8,
+      "bab": 4,
+      "fort": 2,
+      "ref": 2,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Bloodsurge (3/Day, 1d12)",
+          "description": "A bloatmage can exert herself as a free action to instantly gain extra blood points, but doing so puts her at risk of a dangerous collapse. At 1st level, the bloatmage can bloodsurge once per day to gain 1d4 points. At 4th, she can surge twice per day, and the die roll becomes 1d8. At 8th, she can surge three times per day, and the roll becomes 1d12. Editor's Note On the Bloodsurge class ability chart it goes from 1d4 to 2d4 to 3d4 but the text progresses from 1d4 to 1d8 to 1d12. Normally &#8220;Text trumps table&#8221; but is it true in this case?. After discussing this with James, we like the 1d4/1d8/1d12 option in the text better, as it makes it a little more risky for the reckless character-which makes the class more appealing if you're a player who likes to take risks. Note that if you play the class carefully, you'll probably never rage if you use this ability. But sometimes an adventure requires you to push yourself a little harder than you'd planned&#8230;. [ Source ]"
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing arcane class"
+      }
+    },
+    {
+      "level": 9,
+      "bab": 4,
+      "fort": 3,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing arcane class"
+      }
+    },
+    {
+      "level": 10,
+      "bab": 5,
+      "fort": 3,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Absorb Bloodline",
+          "description": "At 10th level, a bloatmage can temporarily access all of the bloodline powers of a given sorcerer bloodline as if she were a sorcerer of a level equaling her total arcane spellcaster level (including bloatmage levels) by consuming blood tied to that bloodline. By drinking 1 pint of fresh blood (which inflicts 1 point of Constitution damage) from a sorcerer with the given bloodline or from a creature affiliated with that bloodline, the bloatmage gains the ability to use the bloodline powers (but not bonus spells, proficiencies, and so on) as appropriate to her level for 1 hour. This ability is usable once per day and drinking the blood normally requires a full minute, but bloatmages with the Brew Potion feat can distill the blood into a potion -sized draught that can be stored and consumed as a standard action . Any bloodlines absorbed are in addition to the original bloodline of a bloatmage with sorcerer levels. Though the bloatmage gains no physical nourishment from drinking blood, this practice is likely responsible for many of the stories linking bloatmages and vampires. In addition to sorcerers of the given bloodline, the following list presents a few examples of creatures whose blood is considered affiliated to a bloodline. There may be others who work equally well, at the GMÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s discretion. Aberrant : any aberration. Abyssal : any chaotic evil outsider. Arcane : any arcane caster, or any creature with an arcane spell or spell-like ability of at least 3rd-level. Celestial : any good outsider. Destined : any creature able to cast divination spells. Draconic : any dragon o"
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing arcane class"
+      }
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": {
+    "summary": "See level progression spell columns."
+  },
+  "spellcastingClass": true
+}

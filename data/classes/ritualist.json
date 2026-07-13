@@ -1,0 +1,269 @@
+{
+  "name": "Ritualist",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/n-r/ritualist/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Esoteric Discovery",
+          "description": "At 1st level, 3rd level, and every 3 levels thereafter, a ritualist selects one skill. When using that skill to cast an occult ritual, the ritualist can take 10 on the skill check, but only once per skill during any given ritual."
+        },
+        {
+          "name": "Student Of Mysteries",
+          "description": "A ritualist adds half her ritualist level (minimum 1) as a bonus on Intelligence checks made to learn new occult rituals."
+        }
+      ],
+      "spellcasting": {
+        "Spells Per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Stabilize Ritual",
+          "description": "At 2nd level, once per day as a full-round action , a ritualist can refocus a ritual that has been paused, removing any increases to the ritualÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s skill check DCs that have accrued thus far due to pausing the ritual."
+        }
+      ],
+      "spellcasting": {
+        "Spells Per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 3,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Esoteric Discovery",
+          "description": "At 1st level, 3rd level, and every 3 levels thereafter, a ritualist selects one skill. When using that skill to cast an occult ritual, the ritualist can take 10 on the skill check, but only once per skill during any given ritual."
+        },
+        {
+          "name": "Occult Expertise",
+          "description": "At 3rd level, a ritualist adds half her class level as a bonus on all skill checks when using occult skill unlocks. Additionally, a ritualist can take 10 on skill checks when using occult skill unlocks with skills chosen with the esoteric discovery ability."
+        }
+      ],
+      "spellcasting": {
+        "Spells Per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 4,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Cautious Rituals",
+          "description": "At 4th level, once per day when beginning to cast a ritual as the primary caster, a ritualist can decide to cast the ritual as a cautious ritual. The DCs of a cautious ritualÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s skill checks increase by half the ritualÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s level (rounded down, minimum 1). However, if the ritual fails, there is a cumulative 10% chance per ritualist level (40% at 4th level, 50% at 5th level, and so on) that the ritual causes none of its usual failure or backlash effects. The ritual still causes backlash if it succeeds. At 6th level, the ritualistÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s successful cautious rituals do not cause any backlash to any of their secondary casters. At 8th level, a ritualist can cast a cautious ritual without increasing the ritualÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s skill check DCs."
+        }
+      ],
+      "spellcasting": {
+        "Spells Per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 5,
+      "bab": 2,
+      "fort": 2,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Expedited Rituals",
+          "description": "At 5th level, once per day when beginning to cast a ritual as the primary caster, a ritualist can decide to cast the ritual as an expedited ritual. The DCs of an expedited ritualÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s skill checks increase by half the ritualÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s level (rounded down). However, the ritualist can cast the ritual as soon as its casters succeed at the requisite number of skill checks rather than waiting for the ritualÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s full casting time to elapse. A ritual can be both cautious and expedited, but the penalties stack. At 9th level, a ritualist can cast an expedited ritual without increasing the ritualÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s skill check DCs."
+        }
+      ],
+      "spellcasting": {
+        "Spells Per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 6,
+      "bab": 3,
+      "fort": 2,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Esoteric Discovery",
+          "description": "At 1st level, 3rd level, and every 3 levels thereafter, a ritualist selects one skill. When using that skill to cast an occult ritual, the ritualist can take 10 on the skill check, but only once per skill during any given ritual."
+        }
+      ],
+      "spellcasting": {
+        "Spells Per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 7,
+      "bab": 3,
+      "fort": 2,
+      "ref": 2,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Independent Rituals",
+          "description": "At 7th-level, a ritualist becomes so adept at casting rituals that secondary casters are unnecessary. Once per day when beginning to cast a ritual as the primary caster, the ritualist can decide to cast the ritual as an independent ritual. The ritualist gains a bonus on all skill checks attempted as part of casting the ritual equal to half the ritualistÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s level, and she can always take 10 when using skills she chose for her esoteric discovery ability. However, none of the ritualÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s secondary casters, if any, can attempt any of the ritualÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s skill checks. The ritualist can still include secondary casters as part of a ritual, if it allows secondary casters, to grant them the ritualÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s effects. An independent ritual can also be cast as an expedited or cautious ritual (or both)."
+        }
+      ],
+      "spellcasting": {
+        "Spells Per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 8,
+      "bab": 4,
+      "fort": 3,
+      "ref": 3,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Focused Rituals",
+          "description": "At 8th level, a ritualist can maintain a ritualÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s focus even under dire circumstances. While performing a ritual as the primary caster, the ritualist can continue the ritual even if some or all of its secondary casters are incapacitated, killed, or moved out of range of the ritual."
+        }
+      ],
+      "spellcasting": {
+        "Spells Per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 9,
+      "bab": 4,
+      "fort": 3,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Esoteric Discovery",
+          "description": "At 1st level, 3rd level, and every 3 levels thereafter, a ritualist selects one skill. When using that skill to cast an occult ritual, the ritualist can take 10 on the skill check, but only once per skill during any given ritual."
+        }
+      ],
+      "spellcasting": {
+        "Spells Per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 10,
+      "bab": 5,
+      "fort": 3,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Master Of Mysteries",
+          "description": "At 10th level, a ritualistÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s knowledge of the occult reaches unfathomable depths, and she can perform rituals with disturbing alacrity. Once per day when casting a ritual as the primary caster, the ritualist can reduce the casting time from 10 minutes per ritual level to 1 round per ritual level, or from 1 hour per ritual level to 1 minute per ritual level. One of the ritualÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s casters attempts a check every round or every minute of the casting instead of every 10 minutes or every hour, as appropriate. Section 15: Copyright Notice Pathfinder Player Companion: Chronicle of Legends Ãƒâ€šÃ‚Â© 2019, Paizo Inc.; Authors: Calder CaDavid, Vanessa Hoskins, Mike Kimmel, Isabelle Lee, Matt Morris, Mikhail Rekun, and Michael Sayre."
+        }
+      ],
+      "spellcasting": {
+        "Spells Per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": {
+    "summary": "See level progression spell columns."
+  },
+  "spellcastingClass": true
+}

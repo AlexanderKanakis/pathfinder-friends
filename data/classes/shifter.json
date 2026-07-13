@@ -1,0 +1,321 @@
+{
+  "name": "Shifter",
+  "type": "base",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/base-classes/shifter/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 1,
+      "fort": 2,
+      "ref": 2,
+      "will": 0,
+      "classFeatures": [
+        {
+          "name": "Shifter Aspect",
+          "description": "At 1st level, a shifter gains her first aspect -a category of animal to which her body and soul have become supernaturally attuned. She can shift into her aspect's minor form (see Aspects ) for a number of minutes per day equal to 3 + her shifter level. The duration need not be consecutive but must be spent in 1-minute increments. Shifting into a minor form is a swift action , while ending the effect is a free action that can be taken only on the shifter's turn. Until a shifter reaches 9th level and gains the chimeric aspect class feature, she can assume only one minor form at a time. Shifting to a new aspect (or aspects, in the case of chimeric aspects or greater chimeric aspects ) ends all minor forms currently manifested. The minor forms of aspects are not polymorph effects, and the shifter does not lose the benefits of a minor form while affected by polymorph effects. As the shifter gains levels, she gains more aspects ; she gains her second aspect at 5th level, a third aspect at 10th level, and a fourth at 15th level."
+        },
+        {
+          "name": "Shifter Claws",
+          "description": "At will, a shifter in her natural form can extend her claws as a swift action to use as a weapon. This magical transformation is fueled as much by the shifter's faith in the natural world as it is by inborn talent. The claws on each hand can be used as a primary natural attack , dealing 1d4 points of piercing and slashing damage (1d3 if she is Small). If she uses one of her claw attacks in concert with a weapon held in the other hand, the claw acts as a secondary natural attack instead. As the shifter gains levels, the power of her claws increases. At 3rd level, her claws count as magic weapons SOURCE , ignore DR / cold iron and DR /silver. At 7th level, her claw damage increases to 1d6 (1d4 if Small). At 11th level, her claw damage increases to 1d8 (1d6 if Small). At 13th level, her claw damage increases to 1d10 (1d8 if Small). At 17th level, the damage die does not increase, but the critical multiplier becomes ÃƒÆ’Ã¢â‚¬â€3. Lastly, at 19th level, the claws ignore DR / adamantine and DR /-. While a shifter uses wild shape to assume her aspect &#8216;s major form, her natural attacks gain the same benefits granted by her shifter claws ability. If the form she takes has claw attacks, she can use either the base damage of her shifter claws or the damage of the form's claws, whichever is greater. If the form does not have claw attacks, she can choose up to two natural attacks that would deal less damage than her shifter claw damage and have those attacks instead deal the same damage as her shifter claws. Alternate Natural Attacks A shifter can draw on her chosen animal aspec"
+        },
+        {
+          "name": "Wild Empathy",
+          "description": "A shifter can improve the attitude of an animal. This ability functions as a Diplomacy check to improve the attitude of a person. The shifter rolls 1d20 and adds her shifter level and Charisma modifier to determine the wild empathy check result. The typical domestic animal has a starting attitude of indifferent, while wild animals are usually unfriendly. To use wild empathy , the shifter and the animal must be within 30 feet of one another and under normal conditions. Generally, influencing an animal in this way takes 1 minute but, as with influencing people, it might take more or less time. The shifter can also use this ability to influence a magical beast with an Intelligence score of 1 or 2, but she takes a -4 penalty on the check."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 2,
+      "bab": 2,
+      "fort": 3,
+      "ref": 3,
+      "will": 0,
+      "classFeatures": [
+        {
+          "name": "Defensive Instinct",
+          "description": "At 2nd level, when unarmored, not using a shield, unencumbered, and conscious, the shifter adds her Wisdom bonus (if any) to her AC and CMD . If she is wearing nonmetal armor or using a nonmetal shield, she instead adds half her Wisdom bonus to her AC (minimum 0). In addition, the shifter gains a +1 bonus to her AC and CMD at 4th level. This bonus increases by 1 for every 4 shifter levels thereafter (up to a maximum of +5 at 20th level). These bonuses to AC apply even against touch attacks and when the shifter is flat-footed . She loses these bonuses when she is immobilized or helpless . These bonuses do not stack with the monk AC bonus class feature."
+        },
+        {
+          "name": "Track",
+          "description": "At 2nd level, a shifter adds half her level as a bonus on Survival checks to follow tracks."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 3,
+      "bab": 3,
+      "fort": 3,
+      "ref": 3,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Shifter Claws Increase",
+          "description": ""
+        },
+        {
+          "name": "Woodland Stride",
+          "description": "At 3rd level, a shifter can move through any sort of undergrowth (such as briars, natural thorns, overgrown areas, and similar terrain) at her normal speed and without taking damage or suffering any other impairment. Briars, thorns, and overgrown areas that are enchanted or magically manipulated to impede motion still affect the shifter."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 4,
+      "bab": 4,
+      "fort": 4,
+      "ref": 4,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Defensive Instinct (+1)",
+          "description": "At 2nd level, when unarmored, not using a shield, unencumbered, and conscious, the shifter adds her Wisdom bonus (if any) to her AC and CMD . If she is wearing nonmetal armor or using a nonmetal shield, she instead adds half her Wisdom bonus to her AC (minimum 0). In addition, the shifter gains a +1 bonus to her AC and CMD at 4th level. This bonus increases by 1 for every 4 shifter levels thereafter (up to a maximum of +5 at 20th level). These bonuses to AC apply even against touch attacks and when the shifter is flat-footed . She loses these bonuses when she is immobilized or helpless . These bonuses do not stack with the monk AC bonus class feature."
+        },
+        {
+          "name": "Wild Shape",
+          "description": "The ability details below have been updated based on this FAQ entry . At 4th level, a shifter gains the ability to turn herself into the major form of one of her aspects and back again. This ability functions as beast shape II , except as noted here. The shifter can turn into the major form of only one of her aspects at a time. Using wild shape to change to a major form or back is a standard action that doesn't provoke attacks of opportunity . Often a particular aspect's major form grants abilities beyond the normal effect of beast shape II . Each major form details the abilities the shifter gains with that major form and at what level; she gains these instead of the form abilities from beast shape II , but she still gains beast shape II abilities that are size dependent. A shifter loses her ability to speak while in animal form because she is limited to the sounds that a normal, untrained animal of that form can make, but she can communicate with other animals of the same general grouping as her form. She can also communicate in nonverbal ways with allies. A shifter can use wild shape for a number of hours each day equal to her shifter level + her Wisdom modifier. It need not be consecutive but must be spent in 1 hour increments. For abilities that function based on ÃƒÂ¢Ã¢â€šÂ¬Ã‹Å“uses of wild shape,ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ each hour of wild shape counts as a use. Shifters can take feats and other abilities that require wild shape ; for the purpose of qualifying for prerequisites, her effective druid level is equal to her shifter level."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 5,
+      "bab": 5,
+      "fort": 4,
+      "ref": 4,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Second Aspect",
+          "description": ""
+        },
+        {
+          "name": "Trackless Step",
+          "description": "At 5th level, a shifter leaves no trail in natural surroundings and cannot be tracked. She can choose to leave a trail if she so desires."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 6,
+      "bab": 6,
+      "fort": 5,
+      "ref": 5,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Shifter'S Fury",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 7,
+      "bab": 7,
+      "fort": 5,
+      "ref": 5,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Shifter Claws Increase",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 8,
+      "bab": 8,
+      "fort": 6,
+      "ref": 6,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Defensive Instinct (+2)",
+          "description": "At 2nd level, when unarmored, not using a shield, unencumbered, and conscious, the shifter adds her Wisdom bonus (if any) to her AC and CMD . If she is wearing nonmetal armor or using a nonmetal shield, she instead adds half her Wisdom bonus to her AC (minimum 0). In addition, the shifter gains a +1 bonus to her AC and CMD at 4th level. This bonus increases by 1 for every 4 shifter levels thereafter (up to a maximum of +5 at 20th level). These bonuses to AC apply even against touch attacks and when the shifter is flat-footed . She loses these bonuses when she is immobilized or helpless . These bonuses do not stack with the monk AC bonus class feature."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 9,
+      "bab": 9,
+      "fort": 6,
+      "ref": 6,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Chimeric Aspect",
+          "description": "At 9th level, when a shifter uses her shifter aspect ability to take on a minor form, she can choose two aspects and assume the minor form of each aspect ."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 10,
+      "bab": 10,
+      "fort": 7,
+      "ref": 7,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Third Aspect",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 11,
+      "bab": 11,
+      "fort": 7,
+      "ref": 7,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Shifter Claws Increase",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 12,
+      "fort": 8,
+      "ref": 8,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Defensive Instinct (+3)",
+          "description": "At 2nd level, when unarmored, not using a shield, unencumbered, and conscious, the shifter adds her Wisdom bonus (if any) to her AC and CMD . If she is wearing nonmetal armor or using a nonmetal shield, she instead adds half her Wisdom bonus to her AC (minimum 0). In addition, the shifter gains a +1 bonus to her AC and CMD at 4th level. This bonus increases by 1 for every 4 shifter levels thereafter (up to a maximum of +5 at 20th level). These bonuses to AC apply even against touch attacks and when the shifter is flat-footed . She loses these bonuses when she is immobilized or helpless . These bonuses do not stack with the monk AC bonus class feature."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 13,
+      "fort": 8,
+      "ref": 8,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Shifter Claws Increase",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 14,
+      "fort": 9,
+      "ref": 9,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Greater Chimeric Aspect",
+          "description": "At 14th level, when a shifter uses her shifter aspect ability to take on a minor form, she can choose up to three aspects and assume the minor form of each aspect ."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 15,
+      "fort": 9,
+      "ref": 9,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Fourth Aspect",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 16,
+      "fort": 10,
+      "ref": 10,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Defensive Instinct (+4)",
+          "description": "At 2nd level, when unarmored, not using a shield, unencumbered, and conscious, the shifter adds her Wisdom bonus (if any) to her AC and CMD . If she is wearing nonmetal armor or using a nonmetal shield, she instead adds half her Wisdom bonus to her AC (minimum 0). In addition, the shifter gains a +1 bonus to her AC and CMD at 4th level. This bonus increases by 1 for every 4 shifter levels thereafter (up to a maximum of +5 at 20th level). These bonuses to AC apply even against touch attacks and when the shifter is flat-footed . She loses these bonuses when she is immobilized or helpless . These bonuses do not stack with the monk AC bonus class feature."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 17,
+      "fort": 10,
+      "ref": 10,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Shifter Claws Increase",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 18,
+      "fort": 11,
+      "ref": 11,
+      "will": 6,
+      "classFeatures": [
+        {
+          "name": "A Thousand Faces",
+          "description": "This ability has been added based on this FAQ entry . At 18th level, a shifter gains the ability to change her appearance at will, as if using the alter self spell, but only while in her normal form."
+        },
+        {
+          "name": "Timeless Body",
+          "description": "This ability has been added based on this FAQ entry . After attaining 18th level, a shifter no longer takes ability score penalties for aging and cannot be magically aged. Any penalties she may have already incurred, however, remain in place. Bonuses still accrue, and the shifter still dies of old age when her time is up."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 19,
+      "fort": 11,
+      "ref": 11,
+      "will": 6,
+      "classFeatures": [
+        {
+          "name": "Shifter Claws Increase",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 20,
+      "fort": 12,
+      "ref": 12,
+      "will": 6,
+      "classFeatures": [
+        {
+          "name": "Defensive Instinct (+5)",
+          "description": "At 2nd level, when unarmored, not using a shield, unencumbered, and conscious, the shifter adds her Wisdom bonus (if any) to her AC and CMD . If she is wearing nonmetal armor or using a nonmetal shield, she instead adds half her Wisdom bonus to her AC (minimum 0). In addition, the shifter gains a +1 bonus to her AC and CMD at 4th level. This bonus increases by 1 for every 4 shifter levels thereafter (up to a maximum of +5 at 20th level). These bonuses to AC apply even against touch attacks and when the shifter is flat-footed . She loses these bonuses when she is immobilized or helpless . These bonuses do not stack with the monk AC bonus class feature."
+        },
+        {
+          "name": "Final Aspect",
+          "description": "This ability has been updated based on this FAQ entry . At 20th level, a shifter gains access to a fifth aspect , when she uses shifter aspect she can assume the minor forms of all her aspects , and the shifter can use her major and minor forms at will."
+        }
+      ],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": null,
+  "spellcastingClass": false
+}

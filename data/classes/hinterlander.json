@@ -1,0 +1,277 @@
+{
+  "name": "Hinterlander",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/e-h/hinterlander/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Favored Enemy +2",
+          "description": ""
+        },
+        {
+          "name": "Master Archer Bonus Feat",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "-"
+      }
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Fast Movement",
+          "description": "At 2nd level, a hinterlanderÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s base land speed increases by 10 feet."
+        },
+        {
+          "name": "Favored Terrain (Hinterland) +2",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 3,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Hinterland Stride",
+          "description": "At 3rd level, a hinterlander moves with ease through natural and agrarian environments. This functions exactly like woodland stride , except that a hinterlander also moves normally through any non-magical difficult terrain in settled areas with a population of 2,000 or less individuals, such as a farm or village."
+        },
+        {
+          "name": "Master Archer Bonus Feat",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 4,
+      "bab": 3,
+      "fort": 1,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Chosen Kin",
+          "description": "At 4th level, as a standard action , a hinterlander can designate a number of allies up to 3 + his Wisdom modifier to be his chosen kin. Allies so designated gain half the hinterlanderÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s favored terrain (hinterland) bonus and half of the bonuses granted by defended hearth (see below). Members of his chosen kin must remain within 30 feet of the hinterlander in order to gain these benefits. At 7th level, this range increases to 60 feet."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 5,
+      "bab": 3,
+      "fort": 2,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Master Archer Bonus Feat",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 6,
+      "bab": 4,
+      "fort": 2,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Defended Hearth +2",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 7,
+      "bab": 5,
+      "fort": 2,
+      "ref": 2,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Imbue Arrow",
+          "description": "At 7th level, a hinterlander gains the ability to place a spell that affects an area upon an arrow. This functions exactly like the arcane archer ability of the same name."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 8,
+      "bab": 6,
+      "fort": 3,
+      "ref": 3,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Favored Enemy +4",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 9,
+      "bab": 6,
+      "fort": 3,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Favored Terrain (Hinterland) +4",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 10,
+      "bab": 7,
+      "fort": 3,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Defended Hearth +4",
+          "description": ""
+        },
+        {
+          "name": "Waymarker Travel",
+          "description": "At 10th level, a hinterlander gains the ability to create a waymarker anywhere within the area of a defended hearth. The hinterlander can maintain up to five waymarkers at a time-if the hinterlander creates a sixth waymarker, he chooses which of the previous five deactivates. Once per day as a move action , the hinterlander can cast word of recall as a spell-like ability to teleport to any of his active waymarkers. Section 15: Copyright Notice Pathfinder Player Companion: Paths of the Righteous Ãƒâ€šÃ‚Â© 2016, Paizo Inc.; Authors: Alexander Augunas, John Compton, Jenny Jarzabski, Isabelle Lee, Stephen Rowe, and Owen K.C. Stephens."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": {
+    "summary": "See level progression spell columns."
+  },
+  "spellcastingClass": true
+}

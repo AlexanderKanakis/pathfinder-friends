@@ -1,0 +1,725 @@
+{
+  "name": "Omdura",
+  "type": "base",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/base-classes/omdura/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 2,
+      "ref": 0,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Aura",
+          "description": "An omdura of a chaotic, evil, good, or lawful deity has a powerful aura corresponding to the deity's alignment (see the detect evil spell for details)."
+        },
+        {
+          "name": "Detect Alignment",
+          "description": "At will, an omdura can cast detect chaos , detect evil , detect good , or detect law . She can use only one of these at any given time."
+        },
+        {
+          "name": "Invocation",
+          "description": "An omdura can call forth the power of her deity to improve her allies' abilities as a standard action . When the omdura calls upon this power, she must select one type of invocation from those listed below to grant the benefits to her allies within 30 feet. If the omdura is evil, she grants profane bonuses instead of sacred, as appropriate. Neutral omduras must select profane or sacred bonuses. Once made, this choice cannot be changed. A called invocation cannot be disrupted, but it ends immediately if the omdura is killed, paralyzed , stunned , or knocked unconscious . The omdura can use this ability for a number of minutes per day equal to her level. This duration does not need to be consecutive, but it must be spent in 1-minute increments. The omdura can change her chosen invocation to another type as a swift action , but doing so expends a 1-minute increment of her invocations. At 7th level, an omdura can call an invocation as a move action instead of a standard action . At 13th level, an omdura can call an invocation as a swift action . Destruction : The omdura's allies are filled with divine wrath, gaining a +1 sacred bonus on weapon damage rolls. This bonus increases by 1 for every 3 class levels the omdura has. Healing : The omdura radiates a healing light, granting fast healing 1. This causes the omdura's allies to recover 1 hit point each round (up to their maximum hit points ). The amount of fast healing increases by 1 for every 3 class levels the omdura has. Justice : This invocation spurs the omdura's allies to seek justice, granting a +"
+        },
+        {
+          "name": "Orisons",
+          "description": ""
+        },
+        {
+          "name": "Spells",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells Per Day": "1"
+      }
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 3,
+      "ref": 0,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Divine Touch",
+          "description": "At 2nd level, an omdura can deliver divine energy by touch. She can deliver either positive energy or negative energy. A good omdura (or a neutral omdura of a good deity) must select positive energy. An evil omdura (or a neutral omdura of an evil deity) must select negative energy. An omdura who is neither good nor evil and whose deity is neither good nor evil can select either positive or negative energy. This choice is made when the omdura gains this ability and cannot be changed. Each day the omdura can use this ability a number of times equal to half her omdura level plus her Charisma modifier. With one use of this ability, an omdura can use divine energy to restore to a target 1d6 hit points for every 2 omdura levels she has. Using this ability is a standard action , unless the omdura targets herself, in which case it is a swift action . An omdura who delivers negative energy with her touch can instead deal 1d6 points of damage to a living creature for every 2 omdura levels she has. Alternatively, an omdura can use this divine energy to affect undead creatures, dealing damage when delivering positive energy or restoring hit points when delivering negative energy. An omdura needs only one freehand to use this ability. Using divine touch to harm a creature requires a successful melee touch attack and doesn't provoke an attack of opportunity . Creatures do not receive a saving throw against the damage from divine touch. Divine touch is modified by any feat, spell, or effect that specifically works with the lay on hands paladin class feature. For example, the Extra L"
+        }
+      ],
+      "spellcasting": {
+        "Spells Per Day": "2"
+      }
+    },
+    {
+      "level": 3,
+      "bab": 2,
+      "fort": 3,
+      "ref": 1,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Divine Infusion",
+          "description": "At 3rd level and every 3 levels thereafter, an omdura can select one divine infusion. Each infusion adds an effect to the omdura's divine touch ability. The types of infusions available to the omdura are determined by the type of energy the omdura delivers with her divine touch. An omdura who delivers positive energy adds a mercy to her divine touch, treating her omdura level as her paladin level and her divine touch as the paladin's lay on hands ability. An omdura who delivers negative energy adds a cruelty to her divine touch, treating her omdura level as her antipaladin level and her divine touch as the antipaladin's touch of corruption ability. At 6th, 9th, and 12th level, she adds infusions to the list of those she can select as though she were a paladin or antipaladin (depending on her divine touch ability) of her omdura level. Divine infusion functions as either the cruelty or mercy class ability, depending on the omdura's divine touch energy, for the purposes of feats, spells, or effects that work with those class features."
+        }
+      ],
+      "spellcasting": {
+        "Spells Per Day": "3"
+      }
+    },
+    {
+      "level": 4,
+      "bab": 3,
+      "fort": 4,
+      "ref": 1,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Divine Might",
+          "description": "At 4th level, an omdura can call on the powers of her god once per day to aid in her struggle against her enemies. As a swift action , the omdura chooses one target within sight to be the focus of her divine might. If the target is opposed to the omdura's alignment on either the law/chaos or the good/evil axis, the omdura adds half her Charisma bonus (minimum +o) to her attack rolls and adds half her omdura level to damage rolls against the target of her divine might. A neutral omdura can choose any target to be the target of her divine might, but she adds only oneÃƒâ€šÃ‚Â­ third her Charisma bonus and omdura level. In addition, while divine might is in effect, the omdura gains a deflection bonus equal to half her Charisma modifier (one-third for a neutral omdura) to her AC against attacks made by the target of the divine might. If a nonÃƒâ€šÃ‚Â­ neutral omdura targets a creature that is not opposed to her alignment , the use of this ability is wasted with no effect. The divine might effect remains until the target of divine might is dead or the next time the omdura rests and regains her uses of this ability. At 9th level and every 5 levels thereafter, the omdura can use divine might one additional time per day to a maximum of four times per day at 19th level."
+        }
+      ],
+      "spellcasting": {
+        "Spells Per Day": "3"
+      }
+    },
+    {
+      "level": 5,
+      "bab": 3,
+      "fort": 4,
+      "ref": 1,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Divine Weapon",
+          "description": "At 5th level, an omdura forms a divine bond with her god. This bond allows the omdura to enhance her weapon as a standard action by calling upon the aid of a divine spirit. This aid lasts for 1 minute per omdura level. When called, the spirit causes the weapon to shed light as a torch . At 5th level, this spirit grants the weapon a +1 enhancement bonus . For every 3 levels beyond 5th, the weapon gains another +1 enhancement bonus , to a maximum of +6 at 20th level. These bonuses can be added to the weapon, stacking with existing weapon bonuses to a maximum of +5, or they can be used to add any of the following weapon special abilities: brilliant energy , defending , flaming , flaming burst , keen , or speed . A lawful omdura can also choose from axiomatic and merciful . A chaotic omdura can also choose from anarchic and vicious . A good omdura can also choose from disruption and holy . An evil omdura can also choose from unholy and wounding . A neutral omdura can also add vorpal . Adding a special ability consumes an amount of bonus equal to the special ability's cost (see Table: Melee Weapon Special Abilities ). These bonuses are in addition to any special abilities the weapon already has, but duplicate abilities do not stack. If the weapon is not magic, at least a +1 enhancement bonus must be added before any other special abilities can be added. The bonus and special abilities granted by the spirit are determined when the spirit is called and cannot be changed until the spirit is called again. The divine spirit imparts no bonuses if the weapon is held by anyone oth"
+        }
+      ],
+      "spellcasting": {
+        "Spells Per Day": "4"
+      }
+    },
+    {
+      "level": 6,
+      "bab": 4,
+      "fort": 5,
+      "ref": 2,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Divine Infusion",
+          "description": "At 3rd level and every 3 levels thereafter, an omdura can select one divine infusion. Each infusion adds an effect to the omdura's divine touch ability. The types of infusions available to the omdura are determined by the type of energy the omdura delivers with her divine touch. An omdura who delivers positive energy adds a mercy to her divine touch, treating her omdura level as her paladin level and her divine touch as the paladin's lay on hands ability. An omdura who delivers negative energy adds a cruelty to her divine touch, treating her omdura level as her antipaladin level and her divine touch as the antipaladin's touch of corruption ability. At 6th, 9th, and 12th level, she adds infusions to the list of those she can select as though she were a paladin or antipaladin (depending on her divine touch ability) of her omdura level. Divine infusion functions as either the cruelty or mercy class ability, depending on the omdura's divine touch energy, for the purposes of feats, spells, or effects that work with those class features."
+        }
+      ],
+      "spellcasting": {
+        "Spells Per Day": "4"
+      }
+    },
+    {
+      "level": 7,
+      "bab": 5,
+      "fort": 5,
+      "ref": 2,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Commune 1/Day",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells Per Day": "4"
+      }
+    },
+    {
+      "level": 8,
+      "bab": 6,
+      "fort": 6,
+      "ref": 2,
+      "will": 6,
+      "classFeatures": [
+        {
+          "name": "Divine Weapon",
+          "description": "At 5th level, an omdura forms a divine bond with her god. This bond allows the omdura to enhance her weapon as a standard action by calling upon the aid of a divine spirit. This aid lasts for 1 minute per omdura level. When called, the spirit causes the weapon to shed light as a torch . At 5th level, this spirit grants the weapon a +1 enhancement bonus . For every 3 levels beyond 5th, the weapon gains another +1 enhancement bonus , to a maximum of +6 at 20th level. These bonuses can be added to the weapon, stacking with existing weapon bonuses to a maximum of +5, or they can be used to add any of the following weapon special abilities: brilliant energy , defending , flaming , flaming burst , keen , or speed . A lawful omdura can also choose from axiomatic and merciful . A chaotic omdura can also choose from anarchic and vicious . A good omdura can also choose from disruption and holy . An evil omdura can also choose from unholy and wounding . A neutral omdura can also add vorpal . Adding a special ability consumes an amount of bonus equal to the special ability's cost (see Table: Melee Weapon Special Abilities ). These bonuses are in addition to any special abilities the weapon already has, but duplicate abilities do not stack. If the weapon is not magic, at least a +1 enhancement bonus must be added before any other special abilities can be added. The bonus and special abilities granted by the spirit are determined when the spirit is called and cannot be changed until the spirit is called again. The divine spirit imparts no bonuses if the weapon is held by anyone oth"
+        }
+      ],
+      "spellcasting": {
+        "Spells Per Day": "4"
+      }
+    },
+    {
+      "level": 9,
+      "bab": 6,
+      "fort": 6,
+      "ref": 3,
+      "will": 6,
+      "classFeatures": [
+        {
+          "name": "Divine Might 2/Day",
+          "description": ""
+        },
+        {
+          "name": "Divine Infusion",
+          "description": "At 3rd level and every 3 levels thereafter, an omdura can select one divine infusion. Each infusion adds an effect to the omdura's divine touch ability. The types of infusions available to the omdura are determined by the type of energy the omdura delivers with her divine touch. An omdura who delivers positive energy adds a mercy to her divine touch, treating her omdura level as her paladin level and her divine touch as the paladin's lay on hands ability. An omdura who delivers negative energy adds a cruelty to her divine touch, treating her omdura level as her antipaladin level and her divine touch as the antipaladin's touch of corruption ability. At 6th, 9th, and 12th level, she adds infusions to the list of those she can select as though she were a paladin or antipaladin (depending on her divine touch ability) of her omdura level. Divine infusion functions as either the cruelty or mercy class ability, depending on the omdura's divine touch energy, for the purposes of feats, spells, or effects that work with those class features."
+        }
+      ],
+      "spellcasting": {
+        "Spells Per Day": "5"
+      }
+    },
+    {
+      "level": 10,
+      "bab": 7,
+      "fort": 7,
+      "ref": 3,
+      "will": 7,
+      "classFeatures": [],
+      "spellcasting": {
+        "Spells Per Day": "5"
+      }
+    },
+    {
+      "level": 11,
+      "bab": 8,
+      "fort": 7,
+      "ref": 3,
+      "will": 7,
+      "classFeatures": [
+        {
+          "name": "Divine Weapon +3",
+          "description": ""
+        },
+        {
+          "name": "Improved Invocation",
+          "description": "At 11th level, when using her invocation class ability, the omdura chooses two invocations to grant her allies. In addition, the omdura also benefits from any one invocation she calls, but she receives only half the invocation's granted bonus."
+        }
+      ],
+      "spellcasting": {
+        "Spells Per Day": "5"
+      }
+    },
+    {
+      "level": 12,
+      "bab": 9,
+      "fort": 8,
+      "ref": 4,
+      "will": 8,
+      "classFeatures": [
+        {
+          "name": "Divine Infusion",
+          "description": "At 3rd level and every 3 levels thereafter, an omdura can select one divine infusion. Each infusion adds an effect to the omdura's divine touch ability. The types of infusions available to the omdura are determined by the type of energy the omdura delivers with her divine touch. An omdura who delivers positive energy adds a mercy to her divine touch, treating her omdura level as her paladin level and her divine touch as the paladin's lay on hands ability. An omdura who delivers negative energy adds a cruelty to her divine touch, treating her omdura level as her antipaladin level and her divine touch as the antipaladin's touch of corruption ability. At 6th, 9th, and 12th level, she adds infusions to the list of those she can select as though she were a paladin or antipaladin (depending on her divine touch ability) of her omdura level. Divine infusion functions as either the cruelty or mercy class ability, depending on the omdura's divine touch energy, for the purposes of feats, spells, or effects that work with those class features."
+        }
+      ],
+      "spellcasting": {
+        "Spells Per Day": "5"
+      }
+    },
+    {
+      "level": 13,
+      "bab": 9,
+      "fort": 8,
+      "ref": 4,
+      "will": 8,
+      "classFeatures": [],
+      "spellcasting": {
+        "Spells Per Day": "5"
+      }
+    },
+    {
+      "level": 14,
+      "bab": 10,
+      "fort": 9,
+      "ref": 4,
+      "will": 9,
+      "classFeatures": [
+        {
+          "name": "Divine Might 3/Day",
+          "description": ""
+        },
+        {
+          "name": "Divine Weapon",
+          "description": "At 5th level, an omdura forms a divine bond with her god. This bond allows the omdura to enhance her weapon as a standard action by calling upon the aid of a divine spirit. This aid lasts for 1 minute per omdura level. When called, the spirit causes the weapon to shed light as a torch . At 5th level, this spirit grants the weapon a +1 enhancement bonus . For every 3 levels beyond 5th, the weapon gains another +1 enhancement bonus , to a maximum of +6 at 20th level. These bonuses can be added to the weapon, stacking with existing weapon bonuses to a maximum of +5, or they can be used to add any of the following weapon special abilities: brilliant energy , defending , flaming , flaming burst , keen , or speed . A lawful omdura can also choose from axiomatic and merciful . A chaotic omdura can also choose from anarchic and vicious . A good omdura can also choose from disruption and holy . An evil omdura can also choose from unholy and wounding . A neutral omdura can also add vorpal . Adding a special ability consumes an amount of bonus equal to the special ability's cost (see Table: Melee Weapon Special Abilities ). These bonuses are in addition to any special abilities the weapon already has, but duplicate abilities do not stack. If the weapon is not magic, at least a +1 enhancement bonus must be added before any other special abilities can be added. The bonus and special abilities granted by the spirit are determined when the spirit is called and cannot be changed until the spirit is called again. The divine spirit imparts no bonuses if the weapon is held by anyone oth"
+        }
+      ],
+      "spellcasting": {
+        "Spells Per Day": "5"
+      }
+    },
+    {
+      "level": 15,
+      "bab": 11,
+      "fort": 9,
+      "ref": 5,
+      "will": 9,
+      "classFeatures": [
+        {
+          "name": "Commune 2/Day",
+          "description": ""
+        },
+        {
+          "name": "Divine Infusion",
+          "description": "At 3rd level and every 3 levels thereafter, an omdura can select one divine infusion. Each infusion adds an effect to the omdura's divine touch ability. The types of infusions available to the omdura are determined by the type of energy the omdura delivers with her divine touch. An omdura who delivers positive energy adds a mercy to her divine touch, treating her omdura level as her paladin level and her divine touch as the paladin's lay on hands ability. An omdura who delivers negative energy adds a cruelty to her divine touch, treating her omdura level as her antipaladin level and her divine touch as the antipaladin's touch of corruption ability. At 6th, 9th, and 12th level, she adds infusions to the list of those she can select as though she were a paladin or antipaladin (depending on her divine touch ability) of her omdura level. Divine infusion functions as either the cruelty or mercy class ability, depending on the omdura's divine touch energy, for the purposes of feats, spells, or effects that work with those class features."
+        }
+      ],
+      "spellcasting": {
+        "Spells Per Day": "5"
+      }
+    },
+    {
+      "level": 16,
+      "bab": 12,
+      "fort": 10,
+      "ref": 5,
+      "will": 10,
+      "classFeatures": [],
+      "spellcasting": {
+        "Spells Per Day": "5"
+      }
+    },
+    {
+      "level": 17,
+      "bab": 12,
+      "fort": 10,
+      "ref": 5,
+      "will": 10,
+      "classFeatures": [
+        {
+          "name": "Divine Weapon +5",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells Per Day": "5"
+      }
+    },
+    {
+      "level": 18,
+      "bab": 13,
+      "fort": 11,
+      "ref": 6,
+      "will": 11,
+      "classFeatures": [
+        {
+          "name": "Divine Infusion",
+          "description": "At 3rd level and every 3 levels thereafter, an omdura can select one divine infusion. Each infusion adds an effect to the omdura's divine touch ability. The types of infusions available to the omdura are determined by the type of energy the omdura delivers with her divine touch. An omdura who delivers positive energy adds a mercy to her divine touch, treating her omdura level as her paladin level and her divine touch as the paladin's lay on hands ability. An omdura who delivers negative energy adds a cruelty to her divine touch, treating her omdura level as her antipaladin level and her divine touch as the antipaladin's touch of corruption ability. At 6th, 9th, and 12th level, she adds infusions to the list of those she can select as though she were a paladin or antipaladin (depending on her divine touch ability) of her omdura level. Divine infusion functions as either the cruelty or mercy class ability, depending on the omdura's divine touch energy, for the purposes of feats, spells, or effects that work with those class features."
+        },
+        {
+          "name": "Greater Divine Might",
+          "description": "At 18th level, the omdura uses her full Charisma bonus and full omdura level when using her divine might ability. A neutral omdura uses her full Charisma bonus and her omdura level - 3 when using her divine might ability."
+        }
+      ],
+      "spellcasting": {
+        "Spells Per Day": "5"
+      }
+    },
+    {
+      "level": 19,
+      "bab": 14,
+      "fort": 11,
+      "ref": 6,
+      "will": 11,
+      "classFeatures": [
+        {
+          "name": "Divine Might 4/Day",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells Per Day": "5"
+      }
+    },
+    {
+      "level": 20,
+      "bab": 15,
+      "fort": 12,
+      "ref": 6,
+      "will": 12,
+      "classFeatures": [
+        {
+          "name": "Divine Weapon +6",
+          "description": ""
+        },
+        {
+          "name": "Greater Invocation",
+          "description": "At 20th level, each day when the omdura regains her spell slots, she chooses one invocation to be active on herself and her allies for the entire day. The omdura receives the full bonus granted by this invocation. This invocation is in addition to her uses of the invocation and improved invocation class abilities."
+        }
+      ],
+      "spellcasting": {
+        "Spells Per Day": "5"
+      }
+    }
+  ],
+  "spellcasting": {
+    "summary": "spontaneous 2/3 caster using CHA",
+    "castingType": "spontaneous",
+    "progression": "2/3",
+    "ability": "cha",
+    "preparation": "spontaneous",
+    "maxSpellLevel": 6,
+    "slotsByLevel": [
+      [
+        0,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        4,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        5,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        5,
+        3,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        6,
+        4,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        6,
+        5,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        6,
+        5,
+        3,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        6,
+        6,
+        4,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        7,
+        6,
+        5,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        7,
+        6,
+        5,
+        3,
+        0,
+        0
+      ],
+      [
+        0,
+        7,
+        6,
+        6,
+        4,
+        0,
+        0
+      ],
+      [
+        0,
+        7,
+        7,
+        6,
+        5,
+        0,
+        0
+      ],
+      [
+        0,
+        7,
+        7,
+        6,
+        5,
+        3,
+        0
+      ],
+      [
+        0,
+        7,
+        7,
+        6,
+        6,
+        4,
+        0
+      ],
+      [
+        0,
+        7,
+        7,
+        7,
+        6,
+        5,
+        0
+      ],
+      [
+        0,
+        7,
+        7,
+        7,
+        6,
+        5,
+        3
+      ],
+      [
+        0,
+        7,
+        7,
+        7,
+        6,
+        6,
+        4
+      ],
+      [
+        0,
+        7,
+        7,
+        7,
+        7,
+        6,
+        5
+      ],
+      [
+        0,
+        7,
+        7,
+        7,
+        7,
+        7,
+        6
+      ],
+      [
+        0,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7
+      ]
+    ],
+    "knownByLevel": [
+      [
+        4,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        5,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        6,
+        4,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        6,
+        4,
+        2,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        6,
+        4,
+        3,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        6,
+        4,
+        4,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        6,
+        5,
+        4,
+        2,
+        0,
+        0,
+        0
+      ],
+      [
+        6,
+        5,
+        4,
+        3,
+        0,
+        0,
+        0
+      ],
+      [
+        6,
+        5,
+        4,
+        4,
+        0,
+        0,
+        0
+      ],
+      [
+        6,
+        5,
+        5,
+        4,
+        2,
+        0,
+        0
+      ],
+      [
+        6,
+        6,
+        5,
+        4,
+        3,
+        0,
+        0
+      ],
+      [
+        6,
+        6,
+        5,
+        4,
+        4,
+        0,
+        0
+      ],
+      [
+        6,
+        6,
+        5,
+        5,
+        4,
+        2,
+        0
+      ],
+      [
+        6,
+        6,
+        6,
+        5,
+        4,
+        3,
+        0
+      ],
+      [
+        6,
+        6,
+        6,
+        5,
+        4,
+        4,
+        0
+      ],
+      [
+        6,
+        6,
+        6,
+        5,
+        5,
+        4,
+        2
+      ],
+      [
+        6,
+        6,
+        6,
+        6,
+        5,
+        4,
+        3
+      ],
+      [
+        6,
+        6,
+        6,
+        6,
+        5,
+        4,
+        4
+      ],
+      [
+        6,
+        6,
+        6,
+        6,
+        5,
+        5,
+        4
+      ],
+      [
+        6,
+        6,
+        6,
+        6,
+        6,
+        5,
+        5
+      ]
+    ]
+  },
+  "spellcastingClass": true
+}

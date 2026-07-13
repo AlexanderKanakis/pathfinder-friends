@@ -1,0 +1,261 @@
+{
+  "name": "Cyphermage",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/c-d/cyphermage/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Cypher Lore",
+          "description": "As a Cyphermage gains levels, he begins mastering written magic such as scrolls , glyphs, and symbols. He also begins to discover ancient Sin magics that further bolster his power. These discoveries are known collectively as cypher lore. At each level except for 10th, the Cyphermage learns a new way to enhance his magic, chosen from the list of cypher lore discoveries below. Analyze Scroll (Su) : As a free action , the Cyphermage can automatically discern the contents of a magic scroll , as if he were using read magic . He gains an insight bonus equal to his Cyphermage level on Use Magic Device checks to cast spells from scrolls . Bypass Symbol (Su) : When the Cyphermage attempts a saving throw against a magical glyph, symbol, sigil, or similar written trap , as an immediate action he can attempt a Spellcraft check against the same DC to delay the trap's effects for 1d6 rounds. Once the delay is over, the trap has its normal effect. The Cyphermage must be at least 8th level to select this lore. Defensive Scrollcaster (Ex) : The Cyphermage gains a +4 bonus on concentration checks to cast spells defensively when casting spells from scrolls . Enhance Scroll (Su) : As a swift action , the Cyphermage can cause any scroll spell he reads to function using his caster level rather than the scroll's caster level . He can use this ability a number of times per day equal to one-third his Cyphermage level (minimum 1). Extended Scroll (Su) : As a swift action , the Cyphermage can double the duration of any spell he reads from a scroll as if the spell were modified by Extend S"
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of arcane spellcasting class"
+      }
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Cypher Lore",
+          "description": "As a Cyphermage gains levels, he begins mastering written magic such as scrolls , glyphs, and symbols. He also begins to discover ancient Sin magics that further bolster his power. These discoveries are known collectively as cypher lore. At each level except for 10th, the Cyphermage learns a new way to enhance his magic, chosen from the list of cypher lore discoveries below. Analyze Scroll (Su) : As a free action , the Cyphermage can automatically discern the contents of a magic scroll , as if he were using read magic . He gains an insight bonus equal to his Cyphermage level on Use Magic Device checks to cast spells from scrolls . Bypass Symbol (Su) : When the Cyphermage attempts a saving throw against a magical glyph, symbol, sigil, or similar written trap , as an immediate action he can attempt a Spellcraft check against the same DC to delay the trap's effects for 1d6 rounds. Once the delay is over, the trap has its normal effect. The Cyphermage must be at least 8th level to select this lore. Defensive Scrollcaster (Ex) : The Cyphermage gains a +4 bonus on concentration checks to cast spells defensively when casting spells from scrolls . Enhance Scroll (Su) : As a swift action , the Cyphermage can cause any scroll spell he reads to function using his caster level rather than the scroll's caster level . He can use this ability a number of times per day equal to one-third his Cyphermage level (minimum 1). Extended Scroll (Su) : As a swift action , the Cyphermage can double the duration of any spell he reads from a scroll as if the spell were modified by Extend S"
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of arcane spellcasting class"
+      }
+    },
+    {
+      "level": 3,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Cypher Lore",
+          "description": "As a Cyphermage gains levels, he begins mastering written magic such as scrolls , glyphs, and symbols. He also begins to discover ancient Sin magics that further bolster his power. These discoveries are known collectively as cypher lore. At each level except for 10th, the Cyphermage learns a new way to enhance his magic, chosen from the list of cypher lore discoveries below. Analyze Scroll (Su) : As a free action , the Cyphermage can automatically discern the contents of a magic scroll , as if he were using read magic . He gains an insight bonus equal to his Cyphermage level on Use Magic Device checks to cast spells from scrolls . Bypass Symbol (Su) : When the Cyphermage attempts a saving throw against a magical glyph, symbol, sigil, or similar written trap , as an immediate action he can attempt a Spellcraft check against the same DC to delay the trap's effects for 1d6 rounds. Once the delay is over, the trap has its normal effect. The Cyphermage must be at least 8th level to select this lore. Defensive Scrollcaster (Ex) : The Cyphermage gains a +4 bonus on concentration checks to cast spells defensively when casting spells from scrolls . Enhance Scroll (Su) : As a swift action , the Cyphermage can cause any scroll spell he reads to function using his caster level rather than the scroll's caster level . He can use this ability a number of times per day equal to one-third his Cyphermage level (minimum 1). Extended Scroll (Su) : As a swift action , the Cyphermage can double the duration of any spell he reads from a scroll as if the spell were modified by Extend S"
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of arcane spellcasting class"
+      }
+    },
+    {
+      "level": 4,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Cypher Lore",
+          "description": "As a Cyphermage gains levels, he begins mastering written magic such as scrolls , glyphs, and symbols. He also begins to discover ancient Sin magics that further bolster his power. These discoveries are known collectively as cypher lore. At each level except for 10th, the Cyphermage learns a new way to enhance his magic, chosen from the list of cypher lore discoveries below. Analyze Scroll (Su) : As a free action , the Cyphermage can automatically discern the contents of a magic scroll , as if he were using read magic . He gains an insight bonus equal to his Cyphermage level on Use Magic Device checks to cast spells from scrolls . Bypass Symbol (Su) : When the Cyphermage attempts a saving throw against a magical glyph, symbol, sigil, or similar written trap , as an immediate action he can attempt a Spellcraft check against the same DC to delay the trap's effects for 1d6 rounds. Once the delay is over, the trap has its normal effect. The Cyphermage must be at least 8th level to select this lore. Defensive Scrollcaster (Ex) : The Cyphermage gains a +4 bonus on concentration checks to cast spells defensively when casting spells from scrolls . Enhance Scroll (Su) : As a swift action , the Cyphermage can cause any scroll spell he reads to function using his caster level rather than the scroll's caster level . He can use this ability a number of times per day equal to one-third his Cyphermage level (minimum 1). Extended Scroll (Su) : As a swift action , the Cyphermage can double the duration of any spell he reads from a scroll as if the spell were modified by Extend S"
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of arcane spellcasting class"
+      }
+    },
+    {
+      "level": 5,
+      "bab": 2,
+      "fort": 2,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Cypher Lore",
+          "description": "As a Cyphermage gains levels, he begins mastering written magic such as scrolls , glyphs, and symbols. He also begins to discover ancient Sin magics that further bolster his power. These discoveries are known collectively as cypher lore. At each level except for 10th, the Cyphermage learns a new way to enhance his magic, chosen from the list of cypher lore discoveries below. Analyze Scroll (Su) : As a free action , the Cyphermage can automatically discern the contents of a magic scroll , as if he were using read magic . He gains an insight bonus equal to his Cyphermage level on Use Magic Device checks to cast spells from scrolls . Bypass Symbol (Su) : When the Cyphermage attempts a saving throw against a magical glyph, symbol, sigil, or similar written trap , as an immediate action he can attempt a Spellcraft check against the same DC to delay the trap's effects for 1d6 rounds. Once the delay is over, the trap has its normal effect. The Cyphermage must be at least 8th level to select this lore. Defensive Scrollcaster (Ex) : The Cyphermage gains a +4 bonus on concentration checks to cast spells defensively when casting spells from scrolls . Enhance Scroll (Su) : As a swift action , the Cyphermage can cause any scroll spell he reads to function using his caster level rather than the scroll's caster level . He can use this ability a number of times per day equal to one-third his Cyphermage level (minimum 1). Extended Scroll (Su) : As a swift action , the Cyphermage can double the duration of any spell he reads from a scroll as if the spell were modified by Extend S"
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of arcane spellcasting class"
+      }
+    },
+    {
+      "level": 6,
+      "bab": 3,
+      "fort": 2,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Cypher Lore",
+          "description": "As a Cyphermage gains levels, he begins mastering written magic such as scrolls , glyphs, and symbols. He also begins to discover ancient Sin magics that further bolster his power. These discoveries are known collectively as cypher lore. At each level except for 10th, the Cyphermage learns a new way to enhance his magic, chosen from the list of cypher lore discoveries below. Analyze Scroll (Su) : As a free action , the Cyphermage can automatically discern the contents of a magic scroll , as if he were using read magic . He gains an insight bonus equal to his Cyphermage level on Use Magic Device checks to cast spells from scrolls . Bypass Symbol (Su) : When the Cyphermage attempts a saving throw against a magical glyph, symbol, sigil, or similar written trap , as an immediate action he can attempt a Spellcraft check against the same DC to delay the trap's effects for 1d6 rounds. Once the delay is over, the trap has its normal effect. The Cyphermage must be at least 8th level to select this lore. Defensive Scrollcaster (Ex) : The Cyphermage gains a +4 bonus on concentration checks to cast spells defensively when casting spells from scrolls . Enhance Scroll (Su) : As a swift action , the Cyphermage can cause any scroll spell he reads to function using his caster level rather than the scroll's caster level . He can use this ability a number of times per day equal to one-third his Cyphermage level (minimum 1). Extended Scroll (Su) : As a swift action , the Cyphermage can double the duration of any spell he reads from a scroll as if the spell were modified by Extend S"
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of arcane spellcasting class"
+      }
+    },
+    {
+      "level": 7,
+      "bab": 3,
+      "fort": 2,
+      "ref": 2,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Cypher Lore",
+          "description": "As a Cyphermage gains levels, he begins mastering written magic such as scrolls , glyphs, and symbols. He also begins to discover ancient Sin magics that further bolster his power. These discoveries are known collectively as cypher lore. At each level except for 10th, the Cyphermage learns a new way to enhance his magic, chosen from the list of cypher lore discoveries below. Analyze Scroll (Su) : As a free action , the Cyphermage can automatically discern the contents of a magic scroll , as if he were using read magic . He gains an insight bonus equal to his Cyphermage level on Use Magic Device checks to cast spells from scrolls . Bypass Symbol (Su) : When the Cyphermage attempts a saving throw against a magical glyph, symbol, sigil, or similar written trap , as an immediate action he can attempt a Spellcraft check against the same DC to delay the trap's effects for 1d6 rounds. Once the delay is over, the trap has its normal effect. The Cyphermage must be at least 8th level to select this lore. Defensive Scrollcaster (Ex) : The Cyphermage gains a +4 bonus on concentration checks to cast spells defensively when casting spells from scrolls . Enhance Scroll (Su) : As a swift action , the Cyphermage can cause any scroll spell he reads to function using his caster level rather than the scroll's caster level . He can use this ability a number of times per day equal to one-third his Cyphermage level (minimum 1). Extended Scroll (Su) : As a swift action , the Cyphermage can double the duration of any spell he reads from a scroll as if the spell were modified by Extend S"
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of arcane spellcasting class"
+      }
+    },
+    {
+      "level": 8,
+      "bab": 4,
+      "fort": 3,
+      "ref": 3,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Cypher Lore",
+          "description": "As a Cyphermage gains levels, he begins mastering written magic such as scrolls , glyphs, and symbols. He also begins to discover ancient Sin magics that further bolster his power. These discoveries are known collectively as cypher lore. At each level except for 10th, the Cyphermage learns a new way to enhance his magic, chosen from the list of cypher lore discoveries below. Analyze Scroll (Su) : As a free action , the Cyphermage can automatically discern the contents of a magic scroll , as if he were using read magic . He gains an insight bonus equal to his Cyphermage level on Use Magic Device checks to cast spells from scrolls . Bypass Symbol (Su) : When the Cyphermage attempts a saving throw against a magical glyph, symbol, sigil, or similar written trap , as an immediate action he can attempt a Spellcraft check against the same DC to delay the trap's effects for 1d6 rounds. Once the delay is over, the trap has its normal effect. The Cyphermage must be at least 8th level to select this lore. Defensive Scrollcaster (Ex) : The Cyphermage gains a +4 bonus on concentration checks to cast spells defensively when casting spells from scrolls . Enhance Scroll (Su) : As a swift action , the Cyphermage can cause any scroll spell he reads to function using his caster level rather than the scroll's caster level . He can use this ability a number of times per day equal to one-third his Cyphermage level (minimum 1). Extended Scroll (Su) : As a swift action , the Cyphermage can double the duration of any spell he reads from a scroll as if the spell were modified by Extend S"
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of arcane spellcasting class"
+      }
+    },
+    {
+      "level": 9,
+      "bab": 4,
+      "fort": 3,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Cypher Lore",
+          "description": "As a Cyphermage gains levels, he begins mastering written magic such as scrolls , glyphs, and symbols. He also begins to discover ancient Sin magics that further bolster his power. These discoveries are known collectively as cypher lore. At each level except for 10th, the Cyphermage learns a new way to enhance his magic, chosen from the list of cypher lore discoveries below. Analyze Scroll (Su) : As a free action , the Cyphermage can automatically discern the contents of a magic scroll , as if he were using read magic . He gains an insight bonus equal to his Cyphermage level on Use Magic Device checks to cast spells from scrolls . Bypass Symbol (Su) : When the Cyphermage attempts a saving throw against a magical glyph, symbol, sigil, or similar written trap , as an immediate action he can attempt a Spellcraft check against the same DC to delay the trap's effects for 1d6 rounds. Once the delay is over, the trap has its normal effect. The Cyphermage must be at least 8th level to select this lore. Defensive Scrollcaster (Ex) : The Cyphermage gains a +4 bonus on concentration checks to cast spells defensively when casting spells from scrolls . Enhance Scroll (Su) : As a swift action , the Cyphermage can cause any scroll spell he reads to function using his caster level rather than the scroll's caster level . He can use this ability a number of times per day equal to one-third his Cyphermage level (minimum 1). Extended Scroll (Su) : As a swift action , the Cyphermage can double the duration of any spell he reads from a scroll as if the spell were modified by Extend S"
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of arcane spellcasting class"
+      }
+    },
+    {
+      "level": 10,
+      "bab": 5,
+      "fort": 3,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Cypherlord",
+          "description": "At 10th level, a Cyphermage gains a +5 insight bonus on saving throws against the effects of magical symbols, glyphs, sigils, and similar writing-based spells and traps. He selects one of his cypher lore abilities that requires a swift action to activate ; thereafter, he can activate that ability as a free action . Section 15: Copyright Notice Pathfinder Roleplaying Game Adventurer's Guide Ãƒâ€šÃ‚Â© 2017, Paizo Inc.; Authors: Benjamin Bruck, John Compton, Crystal Frasier, Tim Hitchcock, Jenny Jarzabski, Isabelle Lee, Joe Pasini, Jessica Price, David Schwartz, and Josh Vogt."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of arcane spellcasting class"
+      }
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": {
+    "summary": "See level progression spell columns."
+  },
+  "spellcastingClass": true
+}

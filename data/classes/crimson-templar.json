@@ -1,0 +1,283 @@
+{
+  "name": "Crimson Templar",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/c-d/crimson-templar/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 0,
+      "classFeatures": [
+        {
+          "name": "Fiendish Studies +2 ( Move Action )",
+          "description": ""
+        },
+        {
+          "name": "Obedience",
+          "description": "At 1st level, a crimson templar gains Deific Obedience as a bonus feat. If the crimson templar already has this feat or Celestial Obedience, he instead gains a bonus combat feat ."
+        },
+        {
+          "name": "Shield Of Wings (Resist 5)",
+          "description": "At 1st level, a crimson templar gains fire resistance 5. This increases to fire resistance 10 at 3rd level, increases to fire resistance 30 at 6th level, and becomes immunity to fire at 9th level. As a swift action , a crimson templar can manifest a set of five burning wings from his back to gain a fly speed of 40 feet (average maneuverability) for a number of minutes equal to his crimson templar level. He can dismiss these wings as a move action , but any remaining duration is lost. While the crimson templar has these wings, and for a number of minutes equal to the number of minutes the crimson templar had wings after the duration ends or the wings are dismissed, the crimson templar does not have the fire resistance or immunity granted by shield of wings."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 2,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Fiendish Studies ( Swift Action )",
+          "description": "As a move action , a crimson templar can study an outsider with the evil subtype he can see. The crimson templar then gains a +2 bonus on Bluff , Disguise , Intimidate , Knowledge , Perception , Sense Motive , Stealth , and Survival checks against that outsider , and a +2 bonus on weapon attack rolls and weapon damage rolls against it. The DCs of crimson templar class abilities against that opponent increase by 2. A crimson templar can maintain these bonuses against only one evil outsider at a time; these bonuses remain in effect until either the outsider is dead or the crimson templar studies a new evil outsider . If a crimson templar deals sneak attack damage to an evil outsider , he can study that target as an immediate action , allowing him to apply his fiendish studies bonuses against that target (including to the weapon damage roll). At 2nd level, a crimson templar can study an evil outsider as a move or swift action . At 5th and 10th levels, the bonuses on weapon attack rolls , damage rolls, and skill checks and to the DCs of crimson templar abilities against an evil outsider increase by 2. In addition, at 5th level and 10th levels, the crimson templar is able to maintain these bonuses against an additional evil outsider at the same time. The crimson templar can end these bonuses as a free action , allowing him to study another target. The bonuses from fiendish studies stack with any bonuses gained from the slayerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s studied target ability or a rangerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s favored enemy ability."
+        },
+        {
+          "name": "Ruthlessness",
+          "description": "At 2nd level, a crimson templar can use a bastard sword to deliver a coup de grace to a helpless opponent as a standard action ."
+        },
+        {
+          "name": "Sneak Attack +1d6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 3,
+      "bab": 3,
+      "fort": 2,
+      "ref": 2,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": "At 3rd level, 6th level, and 9th level, the crimson templar gains a bonus combat feat . He must still meet any prerequisites for these bonus feats."
+        },
+        {
+          "name": "Shield Of Wings (Resist 10)",
+          "description": "At 1st level, a crimson templar gains fire resistance 5. This increases to fire resistance 10 at 3rd level, increases to fire resistance 30 at 6th level, and becomes immunity to fire at 9th level. As a swift action , a crimson templar can manifest a set of five burning wings from his back to gain a fly speed of 40 feet (average maneuverability) for a number of minutes equal to his crimson templar level. He can dismiss these wings as a move action , but any remaining duration is lost. While the crimson templar has these wings, and for a number of minutes equal to the number of minutes the crimson templar had wings after the duration ends or the wings are dismissed, the crimson templar does not have the fire resistance or immunity granted by shield of wings."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 4,
+      "bab": 4,
+      "fort": 2,
+      "ref": 2,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Divine Boon 1",
+          "description": ""
+        },
+        {
+          "name": "Heavenly Fire",
+          "description": "At 4th level, the crimson templar can incinerate unaware evil foes with pure celestial flame. If the crimson templar deals sneak attack damage to a creature he has successfully used his fiendish studies ability on, the sneak attack wreathes the target in crimson fire. The target must attempt a Fortitude saving throw (DC = 10 + the crimson templarÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s class level + his Charisma modifier). If the target fails this save, it takes an additional 1d6 points of damage per class level the crimson templar has. Half of this damage is fire damage, but the other half results directly from divine power and is therefore not subject to being reduced by resistance or immunity to fire-based attacks. On a successful save, the target takes the sneak attack damage as normal but does not take any of the heavenly fire damage. A crimson templar can use heavenly fire a number of times per day equal to his crimson templar level."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 5,
+      "bab": 5,
+      "fort": 3,
+      "ref": 3,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Fiendish Studies +4",
+          "description": ""
+        },
+        {
+          "name": "Sneak Attack +2d6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 6,
+      "bab": 6,
+      "fort": 3,
+      "ref": 3,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": "At 3rd level, 6th level, and 9th level, the crimson templar gains a bonus combat feat . He must still meet any prerequisites for these bonus feats."
+        },
+        {
+          "name": "Shield Of Wings (Resist 30)",
+          "description": "At 1st level, a crimson templar gains fire resistance 5. This increases to fire resistance 10 at 3rd level, increases to fire resistance 30 at 6th level, and becomes immunity to fire at 9th level. As a swift action , a crimson templar can manifest a set of five burning wings from his back to gain a fly speed of 40 feet (average maneuverability) for a number of minutes equal to his crimson templar level. He can dismiss these wings as a move action , but any remaining duration is lost. While the crimson templar has these wings, and for a number of minutes equal to the number of minutes the crimson templar had wings after the duration ends or the wings are dismissed, the crimson templar does not have the fire resistance or immunity granted by shield of wings."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 7,
+      "bab": 7,
+      "fort": 4,
+      "ref": 4,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Divine Boon 2",
+          "description": ""
+        },
+        {
+          "name": "Immolate",
+          "description": "At 7th level, whenever the crimson templar reduces a creature with an evil alignment to negative hit points with a sneak attack or coup de grace , the target must attempt a Fortitude saving throw (DC = 10 + the crimson templarÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s class level + his Charisma modifier). If the target fails this save, it is entirely disintegrated, leaving behind only a trace of fine ash (as per disintegrate ). If an evil target is reduced to negative hit points from the heavenly fire ability, it receives no saving throw against this effect. This ability has no effect if the target does not have an evil alignment ."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 8,
+      "bab": 8,
+      "fort": 4,
+      "ref": 4,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Sneak Attack +3d6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 9,
+      "bab": 9,
+      "fort": 5,
+      "ref": 5,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": "At 3rd level, 6th level, and 9th level, the crimson templar gains a bonus combat feat . He must still meet any prerequisites for these bonus feats."
+        },
+        {
+          "name": "Shield Of Wings (Immunity)",
+          "description": "At 1st level, a crimson templar gains fire resistance 5. This increases to fire resistance 10 at 3rd level, increases to fire resistance 30 at 6th level, and becomes immunity to fire at 9th level. As a swift action , a crimson templar can manifest a set of five burning wings from his back to gain a fly speed of 40 feet (average maneuverability) for a number of minutes equal to his crimson templar level. He can dismiss these wings as a move action , but any remaining duration is lost. While the crimson templar has these wings, and for a number of minutes equal to the number of minutes the crimson templar had wings after the duration ends or the wings are dismissed, the crimson templar does not have the fire resistance or immunity granted by shield of wings."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 10,
+      "bab": 10,
+      "fort": 5,
+      "ref": 5,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Divine Boon 3",
+          "description": ""
+        },
+        {
+          "name": "Fiendish Studies +6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": null,
+  "spellcastingClass": false
+}

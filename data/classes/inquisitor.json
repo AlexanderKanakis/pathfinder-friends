@@ -1,0 +1,703 @@
+{
+  "name": "Inquisitor",
+  "type": "base",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/base-classes/inquisitor/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 2,
+      "ref": 0,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Domain",
+          "description": "Like a cleric's deity, an inquisitorÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s deity influences her alignment, what magic she can perform, and her values. Although not as tied to the tenets of the deity as a cleric , an inquisitor must still hold such guidelines in high regard, despite that fact she can go against them if it serves the greater good of the faith. An inquisitor can select one domain from among those belonging to her deity. She can select an alignment domain only if her alignment matches that domain. With the GMÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s approval, an inquisitor can be devoted to an ideal instead of a deity, selecting one domain to represent her personal inclination and abilities. The restriction on alignment domains still applies. Each domain grants a number of domain powers, depending on the level of the inquisitor. An inquisitor does not gain the bonus spells listed for each domain, nor does she gain bonus spell slots. The inquisitor uses her level as her effective cleric level when determining the power and effect of her domain powers. If the inquisitor has cleric levels, one of her two domain selections must be the same domain selected as an inquisitor. Levels of cleric and inquisitor stack for the purpose of determining domain powers and abilities, but not for bonus spells. ( Editor's Note : A complete listing of domains can be found here: Domains . Inquisitors also have access to Inquisitions, which are similar to Domains but do not include Domain spells. A complete listing of Inquisitions can be found here: Inquisitions .)"
+        },
+        {
+          "name": "Judgment 1/Day",
+          "description": ""
+        },
+        {
+          "name": "Monster Lore",
+          "description": "The inquisitor adds her Wisdom modifier on Knowledge skill checks in addition to her Intelligence modifier, when making skill checks to identify the abilities and weaknesses of creatures."
+        },
+        {
+          "name": "Orisons",
+          "description": "Inquisitors learn a number of orisons, or 0-level spells, as noted on Table: Inquisitor Spells Known . These spells are cast like any other spell, but they are not expended when cast and may be used again. Orisons prepared using other spell slots, such as those due to metamagic feats, are expended normally."
+        },
+        {
+          "name": "Stern Gaze",
+          "description": "Inquisitors are skilled at sensing deception and intimidating their foes. An inquisitor receives a morale bonus on all Intimidate and Sense Motive checks equal to 1/2 her inquisitor level (minimum +1)."
+        }
+      ]
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 3,
+      "ref": 0,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Cunning Initiative",
+          "description": "At 2nd level, an inquisitor adds her Wisdom modifier on initiative checks, in addition to her Dexterity modifier."
+        },
+        {
+          "name": "Detect Alignment",
+          "description": "At 2nd level, at will, an inquisitor can use detect chaos , detect evil , detect good , or detect law . She can only use one of these at any given time."
+        },
+        {
+          "name": "Track",
+          "description": "At 2nd level, an inquisitor adds half her level on Survival skill checks made to follow or identify tracks."
+        }
+      ]
+    },
+    {
+      "level": 3,
+      "bab": 2,
+      "fort": 3,
+      "ref": 1,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Solo Tactics",
+          "description": "At 3rd level, all of the inquisitorÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s allies are treated as if they possessed the same teamwork feats as the inquisitor for the purpose of determining whether the inquisitor receives a bonus from her teamwork feats. Her allies do not receive any bonuses from these feats unless they actually possess the feats themselves. The alliesÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ positioning and actions must still meet the prerequisites listed in the teamwork feat for the inquisitor to receive the listed bonus."
+        },
+        {
+          "name": "Teamwork Feat",
+          "description": "At 3rd level, and every three levels thereafter, the inquisitor gains a bonus feat in addition to those gained from normal advancement. These bonus feats must be selected from those listed as teamwork feats . The inquisitor must meet the prerequisites of the selected bonus feat. As a standard action , the inquisitor can choose to learn a new bonus teamwork feat in place of the most recent bonus teamwork feat she has already learned. In effect, the inquisitor loses the bonus feat in exchange for the new one. She can only change the most recent teamwork feat gained. Whenever she gains a new teamwork feat , the previous teamwork feat becomes set and cannot be changed again. An inquisitor can change her most recent teamwork feat a number of times per day equal to her Wisdom modifier."
+        }
+      ]
+    },
+    {
+      "level": 4,
+      "bab": 3,
+      "fort": 4,
+      "ref": 1,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Judgment 2/Day",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "level": 5,
+      "bab": 3,
+      "fort": 4,
+      "ref": 1,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Bane",
+          "description": "FAQ Does an inquisitor's bane ability affect both ends of a double weapon? No. In general, the game treats double weapons as if they were two different weapons, and an ability, spell, or effect that changes or augments &#8220;a weapon&#8221; only applies to one end of a double weapon. Sometimes the rules are redundant and specifically call out that an ability that affects &#8220;a weapon&#8221; (such as a paladin's divine bond) only affects one end of a double weapon. Sometimes the rules aren't redundant (such as the magic weapon spell, or the inquisitor's bane ability), but the general rule still applies: the double weapon is treated as two separate weapons. [ Source ] At 5th level, an inquisitor can imbue one of her weapons with the bane weapon special ability as a swift action . She must select one creature type when she uses this ability (and a subtype if the creature type selected is humanoid or outsider ). Once selected, the type can be changed as a swift action . This ability only functions while the inquisitor wields the weapon. If dropped or taken, the weapon resumes granting this ability if it is returned to the inquisitor before the duration expires. This ability lasts for a number of rounds per day equal to the inquisitorÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s level. These rounds do not need to be consecutive."
+        },
+        {
+          "name": "Discern Lies",
+          "description": "At 5th level, an inquisitor can discern lies , as per the spell, for a number of rounds per day equal to her inquisitor level. These rounds do not need to be consecutive. Activating this ability is an immediate action."
+        }
+      ]
+    },
+    {
+      "level": 6,
+      "bab": 4,
+      "fort": 5,
+      "ref": 2,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Teamwork Feat",
+          "description": "At 3rd level, and every three levels thereafter, the inquisitor gains a bonus feat in addition to those gained from normal advancement. These bonus feats must be selected from those listed as teamwork feats . The inquisitor must meet the prerequisites of the selected bonus feat. As a standard action , the inquisitor can choose to learn a new bonus teamwork feat in place of the most recent bonus teamwork feat she has already learned. In effect, the inquisitor loses the bonus feat in exchange for the new one. She can only change the most recent teamwork feat gained. Whenever she gains a new teamwork feat , the previous teamwork feat becomes set and cannot be changed again. An inquisitor can change her most recent teamwork feat a number of times per day equal to her Wisdom modifier."
+        }
+      ]
+    },
+    {
+      "level": 7,
+      "bab": 5,
+      "fort": 5,
+      "ref": 2,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Judgment 3/Day",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "level": 8,
+      "bab": 6,
+      "fort": 6,
+      "ref": 2,
+      "will": 6,
+      "classFeatures": [
+        {
+          "name": "Second Judgment",
+          "description": "At 8th level, whenever an inquisitor uses her judgment ability, she selects two different judgments, instead of one. This only consumes one use of her judgment ability. As a swift action , she can change one of these judgments to another type."
+        }
+      ]
+    },
+    {
+      "level": 9,
+      "bab": 6,
+      "fort": 6,
+      "ref": 3,
+      "will": 6,
+      "classFeatures": [
+        {
+          "name": "Teamwork Feat",
+          "description": "At 3rd level, and every three levels thereafter, the inquisitor gains a bonus feat in addition to those gained from normal advancement. These bonus feats must be selected from those listed as teamwork feats . The inquisitor must meet the prerequisites of the selected bonus feat. As a standard action , the inquisitor can choose to learn a new bonus teamwork feat in place of the most recent bonus teamwork feat she has already learned. In effect, the inquisitor loses the bonus feat in exchange for the new one. She can only change the most recent teamwork feat gained. Whenever she gains a new teamwork feat , the previous teamwork feat becomes set and cannot be changed again. An inquisitor can change her most recent teamwork feat a number of times per day equal to her Wisdom modifier."
+        }
+      ]
+    },
+    {
+      "level": 10,
+      "bab": 7,
+      "fort": 7,
+      "ref": 3,
+      "will": 7,
+      "classFeatures": [
+        {
+          "name": "Judgment 4/Day",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "level": 11,
+      "bab": 8,
+      "fort": 7,
+      "ref": 3,
+      "will": 7,
+      "classFeatures": [
+        {
+          "name": "Stalwart",
+          "description": "At 11th level, an inquisitor can use mental and physical resiliency to avoid certain attacks. If she makes a Fortitude or Will saving throw against an attack that has a reduced effect on a successful save, she instead avoids the effect entirely. This ability can only be used if the inquisitor is wearing light armor , medium armor , or no armor. A helpless inquisitor does not gain the benefit of the stalwart ability."
+        }
+      ]
+    },
+    {
+      "level": 12,
+      "bab": 9,
+      "fort": 8,
+      "ref": 4,
+      "will": 8,
+      "classFeatures": [
+        {
+          "name": "Greater Bane",
+          "description": "At 12th level, whenever an inquisitor uses her bane ability, the amount of bonus damage dealt by the weapon against creatures of the selected type increases to 4d6."
+        },
+        {
+          "name": "Teamwork Feat",
+          "description": "At 3rd level, and every three levels thereafter, the inquisitor gains a bonus feat in addition to those gained from normal advancement. These bonus feats must be selected from those listed as teamwork feats . The inquisitor must meet the prerequisites of the selected bonus feat. As a standard action , the inquisitor can choose to learn a new bonus teamwork feat in place of the most recent bonus teamwork feat she has already learned. In effect, the inquisitor loses the bonus feat in exchange for the new one. She can only change the most recent teamwork feat gained. Whenever she gains a new teamwork feat , the previous teamwork feat becomes set and cannot be changed again. An inquisitor can change her most recent teamwork feat a number of times per day equal to her Wisdom modifier."
+        }
+      ]
+    },
+    {
+      "level": 13,
+      "bab": 9,
+      "fort": 8,
+      "ref": 4,
+      "will": 8,
+      "classFeatures": [
+        {
+          "name": "Judgment 5/Day",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "level": 14,
+      "bab": 10,
+      "fort": 9,
+      "ref": 4,
+      "will": 9,
+      "classFeatures": [
+        {
+          "name": "Exploit Weakness",
+          "description": "At 14th level, the inquisitor learns to take advantage of any opportunity that presents itself. Whenever the inquisitor scores a critical hit, she ignores any damage reduction the target might have. In addition, if the target has regeneration, the creature loses regeneration on the round following the critical hit and can die normally during that round. Creatures whose regeneration always functions are immune to this ability. Finally, if the inquisitor deals energy damage to a creature with vulnerability to that energy type, she deals +1 point of damage per die rolled.",
+          "pools": [
+            {
+              "name": "Exploit Weakness",
+              "description": "At 14th level, the inquisitor learns to take advantage of any opportunity that presents itself. Whenever the inquisitor scores a critical hit, she ignores any damage reduction the target might have. In addition, if the target has regeneration, the creature loses regeneration on the round following the critical hit and can die normally during that round. Creatures whose regeneration always functions are immune to this ability. Finally, if the inquisitor deals energy damage to a creature with vulnerability to that energy type, she deals +1 point of damage per die rolled.",
+              "requirements": {
+                "minClassLevel": 14,
+                "text": "At 14th level, the inquisitor learns to take advantage of any opportunity that presents itself."
+              },
+              "options": [
+                {
+                  "name": "Exploit Weakness",
+                  "description": "At 14th level, the inquisitor learns to take advantage of any opportunity that presents itself. Whenever the inquisitor scores a critical hit, she ignores any damage reduction the target might have. In addition, if the target has regeneration, the creature loses regeneration on the round following the critical hit and can die normally during that round. Creatures whose regeneration always functions are immune to this ability. Finally, if the inquisitor deals energy damage to a creature with vulnerability to that energy type, she deals +1 point of damage per die rolled.",
+                  "requirements": {
+                    "minClassLevel": 14,
+                    "text": "At 14th level, the inquisitor learns to take advantage of any opportunity that presents itself."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/base-classes/inquisitor/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "level": 15,
+      "bab": 11,
+      "fort": 9,
+      "ref": 5,
+      "will": 9,
+      "classFeatures": [
+        {
+          "name": "Teamwork Feat",
+          "description": "At 3rd level, and every three levels thereafter, the inquisitor gains a bonus feat in addition to those gained from normal advancement. These bonus feats must be selected from those listed as teamwork feats . The inquisitor must meet the prerequisites of the selected bonus feat. As a standard action , the inquisitor can choose to learn a new bonus teamwork feat in place of the most recent bonus teamwork feat she has already learned. In effect, the inquisitor loses the bonus feat in exchange for the new one. She can only change the most recent teamwork feat gained. Whenever she gains a new teamwork feat , the previous teamwork feat becomes set and cannot be changed again. An inquisitor can change her most recent teamwork feat a number of times per day equal to her Wisdom modifier."
+        }
+      ]
+    },
+    {
+      "level": 16,
+      "bab": 12,
+      "fort": 10,
+      "ref": 5,
+      "will": 10,
+      "classFeatures": [
+        {
+          "name": "Judgment 6/Day",
+          "description": ""
+        },
+        {
+          "name": "Third Judgment",
+          "description": "At 16th level, whenever an inquisitor uses her judgment ability, she selects three different judgments, instead of just two. This only consumes one use of her judgment ability. As a swift action , the inquisitor can change one of these judgments to another type."
+        }
+      ]
+    },
+    {
+      "level": 17,
+      "bab": 12,
+      "fort": 10,
+      "ref": 5,
+      "will": 10,
+      "classFeatures": [
+        {
+          "name": "Slayer",
+          "description": "At 17th level, an inquisitor learns to focus her judgment. Whenever an inquisitor uses her judgment ability, she must select one type of judgment. She is treated as if she were 5 levels higher for the purposes of determining the bonus granted by this judgment. Unlike other types of judgment, the one enhanced by this ability cannot be changed for the remainder of the judgment."
+        }
+      ]
+    },
+    {
+      "level": 18,
+      "bab": 13,
+      "fort": 11,
+      "ref": 6,
+      "will": 11,
+      "classFeatures": [
+        {
+          "name": "Teamwork Feat",
+          "description": "At 3rd level, and every three levels thereafter, the inquisitor gains a bonus feat in addition to those gained from normal advancement. These bonus feats must be selected from those listed as teamwork feats . The inquisitor must meet the prerequisites of the selected bonus feat. As a standard action , the inquisitor can choose to learn a new bonus teamwork feat in place of the most recent bonus teamwork feat she has already learned. In effect, the inquisitor loses the bonus feat in exchange for the new one. She can only change the most recent teamwork feat gained. Whenever she gains a new teamwork feat , the previous teamwork feat becomes set and cannot be changed again. An inquisitor can change her most recent teamwork feat a number of times per day equal to her Wisdom modifier."
+        }
+      ]
+    },
+    {
+      "level": 19,
+      "bab": 14,
+      "fort": 11,
+      "ref": 6,
+      "will": 11,
+      "classFeatures": [
+        {
+          "name": "Judgment 7/Day",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "level": 20,
+      "bab": 15,
+      "fort": 12,
+      "ref": 6,
+      "will": 12,
+      "classFeatures": [
+        {
+          "name": "True Judgment",
+          "description": "At 20th level, an inquisitor can call true judgment down upon a foe during combat. Whenever an inquisitor uses her judgment ability, the inquisitor can invoke true judgment on a foe as a swift action. Once declared, the inquisitor can make a single melee (or ranged attack, if the foe is within 30 feet) against the target. If the attack hits, it deals damage normally and the target must make a Fortitude save or die. The DC of this save is equal to 10 + 1/2 the inquisitor's level + the inquisitor's Wisdom modifier. Regardless of whether or not the save is made, the target creature is immune to the inquisitor's true judgment ability for 24 hours. Once this ability has been used, it cannot be used again for 1d4 rounds."
+        }
+      ]
+    }
+  ],
+  "spellcasting": {
+    "summary": "spontaneous 2/3 caster using WIS",
+    "castingType": "spontaneous",
+    "progression": "2/3",
+    "ability": "wis",
+    "preparation": "spontaneous",
+    "maxSpellLevel": 6,
+    "slotsByLevel": [
+      [
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        3,
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        4,
+        2,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        4,
+        3,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        4,
+        3,
+        1,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        4,
+        4,
+        2,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        5,
+        4,
+        3,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        5,
+        4,
+        3,
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        5,
+        4,
+        4,
+        2,
+        0,
+        0
+      ],
+      [
+        0,
+        5,
+        5,
+        4,
+        3,
+        0,
+        0
+      ],
+      [
+        0,
+        5,
+        5,
+        4,
+        3,
+        1,
+        0
+      ],
+      [
+        0,
+        5,
+        5,
+        4,
+        4,
+        2,
+        0
+      ],
+      [
+        0,
+        5,
+        5,
+        5,
+        4,
+        3,
+        0
+      ],
+      [
+        0,
+        5,
+        5,
+        5,
+        4,
+        3,
+        1
+      ],
+      [
+        0,
+        5,
+        5,
+        5,
+        4,
+        4,
+        2
+      ],
+      [
+        0,
+        5,
+        5,
+        5,
+        5,
+        4,
+        3
+      ],
+      [
+        0,
+        5,
+        5,
+        5,
+        5,
+        5,
+        4
+      ],
+      [
+        0,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5
+      ]
+    ],
+    "knownByLevel": [
+      [
+        4,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        5,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        6,
+        4,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        6,
+        4,
+        2,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        6,
+        4,
+        3,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        6,
+        4,
+        4,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        6,
+        5,
+        4,
+        2,
+        0,
+        0,
+        0
+      ],
+      [
+        6,
+        5,
+        4,
+        3,
+        0,
+        0,
+        0
+      ],
+      [
+        6,
+        5,
+        4,
+        4,
+        0,
+        0,
+        0
+      ],
+      [
+        6,
+        5,
+        5,
+        4,
+        2,
+        0,
+        0
+      ],
+      [
+        6,
+        6,
+        5,
+        4,
+        3,
+        0,
+        0
+      ],
+      [
+        6,
+        6,
+        5,
+        4,
+        4,
+        0,
+        0
+      ],
+      [
+        6,
+        6,
+        5,
+        5,
+        4,
+        2,
+        0
+      ],
+      [
+        6,
+        6,
+        6,
+        5,
+        4,
+        3,
+        0
+      ],
+      [
+        6,
+        6,
+        6,
+        5,
+        4,
+        4,
+        0
+      ],
+      [
+        6,
+        6,
+        6,
+        5,
+        5,
+        4,
+        2
+      ],
+      [
+        6,
+        6,
+        6,
+        6,
+        5,
+        4,
+        3
+      ],
+      [
+        6,
+        6,
+        6,
+        6,
+        5,
+        4,
+        4
+      ],
+      [
+        6,
+        6,
+        6,
+        6,
+        5,
+        5,
+        4
+      ],
+      [
+        6,
+        6,
+        6,
+        6,
+        6,
+        5,
+        5
+      ]
+    ]
+  },
+  "spellcastingClass": true
+}

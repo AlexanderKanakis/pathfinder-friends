@@ -1,0 +1,747 @@
+{
+  "name": "Sorcerer",
+  "type": "core",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/core-classes/sorcerer/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Bloodline Power",
+          "description": ""
+        },
+        {
+          "name": "Cantrips",
+          "description": "Sorcerers learn a number of cantrips, or 0-level spells, as noted on Table: Sorcerer Spells Known under ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œSpells Known.ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â These spells are cast like any other spell, but they do not consume any slots and may be used again."
+        },
+        {
+          "name": "Eschew Materials",
+          "description": "A sorcerer gains Eschew Materials as a bonus feat at 1st level."
+        }
+      ]
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 0,
+      "ref": 0,
+      "will": 3,
+      "classFeatures": []
+    },
+    {
+      "level": 3,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Bloodline Power",
+          "description": ""
+        },
+        {
+          "name": "Bloodline Spell",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "level": 4,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 4,
+      "classFeatures": []
+    },
+    {
+      "level": 5,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Bloodline Spell",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "level": 6,
+      "bab": 3,
+      "fort": 2,
+      "ref": 2,
+      "will": 5,
+      "classFeatures": []
+    },
+    {
+      "level": 7,
+      "bab": 3,
+      "fort": 2,
+      "ref": 2,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Bloodline Feat",
+          "description": ""
+        },
+        {
+          "name": "Bloodline Spell",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "level": 8,
+      "bab": 4,
+      "fort": 2,
+      "ref": 2,
+      "will": 6,
+      "classFeatures": []
+    },
+    {
+      "level": 9,
+      "bab": 4,
+      "fort": 3,
+      "ref": 3,
+      "will": 6,
+      "classFeatures": [
+        {
+          "name": "Bloodline Power",
+          "description": ""
+        },
+        {
+          "name": "Bloodline Spell",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "level": 10,
+      "bab": 5,
+      "fort": 3,
+      "ref": 3,
+      "will": 7,
+      "classFeatures": []
+    },
+    {
+      "level": 11,
+      "bab": 5,
+      "fort": 3,
+      "ref": 3,
+      "will": 7,
+      "classFeatures": [
+        {
+          "name": "Bloodline Spell",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "level": 12,
+      "bab": 6,
+      "fort": 4,
+      "ref": 4,
+      "will": 8,
+      "classFeatures": []
+    },
+    {
+      "level": 13,
+      "bab": 6,
+      "fort": 4,
+      "ref": 4,
+      "will": 8,
+      "classFeatures": [
+        {
+          "name": "Bloodline Feat",
+          "description": ""
+        },
+        {
+          "name": "Bloodline Spell",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "level": 14,
+      "bab": 7,
+      "fort": 4,
+      "ref": 4,
+      "will": 9,
+      "classFeatures": []
+    },
+    {
+      "level": 15,
+      "bab": 7,
+      "fort": 5,
+      "ref": 5,
+      "will": 9,
+      "classFeatures": [
+        {
+          "name": "Bloodline Power",
+          "description": ""
+        },
+        {
+          "name": "Bloodline Spell",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "level": 16,
+      "bab": 8,
+      "fort": 5,
+      "ref": 5,
+      "will": 10,
+      "classFeatures": []
+    },
+    {
+      "level": 17,
+      "bab": 8,
+      "fort": 5,
+      "ref": 5,
+      "will": 10,
+      "classFeatures": [
+        {
+          "name": "Bloodline Spell",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "level": 18,
+      "bab": 9,
+      "fort": 6,
+      "ref": 6,
+      "will": 11,
+      "classFeatures": []
+    },
+    {
+      "level": 19,
+      "bab": 9,
+      "fort": 6,
+      "ref": 6,
+      "will": 11,
+      "classFeatures": [
+        {
+          "name": "Bloodline Feat",
+          "description": ""
+        },
+        {
+          "name": "Bloodline Spell",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "level": 20,
+      "bab": 10,
+      "fort": 6,
+      "ref": 6,
+      "will": 12,
+      "classFeatures": [
+        {
+          "name": "Bloodline Power",
+          "description": ""
+        }
+      ]
+    }
+  ],
+  "spellcasting": {
+    "summary": "spontaneous full caster using CHA",
+    "castingType": "spontaneous",
+    "progression": "full",
+    "ability": "cha",
+    "preparation": "spontaneous",
+    "maxSpellLevel": 9,
+    "slotsByLevel": [
+      [
+        3,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        4,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        5,
+        5,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        6,
+        6,
+        4,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        6,
+        6,
+        5,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        6,
+        6,
+        6,
+        4,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        6,
+        6,
+        6,
+        5,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        6,
+        6,
+        6,
+        6,
+        4,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        6,
+        6,
+        6,
+        6,
+        5,
+        3,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        6,
+        6,
+        6,
+        6,
+        6,
+        4,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        6,
+        6,
+        6,
+        6,
+        6,
+        5,
+        3,
+        0,
+        0,
+        0
+      ],
+      [
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        4,
+        0,
+        0,
+        0
+      ],
+      [
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        5,
+        0,
+        0,
+        0
+      ],
+      [
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        3,
+        0,
+        0
+      ],
+      [
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        4,
+        0,
+        0
+      ],
+      [
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        5,
+        3,
+        0
+      ],
+      [
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        4,
+        0
+      ],
+      [
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        5,
+        3
+      ],
+      [
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        4
+      ],
+      [
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6
+      ]
+    ],
+    "knownByLevel": [
+      [
+        4,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        5,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        5,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        6,
+        3,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        6,
+        4,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        7,
+        4,
+        2,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        7,
+        5,
+        3,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        8,
+        5,
+        3,
+        2,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        8,
+        5,
+        4,
+        3,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        9,
+        5,
+        4,
+        3,
+        2,
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        9,
+        5,
+        5,
+        4,
+        3,
+        2,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        9,
+        5,
+        5,
+        4,
+        3,
+        2,
+        1,
+        0,
+        0,
+        0
+      ],
+      [
+        9,
+        5,
+        5,
+        4,
+        4,
+        3,
+        2,
+        0,
+        0,
+        0
+      ],
+      [
+        9,
+        5,
+        5,
+        4,
+        4,
+        3,
+        2,
+        1,
+        0,
+        0
+      ],
+      [
+        9,
+        5,
+        5,
+        4,
+        4,
+        4,
+        3,
+        2,
+        0,
+        0
+      ],
+      [
+        9,
+        5,
+        5,
+        4,
+        4,
+        4,
+        3,
+        2,
+        1,
+        0
+      ],
+      [
+        9,
+        5,
+        5,
+        4,
+        4,
+        4,
+        3,
+        3,
+        2,
+        0
+      ],
+      [
+        9,
+        5,
+        5,
+        4,
+        4,
+        4,
+        3,
+        3,
+        2,
+        1
+      ],
+      [
+        9,
+        5,
+        5,
+        4,
+        4,
+        4,
+        3,
+        3,
+        3,
+        2
+      ],
+      [
+        9,
+        5,
+        5,
+        4,
+        4,
+        4,
+        3,
+        3,
+        3,
+        3
+      ]
+    ]
+  },
+  "spellcastingClass": true
+}

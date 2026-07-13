@@ -1,0 +1,267 @@
+{
+  "name": "Battle Herald",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/apg/battle-herald/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 1,
+      "fort": 1,
+      "ref": 0,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Inspiring Command (+1)",
+          "description": "A battle herald uses her keen tactical acumen and decisive judgment to lead others to victory, as well as her mastery of command to assist herself and her allies in battle. All battle heralds may use inspiring command to inspire courage (as the bardic performance ability); bard and battle herald levels stack to determine the bonuses provided by inspire courage . At 1st level, and every two levels thereafter, the battle herald chooses one command to learn. Unless otherwise noted, these abilities provide a competence bonus equal to the battle heraldÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s inspiring command bonus to her and to all allies within 60 feet able to see or hear her. Commands marked with an asterisk have the same range as above but only affect a certain number of allies (which can include the battle herald). Issuing an inspiring command is a move action . At 5th level, this becomes a swift action , and at 10th level, it becomes an immediate action . Maintaining an inspiring command is a free action that cannot be disrupted, but its effects end immediately if the battle herald is killed or otherwise prevented from taking actions (such as being dazed , helpless , or stunned ). The battle herald cannot have more than one command in effect at a time. She may use this ability for a number of rounds per day equal to 4 + her Charisma modifier, plus 2 additional rounds per level after 1st. She may use rounds of bardic performance to issue inspiring commands, but not vice versa. Inspiring commands are language-dependent, mind-affecting effects. The battle herald cannot maintain an inspiring command and a bardic p"
+        },
+        {
+          "name": "Improved Leadership",
+          "description": "A battle herald with the Leadership feat adds her inspiring command bonus to her leadership score."
+        },
+        {
+          "name": "Voice Of Authority",
+          "description": "A battle herald is skilled at shouting commands over the din of the battlefield and signaling allies when speech is impossible. She gains a +2 bonus on Diplomacy and Intimidate checks with creatures with which she shares a language. In addition, her allies gain a bonus equal to the battle heraldÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s class level on Perception or Sense Motive checks to hear her commands or interpret her secret messages conveyed with Bluff . The battle heraldÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s levels stack with cavalier levels for the purpose of the cavalier's tactician ability."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 2,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Easy March",
+          "description": "At 2nd level, allies within 60 feet of the battle herald can hustle or force march during overland travel without ill effects for a number of hours per day equal to 1 hour times her inspiring command bonus."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 3,
+      "bab": 3,
+      "fort": 2,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "2Nd Inspiring Command",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 4,
+      "bab": 4,
+      "fort": 2,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Inspiring Command (+2)",
+          "description": "A battle herald uses her keen tactical acumen and decisive judgment to lead others to victory, as well as her mastery of command to assist herself and her allies in battle. All battle heralds may use inspiring command to inspire courage (as the bardic performance ability); bard and battle herald levels stack to determine the bonuses provided by inspire courage . At 1st level, and every two levels thereafter, the battle herald chooses one command to learn. Unless otherwise noted, these abilities provide a competence bonus equal to the battle heraldÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s inspiring command bonus to her and to all allies within 60 feet able to see or hear her. Commands marked with an asterisk have the same range as above but only affect a certain number of allies (which can include the battle herald). Issuing an inspiring command is a move action . At 5th level, this becomes a swift action , and at 10th level, it becomes an immediate action . Maintaining an inspiring command is a free action that cannot be disrupted, but its effects end immediately if the battle herald is killed or otherwise prevented from taking actions (such as being dazed , helpless , or stunned ). The battle herald cannot have more than one command in effect at a time. She may use this ability for a number of rounds per day equal to 4 + her Charisma modifier, plus 2 additional rounds per level after 1st. She may use rounds of bardic performance to issue inspiring commands, but not vice versa. Inspiring commands are language-dependent, mind-affecting effects. The battle herald cannot maintain an inspiring command and a bardic p"
+        },
+        {
+          "name": "Inspire Greatness",
+          "description": "At 4th level, a battle herald may use her inspiring command ability to inspire greatness (as the 9th-level bardic performance ability). This ability affects one creature at 4th level, two at 7th, and three at 10th."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 5,
+      "bab": 5,
+      "fort": 3,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "3Rd Inspiring Command",
+          "description": ""
+        },
+        {
+          "name": "Banner",
+          "description": "At 5th level, a battle herald may fly a battle standard that inspires her allies. This ability is identical to the cavalier's banner ability, and cavalier levels stack with battle herald levels to determine the bonuses provided by the banner."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 6,
+      "bab": 6,
+      "fort": 3,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Teamwork Feat",
+          "description": "At 6th level, a battle herald receives a teamwork feat as a bonus feat. She must meet the prerequisites for this feat. She can use her cavalier tactician ability as a move action to grant this feat to allies (if she has the cavalier greater tactician ability, this is a swift action )."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 7,
+      "bab": 7,
+      "fort": 4,
+      "ref": 2,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Inspiring Command (+3)",
+          "description": "A battle herald uses her keen tactical acumen and decisive judgment to lead others to victory, as well as her mastery of command to assist herself and her allies in battle. All battle heralds may use inspiring command to inspire courage (as the bardic performance ability); bard and battle herald levels stack to determine the bonuses provided by inspire courage . At 1st level, and every two levels thereafter, the battle herald chooses one command to learn. Unless otherwise noted, these abilities provide a competence bonus equal to the battle heraldÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s inspiring command bonus to her and to all allies within 60 feet able to see or hear her. Commands marked with an asterisk have the same range as above but only affect a certain number of allies (which can include the battle herald). Issuing an inspiring command is a move action . At 5th level, this becomes a swift action , and at 10th level, it becomes an immediate action . Maintaining an inspiring command is a free action that cannot be disrupted, but its effects end immediately if the battle herald is killed or otherwise prevented from taking actions (such as being dazed , helpless , or stunned ). The battle herald cannot have more than one command in effect at a time. She may use this ability for a number of rounds per day equal to 4 + her Charisma modifier, plus 2 additional rounds per level after 1st. She may use rounds of bardic performance to issue inspiring commands, but not vice versa. Inspiring commands are language-dependent, mind-affecting effects. The battle herald cannot maintain an inspiring command and a bardic p"
+        },
+        {
+          "name": "Demanding Challenge",
+          "description": "This ability is identical to the 12th-level cavalier demanding challenge ability."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 8,
+      "bab": 8,
+      "fort": 4,
+      "ref": 3,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Persistent Commands",
+          "description": "At 8th level, a battle herald may allow her inspiring commands to persist even if she is incapacitated and unable to maintain them. If the player chooses, the effects of the battle heraldÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s inspiring commands persist for a number of rounds equal to her Charisma bonus (these count toward her number of rounds per day limit). This ability does not apply if the battle herald intentionally stops maintaining an inspiring command-only if she is dazed , held, stunned , killed, and so on, and is unable to maintain them. If the battle herald recovers from incapacity while an inspiring command is ongoing, she may resume maintaining it as a free action ."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 9,
+      "bab": 9,
+      "fort": 5,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "5Th Inspiring Command",
+          "description": ""
+        },
+        {
+          "name": "Inspire Last Stand",
+          "description": "At 9th level, a battle herald may use inspiring command to grant herself and all allies within 30 feet the benefits of the Diehard feat. Conscious affected creatures also gain the benefits of inspire courage while at negative hit points ."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 10,
+      "bab": 10,
+      "fort": 5,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Complex Commands",
+          "description": "At 10th level, a battle herald can have more than one command ability in effect at one time. Each must be begun separately and requires a separate maintenance cost. This allows the battle herald to have more than one single-target command (such as battle magic) in effect at the same time. The effects of multiple instances of the same command ability do not stack, even if the bonuses provided by that ability would normally stack (for example, if the battle herald maintains two pincer maneuver commands, her allies do not get double the bonus, even though dodge bonuses normally stack). The battle herald can also maintain one bardic performance in addition to her inspiring commands, though each must be begun separately and each requires its own maintenance cost. Section 15: Copyright Notice Advanced Player's Guide . Copyright 2010, Paizo Publishing, LLC; Authors: Jason Bulmahn, James Jacobs, Steve Kenson, Hal Maclean, Rob McCreary, Erik Mona, Jason Nelson,Stephen Radney-MacFarland, Sean K Reynolds, F. Wesley Schneider, James L. Sutter, Owen Stephens, and Russ Taylor."
+        },
+        {
+          "name": "Inspiring Command (+4)",
+          "description": "A battle herald uses her keen tactical acumen and decisive judgment to lead others to victory, as well as her mastery of command to assist herself and her allies in battle. All battle heralds may use inspiring command to inspire courage (as the bardic performance ability); bard and battle herald levels stack to determine the bonuses provided by inspire courage . At 1st level, and every two levels thereafter, the battle herald chooses one command to learn. Unless otherwise noted, these abilities provide a competence bonus equal to the battle heraldÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s inspiring command bonus to her and to all allies within 60 feet able to see or hear her. Commands marked with an asterisk have the same range as above but only affect a certain number of allies (which can include the battle herald). Issuing an inspiring command is a move action . At 5th level, this becomes a swift action , and at 10th level, it becomes an immediate action . Maintaining an inspiring command is a free action that cannot be disrupted, but its effects end immediately if the battle herald is killed or otherwise prevented from taking actions (such as being dazed , helpless , or stunned ). The battle herald cannot have more than one command in effect at a time. She may use this ability for a number of rounds per day equal to 4 + her Charisma modifier, plus 2 additional rounds per level after 1st. She may use rounds of bardic performance to issue inspiring commands, but not vice versa. Inspiring commands are language-dependent, mind-affecting effects. The battle herald cannot maintain an inspiring command and a bardic p"
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": null,
+  "spellcastingClass": false
+}

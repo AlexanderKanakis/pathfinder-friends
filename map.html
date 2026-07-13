@@ -143,6 +143,9 @@
     .mini-sheet-row span:last-child { color: #fff; font-weight: 700; text-align: right; }
     .mini-sheet-conditional { border-left: 3px solid #f0d58c; background: rgba(240, 213, 140, .08); }
     .mini-sheet-conditional .mini-sheet-value, .mini-sheet-conditional .mini-sheet-row span:last-child { color: #f0d58c; }
+    .mini-sheet-inline-conditional { margin-top: 3px; padding-top: 3px; border-top: 1px solid rgba(240, 213, 140, .22); color: #f0d58c; font-size: 11px; line-height: 1.2; }
+    .mini-sheet-inline-conditional span { font-weight: 700; }
+    .mini-sheet-inline-conditional small { color: #d8cfae; }
     .hp-number-input { appearance: textfield; -moz-appearance: textfield; }
     .hp-number-input::-webkit-inner-spin-button, .hp-number-input::-webkit-outer-spin-button { appearance: none; -webkit-appearance: none; margin: 0; }
     .map-weapon-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(92px, 1fr)); gap: 5px; margin: 4px 0 8px; padding: 6px; border: 1px solid #383838; border-radius: 6px; background: #1f1f1f; }
@@ -591,11 +594,12 @@
   </div>
 </div>
 
-<script src="navbar.js"></script>
+<script src="scripts/navbar.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase-config.js"></script>
-<script src="app-supabase.js"></script>
-<script src="buff-tracker-widget.js?v=extra-attack-widget-2"></script>
+<script src="scripts/supabase-config.js"></script>
+<script src="scripts/app-supabase.js"></script>
+<script src="modals/effect-duration-editor.js"></script>
+<script src="scripts/buff-tracker-widget.js?v=extra-attack-widget-2"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 let mapContextKey = "";
@@ -637,6 +641,7 @@ let hpSaveTimers = new Map();
 let hpSaveSeq = new Map();
 let characterSheetBridgeFrame = null;
 let characterSheetBridgePromise = null;
+let mapSheetCalculationSignatures = new Map();
 let quickEffectDefinitions = [];
 let quickEffectSourceTokenId = "";
 let quickEffectSelection = null;
@@ -885,6 +890,10 @@ function legacyDurationParts(text) {
   return { count: unit === "variable" ? null : count, unit, perLevel: unit !== "variable" && (value.includes("/level") || value.includes("per level")) };
 }
 function durationParts(effect) {
+  if (window.PFEffectMeta?.normalizeDurationConfig) {
+    const config = window.PFEffectMeta.normalizeDurationConfig(effect);
+    return { count: config.count, unit: config.unit, perLevel: config.factors.some(factor => factor.type === "caster"), config };
+  }
   const hasStructured = effect && (effect.durationCount !== undefined || effect.durationUnit || effect.durationPerLevel !== undefined);
   if (hasStructured) {
     return {
@@ -896,14 +905,17 @@ function durationParts(effect) {
   return legacyDurationParts(effect?.duration);
 }
 function durationUsesCasterLevel(effect) {
-  return durationParts(effect).perLevel;
+  const config = durationParts(effect).config;
+  return config ? config.factors.some(factor => factor.type === "caster") : durationParts(effect).perLevel;
 }
 function durationLabel(effect) {
+  if (window.PFEffectMeta?.durationLabel) return window.PFEffectMeta.durationLabel(effect);
   const parts = durationParts(effect);
   if (!parts.count || parts.unit === "variable") return "variable";
   return `${parts.count} ${parts.unit}${Number(parts.count) === 1 ? "" : "s"}${parts.perLevel ? " / level" : ""}`;
 }
 function parseEffectDuration(effect, casterLevel = 1) {
+  if (window.PFEffectMeta?.parseDuration) return window.PFEffectMeta.parseDuration(effect, { casterLevel });
   const parts = durationParts(effect);
   if (!parts.count || parts.unit === "variable") return null;
   const amount = Number(parts.count) || 1;
@@ -935,14 +947,15 @@ function titleCaseStat(value) {
 function scaleText(scale) {
   if (!scale) return "";
   const parts = [];
+  const sourceLabel = scale.source ? (window.PFEffectMeta?.factorLabel?.(scale.source) || "level") : "CL";
   const milestones = Array.isArray(scale.milestones) ? scale.milestones : [];
   const milestoneText = milestones
     .filter(milestone => milestone.level && milestone.value !== "" && milestone.value !== null && milestone.value !== undefined)
-    .map(milestone => `CL ${milestone.level}: ${fmtSigned(Number(milestone.value || 0))}`);
+    .map(milestone => `${sourceLabel} ${milestone.level}: ${fmtSigned(Number(milestone.value || 0))}`);
   if (milestoneText.length) parts.push(milestoneText.join(", "));
   const every = scale.every || {};
   if (every.afterLevel && every.everyLevels && every.increase) {
-    parts.push(`after CL ${every.afterLevel}, every ${every.everyLevels}: ${fmtSigned(Number(every.increase || 0))}`);
+    parts.push(`after ${sourceLabel} ${every.afterLevel}, every ${every.everyLevels}: ${fmtSigned(Number(every.increase || 0))}`);
   }
   return parts.length ? `scales ${parts.join("; ")}` : "";
 }
@@ -1306,6 +1319,27 @@ function compactStat(label, value) {
   return `<div class="mini-sheet-card"><div class="mini-sheet-label">${escapeHtml(label)}</div><div class="mini-sheet-value">${escapeHtml(value)}</div></div>`;
 }
 
+function compactInlineConditionals(rows = []) {
+  return (rows || []).map(conditional => {
+    const note = conditional.detail || conditional.appliesWhen || conditional.label || "Conditional";
+    return `<div class="mini-sheet-inline-conditional"><span>${escapeHtml(conditional.total || "")}</span>${note ? ` <small>(${escapeHtml(note)})</small>` : ""}</div>`;
+  }).join("");
+}
+
+function compactStatWithConditionals(label, value, conditionals = []) {
+  return `
+    <div class="mini-sheet-card">
+      <div class="mini-sheet-label">${escapeHtml(label)}</div>
+      <div class="mini-sheet-value">${escapeHtml(value)}</div>
+      ${compactInlineConditionals(conditionals)}
+    </div>
+  `;
+}
+
+function compactSaveStat(row) {
+  return compactStatWithConditionals(row.label || row.key || "Save", row.total || "", row.conditionals || []);
+}
+
 function compactConditionalStat(row) {
   return `<div class="mini-sheet-card mini-sheet-conditional"><div class="mini-sheet-label">${escapeHtml(row.label || "Conditional")}</div><div class="mini-sheet-value">${escapeHtml(row.total || "")}</div>${row.source ? `<div class="small text-secondary">${escapeHtml(row.source)}</div>` : ""}</div>`;
 }
@@ -1360,24 +1394,19 @@ function renderCalculatedSheetSummary(token, calculated) {
         ${compactConditionalStats(calculated.initiativeConditionals || [])}
       </div>`)}
       ${compactSection("Abilities", `<div class="mini-sheet-grid">
-        ${abilities.map(row => compactStat(row.label || row.key?.toUpperCase() || "Ability", compactAbilityValue(row)) + compactConditionalStats(row.conditionals || [])).join("")}
+        ${abilities.map(row => compactStatWithConditionals(row.label || row.key?.toUpperCase() || "Ability", compactAbilityValue(row), row.conditionals || [])).join("")}
       </div>`)}
       ${compactSection("Armor Class", `<div class="mini-sheet-grid">
-        ${compactStat("AC", calculated.armorClass?.ac || "")}
-        ${compactConditionalStats(calculated.armorClass?.conditionals?.ac || [])}
-        ${compactStat("Touch", calculated.armorClass?.touch || "")}
-        ${compactConditionalStats(calculated.armorClass?.conditionals?.touch || [])}
-        ${compactStat("Flat", calculated.armorClass?.flat || "")}
-        ${compactConditionalStats(calculated.armorClass?.conditionals?.flat || [])}
+        ${compactStatWithConditionals("AC", calculated.armorClass?.ac || "", calculated.armorClass?.conditionals?.ac || [])}
+        ${compactStatWithConditionals("Touch", calculated.armorClass?.touch || "", calculated.armorClass?.conditionals?.touch || [])}
+        ${compactStatWithConditionals("Flat", calculated.armorClass?.flat || "", calculated.armorClass?.conditionals?.flat || [])}
       </div>`)}
       ${compactSection("Combat", `<div class="mini-sheet-grid">
-        ${compactStat("CMB", calculated.combat?.cmb || "")}
-        ${compactConditionalStats(calculated.combat?.conditionals?.cmb || [])}
-        ${compactStat("CMD", calculated.combat?.cmd || "")}
-        ${compactConditionalStats(calculated.combat?.conditionals?.cmd || [])}
+        ${compactStatWithConditionals("CMB", calculated.combat?.cmb || "", calculated.combat?.conditionals?.cmb || [])}
+        ${compactStatWithConditionals("CMD", calculated.combat?.cmd || "", calculated.combat?.conditionals?.cmd || [])}
       </div>`)}
       ${compactSection("Saves", `<div class="mini-sheet-grid">
-        ${saves.map(row => compactStat(row.label || row.key || "Save", row.total || "") + compactConditionalStats(row.conditionals || [])).join("")}
+        ${saves.map(compactSaveStat).join("")}
       </div>`)}
       ${compactSection("Weapons", `<div class="mini-sheet-list">${
         weapons.length
@@ -1488,6 +1517,62 @@ async function hydrateMapCharacterSheets() {
   }));
 }
 
+function sheetClassFeatureCalculationSignature(sheet = {}) {
+  const progression = Array.isArray(sheet.classProgression) ? sheet.classProgression : [];
+  const choices = sheet.classFeatureChoices && typeof sheet.classFeatureChoices === "object" ? sheet.classFeatureChoices : {};
+  if (!progression.length && !Object.keys(choices).length) return "";
+  return JSON.stringify({
+    level: sheet.fields?.characterLevel || "",
+    classProgression: progression,
+    classFeatureChoices: choices,
+    saves: sheet.saves || {},
+    fields: {
+      babMisc: sheet.fields?.babMisc || "",
+      fortMisc: sheet.fields?.fortMisc || "",
+      reflexMisc: sheet.fields?.reflexMisc || "",
+      willMisc: sheet.fields?.willMisc || ""
+    }
+  });
+}
+
+function canRecalculateMapCharacter(character) {
+  return Boolean(character?.id && (isGm || character.userId === currentUserId));
+}
+
+async function ensureMapCharacterCalculatedSummary(character) {
+  if (!character?.id || !character.sheet || !canRecalculateMapCharacter(character)) return false;
+  const signature = sheetClassFeatureCalculationSignature(character.sheet);
+  if (!signature) return false;
+  const key = `character:${character.id}`;
+  if (mapSheetCalculationSignatures.get(key) === signature) return false;
+  mapSheetCalculationSignatures.set(key, signature);
+  const calculated = await recalculateCharacterSheetFromMap(character.id);
+  if (!calculated) {
+    mapSheetCalculationSignatures.delete(key);
+    return false;
+  }
+  const saved = await PFApp.loadCharacterSheet("", mapContextKey, character.id);
+  if (saved?.sheet) character.sheet = saved.sheet;
+  return true;
+}
+
+async function ensureMapEnemyCalculatedSummary(enemy) {
+  if (!enemy?.id || !enemy.sheet) return false;
+  const signature = sheetClassFeatureCalculationSignature(enemy.sheet);
+  if (!signature) return false;
+  const key = `enemy:${enemy.id}`;
+  if (mapSheetCalculationSignatures.get(key) === signature) return false;
+  mapSheetCalculationSignatures.set(key, signature);
+  const calculated = await recalculateEnemySheetFromMap(enemy.id);
+  if (!calculated) {
+    mapSheetCalculationSignatures.delete(key);
+    return false;
+  }
+  const saved = await PFApp.loadEnemy(enemy.id, mapContextKey);
+  if (saved?.sheet) enemy.sheet = saved.sheet;
+  return true;
+}
+
 function syncTokenFromSheet(token, source) {
   if (!token || !source?.sheet) return false;
   let changed = false;
@@ -1526,6 +1611,12 @@ async function refreshMapTokenSheets({ save = false } = {}) {
   let changed = false;
   await hydrateMapCharacterSheets();
 
+  for (const token of state.tokens) {
+    if (token.kind !== "character") continue;
+    const character = tokenCharacter(token);
+    if (character) changed = await ensureMapCharacterCalculatedSummary(character) || changed;
+  }
+
   state.tokens.forEach(token => {
     if (token.kind !== "character") return;
     const character = tokenCharacter(token);
@@ -1534,6 +1625,11 @@ async function refreshMapTokenSheets({ save = false } = {}) {
 
   if (isGm) {
     mapEnemies = await PFApp.loadEnemies(mapContextKey);
+    for (const token of state.tokens) {
+      if (token.kind !== "enemy" || !token.enemyId) continue;
+      const enemy = mapEnemies.find(item => item.id === token.enemyId);
+      if (enemy) changed = await ensureMapEnemyCalculatedSummary(enemy) || changed;
+    }
     state.tokens.forEach(token => {
       if (token.kind !== "enemy" || !token.enemyId) return;
       const enemy = mapEnemies.find(item => item.id === token.enemyId);
@@ -2775,6 +2871,7 @@ async function openMapEffects(tokenId) {
 
   if (!mapEffectTrackerInstance) {
     mapEffectTrackerInstance = PFEffectTracker.mount(mount, options);
+    await mapEffectTrackerInstance.ready;
   } else {
     await mapEffectTrackerInstance.refresh(options);
   }

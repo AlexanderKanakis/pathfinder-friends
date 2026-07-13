@@ -1,0 +1,277 @@
+{
+  "name": "Planes Walker",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/n-r/planes-walker/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 1,
+      "ref": 0,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Counter-Summons",
+          "description": "A Planes walker can ready an action to use a summon monster spell or spell-like ability as a counterspell , even though the casting time for a summon monster spell is 1 full round. When used this way, the summon monster spell is treated as though quickened to a swift action via the Quicken Spell metamagic feat , though its spell level is not increased, and it can be used only to counterspell . When used to counterspell , a summon monster spell can counter any conjuration ( summoning ) spell or spell-like ability of its level or lower, including an outsider's summon ability. At 5th level, this ability can be used as an immediate action , without the need to ready an action beforehand."
+        },
+        {
+          "name": "Planar Guide",
+          "description": "At 1st level and every three levels thereafter, a Planes walker chooses one of the following benefits. She may choose each benefit more than once, each time applying to a different plane or outsider subtype. These bonuses stack with similar bonuses from other classes, but unlike with a ranger's abilities, these bonuses do not escalate when new enemies or terrains are selected. Favored Enemy : Choose one outsider subtype as a favored enemy (as the ranger class feature). Favored Terrain : Choose one plane other than the Material Plane as favored terrain (as the ranger class feature). Terrain Mastery : Choose one plane to gain terrain mastery (as the horizon walker class feature.) A Planes walker must have the appropriate plane as a favored terrain before gaining terrain mastery with it."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "-"
+      }
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Planar Channel",
+          "description": "At 2nd level, a Planes walker can channel baneful energies against creatures with the extraplanar subtype, regardless of alignment or plane of origin, as the cleric's channel energy ability. The Planes walker deals damage as a cleric of a level equal to her highest caster level . This energy can only harm, not heal. This ability cannot be used with feats, magic items, or other effects that modify channel energy . A Planes walker can use this ability a number of times per day equal to 3 + her bonus for the relevant ability of the spellcasting class she selected."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of spellcasting class"
+      }
+    },
+    {
+      "level": 3,
+      "bab": 2,
+      "fort": 2,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Eradication +1",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of spellcasting class"
+      }
+    },
+    {
+      "level": 4,
+      "bab": 3,
+      "fort": 2,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Counterport",
+          "description": "At 4th level, a Planes walker can ready an action to counterspell a teleportation effect that allows a creature to enter or exit an area within 30 feet of her. She can use Spellcraft to identify a teleportation effect immediately as creatures arrive and can counter the teleportation effect with an identical spell or with any conjuration spell of at least 1 spell level higher, returning teleporting creatures to their point of origin."
+        },
+        {
+          "name": "Planar Guide",
+          "description": "At 1st level and every three levels thereafter, a Planes walker chooses one of the following benefits. She may choose each benefit more than once, each time applying to a different plane or outsider subtype. These bonuses stack with similar bonuses from other classes, but unlike with a ranger's abilities, these bonuses do not escalate when new enemies or terrains are selected. Favored Enemy : Choose one outsider subtype as a favored enemy (as the ranger class feature). Favored Terrain : Choose one plane other than the Material Plane as favored terrain (as the ranger class feature). Terrain Mastery : Choose one plane to gain terrain mastery (as the horizon walker class feature.) A Planes walker must have the appropriate plane as a favored terrain before gaining terrain mastery with it."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of spellcasting class"
+      }
+    },
+    {
+      "level": 5,
+      "bab": 3,
+      "fort": 3,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Planar Scourge",
+          "description": "At 5th level, an extraplanar creature that fails its save against the Planes walker's planar channel gains the panicked , sickened , or staggered condition, chosen by the Planes walker, for 1d4 rounds."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "-"
+      }
+    },
+    {
+      "level": 6,
+      "bab": 4,
+      "fort": 3,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Eradication +2",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of spellcasting class"
+      }
+    },
+    {
+      "level": 7,
+      "bab": 5,
+      "fort": 4,
+      "ref": 2,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Improved Counterport",
+          "description": "At 7th level, a Planes walker can use her counterport ability to forcibly redirect a creature using a teleportation effect within 30 feet to a new valid destination within 30 feet of her. The wrenching redirection deals 1d6 points of damage per class level to the redirected creature. A successful Fortitude save (DC 10 + the Planes walker's character level + the Planes walker's Cha modifier) halves the damage and negates the redirection. In addition, when a conjuration effect causes a creature to appear in a square threatened by the Planes walker, that creature provokes an attack of opportunity from the Planes walker."
+        },
+        {
+          "name": "Planar Guide",
+          "description": "At 1st level and every three levels thereafter, a Planes walker chooses one of the following benefits. She may choose each benefit more than once, each time applying to a different plane or outsider subtype. These bonuses stack with similar bonuses from other classes, but unlike with a ranger's abilities, these bonuses do not escalate when new enemies or terrains are selected. Favored Enemy : Choose one outsider subtype as a favored enemy (as the ranger class feature). Favored Terrain : Choose one plane other than the Material Plane as favored terrain (as the ranger class feature). Terrain Mastery : Choose one plane to gain terrain mastery (as the horizon walker class feature.) A Planes walker must have the appropriate plane as a favored terrain before gaining terrain mastery with it."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of spellcasting class"
+      }
+    },
+    {
+      "level": 8,
+      "bab": 6,
+      "fort": 4,
+      "ref": 3,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Planar Purge",
+          "description": "At 8th level, an extraplanar creature that fails its save against a Planes walker's planar channel is banished to its home plane (as the banishment spell; no save). Extraplanar creatures with Hit Dice greater than twice the Planes walker's class level are unaffected by this ability, but still take damage from planar channel as normal."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of spellcasting class"
+      }
+    },
+    {
+      "level": 9,
+      "bab": 6,
+      "fort": 5,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Eradication +3",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "-"
+      }
+    },
+    {
+      "level": 10,
+      "bab": 7,
+      "fort": 5,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Greater Counterport",
+          "description": "At 10th level, a Planes walker can counter a teleportation effect as an immediate action , without the need to ready an action beforehand. In addition, as a full-round action , the Planes walker can expend two uses of her planar channel ability to forcibly recall a creature that used teleportation to exit an area within 30 feet of the Planes walker since the end of the Planes walker's last turn. Planar channel deals damage equal to the amount normally dealt by one use of planar channel. This damage affects only that target, and affects it regardless of its current distance from the Planes walker. If the target fails its save, the teleportation effect is reversed and the creature returns to the point from which it teleported (or the nearest available space, if that space is now occupied by another creature). Section 15: Copyright Notice Pathfinder Campaign Setting: Paths of Prestige Ãƒâ€šÃ‚Â© 2012, Paizo Publishing, LLC; Authors: Benjamin Bruck, Jason Bulmahn, Matt Goodall, and Jason Nelson."
+        },
+        {
+          "name": "Planar Guide",
+          "description": "At 1st level and every three levels thereafter, a Planes walker chooses one of the following benefits. She may choose each benefit more than once, each time applying to a different plane or outsider subtype. These bonuses stack with similar bonuses from other classes, but unlike with a ranger's abilities, these bonuses do not escalate when new enemies or terrains are selected. Favored Enemy : Choose one outsider subtype as a favored enemy (as the ranger class feature). Favored Terrain : Choose one plane other than the Material Plane as favored terrain (as the ranger class feature). Terrain Mastery : Choose one plane to gain terrain mastery (as the horizon walker class feature.) A Planes walker must have the appropriate plane as a favored terrain before gaining terrain mastery with it."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of spellcasting class"
+      }
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": {
+    "summary": "See level progression spell columns."
+  },
+  "spellcastingClass": true
+}

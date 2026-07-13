@@ -1,0 +1,251 @@
+{
+  "name": "Stalwart Defender",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/apg/stalwart-defender/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 1,
+      "fort": 1,
+      "ref": 0,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Defensive Stance",
+          "description": "At 1st level, a stalwart defender can enter a defensive stance, a position of readiness and trance-like determination. A stalwart defender can maintain this stance for a number of rounds per day equal to 4 + his Constitution modifier. At each level after 1st, he can maintain the stance for 2 additional rounds per day. Temporary increases to Constitution , such as those gained from the defensive stance and spells like bearÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s endurance , do not increase the total number of rounds that the stalwart defender can maintain a defensive stance per day. The stalwart defender can enter a defensive stance as a free action . The total number of rounds of defensive stance per day is renewed after resting for 8 hours, although these hours do not need to be consecutive. While in a defensive stance, the stalwart defender gains a +2 dodge bonus to AC , a +4 morale bonus to his Strength and Constitution , as well as a +2 morale bonus on Will saves. The increase to Constitution grants the stalwart defender 2 hit points per Hit Die, but these hit points disappear when the defensive stance ends and are not lost first like temporary hit points . While in a defensive stance, a stalwart defender cannot willingly move from his current position through any means (including normal movement, riding a mount, teleportation, or willingly allowing allies to carry him). If he enters a defensive stance while on a moving vehicle he does not control (such as a wagon or ship), he can maintain the stance even if the vehicle moves. If the stalwart defender moves under his own power as a result of an enemyÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s succ"
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 2,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Defensive Power",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 3,
+      "bab": 3,
+      "fort": 2,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Uncanny Dodge",
+          "description": "At 3rd level, a stalwart defender gains the ability to react to danger before his senses would normally allow him to do so. He cannot be caught flatfooted, even if the attacker is invisible . He still loses his Dexterity bonus to AC if immobilized. A stalwart defender with this ability can still lose his Dexterity bonus to AC if an opponent successfully uses the feint action against him. If the character gains uncanny dodge from a second class, he automatically gains improved uncanny dodge (see below)."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 4,
+      "bab": 4,
+      "fort": 2,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Defensive Power",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 5,
+      "bab": 5,
+      "fort": 3,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Damage Reduction 1/-",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 6,
+      "bab": 6,
+      "fort": 3,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Defensive Power",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 7,
+      "bab": 7,
+      "fort": 4,
+      "ref": 2,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Damage Reduction 3/-",
+          "description": ""
+        },
+        {
+          "name": "Improved Uncanny Dodge",
+          "description": "At 7th level, a stalwart defender can no longer be flanked. This defense denies rogues the ability to use f lank attacks to sneak attack the stalwart defender. The exception to this defense is that a rogue at least four levels higher than the stalwart defender can f lank him (and thus sneak attack him). If the character gains uncanny dodge from a second class (see above), he automatically gains improved uncanny dodge, and the levels from those classes stack to determine the minimum rogue level required to f lank the character."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 8,
+      "bab": 8,
+      "fort": 4,
+      "ref": 3,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Defensive Power",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 9,
+      "bab": 9,
+      "fort": 5,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Mobile Defense",
+          "description": "At 9th level, a stalwart defender can adjust his position while maintaining a defensive stance. While in a defensive stance, he can take one 5-foot step each round without losing the benefit of the stance."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 10,
+      "bab": 10,
+      "fort": 5,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Damage Reduction 5/-",
+          "description": ""
+        },
+        {
+          "name": "Defensive Power",
+          "description": ""
+        },
+        {
+          "name": "Last Word",
+          "description": "Once per day, while in a defensive stance, a stalwart defender can make one melee attack against an opponent within reach in response to an attack that would reduce him to negative hit points , knock him unconscious , or kill him. For example, a stalwart defender has 1 hit point left when a red dragon bites him; the defender may use this ability even if the dragonÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s bite would otherwise kill him instantly. If the attack hits, roll the damage dice for the attack twice and add the results together, but do not multiply damage bonuses from Strength , weapon abilities (such as flaming), or precision-based damage (such as sneak attack). This bonus damage is not multiplied on a critical hit (although other damage bonuses are multiplied normally). Once the defenderÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s attack is resolved, he suffers the normal effect of the attack that provoked this ability. Section 15: Copyright Notice Advanced Player's Guide . Copyright 2010, Paizo Publishing, LLC; Author: Jason Bulmahn."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": null,
+  "spellcastingClass": false
+}

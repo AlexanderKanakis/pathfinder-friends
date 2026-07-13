@@ -1,0 +1,301 @@
+{
+  "name": "Storm Kindler",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/s-z/master-of-storms/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 1,
+      "ref": 0,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Oceanic Spirit",
+          "description": "A Storm Kindler gains a bonus equal to her class level on Fly and Swim checks, and never needs to attempt concentration checks because of natural weather. She gains resistance to electricity 5 and sonic 5. At 5th level, her resistance to electricity and sonic increases to 10. At 9th level, these resistances increase to 20."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "-"
+      }
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Seasight",
+          "description": "At 2nd level, a Storm Kindler can see through fog, smoke, and other obscuring vapors as if they did not exist. This ability functions underwater as well, allowing the Storm Kindler to see through thick silt and other aquatic precipitates."
+        },
+        {
+          "name": "Storm Shape (20 Ft., Small)",
+          "description": "At 2nd level, a Storm Kindler becomes a physical embodiment of the fury of the storm. As a standard action , she can transform herself into a whirlwind (as per the universal monster rule) for a number of minutes per day equal to her Storm Kindler level. These minutes need not be consecutive, but must be spent in 1-minute increments. If the Storm Kindler is underwater when she uses this ability, she instead transforms into a vortex of the same size (this functions identically to the whirlwind ability, but can form only underwater and can't leave the water). The Storm Kindler can breathe water while in vortex form. If the Storm Kindler does not have a fly or swim speed, she gains one (as appropriate to her new form) equal to her base land speed while in storm shape. With a fly speed, she has average maneuverability. As a swift action , the Storm Kindler can change the height of her whirlwind form from a minimum of 10 feet tall to a maximum of 20 feet tall. At 4th level and every 2 levels thereafter, the maximum height of the whirlwind increases by 10 feet, to a maximum of 60 feet tall at 10th level. The Storm Kindler can damage and trap Small or smaller creatures caught in her whirlwind, dealing lethal damage equal to her unarmed strike damage to each such creature that fails a Reflex save (DC = 10 + the Storm Kindler's class level + the Storm Kindler's Strength modifier) and lifting it into the air if it fails a second Reflex save. At 4th level and every 2 levels thereafter, the size of creatures the Storm Kindler can affect increases by one step, to a maxi"
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of spellcasting class"
+      }
+    },
+    {
+      "level": 3,
+      "bab": 2,
+      "fort": 2,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Aura Of Calm (5 Ft.)",
+          "description": "At 3rd level, allies within 5 feet of a Storm Kindler (including herself ) are treated as one size category larger for the purpose of wind effects (this stacks with the bonus from Storm-Lashed ), and they gain a +2 competence bonus on all saving throws to resist spells and effects with the air or water descriptors. At 5th level and every 2 levels thereafter, the Storm Kindler's aura of calm extends by 5 feet (to a maximum of 20 feet at 9th level). At 7th level, allies in the Storm Kindler's aura are treated as two size categories larger for the purpose of wind effects, and the bonus on saving throws doubles to +4."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of spellcasting class"
+      }
+    },
+    {
+      "level": 4,
+      "bab": 3,
+      "fort": 2,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Storm Shape (30 Ft., Medium)",
+          "description": "At 2nd level, a Storm Kindler becomes a physical embodiment of the fury of the storm. As a standard action , she can transform herself into a whirlwind (as per the universal monster rule) for a number of minutes per day equal to her Storm Kindler level. These minutes need not be consecutive, but must be spent in 1-minute increments. If the Storm Kindler is underwater when she uses this ability, she instead transforms into a vortex of the same size (this functions identically to the whirlwind ability, but can form only underwater and can't leave the water). The Storm Kindler can breathe water while in vortex form. If the Storm Kindler does not have a fly or swim speed, she gains one (as appropriate to her new form) equal to her base land speed while in storm shape. With a fly speed, she has average maneuverability. As a swift action , the Storm Kindler can change the height of her whirlwind form from a minimum of 10 feet tall to a maximum of 20 feet tall. At 4th level and every 2 levels thereafter, the maximum height of the whirlwind increases by 10 feet, to a maximum of 60 feet tall at 10th level. The Storm Kindler can damage and trap Small or smaller creatures caught in her whirlwind, dealing lethal damage equal to her unarmed strike damage to each such creature that fails a Reflex save (DC = 10 + the Storm Kindler's class level + the Storm Kindler's Strength modifier) and lifting it into the air if it fails a second Reflex save. At 4th level and every 2 levels thereafter, the size of creatures the Storm Kindler can affect increases by one step, to a maxi"
+        },
+        {
+          "name": "Wave Breaker",
+          "description": "At 4th level, a Storm Kindler gains a swim speed equal to twice her base land speed. She can breathe water for a number of hours per day equal to her Storm Kindler level. This time need not be consecutive, but must be spent in 1-hour increments."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of spellcasting class"
+      }
+    },
+    {
+      "level": 5,
+      "bab": 3,
+      "fort": 3,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Aura Of Calm (10 Ft.)",
+          "description": "At 3rd level, allies within 5 feet of a Storm Kindler (including herself ) are treated as one size category larger for the purpose of wind effects (this stacks with the bonus from Storm-Lashed ), and they gain a +2 competence bonus on all saving throws to resist spells and effects with the air or water descriptors. At 5th level and every 2 levels thereafter, the Storm Kindler's aura of calm extends by 5 feet (to a maximum of 20 feet at 9th level). At 7th level, allies in the Storm Kindler's aura are treated as two size categories larger for the purpose of wind effects, and the bonus on saving throws doubles to +4."
+        },
+        {
+          "name": "Thunderstruck",
+          "description": "At 5th level, a Storm Kindler becomes immune to the deafened condition."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "-"
+      }
+    },
+    {
+      "level": 6,
+      "bab": 4,
+      "fort": 3,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Storm Shape (40 Ft., Large)",
+          "description": "At 2nd level, a Storm Kindler becomes a physical embodiment of the fury of the storm. As a standard action , she can transform herself into a whirlwind (as per the universal monster rule) for a number of minutes per day equal to her Storm Kindler level. These minutes need not be consecutive, but must be spent in 1-minute increments. If the Storm Kindler is underwater when she uses this ability, she instead transforms into a vortex of the same size (this functions identically to the whirlwind ability, but can form only underwater and can't leave the water). The Storm Kindler can breathe water while in vortex form. If the Storm Kindler does not have a fly or swim speed, she gains one (as appropriate to her new form) equal to her base land speed while in storm shape. With a fly speed, she has average maneuverability. As a swift action , the Storm Kindler can change the height of her whirlwind form from a minimum of 10 feet tall to a maximum of 20 feet tall. At 4th level and every 2 levels thereafter, the maximum height of the whirlwind increases by 10 feet, to a maximum of 60 feet tall at 10th level. The Storm Kindler can damage and trap Small or smaller creatures caught in her whirlwind, dealing lethal damage equal to her unarmed strike damage to each such creature that fails a Reflex save (DC = 10 + the Storm Kindler's class level + the Storm Kindler's Strength modifier) and lifting it into the air if it fails a second Reflex save. At 4th level and every 2 levels thereafter, the size of creatures the Storm Kindler can affect increases by one step, to a maxi"
+        },
+        {
+          "name": "Weather'S Fury 3d6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of spellcasting class"
+      }
+    },
+    {
+      "level": 7,
+      "bab": 5,
+      "fort": 4,
+      "ref": 2,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Aura Of Calm (15 Ft.)",
+          "description": "At 3rd level, allies within 5 feet of a Storm Kindler (including herself ) are treated as one size category larger for the purpose of wind effects (this stacks with the bonus from Storm-Lashed ), and they gain a +2 competence bonus on all saving throws to resist spells and effects with the air or water descriptors. At 5th level and every 2 levels thereafter, the Storm Kindler's aura of calm extends by 5 feet (to a maximum of 20 feet at 9th level). At 7th level, allies in the Storm Kindler's aura are treated as two size categories larger for the purpose of wind effects, and the bonus on saving throws doubles to +4."
+        },
+        {
+          "name": "Eye Of The Storm",
+          "description": "At 7th level, a Storm Kindler becomes immune to damage and detrimental effects from non-magical wind and waves. In addition, she receives a +4 insight bonus on saving throws and to AC against spells and effects with the air or water descriptors."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of spellcasting class"
+      }
+    },
+    {
+      "level": 8,
+      "bab": 6,
+      "fort": 4,
+      "ref": 3,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Fickle Winds",
+          "description": "At 8th level, as a swift action , a Storm Kindler can call the winds to her defense, protecting her as per the spell fickle winds for a number of rounds per day equal to her level. These rounds need not be consecutive."
+        },
+        {
+          "name": "Storm Shape (50 Ft., Huge)",
+          "description": "At 2nd level, a Storm Kindler becomes a physical embodiment of the fury of the storm. As a standard action , she can transform herself into a whirlwind (as per the universal monster rule) for a number of minutes per day equal to her Storm Kindler level. These minutes need not be consecutive, but must be spent in 1-minute increments. If the Storm Kindler is underwater when she uses this ability, she instead transforms into a vortex of the same size (this functions identically to the whirlwind ability, but can form only underwater and can't leave the water). The Storm Kindler can breathe water while in vortex form. If the Storm Kindler does not have a fly or swim speed, she gains one (as appropriate to her new form) equal to her base land speed while in storm shape. With a fly speed, she has average maneuverability. As a swift action , the Storm Kindler can change the height of her whirlwind form from a minimum of 10 feet tall to a maximum of 20 feet tall. At 4th level and every 2 levels thereafter, the maximum height of the whirlwind increases by 10 feet, to a maximum of 60 feet tall at 10th level. The Storm Kindler can damage and trap Small or smaller creatures caught in her whirlwind, dealing lethal damage equal to her unarmed strike damage to each such creature that fails a Reflex save (DC = 10 + the Storm Kindler's class level + the Storm Kindler's Strength modifier) and lifting it into the air if it fails a second Reflex save. At 4th level and every 2 levels thereafter, the size of creatures the Storm Kindler can affect increases by one step, to a maxi"
+        },
+        {
+          "name": "Weather'S Fury 4d6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of spellcasting class"
+      }
+    },
+    {
+      "level": 9,
+      "bab": 6,
+      "fort": 5,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Aura Of Calm (20 Ft.)",
+          "description": "At 3rd level, allies within 5 feet of a Storm Kindler (including herself ) are treated as one size category larger for the purpose of wind effects (this stacks with the bonus from Storm-Lashed ), and they gain a +2 competence bonus on all saving throws to resist spells and effects with the air or water descriptors. At 5th level and every 2 levels thereafter, the Storm Kindler's aura of calm extends by 5 feet (to a maximum of 20 feet at 9th level). At 7th level, allies in the Storm Kindler's aura are treated as two size categories larger for the purpose of wind effects, and the bonus on saving throws doubles to +4."
+        },
+        {
+          "name": "Echoing Thunder",
+          "description": "At 9th level, anytime a Storm Kindler resists electricity or sonic damage with her oceanic spirit ability, she can spend an immediate action to redirect the damage to another creature within 30 feet. The creature must succeed at a Reflex save (DC = 10 + the Storm Kindler's class level + the Storm Kindler's Wisdom modifier) or take an amount of electricity or sonic damage equal to the amount the Storm Kindler resisted."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "-"
+      }
+    },
+    {
+      "level": 10,
+      "bab": 7,
+      "fort": 5,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Storm Mastery",
+          "description": "At 10th level, a Storm Kindler becomes one with the relentless fury of the storm, allowing her to use her storm shape ability at will. In addition to this, she gains a fly speed equal to double her base land speed, and gains the aquatic subtype and the amphibious special quality. The Storm Kindler never takes the normal penalties on her attack or damage rolls for fighting underwater. Section 15: Copyright Notice Pathfinder Roleplaying Game Adventurer's Guide Ãƒâ€šÃ‚Â© 2017, Paizo Inc.; Authors: Benjamin Bruck, John Compton, Crystal Frasier, Tim Hitchcock, Jenny Jarzabski, Isabelle Lee, Joe Pasini, Jessica Price, David Schwartz, and Josh Vogt."
+        },
+        {
+          "name": "Storm Shape (60 Ft., Huge)",
+          "description": "At 2nd level, a Storm Kindler becomes a physical embodiment of the fury of the storm. As a standard action , she can transform herself into a whirlwind (as per the universal monster rule) for a number of minutes per day equal to her Storm Kindler level. These minutes need not be consecutive, but must be spent in 1-minute increments. If the Storm Kindler is underwater when she uses this ability, she instead transforms into a vortex of the same size (this functions identically to the whirlwind ability, but can form only underwater and can't leave the water). The Storm Kindler can breathe water while in vortex form. If the Storm Kindler does not have a fly or swim speed, she gains one (as appropriate to her new form) equal to her base land speed while in storm shape. With a fly speed, she has average maneuverability. As a swift action , the Storm Kindler can change the height of her whirlwind form from a minimum of 10 feet tall to a maximum of 20 feet tall. At 4th level and every 2 levels thereafter, the maximum height of the whirlwind increases by 10 feet, to a maximum of 60 feet tall at 10th level. The Storm Kindler can damage and trap Small or smaller creatures caught in her whirlwind, dealing lethal damage equal to her unarmed strike damage to each such creature that fails a Reflex save (DC = 10 + the Storm Kindler's class level + the Storm Kindler's Strength modifier) and lifting it into the air if it fails a second Reflex save. At 4th level and every 2 levels thereafter, the size of creatures the Storm Kindler can affect increases by one step, to a maxi"
+        },
+        {
+          "name": "Weather'S Fury 5d6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of spellcasting class"
+      }
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": {
+    "summary": "See level progression spell columns."
+  },
+  "spellcastingClass": true
+}

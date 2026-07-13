@@ -1,0 +1,281 @@
+{
+  "name": "Umbral Agent",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/s-z/umbral-agent/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 1,
+      "ref": 0,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Blessings Of Darkness",
+          "description": "An Umbral agent gains the Darkness domain at 1st level, using his class level as his effective cleric level to determine the effects of its granted powers. If he already possesses the Darkness domain from another class, his Umbral agent levels stack with levels in that class when determining the effects of his Darkness domain powers. The Umbral agent does not receive bonus spells or domain spell slots from his Umbral agent levels."
+        },
+        {
+          "name": "Shadow Courtier",
+          "description": ""
+        },
+        {
+          "name": "Tenebrous Magic",
+          "description": "An Umbral agent receives Tenebrous Spell as a bonus feat at 1st level, and can apply its effects to his spells without increasing their effective spell level or casting time . In addition, if the spell has the darkness or shadow descriptor or is of the illusion (shadow) subschool , the spell's effective caster level and any associated save DCs are increased by 2 (instead of 1), and any attempts at dispelling the spell in darkness or dim light take a -4 penalty on the dispel check (instead of -2)."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "-"
+      }
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Darkvision",
+          "description": "At 2nd level, an Umbral agent gains darkvision out to a range of 60 feet. If he already has darkvision , the range increases by 30 feet. At 7th level, the range of the Umbral agent's darkvision increases by an additional 30 feet."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of spellcasting class"
+      }
+    },
+    {
+      "level": 3,
+      "bab": 2,
+      "fort": 2,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Shadow Chains",
+          "description": "At 3rd level, an Umbral agent can use his touch of darkness ability one additional time per day. When using the touch of darkness ability, the Umbral agent manifests shadowy chains that increase the reach of his melee touch attack by 5 feet. A creature struck by these chains must succeed at a Reflex save (DC 10 + the Umbral agent's level + the Umbral agent's Wisdom modifier) or be entangled for 1d4 rounds in addition to the normal effects of the ability."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of spellcasting class"
+      }
+    },
+    {
+      "level": 4,
+      "bab": 3,
+      "fort": 2,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Shadow Jump (40 Ft.)",
+          "description": "At 4th level, an Umbral agent gains the ability to supernaturally travel between shadows. This ability functions exactly like the shadowdancer ability of the same name."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of spellcasting class"
+      }
+    },
+    {
+      "level": 5,
+      "bab": 3,
+      "fort": 3,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Unnerving Gaze ( Shaken 1 Round)",
+          "description": "At 5th level, an Umbral agent gains a gaze attack similar to the kyton ability of the same name. Creatures within 30 feet of the Umbral agent must succeed at a Will save (DC 10 + the Umbral agent's level + the Umbral agent's Wisdom modifier) or be shaken for 1 round. The Umbral agent can use this ability for a number of rounds per day equal to his level; these rounds do not need to be consecutive. Activating this ability is a swift action . The Umbral agent is immune to the unnerving gaze of kytons (whether or not his own unnerving gaze is active). This is a mind-affecting fear effect that follows all the normal rules for a gaze attack. As the Umbral agent gains levels, his unnerving gaze grows more potent. At 7th level, creatures that fail their save are shaken for 1d4 rounds. At 9th level, they are staggered for 1 round and shaken for 1d4 rounds after."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "-"
+      }
+    },
+    {
+      "level": 6,
+      "bab": 4,
+      "fort": 3,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Grasping Darkness",
+          "description": "At 6th level, an Umbral agent can use his touch of darkness ability an additional time per day, and the reach provided by his shadow chains ability increases by 5 feet (to a total 10 foot increase). In place of entangling the target, the Umbral agent can attempt to grapple the target without provoking an attack of opportunity , using his Wisdom modifier in place of his Strength modifier for the purpose of determining his CMB . If both the Umbral agent and his target are in an area of dim or darker light, he gains a +5 bonus on this grapple check. The Umbral agent does not gain the grappled condition when using his shadow chains this way. He may make combat maneuver checks to maintain the grapple for as long as the effect of his touch of darkness ability persists."
+        },
+        {
+          "name": "Shadow Jump (80 Ft.)",
+          "description": "At 4th level, an Umbral agent gains the ability to supernaturally travel between shadows. This ability functions exactly like the shadowdancer ability of the same name."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of spellcasting class"
+      }
+    },
+    {
+      "level": 7,
+      "bab": 5,
+      "fort": 4,
+      "ref": 2,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Darkvision +30 Ft.",
+          "description": ""
+        },
+        {
+          "name": "Unnerving Gaze ( Shaken 1d4 Rounds)",
+          "description": "At 5th level, an Umbral agent gains a gaze attack similar to the kyton ability of the same name. Creatures within 30 feet of the Umbral agent must succeed at a Will save (DC 10 + the Umbral agent's level + the Umbral agent's Wisdom modifier) or be shaken for 1 round. The Umbral agent can use this ability for a number of rounds per day equal to his level; these rounds do not need to be consecutive. Activating this ability is a swift action . The Umbral agent is immune to the unnerving gaze of kytons (whether or not his own unnerving gaze is active). This is a mind-affecting fear effect that follows all the normal rules for a gaze attack. As the Umbral agent gains levels, his unnerving gaze grows more potent. At 7th level, creatures that fail their save are shaken for 1d4 rounds. At 9th level, they are staggered for 1 round and shaken for 1d4 rounds after."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of spellcasting class"
+      }
+    },
+    {
+      "level": 8,
+      "bab": 6,
+      "fort": 4,
+      "ref": 3,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Shadow Jump (160 Ft.)",
+          "description": "At 4th level, an Umbral agent gains the ability to supernaturally travel between shadows. This ability functions exactly like the shadowdancer ability of the same name."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of spellcasting class"
+      }
+    },
+    {
+      "level": 9,
+      "bab": 6,
+      "fort": 5,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Unnerving Gaze ( Staggered 1 Round)",
+          "description": "At 5th level, an Umbral agent gains a gaze attack similar to the kyton ability of the same name. Creatures within 30 feet of the Umbral agent must succeed at a Will save (DC 10 + the Umbral agent's level + the Umbral agent's Wisdom modifier) or be shaken for 1 round. The Umbral agent can use this ability for a number of rounds per day equal to his level; these rounds do not need to be consecutive. Activating this ability is a swift action . The Umbral agent is immune to the unnerving gaze of kytons (whether or not his own unnerving gaze is active). This is a mind-affecting fear effect that follows all the normal rules for a gaze attack. As the Umbral agent gains levels, his unnerving gaze grows more potent. At 7th level, creatures that fail their save are shaken for 1d4 rounds. At 9th level, they are staggered for 1 round and shaken for 1d4 rounds after."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "-"
+      }
+    },
+    {
+      "level": 10,
+      "bab": 7,
+      "fort": 5,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Crushing Umbra",
+          "description": "At 10th level, an Umbral agent can use his touch of darkness ability at will, and the reach provided by his shadow chains increases by another 10 feet (to a total 20 foot increase). When he successfully grapples a creature with his shadow chains, the Umbral agent can begin constricting his victim as a free action , dealing 5d6 points of damage whenever he makes a successful grapple check. Creatures constricted in this way are also considered strangled, and cannot speak or cast spells with verbal components . Section 15: Copyright Notice Pathfinder Campaign Setting: Paths of Prestige Ãƒâ€šÃ‚Â© 2012, Paizo Publishing, LLC; Authors: Benjamin Bruck, Jason Bulmahn, Matt Goodall, and Jason Nelson."
+        },
+        {
+          "name": "Shadow Jump (320 Ft.)",
+          "description": "At 4th level, an Umbral agent gains the ability to supernaturally travel between shadows. This ability functions exactly like the shadowdancer ability of the same name."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of spellcasting class"
+      }
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": {
+    "summary": "See level progression spell columns."
+  },
+  "spellcastingClass": true
+}

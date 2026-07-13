@@ -1,0 +1,582 @@
+{
+  "name": "Warpriest",
+  "type": "hybrid",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/hybrid-classes/warpriest/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 2,
+      "ref": 0,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Aura",
+          "description": "A warpriest of a chaotic, evil, good, or lawful deity has a particularly powerful aura (as a cleric ) corresponding to the deity's alignment (see detect evil )."
+        },
+        {
+          "name": "Blessings (Minor)",
+          "description": "A warpriest's deity influences his alignment , what magic he can perform, his values, and how others see him. Each warpriest can select two blessings from among those granted by his deity (each deity grants the blessings tied to its domains). A warpriest can select an alignment blessing (Chaos, Evil, Good, or Law) only if his alignment matches that domain. If a warpriest isn't devoted to a particular deity, he still selects two blessings to represent his spiritual inclinations and abilities, subject to GM approval. The restriction on alignment domains still applies. Each blessing grants a minor power at 1st level and a major power at 10th level. A warpriest can call upon the power of his blessings a number of times per day (in any combination) equal to 3 + 1/2 his warpriest level (to a maximum of 13 times per day at 20th level). Each time he calls upon any one of his blessings, it counts against his daily limit. The save DC for these blessings is equal to 10 + 1/2 the warpriest's level + the warpriest's Wisdom modifier. If a warpriest also has levels in a class that grants cleric domains, the blessings chosen must match the domains selected by that class. Subject to GM discretion, the warpriest can change his former blessings or domains to make them conform. Blessings are here: Blessings."
+        },
+        {
+          "name": "Focus Weapon",
+          "description": "At 1st level, a warpriest receives Weapon Focus as a bonus feat (he can choose any weapon, not just his deity's favored weapon)."
+        },
+        {
+          "name": "Orisons",
+          "description": ""
+        },
+        {
+          "name": "Sacred Weapon",
+          "description": "Table: Small or Large Warpriest Sacred Weapon Damage Level Damage(Small) Damage(Large) 1st-4th 1d4 1d8 5th-9th 1d6 2d6 10th-14th 1d8 2d8 15th-19th 1d10 3d6 20th 2d6 3d8 At 1st level, weapons wielded by a warpriest are charged with the power of his faith. In addition to the favored weapon of his deity, the warpriest can designate a weapon as a sacred weapon by selecting that weapon with the Weapon Focus feat; if he has multiple Weapon Focus feats, this ability applies to all of them. Whenever the warpriest hits with his sacred weapon, the weapon damage is based on his level and not the weapon type. The damage for Medium warpriests is listed on Table 1-14; see the table below for Small and Large warpriests. The warpriest can decide to use the weapon's base damage instead of the sacred weapon damage-this must be declared before the attack roll is made. (If the weapon's base damage exceeds the sacred weapon damage, its damage is unchanged.) This increase in damage does not affect any other aspect of the weapon, and doesn't apply to alchemical items, bombs, or other weapons that only deal energy damage. At 4th level, the warpriest gains the ability to enhance one of his sacred weapons with divine power as a swift action . This power grants the weapon a +1 enhancement bonus . For every 4 levels beyond 4th, this bonus increases by 1 (to a maximum of +5 at 20th level). If the warpriest has more than one sacred weapon, he can enhance another on the following round by using another swift action . The warpriest can use this ability a number of rounds per day equal to"
+        }
+      ],
+      "spellcasting": {
+        "Sacred Weapon Damage*": "1d6",
+        "Spells per Day": "3"
+      }
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 3,
+      "ref": 0,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Fervor 1d6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Sacred Weapon Damage*": "1d6",
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 3,
+      "bab": 2,
+      "fort": 3,
+      "ref": 1,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Sacred Weapon Damage*": "1d6",
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 4,
+      "bab": 3,
+      "fort": 4,
+      "ref": 1,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Channel Energy",
+          "description": "Starting at 4th level, a warpriest can release a wave of energy by channeling the power of his faith through his holy (or unholy ) symbol. This energy can be used to deal or heal damage, depending on the type of energy channeled and the creatures targeted. Using this ability is a standard action that expends two uses of his fervor ability and doesn't provoke an attack of opportunity . The warpriest must present a holy (or unholy ) symbol to use this ability. A good warpriest (or one who worships a good deity) channels positive energy and can choose to heal living creatures or to deal damage to undead creatures. An evil warpriest (or one who worships an evil deity) channels negative energy and can choose to deal damage to living creatures or heal undead creatures. A neutral warpriest who worships a neutral deity (or one who is not devoted to a particular deity) channels positive energy if he chose to spontaneously cast cure spells or negative energy if he chose to spontaneously cast inflict spells. Channeling energy causes a burst that affects all creatures of one type (either undead or living) in a 30-foot radius centered on the warpriest. The amount of damage dealt or healed is equal to the amount listed in the fervor ability. Creatures that take damage from channeled energy must succeed at a Will saving throw to halve the damage. The save DC is 10 + 1/2 the warpriest's level + the warpriest's Wisdom modifier. Creatures healed by channeled energy cannot exceed their maximum hit point total-all excess healing is lost. A warpriest can choose whether or not "
+        },
+        {
+          "name": "Sacred Weapon +1",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Sacred Weapon Damage*": "1d6",
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 5,
+      "bab": 3,
+      "fort": 4,
+      "ref": 1,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Fervor 2d6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Sacred Weapon Damage*": "1d8",
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 6,
+      "bab": 4,
+      "fort": 5,
+      "ref": 2,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Sacred Weapon Damage*": "1d8",
+        "Spells per Day": "5"
+      }
+    },
+    {
+      "level": 7,
+      "bab": 5,
+      "fort": 5,
+      "ref": 2,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Sacred Armor +1",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Sacred Weapon Damage*": "1d8",
+        "Spells per Day": "5"
+      }
+    },
+    {
+      "level": 8,
+      "bab": 6,
+      "fort": 6,
+      "ref": 2,
+      "will": 6,
+      "classFeatures": [
+        {
+          "name": "Fervor 3d6",
+          "description": ""
+        },
+        {
+          "name": "Sacred Weapon +2",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Sacred Weapon Damage*": "1d8",
+        "Spells per Day": "5"
+      }
+    },
+    {
+      "level": 9,
+      "bab": 6,
+      "fort": 6,
+      "ref": 3,
+      "will": 6,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Sacred Weapon Damage*": "1d8",
+        "Spells per Day": "5"
+      }
+    },
+    {
+      "level": 10,
+      "bab": 7,
+      "fort": 7,
+      "ref": 3,
+      "will": 7,
+      "classFeatures": [
+        {
+          "name": "Blessings (Major)",
+          "description": "A warpriest's deity influences his alignment , what magic he can perform, his values, and how others see him. Each warpriest can select two blessings from among those granted by his deity (each deity grants the blessings tied to its domains). A warpriest can select an alignment blessing (Chaos, Evil, Good, or Law) only if his alignment matches that domain. If a warpriest isn't devoted to a particular deity, he still selects two blessings to represent his spiritual inclinations and abilities, subject to GM approval. The restriction on alignment domains still applies. Each blessing grants a minor power at 1st level and a major power at 10th level. A warpriest can call upon the power of his blessings a number of times per day (in any combination) equal to 3 + 1/2 his warpriest level (to a maximum of 13 times per day at 20th level). Each time he calls upon any one of his blessings, it counts against his daily limit. The save DC for these blessings is equal to 10 + 1/2 the warpriest's level + the warpriest's Wisdom modifier. If a warpriest also has levels in a class that grants cleric domains, the blessings chosen must match the domains selected by that class. Subject to GM discretion, the warpriest can change his former blessings or domains to make them conform. Blessings are here: Blessings."
+        },
+        {
+          "name": "Sacred Armor +2",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Sacred Weapon Damage*": "1d10",
+        "Spells per Day": "5"
+      }
+    },
+    {
+      "level": 11,
+      "bab": 8,
+      "fort": 7,
+      "ref": 3,
+      "will": 7,
+      "classFeatures": [
+        {
+          "name": "Fervor 4d6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Sacred Weapon Damage*": "1d10",
+        "Spells per Day": "5"
+      }
+    },
+    {
+      "level": 12,
+      "bab": 9,
+      "fort": 8,
+      "ref": 4,
+      "will": 8,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": ""
+        },
+        {
+          "name": "Sacred Weapon +3",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Sacred Weapon Damage*": "1d10",
+        "Spells per Day": "5"
+      }
+    },
+    {
+      "level": 13,
+      "bab": 9,
+      "fort": 8,
+      "ref": 4,
+      "will": 8,
+      "classFeatures": [
+        {
+          "name": "Sacred Armor +3",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Sacred Weapon Damage*": "1d10",
+        "Spells per Day": "5"
+      }
+    },
+    {
+      "level": 14,
+      "bab": 10,
+      "fort": 9,
+      "ref": 4,
+      "will": 9,
+      "classFeatures": [
+        {
+          "name": "Fervor 5d6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Sacred Weapon Damage*": "1d10",
+        "Spells per Day": "5"
+      }
+    },
+    {
+      "level": 15,
+      "bab": 11,
+      "fort": 9,
+      "ref": 5,
+      "will": 9,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Sacred Weapon Damage*": "2d6",
+        "Spells per Day": "5"
+      }
+    },
+    {
+      "level": 16,
+      "bab": 12,
+      "fort": 10,
+      "ref": 5,
+      "will": 10,
+      "classFeatures": [
+        {
+          "name": "Sacred Armor +4",
+          "description": ""
+        },
+        {
+          "name": "Sacred Weapon +4",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Sacred Weapon Damage*": "2d6",
+        "Spells per Day": "5"
+      }
+    },
+    {
+      "level": 17,
+      "bab": 12,
+      "fort": 10,
+      "ref": 5,
+      "will": 10,
+      "classFeatures": [
+        {
+          "name": "Fervor 6d6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Sacred Weapon Damage*": "2d6",
+        "Spells per Day": "5"
+      }
+    },
+    {
+      "level": 18,
+      "bab": 13,
+      "fort": 11,
+      "ref": 6,
+      "will": 11,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Sacred Weapon Damage*": "2d6",
+        "Spells per Day": "5"
+      }
+    },
+    {
+      "level": 19,
+      "bab": 14,
+      "fort": 11,
+      "ref": 6,
+      "will": 11,
+      "classFeatures": [
+        {
+          "name": "Sacred Armor +5",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Sacred Weapon Damage*": "2d6",
+        "Spells per Day": "5"
+      }
+    },
+    {
+      "level": 20,
+      "bab": 15,
+      "fort": 12,
+      "ref": 6,
+      "will": 12,
+      "classFeatures": [
+        {
+          "name": "Aspect Of War",
+          "description": "At 20th level, the warpriest can channel an aspect of war, growing in power and martial ability. Once per day as a swift action , a warpriest can treat his level as his base attack bonus , gains DR 10/-, and can move at his full speed regardless of the armor he is wearing or his encumbrance. In addition, the blessings he calls upon don't count against his daily limit during this time. This ability lasts for 1 minute."
+        },
+        {
+          "name": "Fervor 7d6",
+          "description": ""
+        },
+        {
+          "name": "Sacred Weapon +5",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Sacred Weapon Damage*": "2d8",
+        "Spells per Day": "5"
+      }
+    }
+  ],
+  "spellcasting": {
+    "summary": "prepared 2/3 caster using WIS",
+    "castingType": "prepared",
+    "progression": "2/3",
+    "ability": "wis",
+    "preparation": "daily-list",
+    "maxSpellLevel": 6,
+    "slotsByLevel": [
+      [
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        3,
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        4,
+        2,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        4,
+        3,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        4,
+        3,
+        1,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        4,
+        4,
+        2,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        5,
+        4,
+        3,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        5,
+        4,
+        3,
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        5,
+        4,
+        4,
+        2,
+        0,
+        0
+      ],
+      [
+        0,
+        5,
+        5,
+        4,
+        3,
+        0,
+        0
+      ],
+      [
+        0,
+        5,
+        5,
+        4,
+        3,
+        1,
+        0
+      ],
+      [
+        0,
+        5,
+        5,
+        4,
+        4,
+        2,
+        0
+      ],
+      [
+        0,
+        5,
+        5,
+        5,
+        4,
+        3,
+        0
+      ],
+      [
+        0,
+        5,
+        5,
+        5,
+        4,
+        3,
+        1
+      ],
+      [
+        0,
+        5,
+        5,
+        5,
+        4,
+        4,
+        2
+      ],
+      [
+        0,
+        5,
+        5,
+        5,
+        5,
+        4,
+        3
+      ],
+      [
+        0,
+        5,
+        5,
+        5,
+        5,
+        5,
+        4
+      ],
+      [
+        0,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5
+      ]
+    ]
+  },
+  "spellcastingClass": true
+}

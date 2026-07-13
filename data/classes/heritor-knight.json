@@ -1,0 +1,255 @@
+{
+  "name": "Heritor Knight",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/e-h/heritor-knight/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 1,
+      "fort": 1,
+      "ref": 0,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Skill And Heart As One",
+          "description": "If the heritor knight has the weapon training class feature , her heritor knight levels stack with her fighter levels for the purpose of that ability. In addition, heritor knight levels stack with fighter levels for the purpose of feat prerequisites."
+        },
+        {
+          "name": "Savior Of The Swallowed",
+          "description": "At 1st level, as a standard action , a heritor knight can make a melee attack with a longsword against a creature that is physically restraining an ally. This includes grappling , pinning, swallowing whole, and similar effects (at the GMÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s discretion). Resolve the attack normally, but if the attack roll equals or exceeds the creatureÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s CMD , the restraining effect is immediately ended."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 2,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "HeritorÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢S Honor",
+          "description": "At 2nd level, a heritor knight gains a bonus on Will saving throws thatÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s equal to her Charisma modifier. The bonus from this ability doesnÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢t stack with those from similar effects."
+        },
+        {
+          "name": "WitchesÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Woe",
+          "description": "At 2nd level, a heritor knight gains a bonus equal to half her class level on saves against hexes and curse effects. In addition, once per day, she can cast remove curse as a spell-like ability , with a caster level equal to her character level."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 3,
+      "bab": 3,
+      "fort": 2,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Skyreaver",
+          "description": "At 3rd level, as a standard action , a heritor knight can make a melee attack with a longsword against a flying creature (regardless of its method of flight). Resolve the attack normally, but any damage dealt is halved; in addition, if the attack roll equals or exceeds the creatureÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s CMD , the creature immediately stops flying and falls to the ground. For a number of rounds equal to the heritor knightÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Charisma modifier, the target creature takes a -20 penalty on all of its Fly checks."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 4,
+      "bab": 4,
+      "fort": 2,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Wraithwall",
+          "description": "At 4th level, once per day as a standard action , a heritor knight can inspire allies within 30 feet. Allies inspired this way treat all armor they wear as having the ghost touch special ability. In addition, inspired allies gain a +4 sacred bonus on saving throws against effects that would cause ability damage , ability drain , or negative levels . This effect lasts for 1 minute."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 5,
+      "bab": 5,
+      "fort": 3,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Mohrgbreaker",
+          "description": "At 5th level, as a standard action , a heritor knight can make a melee attack with a longsword against an undead creature. Resolve the attack normally, but the creature must succeed at a Will saving throw (DC = 10 + the heritor knightÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s level + her Charisma modifier) or lose all special attacks associated with its natural weapons or touch attacks for a number of rounds equal to the heritor knightÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Charisma modifier."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 6,
+      "bab": 6,
+      "fort": 3,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Mighty Strike",
+          "description": "At 6th level, a heritor knight gains Vital Strike and Improved Vital Strike as bonus feats. Whenever the heritor knight makes a melee attack as a standard action , she can apply the effects of Improved Vital Strike to that attack. If she has Greater Vital Strike , she can apply that featÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s effects instead."
+        },
+        {
+          "name": "Reforged Heart",
+          "description": "At 6th level, once per day, a heritor knight can cast greater make whole as a spell-like ability , with a caster level equal to her character level."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 7,
+      "bab": 7,
+      "fort": 4,
+      "ref": 2,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Image Of Divinity",
+          "description": "At 7th level, a humanoid heritor knightÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s appearance changes to superficially resemble the Inheritor herself, although she is still recognizable to those who know her, and her statistics do not change. Nonhumanoids do not change in appearance in this way. Three times per day as a swift action , the heritor knight can touch a creature. If the touched creature is good-aligned, it regains 1d6 hit points per class level of the heritor knight; evil-aligned creatures instead take that amount of damage. If this ability heals the target, the target is also affected by restoration . If this ability damages the target, the target must succeed at a Fortitude save (DC = 10 + the heritor knightÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s level + the heritor knightÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Charisma modifier) or become staggered for a number of rounds equal to the heritor knightÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Charisma bonus (minimum 1 round). Neutral-aligned creatures are unaffected."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 8,
+      "bab": 8,
+      "fort": 4,
+      "ref": 3,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Redeemer Of Undeath",
+          "description": "At 8th level, as a standard action , a heritor knight can make a melee attack with a longsword against an undead creature. Resolve the attack normally, but if the attack hits and the undead was good-aligned in life, it must succeed at a Will save (DC = 10 + the heritor knightÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s class level + her Charisma modifier) or be destroyed and redeemed of the evils of undeath, allowing the soul to reach a righteous afterlife. If the creature succeeds, it is immune to this ability for 24 hours."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 9,
+      "bab": 9,
+      "fort": 5,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Freed By Blood",
+          "description": "At 9th level, when an ally within 30 feet attempts a saving throw against a death, paralysis , or compulsion effect, the heritor knight can take up to 9 points of damage as an immediate action . The ally gains a sacred bonus on the saving throw equal to the damage taken. This ability must be used before the saving throw is rolled, and can be used three times per day."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 10,
+      "bab": 10,
+      "fort": 5,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Sky Stride",
+          "description": "At 10th level, a heritor knight is constantly under the effects of air walk . When the heritor knight moves through the air , her steps appear to be supported by crimson cloth that appears beneath her feet. Activating or deactivating this ability is a free action ."
+        },
+        {
+          "name": "Unveiling Mistress",
+          "description": "Once per day at 10th level, a heritor knight can emit an unveiling aura as a free action . The true form of any creature within 30 feet is revealed, although polymorph and similar physical effects are not removed (remaining visible as a ghostly overlay). This aura lasts for 1 minute. Section 15: Copyright Notice Pathfinder Player Companion: Paths of the Righteous Ãƒâ€šÃ‚Â© 2016, Paizo Inc.; Authors: Alexander Augunas, John Compton, Jenny Jarzabski, Isabelle Lee, Stephen Rowe, and Owen K.C. Stephens."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": null,
+  "spellcastingClass": false
+}

@@ -1,0 +1,552 @@
+{
+  "name": "Slayer",
+  "type": "hybrid",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/hybrid-classes/slayer/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 1,
+      "fort": 2,
+      "ref": 2,
+      "will": 0,
+      "classFeatures": [
+        {
+          "name": "Studied Target",
+          "description": "[Errata] A slayer can study an opponent he can see as a move action . The slayer then gains a +1 bonus on Bluff , Knowledge , Perception , Sense Motive , and Survival checks attempted against that opponent, and a +1 bonus on weapon attack and damage rolls against it. The DCs of slayer class abilities against that opponent increase by 1. A slayer can only maintain these bonuses against one opponent at a time; these bonuses remain in effect until either the opponent is dead or the slayer studies a new target. If a slayer deals sneak attack damage to a target, he can study that target as an immediate action , allowing him to apply his studied target bonuses against that target (including to the normal weapon damage roll). At 5th, 10th, 15th, and 20th levels, the bonuses on weapon attack rolls , damage rolls , and skill checks and to slayer DCs against a studied target increase by 1. In addition, at each such interval, the slayer is able to maintain these bonuses against an additional studied target at the same time. The slayer may discard this connection to a studied target as a free action , allowing him to study another target in its place. At 7th level, a slayer can study an opponent as a move or swift action ."
+        },
+        {
+          "name": "Track",
+          "description": "A slayer adds 1/2 his level (minimum 1) to Survival skill checks made to follow tracks."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 2,
+      "bab": 2,
+      "fort": 3,
+      "ref": 3,
+      "will": 0,
+      "classFeatures": [
+        {
+          "name": "Slayer Talent",
+          "description": "",
+          "pools": [
+            {
+              "name": "Slayer Talent",
+              "description": "",
+              "requirements": {},
+              "options": [
+                {
+                  "name": "Slayer Talents",
+                  "description": "As a slayer gains experience, he learns a number of talents that aid him and confound his foes. Starting at 2nd level and every 2 levels thereafter, a slayer gains one slayer talent. Unless otherwise noted, a slayer cannot select an individual talent more than once. Talents marked with an asterisk (*) add effects to a slayer&#8217;s sneak attack . Only one of these talents can be applied to an individual attack, and the decision of which to use must be made before the attack roll is made. A complete listing of slayer talents can be found here: Slayer Talents",
+                  "requirements": {
+                    "minClassLevel": 2,
+                    "text": "Starting at 2nd level and every 2 levels thereafter, a slayer gains one slayer talent. Only one of these talents can be applied to an individual attack, and the decision of which to use must be made before the attack roll is made."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/hybrid-classes/slayer/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 3,
+      "bab": 3,
+      "fort": 3,
+      "ref": 3,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Sneak Attack +1d6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 4,
+      "bab": 4,
+      "fort": 4,
+      "ref": 4,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Slayer Talent",
+          "description": "",
+          "pools": [
+            {
+              "name": "Slayer Talent",
+              "description": "",
+              "requirements": {},
+              "options": [
+                {
+                  "name": "Slayer Talents",
+                  "description": "As a slayer gains experience, he learns a number of talents that aid him and confound his foes. Starting at 2nd level and every 2 levels thereafter, a slayer gains one slayer talent. Unless otherwise noted, a slayer cannot select an individual talent more than once. Talents marked with an asterisk (*) add effects to a slayer&#8217;s sneak attack . Only one of these talents can be applied to an individual attack, and the decision of which to use must be made before the attack roll is made. A complete listing of slayer talents can be found here: Slayer Talents",
+                  "requirements": {
+                    "minClassLevel": 2,
+                    "text": "Starting at 2nd level and every 2 levels thereafter, a slayer gains one slayer talent. Only one of these talents can be applied to an individual attack, and the decision of which to use must be made before the attack roll is made."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/hybrid-classes/slayer/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 5,
+      "bab": 5,
+      "fort": 4,
+      "ref": 4,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "2Nd Studied Target",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 6,
+      "bab": 6,
+      "fort": 5,
+      "ref": 5,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Slayer Talent",
+          "description": "",
+          "pools": [
+            {
+              "name": "Slayer Talent",
+              "description": "",
+              "requirements": {},
+              "options": [
+                {
+                  "name": "Slayer Talents",
+                  "description": "As a slayer gains experience, he learns a number of talents that aid him and confound his foes. Starting at 2nd level and every 2 levels thereafter, a slayer gains one slayer talent. Unless otherwise noted, a slayer cannot select an individual talent more than once. Talents marked with an asterisk (*) add effects to a slayer&#8217;s sneak attack . Only one of these talents can be applied to an individual attack, and the decision of which to use must be made before the attack roll is made. A complete listing of slayer talents can be found here: Slayer Talents",
+                  "requirements": {
+                    "minClassLevel": 2,
+                    "text": "Starting at 2nd level and every 2 levels thereafter, a slayer gains one slayer talent. Only one of these talents can be applied to an individual attack, and the decision of which to use must be made before the attack roll is made."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/hybrid-classes/slayer/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        },
+        {
+          "name": "Sneak Attack +2d6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 7,
+      "bab": 7,
+      "fort": 5,
+      "ref": 5,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Stalker",
+          "description": "At 7th level, a slayer gains his studied target bonus on Disguise , Intimidate , and Stealth checks against his studied opponent."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 8,
+      "bab": 8,
+      "fort": 6,
+      "ref": 6,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Slayer Talent",
+          "description": "",
+          "pools": [
+            {
+              "name": "Slayer Talent",
+              "description": "",
+              "requirements": {},
+              "options": [
+                {
+                  "name": "Slayer Talents",
+                  "description": "As a slayer gains experience, he learns a number of talents that aid him and confound his foes. Starting at 2nd level and every 2 levels thereafter, a slayer gains one slayer talent. Unless otherwise noted, a slayer cannot select an individual talent more than once. Talents marked with an asterisk (*) add effects to a slayer&#8217;s sneak attack . Only one of these talents can be applied to an individual attack, and the decision of which to use must be made before the attack roll is made. A complete listing of slayer talents can be found here: Slayer Talents",
+                  "requirements": {
+                    "minClassLevel": 2,
+                    "text": "Starting at 2nd level and every 2 levels thereafter, a slayer gains one slayer talent. Only one of these talents can be applied to an individual attack, and the decision of which to use must be made before the attack roll is made."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/hybrid-classes/slayer/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 9,
+      "bab": 9,
+      "fort": 6,
+      "ref": 6,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Sneak Attack +3d6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 10,
+      "bab": 10,
+      "fort": 7,
+      "ref": 7,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "3Rd Studied Target",
+          "description": ""
+        },
+        {
+          "name": "Advanced Talents",
+          "description": "At 10th level and every 2 levels thereafter, a slayer can select one of the following advanced talents in place of a slayer talent. A complete listing of slayer advanced talents can be found here: Slayer Advanced Talents",
+          "pools": [
+            {
+              "name": "Advanced Talents",
+              "description": "At 10th level and every 2 levels thereafter, a slayer can select one of the following advanced talents in place of a slayer talent. A complete listing of slayer advanced talents can be found here: Slayer Advanced Talents",
+              "requirements": {
+                "minClassLevel": 2,
+                "text": "At 10th level and every 2 levels thereafter, a slayer can select one of the following advanced talents in place of a slayer talent."
+              },
+              "options": [
+                {
+                  "name": "Advanced Talents",
+                  "description": "At 10th level and every 2 levels thereafter, a slayer can select one of the following advanced talents in place of a slayer talent. A complete listing of slayer advanced talents can be found here: Slayer Advanced Talents",
+                  "requirements": {
+                    "minClassLevel": 2,
+                    "text": "At 10th level and every 2 levels thereafter, a slayer can select one of the following advanced talents in place of a slayer talent."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/hybrid-classes/slayer/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        },
+        {
+          "name": "Slayer Talent",
+          "description": "",
+          "pools": [
+            {
+              "name": "Slayer Talent",
+              "description": "",
+              "requirements": {},
+              "options": [
+                {
+                  "name": "Slayer Talents",
+                  "description": "As a slayer gains experience, he learns a number of talents that aid him and confound his foes. Starting at 2nd level and every 2 levels thereafter, a slayer gains one slayer talent. Unless otherwise noted, a slayer cannot select an individual talent more than once. Talents marked with an asterisk (*) add effects to a slayer&#8217;s sneak attack . Only one of these talents can be applied to an individual attack, and the decision of which to use must be made before the attack roll is made. A complete listing of slayer talents can be found here: Slayer Talents",
+                  "requirements": {
+                    "minClassLevel": 2,
+                    "text": "Starting at 2nd level and every 2 levels thereafter, a slayer gains one slayer talent. Only one of these talents can be applied to an individual attack, and the decision of which to use must be made before the attack roll is made."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/hybrid-classes/slayer/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 11,
+      "bab": 11,
+      "fort": 7,
+      "ref": 7,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Swift Tracker",
+          "description": "At 11th level, a slayer can move at his normal speed while using Survival to follow tracks without taking the normal -5 penalty. When moving at up to twice his normal speed while tracking, he takes only a -10 penalty instead of the normal -20."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 12,
+      "fort": 8,
+      "ref": 8,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Slayer Talent",
+          "description": "",
+          "pools": [
+            {
+              "name": "Slayer Talent",
+              "description": "",
+              "requirements": {},
+              "options": [
+                {
+                  "name": "Slayer Talents",
+                  "description": "As a slayer gains experience, he learns a number of talents that aid him and confound his foes. Starting at 2nd level and every 2 levels thereafter, a slayer gains one slayer talent. Unless otherwise noted, a slayer cannot select an individual talent more than once. Talents marked with an asterisk (*) add effects to a slayer&#8217;s sneak attack . Only one of these talents can be applied to an individual attack, and the decision of which to use must be made before the attack roll is made. A complete listing of slayer talents can be found here: Slayer Talents",
+                  "requirements": {
+                    "minClassLevel": 2,
+                    "text": "Starting at 2nd level and every 2 levels thereafter, a slayer gains one slayer talent. Only one of these talents can be applied to an individual attack, and the decision of which to use must be made before the attack roll is made."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/hybrid-classes/slayer/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        },
+        {
+          "name": "Sneak Attack +4d6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 13,
+      "fort": 8,
+      "ref": 8,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Slayer'S Advance 1/Day",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 14,
+      "fort": 9,
+      "ref": 9,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Quarry",
+          "description": "At 14th level, a slayer can as a standard action denote one target within his line of sight as his quarry. Whenever he is following the tracks of his quarry, a slayer can take 10 on his Survival skill checks while moving at normal speed , without penalty. In addition, he gains a +2 insight bonus on attack rolls made against his quarry, and all critical threats against his quarry are automatically confirmed. A slayer can have no more than one quarry at a time, and the target must be selected as a studied target . He can dismiss this effect at any time as a free action , but he cannot select a new quarry target for 24 hours. If the slayer sees proof that his quarry is dead , he can select a new quarry target after 1 hour."
+        },
+        {
+          "name": "Slayer Talent",
+          "description": "",
+          "pools": [
+            {
+              "name": "Slayer Talent",
+              "description": "",
+              "requirements": {},
+              "options": [
+                {
+                  "name": "Slayer Talents",
+                  "description": "As a slayer gains experience, he learns a number of talents that aid him and confound his foes. Starting at 2nd level and every 2 levels thereafter, a slayer gains one slayer talent. Unless otherwise noted, a slayer cannot select an individual talent more than once. Talents marked with an asterisk (*) add effects to a slayer&#8217;s sneak attack . Only one of these talents can be applied to an individual attack, and the decision of which to use must be made before the attack roll is made. A complete listing of slayer talents can be found here: Slayer Talents",
+                  "requirements": {
+                    "minClassLevel": 2,
+                    "text": "Starting at 2nd level and every 2 levels thereafter, a slayer gains one slayer talent. Only one of these talents can be applied to an individual attack, and the decision of which to use must be made before the attack roll is made."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/hybrid-classes/slayer/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 15,
+      "fort": 9,
+      "ref": 9,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "4Th Studied Target",
+          "description": ""
+        },
+        {
+          "name": "Sneak Attack +5d6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 16,
+      "fort": 10,
+      "ref": 10,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Slayer Talent",
+          "description": "",
+          "pools": [
+            {
+              "name": "Slayer Talent",
+              "description": "",
+              "requirements": {},
+              "options": [
+                {
+                  "name": "Slayer Talents",
+                  "description": "As a slayer gains experience, he learns a number of talents that aid him and confound his foes. Starting at 2nd level and every 2 levels thereafter, a slayer gains one slayer talent. Unless otherwise noted, a slayer cannot select an individual talent more than once. Talents marked with an asterisk (*) add effects to a slayer&#8217;s sneak attack . Only one of these talents can be applied to an individual attack, and the decision of which to use must be made before the attack roll is made. A complete listing of slayer talents can be found here: Slayer Talents",
+                  "requirements": {
+                    "minClassLevel": 2,
+                    "text": "Starting at 2nd level and every 2 levels thereafter, a slayer gains one slayer talent. Only one of these talents can be applied to an individual attack, and the decision of which to use must be made before the attack roll is made."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/hybrid-classes/slayer/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 17,
+      "fort": 10,
+      "ref": 10,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Slayer'S Advance 2/Day",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 18,
+      "fort": 11,
+      "ref": 11,
+      "will": 6,
+      "classFeatures": [
+        {
+          "name": "Slayer Talent",
+          "description": "",
+          "pools": [
+            {
+              "name": "Slayer Talent",
+              "description": "",
+              "requirements": {},
+              "options": [
+                {
+                  "name": "Slayer Talents",
+                  "description": "As a slayer gains experience, he learns a number of talents that aid him and confound his foes. Starting at 2nd level and every 2 levels thereafter, a slayer gains one slayer talent. Unless otherwise noted, a slayer cannot select an individual talent more than once. Talents marked with an asterisk (*) add effects to a slayer&#8217;s sneak attack . Only one of these talents can be applied to an individual attack, and the decision of which to use must be made before the attack roll is made. A complete listing of slayer talents can be found here: Slayer Talents",
+                  "requirements": {
+                    "minClassLevel": 2,
+                    "text": "Starting at 2nd level and every 2 levels thereafter, a slayer gains one slayer talent. Only one of these talents can be applied to an individual attack, and the decision of which to use must be made before the attack roll is made."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/hybrid-classes/slayer/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        },
+        {
+          "name": "Sneak Attack +6d6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 19,
+      "fort": 11,
+      "ref": 11,
+      "will": 6,
+      "classFeatures": [
+        {
+          "name": "Improved Quarry",
+          "description": "At 19th level, the slayer's ability to hunt his quarry improves. He can now select a quarry as a free action , and can now take 20 while using Survival to track his quarry, while moving at normal speed without penalty. His insight bonus to attack his quarry increases to +4. If his quarry is killed or dismissed, he can select a new one after 10 minutes have passed."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 20,
+      "fort": 12,
+      "ref": 12,
+      "will": 6,
+      "classFeatures": [
+        {
+          "name": "5Th Studied Target",
+          "description": ""
+        },
+        {
+          "name": "Master Slayer",
+          "description": "At 20th level, the slayer becomes a master at capturing or killing his studied targets . As a standard action , he can make a single attack against a studied target at his full attack bonus , choosing one of the following effects: kill, knock unconscious for 1d4 hours, or paralyze for 2d6 rounds . If the attack succeeds, the target takes damage normally and must succeed at a Fortitude saving throw or suffer the additional effect. The DC for this save is 10 + 1/2 the slayer's level + the slayer's Intelligence modifier. Whether or not the target succeeds, it cannot be targeted by this ability again (by any slayer) for 24 hours."
+        },
+        {
+          "name": "Slayer Talent",
+          "description": "",
+          "pools": [
+            {
+              "name": "Slayer Talent",
+              "description": "",
+              "requirements": {},
+              "options": [
+                {
+                  "name": "Slayer Talents",
+                  "description": "As a slayer gains experience, he learns a number of talents that aid him and confound his foes. Starting at 2nd level and every 2 levels thereafter, a slayer gains one slayer talent. Unless otherwise noted, a slayer cannot select an individual talent more than once. Talents marked with an asterisk (*) add effects to a slayer&#8217;s sneak attack . Only one of these talents can be applied to an individual attack, and the decision of which to use must be made before the attack roll is made. A complete listing of slayer talents can be found here: Slayer Talents",
+                  "requirements": {
+                    "minClassLevel": 2,
+                    "text": "Starting at 2nd level and every 2 levels thereafter, a slayer gains one slayer talent. Only one of these talents can be applied to an individual attack, and the decision of which to use must be made before the attack roll is made."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/hybrid-classes/slayer/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        }
+      ],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": null,
+  "spellcastingClass": false
+}

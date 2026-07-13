@@ -1,0 +1,277 @@
+{
+  "name": "Ashavic Dancer",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/a-b/ashavic-dancer/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 0,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Ashavic Performance ( Move Action )",
+          "description": "An Ashavic dancer can use Perform (dance) to create magical effects, as per the bardic performance bard class feature, for a number of rounds per day equal to twice his Ashavic dancer level. He can also use rounds of bardic performance gained from bard levels to perform Ashavic performances, and vice versa. Starting an Ashavic performance is a move action , but it can be maintained each round as a free action . If the Ashavic dancer has bardic performance , he can also start bardic performances as a move action instead of a standard action even if he does not have sufficient bard levels to do so. The performance cannot be disrupted, but ends immediately if the dancer is killed, paralyzed , stunned , knocked unconscious , or otherwise prevented from taking a free action to maintain it each round. The performance counts as a bardic performance for the purpose of determining how many performances the dancer can have in effect at one time. The performance has visual components but not audible components . At 7th level, an Ashavic dancer can start an Ashavic performance or a bardic performance as a swift action . The save DC against an Ashavic dancerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s performance is equal to 10 + the Ashavic dancerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s class level + his Charisma modifier. The performance abilities that an Ashavic dancer gains are noted below."
+        },
+        {
+          "name": "Deathwaking Dance",
+          "description": "At 1st level, an Ashavic dancer can unravel undead and haunts. When he starts the performance and each round he maintains it, all haunts and undead creatures within 30 feet take positive energy damage equal to 1d6 + the Ashavic dancerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Charisma modifier. A successful Will save negates this damage."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "-"
+      }
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Ashavic Rites",
+          "description": "At 2nd level, an Ashavic dancerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s mind-affecting Ashavic performances overcome an undead creatureÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s immunity to mind-affecting effects, even if the undead is mindless. While maintaining any Ashavic or bardic performance , he can spend 1 additional round of the performance when he casts a mind-affecting spell to allow that spell to overcome an undead creatureÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s immunity to mind-affecting effects as well."
+        },
+        {
+          "name": "Peerless Dancer",
+          "description": "At 2nd level, an Ashavic dancer gains versatile performance , as per the bard class feature. He must choose Perform (dance) as his Perform skill with this ability. If he had versatile performance in Perform (dance) before adding his first level in this prestige class, he gains Skill Focus ( Perform [dance]) as a bonus feat instead. At 6th level, an Ashavic dancer chooses one of the following skills and adds it to the list of skills that are associated with Perform (dance) for the purpose of versatile performance : Bluff , Diplomacy , Intimidate , or Sense Motive . He chooses a second skill at 8th level and a third skill at 10th level."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 3,
+      "bab": 2,
+      "fort": 1,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Untethering Steps",
+          "description": "At 3rd level, an Ashavic dancer can use his performance to hinder one or more undead creatures within 30 feet to which the dancer has line of sight. For every 2 class levels the Ashavic dancer has attained beyond 3rd, he can target one additional creature. Each round he maintains the performance, the Ashavic dancer attempts a Perform (dance) skill check and compares the result to all of the targetsÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ CMD scores. Any target whose CMD is equaled or exceeded by the result of the Perform (dance) check becomes sickened by the dancerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s movements for 1 round. Any target with a CMD that is exceeded by 10 or more also becomes staggered for 1 round."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 4,
+      "bab": 3,
+      "fort": 1,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Ghostly Grace (Self)",
+          "description": "At 4th level, during an Ashavic dancerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Ashavic performance, all weapon attacks he makes are treated as if they had the ghost touch weapon special ability, and his spells have their full effect against incorporeal creatures, as per the Ectoplasmic Spell feat. At 9th level, allies within 30 feet also receive these benefits during his Ashavic performance. Section 15: Copyright Notice Pathfinder Player Companion: Paths of the Righteous Ãƒâ€šÃ‚Â© 2016, Paizo Inc.; Authors: Alexander Augunas, John Compton, Jenny Jarzabski, Isabelle Lee, Stephen Rowe, and Owen K.C. Stephens."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 5,
+      "bab": 3,
+      "fort": 2,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Peerless Dancer (First Skill)",
+          "description": "At 2nd level, an Ashavic dancer gains versatile performance , as per the bard class feature. He must choose Perform (dance) as his Perform skill with this ability. If he had versatile performance in Perform (dance) before adding his first level in this prestige class, he gains Skill Focus ( Perform [dance]) as a bonus feat instead. At 6th level, an Ashavic dancer chooses one of the following skills and adds it to the list of skills that are associated with Perform (dance) for the purpose of versatile performance : Bluff , Diplomacy , Intimidate , or Sense Motive . He chooses a second skill at 8th level and a third skill at 10th level."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 6,
+      "bab": 4,
+      "fort": 2,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Soothing Performance",
+          "description": "At 6th level, an Ashavic dancer gains the soothing performance bardic performance ."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 7,
+      "bab": 5,
+      "fort": 2,
+      "ref": 4,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Ashavic Performance ( Swift Action )",
+          "description": "An Ashavic dancer can use Perform (dance) to create magical effects, as per the bardic performance bard class feature, for a number of rounds per day equal to twice his Ashavic dancer level. He can also use rounds of bardic performance gained from bard levels to perform Ashavic performances, and vice versa. Starting an Ashavic performance is a move action , but it can be maintained each round as a free action . If the Ashavic dancer has bardic performance , he can also start bardic performances as a move action instead of a standard action even if he does not have sufficient bard levels to do so. The performance cannot be disrupted, but ends immediately if the dancer is killed, paralyzed , stunned , knocked unconscious , or otherwise prevented from taking a free action to maintain it each round. The performance counts as a bardic performance for the purpose of determining how many performances the dancer can have in effect at one time. The performance has visual components but not audible components . At 7th level, an Ashavic dancer can start an Ashavic performance or a bardic performance as a swift action . The save DC against an Ashavic dancerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s performance is equal to 10 + the Ashavic dancerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s class level + his Charisma modifier. The performance abilities that an Ashavic dancer gains are noted below."
+        },
+        {
+          "name": "ExorcistÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢S Waltz",
+          "description": "At 7th level, an Ashavic dancer can use his Ashavic performance to attempt to end an ongoing compulsion or possession effect. Using this ability requires 4 rounds of consecutive performance, and the target must be able to see the dancer perform and be within 30 feet. If the target is possessed, the target gains a new saving throw to end the possession effect; otherwise, this functions as break enchantment , using the Ashavic dancerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s caster level for the effect. Any possessing entity cast out in this manner cannot attempt to possess that target again for 24 hours."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 8,
+      "bab": 6,
+      "fort": 3,
+      "ref": 4,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Peerless Dancer (Second Skill)",
+          "description": "At 2nd level, an Ashavic dancer gains versatile performance , as per the bard class feature. He must choose Perform (dance) as his Perform skill with this ability. If he had versatile performance in Perform (dance) before adding his first level in this prestige class, he gains Skill Focus ( Perform [dance]) as a bonus feat instead. At 6th level, an Ashavic dancer chooses one of the following skills and adds it to the list of skills that are associated with Perform (dance) for the purpose of versatile performance : Bluff , Diplomacy , Intimidate , or Sense Motive . He chooses a second skill at 8th level and a third skill at 10th level."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 9,
+      "bab": 6,
+      "fort": 3,
+      "ref": 5,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Ghostly Grace (Allies)",
+          "description": "At 4th level, during an Ashavic dancerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Ashavic performance, all weapon attacks he makes are treated as if they had the ghost touch weapon special ability, and his spells have their full effect against incorporeal creatures, as per the Ectoplasmic Spell feat. At 9th level, allies within 30 feet also receive these benefits during his Ashavic performance. Section 15: Copyright Notice Pathfinder Player Companion: Paths of the Righteous Ãƒâ€šÃ‚Â© 2016, Paizo Inc.; Authors: Alexander Augunas, John Compton, Jenny Jarzabski, Isabelle Lee, Stephen Rowe, and Owen K.C. Stephens."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 10,
+      "bab": 7,
+      "fort": 3,
+      "ref": 5,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Peerless Dancer (Third Skill)",
+          "description": "At 2nd level, an Ashavic dancer gains versatile performance , as per the bard class feature. He must choose Perform (dance) as his Perform skill with this ability. If he had versatile performance in Perform (dance) before adding his first level in this prestige class, he gains Skill Focus ( Perform [dance]) as a bonus feat instead. At 6th level, an Ashavic dancer chooses one of the following skills and adds it to the list of skills that are associated with Perform (dance) for the purpose of versatile performance : Bluff , Diplomacy , Intimidate , or Sense Motive . He chooses a second skill at 8th level and a third skill at 10th level."
+        },
+        {
+          "name": "True SparkÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢S Guidance",
+          "description": "At 10th level, an Ashavic dancer can lure the dead back into their graves. He can target one undead creature within 60 feet each round he maintains this performance-the targeted undead can resist the effects with a successful Will save. If the creature first became undead within the affected area, or if an open grave under the effects of hallow or consecrate is in the area, the undead takes a -4 penalty on this saving throw. On a successful saving throw, the targetÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s speed is halved for 1 round (this includes all forms of movement such as fly or swim). If the undead fails its save, it immediately takes 10 points of damage per class level of the Ashavic dancer and is staggered for 1 round, and it takes a -4 penalty on future saving throws against this performance for 24 hours."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": {
+    "summary": "See level progression spell columns."
+  },
+  "spellcastingClass": true
+}

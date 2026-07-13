@@ -1,0 +1,712 @@
+{
+  "name": "Summoner (Unchained)",
+  "type": "unchained",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/unchained-classes/summoner-unchained/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Cantrips",
+          "description": ""
+        },
+        {
+          "name": "Eidolon",
+          "description": "A summoner begins play with the ability to summon to his side a powerful outsider called an eidolon. The eidolon forms a link with the summoner, who forever after summons an aspect of the same creature. Each eidolon has a subtype, chosen when the eidolon is first summoned, that determines its origin and many of its abilities. An eidolon must be within one alignment step of the summoner who calls it (so a neutral good summoner can call a neutral, lawful good, or chaotic good eidolon) and can speak all of his languages. An eidolon is treated as a summoned creature, except it is not sent back to its home plane until reduced to a number of negative hit points equal to or greater than its Constitution score. In addition, due to its tie to its summoner, an eidolon can touch and attack creatures warded by protection from evil and similar effects that prevent contact with summoned creatures. A summoner can summon his eidolon in a ritual that takes 1 minute to perform. When summoned in this way, the eidolon's hit points are unchanged from the last time it was summoned. The only exception to this is if the eidolon was slain, in which case it returns with half its normal hit points . The eidolon does not heal naturally. The eidolon remains until dismissed by the summoner (a standard action ). If the eidolon is sent back to its home plane due to death, it cannot be summoned again until the following day. The eidolon cannot be sent back to its home plane by means of dispel magic , but spells such as dismissal and banishment function normally. If the summoner is unconscious , aslee"
+        },
+        {
+          "name": "Life Link",
+          "description": "At 1st level, a summoner forms a close bond with his eidolon . Whenever the eidolon takes enough damage to send it back to its home plane, as a reaction to the damage, the summoner can sacrifice any number of hit points he has without using an action. Each hit point sacrificed in this way prevents 1 point of damage dealt to the eidolon . This can prevent the eidolon from being sent back to its home plane. In addition, the eidolon and the summoner must remain within 100 feet of one another for the eidolon to remain at full strength. If the eidolon is beyond 100 feet but closer than 1,000 feet, its current and maximum hit point totals are reduced by 50%. If the eidolon is more than 1,000 feet away but closer than 10,000 feet, its current and maximum hit point totals are reduced by 75%. If the eidolon is more than 10,000 feet away, it is immediately returned to its home plane. Current hit points lost in this way are not restored when the eidolon gets closer to its summoner, but its maximum hit point total does climb to the levels indicated and eventually returns to normal."
+        },
+        {
+          "name": "Summon Monster I",
+          "description": "At 1st level, a summoner can cast summon monster I as a spell-like ability a number of times per day equal to 3 + his Charisma modifier. Drawing on this ability uses up the same power that the summoner uses to call his eidolon . As a result, he can use this ability only when his eidolon is not summoned. He can cast this spell as a standard action , and the creatures remain for 1 minute per level (instead of 1 round per level). At 3rd level, and every 2 levels thereafter, the power of this ability increases by 1 spell level, allowing him to summon more powerful creatures (to a maximum of summon monster IX at 17th level). At 19th level, this ability can be used as gate or summon monster IX . If used as gate , the summoner must pay any required material components . A summoner cannot have more than one summon monster or gate spell active in this way at one time. If this ability is used again, any existing summon monster or gate from this spell-like ability immediately ends. These summon spells are considered to be part of the summoner's spell list for the purposes of spell trigger and spell completion items. In addition, the summoner can expend uses of this ability to fulfill the construction requirements of any magic item he creates, so long as he can use this ability to cast the required spell."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "1"
+      }
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 0,
+      "ref": 0,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Bond Senses",
+          "description": "At 2nd level, a summoner can, as a standard action , share the senses of his eidolon , hearing, seeing, smelling, tasting, and touching everything the eidolon does. He can use this ability a number of rounds per day equal to his summoner level. There is no maximum range to this effect, but the eidolon and the summoner must be on the same plane. The summoner can end this effect as a free action ."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "2"
+      }
+    },
+    {
+      "level": 3,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Summon Monster II",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "3"
+      }
+    },
+    {
+      "level": 4,
+      "bab": 3,
+      "fort": 1,
+      "ref": 1,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Shield Ally",
+          "description": "At 4th level, whenever a summoner is within his eidolon's reach, the summoner gains a +2 shield bonus to his Armor Class and a +2 circumstance bonus on his saving throws. This bonus does not apply if the eidolon is grappled , helpless , paralyzed , stunned , or unconscious ."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "3"
+      }
+    },
+    {
+      "level": 5,
+      "bab": 3,
+      "fort": 1,
+      "ref": 1,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Summon Monster III",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 6,
+      "bab": 4,
+      "fort": 2,
+      "ref": 2,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "MakerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢S Call",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 7,
+      "bab": 5,
+      "fort": 2,
+      "ref": 2,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Summon Monster IV",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 8,
+      "bab": 6,
+      "fort": 2,
+      "ref": 2,
+      "will": 6,
+      "classFeatures": [
+        {
+          "name": "Transposition",
+          "description": "At 8th level, a summoner can use his maker's call ability to swap locations with his eidolon . If the eidolon occupies more squares than the summoner, the summoner can appear in any square occupied by the eidolon . The eidolon must occupy the square that was occupied by the summoner if able, or as close as possible if it is not able."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 9,
+      "bab": 6,
+      "fort": 3,
+      "ref": 3,
+      "will": 6,
+      "classFeatures": [
+        {
+          "name": "Summon Monster V",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "5"
+      }
+    },
+    {
+      "level": 10,
+      "bab": 7,
+      "fort": 3,
+      "ref": 3,
+      "will": 7,
+      "classFeatures": [
+        {
+          "name": "Aspect",
+          "description": "At 10th level, a summoner can divert up to 2 points from his eidolon's evolution pool to add evolutions to himself. He cannot select any evolution that the eidolon could not possess, and he must be able to meet the requirements as well (except for subtype requirements, so long as his eidolon meets the subtype requirement). He cannot select the ability increase evolution through this ability. Any points spent in this way are taken from the eidolon's evolution pool (reducing the total number available to the eidolon ). The summoner can change the evolutions granted by these points anytime he can change the eidolon's evolutions."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "5"
+      }
+    },
+    {
+      "level": 11,
+      "bab": 8,
+      "fort": 3,
+      "ref": 3,
+      "will": 7,
+      "classFeatures": [
+        {
+          "name": "Summon Monster VI",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "5"
+      }
+    },
+    {
+      "level": 12,
+      "bab": 9,
+      "fort": 4,
+      "ref": 4,
+      "will": 8,
+      "classFeatures": [
+        {
+          "name": "Greater Shield Ally",
+          "description": "At 12th level, whenever an ally is within reach of the summoner's eidolon , the ally gains a +2 shield bonus to its Armor Class and a +2 circumstance bonus on its saving throws. If this ally is the summoner, these bonuses increase to +4. This bonus does not apply if the eidolon is grappled , helpless , paralyzed , stunned , or unconscious ."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "5"
+      }
+    },
+    {
+      "level": 13,
+      "bab": 9,
+      "fort": 4,
+      "ref": 4,
+      "will": 8,
+      "classFeatures": [
+        {
+          "name": "Summon Monster VII",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "5"
+      }
+    },
+    {
+      "level": 14,
+      "bab": 10,
+      "fort": 4,
+      "ref": 4,
+      "will": 9,
+      "classFeatures": [
+        {
+          "name": "Life Bond",
+          "description": "At 14th level, the summoner's life becomes linked to his eidolon's . As long as the eidolon has 1 or more hit points , the summoner is protected from harm. Damage in excess of that which would reduce the summoner to 0 hit points is instead transferred to the eidolon . This damage is transferred 1 point at a time, meaning that as soon as the eidolon is reduced to a number of negative hit points equal to its Constitution score, all excess damage remains with the summoner. Effects that cause death but don't deal damage are unaffected by this ability. This ability does not affect spells such as baleful polymorph , flesh to stone , imprisonment , or other spells that don't deal damage."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "5"
+      }
+    },
+    {
+      "level": 15,
+      "bab": 11,
+      "fort": 5,
+      "ref": 5,
+      "will": 9,
+      "classFeatures": [
+        {
+          "name": "Summon Monster VIII",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "5"
+      }
+    },
+    {
+      "level": 16,
+      "bab": 12,
+      "fort": 5,
+      "ref": 5,
+      "will": 10,
+      "classFeatures": [
+        {
+          "name": "Merge Forms",
+          "description": "At 16th level, as a full-round action , a summoner can touch his eidolon and the two can merge forms. This transformation includes all of the summoner's gear. While merged in this way, the summoner is protected from harm and cannot be the target of spells or effects. All effects and spells currently targeting the summoner are suspended until the summoner emerges from the eidolon (although durations continue to expire). The summoner can cast spells while inside the eidolon by taking control of the eidolon for the duration of the casting. Any material components used for these spells are taken from the summoner's gear, even though they are otherwise inaccessible. The summoner can direct all of the eidolon's actions while merged, can perceive through its senses, and can speak through its voice. The summoner can use this ability for a number of rounds per day equal to his summoner level. He can end this effect at any time as a swift action . The summoner emerges in a square adjacent to the eidolon if able. If the eidolon is returned to its home plane while the summoner is merged with it, the summoner is immediately ejected, takes 4d6 points of damage, and is stunned for 1 round."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "5"
+      }
+    },
+    {
+      "level": 17,
+      "bab": 12,
+      "fort": 5,
+      "ref": 5,
+      "will": 10,
+      "classFeatures": [
+        {
+          "name": "Summon Monster IX",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "5"
+      }
+    },
+    {
+      "level": 18,
+      "bab": 13,
+      "fort": 6,
+      "ref": 6,
+      "will": 11,
+      "classFeatures": [
+        {
+          "name": "Greater Aspect",
+          "description": "At 18th level, a summoner can divert more of his eidolon's evolutions to himself. This ability functions as the aspect ability, but the maximum number of evolution points the summoner can divert increases to 6. In addition, the eidolon loses 1 point from its evolution pool for every 2 points (or fraction thereof ) diverted to the summoner instead of losing 1 point from the evolution pool for each point diverted."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "5"
+      }
+    },
+    {
+      "level": 19,
+      "bab": 14,
+      "fort": 6,
+      "ref": 6,
+      "will": 11,
+      "classFeatures": [
+        {
+          "name": "Gate",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "5"
+      }
+    },
+    {
+      "level": 20,
+      "bab": 15,
+      "fort": 6,
+      "ref": 6,
+      "will": 12,
+      "classFeatures": [
+        {
+          "name": "Twin Eidolon",
+          "description": "At 20th level, a summoner and his eidolon share a true connection. As a standard action , the summoner can assume the shape of his eidolon , copying all of its evolutions, form, and abilities. His Strength , Dexterity , and Constitution scores change to match the base scores of his eidolon . He can choose to have any gear that he carries become absorbed by his new form, as with spells from the polymorph subschool. Items with continuous effects continue to function while absorbed in this way. The summoner loses his natural attacks and all racial traits (except bonus feats, skills, and languages) in favor of the abilities granted by his eidolon's evolutions. The summoner retains all of his class features. The summoner can keep this form for a number of minutes per day equal to his summoner level. This duration does not need to be consecutive, but it must be spent in 1-minute increments. The summoner can end this effect as a free action ."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "5"
+      }
+    }
+  ],
+  "spellcasting": {
+    "summary": "spontaneous 2/3 caster using CHA",
+    "castingType": "spontaneous",
+    "progression": "2/3",
+    "ability": "cha",
+    "preparation": "spontaneous",
+    "maxSpellLevel": 6,
+    "slotsByLevel": [
+      [
+        0,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        4,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        5,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        5,
+        3,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        6,
+        4,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        6,
+        5,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        6,
+        5,
+        3,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        6,
+        6,
+        4,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        7,
+        6,
+        5,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        7,
+        6,
+        5,
+        3,
+        0,
+        0
+      ],
+      [
+        0,
+        7,
+        6,
+        6,
+        4,
+        0,
+        0
+      ],
+      [
+        0,
+        7,
+        7,
+        6,
+        5,
+        0,
+        0
+      ],
+      [
+        0,
+        7,
+        7,
+        6,
+        5,
+        3,
+        0
+      ],
+      [
+        0,
+        7,
+        7,
+        6,
+        6,
+        4,
+        0
+      ],
+      [
+        0,
+        7,
+        7,
+        7,
+        6,
+        5,
+        0
+      ],
+      [
+        0,
+        7,
+        7,
+        7,
+        6,
+        5,
+        3
+      ],
+      [
+        0,
+        7,
+        7,
+        7,
+        6,
+        6,
+        4
+      ],
+      [
+        0,
+        7,
+        7,
+        7,
+        7,
+        6,
+        5
+      ],
+      [
+        0,
+        7,
+        7,
+        7,
+        7,
+        7,
+        6
+      ],
+      [
+        0,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7
+      ]
+    ],
+    "knownByLevel": [
+      [
+        4,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        5,
+        4,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        5,
+        4,
+        2,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        6,
+        5,
+        3,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        6,
+        5,
+        4,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        7,
+        5,
+        4,
+        2,
+        0,
+        0,
+        0
+      ],
+      [
+        7,
+        5,
+        5,
+        3,
+        0,
+        0,
+        0
+      ],
+      [
+        8,
+        6,
+        5,
+        4,
+        0,
+        0,
+        0
+      ],
+      [
+        8,
+        6,
+        5,
+        4,
+        2,
+        0,
+        0
+      ],
+      [
+        9,
+        6,
+        5,
+        5,
+        3,
+        0,
+        0
+      ],
+      [
+        9,
+        6,
+        6,
+        5,
+        4,
+        0,
+        0
+      ],
+      [
+        9,
+        6,
+        6,
+        5,
+        4,
+        2,
+        0
+      ],
+      [
+        9,
+        6,
+        6,
+        5,
+        5,
+        3,
+        0
+      ],
+      [
+        9,
+        6,
+        6,
+        6,
+        5,
+        4,
+        0
+      ],
+      [
+        9,
+        6,
+        6,
+        6,
+        5,
+        4,
+        2
+      ],
+      [
+        9,
+        6,
+        6,
+        6,
+        5,
+        5,
+        3
+      ],
+      [
+        9,
+        6,
+        6,
+        6,
+        6,
+        5,
+        4
+      ],
+      [
+        9,
+        6,
+        6,
+        6,
+        6,
+        6,
+        5
+      ],
+      [
+        9,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6
+      ]
+    ]
+  },
+  "spellcastingClass": true
+}

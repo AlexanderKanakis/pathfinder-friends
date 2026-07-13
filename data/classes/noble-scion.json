@@ -1,0 +1,243 @@
+{
+  "name": "Noble Scion",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/n-r/noble-scion/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Affluent",
+          "description": "At each level, a noble scion gains a stipend worth a number of gold pieces equal to 750 multiplied by his class level. (He gains 750 gp at 1st level, an additional 1,500 gp at 2nd level, and so on.)"
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Greater Leadership",
+          "description": "At 2nd level, a noble scion gains the Leadership feat as a bonus feat. He can recruit a cohort up to one level lower than himself. At 10th level, he can recruit a cohort of the same level as himself."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 3,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Aristocratic Erudition",
+          "description": "At 3rd level, a noble scion gains a bonus equal to 1/2 his class level on Diplomacy , Knowledge (local), and Knowledge (nobility) checks. This ability also reduces the DCs of Diplomacy and Knowledge (local) checks others make to gather publicly known information about the noble scion by the same amount."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 4,
+      "bab": 3,
+      "fort": 1,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Prestigious Influence",
+          "description": "At 4th level, a noble scion can use his influence to receive special treatment, favors, and other services. He effectively has a pool of virtual gold pieces equal to 150 gp plus 10 gp per class level to spend on services and non-material goods. This pool replenishes at the beginning of every week. Services and nonmaterial goods available to a noble scion include: Pay for lodgings, stabling, taxes, and tolls. Improve his lifestyle quality. Hire entertainers, messengers, mounts, servants, transport, workers, and so on. Obtain invitations to exclusive events, or entry into privileged locations. Spread rumors or start a whispering campaign. Purchase spellcasting services. Employ an expert hireling to make a skill check with a check bonus of +10 plus his class level (50 gp). A noble scion cannot permanently gain goods or wealth from this ability; boons attainable from this ability are generally only available in settlements of 5,000 people or more. The exact benefits available in a location are subject to GM discretion."
+        },
+        {
+          "name": "Regional Expertise",
+          "description": "At 4th level, and again at 6th and 8th level, a noble scion gains a bonus feat from one of the lists below, depending on where he is from. These feats must be taken from the same list at each level (except for feats under the ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œgeneralÃƒÂ¢Ã¢â€šÂ¬Ã‚Â category, which can be taken by nobles from any region). A noble scion need not meet the prerequisites for these feats. At their discretion, GMs may add other feats to these regions or create lists for other regions. Land of the Fallen Dragon Kings : Exotic Weapon Proficiency ( dueling sword ), Flanking Foil , Step Up , Weapon Focus ( dueling sword ). The Empire of Devils : Careful Speaker , Enforcer , Intimidating Prowess , Skill Focus ( Knowledge [planes]). The Land of the Ten-Thousand Gods : Improved Unarmed Strike , Skill Focus ( Perform [dance]), Voice of the Sibyl , Weapon Focus ( unarmed strike ). The Elven Forest Kingdom : Agile Maneuvers , Breadth of Experience , Skill Focus ( Knowledge [nature]), Weapon Focus ( longbow ). The Shadow Kingdom : Blind-Fight , Diehard , Shadow Strike , Stealthy . The Kingdom of Pharaohs : Exotic Weapon Proficiency ( khopesh ), Self-Sufficient , Skill Focus ( Knowledge [history]), Weapon Focus ( khopesh ). The Satrapy of the Desert : Animal Affinity , Quick Draw , Skill Focus ( Appraise ), Weapon Focus ( scimitar ). The River Nations : Improved Dirty Trick , Improved Steal , Ironguts , Skill Focus ( Knowledge [local]). The Fallen Empire : Dazzling Display , Exotic Weapon Proficiency ( falcata ), Skill Focus ( Bluff ), Weapon Focus ( falcata ). The Gothic Kingdoms : Combat Reflexes , Focused Discipline , "
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 5,
+      "bab": 3,
+      "fort": 2,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Dilettante Studies",
+          "description": "At 5th level, a noble scion chooses two different dilettante studies from the list below. At 9th level, he again chooses two different dilettante studies to add to his repertoire. If either of these are duplicates of those chosen at 5th level, the bonuses stack. Dilettante Performer (Su) : A noble scion treats his effective bard level as two higher for the purpose of the bardic performance class ability. He must have the bardic performance class ability to choose this dilettante study. Dilettante Scholar (Su) : A noble scion gains new spells per day as if he had also gained a level in a spellcasting class he belonged to before he added the prestige class. Dilettante Scoundrel ( Ex ) : A noble scion gains a +1d6 sneak attack bonus as per the rogue class ability. If a noble scion gets a sneak attack bonus from another source, the bonuses on damage stack. Dilettante Warrior ( Ex ) : A noble scion gains a +1 bonus on attack and damage rolls."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 6,
+      "bab": 4,
+      "fort": 2,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Regional Expertise",
+          "description": "At 4th level, and again at 6th and 8th level, a noble scion gains a bonus feat from one of the lists below, depending on where he is from. These feats must be taken from the same list at each level (except for feats under the ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œgeneralÃƒÂ¢Ã¢â€šÂ¬Ã‚Â category, which can be taken by nobles from any region). A noble scion need not meet the prerequisites for these feats. At their discretion, GMs may add other feats to these regions or create lists for other regions. Land of the Fallen Dragon Kings : Exotic Weapon Proficiency ( dueling sword ), Flanking Foil , Step Up , Weapon Focus ( dueling sword ). The Empire of Devils : Careful Speaker , Enforcer , Intimidating Prowess , Skill Focus ( Knowledge [planes]). The Land of the Ten-Thousand Gods : Improved Unarmed Strike , Skill Focus ( Perform [dance]), Voice of the Sibyl , Weapon Focus ( unarmed strike ). The Elven Forest Kingdom : Agile Maneuvers , Breadth of Experience , Skill Focus ( Knowledge [nature]), Weapon Focus ( longbow ). The Shadow Kingdom : Blind-Fight , Diehard , Shadow Strike , Stealthy . The Kingdom of Pharaohs : Exotic Weapon Proficiency ( khopesh ), Self-Sufficient , Skill Focus ( Knowledge [history]), Weapon Focus ( khopesh ). The Satrapy of the Desert : Animal Affinity , Quick Draw , Skill Focus ( Appraise ), Weapon Focus ( scimitar ). The River Nations : Improved Dirty Trick , Improved Steal , Ironguts , Skill Focus ( Knowledge [local]). The Fallen Empire : Dazzling Display , Exotic Weapon Proficiency ( falcata ), Skill Focus ( Bluff ), Weapon Focus ( falcata ). The Gothic Kingdoms : Combat Reflexes , Focused Discipline , "
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 7,
+      "bab": 5,
+      "fort": 2,
+      "ref": 2,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Servitor",
+          "description": "At 7th level, a noble scion gains a faithful NPC servitor of the same level as his cohort granted by the Leadership feat. This servitor can only have levels in NPC classes and comes equipped with gear appropriate for a character 1 level lower than the servitor's actual level. The servitor does not follow the noble scion as would a cohort or follower, but instead can run various errands for his master while the noble scion is adventuring, such as delivering messages or maintaining the scion's manor in his stead."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 8,
+      "bab": 6,
+      "fort": 3,
+      "ref": 3,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Regional Expertise",
+          "description": "At 4th level, and again at 6th and 8th level, a noble scion gains a bonus feat from one of the lists below, depending on where he is from. These feats must be taken from the same list at each level (except for feats under the ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œgeneralÃƒÂ¢Ã¢â€šÂ¬Ã‚Â category, which can be taken by nobles from any region). A noble scion need not meet the prerequisites for these feats. At their discretion, GMs may add other feats to these regions or create lists for other regions. Land of the Fallen Dragon Kings : Exotic Weapon Proficiency ( dueling sword ), Flanking Foil , Step Up , Weapon Focus ( dueling sword ). The Empire of Devils : Careful Speaker , Enforcer , Intimidating Prowess , Skill Focus ( Knowledge [planes]). The Land of the Ten-Thousand Gods : Improved Unarmed Strike , Skill Focus ( Perform [dance]), Voice of the Sibyl , Weapon Focus ( unarmed strike ). The Elven Forest Kingdom : Agile Maneuvers , Breadth of Experience , Skill Focus ( Knowledge [nature]), Weapon Focus ( longbow ). The Shadow Kingdom : Blind-Fight , Diehard , Shadow Strike , Stealthy . The Kingdom of Pharaohs : Exotic Weapon Proficiency ( khopesh ), Self-Sufficient , Skill Focus ( Knowledge [history]), Weapon Focus ( khopesh ). The Satrapy of the Desert : Animal Affinity , Quick Draw , Skill Focus ( Appraise ), Weapon Focus ( scimitar ). The River Nations : Improved Dirty Trick , Improved Steal , Ironguts , Skill Focus ( Knowledge [local]). The Fallen Empire : Dazzling Display , Exotic Weapon Proficiency ( falcata ), Skill Focus ( Bluff ), Weapon Focus ( falcata ). The Gothic Kingdoms : Combat Reflexes , Focused Discipline , "
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 9,
+      "bab": 6,
+      "fort": 3,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Dilettante Studies",
+          "description": "At 5th level, a noble scion chooses two different dilettante studies from the list below. At 9th level, he again chooses two different dilettante studies to add to his repertoire. If either of these are duplicates of those chosen at 5th level, the bonuses stack. Dilettante Performer (Su) : A noble scion treats his effective bard level as two higher for the purpose of the bardic performance class ability. He must have the bardic performance class ability to choose this dilettante study. Dilettante Scholar (Su) : A noble scion gains new spells per day as if he had also gained a level in a spellcasting class he belonged to before he added the prestige class. Dilettante Scoundrel ( Ex ) : A noble scion gains a +1d6 sneak attack bonus as per the rogue class ability. If a noble scion gets a sneak attack bonus from another source, the bonuses on damage stack. Dilettante Warrior ( Ex ) : A noble scion gains a +1 bonus on attack and damage rolls."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 10,
+      "bab": 7,
+      "fort": 3,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Peerless Patrician",
+          "description": "At 10th level, once per round a noble scion can roll twice on any Bluff , Diplomacy , Intimidate , Knowledge (nobility), or Sense Motive check and take the better roll. Once per day, instead of rolling one of these skill checks, he can assume the roll resulted in a natural 20. Section 15: Copyright Notice Pathfinder Campaign Setting: Paths of Prestige Ãƒâ€šÃ‚Â© 2012, Paizo Publishing, LLC; Authors: Benjamin Bruck, Jason Bulmahn, Matt Goodall, and Jason Nelson."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": null,
+  "spellcastingClass": false
+}

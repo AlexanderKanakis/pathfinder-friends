@@ -1,0 +1,269 @@
+{
+  "name": "Exalted",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/e-h/exalted/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Divine Brand",
+          "description": "At 1st level, a mark appears somewhere on the exalted's body. The mark's location varies by individual and by faith, but the mark clearly represents the exalted's chosen deity. The divine brand generally appears in a location easy to display, such as on the hand, forearm, chest, or face. An uncovered divine brand functions as a silver holy (or unholy) symbol. If the divine brand is forcibly removed from an unwilling exalted, it reappears on her body 24 hours later."
+        },
+        {
+          "name": "Obedience",
+          "description": "In order to maintain the abilities granted by this prestige class (including all spellcasting abilities that have been augmented by this prestige class), an exalted must perform a daily obedience to the deity she worships."
+        },
+        {
+          "name": "Scholar",
+          "description": "The exalted come from many backgrounds and study different aspects of their chosen faiths. At 1st level, an exalted may select one additional Knowledge skill to add to her list of class skills."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing divine spellcasting class"
+      }
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Vitality",
+          "description": "Divine energy suffuses the body of the exalted, making her more resilient. At 2nd level, the exalted gains a +2 sacred or profane bonus on Fortitude saves and on Constitution checks to stabilize ."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing divine spellcasting class"
+      }
+    },
+    {
+      "level": 3,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Divine Boon 1",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing divine spellcasting class"
+      }
+    },
+    {
+      "level": 4,
+      "bab": 3,
+      "fort": 1,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Religious Speaker",
+          "description": "Through her intense studies, meditation, and discussions with other worshipers, the exalted has mastered the art of speaking about her faith. At 4th level, she gains a +2 competence bonus on Bluff , Diplomacy , and Perform (oratory) checks while her divine brand is visible."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing divine spellcasting class"
+      }
+    },
+    {
+      "level": 5,
+      "bab": 3,
+      "fort": 2,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Expanded Portfolio",
+          "description": "At 5th level, the exalted further increases her already impressive knowledge of her chosen deity's faith and is rewarded with increased powers in one of the spheres over which her deity holds sway. The exalted chooses a domain of her chosen deity to which she gains access, using her exalted level as her effective cleric level. The exalted can also can use each of the chosen domain's spells once per day as a spell-like ability , with a caster level equal to her exalted level. The exalted can use each spell-like ability only if she is able to cast divine spells of that level. If the exalted has any domain spell slots, she is also able to cast the chosen domain's spells in those slots as normal."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing divine spellcasting class"
+      }
+    },
+    {
+      "level": 6,
+      "bab": 4,
+      "fort": 2,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Divine Boon 2",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing divine spellcasting class"
+      }
+    },
+    {
+      "level": 7,
+      "bab": 5,
+      "fort": 2,
+      "ref": 2,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Aspect Of Divinity",
+          "description": "At 7th level, the exalted gains a physical trait that reflects her faith. These physical traits vary by individual and deity; examples include hair with the appearance of fire or water, scaled or metallic flesh, talons, reptilian or glowing eyes, or a faint and colorful aura. The traits may be obvious or subtle, but in any case they confer no special attacks or abilities and impose a - 4 penalty on Disguise checks. In addition, the exalted gains a permanent protection from chaos/evil/good/law effect with a caster level equal to her character level. She must select one alignment from which her aura protects her, and the chosen alignment must be opposed to the exalted's alignment (and therefore her deity's). An exalted who is neutral chooses any of the four alignments. Once the exalted makes this choice, it can't be changed."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing divine spellcasting class"
+      }
+    },
+    {
+      "level": 8,
+      "bab": 6,
+      "fort": 3,
+      "ref": 3,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Ardent Vision",
+          "description": "At 8th level, the exalted can always discern the enemies of her faith. She gains the ability to cast detect chaos/evil/good/law at will, with a caster level equal to her character level. The exalted must choose one alignment to detect that is opposed to her alignment (or one of her choice is if she is neutral), and once this choice is made it can't be changed."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing divine spellcasting class"
+      }
+    },
+    {
+      "level": 9,
+      "bab": 6,
+      "fort": 3,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Divine Boon 3",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing divine spellcasting class"
+      }
+    },
+    {
+      "level": 10,
+      "bab": 7,
+      "fort": 3,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Perform Miracle",
+          "description": "The exalted at the pinnacle of her abilities can create effects that are nothing short of miraculous. At 10th level, once per day the exalted can do one of the following things. Duplicate any cleric spell of 6th level or lower. Duplicate any other spell of 5th level or lower. Potentially undo the harmful effects of certain spells, such as feeblemind or insanity , that require miracle to counteract. To attempt to undo such a spell, the exalted must make a caster level check using her level in the spellcasting class to which she added her exalted levels (including the increases in spellcasting from her exalted levels) against a DC of 11 + the caster level of the targeted effect. On a success, the exalted counters the spell or effect. On a failure, the exalted does not counter the spell or effect, though she can try again after 24 hours. Make a request of her chosen deity in line with the above effects. Doing so requires a sacrifice of 10,000 gp in powdered diamond or another appropriate precious material based on the teachings of the deity's faith. Examples of potential effects include returning a fallen ally to life and full health, teleporting the exalted and her allies to a location with no chance of error, or protecting a town from a wildfire. In any event, a request that is out of line with the deity's nature is refused. A duplicated spell allows saving throws and spell resistance as normal, but the save DCs are calculated as if it were a 7th-level spell. When an exalted uses this ability to duplicate a spell with a material component that costs more than 100"
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing divine spellcasting class"
+      }
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": {
+    "summary": "See level progression spell columns."
+  },
+  "spellcastingClass": true
+}

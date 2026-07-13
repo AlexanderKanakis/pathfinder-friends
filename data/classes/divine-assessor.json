@@ -1,0 +1,241 @@
+{
+  "name": "Divine Assessor",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/c-d/divine-assessor/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Bypass Ward",
+          "description": "Ancient ruins often contain locked and sometimes warded doors; as such, a divine assessor can pick the lock of even a magically locked door (such as one sealed by arcane lock or hold portal ). The Disable Device DC for the door is considered 10 higher than normal due to the effect of the warding spell. A divine assessor also gains a +2 sacred bonus to Disable Device checks. As a full-round action , a divine assessor can make a Disable Device check to disable a magical trap (such as a glyph of warding ) for 1 minute."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "-"
+      }
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Appraising Eye",
+          "description": "A divine assessor must estimate value quickly and accurately, particularly when in a dangerous environment such as an underground tomb. She gains a +2 sacred bonus to all Appraise checks, and can appraise an item with 1 full-round action , instead of 1 minute, if she takes a -10 penalty."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of divine spellcasting class"
+      }
+    },
+    {
+      "level": 3,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Access The Vault (Non-Magical Items)",
+          "description": "At 3rd level, a divine assessor gains the power to access a divine planar repository holding perfect versions of every item ever made. Once per week a divine assessor can summon a copy of any one non-magical item (normal or masterwork) as long as its market price is equal to or less than 500 gp per divine caster level and its volume is less than 1 cubic foot per caster level. The item remains with the divine assessor for 1 minute per class level, after which it returns automatically to the vault. Consumable items vanish once used but function for their normal duration or 1 minute per class level, whichever is less. Even if an item is destroyed while in the divine assessorÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s possession, a new copy appears in the vault. At 5th level, a divine assessor can use this ability to summon a magic item from the vault. Items with charges always arrive fully charged, and the price limit applies to this fully charged version (for example, a fully charged wand of cure serious wounds costs 11,250 gp, putting it out of reach of any caster level 22 or lower). Items taken from the vault are obviously of exceptional quality and radiate magic (even if not normally a magic item, such as a chair or table), and their unearthly perfection is enough to make any intelligent potential buyer suspicious. The church frowns on selling items from the vault, as it is essentially stealing from the buyer (as the items vanish shortly thereafter), which disrupts faith in fair trade and the church; divine assessors who abuse this ability lose access to the vault until they have atoned for their transgression. B"
+        },
+        {
+          "name": "Bottomless Bag (Type II)",
+          "description": "Sometimes a divine assessor finds an unexpected treasure too large to transport. Once per day she can turn any ordinary sack, backpack, or other container into a bag of holding type II . The container remains a bag of holding for 1 hour per class level; after the duration expires, the container resumes its normal properties, and any items too large to fit within its true dimensions immediately and harmlessly fall out of the opening. Unlike a permanent bag of holding , the bag created by this ability cannot be overloaded or ruptured, nor does it have any special interaction with other kinds of extra-dimensional spaces . At 6th level, the divine assessorÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s bottomless bag increases to the size of a bag of holding type III . Alternately, she can create two bags of holding type II , though their extradimensional spaces are not linked in any way."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of divine spellcasting class"
+      }
+    },
+    {
+      "level": 4,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Eloquent Bargainer",
+          "description": "Getting permission to enter treasure-laden ruins sometimes requires talking to the right people and handing around a few coins for bribes, ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œfinderÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s fees,ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â and so on. At 4th level, a divine assessor learns which palms to grease and what promises to make, gaining a +2 bonus to Diplomacy checks when she offers an appropriate bribe (minimum 10 gp ÃƒÆ’Ã¢â‚¬â€ the level of the recipient) during the interaction. In addition, she receives a +2 sacred bonus on Charisma checks made to compel a bound creature to perform a service when using the lesser planar binding and greater planar binding spells."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of divine spellcasting class"
+      }
+    },
+    {
+      "level": 5,
+      "bab": 2,
+      "fort": 2,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Access The Vault (Magic Items)",
+          "description": "At 3rd level, a divine assessor gains the power to access a divine planar repository holding perfect versions of every item ever made. Once per week a divine assessor can summon a copy of any one non-magical item (normal or masterwork) as long as its market price is equal to or less than 500 gp per divine caster level and its volume is less than 1 cubic foot per caster level. The item remains with the divine assessor for 1 minute per class level, after which it returns automatically to the vault. Consumable items vanish once used but function for their normal duration or 1 minute per class level, whichever is less. Even if an item is destroyed while in the divine assessorÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s possession, a new copy appears in the vault. At 5th level, a divine assessor can use this ability to summon a magic item from the vault. Items with charges always arrive fully charged, and the price limit applies to this fully charged version (for example, a fully charged wand of cure serious wounds costs 11,250 gp, putting it out of reach of any caster level 22 or lower). Items taken from the vault are obviously of exceptional quality and radiate magic (even if not normally a magic item, such as a chair or table), and their unearthly perfection is enough to make any intelligent potential buyer suspicious. The church frowns on selling items from the vault, as it is essentially stealing from the buyer (as the items vanish shortly thereafter), which disrupts faith in fair trade and the church; divine assessors who abuse this ability lose access to the vault until they have atoned for their transgression. B"
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of divine spellcasting class"
+      }
+    },
+    {
+      "level": 6,
+      "bab": 3,
+      "fort": 2,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Bottomless Bag (Type III)",
+          "description": "Sometimes a divine assessor finds an unexpected treasure too large to transport. Once per day she can turn any ordinary sack, backpack, or other container into a bag of holding type II . The container remains a bag of holding for 1 hour per class level; after the duration expires, the container resumes its normal properties, and any items too large to fit within its true dimensions immediately and harmlessly fall out of the opening. Unlike a permanent bag of holding , the bag created by this ability cannot be overloaded or ruptured, nor does it have any special interaction with other kinds of extra-dimensional spaces . At 6th level, the divine assessorÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s bottomless bag increases to the size of a bag of holding type III . Alternately, she can create two bags of holding type II , though their extradimensional spaces are not linked in any way."
+        },
+        {
+          "name": "Vault Jump",
+          "description": "Those who drive hard bargains and search for lost treasures sometimes bite off more than they can chew, and a quick exit is often the only way to escape a bad situation alive. Once per day, a divine assessor can create a one-way portal through the vault, which has one of two effects. First, she may use the portal as if it were a dimension door , but can only travel to areas within range and to which she has been (for example, she cannot use it to get past a sealed door into the unknown room beyond). Second, she may use the portal as if she were casting word of recall , but instead of returning to her sanctuary she always returns to the closest active temple. The divine assessorÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s caster level for this ability is equal to her divine caster level, and she can bring others with her as defined in the spell descriptions. Travel through the vault is uncomfortable and disorienting, possibly because the Vault rejects imperfect mortal flesh in an attempt to protect itself, or because the aura of so much perfection is overwhelming to mortal senses. Regardless of the distance traveled, the divine assessor (and anyone traveling with her) arrives 1d4+1 rounds later and is nauseated for 1d4+1 rounds after arriving ( Fortitude DC 15 negates). As with the divine assessorÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s ability to access the vault, some scholars believe this ability transports the user through a space other than the vault. Their reasoning is that, if a divine assessor were mind-controlled or otherwise compromised, this ability might allow thieves to access the vault and steal the priceless, perfect items stored there. S"
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of divine spellcasting class"
+      }
+    },
+    {
+      "level": 7,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 8,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 9,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 10,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": {
+    "summary": "See level progression spell columns."
+  },
+  "spellcastingClass": true
+}

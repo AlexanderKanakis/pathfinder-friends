@@ -1,0 +1,289 @@
+{
+  "name": "Spirit Channeler Emissary",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/s-z/spirit-channeler-emissary-prestige-class/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Spirit Animal",
+          "description": "A Spirit Channeler emissary strengthens her bond to the spirit world by channeling additional divine power through her familiar or spirit animal. If she had a non-spirit- animal familiar before becoming a Spirit Channeler emissary, she can select a single shaman spirit. Her familiar gains the spirit animal ability associated with that spirit. If the Spirit Channeler emissary had the spirit animal class feature before becoming a Spirit Channeler emissary, her spirit animal grows in power and begins to manifest unnatural traits. The spirit animal gains 2 evolution points as if it were an eidolon and can use them to purchase eidolon evolutions from the following list: basic magic, climb, flight, gills, improved natural armor , magic attacks, minor magic , skilled, swim, tail, and unnatural aura . At 5th level, the Spirit Channeler emissary's spirit animal gains an additional evolution point. It can spend this point to gain an additional evolution, or it can freely reassign all of its points to purchase different evolutions. It also adds the following to its list of available evolutions: burrow , damage reduction , and major magic ."
+        },
+        {
+          "name": "Spirit Bond",
+          "description": "A Spirit Channeler emissary's training creates a powerful bond with a specific spirit. Her Spirit Channeler emissary levels stack with any shaman levels she has for the purpose of determining the effects of her spirit class ability, spirit magic class ability, what hexes she qualifies for, and the effects of any hexes with level-dependent abilities. If a Spirit Channeler emissary has neither the spirit class ability nor a spirit animal, she can select a single spirit from those available to the shaman upon gaining her 1st level of Spirit Channeler emissary. She gains this spirit's spirit ability. At 8th level, she also gains this spirit's greater spirit ability. Spirit bond does not affect a shaman's wandering spirit class ability."
+        },
+        {
+          "name": "Sixth Sense (Undead)",
+          "description": "A Spirit Channeler emissary gains detect undead as a spell-like ability , usable a number of times per day equal to her Spirit Channeler emissary level. At 2nd level, this spell-like ability also detects creatures of the fey type. The Spirit Channeler emissary must continue concentrating to discern which auras are undead and which are fey , gaining this knowledge as she learns the strength and location of each aura on her third round of concentration . At 3rd level, this spell-like ability also detects creatures of the outsider type, also requiring concentration to distinguish between aura types."
+        }
+      ],
+      "spellcasting": {
+        "Spellcasting": "-"
+      }
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Animus (Summon Monster IV)",
+          "description": "At 2nd level, a Spirit Channeler emissary learns to call down more powerful spiritual servants, using her spirit animal as the focus and conduit to create a hybrid creature called an animus. This ability functions as summon monster IV , except the Spirit Channeler emissary can summon only a single creature at a time (though she can select a different creature each time and can always decide to summon a single creature from a lower-level list). This summoned creature appears in the spirit animal's location, replaces the spirit animal for the spell's duration, gains the familiar's spirit animal ability, and obeys the Spirit Channeler emissary as if it were her spirit animal. An animus typically retains some superficial traits of the spirit animal used as a conduit in its summoning , but gains no other abilities normally associated with a familiar (such as share spells or evolution points). The Spirit Channeler emissary must be within 30 feet of her spirit animal to use this ability. The animus remains for 1 round per caster level ; it vanishes once this duration expires or it is reduced to 0 or fewer hit points . The spirit animal reappears in the animus's last location and suffers none of the damage, status effects, or spells affecting the animus when it vanished. As the Spirit Channeler emissary grows in power and prestige, the effective summon monster spell she can use to conjure an animus improves, as indicated on the table. The Spirit Channeler emissary can use this ability once per day. At 4th level, she can use it twice per day, and at 8th level"
+        },
+        {
+          "name": "Sixth Sense (Fey)",
+          "description": "A Spirit Channeler emissary gains detect undead as a spell-like ability , usable a number of times per day equal to her Spirit Channeler emissary level. At 2nd level, this spell-like ability also detects creatures of the fey type. The Spirit Channeler emissary must continue concentrating to discern which auras are undead and which are fey , gaining this knowledge as she learns the strength and location of each aura on her third round of concentration . At 3rd level, this spell-like ability also detects creatures of the outsider type, also requiring concentration to distinguish between aura types."
+        }
+      ],
+      "spellcasting": {
+        "Spellcasting": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 3,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Manifest Will",
+          "description": "At 3rd level, spiritual energy flows both into and out of the Spirit Channeler emissary, allowing her to overcome the limitations of her physical body by sheer force of will. The Spirit Channeler emissary selects either Strength , Dexterity , or Constitution . As an immediate action , she can substitute her Wisdom modifier for her selected ability's modifier on a single ability check, attack roll , saving throw, or skill check. She can use this ability a number of times per day equal to her Charisma modifier + half her Spirit Channeler emissary level. At 6th level and again at 9th level, she can select one more physical ability score she can affect with this ability."
+        },
+        {
+          "name": "Sixth Sense (Outsiders)",
+          "description": "A Spirit Channeler emissary gains detect undead as a spell-like ability , usable a number of times per day equal to her Spirit Channeler emissary level. At 2nd level, this spell-like ability also detects creatures of the fey type. The Spirit Channeler emissary must continue concentrating to discern which auras are undead and which are fey , gaining this knowledge as she learns the strength and location of each aura on her third round of concentration . At 3rd level, this spell-like ability also detects creatures of the outsider type, also requiring concentration to distinguish between aura types."
+        }
+      ],
+      "spellcasting": {
+        "Spellcasting": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 4,
+      "bab": 3,
+      "fort": 1,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Animus (Summon Monster V, 2/Day)",
+          "description": "At 2nd level, a Spirit Channeler emissary learns to call down more powerful spiritual servants, using her spirit animal as the focus and conduit to create a hybrid creature called an animus. This ability functions as summon monster IV , except the Spirit Channeler emissary can summon only a single creature at a time (though she can select a different creature each time and can always decide to summon a single creature from a lower-level list). This summoned creature appears in the spirit animal's location, replaces the spirit animal for the spell's duration, gains the familiar's spirit animal ability, and obeys the Spirit Channeler emissary as if it were her spirit animal. An animus typically retains some superficial traits of the spirit animal used as a conduit in its summoning , but gains no other abilities normally associated with a familiar (such as share spells or evolution points). The Spirit Channeler emissary must be within 30 feet of her spirit animal to use this ability. The animus remains for 1 round per caster level ; it vanishes once this duration expires or it is reduced to 0 or fewer hit points . The spirit animal reappears in the animus's last location and suffers none of the damage, status effects, or spells affecting the animus when it vanished. As the Spirit Channeler emissary grows in power and prestige, the effective summon monster spell she can use to conjure an animus improves, as indicated on the table. The Spirit Channeler emissary can use this ability once per day. At 4th level, she can use it twice per day, and at 8th level"
+        }
+      ],
+      "spellcasting": {
+        "Spellcasting": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 5,
+      "bab": 3,
+      "fort": 2,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Parley",
+          "description": "At 5th level, a Spirit Channeler emissary gains the ability to cast calm spirit three times per day as a spell-like ability (her caster level equals her character level). At 6th level, she can also use this spell-like ability to calm corporeal undead and creatures of the outsider type. At 7th level, she can use this spell-like ability to calm creatures of the fey type as well."
+        },
+        {
+          "name": "Spirit Conduit (Augment)",
+          "description": "At 5th level, a Spirit Channeler emissary's bond to an animus strengthens considerably. Any animus she summons is treated as if the Spirit Channeler emissary had the Augment Summoning feat, gaining a +4 enhancement bonus to its Strength and Constitution . At 7th level, when the animus vanishes, the Spirit Channeler emissary can have her spirit animal appear in an empty square adjacent to herself instead of in the animus's location. At 10th level, the bond allows the animus to leave parting insight when it vanishes, answering a single yes-or-no question for the Spirit Channeler emissary as per commune . Section 15: Copyright Notice Pathfinder Roleplaying Game Adventurer's Guide Ãƒâ€šÃ‚Â© 2017, Paizo Inc.; Authors: Benjamin Bruck, John Compton, Crystal Frasier, Tim Hitchcock, Jenny Jarzabski, Isabelle Lee, Joe Pasini, Jessica Price, David Schwartz, and Josh Vogt."
+        }
+      ],
+      "spellcasting": {
+        "Spellcasting": "-"
+      }
+    },
+    {
+      "level": 6,
+      "bab": 4,
+      "fort": 2,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Animus (Summon Monster VI)",
+          "description": "At 2nd level, a Spirit Channeler emissary learns to call down more powerful spiritual servants, using her spirit animal as the focus and conduit to create a hybrid creature called an animus. This ability functions as summon monster IV , except the Spirit Channeler emissary can summon only a single creature at a time (though she can select a different creature each time and can always decide to summon a single creature from a lower-level list). This summoned creature appears in the spirit animal's location, replaces the spirit animal for the spell's duration, gains the familiar's spirit animal ability, and obeys the Spirit Channeler emissary as if it were her spirit animal. An animus typically retains some superficial traits of the spirit animal used as a conduit in its summoning , but gains no other abilities normally associated with a familiar (such as share spells or evolution points). The Spirit Channeler emissary must be within 30 feet of her spirit animal to use this ability. The animus remains for 1 round per caster level ; it vanishes once this duration expires or it is reduced to 0 or fewer hit points . The spirit animal reappears in the animus's last location and suffers none of the damage, status effects, or spells affecting the animus when it vanished. As the Spirit Channeler emissary grows in power and prestige, the effective summon monster spell she can use to conjure an animus improves, as indicated on the table. The Spirit Channeler emissary can use this ability once per day. At 4th level, she can use it twice per day, and at 8th level"
+        },
+        {
+          "name": "Manifest Will",
+          "description": "At 3rd level, spiritual energy flows both into and out of the Spirit Channeler emissary, allowing her to overcome the limitations of her physical body by sheer force of will. The Spirit Channeler emissary selects either Strength , Dexterity , or Constitution . As an immediate action , she can substitute her Wisdom modifier for her selected ability's modifier on a single ability check, attack roll , saving throw, or skill check. She can use this ability a number of times per day equal to her Charisma modifier + half her Spirit Channeler emissary level. At 6th level and again at 9th level, she can select one more physical ability score she can affect with this ability."
+        }
+      ],
+      "spellcasting": {
+        "Spellcasting": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 7,
+      "bab": 5,
+      "fort": 2,
+      "ref": 2,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Spirit Conduit (Recall)",
+          "description": "At 5th level, a Spirit Channeler emissary's bond to an animus strengthens considerably. Any animus she summons is treated as if the Spirit Channeler emissary had the Augment Summoning feat, gaining a +4 enhancement bonus to its Strength and Constitution . At 7th level, when the animus vanishes, the Spirit Channeler emissary can have her spirit animal appear in an empty square adjacent to herself instead of in the animus's location. At 10th level, the bond allows the animus to leave parting insight when it vanishes, answering a single yes-or-no question for the Spirit Channeler emissary as per commune . Section 15: Copyright Notice Pathfinder Roleplaying Game Adventurer's Guide Ãƒâ€šÃ‚Â© 2017, Paizo Inc.; Authors: Benjamin Bruck, John Compton, Crystal Frasier, Tim Hitchcock, Jenny Jarzabski, Isabelle Lee, Joe Pasini, Jessica Price, David Schwartz, and Josh Vogt."
+        }
+      ],
+      "spellcasting": {
+        "Spellcasting": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 8,
+      "bab": 6,
+      "fort": 3,
+      "ref": 3,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Animus (Summon Monster VII, 3/Day)",
+          "description": "At 2nd level, a Spirit Channeler emissary learns to call down more powerful spiritual servants, using her spirit animal as the focus and conduit to create a hybrid creature called an animus. This ability functions as summon monster IV , except the Spirit Channeler emissary can summon only a single creature at a time (though she can select a different creature each time and can always decide to summon a single creature from a lower-level list). This summoned creature appears in the spirit animal's location, replaces the spirit animal for the spell's duration, gains the familiar's spirit animal ability, and obeys the Spirit Channeler emissary as if it were her spirit animal. An animus typically retains some superficial traits of the spirit animal used as a conduit in its summoning , but gains no other abilities normally associated with a familiar (such as share spells or evolution points). The Spirit Channeler emissary must be within 30 feet of her spirit animal to use this ability. The animus remains for 1 round per caster level ; it vanishes once this duration expires or it is reduced to 0 or fewer hit points . The spirit animal reappears in the animus's last location and suffers none of the damage, status effects, or spells affecting the animus when it vanished. As the Spirit Channeler emissary grows in power and prestige, the effective summon monster spell she can use to conjure an animus improves, as indicated on the table. The Spirit Channeler emissary can use this ability once per day. At 4th level, she can use it twice per day, and at 8th level"
+        }
+      ],
+      "spellcasting": {
+        "Spellcasting": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 9,
+      "bab": 6,
+      "fort": 3,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Manifest Will",
+          "description": "At 3rd level, spiritual energy flows both into and out of the Spirit Channeler emissary, allowing her to overcome the limitations of her physical body by sheer force of will. The Spirit Channeler emissary selects either Strength , Dexterity , or Constitution . As an immediate action , she can substitute her Wisdom modifier for her selected ability's modifier on a single ability check, attack roll , saving throw, or skill check. She can use this ability a number of times per day equal to her Charisma modifier + half her Spirit Channeler emissary level. At 6th level and again at 9th level, she can select one more physical ability score she can affect with this ability."
+        }
+      ],
+      "spellcasting": {
+        "Spellcasting": "-"
+      }
+    },
+    {
+      "level": 10,
+      "bab": 7,
+      "fort": 3,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Animus (Summon Monster VIII)",
+          "description": "At 2nd level, a Spirit Channeler emissary learns to call down more powerful spiritual servants, using her spirit animal as the focus and conduit to create a hybrid creature called an animus. This ability functions as summon monster IV , except the Spirit Channeler emissary can summon only a single creature at a time (though she can select a different creature each time and can always decide to summon a single creature from a lower-level list). This summoned creature appears in the spirit animal's location, replaces the spirit animal for the spell's duration, gains the familiar's spirit animal ability, and obeys the Spirit Channeler emissary as if it were her spirit animal. An animus typically retains some superficial traits of the spirit animal used as a conduit in its summoning , but gains no other abilities normally associated with a familiar (such as share spells or evolution points). The Spirit Channeler emissary must be within 30 feet of her spirit animal to use this ability. The animus remains for 1 round per caster level ; it vanishes once this duration expires or it is reduced to 0 or fewer hit points . The spirit animal reappears in the animus's last location and suffers none of the damage, status effects, or spells affecting the animus when it vanished. As the Spirit Channeler emissary grows in power and prestige, the effective summon monster spell she can use to conjure an animus improves, as indicated on the table. The Spirit Channeler emissary can use this ability once per day. At 4th level, she can use it twice per day, and at 8th level"
+        },
+        {
+          "name": "Spirit Conduit (Commune)",
+          "description": "At 5th level, a Spirit Channeler emissary's bond to an animus strengthens considerably. Any animus she summons is treated as if the Spirit Channeler emissary had the Augment Summoning feat, gaining a +4 enhancement bonus to its Strength and Constitution . At 7th level, when the animus vanishes, the Spirit Channeler emissary can have her spirit animal appear in an empty square adjacent to herself instead of in the animus's location. At 10th level, the bond allows the animus to leave parting insight when it vanishes, answering a single yes-or-no question for the Spirit Channeler emissary as per commune . Section 15: Copyright Notice Pathfinder Roleplaying Game Adventurer's Guide Ãƒâ€šÃ‚Â© 2017, Paizo Inc.; Authors: Benjamin Bruck, John Compton, Crystal Frasier, Tim Hitchcock, Jenny Jarzabski, Isabelle Lee, Joe Pasini, Jessica Price, David Schwartz, and Josh Vogt."
+        }
+      ],
+      "spellcasting": {
+        "Spellcasting": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": {
+    "summary": "See level progression spell columns."
+  },
+  "spellcastingClass": true
+}

@@ -1,0 +1,277 @@
+{
+  "name": "Sphere Singer",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/s-z/sphere-singer/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 0,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Graceful Hand",
+          "description": "The sphere singer gains Starry Grace as a bonus feat, ignoring its prerequisites."
+        },
+        {
+          "name": "Starsong",
+          "description": "A sphere singer is able to use Perform (sing) to create magical effects, as per the bardic performance bard class feature. She can use this ability for a number of rounds per day equal to twice her sphere singer level, and can also use rounds of bardic performance gained from bard levels to perform starsong performances, and vice versa. Starting a starsong performance is a move action , but it can be maintained each round as a free action . If the sphere singer has bardic performance , she can also start bardic performances as a move action instead of a standard action . A starsong performance cannot be disrupted, but ends immediately if the sphere singer is killed, paralyzed , stunned , knocked unconscious , silenced, or otherwise prevented from taking a free action to maintain it each round. A starsong performance counts as a bardic performance for the purpose of determining how many performances the sphere singer can have in effect at one time. A starsong performance has audible components but not visual components . At 7th level, a sphere singer can start a starsong performance or a bardic performance as a swift action . The save DC against a sphere singerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s performance is equal to 10 + the sphere singerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s level + her Charisma modifier. The sphere singerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s performances grow stronger as her level increases. WandererÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Hymn : At 1st level, the sphere singer can use music to hasten her steps. As long as she maintains this starsong performance, she gains a +30- foot enhancement bonus to her base land speed. Sweet Dreams : At 3rd level, the sphere singer can spend 5 minutes "
+        },
+        {
+          "name": "WandererÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢S Hymn",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "-"
+      }
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Versatile Performance",
+          "description": "At 2nd and 6th levels, the sphere singer gains versatile performance , as per the bard class feature. The sphere singer can choose only Perform (sing) or Perform (dance); once she has already chosen both of these, she can instead gain any other versatile performance . When the sphere singer gains this ability, she can retrain ranks in the associated skills at no cost."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 3,
+      "bab": 2,
+      "fort": 1,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Sweet Dreams",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 4,
+      "bab": 3,
+      "fort": 1,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Wandering Dream (Dream)",
+          "description": "At 4th level, the sphere singer gains Lucid Dreamer as a bonus feat. Each night as she sleeps, she can contact a single person. This functions as dream , except that the sphere singer must be very familiar with the recipient. Many sphere singers keep contact with distant family or lovers this way. At 6th level, this effect allows the recipient to enter the sphere singerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s dreamscape, as per dream council (as if the recipient had cast dream in response). At 8th level, instead of contacting a familiar person, the sphere singer can travel to a creatureÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s dream and leave a suggestion . This functions as demand , but modifying dream instead of sending . When used this way, the normal restrictions on dreamÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s recipient apply. The sphere singer chooses which of these abilities to use (if any) when she goes to sleep."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 5,
+      "bab": 3,
+      "fort": 2,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Butterfly",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 6,
+      "bab": 4,
+      "fort": 2,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Versatile Performance",
+          "description": "At 2nd and 6th levels, the sphere singer gains versatile performance , as per the bard class feature. The sphere singer can choose only Perform (sing) or Perform (dance); once she has already chosen both of these, she can instead gain any other versatile performance . When the sphere singer gains this ability, she can retrain ranks in the associated skills at no cost."
+        },
+        {
+          "name": "Wandering Dream",
+          "description": "At 4th level, the sphere singer gains Lucid Dreamer as a bonus feat. Each night as she sleeps, she can contact a single person. This functions as dream , except that the sphere singer must be very familiar with the recipient. Many sphere singers keep contact with distant family or lovers this way. At 6th level, this effect allows the recipient to enter the sphere singerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s dreamscape, as per dream council (as if the recipient had cast dream in response). At 8th level, instead of contacting a familiar person, the sphere singer can travel to a creatureÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s dream and leave a suggestion . This functions as demand , but modifying dream instead of sending . When used this way, the normal restrictions on dreamÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s recipient apply. The sphere singer chooses which of these abilities to use (if any) when she goes to sleep."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing spellcasting class (dream council)"
+      }
+    },
+    {
+      "level": 7,
+      "bab": 5,
+      "fort": 2,
+      "ref": 4,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Guide My Steps",
+          "description": ""
+        },
+        {
+          "name": "Starsong ( Swift Action )",
+          "description": "A sphere singer is able to use Perform (sing) to create magical effects, as per the bardic performance bard class feature. She can use this ability for a number of rounds per day equal to twice her sphere singer level, and can also use rounds of bardic performance gained from bard levels to perform starsong performances, and vice versa. Starting a starsong performance is a move action , but it can be maintained each round as a free action . If the sphere singer has bardic performance , she can also start bardic performances as a move action instead of a standard action . A starsong performance cannot be disrupted, but ends immediately if the sphere singer is killed, paralyzed , stunned , knocked unconscious , silenced, or otherwise prevented from taking a free action to maintain it each round. A starsong performance counts as a bardic performance for the purpose of determining how many performances the sphere singer can have in effect at one time. A starsong performance has audible components but not visual components . At 7th level, a sphere singer can start a starsong performance or a bardic performance as a swift action . The save DC against a sphere singerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s performance is equal to 10 + the sphere singerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s level + her Charisma modifier. The sphere singerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s performances grow stronger as her level increases. WandererÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Hymn : At 1st level, the sphere singer can use music to hasten her steps. As long as she maintains this starsong performance, she gains a +30- foot enhancement bonus to her base land speed. Sweet Dreams : At 3rd level, the sphere singer can spend 5 minutes "
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 8,
+      "bab": 6,
+      "fort": 3,
+      "ref": 4,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Wandering Dream (Demand)",
+          "description": "At 4th level, the sphere singer gains Lucid Dreamer as a bonus feat. Each night as she sleeps, she can contact a single person. This functions as dream , except that the sphere singer must be very familiar with the recipient. Many sphere singers keep contact with distant family or lovers this way. At 6th level, this effect allows the recipient to enter the sphere singerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s dreamscape, as per dream council (as if the recipient had cast dream in response). At 8th level, instead of contacting a familiar person, the sphere singer can travel to a creatureÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s dream and leave a suggestion . This functions as demand , but modifying dream instead of sending . When used this way, the normal restrictions on dreamÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s recipient apply. The sphere singer chooses which of these abilities to use (if any) when she goes to sleep."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 9,
+      "bab": 6,
+      "fort": 3,
+      "ref": 5,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "FortuneÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢S Favor",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "-"
+      }
+    },
+    {
+      "level": 10,
+      "bab": 7,
+      "fort": 3,
+      "ref": 5,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Tapestry Traveler",
+          "description": "At 10th level, the sphere singer transcends mortality like a butterfly emerging from its chrysalis, her essence infused with stardust and unearthly energies. Her type changes to fey , and she grows large butterfly wings, gaining a fly speed of 50 feet (good). In addition, she becomes immune to cold and gains the no breath universal monster ability. Section 15: Copyright Notice Pathfinder Player Companion: Paths of the Righteous Ãƒâ€šÃ‚Â© 2016, Paizo Inc.; Authors: Alexander Augunas, John Compton, Jenny Jarzabski, Isabelle Lee, Stephen Rowe, and Owen K.C. Stephens."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": {
+    "summary": "See level progression spell columns."
+  },
+  "spellcastingClass": true
+}

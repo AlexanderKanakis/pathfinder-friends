@@ -1,0 +1,261 @@
+{
+  "name": "Loremaster",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/core-rulebook/loremaster/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Secret",
+          "description": "At 1st level and every two levels higher than 1st (3rd, 5th, 7th, and 9th), the loremaster chooses one secret from Table: Loremaster Secrets . His level plus Intelligence modifier determines which secrets he can choose. He can't choose the same secret twice. Table: Loremaster Secrets Level + Int Modifier Secret Effect 1 Instant mastery 4 ranks of a skill in which the character has no ranks 2 Secret health Toughness bonus feat 3 Secrets of inner strength +2 bonus on Will saves 4 The lore of true stamina +2 bonus on Fortitude saves 5 Secret knowledge of avoidance +2 bonus on Reflex saves 6 Weapon trick +1 bonus on attack rolls 7 Dodge trick +1 dodge bonus to AC 8 Applicable knowledge Any one feat 9 Newfound arcana 1 bonus 1st-level spell* 10 More newfound arcana 1 bonus 2nd-level spell* * As if gained through having a high ability score."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Lore",
+          "description": "At 2nd level, a loremaster adds half his level to all Knowledge skill checks and may make such checks untrained. The bonuses gained from this ability stack with those gained from Bardic Knowledge ."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 3,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Secret",
+          "description": "At 1st level and every two levels higher than 1st (3rd, 5th, 7th, and 9th), the loremaster chooses one secret from Table: Loremaster Secrets . His level plus Intelligence modifier determines which secrets he can choose. He can't choose the same secret twice. Table: Loremaster Secrets Level + Int Modifier Secret Effect 1 Instant mastery 4 ranks of a skill in which the character has no ranks 2 Secret health Toughness bonus feat 3 Secrets of inner strength +2 bonus on Will saves 4 The lore of true stamina +2 bonus on Fortitude saves 5 Secret knowledge of avoidance +2 bonus on Reflex saves 6 Weapon trick +1 bonus on attack rolls 7 Dodge trick +1 dodge bonus to AC 8 Applicable knowledge Any one feat 9 Newfound arcana 1 bonus 1st-level spell* 10 More newfound arcana 1 bonus 2nd-level spell* * As if gained through having a high ability score."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 4,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Bonus Language",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 5,
+      "bab": 2,
+      "fort": 2,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Secret",
+          "description": "At 1st level and every two levels higher than 1st (3rd, 5th, 7th, and 9th), the loremaster chooses one secret from Table: Loremaster Secrets . His level plus Intelligence modifier determines which secrets he can choose. He can't choose the same secret twice. Table: Loremaster Secrets Level + Int Modifier Secret Effect 1 Instant mastery 4 ranks of a skill in which the character has no ranks 2 Secret health Toughness bonus feat 3 Secrets of inner strength +2 bonus on Will saves 4 The lore of true stamina +2 bonus on Fortitude saves 5 Secret knowledge of avoidance +2 bonus on Reflex saves 6 Weapon trick +1 bonus on attack rolls 7 Dodge trick +1 dodge bonus to AC 8 Applicable knowledge Any one feat 9 Newfound arcana 1 bonus 1st-level spell* 10 More newfound arcana 1 bonus 2nd-level spell* * As if gained through having a high ability score."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 6,
+      "bab": 3,
+      "fort": 2,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Greater Lore",
+          "description": "At 6th level, a loremaster gains the ability to understand magic items. Whenever a loremaster examines a magic item to determine its properties, he gains a +10 circumstance bonus on his Spellcraft skill check."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 7,
+      "bab": 3,
+      "fort": 2,
+      "ref": 2,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Secret",
+          "description": "At 1st level and every two levels higher than 1st (3rd, 5th, 7th, and 9th), the loremaster chooses one secret from Table: Loremaster Secrets . His level plus Intelligence modifier determines which secrets he can choose. He can't choose the same secret twice. Table: Loremaster Secrets Level + Int Modifier Secret Effect 1 Instant mastery 4 ranks of a skill in which the character has no ranks 2 Secret health Toughness bonus feat 3 Secrets of inner strength +2 bonus on Will saves 4 The lore of true stamina +2 bonus on Fortitude saves 5 Secret knowledge of avoidance +2 bonus on Reflex saves 6 Weapon trick +1 bonus on attack rolls 7 Dodge trick +1 dodge bonus to AC 8 Applicable knowledge Any one feat 9 Newfound arcana 1 bonus 1st-level spell* 10 More newfound arcana 1 bonus 2nd-level spell* * As if gained through having a high ability score."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 8,
+      "bab": 4,
+      "fort": 3,
+      "ref": 3,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Bonus Language",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 9,
+      "bab": 4,
+      "fort": 3,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Secret",
+          "description": "At 1st level and every two levels higher than 1st (3rd, 5th, 7th, and 9th), the loremaster chooses one secret from Table: Loremaster Secrets . His level plus Intelligence modifier determines which secrets he can choose. He can't choose the same secret twice. Table: Loremaster Secrets Level + Int Modifier Secret Effect 1 Instant mastery 4 ranks of a skill in which the character has no ranks 2 Secret health Toughness bonus feat 3 Secrets of inner strength +2 bonus on Will saves 4 The lore of true stamina +2 bonus on Fortitude saves 5 Secret knowledge of avoidance +2 bonus on Reflex saves 6 Weapon trick +1 bonus on attack rolls 7 Dodge trick +1 dodge bonus to AC 8 Applicable knowledge Any one feat 9 Newfound arcana 1 bonus 1st-level spell* 10 More newfound arcana 1 bonus 2nd-level spell* * As if gained through having a high ability score."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 10,
+      "bab": 5,
+      "fort": 3,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "True Lore",
+          "description": "At 10th level, a loremaster's knowledge becomes vast indeed. Once per day a loremaster can use his knowledge to gain the effect of a legend lore spell or an analyze dweomer spell. If used to create a legend lore effect, this ability has a casting time of 1 minute, regardless of how much information is already known about the subject in question. Section 15: Copyright Notice Pathfinder RPG Core Rulebook . Copyright 2009, Paizo Publishing, LLC; Author: Jason Bulmahn, based on material by Jonathan Tweet, Monte Cook, and Skip Williams."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": {
+    "summary": "See level progression spell columns."
+  },
+  "spellcastingClass": true
+}

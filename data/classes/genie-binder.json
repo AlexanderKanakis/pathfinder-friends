@@ -1,0 +1,246 @@
+{
+  "name": "Genie Binder",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/e-h/genie-binder/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Binding Pool",
+          "description": "Using a combination of blackmail, contracts, magical finesse, and negotiation, a genie binder can command genies and channel their magic. A genie binder has a binding pool equal to twice her genie binder class level, and the pool recharges each day, typically after she gets a restful night's sleep. As a free action before attempting a Charisma check or Charisma -based skill check to interact with a genie , the genie binder can expend 1 point from her binding pool to add 1d6 to the result."
+        },
+        {
+          "name": "Elemental Seal (Seal Of Air)",
+          "description": "By expending 1 point from her binding pool, a genie binder can touch a creature or solid surface to create a powerful rune known as an elemental seal. At 1st level, a genie binder can create a seal of air. At 2nd, 3rd, and 4th levels, she learns how to create seals of earth, fire, and water, respectively. Creating an elemental seal requires a standard action , and placing it on an unwilling target requires a successful melee touch attack . An elemental seal is a writing-based magical effect whose caster level is equal to the genie binder's character level, and any associated saving throw is equal to 10 + the genie binder's class level + the genie binder's Charisma modifier. At 1st level, a genie binder can maintain only one elemental seal at a time. If she creates another seal beyond that limit, she chooses one of her seals to end immediately. Otherwise, an elemental seal lasts for 24 hours, and a genie binder can expend 1 point from her binding pool each day to extend the duration of an existing seal by 24 hours. An elemental seal has a different effect depending on whether it's placed on a genie , a non- genie creature, or a solid surface. If a genie binder places an elemental seal on a genie with a matching subtype (such as a seal of air on a djinni ), the genie must succeed at a Will save or be affected by charm monster as long as the seal lasts. If a genie binder places an elemental seal on a non- genie creature, that creature gains several constant benefits, including resistance 10 to one energy type based on the seal's element. A seal of"
+        },
+        {
+          "name": "Genie Mastery",
+          "description": "At 1st level, a genie binder must decide whether to bind a genie minion or pursue spellcasting power. Once this decision is made, it can't be changed. If she selects a genie minion, she gains an eidolon with the genie subtype, treating her genie binder level as her effective summoner level; her genie binder levels stack with any summoner levels she has for this purpose, but only for an eidolon with the genie subtype. If she selects spellcasting, she gains the benefits of her aligned spellcasting class feature (see below) at 3rd level, in addition to the other indicated levels. Spells per Day: At the indicated levels, a genie binder gains new spells per day as if she had also gained a level in a spellcasting class she belonged to before adding the prestige class. She does not, however, gain other benefits a character of that class would have gained, except for additional spells per day, spells known (if she is a spontaneous spellcaster), and an increased effective level of spellcasting. If a character had more than one spellcasting class before becoming a genie binder, she must decide to which class she adds the new level for the purposes of determining spells per day."
+        }
+      ],
+      "spellcasting": {
+        "Spells Per Day": "-"
+      }
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 0,
+      "ref": 0,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Elemental Seal (Seal Of Earth)",
+          "description": "By expending 1 point from her binding pool, a genie binder can touch a creature or solid surface to create a powerful rune known as an elemental seal. At 1st level, a genie binder can create a seal of air. At 2nd, 3rd, and 4th levels, she learns how to create seals of earth, fire, and water, respectively. Creating an elemental seal requires a standard action , and placing it on an unwilling target requires a successful melee touch attack . An elemental seal is a writing-based magical effect whose caster level is equal to the genie binder's character level, and any associated saving throw is equal to 10 + the genie binder's class level + the genie binder's Charisma modifier. At 1st level, a genie binder can maintain only one elemental seal at a time. If she creates another seal beyond that limit, she chooses one of her seals to end immediately. Otherwise, an elemental seal lasts for 24 hours, and a genie binder can expend 1 point from her binding pool each day to extend the duration of an existing seal by 24 hours. An elemental seal has a different effect depending on whether it's placed on a genie , a non- genie creature, or a solid surface. If a genie binder places an elemental seal on a genie with a matching subtype (such as a seal of air on a djinni ), the genie must succeed at a Will save or be affected by charm monster as long as the seal lasts. If a genie binder places an elemental seal on a non- genie creature, that creature gains several constant benefits, including resistance 10 to one energy type based on the seal's element. A seal of"
+        },
+        {
+          "name": "Genie Summoner",
+          "description": "At 2nd level, a genie binder adds several types of genie to the creatures she can summon using the indicated summon monster spells: djinni ( summon monster V ), efreeti or shaitan ( summon monster VI ), or marid ( summon monster VII ). Each time she summons a genie in this way, she must expend 1 point from her binding pool, and summoned genies cannot cast wish ."
+        }
+      ],
+      "spellcasting": {
+        "Spells Per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 3,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Elemental Seal (Seal Of Fire)",
+          "description": "By expending 1 point from her binding pool, a genie binder can touch a creature or solid surface to create a powerful rune known as an elemental seal. At 1st level, a genie binder can create a seal of air. At 2nd, 3rd, and 4th levels, she learns how to create seals of earth, fire, and water, respectively. Creating an elemental seal requires a standard action , and placing it on an unwilling target requires a successful melee touch attack . An elemental seal is a writing-based magical effect whose caster level is equal to the genie binder's character level, and any associated saving throw is equal to 10 + the genie binder's class level + the genie binder's Charisma modifier. At 1st level, a genie binder can maintain only one elemental seal at a time. If she creates another seal beyond that limit, she chooses one of her seals to end immediately. Otherwise, an elemental seal lasts for 24 hours, and a genie binder can expend 1 point from her binding pool each day to extend the duration of an existing seal by 24 hours. An elemental seal has a different effect depending on whether it's placed on a genie , a non- genie creature, or a solid surface. If a genie binder places an elemental seal on a genie with a matching subtype (such as a seal of air on a djinni ), the genie must succeed at a Will save or be affected by charm monster as long as the seal lasts. If a genie binder places an elemental seal on a non- genie creature, that creature gains several constant benefits, including resistance 10 to one energy type based on the seal's element. A seal of"
+        },
+        {
+          "name": "Extra Seal 1",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells Per Day": "-"
+      }
+    },
+    {
+      "level": 4,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Elemental Seal (Seal Of Water)",
+          "description": "By expending 1 point from her binding pool, a genie binder can touch a creature or solid surface to create a powerful rune known as an elemental seal. At 1st level, a genie binder can create a seal of air. At 2nd, 3rd, and 4th levels, she learns how to create seals of earth, fire, and water, respectively. Creating an elemental seal requires a standard action , and placing it on an unwilling target requires a successful melee touch attack . An elemental seal is a writing-based magical effect whose caster level is equal to the genie binder's character level, and any associated saving throw is equal to 10 + the genie binder's class level + the genie binder's Charisma modifier. At 1st level, a genie binder can maintain only one elemental seal at a time. If she creates another seal beyond that limit, she chooses one of her seals to end immediately. Otherwise, an elemental seal lasts for 24 hours, and a genie binder can expend 1 point from her binding pool each day to extend the duration of an existing seal by 24 hours. An elemental seal has a different effect depending on whether it's placed on a genie , a non- genie creature, or a solid surface. If a genie binder places an elemental seal on a genie with a matching subtype (such as a seal of air on a djinni ), the genie must succeed at a Will save or be affected by charm monster as long as the seal lasts. If a genie binder places an elemental seal on a non- genie creature, that creature gains several constant benefits, including resistance 10 to one energy type based on the seal's element. A seal of"
+        }
+      ],
+      "spellcasting": {
+        "Spells Per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 5,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Extra Seal 2",
+          "description": ""
+        },
+        {
+          "name": "Unstoppable Seal",
+          "description": "At 5th level, when placing an elemental seal on a genie , the genie binder can expend 1 point from her binding pool to increase the saving throw DC to resist the effect by 2. Section 15: Copyright Notice Pathfinder Player Companion: Elemental Master's Handbook Ãƒâ€šÃ‚Â© 2017, Paizo Inc.; Authors: John Compton, Eleanor Ferron, Mikko Kallio, Jason Keeley, Isabelle Lee, and Christopher Wasko."
+        }
+      ],
+      "spellcasting": {
+        "Spells Per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 6,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 7,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 8,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 9,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 10,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": {
+    "summary": "See level progression spell columns."
+  },
+  "spellcastingClass": true
+}

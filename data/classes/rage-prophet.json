@@ -1,0 +1,285 @@
+{
+  "name": "Rage Prophet",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/apg/rage-prophet/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 1,
+      "ref": 0,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Savage Seer",
+          "description": "A rage prophetÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s class level stacks with barbarian levels for determining the effect of his rage powers, oracle revelations, and his oracleÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s curse. This does not grant additional abilities."
+        },
+        {
+          "name": "Spirit Guide",
+          "description": "Every rage prophet possesses a spirit guide, an insubstantial phantom that speaks to his mind, watches over him, and lends him its strength and wisdom. Whenever the rage prophet rages, he gains the benefit of a single guidance spell from his spirit guide; this bonus can be used at any time during his rage. The spirit guide also allows the rage prophet to use dancing lights , ghost sound , and mage hand as spell-like abilities once per day each ( caster level equal to the rage prophetÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s class level). The DCs are Charisma -based."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "-"
+      }
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Rage Prophet Mystery",
+          "description": "At 2nd level and every even level thereafter, a rage prophet learns an additional spell from his spirit guide. These spells are in addition to those listed in Table: Oracle Spells Known . Like spells from an oracleÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s mystery, the rage prophet cannot exchange these spells for different spells at higher levels. The rage prophet must be able to cast oracle spells of the listed level to learn one of these spells from his spirit guide. The rage prophet treats the spell as an oracle spell of the listed level. The possible spells are arcane eye (4th), augury (2nd), divination (4th), dream (5th), find the path (6th), helping hand (3rd), see invisibility (2nd), shadow walk (6th), speak with dead (3rd), spectral hand (2nd), spiritual weapon (2nd), unseen servant (1st), vision (7th), and whispering wind (2nd)."
+        },
+        {
+          "name": "Raging Healer",
+          "description": "At 2nd level, a rage prophet is able to cast cure spells on himself while raging, without having to use clarity of mind."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of divine spellcasting class"
+      }
+    },
+    {
+      "level": 3,
+      "bab": 2,
+      "fort": 2,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Indomitable Caster",
+          "description": "At 3rd level, a rage prophet adds his Constitution bonus (if any) on concentration checks."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of divine spellcasting class"
+      }
+    },
+    {
+      "level": 4,
+      "bab": 3,
+      "fort": 2,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Ragecaster (Caster Level)",
+          "description": "Starting at 4th level, a rage prophetÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s spells grow more potent when he rages. When using moment of clarity, he adds his barbarian level to his caster level . At 7th level, he adds his Constitution bonus to the save DC of any spells cast while raging."
+        },
+        {
+          "name": "Rage Prophet Mystery",
+          "description": "At 2nd level and every even level thereafter, a rage prophet learns an additional spell from his spirit guide. These spells are in addition to those listed in Table: Oracle Spells Known . Like spells from an oracleÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s mystery, the rage prophet cannot exchange these spells for different spells at higher levels. The rage prophet must be able to cast oracle spells of the listed level to learn one of these spells from his spirit guide. The rage prophet treats the spell as an oracle spell of the listed level. The possible spells are arcane eye (4th), augury (2nd), divination (4th), dream (5th), find the path (6th), helping hand (3rd), see invisibility (2nd), shadow walk (6th), speak with dead (3rd), spectral hand (2nd), spiritual weapon (2nd), unseen servant (1st), vision (7th), and whispering wind (2nd)."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of divine spellcasting class"
+      }
+    },
+    {
+      "level": 5,
+      "bab": 3,
+      "fort": 3,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Spirit Guardian",
+          "description": "At 5th level, the competence bonus provided by the spirit guideÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s guidance spell increases to half the rage prophetÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s class level when used while battling a fey, outsider, undead, or incorporeal creature. As a swift action , the rage prophet can spend 1 round of rage (whether he is raging or not) to give his armor and weapons the ghost touch property for 1 round; this effect ends if the item is no longer in his possession."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "-"
+      }
+    },
+    {
+      "level": 6,
+      "bab": 4,
+      "fort": 3,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Enduring Rage",
+          "description": "At 6th level, as a free action , a rage prophet can extend the duration of his rage by sacrificing a spell slot; this prolongs the duration of his rage for a number of rounds equal to the level of the spell slot used."
+        },
+        {
+          "name": "Rage Prophet Mystery",
+          "description": "At 2nd level and every even level thereafter, a rage prophet learns an additional spell from his spirit guide. These spells are in addition to those listed in Table: Oracle Spells Known . Like spells from an oracleÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s mystery, the rage prophet cannot exchange these spells for different spells at higher levels. The rage prophet must be able to cast oracle spells of the listed level to learn one of these spells from his spirit guide. The rage prophet treats the spell as an oracle spell of the listed level. The possible spells are arcane eye (4th), augury (2nd), divination (4th), dream (5th), find the path (6th), helping hand (3rd), see invisibility (2nd), shadow walk (6th), speak with dead (3rd), spectral hand (2nd), spiritual weapon (2nd), unseen servant (1st), vision (7th), and whispering wind (2nd)."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of divine spellcasting class"
+      }
+    },
+    {
+      "level": 7,
+      "bab": 5,
+      "fort": 4,
+      "ref": 2,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Ragecaster (Save DC)",
+          "description": "Starting at 4th level, a rage prophetÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s spells grow more potent when he rages. When using moment of clarity, he adds his barbarian level to his caster level . At 7th level, he adds his Constitution bonus to the save DC of any spells cast while raging."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of divine spellcasting class"
+      }
+    },
+    {
+      "level": 8,
+      "bab": 6,
+      "fort": 4,
+      "ref": 3,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Rage Prophet Mystery",
+          "description": "At 2nd level and every even level thereafter, a rage prophet learns an additional spell from his spirit guide. These spells are in addition to those listed in Table: Oracle Spells Known . Like spells from an oracleÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s mystery, the rage prophet cannot exchange these spells for different spells at higher levels. The rage prophet must be able to cast oracle spells of the listed level to learn one of these spells from his spirit guide. The rage prophet treats the spell as an oracle spell of the listed level. The possible spells are arcane eye (4th), augury (2nd), divination (4th), dream (5th), find the path (6th), helping hand (3rd), see invisibility (2nd), shadow walk (6th), speak with dead (3rd), spectral hand (2nd), spiritual weapon (2nd), unseen servant (1st), vision (7th), and whispering wind (2nd)."
+        },
+        {
+          "name": "Raging Spellstrength",
+          "description": "At 8th level, a rage prophet is able to cast spells with a range of ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œpersonalÃƒÂ¢Ã¢â€šÂ¬Ã‚Â on himself while raging, without having to use clarity of mind."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "-"
+      }
+    },
+    {
+      "level": 9,
+      "bab": 6,
+      "fort": 5,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Spirit Warrior",
+          "description": "At 9th level, the competence bonus provided by the rage prophetÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s guidance increases to his rage prophet level when used while battling a fey, outsider, undead, or incorporeal creature. His ability to give his armor and weapons the ghost touch property becomes an immediate action instead of a swift action ."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of divine spellcasting class"
+      }
+    },
+    {
+      "level": 10,
+      "bab": 7,
+      "fort": 5,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Greater Rage",
+          "description": "At 10th level, when a rage prophet enters a rage, his morale bonus to Strength and Constitution increases to +6 and his morale bonus on Will saves increases to +3. Section 15: Copyright Notice Advanced Player's Guide . Copyright 2010, Paizo Publishing, LLC; Author: Jason Bulmahn."
+        },
+        {
+          "name": "Rage Prophet Mystery",
+          "description": "At 2nd level and every even level thereafter, a rage prophet learns an additional spell from his spirit guide. These spells are in addition to those listed in Table: Oracle Spells Known . Like spells from an oracleÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s mystery, the rage prophet cannot exchange these spells for different spells at higher levels. The rage prophet must be able to cast oracle spells of the listed level to learn one of these spells from his spirit guide. The rage prophet treats the spell as an oracle spell of the listed level. The possible spells are arcane eye (4th), augury (2nd), divination (4th), dream (5th), find the path (6th), helping hand (3rd), see invisibility (2nd), shadow walk (6th), speak with dead (3rd), spectral hand (2nd), spiritual weapon (2nd), unseen servant (1st), vision (7th), and whispering wind (2nd)."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of divine spellcasting class"
+      }
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": {
+    "summary": "See level progression spell columns."
+  },
+  "spellcastingClass": true
+}

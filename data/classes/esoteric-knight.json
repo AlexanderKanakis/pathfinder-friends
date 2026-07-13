@@ -1,0 +1,261 @@
+{
+  "name": "Esoteric Knight",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/e-h/esoteric-knight/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 1,
+      "fort": 1,
+      "ref": 0,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Martial Esoterica",
+          "description": "At 1st level and every 2 levels thereafter, the esoteric knight gains a bonus combat feat . She must meet the prerequisites of the feat. Her esoteric knight levels count as fighter levels and stack with any levels of fighter she might have for meeting the prerequisites for feats. An esoteric knight can learn a new combat feat in place of the most recent martial esoterica feat she has learned either by expending a 1st-level spell slot or, if she is a character with the burn class feature (such as the kineticist ), by accepting 1 point of burn as a standard action . In effect, the esoteric knight loses the bonus feat in exchange for the new one. She can change only the most recent combat feat gained. Whenever she gains a new bonus combat feat , the previous feat becomes set and cannot be changed again."
+        }
+      ],
+      "spellcasting": {
+        "Spells Per Day": "-"
+      }
+    },
+    {
+      "level": 2,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Psychic Esoterica",
+          "description": "As an esoteric knight gains experience, she learns a number of psychic esoterica that enhance her offensive and defensive capabilities. At 2nd level and every 2 levels thereafter, an esoteric knight gains one psychic esoterica. Each esoterica can be selected only once. Some esoterica require a character to expend one or more spell slots to activate. A character with the burn class feature (such as a kineticist ) can accept burn instead of expending spell slots. She can accept 1 point of burn instead of expending a 1st-level or lower spell slot, or 2 points of burn instead of expending a 3rd-level or lower spell slot. Air Walk (Sp) [ Source ] By expending a 2nd-level spell slot as a swift action , the esoteric knight can levitate , as the spell, for 1 minute per esoteric knight level she possesses. Psychokinesis (Sp) [ Source ] By expending a 1st-level spell slot as a swift action , the esoteric knight can manipulate small objects telekinetically. This functions as mage hand , except the chosen object can weigh up to 10 pounds per class level of the esoteric knight. Mental Feat (Ex) [ Source ] The esoteric knight gains one of the following feats as a bonus feat: Combat Casting , Ecstatic Fury (see Feats below), Empath, Extra Rage , Mad Magic, Psychic Combatant, Psychic Defender, Psychic Healing , Psychic Maestro, Psychic Virtuoso, Raging Concentration , Spell Focus , or Spell Penetration . This psychic esoterica can be selected more than once, each time granting a new bonus feat. Mind Connection (Su) [ Source ] By expending a spell slot as a swift action , an esoteric knight"
+        }
+      ],
+      "spellcasting": {
+        "Spells Per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 3,
+      "bab": 3,
+      "fort": 2,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Martial Esoterica",
+          "description": "At 1st level and every 2 levels thereafter, the esoteric knight gains a bonus combat feat . She must meet the prerequisites of the feat. Her esoteric knight levels count as fighter levels and stack with any levels of fighter she might have for meeting the prerequisites for feats. An esoteric knight can learn a new combat feat in place of the most recent martial esoterica feat she has learned either by expending a 1st-level spell slot or, if she is a character with the burn class feature (such as the kineticist ), by accepting 1 point of burn as a standard action . In effect, the esoteric knight loses the bonus feat in exchange for the new one. She can change only the most recent combat feat gained. Whenever she gains a new bonus combat feat , the previous feat becomes set and cannot be changed again."
+        }
+      ],
+      "spellcasting": {
+        "Spells Per Day": "-"
+      }
+    },
+    {
+      "level": 4,
+      "bab": 4,
+      "fort": 2,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Psychic Esoterica",
+          "description": "As an esoteric knight gains experience, she learns a number of psychic esoterica that enhance her offensive and defensive capabilities. At 2nd level and every 2 levels thereafter, an esoteric knight gains one psychic esoterica. Each esoterica can be selected only once. Some esoterica require a character to expend one or more spell slots to activate. A character with the burn class feature (such as a kineticist ) can accept burn instead of expending spell slots. She can accept 1 point of burn instead of expending a 1st-level or lower spell slot, or 2 points of burn instead of expending a 3rd-level or lower spell slot. Air Walk (Sp) [ Source ] By expending a 2nd-level spell slot as a swift action , the esoteric knight can levitate , as the spell, for 1 minute per esoteric knight level she possesses. Psychokinesis (Sp) [ Source ] By expending a 1st-level spell slot as a swift action , the esoteric knight can manipulate small objects telekinetically. This functions as mage hand , except the chosen object can weigh up to 10 pounds per class level of the esoteric knight. Mental Feat (Ex) [ Source ] The esoteric knight gains one of the following feats as a bonus feat: Combat Casting , Ecstatic Fury (see Feats below), Empath, Extra Rage , Mad Magic, Psychic Combatant, Psychic Defender, Psychic Healing , Psychic Maestro, Psychic Virtuoso, Raging Concentration , Spell Focus , or Spell Penetration . This psychic esoterica can be selected more than once, each time granting a new bonus feat. Mind Connection (Su) [ Source ] By expending a spell slot as a swift action , an esoteric knight"
+        }
+      ],
+      "spellcasting": {
+        "Spells Per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 5,
+      "bab": 5,
+      "fort": 3,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Martial Esoterica",
+          "description": "At 1st level and every 2 levels thereafter, the esoteric knight gains a bonus combat feat . She must meet the prerequisites of the feat. Her esoteric knight levels count as fighter levels and stack with any levels of fighter she might have for meeting the prerequisites for feats. An esoteric knight can learn a new combat feat in place of the most recent martial esoterica feat she has learned either by expending a 1st-level spell slot or, if she is a character with the burn class feature (such as the kineticist ), by accepting 1 point of burn as a standard action . In effect, the esoteric knight loses the bonus feat in exchange for the new one. She can change only the most recent combat feat gained. Whenever she gains a new bonus combat feat , the previous feat becomes set and cannot be changed again."
+        }
+      ],
+      "spellcasting": {
+        "Spells Per Day": "-"
+      }
+    },
+    {
+      "level": 6,
+      "bab": 6,
+      "fort": 3,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Psychic Esoterica",
+          "description": "As an esoteric knight gains experience, she learns a number of psychic esoterica that enhance her offensive and defensive capabilities. At 2nd level and every 2 levels thereafter, an esoteric knight gains one psychic esoterica. Each esoterica can be selected only once. Some esoterica require a character to expend one or more spell slots to activate. A character with the burn class feature (such as a kineticist ) can accept burn instead of expending spell slots. She can accept 1 point of burn instead of expending a 1st-level or lower spell slot, or 2 points of burn instead of expending a 3rd-level or lower spell slot. Air Walk (Sp) [ Source ] By expending a 2nd-level spell slot as a swift action , the esoteric knight can levitate , as the spell, for 1 minute per esoteric knight level she possesses. Psychokinesis (Sp) [ Source ] By expending a 1st-level spell slot as a swift action , the esoteric knight can manipulate small objects telekinetically. This functions as mage hand , except the chosen object can weigh up to 10 pounds per class level of the esoteric knight. Mental Feat (Ex) [ Source ] The esoteric knight gains one of the following feats as a bonus feat: Combat Casting , Ecstatic Fury (see Feats below), Empath, Extra Rage , Mad Magic, Psychic Combatant, Psychic Defender, Psychic Healing , Psychic Maestro, Psychic Virtuoso, Raging Concentration , Spell Focus , or Spell Penetration . This psychic esoterica can be selected more than once, each time granting a new bonus feat. Mind Connection (Su) [ Source ] By expending a spell slot as a swift action , an esoteric knight"
+        }
+      ],
+      "spellcasting": {
+        "Spells Per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 7,
+      "bab": 7,
+      "fort": 4,
+      "ref": 2,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Martial Esoterica",
+          "description": "At 1st level and every 2 levels thereafter, the esoteric knight gains a bonus combat feat . She must meet the prerequisites of the feat. Her esoteric knight levels count as fighter levels and stack with any levels of fighter she might have for meeting the prerequisites for feats. An esoteric knight can learn a new combat feat in place of the most recent martial esoterica feat she has learned either by expending a 1st-level spell slot or, if she is a character with the burn class feature (such as the kineticist ), by accepting 1 point of burn as a standard action . In effect, the esoteric knight loses the bonus feat in exchange for the new one. She can change only the most recent combat feat gained. Whenever she gains a new bonus combat feat , the previous feat becomes set and cannot be changed again."
+        }
+      ],
+      "spellcasting": {
+        "Spells Per Day": "-"
+      }
+    },
+    {
+      "level": 8,
+      "bab": 8,
+      "fort": 4,
+      "ref": 3,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Psychic Esoterica",
+          "description": "As an esoteric knight gains experience, she learns a number of psychic esoterica that enhance her offensive and defensive capabilities. At 2nd level and every 2 levels thereafter, an esoteric knight gains one psychic esoterica. Each esoterica can be selected only once. Some esoterica require a character to expend one or more spell slots to activate. A character with the burn class feature (such as a kineticist ) can accept burn instead of expending spell slots. She can accept 1 point of burn instead of expending a 1st-level or lower spell slot, or 2 points of burn instead of expending a 3rd-level or lower spell slot. Air Walk (Sp) [ Source ] By expending a 2nd-level spell slot as a swift action , the esoteric knight can levitate , as the spell, for 1 minute per esoteric knight level she possesses. Psychokinesis (Sp) [ Source ] By expending a 1st-level spell slot as a swift action , the esoteric knight can manipulate small objects telekinetically. This functions as mage hand , except the chosen object can weigh up to 10 pounds per class level of the esoteric knight. Mental Feat (Ex) [ Source ] The esoteric knight gains one of the following feats as a bonus feat: Combat Casting , Ecstatic Fury (see Feats below), Empath, Extra Rage , Mad Magic, Psychic Combatant, Psychic Defender, Psychic Healing , Psychic Maestro, Psychic Virtuoso, Raging Concentration , Spell Focus , or Spell Penetration . This psychic esoterica can be selected more than once, each time granting a new bonus feat. Mind Connection (Su) [ Source ] By expending a spell slot as a swift action , an esoteric knight"
+        }
+      ],
+      "spellcasting": {
+        "Spells Per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 9,
+      "bab": 9,
+      "fort": 5,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Martial Esoterica",
+          "description": "At 1st level and every 2 levels thereafter, the esoteric knight gains a bonus combat feat . She must meet the prerequisites of the feat. Her esoteric knight levels count as fighter levels and stack with any levels of fighter she might have for meeting the prerequisites for feats. An esoteric knight can learn a new combat feat in place of the most recent martial esoterica feat she has learned either by expending a 1st-level spell slot or, if she is a character with the burn class feature (such as the kineticist ), by accepting 1 point of burn as a standard action . In effect, the esoteric knight loses the bonus feat in exchange for the new one. She can change only the most recent combat feat gained. Whenever she gains a new bonus combat feat , the previous feat becomes set and cannot be changed again."
+        }
+      ],
+      "spellcasting": {
+        "Spells Per Day": "-"
+      }
+    },
+    {
+      "level": 10,
+      "bab": 10,
+      "fort": 5,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Psychic Esoterica",
+          "description": "As an esoteric knight gains experience, she learns a number of psychic esoterica that enhance her offensive and defensive capabilities. At 2nd level and every 2 levels thereafter, an esoteric knight gains one psychic esoterica. Each esoterica can be selected only once. Some esoterica require a character to expend one or more spell slots to activate. A character with the burn class feature (such as a kineticist ) can accept burn instead of expending spell slots. She can accept 1 point of burn instead of expending a 1st-level or lower spell slot, or 2 points of burn instead of expending a 3rd-level or lower spell slot. Air Walk (Sp) [ Source ] By expending a 2nd-level spell slot as a swift action , the esoteric knight can levitate , as the spell, for 1 minute per esoteric knight level she possesses. Psychokinesis (Sp) [ Source ] By expending a 1st-level spell slot as a swift action , the esoteric knight can manipulate small objects telekinetically. This functions as mage hand , except the chosen object can weigh up to 10 pounds per class level of the esoteric knight. Mental Feat (Ex) [ Source ] The esoteric knight gains one of the following feats as a bonus feat: Combat Casting , Ecstatic Fury (see Feats below), Empath, Extra Rage , Mad Magic, Psychic Combatant, Psychic Defender, Psychic Healing , Psychic Maestro, Psychic Virtuoso, Raging Concentration , Spell Focus , or Spell Penetration . This psychic esoterica can be selected more than once, each time granting a new bonus feat. Mind Connection (Su) [ Source ] By expending a spell slot as a swift action , an esoteric knight"
+        }
+      ],
+      "spellcasting": {
+        "Spells Per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": {
+    "summary": "See level progression spell columns."
+  },
+  "spellcastingClass": true
+}

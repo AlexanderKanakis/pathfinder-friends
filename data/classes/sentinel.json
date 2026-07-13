@@ -1,0 +1,267 @@
+{
+  "name": "Sentinel",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/s-z/sentinel/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 1,
+      "fort": 1,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [
+        {
+          "name": "Obedience",
+          "description": "In order to maintain the abilities granted by this prestige class, a sentinel must perform a daily obedience to his chosen deity."
+        },
+        {
+          "name": "Symbolic Weapon +1",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 2,
+      "bab": 2,
+      "fort": 1,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": "At 2nd level and again at 7th level, the sentinel gains a bonus feat in addition to those gained from normal advancement. These bonus feats must be selected from those listed as combat feats . Sentinel levels stack with fighter levels for the purpose of qualifying for feats with a fighter level prerequisite. If the bonus feat selected requires the sentinel to select a specific weapon for the feat to apply to (such as Greater Weapon Focus ), the sentinel must select his deity's favored weapon."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 3,
+      "bab": 3,
+      "fort": 2,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Divine Boon 1",
+          "description": ""
+        },
+        {
+          "name": "Symbolic Weapon +2",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 4,
+      "bab": 4,
+      "fort": 2,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Divine Quickness +2",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 5,
+      "bab": 5,
+      "fort": 3,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Aligned Strike",
+          "description": "The sentinel's righteous fervor allows him to cut through certain types of damage reduction . At 5th level, the sentinel gains the ability to bypass a specific type of damage reduction when wielding his deity's favored weapon. The type of damage reduction his weapon bypasses is based on his chosen deity's alignment . The sentinel chooses this type of damage reduction when he gains this ability and this choice can't be changed. He can choose only one of the aligned weapon types regardless of how many options he has based on his deity's alignment . For example, a sentinel of the Inheritor can treat his weapon as axiomatic or holy , but not both. The choices are as follows. Lawful : The sentinel can treat his weapon as axiomatic if his deity is lawful. Chaotic : The sentinel can treat his weapon as anarchic if his deity is chaotic. Good : The sentinel can treat his weapon as holy if his deity is good. Evil : The sentinel can treat his weapon as unholy if his deity is evil. Neutral : The sentinel can choose one of the four other weapon alignment types if his deity is neutral."
+        },
+        {
+          "name": "Stalwart",
+          "description": "At 5th level, the sentinel gains mental fortitude through his constant meditation and adherence to religious tenets. He gains a +2 sacred or profane bonus on saving throws to resist divine spells."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 6,
+      "bab": 6,
+      "fort": 3,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Divine Boon 2",
+          "description": ""
+        },
+        {
+          "name": "Symbolic Weapon +3",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 7,
+      "bab": 7,
+      "fort": 4,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": "At 2nd level and again at 7th level, the sentinel gains a bonus feat in addition to those gained from normal advancement. These bonus feats must be selected from those listed as combat feats . Sentinel levels stack with fighter levels for the purpose of qualifying for feats with a fighter level prerequisite. If the bonus feat selected requires the sentinel to select a specific weapon for the feat to apply to (such as Greater Weapon Focus ), the sentinel must select his deity's favored weapon."
+        },
+        {
+          "name": "Practiced Combatant",
+          "description": "At 7th level, the sentinel displays increased combat ability thanks to his extensive training and experience. He gains a +2 sacred or profane bonus on combat maneuvers he performs with his deity's favored weapon."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 8,
+      "bab": 8,
+      "fort": 4,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Divine Quickness +4",
+          "description": ""
+        },
+        {
+          "name": "Righteous Leader",
+          "description": "At 8th level, the sentinel's commitment to his faith and the deeds he does in the name of his god add to his reputation. He gains Leadership as a bonus feat, and is considered to qualify for that feat's special power leadership modifier. He takes no penalty for moving around a lot (normally this imposes a -1 penalty to a character's leadership score) but he takes double the usual penalty for recruiting a cohort of a different alignment (-2 instead of -1)."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 9,
+      "bab": 9,
+      "fort": 5,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Divine Boon 3",
+          "description": ""
+        },
+        {
+          "name": "Symbolic Weapon +4",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 10,
+      "bab": 10,
+      "fort": 5,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Unstoppable Warrior",
+          "description": "At 10th level, the sentinel becomes a stalwart paragon demonstrating incredible combat prowess. He gains damage reduction based on the alignment of his deity, as shown in the table. Chosen Deity's Alignment Damage Reduction LG 10/evil NG 5/evil and silver CG 5/ cold iron and evil LN 10/chaotic N 3/- CN 10/lawful LE 10/good NE 5/good and silver CE 5/ cold iron and good In addition, the sentinel no longer falls unconscious when reduced to a negative hit point total, though he can take only a single standard or move action while at negative hit points , and he continues to lose hit points normally if he is not stabilized. Taking standard actions after becoming stable causes the sentinel's wounds to reopen, and he begins losing hit points normally again. Once per day as a swift action , the sentinel can use cure critical wounds , but targeting only himself, with a caster level equal to his character level. Section 15: Copyright Notice Pathfinder Campaign Setting: Inner Sea Gods Ãƒâ€šÃ‚Â© 2014, Paizo Publishing, LLC; Authors: Sean K Reynolds, with Amanda Hamon, James Jacobs, John Ling, Mark Moreland, David N. Ross, F. Wesley Schneider, Amber E. Scott, Tork Shaw, James L. Sutter, Jerome Virnich. Pathfinder Roleplaying Game Book of the Damned Ãƒâ€šÃ‚Â© 2017, Paizo Inc.; Authors: John Compton, Adam Daigle, Amanda Hamon Kunz, James Jacobs, Isabelle Lee, F. Wesley Schneider, Todd Stewart, and Josh Vogt."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": null,
+  "spellcastingClass": false
+}

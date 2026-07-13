@@ -1,0 +1,513 @@
+{
+  "name": "Swashbuckler",
+  "type": "hybrid",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/hybrid-classes/swashbuckler/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 1,
+      "fort": 0,
+      "ref": 2,
+      "will": 0,
+      "classFeatures": [
+        {
+          "name": "Deeds",
+          "description": "Swashbucklers spend panache points to accomplish deeds. Most deeds grant the swashbuckler a momentary bonus or effect, but some provide longer-lasting effects. Some deeds remain in effect while the swashbuckler has at least 1 panache point, but do not require expending panache to be maintained. A swashbuckler can only perform deeds of her level or lower. Unless otherwise noted, a deed can be performed multiple successive times, as long as the swashbuckler has or spends the required number of panache points to perform the deed. Derring-Do (Ex) : At 1st level, a swashbuckler can spend 1 panache point when she makes an Acrobatics , Climb , Escape Artist , Fly , Ride , or Swim check to roll 1d6 and add the result to the check. She can do this after she makes the check but before the result is revealed. If the result of the d6 roll is a natural 6, she rolls another 1d6 and adds it to the check. She can continue to do this as long as she rolls natural 6s, up to a number of times equal to her Dexterity modifier (minimum 1). Dodging Panache (Ex) : At 1st level, when an opponent attempts a melee attack against the swashbuckler, the swashbuckler can as an immediate action spend 1 panache point to move 5 feet; doing so grants the swashbuckler a dodge bonus to AC equal to her Charisma modifier (minimum 0) against the triggering attack. This movement doesn't negate the attack, which is still resolved as if the swashbuckler had not moved from the original square. This movement is not a 5-foot step; it provokes attacks of opportunity from creatures other than the one who triggered t",
+          "pools": [
+            {
+              "name": "Deeds",
+              "description": "Swashbucklers spend panache points to accomplish deeds. Most deeds grant the swashbuckler a momentary bonus or effect, but some provide longer-lasting effects. Some deeds remain in effect while the swashbuckler has at least 1 panache point, but do not require expending panache to be maintained. A swashbuckler can only perform deeds of her level or lower. Unless otherwise noted, a deed can be performed multiple successive times, as long as the swashbuckler has or spends the required number of panache points to perform the deed. Derring-Do (Ex) : At 1st level, a swashbuckler can spend 1 panache point when she makes an Acrobatics , Climb , Escape Artist , Fly , Ride , or Swim check to roll 1d6 and add the result to the check. She can do this after she makes the check but before the result is revealed. If the result of the d6 roll is a natural 6, she rolls another 1d6 and adds it to the check. She can continue to do this as long as she rolls natural 6s, up to a number of times equal to her Dexterity modifier (minimum 1). Dodging Panache (Ex) : At 1st level, when an opponent attempts a melee attack against the swashbuckler, the swashbuckler can as an immediate action spend 1 panache point to move 5 feet; doing so grants the swashbuckler a dodge bonus to AC equal to her Charisma modifier (minimum 0) against the triggering attack. This movement doesn't negate the attack, which is still resolved as if the swashbuckler had not moved from the original square. This movement is not a 5-foot step; it provokes attacks of opportunity from creatures other than the one who triggered t",
+              "requirements": {
+                "minClassLevel": 1,
+                "text": "Some deeds remain in effect while the swashbuckler has at least 1 panache point, but do not require expending panache to be maintained. A swashbuckler can only perform deeds of her level or lower."
+              },
+              "options": [
+                {
+                  "name": "Deeds",
+                  "description": "Swashbucklers spend panache points to accomplish deeds. Most deeds grant the swashbuckler a momentary bonus or effect, but some provide longer-lasting effects. Some deeds remain in effect while the swashbuckler has at least 1 panache point, but do not require expending panache to be maintained. A swashbuckler can only perform deeds of her level or lower. Unless otherwise noted, a deed can be performed multiple successive times, as long as the swashbuckler has or spends the required number of panache points to perform the deed. Derring-Do (Ex) : At 1st level, a swashbuckler can spend 1 panache point when she makes an Acrobatics , Climb , Escape Artist , Fly , Ride , or Swim check to roll 1d6 and add the result to the check. She can do this after she makes the check but before the result is revealed. If the result of the d6 roll is a natural 6, she rolls another 1d6 and adds it to the check. She can continue to do this as long as she rolls natural 6s, up to a number of times equal to her Dexterity modifier (minimum 1). Dodging Panache (Ex) : At 1st level, when an opponent attempts a melee attack against the swashbuckler, the swashbuckler can as an immediate action spend 1 panache point to move 5 feet; doing so grants the swashbuckler a dodge bonus to AC equal to her Charisma modifier (minimum 0) against the triggering attack. This movement doesn&#8217;t negate the attack, which is still resolved as if the swashbuckler had not moved from the original square. This movement is not a 5-foot step; it provokes attacks of opportunity from creatures other than the one who triggered this deed. The swashbuckler can only perform this deed while wearing light or no armor , and while carrying no heavier than a light load. Opportune Parry and Riposte (Ex) : At 1st level, when an oppone",
+                  "requirements": {
+                    "minClassLevel": 1,
+                    "text": "Some deeds remain in effect while the swashbuckler has at least 1 panache point, but do not require expending panache to be maintained. A swashbuckler can only perform deeds of her level or lower."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "Deeds Of Renown",
+                  "description": "Swashbucklers and gunslingers perform impressive deeds through their grit and panache, but some are capable of truly spectacular acts known as renowned deeds. A swashbuckler or gunslinger (though not members of other classes) can select a renowned deed for her class upon reaching the class level listed in the deedÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s description. This replaces the specific listed deed or deeds; if the character would not gain the appropriate deeds, she cannot select the renowned deed, as if selecting an archetype. Vengeful Heart (Ex) : Some swashbucklers are driven by vengeance above all else. At 1st level, the swashbuckler gains the samuraiÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s resolve class feature, treating her swashbuckler level as her samurai level. Whenever the swashbuckler spends a use of resolve, she must also spend a point of panache or a use of charmed life, or the use of resolve has no effect. This deed replaces the derring-do deed and one other 1st-level deed. Source PPC:CoL Hilt Hammer (Ex) : Precise strikes with a slender blade do little to hinder amorphous or incorporeal creatures; when encountering such threats, some swashbucklers abandon precision in favor of brutish strikes. At 3rd level, the swashbuckler can activate this deed before rolling the attack roll when making an attack that would benefit from precise strike. An attack altered this way deals only half the normal damage from precise strike, but this damage is not treated as precision damage. This deed alters (but does not replace) the precise strike deed and replaces one other 3rd-level deed. Source PPC:CoL Dodging Dance (Ex) : The swashbuckler moves around her opponentsÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ attacks to open them up for strikes. At 7th level, a swashbuckler can spend 1 panache point to move up to half her speed as a move action . If a creature makes an attack of oppo",
+                  "requirements": {
+                    "minClassLevel": 1,
+                    "text": "A swashbuckler or gunslinger (though not members of other classes) can select a renowned deed for her class upon reaching the class level listed in the deedÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s description. At 1st level, the swashbuckler gains the samuraiÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s resolve class feature, treating her swashbuckler level as her samurai level."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/hybrid-classes/swashbuckler/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        },
+        {
+          "name": "Panache",
+          "description": "More than just a lightly armored warrior, a swashbuckler is a daring combatant. She fights with panache: a fluctuating measure of a swashbuckler's ability to perform amazing actions in combat. At the start of each day, a swashbuckler gains a number of panache points equal to her Charisma modifier (minimum 1). Her panache goes up or down throughout the day, but usually cannot go higher than her Charisma modifier (minimum 1), though feats and magic items can affect this maximum. A swashbuckler spends panache to accomplish deeds (see below), and regains panache in the following ways. Critical Hit with a Light or One-Handed Piercing Melee Weapon : Each time the swashbuckler confirms a critical hit with a light or one-handed piercing melee weapon, she regains 1 panache point. Confirming a critical hit on a helpless or unaware creature or a creature that has fewer Hit Dice than half the swashbuckler's character level doesn't restore panache. Killing Blow with a Light or One-Handed Piercing Melee Weapon : When the swashbuckler reduces a creature to 0 or fewer hit points with a light or one-handed piercing melee weapon attack while in combat, she regains 1 panache point. Destroying an unattended object, reducing a helpless or unaware creature to 0 or fewer hit points , or reducing a creature that has fewer Hit Dice than half the swashbuckler's character level to 0 or fewer hit points doesn't restore any panache. Grit, Luck, and Panache Grit, luck, and panache represent three different means by which heroes can gain access to the same heroic pool, using"
+        },
+        {
+          "name": "Swashbuckler Finesse",
+          "description": "At 1st level, a swashbuckler gains the benefits of the Weapon Finesse feat with light or one-handed piercing melee weapons, and she can use her Charisma score in place of Intelligence as a prerequisite for combat feats . This ability counts as having the Weapon Finesse feat for purposes of meeting feat prerequisites."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 2,
+      "bab": 2,
+      "fort": 0,
+      "ref": 3,
+      "will": 0,
+      "classFeatures": [
+        {
+          "name": "Charmed Life 3/Day",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 3,
+      "bab": 3,
+      "fort": 1,
+      "ref": 3,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Deeds",
+          "description": "Swashbucklers spend panache points to accomplish deeds. Most deeds grant the swashbuckler a momentary bonus or effect, but some provide longer-lasting effects. Some deeds remain in effect while the swashbuckler has at least 1 panache point, but do not require expending panache to be maintained. A swashbuckler can only perform deeds of her level or lower. Unless otherwise noted, a deed can be performed multiple successive times, as long as the swashbuckler has or spends the required number of panache points to perform the deed. Derring-Do (Ex) : At 1st level, a swashbuckler can spend 1 panache point when she makes an Acrobatics , Climb , Escape Artist , Fly , Ride , or Swim check to roll 1d6 and add the result to the check. She can do this after she makes the check but before the result is revealed. If the result of the d6 roll is a natural 6, she rolls another 1d6 and adds it to the check. She can continue to do this as long as she rolls natural 6s, up to a number of times equal to her Dexterity modifier (minimum 1). Dodging Panache (Ex) : At 1st level, when an opponent attempts a melee attack against the swashbuckler, the swashbuckler can as an immediate action spend 1 panache point to move 5 feet; doing so grants the swashbuckler a dodge bonus to AC equal to her Charisma modifier (minimum 0) against the triggering attack. This movement doesn't negate the attack, which is still resolved as if the swashbuckler had not moved from the original square. This movement is not a 5-foot step; it provokes attacks of opportunity from creatures other than the one who triggered t",
+          "pools": [
+            {
+              "name": "Deeds",
+              "description": "Swashbucklers spend panache points to accomplish deeds. Most deeds grant the swashbuckler a momentary bonus or effect, but some provide longer-lasting effects. Some deeds remain in effect while the swashbuckler has at least 1 panache point, but do not require expending panache to be maintained. A swashbuckler can only perform deeds of her level or lower. Unless otherwise noted, a deed can be performed multiple successive times, as long as the swashbuckler has or spends the required number of panache points to perform the deed. Derring-Do (Ex) : At 1st level, a swashbuckler can spend 1 panache point when she makes an Acrobatics , Climb , Escape Artist , Fly , Ride , or Swim check to roll 1d6 and add the result to the check. She can do this after she makes the check but before the result is revealed. If the result of the d6 roll is a natural 6, she rolls another 1d6 and adds it to the check. She can continue to do this as long as she rolls natural 6s, up to a number of times equal to her Dexterity modifier (minimum 1). Dodging Panache (Ex) : At 1st level, when an opponent attempts a melee attack against the swashbuckler, the swashbuckler can as an immediate action spend 1 panache point to move 5 feet; doing so grants the swashbuckler a dodge bonus to AC equal to her Charisma modifier (minimum 0) against the triggering attack. This movement doesn't negate the attack, which is still resolved as if the swashbuckler had not moved from the original square. This movement is not a 5-foot step; it provokes attacks of opportunity from creatures other than the one who triggered t",
+              "requirements": {
+                "minClassLevel": 1,
+                "text": "Some deeds remain in effect while the swashbuckler has at least 1 panache point, but do not require expending panache to be maintained. A swashbuckler can only perform deeds of her level or lower."
+              },
+              "options": [
+                {
+                  "name": "Deeds",
+                  "description": "Swashbucklers spend panache points to accomplish deeds. Most deeds grant the swashbuckler a momentary bonus or effect, but some provide longer-lasting effects. Some deeds remain in effect while the swashbuckler has at least 1 panache point, but do not require expending panache to be maintained. A swashbuckler can only perform deeds of her level or lower. Unless otherwise noted, a deed can be performed multiple successive times, as long as the swashbuckler has or spends the required number of panache points to perform the deed. Derring-Do (Ex) : At 1st level, a swashbuckler can spend 1 panache point when she makes an Acrobatics , Climb , Escape Artist , Fly , Ride , or Swim check to roll 1d6 and add the result to the check. She can do this after she makes the check but before the result is revealed. If the result of the d6 roll is a natural 6, she rolls another 1d6 and adds it to the check. She can continue to do this as long as she rolls natural 6s, up to a number of times equal to her Dexterity modifier (minimum 1). Dodging Panache (Ex) : At 1st level, when an opponent attempts a melee attack against the swashbuckler, the swashbuckler can as an immediate action spend 1 panache point to move 5 feet; doing so grants the swashbuckler a dodge bonus to AC equal to her Charisma modifier (minimum 0) against the triggering attack. This movement doesn&#8217;t negate the attack, which is still resolved as if the swashbuckler had not moved from the original square. This movement is not a 5-foot step; it provokes attacks of opportunity from creatures other than the one who triggered this deed. The swashbuckler can only perform this deed while wearing light or no armor , and while carrying no heavier than a light load. Opportune Parry and Riposte (Ex) : At 1st level, when an oppone",
+                  "requirements": {
+                    "minClassLevel": 1,
+                    "text": "Some deeds remain in effect while the swashbuckler has at least 1 panache point, but do not require expending panache to be maintained. A swashbuckler can only perform deeds of her level or lower."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "Deeds Of Renown",
+                  "description": "Swashbucklers and gunslingers perform impressive deeds through their grit and panache, but some are capable of truly spectacular acts known as renowned deeds. A swashbuckler or gunslinger (though not members of other classes) can select a renowned deed for her class upon reaching the class level listed in the deedÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s description. This replaces the specific listed deed or deeds; if the character would not gain the appropriate deeds, she cannot select the renowned deed, as if selecting an archetype. Vengeful Heart (Ex) : Some swashbucklers are driven by vengeance above all else. At 1st level, the swashbuckler gains the samuraiÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s resolve class feature, treating her swashbuckler level as her samurai level. Whenever the swashbuckler spends a use of resolve, she must also spend a point of panache or a use of charmed life, or the use of resolve has no effect. This deed replaces the derring-do deed and one other 1st-level deed. Source PPC:CoL Hilt Hammer (Ex) : Precise strikes with a slender blade do little to hinder amorphous or incorporeal creatures; when encountering such threats, some swashbucklers abandon precision in favor of brutish strikes. At 3rd level, the swashbuckler can activate this deed before rolling the attack roll when making an attack that would benefit from precise strike. An attack altered this way deals only half the normal damage from precise strike, but this damage is not treated as precision damage. This deed alters (but does not replace) the precise strike deed and replaces one other 3rd-level deed. Source PPC:CoL Dodging Dance (Ex) : The swashbuckler moves around her opponentsÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ attacks to open them up for strikes. At 7th level, a swashbuckler can spend 1 panache point to move up to half her speed as a move action . If a creature makes an attack of oppo",
+                  "requirements": {
+                    "minClassLevel": 1,
+                    "text": "A swashbuckler or gunslinger (though not members of other classes) can select a renowned deed for her class upon reaching the class level listed in the deedÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s description. At 1st level, the swashbuckler gains the samuraiÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s resolve class feature, treating her swashbuckler level as her samurai level."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/hybrid-classes/swashbuckler/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        },
+        {
+          "name": "Nimble +1",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 4,
+      "bab": 4,
+      "fort": 1,
+      "ref": 4,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 5,
+      "bab": 5,
+      "fort": 1,
+      "ref": 4,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Swashbuckler Weapon Training +1",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 6,
+      "bab": 6,
+      "fort": 2,
+      "ref": 5,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Charmed Life 4/Day",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 7,
+      "bab": 7,
+      "fort": 2,
+      "ref": 5,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Deeds",
+          "description": "Swashbucklers spend panache points to accomplish deeds. Most deeds grant the swashbuckler a momentary bonus or effect, but some provide longer-lasting effects. Some deeds remain in effect while the swashbuckler has at least 1 panache point, but do not require expending panache to be maintained. A swashbuckler can only perform deeds of her level or lower. Unless otherwise noted, a deed can be performed multiple successive times, as long as the swashbuckler has or spends the required number of panache points to perform the deed. Derring-Do (Ex) : At 1st level, a swashbuckler can spend 1 panache point when she makes an Acrobatics , Climb , Escape Artist , Fly , Ride , or Swim check to roll 1d6 and add the result to the check. She can do this after she makes the check but before the result is revealed. If the result of the d6 roll is a natural 6, she rolls another 1d6 and adds it to the check. She can continue to do this as long as she rolls natural 6s, up to a number of times equal to her Dexterity modifier (minimum 1). Dodging Panache (Ex) : At 1st level, when an opponent attempts a melee attack against the swashbuckler, the swashbuckler can as an immediate action spend 1 panache point to move 5 feet; doing so grants the swashbuckler a dodge bonus to AC equal to her Charisma modifier (minimum 0) against the triggering attack. This movement doesn't negate the attack, which is still resolved as if the swashbuckler had not moved from the original square. This movement is not a 5-foot step; it provokes attacks of opportunity from creatures other than the one who triggered t",
+          "pools": [
+            {
+              "name": "Deeds",
+              "description": "Swashbucklers spend panache points to accomplish deeds. Most deeds grant the swashbuckler a momentary bonus or effect, but some provide longer-lasting effects. Some deeds remain in effect while the swashbuckler has at least 1 panache point, but do not require expending panache to be maintained. A swashbuckler can only perform deeds of her level or lower. Unless otherwise noted, a deed can be performed multiple successive times, as long as the swashbuckler has or spends the required number of panache points to perform the deed. Derring-Do (Ex) : At 1st level, a swashbuckler can spend 1 panache point when she makes an Acrobatics , Climb , Escape Artist , Fly , Ride , or Swim check to roll 1d6 and add the result to the check. She can do this after she makes the check but before the result is revealed. If the result of the d6 roll is a natural 6, she rolls another 1d6 and adds it to the check. She can continue to do this as long as she rolls natural 6s, up to a number of times equal to her Dexterity modifier (minimum 1). Dodging Panache (Ex) : At 1st level, when an opponent attempts a melee attack against the swashbuckler, the swashbuckler can as an immediate action spend 1 panache point to move 5 feet; doing so grants the swashbuckler a dodge bonus to AC equal to her Charisma modifier (minimum 0) against the triggering attack. This movement doesn't negate the attack, which is still resolved as if the swashbuckler had not moved from the original square. This movement is not a 5-foot step; it provokes attacks of opportunity from creatures other than the one who triggered t",
+              "requirements": {
+                "minClassLevel": 1,
+                "text": "Some deeds remain in effect while the swashbuckler has at least 1 panache point, but do not require expending panache to be maintained. A swashbuckler can only perform deeds of her level or lower."
+              },
+              "options": [
+                {
+                  "name": "Deeds",
+                  "description": "Swashbucklers spend panache points to accomplish deeds. Most deeds grant the swashbuckler a momentary bonus or effect, but some provide longer-lasting effects. Some deeds remain in effect while the swashbuckler has at least 1 panache point, but do not require expending panache to be maintained. A swashbuckler can only perform deeds of her level or lower. Unless otherwise noted, a deed can be performed multiple successive times, as long as the swashbuckler has or spends the required number of panache points to perform the deed. Derring-Do (Ex) : At 1st level, a swashbuckler can spend 1 panache point when she makes an Acrobatics , Climb , Escape Artist , Fly , Ride , or Swim check to roll 1d6 and add the result to the check. She can do this after she makes the check but before the result is revealed. If the result of the d6 roll is a natural 6, she rolls another 1d6 and adds it to the check. She can continue to do this as long as she rolls natural 6s, up to a number of times equal to her Dexterity modifier (minimum 1). Dodging Panache (Ex) : At 1st level, when an opponent attempts a melee attack against the swashbuckler, the swashbuckler can as an immediate action spend 1 panache point to move 5 feet; doing so grants the swashbuckler a dodge bonus to AC equal to her Charisma modifier (minimum 0) against the triggering attack. This movement doesn&#8217;t negate the attack, which is still resolved as if the swashbuckler had not moved from the original square. This movement is not a 5-foot step; it provokes attacks of opportunity from creatures other than the one who triggered this deed. The swashbuckler can only perform this deed while wearing light or no armor , and while carrying no heavier than a light load. Opportune Parry and Riposte (Ex) : At 1st level, when an oppone",
+                  "requirements": {
+                    "minClassLevel": 1,
+                    "text": "Some deeds remain in effect while the swashbuckler has at least 1 panache point, but do not require expending panache to be maintained. A swashbuckler can only perform deeds of her level or lower."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "Deeds Of Renown",
+                  "description": "Swashbucklers and gunslingers perform impressive deeds through their grit and panache, but some are capable of truly spectacular acts known as renowned deeds. A swashbuckler or gunslinger (though not members of other classes) can select a renowned deed for her class upon reaching the class level listed in the deedÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s description. This replaces the specific listed deed or deeds; if the character would not gain the appropriate deeds, she cannot select the renowned deed, as if selecting an archetype. Vengeful Heart (Ex) : Some swashbucklers are driven by vengeance above all else. At 1st level, the swashbuckler gains the samuraiÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s resolve class feature, treating her swashbuckler level as her samurai level. Whenever the swashbuckler spends a use of resolve, she must also spend a point of panache or a use of charmed life, or the use of resolve has no effect. This deed replaces the derring-do deed and one other 1st-level deed. Source PPC:CoL Hilt Hammer (Ex) : Precise strikes with a slender blade do little to hinder amorphous or incorporeal creatures; when encountering such threats, some swashbucklers abandon precision in favor of brutish strikes. At 3rd level, the swashbuckler can activate this deed before rolling the attack roll when making an attack that would benefit from precise strike. An attack altered this way deals only half the normal damage from precise strike, but this damage is not treated as precision damage. This deed alters (but does not replace) the precise strike deed and replaces one other 3rd-level deed. Source PPC:CoL Dodging Dance (Ex) : The swashbuckler moves around her opponentsÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ attacks to open them up for strikes. At 7th level, a swashbuckler can spend 1 panache point to move up to half her speed as a move action . If a creature makes an attack of oppo",
+                  "requirements": {
+                    "minClassLevel": 1,
+                    "text": "A swashbuckler or gunslinger (though not members of other classes) can select a renowned deed for her class upon reaching the class level listed in the deedÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s description. At 1st level, the swashbuckler gains the samuraiÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s resolve class feature, treating her swashbuckler level as her samurai level."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/hybrid-classes/swashbuckler/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        },
+        {
+          "name": "Nimble +2",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 8,
+      "bab": 8,
+      "fort": 2,
+      "ref": 6,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 9,
+      "bab": 9,
+      "fort": 3,
+      "ref": 6,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Swashbuckler Weapon Training +2",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 10,
+      "bab": 10,
+      "fort": 3,
+      "ref": 7,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Charmed Life 5/Day",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 11,
+      "bab": 11,
+      "fort": 3,
+      "ref": 7,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Deeds",
+          "description": "Swashbucklers spend panache points to accomplish deeds. Most deeds grant the swashbuckler a momentary bonus or effect, but some provide longer-lasting effects. Some deeds remain in effect while the swashbuckler has at least 1 panache point, but do not require expending panache to be maintained. A swashbuckler can only perform deeds of her level or lower. Unless otherwise noted, a deed can be performed multiple successive times, as long as the swashbuckler has or spends the required number of panache points to perform the deed. Derring-Do (Ex) : At 1st level, a swashbuckler can spend 1 panache point when she makes an Acrobatics , Climb , Escape Artist , Fly , Ride , or Swim check to roll 1d6 and add the result to the check. She can do this after she makes the check but before the result is revealed. If the result of the d6 roll is a natural 6, she rolls another 1d6 and adds it to the check. She can continue to do this as long as she rolls natural 6s, up to a number of times equal to her Dexterity modifier (minimum 1). Dodging Panache (Ex) : At 1st level, when an opponent attempts a melee attack against the swashbuckler, the swashbuckler can as an immediate action spend 1 panache point to move 5 feet; doing so grants the swashbuckler a dodge bonus to AC equal to her Charisma modifier (minimum 0) against the triggering attack. This movement doesn't negate the attack, which is still resolved as if the swashbuckler had not moved from the original square. This movement is not a 5-foot step; it provokes attacks of opportunity from creatures other than the one who triggered t",
+          "pools": [
+            {
+              "name": "Deeds",
+              "description": "Swashbucklers spend panache points to accomplish deeds. Most deeds grant the swashbuckler a momentary bonus or effect, but some provide longer-lasting effects. Some deeds remain in effect while the swashbuckler has at least 1 panache point, but do not require expending panache to be maintained. A swashbuckler can only perform deeds of her level or lower. Unless otherwise noted, a deed can be performed multiple successive times, as long as the swashbuckler has or spends the required number of panache points to perform the deed. Derring-Do (Ex) : At 1st level, a swashbuckler can spend 1 panache point when she makes an Acrobatics , Climb , Escape Artist , Fly , Ride , or Swim check to roll 1d6 and add the result to the check. She can do this after she makes the check but before the result is revealed. If the result of the d6 roll is a natural 6, she rolls another 1d6 and adds it to the check. She can continue to do this as long as she rolls natural 6s, up to a number of times equal to her Dexterity modifier (minimum 1). Dodging Panache (Ex) : At 1st level, when an opponent attempts a melee attack against the swashbuckler, the swashbuckler can as an immediate action spend 1 panache point to move 5 feet; doing so grants the swashbuckler a dodge bonus to AC equal to her Charisma modifier (minimum 0) against the triggering attack. This movement doesn't negate the attack, which is still resolved as if the swashbuckler had not moved from the original square. This movement is not a 5-foot step; it provokes attacks of opportunity from creatures other than the one who triggered t",
+              "requirements": {
+                "minClassLevel": 1,
+                "text": "Some deeds remain in effect while the swashbuckler has at least 1 panache point, but do not require expending panache to be maintained. A swashbuckler can only perform deeds of her level or lower."
+              },
+              "options": [
+                {
+                  "name": "Deeds",
+                  "description": "Swashbucklers spend panache points to accomplish deeds. Most deeds grant the swashbuckler a momentary bonus or effect, but some provide longer-lasting effects. Some deeds remain in effect while the swashbuckler has at least 1 panache point, but do not require expending panache to be maintained. A swashbuckler can only perform deeds of her level or lower. Unless otherwise noted, a deed can be performed multiple successive times, as long as the swashbuckler has or spends the required number of panache points to perform the deed. Derring-Do (Ex) : At 1st level, a swashbuckler can spend 1 panache point when she makes an Acrobatics , Climb , Escape Artist , Fly , Ride , or Swim check to roll 1d6 and add the result to the check. She can do this after she makes the check but before the result is revealed. If the result of the d6 roll is a natural 6, she rolls another 1d6 and adds it to the check. She can continue to do this as long as she rolls natural 6s, up to a number of times equal to her Dexterity modifier (minimum 1). Dodging Panache (Ex) : At 1st level, when an opponent attempts a melee attack against the swashbuckler, the swashbuckler can as an immediate action spend 1 panache point to move 5 feet; doing so grants the swashbuckler a dodge bonus to AC equal to her Charisma modifier (minimum 0) against the triggering attack. This movement doesn&#8217;t negate the attack, which is still resolved as if the swashbuckler had not moved from the original square. This movement is not a 5-foot step; it provokes attacks of opportunity from creatures other than the one who triggered this deed. The swashbuckler can only perform this deed while wearing light or no armor , and while carrying no heavier than a light load. Opportune Parry and Riposte (Ex) : At 1st level, when an oppone",
+                  "requirements": {
+                    "minClassLevel": 1,
+                    "text": "Some deeds remain in effect while the swashbuckler has at least 1 panache point, but do not require expending panache to be maintained. A swashbuckler can only perform deeds of her level or lower."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "Deeds Of Renown",
+                  "description": "Swashbucklers and gunslingers perform impressive deeds through their grit and panache, but some are capable of truly spectacular acts known as renowned deeds. A swashbuckler or gunslinger (though not members of other classes) can select a renowned deed for her class upon reaching the class level listed in the deedÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s description. This replaces the specific listed deed or deeds; if the character would not gain the appropriate deeds, she cannot select the renowned deed, as if selecting an archetype. Vengeful Heart (Ex) : Some swashbucklers are driven by vengeance above all else. At 1st level, the swashbuckler gains the samuraiÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s resolve class feature, treating her swashbuckler level as her samurai level. Whenever the swashbuckler spends a use of resolve, she must also spend a point of panache or a use of charmed life, or the use of resolve has no effect. This deed replaces the derring-do deed and one other 1st-level deed. Source PPC:CoL Hilt Hammer (Ex) : Precise strikes with a slender blade do little to hinder amorphous or incorporeal creatures; when encountering such threats, some swashbucklers abandon precision in favor of brutish strikes. At 3rd level, the swashbuckler can activate this deed before rolling the attack roll when making an attack that would benefit from precise strike. An attack altered this way deals only half the normal damage from precise strike, but this damage is not treated as precision damage. This deed alters (but does not replace) the precise strike deed and replaces one other 3rd-level deed. Source PPC:CoL Dodging Dance (Ex) : The swashbuckler moves around her opponentsÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ attacks to open them up for strikes. At 7th level, a swashbuckler can spend 1 panache point to move up to half her speed as a move action . If a creature makes an attack of oppo",
+                  "requirements": {
+                    "minClassLevel": 1,
+                    "text": "A swashbuckler or gunslinger (though not members of other classes) can select a renowned deed for her class upon reaching the class level listed in the deedÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s description. At 1st level, the swashbuckler gains the samuraiÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s resolve class feature, treating her swashbuckler level as her samurai level."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/hybrid-classes/swashbuckler/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        },
+        {
+          "name": "Nimble +3",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 12,
+      "fort": 4,
+      "ref": 8,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 13,
+      "fort": 4,
+      "ref": 8,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Swashbuckler Weapon Training +3",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 14,
+      "fort": 4,
+      "ref": 9,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Charmed Life 6/Day",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 15,
+      "fort": 5,
+      "ref": 9,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Deeds",
+          "description": "Swashbucklers spend panache points to accomplish deeds. Most deeds grant the swashbuckler a momentary bonus or effect, but some provide longer-lasting effects. Some deeds remain in effect while the swashbuckler has at least 1 panache point, but do not require expending panache to be maintained. A swashbuckler can only perform deeds of her level or lower. Unless otherwise noted, a deed can be performed multiple successive times, as long as the swashbuckler has or spends the required number of panache points to perform the deed. Derring-Do (Ex) : At 1st level, a swashbuckler can spend 1 panache point when she makes an Acrobatics , Climb , Escape Artist , Fly , Ride , or Swim check to roll 1d6 and add the result to the check. She can do this after she makes the check but before the result is revealed. If the result of the d6 roll is a natural 6, she rolls another 1d6 and adds it to the check. She can continue to do this as long as she rolls natural 6s, up to a number of times equal to her Dexterity modifier (minimum 1). Dodging Panache (Ex) : At 1st level, when an opponent attempts a melee attack against the swashbuckler, the swashbuckler can as an immediate action spend 1 panache point to move 5 feet; doing so grants the swashbuckler a dodge bonus to AC equal to her Charisma modifier (minimum 0) against the triggering attack. This movement doesn't negate the attack, which is still resolved as if the swashbuckler had not moved from the original square. This movement is not a 5-foot step; it provokes attacks of opportunity from creatures other than the one who triggered t",
+          "pools": [
+            {
+              "name": "Deeds",
+              "description": "Swashbucklers spend panache points to accomplish deeds. Most deeds grant the swashbuckler a momentary bonus or effect, but some provide longer-lasting effects. Some deeds remain in effect while the swashbuckler has at least 1 panache point, but do not require expending panache to be maintained. A swashbuckler can only perform deeds of her level or lower. Unless otherwise noted, a deed can be performed multiple successive times, as long as the swashbuckler has or spends the required number of panache points to perform the deed. Derring-Do (Ex) : At 1st level, a swashbuckler can spend 1 panache point when she makes an Acrobatics , Climb , Escape Artist , Fly , Ride , or Swim check to roll 1d6 and add the result to the check. She can do this after she makes the check but before the result is revealed. If the result of the d6 roll is a natural 6, she rolls another 1d6 and adds it to the check. She can continue to do this as long as she rolls natural 6s, up to a number of times equal to her Dexterity modifier (minimum 1). Dodging Panache (Ex) : At 1st level, when an opponent attempts a melee attack against the swashbuckler, the swashbuckler can as an immediate action spend 1 panache point to move 5 feet; doing so grants the swashbuckler a dodge bonus to AC equal to her Charisma modifier (minimum 0) against the triggering attack. This movement doesn't negate the attack, which is still resolved as if the swashbuckler had not moved from the original square. This movement is not a 5-foot step; it provokes attacks of opportunity from creatures other than the one who triggered t",
+              "requirements": {
+                "minClassLevel": 1,
+                "text": "Some deeds remain in effect while the swashbuckler has at least 1 panache point, but do not require expending panache to be maintained. A swashbuckler can only perform deeds of her level or lower."
+              },
+              "options": [
+                {
+                  "name": "Deeds",
+                  "description": "Swashbucklers spend panache points to accomplish deeds. Most deeds grant the swashbuckler a momentary bonus or effect, but some provide longer-lasting effects. Some deeds remain in effect while the swashbuckler has at least 1 panache point, but do not require expending panache to be maintained. A swashbuckler can only perform deeds of her level or lower. Unless otherwise noted, a deed can be performed multiple successive times, as long as the swashbuckler has or spends the required number of panache points to perform the deed. Derring-Do (Ex) : At 1st level, a swashbuckler can spend 1 panache point when she makes an Acrobatics , Climb , Escape Artist , Fly , Ride , or Swim check to roll 1d6 and add the result to the check. She can do this after she makes the check but before the result is revealed. If the result of the d6 roll is a natural 6, she rolls another 1d6 and adds it to the check. She can continue to do this as long as she rolls natural 6s, up to a number of times equal to her Dexterity modifier (minimum 1). Dodging Panache (Ex) : At 1st level, when an opponent attempts a melee attack against the swashbuckler, the swashbuckler can as an immediate action spend 1 panache point to move 5 feet; doing so grants the swashbuckler a dodge bonus to AC equal to her Charisma modifier (minimum 0) against the triggering attack. This movement doesn&#8217;t negate the attack, which is still resolved as if the swashbuckler had not moved from the original square. This movement is not a 5-foot step; it provokes attacks of opportunity from creatures other than the one who triggered this deed. The swashbuckler can only perform this deed while wearing light or no armor , and while carrying no heavier than a light load. Opportune Parry and Riposte (Ex) : At 1st level, when an oppone",
+                  "requirements": {
+                    "minClassLevel": 1,
+                    "text": "Some deeds remain in effect while the swashbuckler has at least 1 panache point, but do not require expending panache to be maintained. A swashbuckler can only perform deeds of her level or lower."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "Deeds Of Renown",
+                  "description": "Swashbucklers and gunslingers perform impressive deeds through their grit and panache, but some are capable of truly spectacular acts known as renowned deeds. A swashbuckler or gunslinger (though not members of other classes) can select a renowned deed for her class upon reaching the class level listed in the deedÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s description. This replaces the specific listed deed or deeds; if the character would not gain the appropriate deeds, she cannot select the renowned deed, as if selecting an archetype. Vengeful Heart (Ex) : Some swashbucklers are driven by vengeance above all else. At 1st level, the swashbuckler gains the samuraiÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s resolve class feature, treating her swashbuckler level as her samurai level. Whenever the swashbuckler spends a use of resolve, she must also spend a point of panache or a use of charmed life, or the use of resolve has no effect. This deed replaces the derring-do deed and one other 1st-level deed. Source PPC:CoL Hilt Hammer (Ex) : Precise strikes with a slender blade do little to hinder amorphous or incorporeal creatures; when encountering such threats, some swashbucklers abandon precision in favor of brutish strikes. At 3rd level, the swashbuckler can activate this deed before rolling the attack roll when making an attack that would benefit from precise strike. An attack altered this way deals only half the normal damage from precise strike, but this damage is not treated as precision damage. This deed alters (but does not replace) the precise strike deed and replaces one other 3rd-level deed. Source PPC:CoL Dodging Dance (Ex) : The swashbuckler moves around her opponentsÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ attacks to open them up for strikes. At 7th level, a swashbuckler can spend 1 panache point to move up to half her speed as a move action . If a creature makes an attack of oppo",
+                  "requirements": {
+                    "minClassLevel": 1,
+                    "text": "A swashbuckler or gunslinger (though not members of other classes) can select a renowned deed for her class upon reaching the class level listed in the deedÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s description. At 1st level, the swashbuckler gains the samuraiÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s resolve class feature, treating her swashbuckler level as her samurai level."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/hybrid-classes/swashbuckler/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        },
+        {
+          "name": "Nimble +4",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 16,
+      "fort": 5,
+      "ref": 10,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 17,
+      "fort": 5,
+      "ref": 10,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Swashbuckler Weapon Training +4",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 18,
+      "fort": 6,
+      "ref": 11,
+      "will": 6,
+      "classFeatures": [
+        {
+          "name": "Charmed Life 7/Day",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 19,
+      "fort": 6,
+      "ref": 11,
+      "will": 6,
+      "classFeatures": [
+        {
+          "name": "Deeds",
+          "description": "Swashbucklers spend panache points to accomplish deeds. Most deeds grant the swashbuckler a momentary bonus or effect, but some provide longer-lasting effects. Some deeds remain in effect while the swashbuckler has at least 1 panache point, but do not require expending panache to be maintained. A swashbuckler can only perform deeds of her level or lower. Unless otherwise noted, a deed can be performed multiple successive times, as long as the swashbuckler has or spends the required number of panache points to perform the deed. Derring-Do (Ex) : At 1st level, a swashbuckler can spend 1 panache point when she makes an Acrobatics , Climb , Escape Artist , Fly , Ride , or Swim check to roll 1d6 and add the result to the check. She can do this after she makes the check but before the result is revealed. If the result of the d6 roll is a natural 6, she rolls another 1d6 and adds it to the check. She can continue to do this as long as she rolls natural 6s, up to a number of times equal to her Dexterity modifier (minimum 1). Dodging Panache (Ex) : At 1st level, when an opponent attempts a melee attack against the swashbuckler, the swashbuckler can as an immediate action spend 1 panache point to move 5 feet; doing so grants the swashbuckler a dodge bonus to AC equal to her Charisma modifier (minimum 0) against the triggering attack. This movement doesn't negate the attack, which is still resolved as if the swashbuckler had not moved from the original square. This movement is not a 5-foot step; it provokes attacks of opportunity from creatures other than the one who triggered t",
+          "pools": [
+            {
+              "name": "Deeds",
+              "description": "Swashbucklers spend panache points to accomplish deeds. Most deeds grant the swashbuckler a momentary bonus or effect, but some provide longer-lasting effects. Some deeds remain in effect while the swashbuckler has at least 1 panache point, but do not require expending panache to be maintained. A swashbuckler can only perform deeds of her level or lower. Unless otherwise noted, a deed can be performed multiple successive times, as long as the swashbuckler has or spends the required number of panache points to perform the deed. Derring-Do (Ex) : At 1st level, a swashbuckler can spend 1 panache point when she makes an Acrobatics , Climb , Escape Artist , Fly , Ride , or Swim check to roll 1d6 and add the result to the check. She can do this after she makes the check but before the result is revealed. If the result of the d6 roll is a natural 6, she rolls another 1d6 and adds it to the check. She can continue to do this as long as she rolls natural 6s, up to a number of times equal to her Dexterity modifier (minimum 1). Dodging Panache (Ex) : At 1st level, when an opponent attempts a melee attack against the swashbuckler, the swashbuckler can as an immediate action spend 1 panache point to move 5 feet; doing so grants the swashbuckler a dodge bonus to AC equal to her Charisma modifier (minimum 0) against the triggering attack. This movement doesn't negate the attack, which is still resolved as if the swashbuckler had not moved from the original square. This movement is not a 5-foot step; it provokes attacks of opportunity from creatures other than the one who triggered t",
+              "requirements": {
+                "minClassLevel": 1,
+                "text": "Some deeds remain in effect while the swashbuckler has at least 1 panache point, but do not require expending panache to be maintained. A swashbuckler can only perform deeds of her level or lower."
+              },
+              "options": [
+                {
+                  "name": "Deeds",
+                  "description": "Swashbucklers spend panache points to accomplish deeds. Most deeds grant the swashbuckler a momentary bonus or effect, but some provide longer-lasting effects. Some deeds remain in effect while the swashbuckler has at least 1 panache point, but do not require expending panache to be maintained. A swashbuckler can only perform deeds of her level or lower. Unless otherwise noted, a deed can be performed multiple successive times, as long as the swashbuckler has or spends the required number of panache points to perform the deed. Derring-Do (Ex) : At 1st level, a swashbuckler can spend 1 panache point when she makes an Acrobatics , Climb , Escape Artist , Fly , Ride , or Swim check to roll 1d6 and add the result to the check. She can do this after she makes the check but before the result is revealed. If the result of the d6 roll is a natural 6, she rolls another 1d6 and adds it to the check. She can continue to do this as long as she rolls natural 6s, up to a number of times equal to her Dexterity modifier (minimum 1). Dodging Panache (Ex) : At 1st level, when an opponent attempts a melee attack against the swashbuckler, the swashbuckler can as an immediate action spend 1 panache point to move 5 feet; doing so grants the swashbuckler a dodge bonus to AC equal to her Charisma modifier (minimum 0) against the triggering attack. This movement doesn&#8217;t negate the attack, which is still resolved as if the swashbuckler had not moved from the original square. This movement is not a 5-foot step; it provokes attacks of opportunity from creatures other than the one who triggered this deed. The swashbuckler can only perform this deed while wearing light or no armor , and while carrying no heavier than a light load. Opportune Parry and Riposte (Ex) : At 1st level, when an oppone",
+                  "requirements": {
+                    "minClassLevel": 1,
+                    "text": "Some deeds remain in effect while the swashbuckler has at least 1 panache point, but do not require expending panache to be maintained. A swashbuckler can only perform deeds of her level or lower."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "Deeds Of Renown",
+                  "description": "Swashbucklers and gunslingers perform impressive deeds through their grit and panache, but some are capable of truly spectacular acts known as renowned deeds. A swashbuckler or gunslinger (though not members of other classes) can select a renowned deed for her class upon reaching the class level listed in the deedÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s description. This replaces the specific listed deed or deeds; if the character would not gain the appropriate deeds, she cannot select the renowned deed, as if selecting an archetype. Vengeful Heart (Ex) : Some swashbucklers are driven by vengeance above all else. At 1st level, the swashbuckler gains the samuraiÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s resolve class feature, treating her swashbuckler level as her samurai level. Whenever the swashbuckler spends a use of resolve, she must also spend a point of panache or a use of charmed life, or the use of resolve has no effect. This deed replaces the derring-do deed and one other 1st-level deed. Source PPC:CoL Hilt Hammer (Ex) : Precise strikes with a slender blade do little to hinder amorphous or incorporeal creatures; when encountering such threats, some swashbucklers abandon precision in favor of brutish strikes. At 3rd level, the swashbuckler can activate this deed before rolling the attack roll when making an attack that would benefit from precise strike. An attack altered this way deals only half the normal damage from precise strike, but this damage is not treated as precision damage. This deed alters (but does not replace) the precise strike deed and replaces one other 3rd-level deed. Source PPC:CoL Dodging Dance (Ex) : The swashbuckler moves around her opponentsÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ attacks to open them up for strikes. At 7th level, a swashbuckler can spend 1 panache point to move up to half her speed as a move action . If a creature makes an attack of oppo",
+                  "requirements": {
+                    "minClassLevel": 1,
+                    "text": "A swashbuckler or gunslinger (though not members of other classes) can select a renowned deed for her class upon reaching the class level listed in the deedÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s description. At 1st level, the swashbuckler gains the samuraiÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s resolve class feature, treating her swashbuckler level as her samurai level."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/hybrid-classes/swashbuckler/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        },
+        {
+          "name": "Nimble +5",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 20,
+      "fort": 6,
+      "ref": 12,
+      "will": 6,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": ""
+        },
+        {
+          "name": "Swashbuckler Weapon Mastery",
+          "description": "At 20th level, when a swashbuckler threatens a critical hit with a light or one-handed piercing melee weapon, that critical is automatically confirmed. Furthermore, the critical modifiers of such weapons increase by 1 (ÃƒÆ’Ã¢â‚¬â€2 becomes ÃƒÆ’Ã¢â‚¬â€3, and so on)."
+        }
+      ],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": null,
+  "spellcastingClass": false
+}

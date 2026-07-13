@@ -1,0 +1,247 @@
+{
+  "name": "Furious Guardian",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/e-h/furious-guardian/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 1,
+      "fort": 1,
+      "ref": 0,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Chosen Ally",
+          "description": "At 1st level, when entering a rage , a furious guardian can choose an ally to protect as a free action . The furious guardian must make this choice when beginning her rage and cannot change her designated ally while raging . Whenever the furious guardian is adjacent to her chosen ally, she can choose to take a -1 penalty to her AC to grant her ally a +1 dodge bonus to AC and Reflex saves. This bonus increases by 1 at 5th and 10th level."
+        },
+        {
+          "name": "Guard Dedication",
+          "description": ""
+        },
+        {
+          "name": "Rage",
+          "description": "A furious guardian is trained to harness her brutish nature while in combat in the defense of her charge. This works as the barbarian ability of the same name. A furious guardian's class levels stack with any other classes granting this ability for determining the effects of rage powers and the number of rounds per day the guard can rage ."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 2,
+      "bab": 2,
+      "fort": 1,
+      "ref": 0,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Guarded Thoughts",
+          "description": "At 2nd level, if the furious guardian fails a saving throw against a charm or compulsion effect, she immediately receives an additional save with a +5 circumstance bonus if the effect would compel her to attack her chosen ally. The guard can use this ability any number of times, but only once per effect."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 3,
+      "bab": 3,
+      "fort": 2,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Guard Dedication",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 4,
+      "bab": 4,
+      "fort": 2,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Adaptable Guardian",
+          "description": "At 4th level, the furious guardian can change her chosen ally during a rage as a move action . At 8th level, the furious guardian can change her chosen ally as a swift action ."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 5,
+      "bab": 5,
+      "fort": 3,
+      "ref": 1,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Guard Dedication",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 6,
+      "bab": 6,
+      "fort": 3,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Tight Follower",
+          "description": "At 6th level, if the furious guardian is within 10 feet of her chosen ally and the ally moves more than 10 feet away from her, the furious guardian can move up to her speed as an immediate action so long as she ends the movement within 10 feet of her chosen ally."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 7,
+      "bab": 7,
+      "fort": 4,
+      "ref": 2,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Guard Dedication",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 8,
+      "bab": 8,
+      "fort": 4,
+      "ref": 2,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Reactive Strike",
+          "description": "At 8th level, a furious guardian can make an attack of opportunity against an enemy that moves adjacent to or attacks the furious guardian's chosen ally. The furious guardian cannot make a reactive strike against a creature she has already made an attack of opportunity against during the round."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 9,
+      "bab": 9,
+      "fort": 5,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Guard Dedication",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 10,
+      "bab": 10,
+      "fort": 5,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Unbreakable Defender",
+          "description": "At 10th level, as long as she is within 10 feet of her chosen ally, the furious guardian gains the benefits of the Die Hard feat and no longer becomes fatigued when she ends her rage . Section 15: Copyright Notice Pathfinder Campaign Setting: Inner Sea Combat Ãƒâ€šÃ‚Â© 2014, Paizo Inc.; Authors: Dennis Baker, Jesse Benner, John Compton, and Thurston Hillman."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": null,
+  "spellcastingClass": false
+}

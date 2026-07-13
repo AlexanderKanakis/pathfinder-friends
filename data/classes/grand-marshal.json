@@ -1,0 +1,251 @@
+{
+  "name": "Grand Marshal",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/e-h/grand-marshal/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 1,
+      "fort": 0,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Eye For Detail",
+          "description": "A grand marshal adds his Intelligence bonus as well as his Wisdom bonus on Perception and Sense Motive checks. In addition, he gains a bonus equal to 1/2 his level on Perception checks opposed by another creature's Disguise or Sleight of Hand checks."
+        },
+        {
+          "name": "Legal Judgment 1/Day",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 2,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Danger Sense",
+          "description": "At 2nd level, a grand marshal gains a bonus on initiative checks equal to 1/2 his level, and can always act during a surprise round even if unaware of opponents."
+        },
+        {
+          "name": "Gunmarshal",
+          "description": "Starting at 2nd level, a grand marshal gains deeds as a gunslinger of half his level. If he also has gunslinger levels, these levels stack. In addition, within a specific region, he gains a bonus on all Charisma -based skill checks equal to 1/2 his grand marshal level if he openly displays his grand marshal's badge."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 3,
+      "bab": 3,
+      "fort": 1,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Labyrinthine Cunning",
+          "description": "At 3rd level, a grand marshal never becomes lost in urban terrain, and he never takes penalties to movement for poor visibility in urban terrain, even while temporarily blinded . A grand marshal can open or close doors as a swift action instead of a move action ."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 4,
+      "bab": 4,
+      "fort": 1,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Legal Judgment 2/Day",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 5,
+      "bab": 5,
+      "fort": 2,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Urban Commando",
+          "description": "At 5th level, a grand marshal treats urban areas as his favored terrain , as the ranger class feature. At 10th level, his favored terrain bonus increases to +4 but he does not gain a second favored terrain . If he already has a favored terrain bonus in urban terrain from another class, these bonuses stack but do not affect bonuses in other terrain types."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 6,
+      "bab": 6,
+      "fort": 2,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Gunhunter",
+          "description": "A grand marshal is well versed in covert operations, especially in urban settings. At 6th level, the grand marshal can move through crowds and difficult terrain without impediment in urban terrain. He can use Stealth to hide in urban terrain even without cover or concealment ; if he has cover or concealment , he gains a bonus on Stealth checks equal to 1/2 his class level."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 7,
+      "bab": 7,
+      "fort": 2,
+      "ref": 4,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Legal Judgment 3/Day",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 8,
+      "bab": 8,
+      "fort": 3,
+      "ref": 4,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Double Jeopardy",
+          "description": "At 8th level, whenever a grand marshal uses his legal judgment ability, he selects two different judgments , instead of one. This consumes only one use of his legal judgment ability. As a swift action , he can change one of these effects to another type."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 9,
+      "bab": 9,
+      "fort": 3,
+      "ref": 5,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Quarry",
+          "description": "At 9th level, a grand marshal can declare one target within his line of sight as his quarry. This ability functions exactly like the ranger ability of the same name."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 10,
+      "bab": 10,
+      "fort": 3,
+      "ref": 5,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "High Grand Marshal",
+          "description": "At 10th level, a grand marshal attains the highest rank among his order. He can expend one use of his legal judgment ability to create a non-magical effect equivalent to discern lies ( caster level equal to his class level; DC = 20 + the grand marshal's Wisdom modifier), or expend one use as part of an initiative check or Charisma -based skill check to take 20 on that check. Section 15: Copyright Notice Pathfinder Campaign Setting: Paths of Prestige Ãƒâ€šÃ‚Â© 2012, Paizo Publishing, LLC; Authors: Benjamin Bruck, Jason Bulmahn, Matt Goodall, and Jason Nelson."
+        },
+        {
+          "name": "Legal Judgment 4/Day",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": null,
+  "spellcastingClass": false
+}

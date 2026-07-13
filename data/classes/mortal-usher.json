@@ -1,0 +1,267 @@
+{
+  "name": "Mortal Usher",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/i-m/mortal-usher/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 1,
+      "ref": 0,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Reaping Strike +1d6",
+          "description": ""
+        },
+        {
+          "name": "Vital Strike",
+          "description": "At 1st level, a mortal usher gains the Vital Strike feat, and at 6th level he gains the Improved Vital Strike feat, even if he would not normally meet the prerequisites for them. If the mortal usher already has Vital Strike or Improved Vital Strike when he would gain it through this ability, he can immediately swap it for another feat for which he qualified at the level he first took it. For the purposes of qualifying for any feat that includes Vital Strike as a prerequisite, the mortal usher can use his class level in place of his base attack bonus , adding this value to his base attack bonus from any other classes he has as normal."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Mortal Talents",
+          "description": "At 2nd level, a mortal usher must choose a class he belonged to before adding the prestige class. At 2nd level and every 2 levels thereafter, the mortal usher gains the class features of an additional level in his chosen class (for example, a wizard 5/mortal usher 4 would have the arcane bond benefits, caster level , and spells per day of a 7th-level wizard ). He still retains the Hit Dice , base attack bonus , saving throw bonuses, and skill ranks of the prestige class, but gains all other class features of his chosen class at the specified levels."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 3,
+      "bab": 2,
+      "fort": 2,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Reaping Strike +2d6",
+          "description": ""
+        },
+        {
+          "name": "Nosoi Plague Mask",
+          "description": "At 3rd level, a mortal usher can conjure or dismiss a nosoi plague mask as a free action . This plague mask is a physical manifestation of the mortal usherÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s soul and cannot be destroyed or stolen, though its magic can be suppressed by an antimagic field or similar effect. As long as the mortal usherÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s nosoi plague mask is conjured, the mortal usher gains the ability to cast invisibility on himself as a standard action with a caster level equal to 5 + his class level. In addition, the mortal usher can activate the nosoi plague mask as a standard action , forcing all living and undead creatures within a 60-foot radius to attempt a Will saving throw (DC = 15 + the mortal usherÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s class level). Those that fail are fascinated ; this effect continues for every round the mortal usher maintains the effect as a swift action and for 1 round thereafter. The mortal usher cannot use the invisibility effect of the plague mask while using its fascinate ability, and a creature that saves against the fascination effect is immune for 24 hours. This is a sonic mind-affecting effect; it can affect undead even though they would normally be immune to mind-affecting effects."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 4,
+      "bab": 3,
+      "fort": 2,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Mortal Talents",
+          "description": "At 2nd level, a mortal usher must choose a class he belonged to before adding the prestige class. At 2nd level and every 2 levels thereafter, the mortal usher gains the class features of an additional level in his chosen class (for example, a wizard 5/mortal usher 4 would have the arcane bond benefits, caster level , and spells per day of a 7th-level wizard ). He still retains the Hit Dice , base attack bonus , saving throw bonuses, and skill ranks of the prestige class, but gains all other class features of his chosen class at the specified levels."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 5,
+      "bab": 3,
+      "fort": 3,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "CatrinaÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢S Calm",
+          "description": ""
+        },
+        {
+          "name": "Reaping Strike +3d6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 6,
+      "bab": 4,
+      "fort": 3,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Improved Vital Strike",
+          "description": ""
+        },
+        {
+          "name": "Mortal Talents",
+          "description": "At 2nd level, a mortal usher must choose a class he belonged to before adding the prestige class. At 2nd level and every 2 levels thereafter, the mortal usher gains the class features of an additional level in his chosen class (for example, a wizard 5/mortal usher 4 would have the arcane bond benefits, caster level , and spells per day of a 7th-level wizard ). He still retains the Hit Dice , base attack bonus , saving throw bonuses, and skill ranks of the prestige class, but gains all other class features of his chosen class at the specified levels."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 7,
+      "bab": 5,
+      "fort": 4,
+      "ref": 2,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Morrigna Wrappings",
+          "description": ""
+        },
+        {
+          "name": "Reaping Strike +4d6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 8,
+      "bab": 6,
+      "fort": 4,
+      "ref": 3,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Mortal Talents",
+          "description": "At 2nd level, a mortal usher must choose a class he belonged to before adding the prestige class. At 2nd level and every 2 levels thereafter, the mortal usher gains the class features of an additional level in his chosen class (for example, a wizard 5/mortal usher 4 would have the arcane bond benefits, caster level , and spells per day of a 7th-level wizard ). He still retains the Hit Dice , base attack bonus , saving throw bonuses, and skill ranks of the prestige class, but gains all other class features of his chosen class at the specified levels."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 9,
+      "bab": 6,
+      "fort": 5,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Reaping Strike +5d6",
+          "description": ""
+        },
+        {
+          "name": "Vanth Wings",
+          "description": "At 9th level, a mortal usher gains a 60-foot fly speed with good maneuverability and resistance to cold equal to 10 + his class level. The mortal usher gains a +5 circumstance bonus on Acrobatics checks and on concentration checks attempted while casting a spell."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 10,
+      "bab": 7,
+      "fort": 5,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Mortal Talents",
+          "description": "At 2nd level, a mortal usher must choose a class he belonged to before adding the prestige class. At 2nd level and every 2 levels thereafter, the mortal usher gains the class features of an additional level in his chosen class (for example, a wizard 5/mortal usher 4 would have the arcane bond benefits, caster level , and spells per day of a 7th-level wizard ). He still retains the Hit Dice , base attack bonus , saving throw bonuses, and skill ranks of the prestige class, but gains all other class features of his chosen class at the specified levels."
+        },
+        {
+          "name": "Yamaraj-Feather Cloak",
+          "description": "At 10th level, a mortal usher becomes immune to electricity and death effects, and whenever he is struck by an attack or effect dealing electricity damage, he regains 1 hit point per 3 points of electricity damage the attack or effect would normally deal. If the amount of healing would cause the mortal usher to exceed his maximum hit points , he gains any excess as temporary hit points (maximum 50) that last for 1 hour. Section 15: Copyright Notice Pathfinder Adventure Path #144: Midwives to Death Ãƒâ€šÃ‚Â© 2019, Paizo Inc.; Authors: John Compton, with Adam Daigle, Eleanor Ferron, Thurston Hillman, James Jacobs, Jason Keeley, Luis Loza, Ron Lundeen, Robert G. McCreary, Erik Mona, Michael Sayre, Owen K. C. Stephens, Mark Seifter, and Linda Zayas-Palmer."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": null,
+  "spellcastingClass": false
+}

@@ -1,0 +1,277 @@
+{
+  "name": "Sun Seeker",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/s-z/sun-seeker/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 1,
+      "fort": 1,
+      "ref": 0,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Ancestral Weapon +1d6",
+          "description": ""
+        },
+        {
+          "name": "Citadel Keeper",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "-"
+      }
+    },
+    {
+      "level": 2,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Rune-Carved Armor",
+          "description": "At 2nd level, a sun seeker learns how to imbue his armor with a small semblance of the magical resistance his dwarven ancestors were renowned for. Against spells and spell-like abilities , he gains a deflection bonus to touch AC equal to his armor bonus . This bonus can't exceed his sun seeker level. This ability functions only while the sun seeker wears armor."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of divine spellcasting class"
+      }
+    },
+    {
+      "level": 3,
+      "bab": 3,
+      "fort": 2,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Commune 1/Week",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of divine spellcasting class"
+      }
+    },
+    {
+      "level": 4,
+      "bab": 4,
+      "fort": 2,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Ancestral Weapon +2d6",
+          "description": ""
+        },
+        {
+          "name": "Dwarven Armor Training",
+          "description": "By studying the arts of his ancestors, the sun seeker learns the secret techniques of his forebears' forges and fighting styles. At 4th level, the sun seeker gains heavy armor proficiency, and he still benefits from his ranger combat style (if he has one) while wearing heavy armor."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of divine spellcasting class"
+      }
+    },
+    {
+      "level": 5,
+      "bab": 5,
+      "fort": 3,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Darkvision",
+          "description": "At 5th level, a sun seeker grows more comfortable operating in the lightless depths of the dwarven ancestral homelands. He gains darkvision out to a range of 60 feet. If he already has darkvision , the range increases by 30 feet. At 7th level, the range of the sun seeker's darkvision increases by an additional 30 feet."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "-"
+      }
+    },
+    {
+      "level": 6,
+      "bab": 6,
+      "fort": 3,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Runes Of Resistance",
+          "description": "At 6th level, a sun seeker can use his armor to shrug off all manner of magical attacks for a short period of time. As a move action , the sun seeker can gain spell resistance equal to 5 + his Hit Dice if wearing light armor or 10 + his Hit Dice if wearing medium or heavy armor. Dismissing this ability is a swift action . A sun seeker can use this ability for a number of rounds per day equal to his class level. These rounds need not be consecutive."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of divine spellcasting class"
+      }
+    },
+    {
+      "level": 7,
+      "bab": 7,
+      "fort": 4,
+      "ref": 2,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Ancestral Weapon +3d6",
+          "description": ""
+        },
+        {
+          "name": "Darkvision +30 Ft.",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of divine spellcasting class"
+      }
+    },
+    {
+      "level": 8,
+      "bab": 8,
+      "fort": 4,
+      "ref": 3,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Paths Of The Ancients",
+          "description": "Other labyrinths pale in comparison to the tangled maze of tunnels left behind by the ancient sun-seeking dwarves . At 8th level, a sun seeker gains immunity to the maze spell and cannot become lost while exploring subterranean environments."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of divine spellcasting class"
+      }
+    },
+    {
+      "level": 9,
+      "bab": 9,
+      "fort": 5,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Stalwart",
+          "description": "At 9th level, a sun seeker has honed his mental resiliency to avoid certain attacks. If he succeeds at a Fortitude or Will saving throw against an attack that has a reduced effect on a successful save, he instead avoids the effect entirely. This ability can be used only if the sun seeker is wearing light armor , medium armor , or no armor. A helpless sun seeker does not gain the benefit of the stalwart ability."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "-"
+      }
+    },
+    {
+      "level": 10,
+      "bab": 10,
+      "fort": 5,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Ancestral Weapon +4d6",
+          "description": ""
+        },
+        {
+          "name": "Call To Arms",
+          "description": "At 10th level, a sun seeker grows so attuned with the spirits of his ancestors that he can channel them into the physical world to battle his enemies. Once per day as a full-round action , he can summon up to 1d4+1 ghostly dwarven allies, who must appear within 60 feet of the sun seeker. These dwarves function exactly as an ally produced by the spell spiritual ally ( caster level equal to the sun seeker's class level), except that they always appear as dwarves wielding warhammers and they share the sun seeker's favored enemy and favored terrain bonuses (if any). On subsequent turns the sun seeker can direct a single dwarven ally to move as a swift action , or he can direct multiple allies to move simultaneously as a move action . Section 15: Copyright Notice Pathfinder Campaign Setting: Paths of Prestige Ãƒâ€šÃ‚Â© 2012, Paizo Publishing, LLC; Authors: Benjamin Bruck, Jason Bulmahn, Matt Goodall, and Jason Nelson."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of divine spellcasting class"
+      }
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": {
+    "summary": "See level progression spell columns."
+  },
+  "spellcastingClass": true
+}

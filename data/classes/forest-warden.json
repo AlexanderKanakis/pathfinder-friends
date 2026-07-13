@@ -1,0 +1,279 @@
+{
+  "name": "Forest Warden",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/e-h/forest-warden/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 0,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Forest Magic 1",
+          "description": ""
+        },
+        {
+          "name": "Unchained Heart +2",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Aligned Class",
+          "description": "Forest wardens come from all walks of life, each offering a unique perspective and skill set. At 2nd level, a forest warden must choose a class she belonged to before adding the prestige class to be her aligned class. She gains all the class features for one additional level of her aligned class as if she had gained a level in it. She gains the class features of an additional level of her aligned class at 4th, 6th, 8th, and 10th levels. She still retains the Hit Dice, base attack bonus, saving throw bonuses, and skill ranks of the prestige class."
+        },
+        {
+          "name": "Bonus Feat",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 3,
+      "bab": 2,
+      "fort": 1,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Forest Magic 2",
+          "description": ""
+        },
+        {
+          "name": "Guerrilla Tactics",
+          "description": "A forest warden is an expert at hit-and-run attacks, sabotage, and subterfuge. At 3rd level, she can use the following tactics in combat. She can gain the bonus of only a single tactic at a time, but can switch between them as a swift action. If the forest warden becomes confused, frightened, panicked, or shaken, she cannot gain any bonuses from guerrilla tactics for as long as the condition persists. Exploit Weakness : When flanking an enemy, a forest warden can forgo the +2 bonus on attack rolls from flanking until the start of her next turn in order to further punish the foe. On a successful hit against a flanked enemy while forgoing the attack bonus, the Forest warden can perform a disarm, sunder, or trip combat maneuver against the target as a swift action at her full base attack bonus. This action still provokes attacks of opportunity as normal. Sneak Attack : A forest warden gains sneak attack +1d6. This increases to +2d6 at 6th level and +3d6 at 9th level. Sniping Prowess : The forest warden takes advantage of any available cover. Her penalty on Stealth checks to snipe changes to -16. The penalty changes to -12 at 6th level and -8 at 9th level. Sprite Step : When moving through wooded terrain, the forest warden gains a +4 competence bonus on Acrobatics and Climb checks. While climbing, she does not lose her Dexterity bonus to AC and does not take a penalty for climbing quickly."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 4,
+      "bab": 3,
+      "fort": 1,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Aligned Class",
+          "description": "Forest wardens come from all walks of life, each offering a unique perspective and skill set. At 2nd level, a forest warden must choose a class she belonged to before adding the prestige class to be her aligned class. She gains all the class features for one additional level of her aligned class as if she had gained a level in it. She gains the class features of an additional level of her aligned class at 4th, 6th, 8th, and 10th levels. She still retains the Hit Dice, base attack bonus, saving throw bonuses, and skill ranks of the prestige class."
+        },
+        {
+          "name": "Unchained Heart +3",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 5,
+      "bab": 3,
+      "fort": 2,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": ""
+        },
+        {
+          "name": "Forest Magic 3",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 6,
+      "bab": 4,
+      "fort": 2,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Advanced Tactics",
+          "description": "At 6th level, a forest warden adds the following tactics to her list of choices. Preemptive Strike : The forest warden strikes before her targets can react. When acting during a surprise round, she can take one move action and one standard action. She cannot take a full-round action during a surprise round, as normal. Trick Shot : This tactic allows the forest warden to attempt Dirty Trick combat maneuver checks with a ranged weapon at a -4 penalty. At 9th level, this penalty changes to -2."
+        },
+        {
+          "name": "Aligned Class",
+          "description": "Forest wardens come from all walks of life, each offering a unique perspective and skill set. At 2nd level, a forest warden must choose a class she belonged to before adding the prestige class to be her aligned class. She gains all the class features for one additional level of her aligned class as if she had gained a level in it. She gains the class features of an additional level of her aligned class at 4th, 6th, 8th, and 10th levels. She still retains the Hit Dice, base attack bonus, saving throw bonuses, and skill ranks of the prestige class."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 7,
+      "bab": 5,
+      "fort": 2,
+      "ref": 4,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Forest Magic 4",
+          "description": ""
+        },
+        {
+          "name": "Unchained Heart +4",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 8,
+      "bab": 6,
+      "fort": 3,
+      "ref": 4,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Aligned Class",
+          "description": "Forest wardens come from all walks of life, each offering a unique perspective and skill set. At 2nd level, a forest warden must choose a class she belonged to before adding the prestige class to be her aligned class. She gains all the class features for one additional level of her aligned class as if she had gained a level in it. She gains the class features of an additional level of her aligned class at 4th, 6th, 8th, and 10th levels. She still retains the Hit Dice, base attack bonus, saving throw bonuses, and skill ranks of the prestige class."
+        },
+        {
+          "name": "Bonus Feat",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 9,
+      "bab": 6,
+      "fort": 3,
+      "ref": 5,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Forest Magic 5",
+          "description": ""
+        },
+        {
+          "name": "Second Tactic",
+          "description": "At 9th level, a forest warden is able to benefit from two tactics at a time. She can change one of these at a time as a swift action."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 10,
+      "bab": 7,
+      "fort": 3,
+      "ref": 5,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Aligned Class",
+          "description": "Forest wardens come from all walks of life, each offering a unique perspective and skill set. At 2nd level, a forest warden must choose a class she belonged to before adding the prestige class to be her aligned class. She gains all the class features for one additional level of her aligned class as if she had gained a level in it. She gains the class features of an additional level of her aligned class at 4th, 6th, 8th, and 10th levels. She still retains the Hit Dice, base attack bonus, saving throw bonuses, and skill ranks of the prestige class."
+        },
+        {
+          "name": "Phantom Strike",
+          "description": "At 10th level, a forest warden becomes a true master of the battlefield. She can always move at her full speed across nonmagical difficult terrain and does not take movement penalties due to poor visibility. A number of times per day equal to her Intelligence modifier, when the forest warden deals weapon damage to an opponent who is unaware of her presence, she can deal an additional 2d6 points of precision damage or cause the target to cower for 2d6 rounds. The target receives a Will saving throw to negate the cowering effect (DC = 10 + half the forest wardenÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s character level + her Intelligence modifier). Section 15: Copyright Notice Ironfang Invasion, Book 2: Fangs of War. Copyright 2017, Paizo Publishing, LLC; Author: Ron Lundeen."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": null,
+  "spellcastingClass": false
+}

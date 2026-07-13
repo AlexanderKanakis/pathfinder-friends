@@ -1,0 +1,361 @@
+{
+  "name": "Monk",
+  "type": "core",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/core-classes/monk/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 2,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": "At 1st level, 2nd level, and every 4 levels thereafter, a monk may select a bonus feat. These feats must be taken from the following list: Catch Off-Guard , Combat Reflexes , Deflect Arrows , Dodge , Improved Grapple , Scorpion Style , and Throw Anything . At 6th level, the following feats are added to the list: Gorgon's Fist , Improved Bull Rush , Improved Disarm , Improved Feint , Improved Trip , and Mobility . At 10th level, the following feats are added to the list: Improved Critical , Medusa's Wrath , Snatch Arrows , and Spring Attack . A monk need not have any of the prerequisites normally required for these feats to select them."
+        },
+        {
+          "name": "Flurry Of Blows",
+          "description": "FAQ The monk rules for flurry of blows state: &#8220;For the purpose of these attacks, the monk's base attack bonus is equal to his monk level.&#8221; How does this interact with BAB from class levels and racial Hit Dice ? Does a multiclassed fighter 19/monk 1 flurry as if his BAB were only +1? A monk using flurry treats his BAB from monk levels as equal to his monk level. He still adds BAB from other sources (such as other classes or racial Hit Dice ) normally to this total. So a fighter 19/monk 1 has a normal BAB of +19. When he flurries, he treats his monk BAB as +1 (for his 1 level of monk) and still gets BAB +19 from his fighter levels, for a total flurry BAB of +20. [ Source ] When I use flurry of blows, can I make all of the attacks with just one weapon, or do I have to use two, as implied by the ability functioning similarly to Two-Weapon Fighting? You can make all of your attacks with a single monk weapon. Alternatively, you can replace any number of these attacks with an unarmed strike. This FAQ specifically changes a previous ruling made in the blog concerning this issue. [ Source ] Starting at 1st level, a monk can make a flurry of blows as a full-attack action. When doing so, he may make one additional attack, taking a -2 penalty on all of his attack rolls , as if using the Two-Weapon Fighting feat. These attacks can be any combination of unarmed strikes and attacks with a monk special weapon (he does not need to use two weapons to utilize this ability). For the purpose of these attacks, the monk's base attack bonus from his monk class levels is equ"
+        },
+        {
+          "name": "Stunning Fist",
+          "description": "At 1st level, the monk gains Stunning Fist as a bonus feat, even if he does not meet the prerequisites. The monk may attempt a stunning attack a number of times per day equal to his monk level, plus one more time per day for every four levels he has in classes other than monk. At 4th level, and every 4 levels thereafter, the monk gains the ability to apply a new condition to the target of his Stunning Fist . This condition replaces stunning the target for 1 round, and a successful saving throw still negates the effect. At 4th level, he can choose to make the target fatigued . At 8th level, he can make the target sickened for 1 minute. At 12th level, he can make the target staggered for 1d6+1 rounds. At 16th level, he can permanently blind or deafen the target. At 20th level, he can paralyze the target for 1d6+1 rounds. The monk must choose which condition will apply before the attack roll is made. These effects do not stack with themselves (a creature sickened by Stunning Fist cannot become nauseated if hit by Stunning Fist again), but additional hits do increase the duration."
+        },
+        {
+          "name": "Unarmed Strike",
+          "description": "At 1st level, a monk gains Improved Unarmed Strike as a bonus feat. A monk's attacks may be with fist, elbows, knees, and feet. This means that a monk may make unarmed strikes with his hands full. There is no such thing as an off-hand attack for a monk striking unarmed. A monk may thus apply his full Strength bonus on damage rolls for all his unarmed strikes. Usually a monk's unarmed strikes deal lethal damage, but he can choose to deal nonlethal damage instead with no penalty on his attack roll . He has the same choice to deal lethal or nonlethal damage while grappling . A monk's unarmed strike is treated as both a manufactured weapon and a natural weapon for the purpose of spells and effects that enhance or improve either manufactured weapons or natural weapons . A monk also deals more damage with his unarmed strikes than a normal person would, as shown above on Table: Monk . The unarmed damage values listed on Table: Monk are for Medium monks. A Small monk deals less damage than the amount given there with his unarmed attacks, while a Large monk deals more damage; see Table: Small or Large Monk Unarmed Damage . Table: Small or Large Monk Unarmed Damage Level Damage (Small monk) Damage (Large monk) 1st-3rd 1d4 1d8 4th-7th 1d6 2d6 8th-11th 1d8 2d8 12th-15th 1d10 3d6 16th-19th 2d6 3d8 20th 2d8 4d8"
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 3,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": "At 1st level, 2nd level, and every 4 levels thereafter, a monk may select a bonus feat. These feats must be taken from the following list: Catch Off-Guard , Combat Reflexes , Deflect Arrows , Dodge , Improved Grapple , Scorpion Style , and Throw Anything . At 6th level, the following feats are added to the list: Gorgon's Fist , Improved Bull Rush , Improved Disarm , Improved Feint , Improved Trip , and Mobility . At 10th level, the following feats are added to the list: Improved Critical , Medusa's Wrath , Snatch Arrows , and Spring Attack . A monk need not have any of the prerequisites normally required for these feats to select them."
+        },
+        {
+          "name": "Evasion",
+          "description": "At 2nd level or higher, a monk can avoid damage from many area-effect attacks. If a monk makes a successful Reflex saving throw against an attack that normally deals half damage on a successful save, he instead takes no damage. Evasion can be used only if a monk is wearing light armor or no armor. A helpless monk does not gain the benefit of evasion ."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 3,
+      "bab": 2,
+      "fort": 3,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Fast Movement",
+          "description": "At 3rd level, a monk gains an enhancement bonus to his land speed, as shown on Table: monk . A monk in armor or carrying a medium or heavy load loses this extra speed."
+        },
+        {
+          "name": "Maneuver Training",
+          "description": "At 3rd level, a monk uses his monk level in place of his base attack bonus when calculating his Combat Maneuver Bonus . Base attack bonuses granted from other classes are unaffected and are added normally."
+        },
+        {
+          "name": "Still Mind",
+          "description": "A monk of 3rd level or higher gains a +2 bonus on saving throws against enchantment spells and effects."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 4,
+      "bab": 3,
+      "fort": 4,
+      "ref": 4,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Ki Pool (Magic)",
+          "description": "At 4th level, a monk gains a pool of ki points, supernatural energy he can use to accomplish amazing feats. The number of points in a monk's ki pool is equal to 1/2 his monk level + his Wisdom modifier. As long as he has at least 1 point in his ki pool, he can make a ki strike. At 4th level , ki strike allows his unarmed attacks to be treated as magic weapons for the purpose of overcoming damage reduction . At 7th level, his unarmed attacks are also treated as cold iron and silver for the purpose of overcoming damage reduction . At 10th level , his unarmed attacks are also treated as lawful weapons for the purpose of overcoming damage reduction . At 16th level , his unarmed attacks are treated as adamantine weapons for the purpose of overcoming damage reduction and bypassing hardness . By spending 1 point from his ki pool, a monk can do one of the following: Make one additional attack at his highest attack bonus when making a flurry of blows attack, or Increase his speed by 20 feet for 1 round, or Give himself a +4 dodge bonus to AC for 1 round. Each of these powers is activated as a swift action . The ki pool is replenished each morning after 8 hours of rest or meditation; these hours do not need to be consecutive."
+        },
+        {
+          "name": "Slow Fall 20 Ft.",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 5,
+      "bab": 3,
+      "fort": 4,
+      "ref": 4,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "High Jump",
+          "description": "At 5th level, a monk adds his level to all Acrobatics checks made to jump, both for vertical jumps and horizontal jumps. In addition, he always counts as having a running start when making jump checks using Acrobatics . By spending 1 point from his ki pool as a swift action , a monk gains a +20 bonus on Acrobatics checks made to jump for 1 round."
+        },
+        {
+          "name": "Purity Of Body",
+          "description": "At 5th level, a monk gains immunity to all diseases, including supernatural and magical diseases."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 6,
+      "bab": 4,
+      "fort": 5,
+      "ref": 5,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": "At 1st level, 2nd level, and every 4 levels thereafter, a monk may select a bonus feat. These feats must be taken from the following list: Catch Off-Guard , Combat Reflexes , Deflect Arrows , Dodge , Improved Grapple , Scorpion Style , and Throw Anything . At 6th level, the following feats are added to the list: Gorgon's Fist , Improved Bull Rush , Improved Disarm , Improved Feint , Improved Trip , and Mobility . At 10th level, the following feats are added to the list: Improved Critical , Medusa's Wrath , Snatch Arrows , and Spring Attack . A monk need not have any of the prerequisites normally required for these feats to select them."
+        },
+        {
+          "name": "Slow Fall 30 Ft.",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 7,
+      "bab": 5,
+      "fort": 5,
+      "ref": 5,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Ki Pool ( Cold Iron / Silver )",
+          "description": "At 4th level, a monk gains a pool of ki points, supernatural energy he can use to accomplish amazing feats. The number of points in a monk's ki pool is equal to 1/2 his monk level + his Wisdom modifier. As long as he has at least 1 point in his ki pool, he can make a ki strike. At 4th level , ki strike allows his unarmed attacks to be treated as magic weapons for the purpose of overcoming damage reduction . At 7th level, his unarmed attacks are also treated as cold iron and silver for the purpose of overcoming damage reduction . At 10th level , his unarmed attacks are also treated as lawful weapons for the purpose of overcoming damage reduction . At 16th level , his unarmed attacks are treated as adamantine weapons for the purpose of overcoming damage reduction and bypassing hardness . By spending 1 point from his ki pool, a monk can do one of the following: Make one additional attack at his highest attack bonus when making a flurry of blows attack, or Increase his speed by 20 feet for 1 round, or Give himself a +4 dodge bonus to AC for 1 round. Each of these powers is activated as a swift action . The ki pool is replenished each morning after 8 hours of rest or meditation; these hours do not need to be consecutive."
+        },
+        {
+          "name": "Wholeness Of Body",
+          "description": "At 7th level or higher, a monk can heal his own wounds as a standard action . He can heal a number of hit points of damage equal to his monk level by using 2 points from his ki pool."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 8,
+      "bab": 6,
+      "fort": 6,
+      "ref": 6,
+      "will": 6,
+      "classFeatures": [
+        {
+          "name": "Slow Fall 40 Ft.",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 9,
+      "bab": 6,
+      "fort": 6,
+      "ref": 6,
+      "will": 6,
+      "classFeatures": [
+        {
+          "name": "Improved Evasion",
+          "description": "At 9th level, a monk's evasion ability improves. He still takes no damage on a successful Reflex saving throw against attacks, but henceforth he takes only half damage on a failed save. A helpless monk does not gain the benefit of improved evasion ."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 10,
+      "bab": 7,
+      "fort": 7,
+      "ref": 7,
+      "will": 7,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": "At 1st level, 2nd level, and every 4 levels thereafter, a monk may select a bonus feat. These feats must be taken from the following list: Catch Off-Guard , Combat Reflexes , Deflect Arrows , Dodge , Improved Grapple , Scorpion Style , and Throw Anything . At 6th level, the following feats are added to the list: Gorgon's Fist , Improved Bull Rush , Improved Disarm , Improved Feint , Improved Trip , and Mobility . At 10th level, the following feats are added to the list: Improved Critical , Medusa's Wrath , Snatch Arrows , and Spring Attack . A monk need not have any of the prerequisites normally required for these feats to select them."
+        },
+        {
+          "name": "Ki Pool (Lawful)",
+          "description": "At 4th level, a monk gains a pool of ki points, supernatural energy he can use to accomplish amazing feats. The number of points in a monk's ki pool is equal to 1/2 his monk level + his Wisdom modifier. As long as he has at least 1 point in his ki pool, he can make a ki strike. At 4th level , ki strike allows his unarmed attacks to be treated as magic weapons for the purpose of overcoming damage reduction . At 7th level, his unarmed attacks are also treated as cold iron and silver for the purpose of overcoming damage reduction . At 10th level , his unarmed attacks are also treated as lawful weapons for the purpose of overcoming damage reduction . At 16th level , his unarmed attacks are treated as adamantine weapons for the purpose of overcoming damage reduction and bypassing hardness . By spending 1 point from his ki pool, a monk can do one of the following: Make one additional attack at his highest attack bonus when making a flurry of blows attack, or Increase his speed by 20 feet for 1 round, or Give himself a +4 dodge bonus to AC for 1 round. Each of these powers is activated as a swift action . The ki pool is replenished each morning after 8 hours of rest or meditation; these hours do not need to be consecutive."
+        },
+        {
+          "name": "Slow Fall 50 Ft.",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 11,
+      "bab": 8,
+      "fort": 7,
+      "ref": 7,
+      "will": 7,
+      "classFeatures": [
+        {
+          "name": "Diamond Body",
+          "description": "At 11th level, a monk gains immunity to poisons of all kinds."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 9,
+      "fort": 8,
+      "ref": 8,
+      "will": 8,
+      "classFeatures": [
+        {
+          "name": "Abundant Step",
+          "description": "At 12th level or higher, a monk can slip magically between spaces, as if using the spell dimension door . Using this ability is a move action that consumes 2 points from his ki pool. His caster level for this effect is equal to his monk level. He cannot take other creatures with him when he uses this ability."
+        },
+        {
+          "name": "Slow Fall 60 Ft.",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 9,
+      "fort": 8,
+      "ref": 8,
+      "will": 8,
+      "classFeatures": [
+        {
+          "name": "Diamond Soul",
+          "description": "At 13th level, a monk gains spell resistance equal to his current monk level + 10. In order to affect the monk with a spell, a spellcaster must get a result on a caster level check (1d20 + caster level ) that equals or exceeds the monk's spell resistance ."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 10,
+      "fort": 9,
+      "ref": 9,
+      "will": 9,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": "At 1st level, 2nd level, and every 4 levels thereafter, a monk may select a bonus feat. These feats must be taken from the following list: Catch Off-Guard , Combat Reflexes , Deflect Arrows , Dodge , Improved Grapple , Scorpion Style , and Throw Anything . At 6th level, the following feats are added to the list: Gorgon's Fist , Improved Bull Rush , Improved Disarm , Improved Feint , Improved Trip , and Mobility . At 10th level, the following feats are added to the list: Improved Critical , Medusa's Wrath , Snatch Arrows , and Spring Attack . A monk need not have any of the prerequisites normally required for these feats to select them."
+        },
+        {
+          "name": "Slow Fall 70 Ft.",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 11,
+      "fort": 9,
+      "ref": 9,
+      "will": 9,
+      "classFeatures": [
+        {
+          "name": "Quivering Palm",
+          "description": "Starting at 15th level, a monk can set up vibrations within the body of another creature that can thereafter be fatal if the monk so desires. He can use this quivering palm attack once per day, and he must announce his intent before making his attack roll . Creatures immune to critical hits cannot be affected. Otherwise, if the monk strikes successfully and the target takes damage from the blow, the quivering palm attack succeeds. Thereafter, the monk can try to slay the victim at any later time, as long as the attempt is made within a number of days equal to his monk level. To make such an attempt, the monk merely wills the target to die (a free action ), and unless the target makes a Fortitude saving throw (DC 10 + 1/2 the monk's level + the monk's Wis modifier), it dies. If the saving throw is successful, the target is no longer in danger from that particular quivering palm attack, but it may still be affected by another one at a later time. A monk can have no more than 1 quivering palm in effect at one time. If a monk uses quivering palm while another is still in effect, the previous effect is negated."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 12,
+      "fort": 10,
+      "ref": 10,
+      "will": 10,
+      "classFeatures": [
+        {
+          "name": "Ki Pool ( Adamantine )",
+          "description": "At 4th level, a monk gains a pool of ki points, supernatural energy he can use to accomplish amazing feats. The number of points in a monk's ki pool is equal to 1/2 his monk level + his Wisdom modifier. As long as he has at least 1 point in his ki pool, he can make a ki strike. At 4th level , ki strike allows his unarmed attacks to be treated as magic weapons for the purpose of overcoming damage reduction . At 7th level, his unarmed attacks are also treated as cold iron and silver for the purpose of overcoming damage reduction . At 10th level , his unarmed attacks are also treated as lawful weapons for the purpose of overcoming damage reduction . At 16th level , his unarmed attacks are treated as adamantine weapons for the purpose of overcoming damage reduction and bypassing hardness . By spending 1 point from his ki pool, a monk can do one of the following: Make one additional attack at his highest attack bonus when making a flurry of blows attack, or Increase his speed by 20 feet for 1 round, or Give himself a +4 dodge bonus to AC for 1 round. Each of these powers is activated as a swift action . The ki pool is replenished each morning after 8 hours of rest or meditation; these hours do not need to be consecutive."
+        },
+        {
+          "name": "Slow Fall 80 Ft.",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 12,
+      "fort": 10,
+      "ref": 10,
+      "will": 10,
+      "classFeatures": [
+        {
+          "name": "Timeless Body",
+          "description": "At 17th level, a monk no longer takes penalties to his ability scores for aging and cannot be magically aged. Any such penalties that he has already taken, however, remain in place. Age bonuses still accrue, and the monk still dies of old age when his time is up."
+        },
+        {
+          "name": "Tongue Of The Sun And Moon",
+          "description": "A monk of 17th level or higher can speak with any living creature."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 13,
+      "fort": 11,
+      "ref": 11,
+      "will": 11,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": "At 1st level, 2nd level, and every 4 levels thereafter, a monk may select a bonus feat. These feats must be taken from the following list: Catch Off-Guard , Combat Reflexes , Deflect Arrows , Dodge , Improved Grapple , Scorpion Style , and Throw Anything . At 6th level, the following feats are added to the list: Gorgon's Fist , Improved Bull Rush , Improved Disarm , Improved Feint , Improved Trip , and Mobility . At 10th level, the following feats are added to the list: Improved Critical , Medusa's Wrath , Snatch Arrows , and Spring Attack . A monk need not have any of the prerequisites normally required for these feats to select them."
+        },
+        {
+          "name": "Slow Fall 90 Ft.",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 14,
+      "fort": 11,
+      "ref": 11,
+      "will": 11,
+      "classFeatures": [
+        {
+          "name": "Empty Body",
+          "description": "At 19th level, a monk gains the ability to assume an ethereal state for 1 minute as though using the spell etherealness . Using this ability is a move action that consumes 3 points from his ki pool. This ability only affects the monk and cannot be used to make other creatures ethereal."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 15,
+      "fort": 12,
+      "ref": 12,
+      "will": 12,
+      "classFeatures": [
+        {
+          "name": "Perfect Self",
+          "description": "At 20th level, a monk becomes a magical creature. He is forevermore treated as an outsider rather than as a humanoid (or whatever the monk's creature type was) for the purpose of spells and magical effects. Additionally, the monk gains damage reduction 10/ chaotic , which allows him to ignore the first 10 points of damage from any attack made by a nonchaotic weapon or by any natural attack made by a creature that doesn't have similar damage reduction . Unlike other outsiders , the monk can still be brought back from the dead as if he were a member of his previous creature type."
+        },
+        {
+          "name": "Slow Fall Any Distance",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": null,
+  "spellcastingClass": false
+}

@@ -20,6 +20,7 @@
     .character-card-actions { position: absolute; right: 8px; bottom: 8px; display: flex; gap: 6px; }
     .character-icon-btn { width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; padding: 0; }
     input { background-color: #2b2b2b !important; color: white !important; border-color: #555 !important; }
+    select { background-color: #2b2b2b !important; color: white !important; border-color: #555 !important; }
     @media (max-width: 520px) {
       .characters-toolbar { grid-template-columns: 1fr; }
     }
@@ -65,8 +66,14 @@
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <label for="newCharacterName">Character Name</label>
-        <input id="newCharacterName" class="form-control form-control-sm" required maxlength="120">
+        <div class="mb-2">
+          <label for="newCharacterName">Character Name</label>
+          <input id="newCharacterName" class="form-control form-control-sm" required maxlength="120">
+        </div>
+        <div>
+          <label for="newCharacterClass">Starting Class</label>
+          <select id="newCharacterClass" class="form-select form-select-sm" required></select>
+        </div>
       </div>
       <div class="modal-footer border-secondary">
         <span id="newCharacterStatus" class="small text-secondary me-auto"></span>
@@ -99,10 +106,11 @@
   </div>
 </div>
 
-<script src="navbar.js"></script>
+<script src="scripts/navbar.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase-config.js"></script>
-<script src="app-supabase.js"></script>
+<script src="scripts/supabase-config.js"></script>
+<script src="scripts/app-supabase.js"></script>
+<script src="scripts/class-data.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 let characterContextKey = "";
@@ -114,6 +122,7 @@ let isAppAdminUser = false;
 let newCharacterModal = null;
 let deleteCharacterModal = null;
 let pendingDeleteCharacterId = "";
+let classDefinitions = [];
 
 function el(id) { return document.getElementById(id); }
 
@@ -159,6 +168,64 @@ function characterOwnerLabel(character) {
 
 function canDeleteCharacter(character) {
   return isAppAdminUser || character.user_id === currentUserId;
+}
+
+function classNameOf(definition) {
+  return definition?.name || definition?.class || "";
+}
+
+const CLASS_GROUPS = [
+  ["core", "Core"],
+  ["base", "Base"],
+  ["alternate", "Alternate"],
+  ["occult", "Occult"],
+  ["hybrid", "Hybrid"],
+  ["unchained", "Unchained"],
+  ["prestige", "Prestige"],
+  ["npc", "NPC"]
+];
+
+function classTypeOf(definition) {
+  return String(definition?.type || definition?.category || "base").toLowerCase();
+}
+
+function groupedClassOptions(definitions, selected = "") {
+  const selectedClass = String(selected || "");
+  return CLASS_GROUPS.map(([type, label]) => {
+    const options = definitions
+      .filter(definition => classTypeOf(definition) === type)
+      .sort((a, b) => classNameOf(a).localeCompare(classNameOf(b)));
+    if (!options.length) return "";
+    return `
+      <optgroup label="${escapeHtml(label)}">
+        ${options.map(definition => {
+          const name = classNameOf(definition);
+          return `<option value="${escapeHtml(name)}" ${name === selectedClass ? "selected" : ""}>${escapeHtml(name)}</option>`;
+        }).join("")}
+      </optgroup>
+    `;
+  }).join("");
+}
+
+function playableClassDefinitions() {
+  return classDefinitions.filter(definition => {
+    const type = classTypeOf(definition);
+    return classNameOf(definition) && !type.includes("prestige") && !type.includes("3rd");
+  });
+}
+
+async function loadClassDefinitions() {
+  try {
+    classDefinitions = await PFClassData.loadIndex();
+  } catch (error) {
+    console.warn("Could not load classes", error);
+    classDefinitions = [];
+  }
+  const select = el("newCharacterClass");
+  const options = playableClassDefinitions();
+  select.innerHTML = options.length
+    ? groupedClassOptions(options)
+    : `<option value="">No class data found</option>`;
 }
 
 function renderCharacters() {
@@ -226,10 +293,12 @@ async function updateCharacterContextLabel() {
   el("characterContextLabel").textContent = context?.label || "";
 }
 
-function defaultCharacterSheet(name) {
+function defaultCharacterSheet(name, startingClass) {
+  const classProgression = Array.from({ length: 20 }, (_, index) => ({ level: index + 1, className: startingClass || "" }));
   return {
     fields: {
       characterName: name,
+      classLevel: startingClass ? `${startingClass} 1` : "",
       characterLevel: "1",
       currentHitPoints: "0",
       hitPointsTotal: "0"
@@ -240,6 +309,7 @@ function defaultCharacterSheet(name) {
     weapons: [],
     armor: [],
     gear: [],
+    classProgression,
     preferences: { showAppliedBuffs: true }
   };
 }
@@ -247,14 +317,19 @@ function defaultCharacterSheet(name) {
 async function createCharacter(event) {
   event.preventDefault();
   const name = el("newCharacterName").value.trim();
+  const startingClass = el("newCharacterClass").value.trim();
   if (!name) return;
+  if (!startingClass) {
+    el("newCharacterStatus").textContent = "Choose a starting class.";
+    return;
+  }
 
   const button = el("createCharacterButton");
   const modalStatus = el("newCharacterStatus");
   button.disabled = true;
   modalStatus.textContent = "Creating...";
 
-  const saved = await PFApp.saveCharacterSheet(name, defaultCharacterSheet(name), characterContextKey);
+  const saved = await PFApp.saveCharacterSheet(name, defaultCharacterSheet(name, startingClass), characterContextKey);
   button.disabled = false;
 
   if (!saved?.id) {
@@ -311,6 +386,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   newCharacterModal = bootstrap.Modal.getOrCreateInstance(el("newCharacterModal"));
   deleteCharacterModal = bootstrap.Modal.getOrCreateInstance(el("deleteCharacterModal"));
+  await loadClassDefinitions();
   el("newCharacterForm").addEventListener("submit", createCharacter);
   el("deleteCharacterForm").addEventListener("submit", deleteCharacter);
   el("characterSearch").addEventListener("input", event => {

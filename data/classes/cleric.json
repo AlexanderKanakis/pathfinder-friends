@@ -1,0 +1,484 @@
+{
+  "name": "Cleric",
+  "type": "core",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/core-classes/cleric/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 2,
+      "ref": 0,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Aura",
+          "description": "A cleric of a chaotic, evil, good, or lawful deity has a particularly powerful aura corresponding to the deity's alignment (see detect evil for details)."
+        },
+        {
+          "name": "Channel Energy 1d6",
+          "description": ""
+        },
+        {
+          "name": "Domains",
+          "description": "A cleric's deity influences her alignment, what magic she can perform, her values, and how others see her. A cleric chooses two domains from among those belonging to her deity. A cleric can select an alignment domain (Chaos, Evil, Good, or Law) only if her alignment matches that domain . If a cleric is not devoted to a particular deity, she still selects two domains to represent her spiritual inclinations and abilities (subject to GM approval). The restriction on alignment domains still applies. Each domain grants a number of domain powers, dependent upon the level of the cleric, as well as a number of bonus spells. A cleric gains one domain spell slot for each level of cleric spell she can cast, from 1st on up. Each day, a cleric can prepare one of the spells from her two domain s in that slot. If a domain spell is not on the cleric spell list, a cleric can prepare it only in her domain spell slot. Domain spells cannot be used to cast spells spontaneously. In addition, a cleric gains the listed powers from both of her domains, if she is of a high enough level. Unless otherwise noted, activating a domain power is a standard action. A complete listing of cleric domains can be found here: Cleric Domains"
+        },
+        {
+          "name": "Orisons",
+          "description": "Clerics can prepare a number of orisons, or 0-level spells, each day, as noted on Table: Cleric under ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œSpells per day.ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â These spells are treated like any other spell, but they are not expended when cast and may be used again."
+        },
+        {
+          "name": "Spontaneous Casting",
+          "description": "A good cleric (or a neutral cleric of a good deity) can channel stored spell energy into healing spells that she did not prepare ahead of time. The cleric can ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œloseÃƒÂ¢Ã¢â€šÂ¬Ã‚Â any prepared spell that is not an orison or domain spell in order to cast any cure spell of the same spell level or lower (a cure spell is any spell with ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œcureÃƒÂ¢Ã¢â€šÂ¬Ã‚Â in its name). An evil cleric (or a neutral cleric of an evil deity) can't convert prepared spells to cure spells but can convert them to inflict spells (an inflict spell is one with ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œinflictÃƒÂ¢Ã¢â€šÂ¬Ã‚Â in its name). A cleric who is neither good nor evil and whose deity is neither good nor evil can convert spells to either cure spells or inflict spells (player's choice). Once the player makes this choice, it cannot be reversed. This choice also determines whether the cleric channels positive or negative energy (see channel energy)."
+        }
+      ]
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 3,
+      "ref": 0,
+      "will": 3,
+      "classFeatures": []
+    },
+    {
+      "level": 3,
+      "bab": 2,
+      "fort": 3,
+      "ref": 1,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Channel Energy 2d6",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "level": 4,
+      "bab": 3,
+      "fort": 4,
+      "ref": 1,
+      "will": 4,
+      "classFeatures": []
+    },
+    {
+      "level": 5,
+      "bab": 3,
+      "fort": 4,
+      "ref": 1,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Channel Energy 3d6",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "level": 6,
+      "bab": 4,
+      "fort": 5,
+      "ref": 2,
+      "will": 5,
+      "classFeatures": []
+    },
+    {
+      "level": 7,
+      "bab": 5,
+      "fort": 5,
+      "ref": 2,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Channel Energy 4d6",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "level": 8,
+      "bab": 6,
+      "fort": 6,
+      "ref": 2,
+      "will": 6,
+      "classFeatures": []
+    },
+    {
+      "level": 9,
+      "bab": 6,
+      "fort": 6,
+      "ref": 3,
+      "will": 6,
+      "classFeatures": [
+        {
+          "name": "Channel Energy 5d6",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "level": 10,
+      "bab": 7,
+      "fort": 7,
+      "ref": 3,
+      "will": 7,
+      "classFeatures": []
+    },
+    {
+      "level": 11,
+      "bab": 8,
+      "fort": 7,
+      "ref": 3,
+      "will": 7,
+      "classFeatures": [
+        {
+          "name": "Channel Energy 6d6",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "level": 12,
+      "bab": 9,
+      "fort": 8,
+      "ref": 4,
+      "will": 8,
+      "classFeatures": []
+    },
+    {
+      "level": 13,
+      "bab": 9,
+      "fort": 8,
+      "ref": 4,
+      "will": 8,
+      "classFeatures": [
+        {
+          "name": "Channel Energy 7d6",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "level": 14,
+      "bab": 10,
+      "fort": 9,
+      "ref": 4,
+      "will": 9,
+      "classFeatures": []
+    },
+    {
+      "level": 15,
+      "bab": 11,
+      "fort": 9,
+      "ref": 5,
+      "will": 9,
+      "classFeatures": [
+        {
+          "name": "Channel Energy 8d6",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "level": 16,
+      "bab": 12,
+      "fort": 10,
+      "ref": 5,
+      "will": 10,
+      "classFeatures": []
+    },
+    {
+      "level": 17,
+      "bab": 12,
+      "fort": 10,
+      "ref": 5,
+      "will": 10,
+      "classFeatures": [
+        {
+          "name": "Channel Energy 9d6",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "level": 18,
+      "bab": 13,
+      "fort": 11,
+      "ref": 6,
+      "will": 11,
+      "classFeatures": []
+    },
+    {
+      "level": 19,
+      "bab": 14,
+      "fort": 11,
+      "ref": 6,
+      "will": 11,
+      "classFeatures": [
+        {
+          "name": "Channel Energy 10d6",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "level": 20,
+      "bab": 15,
+      "fort": 12,
+      "ref": 6,
+      "will": 12,
+      "classFeatures": []
+    }
+  ],
+  "spellcasting": {
+    "summary": "prepared full caster using WIS",
+    "castingType": "prepared",
+    "progression": "full",
+    "ability": "wis",
+    "preparation": "daily-list",
+    "maxSpellLevel": 9,
+    "slotsByLevel": [
+      [
+        3,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        2,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        3,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        3,
+        2,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        3,
+        3,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        4,
+        3,
+        2,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        4,
+        3,
+        3,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        4,
+        4,
+        3,
+        2,
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        4,
+        4,
+        3,
+        3,
+        2,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        4,
+        4,
+        4,
+        3,
+        2,
+        1,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        4,
+        4,
+        4,
+        3,
+        3,
+        2,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        2,
+        1,
+        0,
+        0
+      ],
+      [
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        3,
+        2,
+        0,
+        0
+      ],
+      [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        2,
+        1,
+        0
+      ],
+      [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        3,
+        2,
+        0
+      ],
+      [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        2,
+        1
+      ],
+      [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        3,
+        2
+      ],
+      [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        3
+      ],
+      [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ]
+    ]
+  },
+  "spellcastingClass": true
+}

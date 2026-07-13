@@ -1,0 +1,273 @@
+{
+  "name": "False Priest",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/e-h/false-priest/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "False Domain",
+          "description": ""
+        },
+        {
+          "name": "First Ritual",
+          "description": "At 1st level, a False Priest adds both bless and cure light wounds to one of his arcane spell lists, but treats them as if they were 2nd-level spells. If he is a spontaneous caster, they are also added to his list of spells known. Whenever he casts cure light wounds using this ability, the hit points healed are instead treated as temporary hit points that last 10 minutes per False Priest level, although the subject of the spell does not notice this difference until the duration expires. Temporary hit points from this (and any subsequent cure spells) do not stack. In addition, whenever a False Priest uses False Casting to cast a 0- or 1st-level spell on the cleric spell list, he receives a +10 circumstance bonus on any opposed Bluff check made when casting the spell."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "-"
+      }
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "False Channel 1d6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of arcane spellcasting class"
+      }
+    },
+    {
+      "level": 3,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Master Of Lies",
+          "description": "At 3rd level, a False Priest adds his class level to any Bluff check made as part of a lie or deception. In addition, whenever he is subject to a spell or special ability that can discern whether or not he is telling the truth, he is automatically aware of such magic. He is not immune to such spells or abilities, but he can choose to remain silent or avoid answering questions."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of arcane spellcasting class"
+      }
+    },
+    {
+      "level": 4,
+      "bab": 3,
+      "fort": 1,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "False Channel 2d6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of arcane spellcasting class"
+      }
+    },
+    {
+      "level": 5,
+      "bab": 3,
+      "fort": 2,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "False Domain",
+          "description": ""
+        },
+        {
+          "name": "Second Ritual",
+          "description": "At 5th level, a False Priest adds cure moderate wounds and spiritual weapon to one of his arcane spell lists, but treats them as if they were 3rd-level spells. If he is a spontaneous caster, they are also added to his list of spells known. As with the first ritual, any hit points gained from cure moderate wounds are temporary hit points . Finally, whenever a False Priest uses False Casting to cast a 2nd- or 3rd-level spell on the cleric spell list, he receives a +10 circumstance bonus on any opposed Bluff check made when casting the spell."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "-"
+      }
+    },
+    {
+      "level": 6,
+      "bab": 4,
+      "fort": 2,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "False Channel 3d6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of arcane spellcasting class"
+      }
+    },
+    {
+      "level": 7,
+      "bab": 5,
+      "fort": 2,
+      "ref": 2,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Conversion",
+          "description": "At 7th level, whenever a False Priest heals himself using false channel, the effect heals damage, instead of granting temporary hit points . This has no effect on others in the area of effect."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of arcane spellcasting class"
+      }
+    },
+    {
+      "level": 8,
+      "bab": 6,
+      "fort": 3,
+      "ref": 3,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "False Channel 4d6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of arcane spellcasting class"
+      }
+    },
+    {
+      "level": 9,
+      "bab": 6,
+      "fort": 3,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Third Ritual",
+          "description": "At 9th level, a False Priest adds cure serious wounds and prayer to one of his arcane spell lists, but treats them as if they were 4th-level spells. If he is a spontaneous caster, they are also added to his list of spells known. As with the first ritual, any hit points gained from cure serious wounds are temporary hit points . Finally, whenever a False Priest uses False Casting to cast a 4th- or 5th-level spell on the cleric spell list, he receives a +10 circumstance bonus on any opposed Bluff check made when casting the spell."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "-"
+      }
+    },
+    {
+      "level": 10,
+      "bab": 7,
+      "fort": 3,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "False Channel 5d6",
+          "description": ""
+        },
+        {
+          "name": "True Pretender",
+          "description": "At 10th level, a False Priest attains true power. Whenever he uses false channel, he can spend two uses of that ability to heal damage to all living creatures in the area, instead of granting temporary hit points . In addition, when determining what spell trigger and spell completion magic items he can use, he acts as though all cleric spells were on his spell list. This makes it so that he does not need to make a Use Magic Device skill check when using such items, but he must still make Bluff skill checks when using False Casting with such spells. Section 15: Copyright Notice Pathfinder Campaign Setting: Paths of Prestige Ãƒâ€šÃ‚Â© 2012, Paizo Publishing, LLC; Authors: Benjamin Bruck, Jason Bulmahn, Matt Goodall, and Jason Nelson."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of arcane spellcasting class"
+      }
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": {
+    "summary": "See level progression spell columns."
+  },
+  "spellcastingClass": true
+}

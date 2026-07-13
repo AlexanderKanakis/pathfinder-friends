@@ -1,0 +1,283 @@
+{
+  "name": "Rose Warden",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/n-r/rose-warden/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 0,
+      "ref": 1,
+      "will": 0,
+      "classFeatures": [
+        {
+          "name": "Anonymity",
+          "description": "A rose warden gains a bonus equal to her class level on any Bluff and Disguise checks to conceal her true identity."
+        },
+        {
+          "name": "Insurgent Technique",
+          "description": "At 1st level and every 2 class levels thereafter, a rose warden gains one of the following insurgent techniques. The save DC of any saving throw called for by an insurgent technique is equal to 10 + the rose wardenÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s class level + her Intelligence modifier. Spell-like abilities have a caster level equal to the rose wardenÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s class level. EverbloomÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Wrath (Sp) : The rose warden selects either chaos hammer or holy smite . She can use that spell once per day as a spell-like ability . If a rose warden chooses this technique a second time, she gains the ability to cast the other spell once per day as well. Holy Thorns (Su) : Once per day as a swift action , the rose warden can cause thorns to magically sprout from her weapon. The weapon counts as good-aligned for purposes of overcoming DR . A lawful or evil target damaged by this weapon must succeed at a Fortitude save or be wracked with pain and become staggered for 1 round. The thorns dissipate after a number of rounds equal to the rose wardenÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s class level. Rogue Talent : A rose warden can select one rogue talent for which she qualifies. Her rose warden levels stack with rogue levels for the purpose of any rogue talents she has with level-dependent effects, whether they were gained from this prestige class or another class."
+        },
+        {
+          "name": "Liberated Mind",
+          "description": "A rose warden gains a +2 bonus on saving throws to resist charm , compulsion , and fear effects. This bonus increases to +4 at 5th level."
+        },
+        {
+          "name": "Street Sentinel +2",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Sneak Attack +1d6",
+          "description": ""
+        },
+        {
+          "name": "Voice Of The Masses",
+          "description": "At 2nd level, a rose wardenÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s movement is not impeded by crowds, and she gains a bonus equal to her rose warden level on checks to influence crowds."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 3,
+      "bab": 2,
+      "fort": 1,
+      "ref": 2,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Cunning Disarm",
+          "description": "At 3rd level, a rose warden can use Sleight of Hand in place of a combat maneuver check to disarm a foe. This does not provoke an attack of opportunity ."
+        },
+        {
+          "name": "Insurgent Technique",
+          "description": "At 1st level and every 2 class levels thereafter, a rose warden gains one of the following insurgent techniques. The save DC of any saving throw called for by an insurgent technique is equal to 10 + the rose wardenÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s class level + her Intelligence modifier. Spell-like abilities have a caster level equal to the rose wardenÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s class level. EverbloomÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Wrath (Sp) : The rose warden selects either chaos hammer or holy smite . She can use that spell once per day as a spell-like ability . If a rose warden chooses this technique a second time, she gains the ability to cast the other spell once per day as well. Holy Thorns (Su) : Once per day as a swift action , the rose warden can cause thorns to magically sprout from her weapon. The weapon counts as good-aligned for purposes of overcoming DR . A lawful or evil target damaged by this weapon must succeed at a Fortitude save or be wracked with pain and become staggered for 1 round. The thorns dissipate after a number of rounds equal to the rose wardenÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s class level. Rogue Talent : A rose warden can select one rogue talent for which she qualifies. Her rose warden levels stack with rogue levels for the purpose of any rogue talents she has with level-dependent effects, whether they were gained from this prestige class or another class."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 4,
+      "bab": 3,
+      "fort": 1,
+      "ref": 2,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Insurrectionist",
+          "description": "At 4th level, a rose warden can ignore impediments to her mobility. For a number of rounds per day equal to her rose warden level, she can move normally regardless of magical effects that impede movement, as if she were affected by freedom of movement . These rounds do not need to be consecutive. In addition, once per day she can grant this ability to all allies within 30 feet. This effect occurs automatically as soon as it applies."
+        },
+        {
+          "name": "Sneak Attack +2d6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 5,
+      "bab": 3,
+      "fort": 2,
+      "ref": 3,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Advanced Insurgent Technique",
+          "description": "At 5th level, a rose warden can select one of the following advanced insurgent techniques in place of a normal insurgent technique. Advanced Rogue Talent : A rose warden can select one advanced rogue talent that she qualifies for. Her rose warden levels stack with rogue levels for the purpose of any advanced rogue talents she has with level-dependent effects, whether they were gained from this prestige class or another class. Alleyport (Sp) : Once per day as a swift action , the rose warden can teleport as per dimension door , but only when she is in an area no wider than her space, and she can arrive only in an area of similar width. Small but Fierce (Ex) : As a move action , the rose warden can study an opponent at least one size category larger than herself that she can see. She can then apply the precision damage granted by sneak attack on her next attack made in the same round she studied the larger foe, even if that target is not denied its Dexterity bonus to its AC. Wall of Roses (Sp) : Once per day, the rose warden can cast wall of thorns as a spell-like ability . The wall consists of a dense tangle of roses through which worshipers of the associated deity can pass with ease. The wall of roses heals at a rate of 5 hit points per round; it is immune to fire damage; and all piercing damage it deals bypasses damage reduction as if it were a good, magic, and silver weapon. Evil and lawful creatures damaged by a wall of roses automatically become sickened for the next minute (this is a poison effect)."
+        },
+        {
+          "name": "Liberated Mind +4",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 6,
+      "bab": 4,
+      "fort": 2,
+      "ref": 3,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Sneak Attack +3d6",
+          "description": ""
+        },
+        {
+          "name": "Street Sentinel +4",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 7,
+      "bab": 5,
+      "fort": 2,
+      "ref": 4,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Advanced Insurgent Technique",
+          "description": "At 5th level, a rose warden can select one of the following advanced insurgent techniques in place of a normal insurgent technique. Advanced Rogue Talent : A rose warden can select one advanced rogue talent that she qualifies for. Her rose warden levels stack with rogue levels for the purpose of any advanced rogue talents she has with level-dependent effects, whether they were gained from this prestige class or another class. Alleyport (Sp) : Once per day as a swift action , the rose warden can teleport as per dimension door , but only when she is in an area no wider than her space, and she can arrive only in an area of similar width. Small but Fierce (Ex) : As a move action , the rose warden can study an opponent at least one size category larger than herself that she can see. She can then apply the precision damage granted by sneak attack on her next attack made in the same round she studied the larger foe, even if that target is not denied its Dexterity bonus to its AC. Wall of Roses (Sp) : Once per day, the rose warden can cast wall of thorns as a spell-like ability . The wall consists of a dense tangle of roses through which worshipers of the associated deity can pass with ease. The wall of roses heals at a rate of 5 hit points per round; it is immune to fire damage; and all piercing damage it deals bypasses damage reduction as if it were a good, magic, and silver weapon. Evil and lawful creatures damaged by a wall of roses automatically become sickened for the next minute (this is a poison effect)."
+        },
+        {
+          "name": "Obfuscate",
+          "description": "At 7th level, a rose warden can use the Stealth skill even while she is being observed. While she is in an urban area, a rose warden can hide in the open even without actually having anything to hide behind."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 8,
+      "bab": 6,
+      "fort": 3,
+      "ref": 4,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Rallying Courage",
+          "description": "At 8th level, a rose warden becomes immune to fear effects. Once per day as a swift action , she can inspire an ally affected by fear who is within her line of sight, allowing that ally to attempt a second saving throw against the condition."
+        },
+        {
+          "name": "Sneak Attack +4d6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 9,
+      "bab": 6,
+      "fort": 3,
+      "ref": 5,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Advanced Insurgent Technique",
+          "description": "At 5th level, a rose warden can select one of the following advanced insurgent techniques in place of a normal insurgent technique. Advanced Rogue Talent : A rose warden can select one advanced rogue talent that she qualifies for. Her rose warden levels stack with rogue levels for the purpose of any advanced rogue talents she has with level-dependent effects, whether they were gained from this prestige class or another class. Alleyport (Sp) : Once per day as a swift action , the rose warden can teleport as per dimension door , but only when she is in an area no wider than her space, and she can arrive only in an area of similar width. Small but Fierce (Ex) : As a move action , the rose warden can study an opponent at least one size category larger than herself that she can see. She can then apply the precision damage granted by sneak attack on her next attack made in the same round she studied the larger foe, even if that target is not denied its Dexterity bonus to its AC. Wall of Roses (Sp) : Once per day, the rose warden can cast wall of thorns as a spell-like ability . The wall consists of a dense tangle of roses through which worshipers of the associated deity can pass with ease. The wall of roses heals at a rate of 5 hit points per round; it is immune to fire damage; and all piercing damage it deals bypasses damage reduction as if it were a good, magic, and silver weapon. Evil and lawful creatures damaged by a wall of roses automatically become sickened for the next minute (this is a poison effect)."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 10,
+      "bab": 7,
+      "fort": 3,
+      "ref": 5,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Smite Tyranny",
+          "description": "At 10th level, when a rose warden deals sneak attack damage to a lawful or evil target, she can choose to smite tyranny as a free action . The rose warden deals an additional 2 points of damage per sneak attack die rolled to the target. The target must also succeed at a Fortitude saving throw (DC = 20 + the rose wardenÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Charisma modifier) or be staggered for 1 round by the blow. A lawful evil target is instead staggered for 1d4 rounds. The rose warden can smite tyranny a number of times per day equal to 3 + her Charisma modifier. Section 15: Copyright Notice Pathfinder Player Companion: Paths of the Righteous Ãƒâ€šÃ‚Â© 2016, Paizo Inc.; Authors: Alexander Augunas, John Compton, Jenny Jarzabski, Isabelle Lee, Stephen Rowe, and Owen K.C. Stephens."
+        },
+        {
+          "name": "Sneak Attack +5d6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": null,
+  "spellcastingClass": false
+}

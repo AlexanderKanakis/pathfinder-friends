@@ -1,0 +1,265 @@
+{
+  "name": "Mage of the Third Eye",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/i-m/mage-of-the-third-eye/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Mystic Pedagogue",
+          "description": "A Mage of the third eye adds a bonus equal to 1/2 his class level on Spellcraft checks to learn a wizard spell or craft a magical item."
+        },
+        {
+          "name": "Third Eye",
+          "description": "An Mage of the third eye can use his Eldritch Eye feat one additional time per day, plus one additional time per day for every two levels beyond 1st (three times per day at 3rd level, and so on). In addition, while the eye is open, the Mage of the third eye can use the aid another action to grant an adjacent wizard a +1 bonus to her caster level and a +2 circumstance bonus on concentration checks for the next wizard spell she casts before the beginning of the Mage of the third eye s next turn."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of arcane spellcasting class"
+      }
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Artificer'S Touch",
+          "description": "At 2nd level, a Mage of the third eye can expend one use of his hand of the apprentice to use the Artifice domain's artificer's touch power, using his caster level as his cleric level."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of arcane spellcasting class"
+      }
+    },
+    {
+      "level": 3,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Scholiast 1",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of arcane spellcasting class"
+      }
+    },
+    {
+      "level": 4,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Arcane Architect",
+          "description": "At 4th level, a Mage of the third eye can create constructs with the Craft Construct feat in only half the time it would normally take. In addition, he can apply the Extend Spell and/or Widen Spell metamagic feats to conjuration ( creation ) spells he prepares, even if he doesn't possess those feats. If he does possess them, the level increase for applying Extend Spell to a conjuration ( creation ) spell is eliminated, and the level increase for applying Widen Spell to a conjuration ( creation ) spell is reduced to 2."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of arcane spellcasting class"
+      }
+    },
+    {
+      "level": 5,
+      "bab": 2,
+      "fort": 2,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Improved Third Eye",
+          "description": "At 5th level, a Mage of the third eye can activate his Eldritch Eye feat as a move action . A Mage of the third eye can expend two uses of his hand of the apprentice ability to add the effect of arcane sight or see invisibility to the benefits of his Eldritch Eye for 1 minute (or until the duration of the Eye ends, whichever is sooner). He can add both effects by expending four uses of this ability."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of arcane spellcasting class"
+      }
+    },
+    {
+      "level": 6,
+      "bab": 3,
+      "fort": 2,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Scholiast 2",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of arcane spellcasting class"
+      }
+    },
+    {
+      "level": 7,
+      "bab": 3,
+      "fort": 2,
+      "ref": 2,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Extradimensional Extension",
+          "description": "At 6th level, the duration of any spell cast by a Mage of the third eye that creates an extradimensional space (or demiplane) or moves creatures or objects through the Ethereal Plane is doubled as though affected by the Extend Spell feat, without altering the level of the spell. Applications of Extend Spell do not stack with this ability."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of arcane spellcasting class"
+      }
+    },
+    {
+      "level": 8,
+      "bab": 4,
+      "fort": 3,
+      "ref": 3,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Call For Aid",
+          "description": "At 8th level, as a standard action , a Mage of the third eye can sacrifice a prepared spell of 2nd level or higher to call a creature bound to him, including an animal companion , eidolon , familiar , personally controlled construct or undead creature, creature telepathically linked to him (including by telepathic bond , dominate person , or dominate monster ), or an outsider bound with a planar binding spell. The named creature appears adjacent to the Mage of the third eye or in the nearest open space if all adjacent squares are occupied. This ability functions like greater teleport , except the range limit is determined by the level of the sacrificed spell: short (2nd-3rd), medium (4th-5th), long (6th-7th), unlimited (same plane) (8th), or unlimited (any plane) (9th)."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of arcane spellcasting class"
+      }
+    },
+    {
+      "level": 9,
+      "bab": 4,
+      "fort": 3,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Scholiast 3",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of arcane spellcasting class"
+      }
+    },
+    {
+      "level": 10,
+      "bab": 5,
+      "fort": 3,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Greater Third Eye",
+          "description": "At 10th level, a Mage of the third eye can activate his Eldritch Eye as a swift action . In addition, he can expend four uses of his hand of the apprentice while opening his third eye to gain greater arcane sight or true seeing until the beginning of his next turn. He gains both effects if he expends eight uses of this ability. Section 15: Copyright Notice Pathfinder Campaign Setting: Paths of Prestige Ãƒâ€šÃ‚Â© 2012, Paizo Publishing, LLC; Authors: Benjamin Bruck, Jason Bulmahn, Matt Goodall, and Jason Nelson."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of arcane spellcasting class"
+      }
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": {
+    "summary": "See level progression spell columns."
+  },
+  "spellcastingClass": true
+}

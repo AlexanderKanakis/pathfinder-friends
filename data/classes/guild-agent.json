@@ -1,0 +1,271 @@
+{
+  "name": "Guild Agent",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/e-h/guild-agent/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 0,
+      "ref": 1,
+      "will": 0,
+      "classFeatures": [
+        {
+          "name": "Trap Sense +1",
+          "description": ""
+        },
+        {
+          "name": "Trapfinding",
+          "description": "This ability functions as per the rogue class feature. Levels in Guild agent stack with levels from any other class that grants this ability for the purposes of determining a Guild agent's total trapfinding bonus."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Agency Secrets",
+          "description": "At 2nd level and every 2 levels thereafter, a Guild agent gains one of the following agency secrets. A Guild agent can't select an individual agency secret more than once (unless otherwise stated in the secret's text). Bluster (Ex) The Guild agent takes no penalty on Intimidate checks against larger creatures, and larger creatures gain no bonus on Intimidate checks against her. Bonus Feat The Guild agent can choose one of the following as a bonus feat: Advanced Ranger Trap , Antagonize , Combat Expertise , Enforcer , Greater Dirty Trick , Improved Dirty Trick , Improved Whip Mastery , Intimidating Prowess , Learn Ranger Trap , Skill Focus ( Intimidate ), or Whip Mastery . She must meet the prerequisites of the selected bonus feat. A Guild agent can select this agency secret twice. Conceal Thoughts (Su) The Guild agent who is targeted with detect thoughts or a similar effect can choose what thoughts are actually detected, while her true thoughts remain private. This does not affect mind-affecting effects other than thought-reading. Exotic Performance The Guild agent with the bardic performance or the versatile performance class feature increases her effective bard level by 1 for all effects related to performances, including learning new types of performances and increasing the effects of her performances. Hidden Stash (Ex/Sp) The Guild agent gains a bonus equal to her class level on Sleight of Hand checks to hide small objects on her person. In addition, once per day she can hide the magical properties of one item as per magic aura . Master Caster The Guild agen"
+        },
+        {
+          "name": "Mask Alignment",
+          "description": "At 2nd level, as a standard action , a Guild agent can alter her alignment aura to deceive effects that detect alignment. She can emulate a different aura of her choice or to radiate no alignment aura. This affects only alignment detection, not effects that cause harm or are otherwise based on alignment . This effect lasts until she dismisses it or changes her alignment aura again. At 6th level, a Guild agent targeted with an effect that detects alignment or with any alignment -based effect can automatically identify the effect by attempting a Spellcraft check. If successful, she can mask her alignment as an immediate action . At 10th level, when a Guild agent assumes a false alignment aura, she is treated as having that alignment for all effects of magic items, spells, and spell-like or supernatural effects (such as forbiddance , sympathy , or an unholy weapon), including magical traps based on alignment . While masking her alignment , she ignores these types of effects that relate to her true alignment ."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 3,
+      "bab": 2,
+      "fort": 1,
+      "ref": 2,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Ambush Trap",
+          "description": "At 3rd level, a Guild agent can specially rig a mechanical trap she has either crafted or bypassed by exceeding its Disable Device DC by 10. A trap so rigged can be triggered by the Guild agent as a move action as long as she is adjacent to the trap . She adds her trap sense bonus to the trap's Perception DC and to the trap's attack rolls , and adds her sneak attack damage to the damage the trap deals to affected creatures that are flat-footed or otherwise denied their Dexterity bonus to AC."
+        },
+        {
+          "name": "Sneak Attack +1d6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 4,
+      "bab": 3,
+      "fort": 1,
+      "ref": 2,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Agency Secrets",
+          "description": "At 2nd level and every 2 levels thereafter, a Guild agent gains one of the following agency secrets. A Guild agent can't select an individual agency secret more than once (unless otherwise stated in the secret's text). Bluster (Ex) The Guild agent takes no penalty on Intimidate checks against larger creatures, and larger creatures gain no bonus on Intimidate checks against her. Bonus Feat The Guild agent can choose one of the following as a bonus feat: Advanced Ranger Trap , Antagonize , Combat Expertise , Enforcer , Greater Dirty Trick , Improved Dirty Trick , Improved Whip Mastery , Intimidating Prowess , Learn Ranger Trap , Skill Focus ( Intimidate ), or Whip Mastery . She must meet the prerequisites of the selected bonus feat. A Guild agent can select this agency secret twice. Conceal Thoughts (Su) The Guild agent who is targeted with detect thoughts or a similar effect can choose what thoughts are actually detected, while her true thoughts remain private. This does not affect mind-affecting effects other than thought-reading. Exotic Performance The Guild agent with the bardic performance or the versatile performance class feature increases her effective bard level by 1 for all effects related to performances, including learning new types of performances and increasing the effects of her performances. Hidden Stash (Ex/Sp) The Guild agent gains a bonus equal to her class level on Sleight of Hand checks to hide small objects on her person. In addition, once per day she can hide the magical properties of one item as per magic aura . Master Caster The Guild agen"
+        },
+        {
+          "name": "Trap Sense +2",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 5,
+      "bab": 3,
+      "fort": 2,
+      "ref": 3,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Crucial Taunt",
+          "description": "At 5th level, a ConsoGuildrtium agent can combine smugness and mockery with Bluff checks to feint , Intimidate checks to demoralize, and dirty trick combat maneuver checks, gaining a bonus equal to half her class level on these checks. She can then delay the effect of the successful check for up to 1 day per class level, spending an immediate action to trigger it later. The Guild agent must be within 60 feet of her target to use or trigger a crucial taunt. This is a language-dependent effect."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 6,
+      "bab": 4,
+      "fort": 2,
+      "ref": 3,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Agency Secrets",
+          "description": "At 2nd level and every 2 levels thereafter, a Guild agent gains one of the following agency secrets. A Guild agent can't select an individual agency secret more than once (unless otherwise stated in the secret's text). Bluster (Ex) The Guild agent takes no penalty on Intimidate checks against larger creatures, and larger creatures gain no bonus on Intimidate checks against her. Bonus Feat The Guild agent can choose one of the following as a bonus feat: Advanced Ranger Trap , Antagonize , Combat Expertise , Enforcer , Greater Dirty Trick , Improved Dirty Trick , Improved Whip Mastery , Intimidating Prowess , Learn Ranger Trap , Skill Focus ( Intimidate ), or Whip Mastery . She must meet the prerequisites of the selected bonus feat. A Guild agent can select this agency secret twice. Conceal Thoughts (Su) The Guild agent who is targeted with detect thoughts or a similar effect can choose what thoughts are actually detected, while her true thoughts remain private. This does not affect mind-affecting effects other than thought-reading. Exotic Performance The Guild agent with the bardic performance or the versatile performance class feature increases her effective bard level by 1 for all effects related to performances, including learning new types of performances and increasing the effects of her performances. Hidden Stash (Ex/Sp) The Guild agent gains a bonus equal to her class level on Sleight of Hand checks to hide small objects on her person. In addition, once per day she can hide the magical properties of one item as per magic aura . Master Caster The Guild agen"
+        },
+        {
+          "name": "Sneak Attack +2d6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 7,
+      "bab": 5,
+      "fort": 2,
+      "ref": 4,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Improved Trap Sense",
+          "description": "At 7th level, a Guild agent's trap sense bonus applies to saving throws to avoid trap effects."
+        },
+        {
+          "name": "Trap Sense +3",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 8,
+      "bab": 6,
+      "fort": 3,
+      "ref": 4,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Agency Secrets",
+          "description": "At 2nd level and every 2 levels thereafter, a Guild agent gains one of the following agency secrets. A Guild agent can't select an individual agency secret more than once (unless otherwise stated in the secret's text). Bluster (Ex) The Guild agent takes no penalty on Intimidate checks against larger creatures, and larger creatures gain no bonus on Intimidate checks against her. Bonus Feat The Guild agent can choose one of the following as a bonus feat: Advanced Ranger Trap , Antagonize , Combat Expertise , Enforcer , Greater Dirty Trick , Improved Dirty Trick , Improved Whip Mastery , Intimidating Prowess , Learn Ranger Trap , Skill Focus ( Intimidate ), or Whip Mastery . She must meet the prerequisites of the selected bonus feat. A Guild agent can select this agency secret twice. Conceal Thoughts (Su) The Guild agent who is targeted with detect thoughts or a similar effect can choose what thoughts are actually detected, while her true thoughts remain private. This does not affect mind-affecting effects other than thought-reading. Exotic Performance The Guild agent with the bardic performance or the versatile performance class feature increases her effective bard level by 1 for all effects related to performances, including learning new types of performances and increasing the effects of her performances. Hidden Stash (Ex/Sp) The Guild agent gains a bonus equal to her class level on Sleight of Hand checks to hide small objects on her person. In addition, once per day she can hide the magical properties of one item as per magic aura . Master Caster The Guild agen"
+        },
+        {
+          "name": "Remote Activation",
+          "description": "At 8th level, a Guild agent can use her ambush trap ability on a trap up to 30 feet away. Section 15: Copyright Notice Pathfinder Roleplaying Game Adventurer's Guide Ãƒâ€šÃ‚Â© 2017, Paizo Inc.; Authors: Benjamin Bruck, John Compton, Crystal Frasier, Tim Hitchcock, Jenny Jarzabski, Isabelle Lee, Joe Pasini, Jessica Price, David Schwartz, and Josh Vogt."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 9,
+      "bab": 6,
+      "fort": 3,
+      "ref": 5,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Sneak Attack +3d6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 10,
+      "bab": 7,
+      "fort": 3,
+      "ref": 5,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Agency Secrets",
+          "description": "At 2nd level and every 2 levels thereafter, a Guild agent gains one of the following agency secrets. A Guild agent can't select an individual agency secret more than once (unless otherwise stated in the secret's text). Bluster (Ex) The Guild agent takes no penalty on Intimidate checks against larger creatures, and larger creatures gain no bonus on Intimidate checks against her. Bonus Feat The Guild agent can choose one of the following as a bonus feat: Advanced Ranger Trap , Antagonize , Combat Expertise , Enforcer , Greater Dirty Trick , Improved Dirty Trick , Improved Whip Mastery , Intimidating Prowess , Learn Ranger Trap , Skill Focus ( Intimidate ), or Whip Mastery . She must meet the prerequisites of the selected bonus feat. A Guild agent can select this agency secret twice. Conceal Thoughts (Su) The Guild agent who is targeted with detect thoughts or a similar effect can choose what thoughts are actually detected, while her true thoughts remain private. This does not affect mind-affecting effects other than thought-reading. Exotic Performance The Guild agent with the bardic performance or the versatile performance class feature increases her effective bard level by 1 for all effects related to performances, including learning new types of performances and increasing the effects of her performances. Hidden Stash (Ex/Sp) The Guild agent gains a bonus equal to her class level on Sleight of Hand checks to hide small objects on her person. In addition, once per day she can hide the magical properties of one item as per magic aura . Master Caster The Guild agen"
+        },
+        {
+          "name": "Trap Sense +4",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": null,
+  "spellcastingClass": false
+}

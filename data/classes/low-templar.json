@@ -1,0 +1,251 @@
+{
+  "name": "Low Templar",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/i-m/low-templar/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 1,
+      "fort": 1,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [
+        {
+          "name": "Crusader +1",
+          "description": ""
+        },
+        {
+          "name": "Flag Of Convenience",
+          "description": "A low templar is adept at aligning himself with the winning side and has mastered the art of shifting or switching allegiance when convenient. He can disappear in one place and appear in another with new affiliations and associations, yet without besmirching his reputation. Even when caught in illicit acts, he easily evades blame. The low templar gains a +2 bonus on all Bluff and Disguise checks, and on Linguistics checks made to create forgeries. A low templar never suffers a penalty to his Leadership score for moving around frequently, aloofness, cruelty, or the loss of prior cohorts or followers, and can replace lost followers in half the normal amount of time."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 2,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Dirty Fighting",
+          "description": "A low templar melds the stately forms of jousting and chivalric standards with the down-and-dirty style of a barroom brawler. No trick is beneath him. A low templar never takes a non-proficiency penalty on attack rolls with improvised weapons and gains a +2 bonus on all combat maneuver checks. In addition, whenever he lands a critical hit , the low templar may opt to deal normal damage and roll on the following table rather than dealing extra damage. If the critical multiplier is x3, the duration of the effect doubles. If the critical multiplier is x4, the duration triples. d6 Result 1 Target is staggered for 1 round 2 Target is nauseated for 1 round 3 Target is deafened for 1 round 4 Target is blinded for 1 round 5 Target is sickened for 1 minute 6 Target becomes fatigued"
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 3,
+      "bab": 3,
+      "fort": 2,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Sneak Attack +1d6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 4,
+      "bab": 4,
+      "fort": 2,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Crusader +2",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 5,
+      "bab": 5,
+      "fort": 3,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Live To Fight Another Day",
+          "description": "At 6th level, a low templar can use the withdraw action as a standard action , although if he does so, he can only move at his speed (not double his speed)."
+        },
+        {
+          "name": "Path Of Darkness/Path Of Light",
+          "description": "As a low templar advances, he must eventually decide how closely he wishes to hew to his oaths to his god or goddess and the gods ethos of law and goodness. If he chooses the path of light, he may choose to ignore the lawful or good aspect of his alignment (choose one) for determining alignment -based magical effects (e.g., reducing damage from unholy blight or an unholy weapon, masking his alignment from detect good , or ignoring some effects of a magic circle against good ). He also gains a +2 circumstance bonus on Diplomacy checks with creatures with the lawful or good subtypes. If he chooses the path of darkness, he instead disregards either chaos or evil from his alignment and gains a Diplomacy bonus with creatures of the chaotic or evil subtypes."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 6,
+      "bab": 6,
+      "fort": 3,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Ruthless",
+          "description": "Whenever a low templar kills a foe or reduces it to a dying state with a melee attack, he can immediately make another attack with the same weapon at the same attack bonus as a swift action . This additional attack can be made on any legal target. The low templar gains a bonus on damage rolls with this swift action attack equal to his character level."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 7,
+      "bab": 7,
+      "fort": 4,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Crusader +3",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 8,
+      "bab": 8,
+      "fort": 4,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Sneak Attack +2d6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 9,
+      "bab": 9,
+      "fort": 5,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Parting Shot",
+          "description": "At 9th level, a low templar can use the withdraw action as a move action , although if he does so, he can only move at his speed (not double his speed)."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 10,
+      "bab": 10,
+      "fort": 5,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Crusader +4",
+          "description": ""
+        },
+        {
+          "name": "Damnation/Redemption",
+          "description": "At 10th level, a low templar must make a final choice of which ethical path to follow. He may mask a second alignment trait versus alignment -based effects, as per the path of darkness/path of light ability. A low templar can choose the path of darkness at 5th level and then choose the path of redemption at 10th level (or vice versa). When the low templar makes his damnation/redemption choice, he gains a planar cohort appropriate to his actual alignment , gained as if he had taken the Leadership feat. This planar cohort appears to him and pledges her loyalty to the low templar immediately. If the cohort perishes, the low templar must wait a week before calling upon a replacement. If the low templar has the Leadership feat, he gains a +1 bonus to his Leadership score. If he replaces his cohort gained from the leadership feat with the planar cohort, the maximum level equivalent for his planar cohort equals the templarÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s class level -1, rather than -2. Section 15: Copyright Notice Pathfinder Campaign Setting: The Inner Sea World Guide. Ãƒâ€šÃ‚Â© 2011, Paizo Publishing, LLC; Authors: Keith Baker, Wolfgang Baur, Clinton J. Boomer, Jason Bulmahn, Joshua J. Frost, Ed Greenwood, Stephen S. Greer, Jeff Grubb, James Jacobs, Michael Kortes, Tito Leati, Mike McArtor, Rob McCreary, Erik Mona, Jason Eric Nelson, Jeff Quick, Sean K Reynolds, F. Wesley Schneider, Leandra Christine Schneider, David Schwartz, Amber E. Scott, Stan!, Owen K.C. Stephens, Todd Stewart, James L. Sutter, Greg A. Vaughan, Jeremy Walker, and JD Wiker."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": null,
+  "spellcastingClass": false
+}

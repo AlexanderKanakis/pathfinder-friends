@@ -1,0 +1,265 @@
+{
+  "name": "Scar Seeker",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/s-z/scar-seeker/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 1,
+      "fort": 1,
+      "ref": 0,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Enduring Scar",
+          "description": "As a scar seeker gains levels, he accumulates scars of supernatural significance. He can activate his enduring scars abilities in any combination a number of times per day equal to half his class level plus his Charisma modifier. At 1st level and every 2 class levels thereafter, the scar seeker awakens a new enduring scar selected from the list below. Blood : As a swift action , the scar seeker can imbue a melee weapon he wields with the vicious weapon special ability for a number of rounds equal to his Charisma modifier (minimum 1 round). At 5th level, he can select this scar a second time to increase the extra damage to 2d8 and the damage received to 1d8. At 9th level, he can select the scar a third time to increase the extra damage to 2d10 and damage received to 1d10. Healing : When the scar seeker uses his lay on hands ability to heal another creature, the scar seeker can use this scar to heal double the normal amount of damage; however, the scar seeker immediately takes damage equal to half the amount he healed, and this damage cannot be reduced or otherwise prevented in any way. Martyr : When the scar seeker is brought below 0 hit points , he can expend all his remaining uses of lay on hands (minimum 1) as an immediate action in order to heal his allies and harm evil enemies in a 30-foot radius. He restores or deals an amount of damage equal to 4d6 plus his level, and the damage increases by 1d6 for each use of lay on hands he expends; a creature takes half damage if it succeeds at a Will save (DC = 10 + the scar seekerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s level + his Charisma modifier). The damage dea"
+        },
+        {
+          "name": "Painful Purification",
+          "description": "A scar seeker can relive his past sacrifices in order to activate an enduring scarÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s ability, even if he has expended all his daily uses of the ability. Rather than expend a daily use of enduring scars, he can activate a scar by taking 1 point of damage per Hit Die he has. This damage canÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢t be healed by any means other than getting a full nightÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s rest, which removes all damage dealt in this fashion. This damage cannot be ignored, reduced, or redirected."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "-"
+      }
+    },
+    {
+      "level": 2,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Lay On Hands",
+          "description": "At 2nd level, a scar seeker gains the ability to lay on hands . This ability functions as the paladin ability of the same name. For the purpose of this ability, a scar seekerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s class levels stack with levels in any other class that grants the lay on hands ability."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 3,
+      "bab": 3,
+      "fort": 2,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Enduring Scar",
+          "description": "As a scar seeker gains levels, he accumulates scars of supernatural significance. He can activate his enduring scars abilities in any combination a number of times per day equal to half his class level plus his Charisma modifier. At 1st level and every 2 class levels thereafter, the scar seeker awakens a new enduring scar selected from the list below. Blood : As a swift action , the scar seeker can imbue a melee weapon he wields with the vicious weapon special ability for a number of rounds equal to his Charisma modifier (minimum 1 round). At 5th level, he can select this scar a second time to increase the extra damage to 2d8 and the damage received to 1d8. At 9th level, he can select the scar a third time to increase the extra damage to 2d10 and damage received to 1d10. Healing : When the scar seeker uses his lay on hands ability to heal another creature, the scar seeker can use this scar to heal double the normal amount of damage; however, the scar seeker immediately takes damage equal to half the amount he healed, and this damage cannot be reduced or otherwise prevented in any way. Martyr : When the scar seeker is brought below 0 hit points , he can expend all his remaining uses of lay on hands (minimum 1) as an immediate action in order to heal his allies and harm evil enemies in a 30-foot radius. He restores or deals an amount of damage equal to 4d6 plus his level, and the damage increases by 1d6 for each use of lay on hands he expends; a creature takes half damage if it succeeds at a Will save (DC = 10 + the scar seekerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s level + his Charisma modifier). The damage dea"
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "-"
+      }
+    },
+    {
+      "level": 4,
+      "bab": 4,
+      "fort": 2,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Smite Evil 1/Day",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 5,
+      "bab": 5,
+      "fort": 3,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Enduring Scar",
+          "description": "As a scar seeker gains levels, he accumulates scars of supernatural significance. He can activate his enduring scars abilities in any combination a number of times per day equal to half his class level plus his Charisma modifier. At 1st level and every 2 class levels thereafter, the scar seeker awakens a new enduring scar selected from the list below. Blood : As a swift action , the scar seeker can imbue a melee weapon he wields with the vicious weapon special ability for a number of rounds equal to his Charisma modifier (minimum 1 round). At 5th level, he can select this scar a second time to increase the extra damage to 2d8 and the damage received to 1d8. At 9th level, he can select the scar a third time to increase the extra damage to 2d10 and damage received to 1d10. Healing : When the scar seeker uses his lay on hands ability to heal another creature, the scar seeker can use this scar to heal double the normal amount of damage; however, the scar seeker immediately takes damage equal to half the amount he healed, and this damage cannot be reduced or otherwise prevented in any way. Martyr : When the scar seeker is brought below 0 hit points , he can expend all his remaining uses of lay on hands (minimum 1) as an immediate action in order to heal his allies and harm evil enemies in a 30-foot radius. He restores or deals an amount of damage equal to 4d6 plus his level, and the damage increases by 1d6 for each use of lay on hands he expends; a creature takes half damage if it succeeds at a Will save (DC = 10 + the scar seekerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s level + his Charisma modifier). The damage dea"
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "-"
+      }
+    },
+    {
+      "level": 6,
+      "bab": 6,
+      "fort": 3,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Sanguine Sacrifice",
+          "description": "At 6th level, when a scar seeker uses the painful purification ability, he gains a +1 morale bonus on attack rolls , skill checks, ability checks, and saving throws for 1 hour. Multiple uses of this ability increase the morale bonus by 1 (maximum one-third his class level)."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 7,
+      "bab": 7,
+      "fort": 4,
+      "ref": 2,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Enduring Scar",
+          "description": "As a scar seeker gains levels, he accumulates scars of supernatural significance. He can activate his enduring scars abilities in any combination a number of times per day equal to half his class level plus his Charisma modifier. At 1st level and every 2 class levels thereafter, the scar seeker awakens a new enduring scar selected from the list below. Blood : As a swift action , the scar seeker can imbue a melee weapon he wields with the vicious weapon special ability for a number of rounds equal to his Charisma modifier (minimum 1 round). At 5th level, he can select this scar a second time to increase the extra damage to 2d8 and the damage received to 1d8. At 9th level, he can select the scar a third time to increase the extra damage to 2d10 and damage received to 1d10. Healing : When the scar seeker uses his lay on hands ability to heal another creature, the scar seeker can use this scar to heal double the normal amount of damage; however, the scar seeker immediately takes damage equal to half the amount he healed, and this damage cannot be reduced or otherwise prevented in any way. Martyr : When the scar seeker is brought below 0 hit points , he can expend all his remaining uses of lay on hands (minimum 1) as an immediate action in order to heal his allies and harm evil enemies in a 30-foot radius. He restores or deals an amount of damage equal to 4d6 plus his level, and the damage increases by 1d6 for each use of lay on hands he expends; a creature takes half damage if it succeeds at a Will save (DC = 10 + the scar seekerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s level + his Charisma modifier). The damage dea"
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "-"
+      }
+    },
+    {
+      "level": 8,
+      "bab": 8,
+      "fort": 4,
+      "ref": 3,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Smite Evil 2/Day",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 9,
+      "bab": 9,
+      "fort": 5,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Enduring Scar",
+          "description": "As a scar seeker gains levels, he accumulates scars of supernatural significance. He can activate his enduring scars abilities in any combination a number of times per day equal to half his class level plus his Charisma modifier. At 1st level and every 2 class levels thereafter, the scar seeker awakens a new enduring scar selected from the list below. Blood : As a swift action , the scar seeker can imbue a melee weapon he wields with the vicious weapon special ability for a number of rounds equal to his Charisma modifier (minimum 1 round). At 5th level, he can select this scar a second time to increase the extra damage to 2d8 and the damage received to 1d8. At 9th level, he can select the scar a third time to increase the extra damage to 2d10 and damage received to 1d10. Healing : When the scar seeker uses his lay on hands ability to heal another creature, the scar seeker can use this scar to heal double the normal amount of damage; however, the scar seeker immediately takes damage equal to half the amount he healed, and this damage cannot be reduced or otherwise prevented in any way. Martyr : When the scar seeker is brought below 0 hit points , he can expend all his remaining uses of lay on hands (minimum 1) as an immediate action in order to heal his allies and harm evil enemies in a 30-foot radius. He restores or deals an amount of damage equal to 4d6 plus his level, and the damage increases by 1d6 for each use of lay on hands he expends; a creature takes half damage if it succeeds at a Will save (DC = 10 + the scar seekerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s level + his Charisma modifier). The damage dea"
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "-"
+      }
+    },
+    {
+      "level": 10,
+      "bab": 10,
+      "fort": 5,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "True Martyr",
+          "description": "At 10th level, a scar seeker can embrace death in a final act of defiance. As an immediate action , he can take half the damage dealt to all allies within 60 feet by a single effect, such as a breath weapon , melee attack, or cave-in. If this damage would kill the scar seeker, his blood coalesces in his space in the form of a lawful good monadic deva that fights in his place for 1 minute before dissipating. A scar seeker can use this ability once per week. Section 15: Copyright Notice Pathfinder Player Companion: Paths of the Righteous Ãƒâ€šÃ‚Â© 2016, Paizo Inc.; Authors: Alexander Augunas, John Compton, Jenny Jarzabski, Isabelle Lee, Stephen Rowe, and Owen K.C. Stephens."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": {
+    "summary": "See level progression spell columns."
+  },
+  "spellcastingClass": true
+}

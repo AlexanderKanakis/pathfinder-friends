@@ -1,0 +1,267 @@
+{
+  "name": "Dark Delver",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/c-d/dark-delver/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 0,
+      "ref": 1,
+      "will": 0,
+      "classFeatures": [
+        {
+          "name": "Bardic Knowledge",
+          "description": "This ability is identical to the bard class feature of the same name. Levels in this class stack with levels in any other class that grants bardic knowledge or a similar ability."
+        },
+        {
+          "name": "Master Explorer",
+          "description": "A delver adds half his class level (minimum 1) as a bonus on all Disable Device and Perception checks. A delver can disable intricate and complex traps in half the normal amount of time (minimum 1 round) and open a lock as a standard action instead of a full-round action . He can always take 10 on Disable Device and Stealth checks, even if distracted or endangered, and he can use Disable Device to disarm magical traps."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Surefooted",
+          "description": "At 2nd level, a delver can move through difficult terrain at his normal speed. Ground that has been magically manipulated to impede motion still affects him normally."
+        },
+        {
+          "name": "Trap Sense +1",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 3,
+      "bab": 2,
+      "fort": 1,
+      "ref": 2,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Thrilling Escape 1/Day",
+          "description": ""
+        },
+        {
+          "name": "Guardbreaker",
+          "description": "At 3rd level, a delver's familiarity with the strange guardians often left in tombs allows him to attack them more effectively. He can treat his trap sense bonus as if it were a favored enemy bonus against constructs , oozes , and undead ; this bonus stacks with any favored enemy bonuses gained from ranger levels or similar class features."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 4,
+      "bab": 3,
+      "fort": 1,
+      "ref": 2,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Resourceful Disabler",
+          "description": "Dark delvers are adept at making use of what's at hand. At 4th level, a delver can use the Disable Device skill without tools at no penalty."
+        },
+        {
+          "name": "Vigilant Combatant",
+          "description": "At 4th level, a delver adds half his class level on initiative checks."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 5,
+      "bab": 3,
+      "fort": 2,
+      "ref": 3,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Left For Dead",
+          "description": "At 5th-level, a delver can cheat death once per day. If he would be killed by a melee attack, ranged attack, or effect that requires a saving throw, he is instead reduced to -1 hit points and knocked unconscious , but is stable . He appears dead (though a character who succeeds at a DC 25 Heal check or who uses an ability such as deathwatch can tell he is not) for 1 minute, after which he regains 1 hp and becomes conscious (unless healed sooner)."
+        },
+        {
+          "name": "Trap Sense +2",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 6,
+      "bab": 4,
+      "fort": 2,
+      "ref": 3,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Fortunate Soul 1/Day",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 7,
+      "bab": 5,
+      "fort": 2,
+      "ref": 4,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Thrilling Escape 2/Day",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 8,
+      "bab": 6,
+      "fort": 3,
+      "ref": 4,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Trap Sense +3",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 9,
+      "bab": 6,
+      "fort": 3,
+      "ref": 5,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Thrilling Escape 3/Day",
+          "description": ""
+        },
+        {
+          "name": "True Seeing 1/Day",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 10,
+      "bab": 7,
+      "fort": 3,
+      "ref": 5,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Fortunate Soul 2/Day",
+          "description": ""
+        },
+        {
+          "name": "Nick Of Time",
+          "description": "Once per day at 10th level, a delver can use an immediate action to perform an action that normally requires a standard action to perform. Section 15: Copyright Notice Pathfinder Roleplaying Game Adventurer's Guide Ãƒâ€šÃ‚Â© 2017, Paizo Inc.; Authors: Benjamin Bruck, John Compton, Crystal Frasier, Tim Hitchcock, Jenny Jarzabski, Isabelle Lee, Joe Pasini, Jessica Price, David Schwartz, and Josh Vogt."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": null,
+  "spellcastingClass": false
+}

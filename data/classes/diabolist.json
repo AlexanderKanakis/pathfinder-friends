@@ -1,0 +1,301 @@
+{
+  "name": "Diabolist",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/c-d/diabolist/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Damned",
+          "description": "When a diabolist is killed, her soul is instantly sent to Hell . A character attempting to resurrect her must succeed at a caster level check with a DC equal to 10 + the diabolist's level or the spell fails. That character cannot attempt to resurrect the diabolist again until 24 hours have passed, though other characters can still attempt to do so."
+        },
+        {
+          "name": "Imp Familiar",
+          "description": "A diabolist forms a close bond with a particular imp , similar to how a wizard gains a familiar . This functions as the arcane bond wizard class feature, but as if the diabolist had selected the Improved Familiar feat. If a diabolist has class levels in another class that grants a familiar , levels in that class and her diabolist class levels stack for determining the overall abilities of her imp familiar . The imp familiar can communicate with its master via telepathy as long as the imp is in physical contact with her. At 5th level, the diabolist's imp familiar can choose any of the following spells to add to its list of at-will spell-like abilities : bleed , deathwatch , detect evil , detect law , doom , ghost sound , mage hand , message , open/close , or prestidigitation . The imp can also add any of the following spells to its list of 1/day spell-like abilities : curse water , floating disk , grease , hold portal , identify , silent image , unseen servant , or ventriloquism . The range of the imp's telepathy with the diabolist increases to 60 feet. At 8th level, the imp can choose two more at-will spell-like abilities from the corresponding list above, and it can choose one more 1/day spell-like ability from the corresponding list above. The range of the imp's telepathy with the diabolist increases to 1 mile."
+        },
+        {
+          "name": "Infernal Charisma +2",
+          "description": ""
+        },
+        {
+          "name": "Obedience",
+          "description": "In order to maintain her diabolist abilities (including all spellcasting abilities that have been augmented by the class), a diabolist must indulge her chosen patron with a daily obedience. This ceremony is incorporated into whatever method the diabolist uses to regain spellcasting abilities (such as meditating, praying to an archdevil, or studying a spellbook ). When a character takes her first level of diabolist, she must decide whether she is an evangelist, an exalted, or a sentinel of her diabolic patron. This choice determines which category of boons she earns as she gains levels, and once made, it cannot later be changed."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "-"
+      }
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Channel Hellfire",
+          "description": "At 2nd level, a diabolist can alter spells that deal energy damage to instead deal hellfire damage. She can do this as a free action a number of times per day equal to her Charisma modifier (minimum 1). Spells altered to use hellfire gain the lawful and evil descriptors."
+        },
+        {
+          "name": "Infernal Bargain",
+          "description": "At 2nd level, a diabolist making use of planar ally (or a similar spell) can attempt an opposed Charisma check against a called (but not summoned) devil . If she succeeds, the devil reduces the price it demands to serve her by half."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 3,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Augment Summoning",
+          "description": "At 3rd level, a diabolist gains the Augment Summoning feat, even if she does not meet the prerequisites."
+        },
+        {
+          "name": "Diabolic Boon 1",
+          "description": ""
+        },
+        {
+          "name": "Heresy +2",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 4,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Infernal Charisma +4",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 5,
+      "bab": 2,
+      "fort": 2,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Hellish Soul",
+          "description": "At 5th level, a diabolist has been deemed useful enough to the cause of Hell to be allowed a brief respite from damnation. If killed by any means outside of the will of Asmodeus, the archdevils, or another influential force in Hell , the diabolist can be resurrected as normal."
+        },
+        {
+          "name": "Imp Spell-Like Abilities",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 6,
+      "bab": 3,
+      "fort": 2,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Diabolic Boon 2",
+          "description": ""
+        },
+        {
+          "name": "Infernal Transport",
+          "description": "At 6th level, a diabolist can transport herself through Hell in a burst of flames. She can use this ability twice per day as per dimension door , or she can expend both uses to travel as per teleport . She cannot use this ability to enter or leave areas warded against evil creatures."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 7,
+      "bab": 3,
+      "fort": 2,
+      "ref": 2,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Infernal Charisma +6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 8,
+      "bab": 4,
+      "fort": 3,
+      "ref": 3,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Hellfire Ray",
+          "description": "At 8th level, a diabolist can cast hellfire ray ( see) twice per day as a spell-like ability ."
+        },
+        {
+          "name": "Imp Spell-Like Abilities",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 9,
+      "bab": 4,
+      "fort": 3,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Diabolic Boon 3",
+          "description": ""
+        },
+        {
+          "name": "Heresy +4",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 10,
+      "bab": 5,
+      "fort": 3,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Master Conjurer",
+          "description": "At 10th level, when a diabolist calls a devil whose name she knows, she can cast the calling spell as a standard action and bargain with the devil as a move action . She adds half her Bluff , Diplomacy , or Intimidate modifier to the bargaining Charisma check (if any). Section 15: Copyright Notice Pathfinder Roleplaying Game Book of the Damned Ãƒâ€šÃ‚Â© 2017, Paizo Inc.; Authors: John Compton, Adam Daigle, Amanda Hamon Kunz, James Jacobs, Isabelle Lee, F. Wesley Schneider, Todd Stewart, and Josh Vogt."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": {
+    "summary": "See level progression spell columns."
+  },
+  "spellcastingClass": true
+}

@@ -1,0 +1,287 @@
+{
+  "name": "Golden Legionnaire",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/e-h/golden-legionnaire/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 1,
+      "fort": 1,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [
+        {
+          "name": "Authoritative Command +1",
+          "description": ""
+        },
+        {
+          "name": "Defy Danger 1",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 2,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Legion Feat",
+          "description": ""
+        },
+        {
+          "name": "Intercept",
+          "description": "At 2nd level, a Golden Legionnaire gains a bonus equal to half his class level on combat maneuver checks when using the Stand Still feat, and gains the same bonus to his CMD when an opponent attempts an Acrobatics check to move through a square he threatens."
+        },
+        {
+          "name": "United Defense +2",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 3,
+      "bab": 3,
+      "fort": 2,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Allied Retribution +1",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 4,
+      "bab": 4,
+      "fort": 2,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Improved Aid +1",
+          "description": ""
+        },
+        {
+          "name": "Legion Feat",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 5,
+      "bab": 5,
+      "fort": 3,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Defy Danger 2",
+          "description": ""
+        },
+        {
+          "name": "Hold The Line",
+          "description": "At 5th level, if a creature takes a 5-foot step out of an area both adjacent to and threatened by a Golden Legionnaire, or if a creature withdraws from that area, it provokes an attack of opportunity from him."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 6,
+      "bab": 6,
+      "fort": 3,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Authoritative Command +2",
+          "description": ""
+        },
+        {
+          "name": "Legion Feat",
+          "description": ""
+        },
+        {
+          "name": "United Defense +4",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 7,
+      "bab": 7,
+      "fort": 4,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Allied Retribution +2",
+          "description": ""
+        },
+        {
+          "name": "Preemptive Strike",
+          "description": "At 7th level, a Golden Legionnaire can make an attack of opportunity against a foe that moves into any square the Golden Legionnaire threatens, regardless of whether or not this movement would normally provoke an attack of opportunity . He can use this ability against each opponent once per day, and no more than once per round."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 8,
+      "bab": 8,
+      "fort": 4,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Authoritative Command (Swift)",
+          "description": "As a move action , a Golden Legionnaire can issue orders to a number of allies up to half his character level who are within 30 feet and can see, hear, and understand him. As long as at least one selected ally obeys the Golden Legionnaire's orders during that round, the Golden Legionnaire and each compliant ally gain a +1 competence bonus on attack rolls , weapon damage rolls, and saving throws and to Armor Class for 1 round. Affected allies are not under any obligation to obey these commands, but do not gain the bonuses if they ignore the commands. At 6th level, this bonus increases to +2. At 8th level, a Golden Legionnaire can use authoritative command as a swift action ."
+        },
+        {
+          "name": "Legion Feat",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 9,
+      "bab": 9,
+      "fort": 5,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Defy Danger 3",
+          "description": ""
+        },
+        {
+          "name": "Improved Aid +2",
+          "description": ""
+        },
+        {
+          "name": "Retaliate",
+          "description": "At 9th level, once per round when a creature threatened by a Golden Legionnaire attacks and hits an ally adjacent to the Golden Legionnaire, he can make an attack of opportunity against that creature."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 10,
+      "bab": 10,
+      "fort": 5,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Guardian Of Liberty",
+          "description": "At 10th level, once per day as an immediate action a Golden Legionnaire can reroll a single attack roll or saving throw, or force an enemy to reroll an attack roll made against the Legionnaire or an adjacent ally, after the result of the attack roll is revealed. Section 15: Copyright Notice Pathfinder Roleplaying Game Adventurer's Guide Ãƒâ€šÃ‚Â© 2017, Paizo Inc.; Authors: Benjamin Bruck, John Compton, Crystal Frasier, Tim Hitchcock, Jenny Jarzabski, Isabelle Lee, Joe Pasini, Jessica Price, David Schwartz, and Josh Vogt."
+        },
+        {
+          "name": "United Defense +6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": null,
+  "spellcastingClass": false
+}

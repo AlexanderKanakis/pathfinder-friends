@@ -1,0 +1,1370 @@
+[
+  {
+    "name": "Adept",
+    "type": "npc",
+    "category": "npc",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/npc-classes/adept/",
+    "spellcastingClass": true,
+    "file": "adept.json"
+  },
+  {
+    "name": "Alchemist",
+    "type": "base",
+    "category": "base",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/base-classes/alchemist/",
+    "spellcastingClass": true,
+    "file": "alchemist.json"
+  },
+  {
+    "name": "Antipaladin",
+    "type": "alternate",
+    "category": "alternate",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/alternate-classes/antipaladin/",
+    "spellcastingClass": true,
+    "file": "antipaladin.json"
+  },
+  {
+    "name": "Arcanist",
+    "type": "hybrid",
+    "category": "hybrid",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/hybrid-classes/arcanist/",
+    "spellcastingClass": true,
+    "file": "arcanist.json"
+  },
+  {
+    "name": "Aristocrat",
+    "type": "npc",
+    "category": "npc",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/npc-classes/aristocrat/",
+    "spellcastingClass": false,
+    "file": "aristocrat.json"
+  },
+  {
+    "name": "Barbarian",
+    "type": "core",
+    "category": "core",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/core-classes/barbarian/",
+    "spellcastingClass": false,
+    "file": "barbarian.json"
+  },
+  {
+    "name": "Barbarian (Unchained)",
+    "type": "unchained",
+    "category": "unchained",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/unchained-classes/barbarian-unchained/",
+    "spellcastingClass": false,
+    "file": "barbarian-unchained.json"
+  },
+  {
+    "name": "Bard",
+    "type": "core",
+    "category": "core",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/core-classes/bard/",
+    "spellcastingClass": true,
+    "file": "bard.json"
+  },
+  {
+    "name": "Bloodrager",
+    "type": "hybrid",
+    "category": "hybrid",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/hybrid-classes/bloodrager/",
+    "spellcastingClass": true,
+    "file": "bloodrager.json"
+  },
+  {
+    "name": "Brawler",
+    "type": "hybrid",
+    "category": "hybrid",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/hybrid-classes/brawler/",
+    "spellcastingClass": false,
+    "file": "brawler.json"
+  },
+  {
+    "name": "Cavalier",
+    "type": "base",
+    "category": "base",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/base-classes/cavalier/",
+    "spellcastingClass": false,
+    "file": "cavalier.json"
+  },
+  {
+    "name": "Cleric",
+    "type": "core",
+    "category": "core",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/core-classes/cleric/",
+    "spellcastingClass": true,
+    "file": "cleric.json"
+  },
+  {
+    "name": "Commoner",
+    "type": "npc",
+    "category": "npc",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/npc-classes/commoner/",
+    "spellcastingClass": false,
+    "file": "commoner.json"
+  },
+  {
+    "name": "Druid",
+    "type": "core",
+    "category": "core",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/core-classes/druid/",
+    "spellcastingClass": true,
+    "file": "druid.json"
+  },
+  {
+    "name": "Expert",
+    "type": "npc",
+    "category": "npc",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/npc-classes/expert/",
+    "spellcastingClass": false,
+    "file": "expert.json"
+  },
+  {
+    "name": "Fighter",
+    "type": "core",
+    "category": "core",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/core-classes/fighter/",
+    "spellcastingClass": false,
+    "file": "fighter.json"
+  },
+  {
+    "name": "Gunslinger",
+    "type": "base",
+    "category": "base",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/base-classes/gunslinger/",
+    "spellcastingClass": false,
+    "file": "gunslinger.json"
+  },
+  {
+    "name": "Hunter",
+    "type": "hybrid",
+    "category": "hybrid",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/hybrid-classes/hunter/",
+    "spellcastingClass": true,
+    "file": "hunter.json"
+  },
+  {
+    "name": "Inquisitor",
+    "type": "base",
+    "category": "base",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/base-classes/inquisitor/",
+    "spellcastingClass": true,
+    "file": "inquisitor.json"
+  },
+  {
+    "name": "Investigator",
+    "type": "hybrid",
+    "category": "hybrid",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/hybrid-classes/investigator/",
+    "spellcastingClass": true,
+    "file": "investigator.json"
+  },
+  {
+    "name": "Kineticist",
+    "type": "occult",
+    "category": "occult",
+    "sourceUrl": "https://www.d20pfsrd.com/alternative-rule-systems/occult-adventures/occult-classes/kineticist",
+    "spellcastingClass": false,
+    "file": "kineticist.json"
+  },
+  {
+    "name": "Magus",
+    "type": "base",
+    "category": "base",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/base-classes/magus/",
+    "spellcastingClass": true,
+    "file": "magus.json"
+  },
+  {
+    "name": "Medium",
+    "type": "occult",
+    "category": "occult",
+    "sourceUrl": "https://www.d20pfsrd.com/alternative-rule-systems/occult-adventures/occult-classes/medium",
+    "spellcastingClass": true,
+    "file": "medium.json"
+  },
+  {
+    "name": "Mesmerist",
+    "type": "occult",
+    "category": "occult",
+    "sourceUrl": "https://www.d20pfsrd.com/alternative-rule-systems/occult-adventures/occult-classes/mesmerist",
+    "spellcastingClass": true,
+    "file": "mesmerist.json"
+  },
+  {
+    "name": "Monk",
+    "type": "core",
+    "category": "core",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/core-classes/monk/",
+    "spellcastingClass": false,
+    "file": "monk.json"
+  },
+  {
+    "name": "Monk (Unchained)",
+    "type": "unchained",
+    "category": "unchained",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/unchained-classes/monk-unchained/",
+    "spellcastingClass": false,
+    "file": "monk-unchained.json"
+  },
+  {
+    "name": "Ninja",
+    "type": "alternate",
+    "category": "alternate",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/alternate-classes/ninja/",
+    "spellcastingClass": false,
+    "file": "ninja.json"
+  },
+  {
+    "name": "Occultist",
+    "type": "occult",
+    "category": "occult",
+    "sourceUrl": "https://www.d20pfsrd.com/alternative-rule-systems/occult-adventures/occult-classes/occultist",
+    "spellcastingClass": true,
+    "file": "occultist.json"
+  },
+  {
+    "name": "Omdura",
+    "type": "base",
+    "category": "base",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/base-classes/omdura/",
+    "spellcastingClass": true,
+    "file": "omdura.json"
+  },
+  {
+    "name": "Oracle",
+    "type": "base",
+    "category": "base",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/base-classes/oracle/",
+    "spellcastingClass": true,
+    "file": "oracle.json"
+  },
+  {
+    "name": "Paladin",
+    "type": "core",
+    "category": "core",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/core-classes/paladin/",
+    "spellcastingClass": true,
+    "file": "paladin.json"
+  },
+  {
+    "name": "Psychic",
+    "type": "occult",
+    "category": "occult",
+    "sourceUrl": "https://www.d20pfsrd.com/alternative-rule-systems/occult-adventures/occult-classes/psychic",
+    "spellcastingClass": true,
+    "file": "psychic.json"
+  },
+  {
+    "name": "Ranger",
+    "type": "core",
+    "category": "core",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/core-classes/ranger/",
+    "spellcastingClass": true,
+    "file": "ranger.json"
+  },
+  {
+    "name": "Rogue",
+    "type": "core",
+    "category": "core",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/core-classes/rogue/",
+    "spellcastingClass": false,
+    "file": "rogue.json"
+  },
+  {
+    "name": "Rogue (Unchained)",
+    "type": "unchained",
+    "category": "unchained",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/unchained-classes/rogue-unchained/",
+    "spellcastingClass": false,
+    "file": "rogue-unchained.json"
+  },
+  {
+    "name": "Samurai",
+    "type": "alternate",
+    "category": "alternate",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/alternate-classes/samurai/",
+    "spellcastingClass": false,
+    "file": "samurai.json"
+  },
+  {
+    "name": "Shaman",
+    "type": "hybrid",
+    "category": "hybrid",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/hybrid-classes/shaman/",
+    "spellcastingClass": true,
+    "file": "shaman.json"
+  },
+  {
+    "name": "Shifter",
+    "type": "base",
+    "category": "base",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/base-classes/shifter/",
+    "spellcastingClass": false,
+    "file": "shifter.json"
+  },
+  {
+    "name": "Skald",
+    "type": "hybrid",
+    "category": "hybrid",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/hybrid-classes/skald/",
+    "spellcastingClass": true,
+    "file": "skald.json"
+  },
+  {
+    "name": "Slayer",
+    "type": "hybrid",
+    "category": "hybrid",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/hybrid-classes/slayer/",
+    "spellcastingClass": false,
+    "file": "slayer.json"
+  },
+  {
+    "name": "Sorcerer",
+    "type": "core",
+    "category": "core",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/core-classes/sorcerer/",
+    "spellcastingClass": true,
+    "file": "sorcerer.json"
+  },
+  {
+    "name": "Spiritualist",
+    "type": "occult",
+    "category": "occult",
+    "sourceUrl": "https://www.d20pfsrd.com/alternative-rule-systems/occult-adventures/occult-classes/spiritualist",
+    "spellcastingClass": true,
+    "file": "spiritualist.json"
+  },
+  {
+    "name": "Summoner",
+    "type": "base",
+    "category": "base",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/base-classes/summoner/",
+    "spellcastingClass": true,
+    "file": "summoner.json"
+  },
+  {
+    "name": "Summoner (Unchained)",
+    "type": "unchained",
+    "category": "unchained",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/unchained-classes/summoner-unchained/",
+    "spellcastingClass": true,
+    "file": "summoner-unchained.json"
+  },
+  {
+    "name": "Swashbuckler",
+    "type": "hybrid",
+    "category": "hybrid",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/hybrid-classes/swashbuckler/",
+    "spellcastingClass": false,
+    "file": "swashbuckler.json"
+  },
+  {
+    "name": "Vampire Hunter",
+    "type": "base",
+    "category": "base",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/base-classes/vampire-hunter/",
+    "spellcastingClass": true,
+    "file": "vampire-hunter.json"
+  },
+  {
+    "name": "Vigilante",
+    "type": "base",
+    "category": "base",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/base-classes/vigilante/",
+    "spellcastingClass": false,
+    "file": "vigilante.json"
+  },
+  {
+    "name": "Warpriest",
+    "type": "hybrid",
+    "category": "hybrid",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/hybrid-classes/warpriest/",
+    "spellcastingClass": true,
+    "file": "warpriest.json"
+  },
+  {
+    "name": "Warrior",
+    "type": "npc",
+    "category": "npc",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/npc-classes/warrior/",
+    "spellcastingClass": false,
+    "file": "warrior.json"
+  },
+  {
+    "name": "Witch",
+    "type": "base",
+    "category": "base",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/base-classes/witch/",
+    "spellcastingClass": true,
+    "file": "witch.json"
+  },
+  {
+    "name": "Wizard",
+    "type": "core",
+    "category": "core",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/core-classes/wizard/",
+    "spellcastingClass": true,
+    "file": "wizard.json"
+  },
+  {
+    "name": "Agent of the Grave",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/a-b/agent-of-the-grave/",
+    "spellcastingClass": true,
+    "file": "agent-of-the-grave.json"
+  },
+  {
+    "name": "Anchorite of Dawn",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/a-b/anchorite/",
+    "spellcastingClass": true,
+    "file": "anchorite-of-dawn.json"
+  },
+  {
+    "name": "Arcane Archer",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/core-rulebook/arcane-archer/",
+    "spellcastingClass": true,
+    "file": "arcane-archer.json"
+  },
+  {
+    "name": "Arcane Savant",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/a-b/arcane-savant/",
+    "spellcastingClass": true,
+    "file": "arcane-savant.json"
+  },
+  {
+    "name": "Arcane Trickster",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/core-rulebook/arcane-trickster/",
+    "spellcastingClass": true,
+    "file": "arcane-trickster.json"
+  },
+  {
+    "name": "Argent Dramaturge",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/a-b/argent-dramaturge/",
+    "spellcastingClass": true,
+    "file": "argent-dramaturge.json"
+  },
+  {
+    "name": "Asavir",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/a-b/asavir/",
+    "spellcastingClass": false,
+    "file": "asavir.json"
+  },
+  {
+    "name": "Ashavic Dancer",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/a-b/ashavic-dancer/",
+    "spellcastingClass": true,
+    "file": "ashavic-dancer.json"
+  },
+  {
+    "name": "Assassin",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/core-rulebook/assassin/",
+    "spellcastingClass": false,
+    "file": "assassin.json"
+  },
+  {
+    "name": "Battle Herald",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/apg/battle-herald/",
+    "spellcastingClass": false,
+    "file": "battle-herald.json"
+  },
+  {
+    "name": "Bloatmage",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/a-b/bloatmage/",
+    "spellcastingClass": true,
+    "file": "bloatmage.json"
+  },
+  {
+    "name": "Brewkeeper",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/a-b/brewkeeper/",
+    "spellcastingClass": true,
+    "file": "brewkeeper.json"
+  },
+  {
+    "name": "Brother of the Seal",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/a-b/brother-of-the-seal/",
+    "spellcastingClass": false,
+    "file": "brother-of-the-seal.json"
+  },
+  {
+    "name": "Celestial Knight",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/c-d/celestial-knight/",
+    "spellcastingClass": false,
+    "file": "celestial-knight.json"
+  },
+  {
+    "name": "Champion of the Enlightened",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/c-d/champion-of-the-enlightened/",
+    "spellcastingClass": false,
+    "file": "champion-of-the-enlightened.json"
+  },
+  {
+    "name": "Chronicler",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/core-rulebook/chronicler/",
+    "spellcastingClass": false,
+    "file": "chronicler.json"
+  },
+  {
+    "name": "Coastal Pirate",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/c-d/coastal-pirate/",
+    "spellcastingClass": false,
+    "file": "coastal-pirate.json"
+  },
+  {
+    "name": "Collegiate Arcanist",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/c-d/collegiate-arcanist/",
+    "spellcastingClass": true,
+    "file": "collegiate-arcanist.json"
+  },
+  {
+    "name": "Crimson Assassin",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/c-d/crimson-assassin/",
+    "spellcastingClass": true,
+    "file": "crimson-assassin.json"
+  },
+  {
+    "name": "Crimson Templar",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/c-d/crimson-templar/",
+    "spellcastingClass": false,
+    "file": "crimson-templar.json"
+  },
+  {
+    "name": "Cyphermage",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/c-d/cyphermage/",
+    "spellcastingClass": true,
+    "file": "cyphermage.json"
+  },
+  {
+    "name": "Daivrat",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/c-d/daivrat/",
+    "spellcastingClass": true,
+    "file": "daivrat.json"
+  },
+  {
+    "name": "Darechaser",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/c-d/darechaser/",
+    "spellcastingClass": false,
+    "file": "darechaser.json"
+  },
+  {
+    "name": "Dark Delver",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/c-d/dark-delver/",
+    "spellcastingClass": false,
+    "file": "dark-delver.json"
+  },
+  {
+    "name": "Darkfire Adept",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/c-d/darkfire-adept/",
+    "spellcastingClass": true,
+    "file": "darkfire-adept.json"
+  },
+  {
+    "name": "Death Slayer",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/c-d/death-slayer/",
+    "spellcastingClass": true,
+    "file": "death-slayer.json"
+  },
+  {
+    "name": "Deep Sea Pirate",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/c-d/deep-sea-pirate/",
+    "spellcastingClass": false,
+    "file": "deep-sea-pirate.json"
+  },
+  {
+    "name": "Demoniac",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/c-d/demoniac/",
+    "spellcastingClass": true,
+    "file": "demoniac.json"
+  },
+  {
+    "name": "Devoted Muse",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/c-d/devoted-muse/",
+    "spellcastingClass": false,
+    "file": "devoted-muse.json"
+  },
+  {
+    "name": "Diabolist",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/c-d/diabolist/",
+    "spellcastingClass": true,
+    "file": "diabolist.json"
+  },
+  {
+    "name": "Diabolist (PZO9213)",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/c-d/diabolist-botd-vol-1/",
+    "spellcastingClass": true,
+    "file": "diabolist-pzo9213.json"
+  },
+  {
+    "name": "Dissident of Dawn",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/c-d/dissident-of-dawn/",
+    "spellcastingClass": true,
+    "file": "dissident-of-dawn.json"
+  },
+  {
+    "name": "Divine Assessor",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/c-d/divine-assessor/",
+    "spellcastingClass": true,
+    "file": "divine-assessor.json"
+  },
+  {
+    "name": "Divine Scion",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/c-d/divine-scion/",
+    "spellcastingClass": true,
+    "file": "divine-scion.json"
+  },
+  {
+    "name": "Dragon Disciple",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/core-rulebook/dragon-disciple/",
+    "spellcastingClass": true,
+    "file": "dragon-disciple.json"
+  },
+  {
+    "name": "Duelist",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/core-rulebook/duelist/",
+    "spellcastingClass": false,
+    "file": "duelist.json"
+  },
+  {
+    "name": "Eldritch Knight",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/core-rulebook/eldritch-knight/",
+    "spellcastingClass": true,
+    "file": "eldritch-knight.json"
+  },
+  {
+    "name": "Enchanting Courtesan",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/e-h/enchanting-courtesan/",
+    "spellcastingClass": true,
+    "file": "enchanting-courtesan.json"
+  },
+  {
+    "name": "Envoy of Balance",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/e-h/envoy-of-balance/",
+    "spellcastingClass": true,
+    "file": "envoy-of-balance.json"
+  },
+  {
+    "name": "Esoteric Knight",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/e-h/esoteric-knight/",
+    "spellcastingClass": true,
+    "file": "esoteric-knight.json"
+  },
+  {
+    "name": "Evangelist",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/e-h/evangelist/",
+    "spellcastingClass": false,
+    "file": "evangelist.json"
+  },
+  {
+    "name": "Exalted",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/e-h/exalted/",
+    "spellcastingClass": true,
+    "file": "exalted.json"
+  },
+  {
+    "name": "False Priest",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/e-h/false-priest/",
+    "spellcastingClass": true,
+    "file": "false-priest.json"
+  },
+  {
+    "name": "Field Agent",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/e-h/field-agent/",
+    "spellcastingClass": false,
+    "file": "field-agent.json"
+  },
+  {
+    "name": "Forest Warden",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/e-h/forest-warden/",
+    "spellcastingClass": false,
+    "file": "forest-warden.json"
+  },
+  {
+    "name": "Furious Guardian",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/e-h/furious-guardian/",
+    "spellcastingClass": false,
+    "file": "furious-guardian.json"
+  },
+  {
+    "name": "Genie Binder",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/e-h/genie-binder/",
+    "spellcastingClass": true,
+    "file": "genie-binder.json"
+  },
+  {
+    "name": "Golden Legionnaire",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/e-h/golden-legionnaire/",
+    "spellcastingClass": false,
+    "file": "golden-legionnaire.json"
+  },
+  {
+    "name": "Grand Marshal",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/e-h/grand-marshal/",
+    "spellcastingClass": false,
+    "file": "grand-marshal.json"
+  },
+  {
+    "name": "Gray Corsair",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/e-h/gray-corsair/",
+    "spellcastingClass": false,
+    "file": "gray-corsair.json"
+  },
+  {
+    "name": "Gray Warden",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/e-h/gray-warden/",
+    "spellcastingClass": true,
+    "file": "gray-warden.json"
+  },
+  {
+    "name": "Green Faith Acolyte",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/e-h/green-faith-acolyte/",
+    "spellcastingClass": true,
+    "file": "green-faith-acolyte.json"
+  },
+  {
+    "name": "Group Leader",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/e-h/group-leader/",
+    "spellcastingClass": false,
+    "file": "group-leader.json"
+  },
+  {
+    "name": "Guild Agent",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/e-h/guild-agent/",
+    "spellcastingClass": false,
+    "file": "guild-agent.json"
+  },
+  {
+    "name": "Guild Devil",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/e-h/guild-devil/",
+    "spellcastingClass": false,
+    "file": "guild-devil.json"
+  },
+  {
+    "name": "Guild Poisoner",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/e-h/guild-poisoner/",
+    "spellcastingClass": false,
+    "file": "guild-poisoner.json"
+  },
+  {
+    "name": "Halfling Opportunist",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/e-h/halfling-opportunist/",
+    "spellcastingClass": false,
+    "file": "halfling-opportunist.json"
+  },
+  {
+    "name": "Harrower",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/e-h/harrower/",
+    "spellcastingClass": true,
+    "file": "harrower.json"
+  },
+  {
+    "name": "Harvester Tiller",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/e-h/harvester-tiller/",
+    "spellcastingClass": false,
+    "file": "harvester-tiller.json"
+  },
+  {
+    "name": "Hell Knight",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/e-h/hellknight/",
+    "spellcastingClass": false,
+    "file": "hell-knight.json"
+  },
+  {
+    "name": "Hell Knight Enforcer",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/e-h/hell-knight-enforcer/",
+    "spellcastingClass": true,
+    "file": "hell-knight-enforcer.json"
+  },
+  {
+    "name": "Hell Knight Signifer",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/e-h/hellknight-signifer/",
+    "spellcastingClass": true,
+    "file": "hell-knight-signifer.json"
+  },
+  {
+    "name": "Heritor Knight",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/e-h/heritor-knight/",
+    "spellcastingClass": false,
+    "file": "heritor-knight.json"
+  },
+  {
+    "name": "Hinterlander",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/e-h/hinterlander/",
+    "spellcastingClass": true,
+    "file": "hinterlander.json"
+  },
+  {
+    "name": "Holy Vindicator",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/apg/holy-vindicator/",
+    "spellcastingClass": true,
+    "file": "holy-vindicator.json"
+  },
+  {
+    "name": "Horizon Walker",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/apg/horizon-walker/",
+    "spellcastingClass": false,
+    "file": "horizon-walker.json"
+  },
+  {
+    "name": "Inheritor's Crusader",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/i-m/inheritor-s-crusader/",
+    "spellcastingClass": true,
+    "file": "inheritor-s-crusader.json"
+  },
+  {
+    "name": "Justiciar",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/i-m/justiciar/",
+    "spellcastingClass": false,
+    "file": "justiciar.json"
+  },
+  {
+    "name": "Lantern Bearer",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/i-m/lantern-bearer/",
+    "spellcastingClass": false,
+    "file": "lantern-bearer.json"
+  },
+  {
+    "name": "Liberator",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/i-m/liberator/",
+    "spellcastingClass": false,
+    "file": "liberator.json"
+  },
+  {
+    "name": "Lion Blade",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/i-m/lion-blade/",
+    "spellcastingClass": false,
+    "file": "lion-blade.json"
+  },
+  {
+    "name": "Living Monolith",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/i-m/living-monolith/",
+    "spellcastingClass": false,
+    "file": "living-monolith.json"
+  },
+  {
+    "name": "Loremaster",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/core-rulebook/loremaster/",
+    "spellcastingClass": true,
+    "file": "loremaster.json"
+  },
+  {
+    "name": "Low Templar",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/i-m/low-templar/",
+    "spellcastingClass": false,
+    "file": "low-templar.json"
+  },
+  {
+    "name": "Mage of the Third Eye",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/i-m/mage-of-the-third-eye/",
+    "spellcastingClass": true,
+    "file": "mage-of-the-third-eye.json"
+  },
+  {
+    "name": "Mammoth Rider",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/i-m/mammoth-rider/",
+    "spellcastingClass": false,
+    "file": "mammoth-rider.json"
+  },
+  {
+    "name": "Master Chymist",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/apg/master-chymist/",
+    "spellcastingClass": true,
+    "file": "master-chymist.json"
+  },
+  {
+    "name": "Master Spy",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/apg/master-spy/",
+    "spellcastingClass": false,
+    "file": "master-spy.json"
+  },
+  {
+    "name": "Mortal Usher",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/i-m/mortal-usher/",
+    "spellcastingClass": false,
+    "file": "mortal-usher.json"
+  },
+  {
+    "name": "Mystery Cultist",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/i-m/mystery-cultist/",
+    "spellcastingClass": true,
+    "file": "mystery-cultist.json"
+  },
+  {
+    "name": "Mystic Theurge",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/core-rulebook/mystic-theurge/",
+    "spellcastingClass": true,
+    "file": "mystic-theurge.json"
+  },
+  {
+    "name": "Natural Alchemist",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/n-r/natural-alchemist/",
+    "spellcastingClass": true,
+    "file": "natural-alchemist.json"
+  },
+  {
+    "name": "Nature Warden",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/apg/nature-warden/",
+    "spellcastingClass": true,
+    "file": "nature-warden.json"
+  },
+  {
+    "name": "Noble Scion",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/n-r/noble-scion/",
+    "spellcastingClass": false,
+    "file": "noble-scion.json"
+  },
+  {
+    "name": "Pain Taster",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/n-r/pain-taster/",
+    "spellcastingClass": false,
+    "file": "pain-taster.json"
+  },
+  {
+    "name": "Pit Fighter",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/n-r/pit-fighter/",
+    "spellcastingClass": false,
+    "file": "pit-fighter.json"
+  },
+  {
+    "name": "Planes Walker",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/n-r/planes-walker/",
+    "spellcastingClass": true,
+    "file": "planes-walker.json"
+  },
+  {
+    "name": "Proctor",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/n-r/proctor/",
+    "spellcastingClass": true,
+    "file": "proctor.json"
+  },
+  {
+    "name": "Purity Legion Enforcer",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/n-r/purity-legion-enforcer/",
+    "spellcastingClass": false,
+    "file": "purity-legion-enforcer.json"
+  },
+  {
+    "name": "Rage Prophet",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/apg/rage-prophet/",
+    "spellcastingClass": true,
+    "file": "rage-prophet.json"
+  },
+  {
+    "name": "Ritualist",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/n-r/ritualist/",
+    "spellcastingClass": true,
+    "file": "ritualist.json"
+  },
+  {
+    "name": "Rose Warden",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/n-r/rose-warden/",
+    "spellcastingClass": false,
+    "file": "rose-warden.json"
+  },
+  {
+    "name": "Runeguard",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/n-r/runeguard/",
+    "spellcastingClass": true,
+    "file": "runeguard.json"
+  },
+  {
+    "name": "Sacred Sentinel",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/s-z/sacred-sentinel/",
+    "spellcastingClass": false,
+    "file": "sacred-sentinel.json"
+  },
+  {
+    "name": "Sanctified Prophet",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/s-z/sanctified-prophet/",
+    "spellcastingClass": true,
+    "file": "sanctified-prophet.json"
+  },
+  {
+    "name": "Sanguine Angel",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/s-z/sanguine-angel/",
+    "spellcastingClass": false,
+    "file": "sanguine-angel.json"
+  },
+  {
+    "name": "Scar Seeker",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/s-z/scar-seeker/",
+    "spellcastingClass": true,
+    "file": "scar-seeker.json"
+  },
+  {
+    "name": "Sentinel",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/s-z/sentinel/",
+    "spellcastingClass": false,
+    "file": "sentinel.json"
+  },
+  {
+    "name": "Shadowdancer",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/core-rulebook/shadowdancer/",
+    "spellcastingClass": false,
+    "file": "shadowdancer.json"
+  },
+  {
+    "name": "Sleepless Detective",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/s-z/sleepless-detective/",
+    "spellcastingClass": false,
+    "file": "sleepless-detective.json"
+  },
+  {
+    "name": "Soul Warden",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/s-z/soul-warden/",
+    "spellcastingClass": true,
+    "file": "soul-warden.json"
+  },
+  {
+    "name": "Souldrinker (PZO1139)",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/s-z/souldrinker/",
+    "spellcastingClass": true,
+    "file": "souldrinker-pzo1139.json"
+  },
+  {
+    "name": "Souldrinker (PZO9239)",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/s-z/souldrinker-pzo9239/",
+    "spellcastingClass": true,
+    "file": "souldrinker-pzo9239.json"
+  },
+  {
+    "name": "Sphere Singer",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/s-z/sphere-singer/",
+    "spellcastingClass": true,
+    "file": "sphere-singer.json"
+  },
+  {
+    "name": "Spherewalker",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/s-z/spherewalker/",
+    "spellcastingClass": true,
+    "file": "spherewalker.json"
+  },
+  {
+    "name": "Spirit Channeler Emissary",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/s-z/spirit-channeler-emissary-prestige-class/",
+    "spellcastingClass": true,
+    "file": "spirit-channeler-emissary.json"
+  },
+  {
+    "name": "Stalwart Defender",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/apg/stalwart-defender/",
+    "spellcastingClass": false,
+    "file": "stalwart-defender.json"
+  },
+  {
+    "name": "Stargazer",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/s-z/stargazer/",
+    "spellcastingClass": true,
+    "file": "stargazer.json"
+  },
+  {
+    "name": "Steel Falcon",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/s-z/steel-falcon/",
+    "spellcastingClass": false,
+    "file": "steel-falcon.json"
+  },
+  {
+    "name": "Storm Kindler",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/s-z/master-of-storms/",
+    "spellcastingClass": true,
+    "file": "storm-kindler.json"
+  },
+  {
+    "name": "Student of Perfection",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/s-z/student-of-perfection/",
+    "spellcastingClass": false,
+    "file": "student-of-perfection.json"
+  },
+  {
+    "name": "Student of War",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/s-z/student-of-war/",
+    "spellcastingClass": false,
+    "file": "student-of-war.json"
+  },
+  {
+    "name": "Sun Seeker",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/s-z/sun-seeker/",
+    "spellcastingClass": true,
+    "file": "sun-seeker.json"
+  },
+  {
+    "name": "Swordlord",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/s-z/swordlord/",
+    "spellcastingClass": false,
+    "file": "swordlord.json"
+  },
+  {
+    "name": "Tattooed Mystic",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/s-z/tattooed-mystic/",
+    "spellcastingClass": true,
+    "file": "tattooed-mystic.json"
+  },
+  {
+    "name": "Technomancer",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/s-z/technomancer/",
+    "spellcastingClass": true,
+    "file": "technomancer.json"
+  },
+  {
+    "name": "Twilight Talon",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/s-z/twilight-talon/",
+    "spellcastingClass": false,
+    "file": "twilight-talon.json"
+  },
+  {
+    "name": "Umbral Agent",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/s-z/umbral-agent/",
+    "spellcastingClass": true,
+    "file": "umbral-agent.json"
+  },
+  {
+    "name": "Veiled Illusionist",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/s-z/veiled-illusionist/",
+    "spellcastingClass": true,
+    "file": "veiled-illusionist.json"
+  },
+  {
+    "name": "Winter Witch",
+    "type": "prestige",
+    "category": "prestige",
+    "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/s-z/winter-witch/",
+    "spellcastingClass": true,
+    "file": "winter-witch.json"
+  }
+]

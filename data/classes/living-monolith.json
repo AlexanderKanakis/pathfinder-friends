@@ -1,0 +1,259 @@
+{
+  "name": "Living Monolith",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/i-m/living-monolith/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 1,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [
+        {
+          "name": "Soul Stone",
+          "description": "During his induction into this prestige class, a living monolith has a stone scarab embedded in his forehead, often set with gems or inlaid with precious metals. This stone is inscribed on its inner side with the monolith's true name and his oaths to the gods and pharaohs. It cannot be removed without his permission, cannot be dispelled (though it does not function in areas where magic does not work), and does not use a magic item slot. The soul stone grants the living monolith a +2 bonus on saving throws against death effects, mind-affecting effects, effects that grant negative levels , and on saves to overcome negative levels . A living monolith can invoke the power of his soul stone 3 times per day as a swift action , enabling him to grow in size as if using enlarge person (even if he is not a humanoid ). When a living monolith first gains the soul stone ability, he must decide whether it takes the form of an ib stone or a ka stone. If the character was a spellcaster before becoming a living monolith, he can choose either an ib stone or a ka stone. If the character was not a spellcaster before becoming a living monolith, he must take a ka stone."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Stone Blood",
+          "description": "At 2nd level, the vital fluids and tissues of a living monolith can selectively petrify in response to injury. A living monolith automatically stabilizes when at negative hit points and is immune to continuous damage from bleed attacks (including weapons with the wounding special ability) and ability damage from blood drain ."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 3,
+      "bab": 2,
+      "fort": 2,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Fortified Flesh (DR 1/-, 10%)",
+          "description": "At 3rd level, the flesh of a living monolith takes on the hardness of stone. A living monolith gains DR 1/- and 10% immunity to critical hits and sneak attacks (as if wearing fortification armor). At 5th level and again at 8th level, this DR increases by 1 and the immunity to critical hits increases by 10%. When a living monolith uses his soul stone to increase his size, these defenses temporarily increase by an additional 1 and 10%, respectively. At 5th level, a living monolith becomes immune to all diseases, including supernatural and magical diseases (such as mummy rot)."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 4,
+      "bab": 3,
+      "fort": 2,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Stability",
+          "description": "At 4th level, a living monolith becomes exceptionally stable on his feet, gaining a +4 bonus to his CMD when he resists a bull rush or trip attempt while standing on the ground. This stacks with a dwarf &#8216;s stability trait and similar abilities."
+        },
+        {
+          "name": "Tombsight",
+          "description": "At 4th level, a living monolith can perceive the balance of life and death within those he sees, as if using deathwatch and detect undead simultaneously. This power can be used at will and lasts as long as the living monolith concentrates."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 5,
+      "bab": 3,
+      "fort": 3,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Fortified Flesh (DR 2/-, 20%, Immune To Disease)",
+          "description": "At 3rd level, the flesh of a living monolith takes on the hardness of stone. A living monolith gains DR 1/- and 10% immunity to critical hits and sneak attacks (as if wearing fortification armor). At 5th level and again at 8th level, this DR increases by 1 and the immunity to critical hits increases by 10%. When a living monolith uses his soul stone to increase his size, these defenses temporarily increase by an additional 1 and 10%, respectively. At 5th level, a living monolith becomes immune to all diseases, including supernatural and magical diseases (such as mummy rot)."
+        },
+        {
+          "name": "Greater Ka Stone",
+          "description": "At 5th level, when a living monolith with a ka stone invokes his ka stone's power to increase his size, the living monolith gains the benefit of righteous might rather than enlarge person . The DR gained from righteous might is based on the living monolith's alignment . A neutral living monolith must choose which DR to gain from this ability. Once made, this choice cannot be changed."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 6,
+      "bab": 4,
+      "fort": 3,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Attunement To Stone",
+          "description": "At 6th level, a living monolith can use meld into stone at will."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 7,
+      "bab": 5,
+      "fort": 4,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Summon Sphinx",
+          "description": "At 7th level, a living monolith can call upon the aid of the sphinxes. Once per day, the living monolith can call a sphinx to his presence and bargain for its services as if using planar ally to call upon an outsider . At 9th level, this ability functions as greater planar ally . The living monolith gains a +4 bonus on Diplomacy checks to influence sphinxes."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 8,
+      "bab": 6,
+      "fort": 4,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Communion With Stone",
+          "description": "At 8th level, a living monolith achieves a unique communion with the earth, gaining tremorsense to a range of 30 feet. Once per day, the living monolith can communicate with rock and stone as if using stone tell . He gains Terran as a bonus language."
+        },
+        {
+          "name": "Fortified Flesh (DR 3/-, 30%)",
+          "description": "At 3rd level, the flesh of a living monolith takes on the hardness of stone. A living monolith gains DR 1/- and 10% immunity to critical hits and sneak attacks (as if wearing fortification armor). At 5th level and again at 8th level, this DR increases by 1 and the immunity to critical hits increases by 10%. When a living monolith uses his soul stone to increase his size, these defenses temporarily increase by an additional 1 and 10%, respectively. At 5th level, a living monolith becomes immune to all diseases, including supernatural and magical diseases (such as mummy rot)."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 9,
+      "bab": 6,
+      "fort": 5,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Assumption Of Stone",
+          "description": "At 9th level, a living monolith may use statue as a spell-like ability with a range of personal at will. He also becomes immune to petrification."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 10,
+      "bab": 7,
+      "fort": 5,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Ageless Stone",
+          "description": "At 10th level, a living monolith becomes immortal. He ceases aging (though any aging effects already accrued remain in place) and becomes immune to energy drain and death effects, though he can still be killed by other means."
+        },
+        {
+          "name": "Judgment Of The Monolith",
+          "description": "At 10th level, a living monolith gains the divine authority to demand truthful answers. Once per day, a living monolith can conduct a ritual of inquisition. If performed on a dead body, this functions as speak with dead . Upon a living creature, it functions as a mark of justice that activates if the target lies to the living monolith. A living monolith can also use this power to entreat the spirits of the living and the dead to answer questions as if using contact other plane (treat as contacting a lesser deity)."
+        },
+        {
+          "name": "Master Ka Stone",
+          "description": "At 10th level, when a living monolith with a ka stone invokes his ka stone's power to increase his size, he regains lost hit points as if he had rested for a night. This healing does not restore temporary ability damage or provide other benefits of resting, and changing back does not heal him further. Section 15: Copyright Notice Pathfinder Player Companion: People of the Sands Ãƒâ€šÃ‚Â© 2013, Paizo Publishing, LLC; Authors: Shaun Hocking, Rob McCreary, and Jason Nelson."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": null,
+  "spellcastingClass": false
+}

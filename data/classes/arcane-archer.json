@@ -1,0 +1,261 @@
+{
+  "name": "Arcane Archer",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/core-rulebook/arcane-archer/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 0,
+      "classFeatures": [
+        {
+          "name": "Enhance Arrows (Magic)",
+          "description": "At 1st level, every nonmagical arrow an arcane archer nocks and lets fly becomes magical, gaining a +1 enhancement bonus . Unlike magic weapons created by normal means, the archer need not spend gold pieces to accomplish this task. However, an archer's magic arrows only function for him. In addition, the arcane archer's arrows gain a number of additional qualities as he gains additional levels. The elemental, elemental burst, and aligned qualities can be changed once per day, when the arcane archer prepares spells or, in the case of spontaneous spellcasters, after 8 hours of rest. At 3rd level, every non-magical arrow fired by an arcane archer gains one of the following elemental themed weapon qualities: flaming , frost , or shock . At 5th level, every non-magical arrow fired by an arcane archer gains the distance weapon quality. At 7th level, every non-magical arrow fired by an arcane archer gains one of the following elemental burst weapon qualities: flaming burst , icy burst , or shocking burst . This ability replaces the ability gained at 3rd level. At 9th level, every non-magical arrow fired by an arcane archer gains one of the following aligned weapon qualities: anarchic , axiomatic , holy , or unholy . The arcane archer cannot choose an ability that is the opposite of his alignment (for example, a lawful good arcane archer could not choose anarchic or unholy as his weapon quality). The bonuses granted by a magic bow apply as normal to arrows that have been enhanced with this ability. Only the larger enhancement bonus applies. Duplicate abilities do not st"
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "-"
+      }
+    },
+    {
+      "level": 2,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Imbue Arrow",
+          "description": "At 2nd level, an arcane archer gains the ability to place an area spell upon an arrow. When the arrow is fired, the spell's area is centered where the arrow lands, even if the spell could normally be centered only on the caster. This ability allows the archer to use the bow's range rather than the spell's range. A spell cast in this way uses its standard casting time and the arcane archer can fire the arrow as part of the casting. The arrow must be fired during the round that the casting is completed or the spell is wasted. If the arrow misses, the spell is wasted."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 3,
+      "bab": 3,
+      "fort": 2,
+      "ref": 2,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Enhance Arrows (Elemental)",
+          "description": "At 1st level, every nonmagical arrow an arcane archer nocks and lets fly becomes magical, gaining a +1 enhancement bonus . Unlike magic weapons created by normal means, the archer need not spend gold pieces to accomplish this task. However, an archer's magic arrows only function for him. In addition, the arcane archer's arrows gain a number of additional qualities as he gains additional levels. The elemental, elemental burst, and aligned qualities can be changed once per day, when the arcane archer prepares spells or, in the case of spontaneous spellcasters, after 8 hours of rest. At 3rd level, every non-magical arrow fired by an arcane archer gains one of the following elemental themed weapon qualities: flaming , frost , or shock . At 5th level, every non-magical arrow fired by an arcane archer gains the distance weapon quality. At 7th level, every non-magical arrow fired by an arcane archer gains one of the following elemental burst weapon qualities: flaming burst , icy burst , or shocking burst . This ability replaces the ability gained at 3rd level. At 9th level, every non-magical arrow fired by an arcane archer gains one of the following aligned weapon qualities: anarchic , axiomatic , holy , or unholy . The arcane archer cannot choose an ability that is the opposite of his alignment (for example, a lawful good arcane archer could not choose anarchic or unholy as his weapon quality). The bonuses granted by a magic bow apply as normal to arrows that have been enhanced with this ability. Only the larger enhancement bonus applies. Duplicate abilities do not st"
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 4,
+      "bab": 4,
+      "fort": 2,
+      "ref": 2,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Seeker Arrow",
+          "description": "At 4th level, an arcane archer can launch an arrow at a target known to him within range, and the arrow travels to the target, even around corners. Only an unavoidable obstacle or the limit of the arrow's range prevents the arrow's flight. This ability negates cover and concealment modifiers, but otherwise the attack is rolled normally. Using this ability is a standard action (and shooting the arrow is part of the action). An arcane archer can use this ability once per day at 4th level, and one additional time per day for every two levels beyond 4th, to a maximum of four times per day at 10th level."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 5,
+      "bab": 5,
+      "fort": 3,
+      "ref": 3,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Enhance Arrows (Distance)",
+          "description": "At 1st level, every nonmagical arrow an arcane archer nocks and lets fly becomes magical, gaining a +1 enhancement bonus . Unlike magic weapons created by normal means, the archer need not spend gold pieces to accomplish this task. However, an archer's magic arrows only function for him. In addition, the arcane archer's arrows gain a number of additional qualities as he gains additional levels. The elemental, elemental burst, and aligned qualities can be changed once per day, when the arcane archer prepares spells or, in the case of spontaneous spellcasters, after 8 hours of rest. At 3rd level, every non-magical arrow fired by an arcane archer gains one of the following elemental themed weapon qualities: flaming , frost , or shock . At 5th level, every non-magical arrow fired by an arcane archer gains the distance weapon quality. At 7th level, every non-magical arrow fired by an arcane archer gains one of the following elemental burst weapon qualities: flaming burst , icy burst , or shocking burst . This ability replaces the ability gained at 3rd level. At 9th level, every non-magical arrow fired by an arcane archer gains one of the following aligned weapon qualities: anarchic , axiomatic , holy , or unholy . The arcane archer cannot choose an ability that is the opposite of his alignment (for example, a lawful good arcane archer could not choose anarchic or unholy as his weapon quality). The bonuses granted by a magic bow apply as normal to arrows that have been enhanced with this ability. Only the larger enhancement bonus applies. Duplicate abilities do not st"
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "-"
+      }
+    },
+    {
+      "level": 6,
+      "bab": 6,
+      "fort": 3,
+      "ref": 3,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Phase Arrow",
+          "description": "At 6th level, an arcane archer can launch an arrow once per day at a target known to him within range, and the arrow travels to the target in a straight path, passing through any nonmagical barrier or wall in its way. (Any magical barrier stops the arrow.) This ability negates cover , concealment , armor , and shield modifiers, but otherwise the attack is rolled normally. Using this ability is a standard action (and shooting the arrow is part of the action). An arcane archer can use this ability once per day at 6th level, and one additional time per day for every two levels beyond 6th, to a maximum of three times per day at 10th level."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 7,
+      "bab": 7,
+      "fort": 4,
+      "ref": 4,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Enhance Arrows (Elemental Burst)",
+          "description": "At 1st level, every nonmagical arrow an arcane archer nocks and lets fly becomes magical, gaining a +1 enhancement bonus . Unlike magic weapons created by normal means, the archer need not spend gold pieces to accomplish this task. However, an archer's magic arrows only function for him. In addition, the arcane archer's arrows gain a number of additional qualities as he gains additional levels. The elemental, elemental burst, and aligned qualities can be changed once per day, when the arcane archer prepares spells or, in the case of spontaneous spellcasters, after 8 hours of rest. At 3rd level, every non-magical arrow fired by an arcane archer gains one of the following elemental themed weapon qualities: flaming , frost , or shock . At 5th level, every non-magical arrow fired by an arcane archer gains the distance weapon quality. At 7th level, every non-magical arrow fired by an arcane archer gains one of the following elemental burst weapon qualities: flaming burst , icy burst , or shocking burst . This ability replaces the ability gained at 3rd level. At 9th level, every non-magical arrow fired by an arcane archer gains one of the following aligned weapon qualities: anarchic , axiomatic , holy , or unholy . The arcane archer cannot choose an ability that is the opposite of his alignment (for example, a lawful good arcane archer could not choose anarchic or unholy as his weapon quality). The bonuses granted by a magic bow apply as normal to arrows that have been enhanced with this ability. Only the larger enhancement bonus applies. Duplicate abilities do not st"
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 8,
+      "bab": 8,
+      "fort": 4,
+      "ref": 4,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Hail Of Arrows",
+          "description": "In lieu of his regular attacks, once per day an arcane archer of 8th level or higher can fire an arrow at each and every target within range, to a maximum of one target for every arcane archer level she has earned. Each attack uses the archer's primary attack bonus , and each enemy may only be targeted by a single arrow."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 9,
+      "bab": 9,
+      "fort": 5,
+      "ref": 5,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Enhance Arrows (Aligned)",
+          "description": "At 1st level, every nonmagical arrow an arcane archer nocks and lets fly becomes magical, gaining a +1 enhancement bonus . Unlike magic weapons created by normal means, the archer need not spend gold pieces to accomplish this task. However, an archer's magic arrows only function for him. In addition, the arcane archer's arrows gain a number of additional qualities as he gains additional levels. The elemental, elemental burst, and aligned qualities can be changed once per day, when the arcane archer prepares spells or, in the case of spontaneous spellcasters, after 8 hours of rest. At 3rd level, every non-magical arrow fired by an arcane archer gains one of the following elemental themed weapon qualities: flaming , frost , or shock . At 5th level, every non-magical arrow fired by an arcane archer gains the distance weapon quality. At 7th level, every non-magical arrow fired by an arcane archer gains one of the following elemental burst weapon qualities: flaming burst , icy burst , or shocking burst . This ability replaces the ability gained at 3rd level. At 9th level, every non-magical arrow fired by an arcane archer gains one of the following aligned weapon qualities: anarchic , axiomatic , holy , or unholy . The arcane archer cannot choose an ability that is the opposite of his alignment (for example, a lawful good arcane archer could not choose anarchic or unholy as his weapon quality). The bonuses granted by a magic bow apply as normal to arrows that have been enhanced with this ability. Only the larger enhancement bonus applies. Duplicate abilities do not st"
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "-"
+      }
+    },
+    {
+      "level": 10,
+      "bab": 10,
+      "fort": 5,
+      "ref": 5,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Arrow Of Death",
+          "description": "At 10th level, an arcane archer can create a special type of slaying arrow that forces the target, if damaged by the arrow's attack, to make a Fortitude save or be slain immediately. The DC of this save is equal to 20 + the arcane archer's Charisma modifier. It takes 1 day to make a slaying arrow, and the arrow only functions for the arcane archer who created it. The slaying arrow lasts no longer than 1 year, and the archer can only have one such arrow in existence at a time. Section 15: Copyright Notice Pathfinder RPG Core Rulebook . Copyright 2009, Paizo Publishing, LLC; Author: Jason Bulmahn, based on material by Jonathan Tweet, Monte Cook, and Skip Williams."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": {
+    "summary": "See level progression spell columns."
+  },
+  "spellcastingClass": true
+}

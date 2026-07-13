@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>PathFriends Class Editor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    body { background-color: #121212; color: white; }
+    .editor-shell { display: grid; grid-template-columns: minmax(240px, 320px) minmax(0, 1fr); gap: 14px; align-items: start; }
+    .panel { background: #1e1e1e; border: 1px solid #333; border-radius: 10px; padding: 12px; }
+    .class-list { display: grid; gap: 6px; max-height: calc(100vh - 260px); overflow: auto; }
+    .class-list button { text-align: left; display: flex; justify-content: space-between; gap: 8px; }
+    .class-type { color: #aaa; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; }
+    .level-grid { display: grid; gap: 10px; }
+    .level-card { background: #242424; border: 1px solid #444; border-radius: 8px; padding: 10px; }
+    .level-main-grid { display: grid; grid-template-columns: repeat(5, minmax(70px, 1fr)); gap: 8px; align-items: end; }
+    .spellcasting-grid { display: grid; grid-template-columns: repeat(5, minmax(120px, 1fr)); gap: 8px; align-items: end; }
+    .spell-table-wrap { overflow: auto; max-width: 100%; border: 1px solid #444; border-radius: 6px; width: fit-content; }
+    .spell-table { width: auto; margin-bottom: 0; table-layout: fixed; }
+    .spell-table th { background: #263744; color: #d8f7ff; border-color: #555; text-align: center; white-space: nowrap; font-size: 11px; line-height: 1.1; padding: 3px 4px; width: 34px; min-width: 34px; }
+    .spell-table td { background: #202020; border-color: #444; padding: 1px; text-align: center; vertical-align: middle; width: 34px; min-width: 34px; }
+    .spell-table .spell-level-cell { color: #ddd; font-weight: 700; width: 38px; min-width: 38px; font-size: 11px; line-height: 1; }
+    .spell-table input { width: 30px; min-width: 30px; height: 24px; text-align: center; padding: 0 2px; margin: 0 auto; font-size: 12px; line-height: 1; }
+    .feature-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: start; background: #2b2b2b; border: 1px solid #555; border-radius: 8px; padding: 8px; }
+    .feature-effects { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 5px; }
+    .feature-effects span { background: rgba(143, 209, 158, .08); border: 1px solid rgba(143, 209, 158, .35); color: #d9f5df; border-radius: 999px; padding: 1px 7px; font-size: 12px; }
+    .feature-pools { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 5px; }
+    .feature-pool-pill { background: rgba(13, 202, 240, .08); border: 1px solid rgba(13, 202, 240, .35); color: #d8f7ff; border-radius: 999px; padding: 1px 7px; font-size: 12px; }
+    .class-feature-pool-option { background: #242424; border: 1px solid #444; border-radius: 8px; padding: 8px; }
+    .class-feature-effect-row { display: grid; grid-template-columns: 1.25fr .85fr .6fr .85fr .45fr auto; gap: 8px; align-items: end; background: #242424; border: 1px solid #444; border-radius: 8px; padding: 8px; }
+    .class-feature-condition-inline { display: grid; grid-template-columns: auto minmax(140px, 1fr); gap: 8px; align-items: end; grid-column: 1 / -2; }
+    .class-feature-scale-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px; align-items: end; background: #242424; border: 1px solid #444; border-radius: 8px; padding: 8px; }
+    .small-text { font-size: 12px; color: #aaa; }
+    label { font-size: 12px; color: #aaa; margin-bottom: 2px; }
+    input, textarea, select { background-color: #2b2b2b !important; color: white !important; border-color: #555 !important; }
+    textarea { min-height: 80px; }
+    .btn-icon { width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center; padding: 0; }
+    .dirty-dot { width: 8px; height: 8px; border-radius: 999px; background: #ffc107; display: inline-block; }
+    @media (max-width: 900px) {
+      .editor-shell { grid-template-columns: 1fr; }
+      .class-list { max-height: 280px; }
+      .level-main-grid, .spellcasting-grid, .class-feature-effect-row, .class-feature-condition-inline { grid-template-columns: 1fr; }
+      .class-feature-condition-inline { grid-column: auto; }
+    }
+  </style>
+</head>
+<body>
+<div id="appNavbar"></div>
+
+<main class="container-fluid mt-3">
+  <div class="d-flex justify-content-between align-items-start gap-2 flex-wrap mb-3">
+    <div>
+      <h3 class="mb-0">PathFriends Class Editor</h3>
+      <div class="small-text">Local static-data editor for <code>data/classes/*.json</code>.</div>
+    </div>
+    <div class="d-flex gap-2 flex-wrap justify-content-end">
+      <button id="openProjectFolderBtn" class="btn btn-outline-info btn-sm" type="button"><i class="bi bi-folder2-open"></i> Open Project Folder</button>
+      <button id="saveClassesFileBtn" class="btn btn-primary btn-sm" type="button"><i class="bi bi-save"></i> Save to Project</button>
+    </div>
+  </div>
+
+  <div id="classEditorStatus" class="alert d-none py-2"></div>
+
+  <div class="editor-shell">
+    <aside class="panel">
+      <label for="classSearch">Search Classes</label>
+      <input id="classSearch" class="form-control form-control-sm mb-2" placeholder="Class name">
+      <div id="classCount" class="small-text mb-2"></div>
+      <div id="classList" class="class-list"></div>
+    </aside>
+
+    <section id="classEditorPanel" class="panel">
+      <div class="small-text">Choose a class to edit.</div>
+    </section>
+  </div>
+</main>
+
+<script src="scripts/navbar.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="scripts/supabase-config.js"></script>
+<script src="scripts/app-supabase.js"></script>
+<script src="scripts/class-data.js"></script>
+<script src="modals/effect-duration-editor.js?v=level-source-options-1"></script>
+<script src="modals/class-feature-editor.js?v=level-source-options-1"></script>
+<script src="modals/class-feature-pool-editor.js?v=feature-pools-2"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+let classes = [];
+let selectedIndex = -1;
+let searchTerm = "";
+let classDirectoryHandle = null;
+let projectDirectoryHandle = null;
+let dirty = false;
+
+const CLASS_GROUPS = [
+  ["core", "Core"],
+  ["base", "Base"],
+  ["alternate", "Alternate"],
+  ["occult", "Occult"],
+  ["hybrid", "Hybrid"],
+  ["unchained", "Unchained"],
+  ["prestige", "Prestige"],
+  ["npc", "NPC"]
+];
+const CASTING_TYPES = ["", "prepared", "spontaneous"];
+const CASTING_PROGRESSIONS = ["", "full", "2/3", "1/2"];
+const CASTING_ABILITIES = ["", "int", "wis", "cha"];
+const PREPARATION_TYPES = ["", "spellbook", "daily-list", "spontaneous"];
+const FULL_PREPARED_SLOTS = [
+  [3, 1], [4, 2], [4, 2, 1], [4, 3, 2], [4, 3, 2, 1],
+  [4, 3, 3, 2], [4, 4, 3, 2, 1], [4, 4, 3, 3, 2], [4, 4, 4, 3, 2, 1],
+  [4, 4, 4, 3, 3, 2], [4, 4, 4, 4, 3, 2, 1], [4, 4, 4, 4, 3, 3, 2],
+  [4, 4, 4, 4, 4, 3, 2, 1], [4, 4, 4, 4, 4, 3, 3, 2],
+  [4, 4, 4, 4, 4, 4, 3, 2, 1], [4, 4, 4, 4, 4, 4, 3, 3, 2],
+  [4, 4, 4, 4, 4, 4, 4, 3, 2, 1], [4, 4, 4, 4, 4, 4, 4, 3, 3, 2],
+  [4, 4, 4, 4, 4, 4, 4, 4, 3, 3], [4, 4, 4, 4, 4, 4, 4, 4, 4, 4]
+];
+const TWO_THIRDS_SLOTS = [
+  [0, 1], [0, 2], [0, 3], [0, 3, 1], [0, 4, 2],
+  [0, 4, 3], [0, 4, 3, 1], [0, 4, 4, 2], [0, 5, 4, 3],
+  [0, 5, 4, 3, 1], [0, 5, 4, 4, 2], [0, 5, 5, 4, 3],
+  [0, 5, 5, 4, 3, 1], [0, 5, 5, 4, 4, 2], [0, 5, 5, 5, 4, 3],
+  [0, 5, 5, 5, 4, 3, 1], [0, 5, 5, 5, 4, 4, 2], [0, 5, 5, 5, 5, 4, 3],
+  [0, 5, 5, 5, 5, 5, 4], [0, 5, 5, 5, 5, 5, 5]
+];
+const HALF_SLOTS = [
+  [0], [0], [0], [0, 1], [0, 1], [0, 1],
+  [0, 1, 0], [0, 1, 1], [0, 2, 1], [0, 2, 1, 0],
+  [0, 2, 1, 1], [0, 2, 2, 1], [0, 3, 2, 1, 0], [0, 3, 2, 1, 1],
+  [0, 3, 2, 2, 1], [0, 3, 3, 2, 1], [0, 4, 3, 2, 1], [0, 4, 3, 2, 2],
+  [0, 4, 3, 3, 2], [0, 4, 4, 3, 3]
+];
+
+function el(id) { return document.getElementById(id); }
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function setStatus(message, type = "info") {
+  const status = el("classEditorStatus");
+  status.className = `alert alert-${type} py-2`;
+  status.textContent = message;
+  status.classList.remove("d-none");
+}
+
+function setDirty(value = true) {
+  dirty = value;
+  document.title = `${dirty ? "* " : ""}PathFriends Class Editor`;
+  renderClassList();
+}
+
+function cloneJson(value) {
+  return JSON.parse(JSON.stringify(value || {}));
+}
+
+function normalizeLevel(level, index) {
+  return {
+    level: Number(level?.level || index + 1),
+    bab: Number(level?.bab || 0),
+    fort: Number(level?.fort || 0),
+    ref: Number(level?.ref || level?.reflex || 0),
+    will: Number(level?.will || 0),
+    classFeatures: Array.isArray(level?.classFeatures) ? level.classFeatures : [],
+    spellcasting: level?.spellcasting && typeof level.spellcasting === "object" ? level.spellcasting : {}
+  };
+}
+
+function classTypeOf(entry) {
+  return String(entry?.type || entry?.category || "base").toLowerCase();
+}
+
+function classGroupRank(entry) {
+  const index = CLASS_GROUPS.findIndex(([type]) => type === classTypeOf(entry));
+  return index >= 0 ? index : CLASS_GROUPS.length;
+}
+
+function normalizeClass(entry) {
+  const next = { ...entry };
+  next.levelProgression = Array.from({ length: 20 }, (_, index) => normalizeLevel(next.levelProgression?.[index], index));
+  next.spellcastingClass = Boolean(next.spellcastingClass || next.spellcasting || next.levelProgression.some(level => Object.keys(level.spellcasting || {}).length));
+  if (next.spellcastingClass && (!next.spellcasting || typeof next.spellcasting !== "object")) next.spellcasting = {};
+  return next;
+}
+
+function slugifyClassName(name, index = 0) {
+  return String(name || `class-${index + 1}`)
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "") || `class-${index + 1}`;
+}
+
+function ensureClassFiles(list) {
+  const used = new Map();
+  list.forEach((entry, index) => {
+    const current = String(entry.__classFile || "").trim();
+    if (current) {
+      const key = current.toLowerCase();
+      used.set(key, (used.get(key) || 0) + 1);
+      return;
+    }
+    const base = slugifyClassName(entry.name, index);
+    const count = used.get(base) || 0;
+    used.set(base, count + 1);
+    entry.__classFile = `${count ? `${base}-${count + 1}` : base}.json`;
+  });
+}
+
+function classIndexEntry(entry) {
+  return {
+    name: entry.name || "Unnamed Class",
+    type: entry.type || entry.category || "base",
+    category: entry.category || entry.type || "base",
+    sourceUrl: entry.sourceUrl || "",
+    spellcastingClass: Boolean(entry.spellcastingClass),
+    file: entry.__classFile || `${slugifyClassName(entry.name)}.json`
+  };
+}
+
+function classFilePayload(entry) {
+  const payload = cloneJson(entry);
+  delete payload.__classFile;
+  return payload;
+}
+
+function selectOptions(values, selected = "") {
+  return values.map(value => `<option value="${escapeHtml(value)}" ${String(selected || "") === value ? "selected" : ""}>${escapeHtml(value || "None")}</option>`).join("");
+}
+
+function prettyJson(value) {
+  if (!value) return "";
+  try {
+    return JSON.stringify(value, null, 2);
+  } catch {
+    return "";
+  }
+}
+
+function parseJsonTextarea(id, fallback = null) {
+  const raw = el(id)?.value.trim() || "";
+  if (!raw) return fallback;
+  try {
+    return JSON.parse(raw);
+  } catch {
+    setStatus(`${id} must contain valid JSON. Keeping previous value.`, "warning");
+    return fallback;
+  }
+}
+
+function ordinalSpellLevel(level) {
+  const value = Number(level || 0);
+  if (value === 0) return "0th";
+  if (value === 1) return "1st";
+  if (value === 2) return "2nd";
+  if (value === 3) return "3rd";
+  return `${value}th`;
+}
+
+function normalizedSpellTableRows(rows, maxSpellLevel = 9) {
+  const max = Math.max(0, Math.min(9, Number(maxSpellLevel || 0)));
+  return Array.from({ length: 20 }, (_, levelIndex) => {
+    const source = Array.isArray(rows?.[levelIndex]) ? rows[levelIndex] : [];
+    return Array.from({ length: max + 1 }, (_, spellLevel) => Number(source[spellLevel] || 0));
+  });
+}
+
+function baseSlotRowsForProgression(progression, castingType, maxSpellLevel) {
+  const max = Math.max(0, Math.min(9, Number(maxSpellLevel || 0)));
+  let source = FULL_PREPARED_SLOTS;
+  if (progression === "2/3") source = TWO_THIRDS_SLOTS;
+  if (progression === "1/2") source = HALF_SLOTS;
+  const rows = normalizedSpellTableRows(source, max);
+  if (castingType !== "spontaneous") return rows;
+  return rows.map(row => row.map((value, spellLevel) => spellLevel === 0 ? value : value + (value > 0 ? 2 : 0)));
+}
+
+function spontaneousKnownRows(slotRows, maxSpellLevel) {
+  const rows = normalizedSpellTableRows(slotRows, maxSpellLevel);
+  return rows.map((row, classLevelIndex) => row.map((slots, spellLevel) => {
+    if (spellLevel === 0) return Math.min(9, Math.max(4, 4 + Math.floor(classLevelIndex / 2)));
+    if (!slots) return 0;
+    return Math.max(1, Math.min(6, slots - 1));
+  }));
+}
+
+function spellTableHasZeroLevel(rows) {
+  return normalizedSpellTableRows(rows, 0).some(row => Number(row[0] || 0) > 0);
+}
+
+function renderSpellcastingTable(id, label, rows, maxSpellLevel = 9, { includeZero = true } = {}) {
+  const max = Math.max(0, Math.min(9, Number(maxSpellLevel || 0)));
+  const levels = Array.from({ length: max + 1 }, (_, level) => level).filter(level => includeZero || level > 0);
+  const normalized = normalizedSpellTableRows(rows, max);
+  return `
+    <div>
+      <label>${escapeHtml(label)}</label>
+      <div class="spell-table-wrap">
+        <table class="table table-dark table-sm spell-table" data-spell-table="${escapeHtml(id)}">
+          <thead>
+            <tr>
+              <th>Level</th>
+              ${levels.map(level => `<th>${escapeHtml(ordinalSpellLevel(level))}</th>`).join("")}
+            </tr>
+          </thead>
+          <tbody>
+            ${normalized.map((row, levelIndex) => `
+              <tr>
+                <td class="spell-level-cell">${levelIndex + 1}</td>
+                ${levels.map(spellLevel => `
+                  <td>
+                    <input class="form-control form-control-sm" inputmode="numeric" data-spell-row="${levelIndex}" data-spell-col="${spellLevel}" value="${Number(row[spellLevel] || 0) || ""}" aria-label="${escapeHtml(label)} level ${levelIndex + 1} spell ${ordinalSpellLevel(spellLevel)}">
+                  </td>
+                `).join("")}
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+function collectSpellcastingTable(id, maxSpellLevel = 9) {
+  const table = [...document.querySelectorAll("[data-spell-table]")].find(candidate => candidate.dataset.spellTable === id);
+  if (!table) return null;
+  const max = Math.max(0, Math.min(9, Number(maxSpellLevel || 0)));
+  const rows = normalizedSpellTableRows([], max);
+  table.querySelectorAll("[data-spell-row][data-spell-col]").forEach(input => {
+    const row = Number(input.dataset.spellRow || 0);
+    const col = Number(input.dataset.spellCol || 0);
+    rows[row][col] = Number(input.value || 0);
+  });
+  return rows;
+}
+
+function spellcastingTableIsEmpty(rows) {
+  return !Array.isArray(rows) || rows.every(row => !Array.isArray(row) || row.every(value => !Number(value || 0)));
+}
+
+function regenerateSpellcastingTablesFromControls() {
+  const cls = classes[selectedIndex];
+  if (!cls || !el("castingProgression")) return;
+  commitSelectedClass();
+  if (!cls.spellcasting || typeof cls.spellcasting !== "object") cls.spellcasting = {};
+  const maxSpellLevel = Number(cls.spellcasting.maxSpellLevel || 0);
+  cls.spellcasting.slotsByLevel = baseSlotRowsForProgression(cls.spellcasting.progression || "full", cls.spellcasting.castingType || "prepared", maxSpellLevel);
+  if (cls.spellcasting.castingType === "spontaneous") {
+    cls.spellcasting.knownByLevel = spontaneousKnownRows(cls.spellcasting.slotsByLevel, maxSpellLevel);
+  } else {
+    delete cls.spellcasting.knownByLevel;
+  }
+  setDirty(true);
+  renderSelectedClass();
+}
+
+async function loadDefaultClasses() {
+  classes = (await PFClassData.loadAllClasses()).map(normalizeClass);
+  ensureClassFiles(classes);
+  selectedIndex = classes.length ? 0 : -1;
+  setDirty(false);
+  renderClassList();
+  renderSelectedClass();
+  setStatus("Loaded split class data from data/classes. Use Open Project Folder to save directly into this project.", "info");
+}
+
+async function readClassesFromProjectDirectory(handle) {
+  const dataDirectory = await handle.getDirectoryHandle("data");
+  classDirectoryHandle = await dataDirectory.getDirectoryHandle("classes");
+  const indexHandle = await classDirectoryHandle.getFileHandle("index.json");
+  const index = JSON.parse(await (await indexHandle.getFile()).text());
+  classes = await Promise.all((Array.isArray(index) ? index : []).map(async entry => {
+    const classHandle = await classDirectoryHandle.getFileHandle(entry.file);
+    const cls = JSON.parse(await (await classHandle.getFile()).text());
+    return normalizeClass({ ...cls, __classFile: entry.file });
+  }));
+  ensureClassFiles(classes);
+  selectedIndex = classes.length ? 0 : -1;
+  setDirty(false);
+  renderClassList();
+  renderSelectedClass();
+  setStatus("Opened split class data from the selected project folder.", "success");
+}
+
+async function openProjectFolder() {
+  if (!window.showDirectoryPicker) {
+    setStatus("This browser cannot write directly to project folders.", "warning");
+    return;
+  }
+  projectDirectoryHandle = await window.showDirectoryPicker({ mode: "readwrite" });
+  await readClassesFromProjectDirectory(projectDirectoryHandle);
+}
+
+async function saveClassesFile() {
+  commitSelectedClass();
+  ensureClassFiles(classes);
+  if (!classDirectoryHandle && projectDirectoryHandle) {
+    const dataDirectory = await projectDirectoryHandle.getDirectoryHandle("data");
+    classDirectoryHandle = await dataDirectory.getDirectoryHandle("classes", { create: true });
+  }
+  if (!classDirectoryHandle && window.showDirectoryPicker) {
+    projectDirectoryHandle = await window.showDirectoryPicker({ mode: "readwrite" });
+    const dataDirectory = await projectDirectoryHandle.getDirectoryHandle("data");
+    classDirectoryHandle = await dataDirectory.getDirectoryHandle("classes", { create: true });
+  }
+  if (classDirectoryHandle) {
+    const indexHandle = await classDirectoryHandle.getFileHandle("index.json", { create: true });
+    const indexWritable = await indexHandle.createWritable();
+    await indexWritable.write(`${JSON.stringify(classes.map(classIndexEntry), null, 2)}\n`);
+    await indexWritable.close();
+
+    for (const cls of classes) {
+      const classHandle = await classDirectoryHandle.getFileHandle(cls.__classFile, { create: true });
+      const writable = await classHandle.createWritable();
+      await writable.write(`${JSON.stringify(classFilePayload(cls), null, 2)}\n`);
+      await writable.close();
+    }
+    setDirty(false);
+    setStatus("Saved split class data inside data/classes.", "success");
+    return;
+  }
+  const exportData = {
+    index: classes.map(classIndexEntry),
+    classes: classes.map(classFilePayload)
+  };
+  const blob = new Blob([`${JSON.stringify(exportData, null, 2)}\n`], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "classes-export.json";
+  link.click();
+  URL.revokeObjectURL(url);
+  setDirty(false);
+  setStatus("Downloaded a split-class export because direct project saving is unavailable.", "warning");
+}
+
+function filteredClassIndexes() {
+  const term = searchTerm.trim().toLowerCase();
+  return classes
+    .map((entry, index) => ({ entry, index }))
+    .filter(({ entry }) => !term || String(entry.name || "").toLowerCase().includes(term))
+    .sort((a, b) => classGroupRank(a.entry) - classGroupRank(b.entry) || String(a.entry.name || "").localeCompare(String(b.entry.name || "")))
+    .map(item => item.index);
+}
+
+function renderClassList() {
+  const indexes = filteredClassIndexes();
+  el("classCount").innerHTML = `${classes.length} classes${dirty ? ' <span class="dirty-dot" title="Unsaved changes"></span>' : ""}`;
+  el("classList").innerHTML = indexes.map(index => {
+    const entry = classes[index];
+    const group = CLASS_GROUPS.find(([type]) => type === classTypeOf(entry))?.[1] || entry.type || "class";
+    return `
+      <button class="btn ${index === selectedIndex ? "btn-primary" : "btn-outline-light"} btn-sm" type="button" data-class-index="${index}">
+        <span>${escapeHtml(entry.name || "Unnamed Class")}</span>
+        <span class="class-type">${escapeHtml(group)}</span>
+      </button>
+    `;
+  }).join("") || `<div class="small-text">No matching classes.</div>`;
+  el("classList").querySelectorAll("[data-class-index]").forEach(button => {
+    button.addEventListener("click", () => {
+      commitSelectedClass();
+      selectedIndex = Number(button.dataset.classIndex);
+      renderClassList();
+      renderSelectedClass();
+    });
+  });
+}
+
+function levelFeatureSummary(feature) {
+  const effects = Array.isArray(feature.effects) ? feature.effects : [];
+  return effects.length
+    ? `<div class="feature-effects">${effects.map(effect => `<span>${escapeHtml(effect.stat || "effect")} ${Number(effect.value || 0) >= 0 ? "+" : ""}${escapeHtml(effect.value ?? 0)} ${escapeHtml(effect.type || "untyped")}</span>`).join("")}</div>`
+    : "";
+}
+
+function levelFeaturePools(feature, levelIndex, featureIndex) {
+  const pools = Array.isArray(feature.pools) ? feature.pools : Array.isArray(feature.choicePools) ? feature.choicePools : [];
+  if (!pools.length) return "";
+  return `
+    <div class="feature-pools">
+      ${pools.map((pool, poolIndex) => `
+        <button class="btn btn-link p-0 text-decoration-none feature-pool-pill" type="button" data-level-index="${levelIndex}" data-feature-index="${featureIndex}" data-pool-index="${poolIndex}" data-edit-pool>
+          <i class="bi bi-list-stars"></i> ${escapeHtml(pool.name || "Pool")} choices (${Array.isArray(pool.options) ? pool.options.length : 0})
+        </button>
+      `).join("")}
+    </div>
+  `;
+}
+
+function renderSelectedClass() {
+  const cls = classes[selectedIndex];
+  if (!cls) {
+    el("classEditorPanel").innerHTML = `<div class="small-text">Choose a class to edit.</div>`;
+    return;
+  }
+
+  el("classEditorPanel").innerHTML = `
+    <div class="d-flex justify-content-between gap-2 flex-wrap mb-3">
+      <div>
+        <h4 class="mb-0">${escapeHtml(cls.name || "Unnamed Class")}</h4>
+        <div class="small-text">${escapeHtml(cls.type || "class")}${cls.sourceUrl ? ` | ${escapeHtml(cls.sourceUrl)}` : ""}</div>
+      </div>
+      <div class="form-check form-switch">
+        <input id="spellcastingClass" class="form-check-input" type="checkbox" ${cls.spellcastingClass ? "checked" : ""}>
+        <label class="form-check-label" for="spellcastingClass">Spellcasting Class</label>
+      </div>
+    </div>
+
+    <div class="row g-2 mb-3">
+      <div class="col-md-6">
+        <label for="className">Class Name</label>
+        <input id="className" class="form-control form-control-sm" value="${escapeHtml(cls.name || "")}">
+      </div>
+      <div class="col-md-3">
+        <label for="classType">Type</label>
+        <select id="classType" class="form-select form-select-sm">
+          ${CLASS_GROUPS.map(([type, label]) => `<option value="${type}" ${classTypeOf(cls) === type ? "selected" : ""}>${escapeHtml(label)}</option>`).join("")}
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label for="classSourceUrl">Source URL</label>
+        <input id="classSourceUrl" class="form-control form-control-sm" value="${escapeHtml(cls.sourceUrl || "")}">
+      </div>
+    </div>
+
+    <section class="level-card mb-3">
+      <div class="d-flex justify-content-between align-items-center gap-2 flex-wrap mb-2">
+        <strong>Spellcasting</strong>
+        <div class="small-text">Structured spell data used by the character sheet Spells tab.</div>
+      </div>
+      <div class="spellcasting-grid mb-2">
+        <div>
+          <label for="castingType">Casting Type</label>
+          <select id="castingType" class="form-select form-select-sm">${selectOptions(CASTING_TYPES, cls.spellcasting?.castingType || "")}</select>
+        </div>
+        <div>
+          <label for="castingProgression">Progression</label>
+          <select id="castingProgression" class="form-select form-select-sm">${selectOptions(CASTING_PROGRESSIONS, cls.spellcasting?.progression || "")}</select>
+        </div>
+        <div>
+          <label for="castingAbility">Casting Attribute</label>
+          <select id="castingAbility" class="form-select form-select-sm">${selectOptions(CASTING_ABILITIES, cls.spellcasting?.ability || "")}</select>
+        </div>
+        <div>
+          <label for="preparationType">Preparation</label>
+          <select id="preparationType" class="form-select form-select-sm">${selectOptions(PREPARATION_TYPES, cls.spellcasting?.preparation || "")}</select>
+        </div>
+        <div>
+          <label for="maxSpellLevel">Max Spell Level</label>
+          <input id="maxSpellLevel" class="form-control form-control-sm" type="number" min="0" max="9" value="${escapeHtml(cls.spellcasting?.maxSpellLevel ?? "")}">
+        </div>
+      </div>
+      <div class="row g-2">
+        <div class="col-xl-4">
+          ${renderSpellcastingTable(
+            "slotsByLevel",
+            "Spells Per Day",
+            cls.spellcasting?.slotsByLevel,
+            cls.spellcasting?.maxSpellLevel ?? 9,
+            { includeZero: spellTableHasZeroLevel(cls.spellcasting?.slotsByLevel) }
+          )}
+        </div>
+        <div class="col-xl-4">
+          ${renderSpellcastingTable(
+            "preparedByLevel",
+            "Spells Prepared",
+            cls.spellcasting?.preparedByLevel,
+            cls.spellcasting?.maxSpellLevel ?? 9,
+            { includeZero: true }
+          )}
+        </div>
+        <div class="col-xl-4">
+          ${renderSpellcastingTable(
+            "knownByLevel",
+            "Spells Known",
+            cls.spellcasting?.knownByLevel,
+            cls.spellcasting?.maxSpellLevel ?? 9,
+            { includeZero: true }
+          )}
+        </div>
+      </div>
+    </section>
+
+    <div class="level-grid">
+      ${cls.levelProgression.map(renderLevelCard).join("")}
+    </div>
+  `;
+
+  el("classEditorPanel").querySelectorAll("input, textarea, select").forEach(input => {
+    input.addEventListener("input", () => setDirty(true));
+    input.addEventListener("change", () => setDirty(true));
+  });
+  ["castingProgression", "castingType", "maxSpellLevel"].forEach(id => {
+    el(id)?.addEventListener("change", regenerateSpellcastingTablesFromControls);
+  });
+  el("classEditorPanel").querySelectorAll("[data-add-feature]").forEach(button => {
+    button.addEventListener("click", () => addClassFeature(Number(button.dataset.addFeature)));
+  });
+  el("classEditorPanel").querySelectorAll("[data-edit-feature]").forEach(button => {
+    button.addEventListener("click", () => editClassFeature(Number(button.dataset.levelIndex), Number(button.dataset.featureIndex)));
+  });
+  el("classEditorPanel").querySelectorAll("[data-delete-feature]").forEach(button => {
+    button.addEventListener("click", () => deleteClassFeature(Number(button.dataset.levelIndex), Number(button.dataset.featureIndex)));
+  });
+  el("classEditorPanel").querySelectorAll("[data-add-pool]").forEach(button => {
+    button.addEventListener("click", () => addFeaturePool(Number(button.dataset.levelIndex), Number(button.dataset.featureIndex)));
+  });
+  el("classEditorPanel").querySelectorAll("[data-edit-pool]").forEach(button => {
+    button.addEventListener("click", () => editFeaturePool(Number(button.dataset.levelIndex), Number(button.dataset.featureIndex), Number(button.dataset.poolIndex)));
+  });
+}
+
+function renderLevelCard(level, index) {
+  const features = Array.isArray(level.classFeatures) ? level.classFeatures : [];
+  return `
+    <article class="level-card" data-level-index="${index}">
+      <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
+        <strong>Level ${level.level}</strong>
+        <button class="btn btn-outline-info btn-sm" type="button" data-add-feature="${index}">
+          <i class="bi bi-plus-lg"></i> Feature
+        </button>
+      </div>
+      <div class="level-main-grid mb-2">
+        <div><label>BAB</label><input data-level-field="bab" class="form-control form-control-sm" type="number" value="${escapeHtml(level.bab)}"></div>
+        <div><label>Fort</label><input data-level-field="fort" class="form-control form-control-sm" type="number" value="${escapeHtml(level.fort)}"></div>
+        <div><label>Ref</label><input data-level-field="ref" class="form-control form-control-sm" type="number" value="${escapeHtml(level.ref)}"></div>
+        <div><label>Will</label><input data-level-field="will" class="form-control form-control-sm" type="number" value="${escapeHtml(level.will)}"></div>
+      </div>
+      <div class="vstack gap-2">
+        ${features.map((feature, featureIndex) => `
+          <div class="feature-row">
+            <div>
+              <strong>${escapeHtml(feature.name || "Class Feature")}</strong>
+              <div class="small-text">${escapeHtml(String(feature.description || "").slice(0, 180))}${String(feature.description || "").length > 180 ? "..." : ""}</div>
+              ${levelFeatureSummary(feature)}
+              ${levelFeaturePools(feature, index, featureIndex)}
+            </div>
+            <div class="d-flex gap-1">
+              <button class="btn btn-outline-info btn-sm btn-icon" type="button" data-level-index="${index}" data-feature-index="${featureIndex}" data-add-pool aria-label="Add pool"><i class="bi bi-diagram-3"></i></button>
+              <button class="btn btn-outline-warning btn-sm btn-icon" type="button" data-level-index="${index}" data-feature-index="${featureIndex}" data-edit-feature aria-label="Edit feature"><i class="bi bi-pencil-square"></i></button>
+              <button class="btn btn-outline-danger btn-sm btn-icon" type="button" data-level-index="${index}" data-feature-index="${featureIndex}" data-delete-feature aria-label="Delete feature"><i class="bi bi-trash"></i></button>
+            </div>
+          </div>
+        `).join("") || `<div class="small-text">No class features at this level.</div>`}
+      </div>
+    </article>
+  `;
+}
+
+function commitSelectedClass() {
+  const cls = classes[selectedIndex];
+  if (!cls || !el("className")) return;
+  cls.name = el("className").value.trim() || cls.name;
+  cls.type = el("classType").value || cls.type || "base";
+  cls.sourceUrl = el("classSourceUrl").value.trim();
+  cls.spellcastingClass = el("spellcastingClass").checked;
+  const existingSpellcasting = cls.spellcasting && typeof cls.spellcasting === "object" ? cls.spellcasting : {};
+  if (cls.spellcastingClass) {
+    cls.spellcasting = {
+      ...existingSpellcasting,
+      summary: existingSpellcasting.summary || "Structured spellcasting data available.",
+      castingType: el("castingType").value,
+      progression: el("castingProgression").value,
+      ability: el("castingAbility").value,
+      preparation: el("preparationType").value,
+      maxSpellLevel: Number(el("maxSpellLevel").value || existingSpellcasting.maxSpellLevel || 0),
+      slotsByLevel: collectSpellcastingTable("slotsByLevel", el("maxSpellLevel").value || existingSpellcasting.maxSpellLevel || 0),
+      preparedByLevel: collectSpellcastingTable("preparedByLevel", el("maxSpellLevel").value || existingSpellcasting.maxSpellLevel || 0),
+      knownByLevel: collectSpellcastingTable("knownByLevel", el("maxSpellLevel").value || existingSpellcasting.maxSpellLevel || 0)
+    };
+    Object.keys(cls.spellcasting).forEach(key => {
+      if (
+        cls.spellcasting[key] === "" ||
+        cls.spellcasting[key] === null ||
+        (Array.isArray(cls.spellcasting[key]) && (!cls.spellcasting[key].length || spellcastingTableIsEmpty(cls.spellcasting[key])))
+      ) delete cls.spellcasting[key];
+    });
+  } else {
+    cls.spellcasting = null;
+  }
+  el("classEditorPanel").querySelectorAll(".level-card[data-level-index]").forEach(card => {
+    const index = Number(card.dataset.levelIndex);
+    const level = cls.levelProgression[index];
+    level.level = index + 1;
+    level.bab = Number(card.querySelector('[data-level-field="bab"]').value || 0);
+    level.fort = Number(card.querySelector('[data-level-field="fort"]').value || 0);
+    level.ref = Number(card.querySelector('[data-level-field="ref"]').value || 0);
+    level.will = Number(card.querySelector('[data-level-field="will"]').value || 0);
+    delete level.spellcasting;
+  });
+}
+
+async function addClassFeature(levelIndex) {
+  commitSelectedClass();
+  const feature = await PFClassFeatureEditor.open({});
+  if (!feature) return;
+  classes[selectedIndex].levelProgression[levelIndex].classFeatures.push(feature);
+  setDirty(true);
+  renderSelectedClass();
+}
+
+async function editClassFeature(levelIndex, featureIndex) {
+  commitSelectedClass();
+  const features = classes[selectedIndex].levelProgression[levelIndex].classFeatures;
+  const feature = await PFClassFeatureEditor.open(cloneJson(features[featureIndex]));
+  if (!feature) return;
+  features[featureIndex] = feature;
+  setDirty(true);
+  renderSelectedClass();
+}
+
+function deleteClassFeature(levelIndex, featureIndex) {
+  if (!confirm("Delete this class feature?")) return;
+  commitSelectedClass();
+  classes[selectedIndex].levelProgression[levelIndex].classFeatures.splice(featureIndex, 1);
+  setDirty(true);
+  renderSelectedClass();
+}
+
+function featurePools(feature) {
+  if (!Array.isArray(feature.pools)) feature.pools = Array.isArray(feature.choicePools) ? feature.choicePools : [];
+  delete feature.choicePools;
+  return feature.pools;
+}
+
+async function addFeaturePool(levelIndex, featureIndex) {
+  commitSelectedClass();
+  const feature = classes[selectedIndex].levelProgression[levelIndex].classFeatures[featureIndex];
+  const pool = await PFClassFeaturePoolEditor.open({});
+  if (!pool) return;
+  featurePools(feature).push(pool);
+  setDirty(true);
+  renderSelectedClass();
+}
+
+async function editFeaturePool(levelIndex, featureIndex, poolIndex) {
+  commitSelectedClass();
+  const feature = classes[selectedIndex].levelProgression[levelIndex].classFeatures[featureIndex];
+  const pools = featurePools(feature);
+  const pool = await PFClassFeaturePoolEditor.open(cloneJson(pools[poolIndex] || {}));
+  if (!pool) return;
+  pools[poolIndex] = pool;
+  setDirty(true);
+  renderSelectedClass();
+}
+
+async function initClassEditor() {
+  const user = await PFApp.requireAuth();
+  if (!user) return;
+  const admin = await PFApp.isAppAdmin();
+  if (!admin) {
+    document.querySelector("main").innerHTML = `<div class="alert alert-warning">Only app admins can access this tool.</div>`;
+    return;
+  }
+  await loadDefaultClasses();
+}
+
+el("classSearch").addEventListener("input", event => {
+  searchTerm = event.target.value;
+  renderClassList();
+});
+el("openProjectFolderBtn").addEventListener("click", async () => {
+  try {
+    await openProjectFolder();
+  } catch (error) {
+    setStatus(error.message || "Could not open the project folder.", "danger");
+  }
+});
+el("saveClassesFileBtn").addEventListener("click", async () => {
+  try {
+    await saveClassesFile();
+  } catch (error) {
+    setStatus(error.message || "Could not save split class data.", "danger");
+  }
+});
+window.addEventListener("beforeunload", event => {
+  if (!dirty) return;
+  event.preventDefault();
+  event.returnValue = "";
+});
+
+initClassEditor();
+</script>
+</body>
+</html>

@@ -1,0 +1,261 @@
+{
+  "name": "Argent Dramaturge",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/a-b/argent-dramaturge/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 0,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Argent Performance ( Song Of Silver )",
+          "description": "An argent dramaturge can use Perform (sing) to create special magical effects that hinder outsiders (particularly those affected by silver, such as devils ) as per the bardic performance bard class feature. She can use this ability for 2 rounds per day for each argent dramaturge level she has, and can use rounds of bardic performance gained from bard levels to perform argent performances and vice-versa. Starting an argent performance is a move action , but it can be maintained each round as a free action . An argent performance cannot be disrupted, but ends immediately if the argent dramaturge is killed, paralyzed , stunned , knocked unconscious , or otherwise prevented from taking a free action to maintain it each round. An argent performance counts as a bardic performance when determining how many performances the argent dramaturge can have in effect at one time. An argent performance has audible components but not visual components . The save DC against an argent dramaturge's performance is equal to 10 + the argent dramaturge's level + her Charisma modifier. At 7th level, an argent dramaturge can start an argent performance as a swift action if she chooses. The performance abilities that an argent dramaturge gains are noted below."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Dramaturgical Flourish",
+          "description": "At 2nd level and every 2 levels thereafter, an argent dramaturge's studies into the history and structure of stories grant her access to secret performances, allowing her to select an option from the list of dramaturgical flourishes below. Unless otherwise noted, an argent dramaturge cannot select a dramaturgical flourish more than once. Heartening Song (Su): An argent dramaturge's countersong functions against mind-affecting effects that rely on negative emotions (such as crushing despair , rage, or fear effects) as well as sonic and language-dependent effects. An argent dramaturge must have the countersong bardic performance to select this dramaturgical flourish. Masterpiece: The argent dramaturge gains a bardic masterpiece without needing to sacrifice a feat or spell known. She must still meet the prerequisites of the masterpiece. An argent dramaturge can take this flourish more than once, but must select a new bardic masterpiece each time she does so. Reactive Performance (Su): The argent dramaturge can activate her countersong or distraction bardic performance as an immediate action . When she does so, she must expend 2 rounds of bardic performance rather than 1. An argent dramaturge must have the countersong and distraction bardic performances to select this dramaturgical flourish. Sudden Competence (Su): An argent dramaturge can activate her inspire competence bardic performance as an immediate action by spending 2 rounds of bardic performance . She can even use this ability after an ally has failed a skill check. If the check would have been successful w"
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 3,
+      "bab": 1,
+      "fort": 1,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Argent Performance ( Anchoring Aria )",
+          "description": "An argent dramaturge can use Perform (sing) to create special magical effects that hinder outsiders (particularly those affected by silver, such as devils ) as per the bardic performance bard class feature. She can use this ability for 2 rounds per day for each argent dramaturge level she has, and can use rounds of bardic performance gained from bard levels to perform argent performances and vice-versa. Starting an argent performance is a move action , but it can be maintained each round as a free action . An argent performance cannot be disrupted, but ends immediately if the argent dramaturge is killed, paralyzed , stunned , knocked unconscious , or otherwise prevented from taking a free action to maintain it each round. An argent performance counts as a bardic performance when determining how many performances the argent dramaturge can have in effect at one time. An argent performance has audible components but not visual components . The save DC against an argent dramaturge's performance is equal to 10 + the argent dramaturge's level + her Charisma modifier. At 7th level, an argent dramaturge can start an argent performance as a swift action if she chooses. The performance abilities that an argent dramaturge gains are noted below."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 4,
+      "bab": 2,
+      "fort": 1,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Dramaturgical Flourish",
+          "description": "At 2nd level and every 2 levels thereafter, an argent dramaturge's studies into the history and structure of stories grant her access to secret performances, allowing her to select an option from the list of dramaturgical flourishes below. Unless otherwise noted, an argent dramaturge cannot select a dramaturgical flourish more than once. Heartening Song (Su): An argent dramaturge's countersong functions against mind-affecting effects that rely on negative emotions (such as crushing despair , rage, or fear effects) as well as sonic and language-dependent effects. An argent dramaturge must have the countersong bardic performance to select this dramaturgical flourish. Masterpiece: The argent dramaturge gains a bardic masterpiece without needing to sacrifice a feat or spell known. She must still meet the prerequisites of the masterpiece. An argent dramaturge can take this flourish more than once, but must select a new bardic masterpiece each time she does so. Reactive Performance (Su): The argent dramaturge can activate her countersong or distraction bardic performance as an immediate action . When she does so, she must expend 2 rounds of bardic performance rather than 1. An argent dramaturge must have the countersong and distraction bardic performances to select this dramaturgical flourish. Sudden Competence (Su): An argent dramaturge can activate her inspire competence bardic performance as an immediate action by spending 2 rounds of bardic performance . She can even use this ability after an ally has failed a skill check. If the check would have been successful w"
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 5,
+      "bab": 2,
+      "fort": 2,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Argent Performance (60-Ft. Radius, Breath Of Life)",
+          "description": "An argent dramaturge can use Perform (sing) to create special magical effects that hinder outsiders (particularly those affected by silver, such as devils ) as per the bardic performance bard class feature. She can use this ability for 2 rounds per day for each argent dramaturge level she has, and can use rounds of bardic performance gained from bard levels to perform argent performances and vice-versa. Starting an argent performance is a move action , but it can be maintained each round as a free action . An argent performance cannot be disrupted, but ends immediately if the argent dramaturge is killed, paralyzed , stunned , knocked unconscious , or otherwise prevented from taking a free action to maintain it each round. An argent performance counts as a bardic performance when determining how many performances the argent dramaturge can have in effect at one time. An argent performance has audible components but not visual components . The save DC against an argent dramaturge's performance is equal to 10 + the argent dramaturge's level + her Charisma modifier. At 7th level, an argent dramaturge can start an argent performance as a swift action if she chooses. The performance abilities that an argent dramaturge gains are noted below."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 6,
+      "bab": 3,
+      "fort": 2,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Dramaturgical Flourish",
+          "description": "At 2nd level and every 2 levels thereafter, an argent dramaturge's studies into the history and structure of stories grant her access to secret performances, allowing her to select an option from the list of dramaturgical flourishes below. Unless otherwise noted, an argent dramaturge cannot select a dramaturgical flourish more than once. Heartening Song (Su): An argent dramaturge's countersong functions against mind-affecting effects that rely on negative emotions (such as crushing despair , rage, or fear effects) as well as sonic and language-dependent effects. An argent dramaturge must have the countersong bardic performance to select this dramaturgical flourish. Masterpiece: The argent dramaturge gains a bardic masterpiece without needing to sacrifice a feat or spell known. She must still meet the prerequisites of the masterpiece. An argent dramaturge can take this flourish more than once, but must select a new bardic masterpiece each time she does so. Reactive Performance (Su): The argent dramaturge can activate her countersong or distraction bardic performance as an immediate action . When she does so, she must expend 2 rounds of bardic performance rather than 1. An argent dramaturge must have the countersong and distraction bardic performances to select this dramaturgical flourish. Sudden Competence (Su): An argent dramaturge can activate her inspire competence bardic performance as an immediate action by spending 2 rounds of bardic performance . She can even use this ability after an ally has failed a skill check. If the check would have been successful w"
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 7,
+      "bab": 3,
+      "fort": 2,
+      "ref": 4,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Argent Performance (Swift)",
+          "description": "An argent dramaturge can use Perform (sing) to create special magical effects that hinder outsiders (particularly those affected by silver, such as devils ) as per the bardic performance bard class feature. She can use this ability for 2 rounds per day for each argent dramaturge level she has, and can use rounds of bardic performance gained from bard levels to perform argent performances and vice-versa. Starting an argent performance is a move action , but it can be maintained each round as a free action . An argent performance cannot be disrupted, but ends immediately if the argent dramaturge is killed, paralyzed , stunned , knocked unconscious , or otherwise prevented from taking a free action to maintain it each round. An argent performance counts as a bardic performance when determining how many performances the argent dramaturge can have in effect at one time. An argent performance has audible components but not visual components . The save DC against an argent dramaturge's performance is equal to 10 + the argent dramaturge's level + her Charisma modifier. At 7th level, an argent dramaturge can start an argent performance as a swift action if she chooses. The performance abilities that an argent dramaturge gains are noted below."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 8,
+      "bab": 4,
+      "fort": 3,
+      "ref": 4,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Dramaturgical Flourish",
+          "description": "At 2nd level and every 2 levels thereafter, an argent dramaturge's studies into the history and structure of stories grant her access to secret performances, allowing her to select an option from the list of dramaturgical flourishes below. Unless otherwise noted, an argent dramaturge cannot select a dramaturgical flourish more than once. Heartening Song (Su): An argent dramaturge's countersong functions against mind-affecting effects that rely on negative emotions (such as crushing despair , rage, or fear effects) as well as sonic and language-dependent effects. An argent dramaturge must have the countersong bardic performance to select this dramaturgical flourish. Masterpiece: The argent dramaturge gains a bardic masterpiece without needing to sacrifice a feat or spell known. She must still meet the prerequisites of the masterpiece. An argent dramaturge can take this flourish more than once, but must select a new bardic masterpiece each time she does so. Reactive Performance (Su): The argent dramaturge can activate her countersong or distraction bardic performance as an immediate action . When she does so, she must expend 2 rounds of bardic performance rather than 1. An argent dramaturge must have the countersong and distraction bardic performances to select this dramaturgical flourish. Sudden Competence (Su): An argent dramaturge can activate her inspire competence bardic performance as an immediate action by spending 2 rounds of bardic performance . She can even use this ability after an ally has failed a skill check. If the check would have been successful w"
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 9,
+      "bab": 4,
+      "fort": 3,
+      "ref": 5,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Argent Performance ( Righteous Chord )",
+          "description": "An argent dramaturge can use Perform (sing) to create special magical effects that hinder outsiders (particularly those affected by silver, such as devils ) as per the bardic performance bard class feature. She can use this ability for 2 rounds per day for each argent dramaturge level she has, and can use rounds of bardic performance gained from bard levels to perform argent performances and vice-versa. Starting an argent performance is a move action , but it can be maintained each round as a free action . An argent performance cannot be disrupted, but ends immediately if the argent dramaturge is killed, paralyzed , stunned , knocked unconscious , or otherwise prevented from taking a free action to maintain it each round. An argent performance counts as a bardic performance when determining how many performances the argent dramaturge can have in effect at one time. An argent performance has audible components but not visual components . The save DC against an argent dramaturge's performance is equal to 10 + the argent dramaturge's level + her Charisma modifier. At 7th level, an argent dramaturge can start an argent performance as a swift action if she chooses. The performance abilities that an argent dramaturge gains are noted below."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 10,
+      "bab": 5,
+      "fort": 3,
+      "ref": 5,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Dramaturgical Flourish",
+          "description": "At 2nd level and every 2 levels thereafter, an argent dramaturge's studies into the history and structure of stories grant her access to secret performances, allowing her to select an option from the list of dramaturgical flourishes below. Unless otherwise noted, an argent dramaturge cannot select a dramaturgical flourish more than once. Heartening Song (Su): An argent dramaturge's countersong functions against mind-affecting effects that rely on negative emotions (such as crushing despair , rage, or fear effects) as well as sonic and language-dependent effects. An argent dramaturge must have the countersong bardic performance to select this dramaturgical flourish. Masterpiece: The argent dramaturge gains a bardic masterpiece without needing to sacrifice a feat or spell known. She must still meet the prerequisites of the masterpiece. An argent dramaturge can take this flourish more than once, but must select a new bardic masterpiece each time she does so. Reactive Performance (Su): The argent dramaturge can activate her countersong or distraction bardic performance as an immediate action . When she does so, she must expend 2 rounds of bardic performance rather than 1. An argent dramaturge must have the countersong and distraction bardic performances to select this dramaturgical flourish. Sudden Competence (Su): An argent dramaturge can activate her inspire competence bardic performance as an immediate action by spending 2 rounds of bardic performance . She can even use this ability after an ally has failed a skill check. If the check would have been successful w"
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": {
+    "summary": "See level progression spell columns."
+  },
+  "spellcastingClass": true
+}

@@ -1,0 +1,267 @@
+{
+  "name": "Guild Devil",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/e-h/guild-devil/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 0,
+      "ref": 1,
+      "will": 0,
+      "classFeatures": [
+        {
+          "name": "Classically Trained",
+          "description": "A Guild Devil can use Weapon Finesse with a longsword sized for him when he wields it one-handed, even though it is not a light weapon."
+        },
+        {
+          "name": "Founders' Favor (Eye Of The Seer [Devices])",
+          "description": "A Guild Devil learns to call upon the founders' spiritual power, enjoying a Mastery of the city matched by few. At 1st level, a Guild Devil gains a pool of favor points equal to his class level + his Intelligence , Wisdom , or Charisma modifier (whichever is highest). In addition to the powers inspired by specific founders (see below), the Guild Devil can spend one favor point to add a bonus equal to half her class level (minimum +1) on a skill check without spending an action. The Guild Devil must use this ability before learning the result of the check, and he can add this additional bonus only once per skill check. The pool of favor is replenished each morning after 8 hours of rest. As the Guild Devil gains levels, he learns to call upon powers inspired by specific founders. The caster level of spell-like abilities used this way is equal to the character's class level. Effects (including spell-like abilities ) that allow a saving throw have a DC equal to 10 + the Guild devil's class level + the Guild devil's Intelligence , Wisdom , or Charisma modifier (whichever is highest)."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Council'S Secret",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 3,
+      "bab": 2,
+      "fort": 1,
+      "ref": 2,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Founders' Favor (Guidance)",
+          "description": "A Guild Devil learns to call upon the founders' spiritual power, enjoying a Mastery of the city matched by few. At 1st level, a Guild Devil gains a pool of favor points equal to his class level + his Intelligence , Wisdom , or Charisma modifier (whichever is highest). In addition to the powers inspired by specific founders (see below), the Guild Devil can spend one favor point to add a bonus equal to half her class level (minimum +1) on a skill check without spending an action. The Guild Devil must use this ability before learning the result of the check, and he can add this additional bonus only once per skill check. The pool of favor is replenished each morning after 8 hours of rest. As the Guild Devil gains levels, he learns to call upon powers inspired by specific founders. The caster level of spell-like abilities used this way is equal to the character's class level. Effects (including spell-like abilities ) that allow a saving throw have a DC equal to 10 + the Guild devil's class level + the Guild devil's Intelligence , Wisdom , or Charisma modifier (whichever is highest)."
+        },
+        {
+          "name": "Sneak Attack +1d6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 4,
+      "bab": 3,
+      "fort": 1,
+      "ref": 2,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Council'S Secret",
+          "description": ""
+        },
+        {
+          "name": "Founders' Favor (Eye Of The Seer [Barriers])",
+          "description": "A Guild Devil learns to call upon the founders' spiritual power, enjoying a Mastery of the city matched by few. At 1st level, a Guild Devil gains a pool of favor points equal to his class level + his Intelligence , Wisdom , or Charisma modifier (whichever is highest). In addition to the powers inspired by specific founders (see below), the Guild Devil can spend one favor point to add a bonus equal to half her class level (minimum +1) on a skill check without spending an action. The Guild Devil must use this ability before learning the result of the check, and he can add this additional bonus only once per skill check. The pool of favor is replenished each morning after 8 hours of rest. As the Guild Devil gains levels, he learns to call upon powers inspired by specific founders. The caster level of spell-like abilities used this way is equal to the character's class level. Effects (including spell-like abilities ) that allow a saving throw have a DC equal to 10 + the Guild devil's class level + the Guild devil's Intelligence , Wisdom , or Charisma modifier (whichever is highest)."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 5,
+      "bab": 3,
+      "fort": 2,
+      "ref": 3,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Founders' Favor (Craftsmanship)",
+          "description": "A Guild Devil learns to call upon the founders' spiritual power, enjoying a Mastery of the city matched by few. At 1st level, a Guild Devil gains a pool of favor points equal to his class level + his Intelligence , Wisdom , or Charisma modifier (whichever is highest). In addition to the powers inspired by specific founders (see below), the Guild Devil can spend one favor point to add a bonus equal to half her class level (minimum +1) on a skill check without spending an action. The Guild Devil must use this ability before learning the result of the check, and he can add this additional bonus only once per skill check. The pool of favor is replenished each morning after 8 hours of rest. As the Guild Devil gains levels, he learns to call upon powers inspired by specific founders. The caster level of spell-like abilities used this way is equal to the character's class level. Effects (including spell-like abilities ) that allow a saving throw have a DC equal to 10 + the Guild devil's class level + the Guild devil's Intelligence , Wisdom , or Charisma modifier (whichever is highest)."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 6,
+      "bab": 4,
+      "fort": 2,
+      "ref": 3,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Council'S Secret",
+          "description": ""
+        },
+        {
+          "name": "Sneak Attack +2d6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 7,
+      "bab": 5,
+      "fort": 2,
+      "ref": 4,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Founders' Favor (Bounty)",
+          "description": "A Guild Devil learns to call upon the founders' spiritual power, enjoying a Mastery of the city matched by few. At 1st level, a Guild Devil gains a pool of favor points equal to his class level + his Intelligence , Wisdom , or Charisma modifier (whichever is highest). In addition to the powers inspired by specific founders (see below), the Guild Devil can spend one favor point to add a bonus equal to half her class level (minimum +1) on a skill check without spending an action. The Guild Devil must use this ability before learning the result of the check, and he can add this additional bonus only once per skill check. The pool of favor is replenished each morning after 8 hours of rest. As the Guild Devil gains levels, he learns to call upon powers inspired by specific founders. The caster level of spell-like abilities used this way is equal to the character's class level. Effects (including spell-like abilities ) that allow a saving throw have a DC equal to 10 + the Guild devil's class level + the Guild devil's Intelligence , Wisdom , or Charisma modifier (whichever is highest)."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 8,
+      "bab": 6,
+      "fort": 3,
+      "ref": 4,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Council'S Secret",
+          "description": ""
+        },
+        {
+          "name": "Founders' Favor (Craftsmanship, Recovery)",
+          "description": "A Guild Devil learns to call upon the founders' spiritual power, enjoying a Mastery of the city matched by few. At 1st level, a Guild Devil gains a pool of favor points equal to his class level + his Intelligence , Wisdom , or Charisma modifier (whichever is highest). In addition to the powers inspired by specific founders (see below), the Guild Devil can spend one favor point to add a bonus equal to half her class level (minimum +1) on a skill check without spending an action. The Guild Devil must use this ability before learning the result of the check, and he can add this additional bonus only once per skill check. The pool of favor is replenished each morning after 8 hours of rest. As the Guild Devil gains levels, he learns to call upon powers inspired by specific founders. The caster level of spell-like abilities used this way is equal to the character's class level. Effects (including spell-like abilities ) that allow a saving throw have a DC equal to 10 + the Guild devil's class level + the Guild devil's Intelligence , Wisdom , or Charisma modifier (whichever is highest)."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 9,
+      "bab": 6,
+      "fort": 3,
+      "ref": 5,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Founders' Favor (Shroud)",
+          "description": "A Guild Devil learns to call upon the founders' spiritual power, enjoying a Mastery of the city matched by few. At 1st level, a Guild Devil gains a pool of favor points equal to his class level + his Intelligence , Wisdom , or Charisma modifier (whichever is highest). In addition to the powers inspired by specific founders (see below), the Guild Devil can spend one favor point to add a bonus equal to half her class level (minimum +1) on a skill check without spending an action. The Guild Devil must use this ability before learning the result of the check, and he can add this additional bonus only once per skill check. The pool of favor is replenished each morning after 8 hours of rest. As the Guild Devil gains levels, he learns to call upon powers inspired by specific founders. The caster level of spell-like abilities used this way is equal to the character's class level. Effects (including spell-like abilities ) that allow a saving throw have a DC equal to 10 + the Guild devil's class level + the Guild devil's Intelligence , Wisdom , or Charisma modifier (whichever is highest)."
+        },
+        {
+          "name": "Sneak Attack +3d6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 10,
+      "bab": 7,
+      "fort": 3,
+      "ref": 5,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Council'S Secret",
+          "description": ""
+        },
+        {
+          "name": "Founders' Favor (Avatar)",
+          "description": "A Guild Devil learns to call upon the founders' spiritual power, enjoying a Mastery of the city matched by few. At 1st level, a Guild Devil gains a pool of favor points equal to his class level + his Intelligence , Wisdom , or Charisma modifier (whichever is highest). In addition to the powers inspired by specific founders (see below), the Guild Devil can spend one favor point to add a bonus equal to half her class level (minimum +1) on a skill check without spending an action. The Guild Devil must use this ability before learning the result of the check, and he can add this additional bonus only once per skill check. The pool of favor is replenished each morning after 8 hours of rest. As the Guild Devil gains levels, he learns to call upon powers inspired by specific founders. The caster level of spell-like abilities used this way is equal to the character's class level. Effects (including spell-like abilities ) that allow a saving throw have a DC equal to 10 + the Guild devil's class level + the Guild devil's Intelligence , Wisdom , or Charisma modifier (whichever is highest)."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": null,
+  "spellcastingClass": false
+}

@@ -1,0 +1,281 @@
+{
+  "name": "Nature Warden",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/apg/nature-warden/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 1,
+      "ref": 0,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Companion Bond",
+          "description": "At 1st level, a nature wardenÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s class levels stack with levels in all classes that grant an animal companion for the purpose of determining her animal companionÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s abilities. The nature warden and her animal companion have an empathic link like that between a wizard and his familiar . At 5th level, the nature wardenÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s animal companion gains the same benefits the warden does when in the wardenÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s favored terrain ."
+        },
+        {
+          "name": "Natural Empathy",
+          "description": "For the purpose of the wild empathy ability, a nature wardenÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s class level stacks with levels in all classes with the wild empathy ability. When in her favored terrain , a nature warden adds her favored terrain bonus to wild empathy checks. She may also choose to use wild empathy to demoralize an animal or magical beast rather than improving its attitude, as if using Intimidate rather than Diplomacy . At 4th level, a nature warden no longer suffers a penalty when using wild empathy to influence or demoralize magical beasts. At 7th level, she may use wild empathy to affect vermin (whether mindless or with Intelligence 1 or 2). At 10th level, she may use it to affect plant creatures (whether mindless or with Intelligence 1 or 2)."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "-"
+      }
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Mystic Harmony",
+          "description": "At 2nd level, a nature warden in her favored terrain gains an insight bonus to AC equal to half her favored terrain bonus. She loses this bonus when she is immobilized or helpless ."
+        },
+        {
+          "name": "Wild Stride",
+          "description": "At 2nd level, a nature warden and her animal companion gain the ability to move through natural hazards of her favored terrain (such as bogs, loose sand, snow, ice, rockslides, and so on) at her normal speed without taking damage or suffering any other impairment (in effect, this is the woodland stride ability applied to non-plant environmental hazards). Terrain hazards that have been magically manipulated to impede motion still affect her."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of divine spellcasting class"
+      }
+    },
+    {
+      "level": 3,
+      "bab": 2,
+      "fort": 2,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Animal Speech",
+          "description": "At 3rd level, a nature warden can speak with animals at will when in her favored terrain . Outside her favored terrain , she can use speak with animals once per day. Her caster level is equal to her class level."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of divine spellcasting class"
+      }
+    },
+    {
+      "level": 4,
+      "bab": 3,
+      "fort": 2,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Silverclaw",
+          "description": "At 4th level, a nature wardenÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s animal companion and any creature she summons with summon natureÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s ally gain DR/silver equal to the wardenÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s class level. In addition, their natural weapons are considered silver for the purpose of overcoming damage reduction ."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of divine spellcasting class"
+      }
+    },
+    {
+      "level": 5,
+      "bab": 3,
+      "fort": 3,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Favored Terrain",
+          "description": "At 5th level and again at 10th level, a nature warden may choose a favored terrain . This ability is identical to and stacks with the ranger class ability."
+        },
+        {
+          "name": "Survivalist",
+          "description": "At 5th level, a nature warden suffers no penalty for using an improvised weapon or improvised tool. At 10th level, a warden can spend 1 minute examining and adjusting an improvised weapon or tool; thereafter she treats it as a masterwork weapon or tool."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "-"
+      }
+    },
+    {
+      "level": 6,
+      "bab": 4,
+      "fort": 3,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Woodforging",
+          "description": "At 6th level, a nature warden can manufacture wooden items which she may use with surpassing skill. Once per day, she may use wood shape as a spell-like ability with a caster level equal to her nature warden level. In her hands, items created with this ability are treated as masterwork items under the effect of an ironwood spell; in the hands of others, they are merely ordinary wooden items of the appropriate type. If the warden uses this ability to create armor or weapons, she may craft them into magic items as if she had the Craft Magic Arms and Armor feat (though they are merely magical wood in the hands of others, and only ironwood when she uses them)."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of divine spellcasting class"
+      }
+    },
+    {
+      "level": 7,
+      "bab": 5,
+      "fort": 4,
+      "ref": 2,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Companion Walk",
+          "description": "At 7th level, the nature wardenÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s companion shares the benefits of travel spells (such as tree stride and transport via plants ) and polymorph and similar spells (including tree shape ) cast by the warden from the druid or ranger spell list. The companion counts either as part of the warden or as an object with no weight, whichever is more favorable for the warden."
+        },
+        {
+          "name": "Plant Speech",
+          "description": "At 7th level, a nature warden can cast speak with plants at will when in her favored terrain . Outside her favored terrain , she can use speak with plants once per day as a spell-like ability . Her caster level is equal to her class level."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of divine spellcasting class"
+      }
+    },
+    {
+      "level": 8,
+      "bab": 6,
+      "fort": 4,
+      "ref": 3,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Ironpaw",
+          "description": "At 8th level, a nature warden may grant her animal companion and any creature she summons with summon natureÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s ally DR/cold iron equal to her class level. In addition, their natural weapons are considered cold iron for the purpose of overcoming damage reduction . This ability does not stack with the silverclaw ability. The warden must decide at the time of summoning whether a summoned creature gains the benefits of silverclaw or ironpaw. She may change which ability applies to her animal companion by spending 1 hour in prayer and meditation with the companion within 100 feet."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of divine spellcasting class"
+      }
+    },
+    {
+      "level": 9,
+      "bab": 6,
+      "fort": 5,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Guarded Lands",
+          "description": "At 9th level, a nature warden may designate an area as her guarded lands, allowing her to treat it as her favored terrain or to enhance her bonuses if it is already in her favored terrain . The area must be no larger than 1 square mile, and the warden must spend 24 hours carefully studying the entire area. This period of study gives her a +2 favored terrain bonus in that area, which stacks with any favored terrain bonus for that area (for example, she also gets her forest favored terrain bonus if her guarded lands are part of a forest). She may also designate one creature type as her favored enemy within those guarded lands, gaining a +2 favored enemy bonus against the creature type that stacks with any favored enemy bonus she has against that type of creature. Allies who can see and hear the warden gain an initiative bonus equal to half the wardenÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s favored terrain bonus for that terrain. A nature warden may have a number of guarded lands equal to her Wisdom bonus (minimum 1). When she reaches her maximum number of guarded lands, she can select a new guarded land by abandoning an existing one and performing the ritual for a new area."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "-"
+      }
+    },
+    {
+      "level": 10,
+      "bab": 7,
+      "fort": 5,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Companion Soul",
+          "description": "At 10th level, a nature wardenÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s bond with her animal companion is so strong that it transcends distance and even death. The companionÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s devotion ability increases to a +8 morale bonus on Will saves against enchantment spells and effects. The warden may scry on her animal companion once per day as if using the scrying spell, except she needs no focus or divine focus. She may view the area around her companion or see through its eyes. If her companion dies, she can revive it with an 8-hour ritual; this has the same effect as raise dead , except it doesnÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢t require a material component and the companion does not gain any negative levels from the ordeal. Section 15: Copyright Notice Advanced Player's Guide . Copyright 2010, Paizo Publishing, LLC; Author: Jason Bulmahn."
+        },
+        {
+          "name": "Favored Terrain",
+          "description": "At 5th level and again at 10th level, a nature warden may choose a favored terrain . This ability is identical to and stacks with the ranger class ability."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of divine spellcasting class"
+      }
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": {
+    "summary": "See level progression spell columns."
+  },
+  "spellcastingClass": true
+}

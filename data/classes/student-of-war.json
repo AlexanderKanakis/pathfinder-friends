@@ -1,0 +1,271 @@
+{
+  "name": "Student of War",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/s-z/student-of-war/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 1,
+      "fort": 0,
+      "ref": 0,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Additional Skill",
+          "description": "At 1st level and every 2 levels thereafter, a student of war gains a new class skill of her choice."
+        },
+        {
+          "name": "Know Your Enemy +1 (Move)",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 2,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Combat Feat",
+          "description": "At 2nd, 5th, and 8th levels, a student of war gains a bonus Combat feat ."
+        },
+        {
+          "name": "Mind Over Metal",
+          "description": "At 2nd level, when a student of war is using armor or a shield, she can use her Intelligence modifier in place of her Dexterity modifier for determining her Armor Class . The armor's normal maximum Dexterity bonus still applies (limiting how much of the character's Intelligence bonus she can apply to her AC)."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 3,
+      "bab": 3,
+      "fort": 1,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Additional Skill",
+          "description": "At 1st level and every 2 levels thereafter, a student of war gains a new class skill of her choice."
+        },
+        {
+          "name": "Anticipate 1/Day",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 4,
+      "bab": 4,
+      "fort": 1,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Know Your Enemy +2",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 5,
+      "bab": 5,
+      "fort": 2,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Additional Skill",
+          "description": "At 1st level and every 2 levels thereafter, a student of war gains a new class skill of her choice."
+        },
+        {
+          "name": "Combat Feat",
+          "description": "At 2nd, 5th, and 8th levels, a student of war gains a bonus Combat feat ."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 6,
+      "bab": 6,
+      "fort": 2,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Anticipate 2/Day",
+          "description": ""
+        },
+        {
+          "name": "Telling Blow",
+          "description": "At 6th level, a student of war can aim her blows at the weakest point in a studied foe's defense, ignoring up to 5 points of damage reduction . This does not apply to damage reduction without a type (such as DR 10/-). This ability cannot be used against creatures that are immune to critical hits or otherwise lack discernible weak points. This ability stacks with the Penetrating Strike feat."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 7,
+      "bab": 7,
+      "fort": 2,
+      "ref": 2,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Additional Skill",
+          "description": "At 1st level and every 2 levels thereafter, a student of war gains a new class skill of her choice."
+        },
+        {
+          "name": "Know Your Enemy +3 (Swift)",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 8,
+      "bab": 8,
+      "fort": 3,
+      "ref": 3,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Combat Feat",
+          "description": "At 2nd, 5th, and 8th levels, a student of war gains a bonus Combat feat ."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 9,
+      "bab": 9,
+      "fort": 3,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Additional Skill",
+          "description": "At 1st level and every 2 levels thereafter, a student of war gains a new class skill of her choice."
+        },
+        {
+          "name": "Anticipate 3/Day",
+          "description": ""
+        },
+        {
+          "name": "Nemesis",
+          "description": "At 9th level, once per day as a swift action , a student of war can focus on a weapon she holds and render it anathema to her studied foe. The weapon gains the bane special ability against the creature for 1 minute or until the student of war uses know your enemy against a different foe."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 10,
+      "bab": 10,
+      "fort": 3,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Deadly Blow",
+          "description": "At 10th level, a student of war can find weak spots where none should exist. A student of war who uses her know your enemy ability and exceeds the Knowledge check DC by 10 or more can ignore the target's natural damage reduction and immunity to critical hits and sneak attacks . This does not apply to immunities granted by spells, environmental effects, or equipment. Section 15: Copyright Notice Pathfinder Roleplaying Game Adventurer's Guide Ãƒâ€šÃ‚Â© 2017, Paizo Inc.; Authors: Benjamin Bruck, John Compton, Crystal Frasier, Tim Hitchcock, Jenny Jarzabski, Isabelle Lee, Joe Pasini, Jessica Price, David Schwartz, and Josh Vogt."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": null,
+  "spellcastingClass": false
+}

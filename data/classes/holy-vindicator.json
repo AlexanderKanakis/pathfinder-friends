@@ -1,0 +1,269 @@
+{
+  "name": "Holy Vindicator",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/apg/holy-vindicator/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 1,
+      "fort": 1,
+      "ref": 0,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Channel Energy",
+          "description": "The vindicatorÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s class level stacks with levels in any other class that grants the channel energy ability."
+        },
+        {
+          "name": "VindicatorÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢S Shield",
+          "description": "A vindicator can channel energy into his shield as a standard action ; when worn, the shield gives the vindicator a sacred bonus (if positive energy) or profane bonus (if negative energy) to his Armor Class equal to the number of dice of the vindicatorÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s channel energy. This bonus lasts for 24 hours or until the vindicator is struck in combat, whichever comes first. The shield does not provide this bonus to any other wielder, but the vindicator does not need to be holding the shield for it to retain this power."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "-"
+      }
+    },
+    {
+      "level": 2,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Stigmata",
+          "description": "A vindicator willingly gives his blood in service to his faith, and is marked by scarified wounds appropriate to his deity. At 2nd level, he may stop or start the flow of blood by force of will as a standard action ; at 6th level it becomes a move action , and at 10th level it becomes a swift action . Activating stigmata causes bleed damage equal to half the vindicatorÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s class level, and this bleed damage is not halted by curative magic. While the stigmata are bleeding, the vindicator gains a sacred bonus (if he channels positive energy) or profane bonus (if he channels negative energy) equal to half his class level. Each time he activates his stigmata, the vindicator decides if the bonus applies to attack rolls, weapon damage rolls, Armor Class , caster level checks, or saving throws ; to change what the bonus applies to, the vindicator must deactivate and reactivate his stigmata. While his stigmata are bleeding, the vindicator ignores blood drain and bleed damage from any other source and can use bleed or stabilize at will as a standard action ."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level to divine spellcasting class"
+      }
+    },
+    {
+      "level": 3,
+      "bab": 3,
+      "fort": 2,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Faith Healing (Empower)",
+          "description": "At 3rd level, any cure wounds spells a vindicator casts on himself are automatically empowered as if by the Empower Spell feat, except they do not use higher spell level slots or an increased casting time . If the vindicator targets himself with a cure spell that affects multiple creatures, this ability only applies to himself. At 8th level, these healing spells are maximized rather than empowered."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level to divine spellcasting class"
+      }
+    },
+    {
+      "level": 4,
+      "bab": 4,
+      "fort": 2,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Divine Wrath",
+          "description": "At 4th level, when a vindicator confirms a critical hit, he may sacrifice a prepared 1st-level spell or available 1st-level spell slot to invoke doom upon the target as an immediate action (using the vindicatorÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s caster level ). The save DC is increased by +2 if his weapon has a ÃƒÆ’Ã¢â‚¬â€3 damage multiplier, or by +4 if it is ÃƒÆ’Ã¢â‚¬â€4. The vindicator can also use this ability in response to being critically hit, even if the attack incapacitates or kills the vindicator."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level to divine spellcasting class"
+      }
+    },
+    {
+      "level": 5,
+      "bab": 5,
+      "fort": 3,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Bloodfire",
+          "description": "At 5th level, while a vindicatorÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s stigmata are bleeding, his blood runs down his weapons like sacred or profane liquid energy; when he uses Channel Smite , the damage increases by 1d6, and if the target fails its save, it is sickened and takes 1d6 points of bleed damage each round on its turn. The target can attempt a new save every round to end the sickened and bleed effects."
+        },
+        {
+          "name": "Channel Smite",
+          "description": "At 5th level, a vindicator gains Channel Smite as a bonus feat."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "-"
+      }
+    },
+    {
+      "level": 6,
+      "bab": 6,
+      "fort": 3,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Versatile Channel",
+          "description": "At 6th level, a vindicatorÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s channel energy can instead affect a 30-foot cone or a 120-foot line."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level to divine spellcasting class"
+      }
+    },
+    {
+      "level": 7,
+      "bab": 7,
+      "fort": 4,
+      "ref": 2,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Divine Judgment",
+          "description": "At 7th level, when a vindicatorÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s melee attack reduces a creature to -1 or fewer hit points , he may sacrifice a prepared 2nd-level spell or available 2ndlevel spell slot to invoke death knell upon the target as an immediate action (using the vindicatorÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s caster level ). As vindicators mete out divine judgment, this is not an evil act. The save DC increases by +2 if his weapon has a ÃƒÆ’Ã¢â‚¬â€3 critical multiplier, or by +4 if it is ÃƒÆ’Ã¢â‚¬â€4."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level to divine spellcasting class"
+      }
+    },
+    {
+      "level": 8,
+      "bab": 8,
+      "fort": 4,
+      "ref": 3,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Faith Healing (Maximize)",
+          "description": "At 3rd level, any cure wounds spells a vindicator casts on himself are automatically empowered as if by the Empower Spell feat, except they do not use higher spell level slots or an increased casting time . If the vindicator targets himself with a cure spell that affects multiple creatures, this ability only applies to himself. At 8th level, these healing spells are maximized rather than empowered."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level to divine spellcasting class"
+      }
+    },
+    {
+      "level": 9,
+      "bab": 9,
+      "fort": 5,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Bloodrain",
+          "description": "At 9th level, while his stigmata are bleeding, the vindicatorÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s harmful channeled energy is accompanied by a burst of sacred or profane liquid energy, increasing the damage by 1d6. Creatures failing their saves against the channeled energy become sickened and take 1d6 points of bleed damage each round. Affected creatures can attempt a new save every round to end the sickened and bleed effects."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "-"
+      }
+    },
+    {
+      "level": 10,
+      "bab": 10,
+      "fort": 5,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Divine Retribution",
+          "description": "At 10th level, when a vindicator confirms a critical hit, he may sacrifice a prepared 3rd level spell or available 3rd-level spell slot to invoke bestow curse upon the target as an immediate action (using the vindicatorÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s caster level ). The save DC increases by +2 if his weapon has a ÃƒÆ’Ã¢â‚¬â€3 critical multiplier, or by +4 if it is ÃƒÆ’Ã¢â‚¬â€4. The vindicator can also use this ability in response to being critically hit, even if the attack incapacitates or kills the vindicator. Section 15: Copyright Notice Advanced Player's Guide . Copyright 2010, Paizo Publishing, LLC; Author: Jason Bulmahn."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level to divine spellcasting class"
+      }
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": {
+    "summary": "See level progression spell columns."
+  },
+  "spellcastingClass": true
+}

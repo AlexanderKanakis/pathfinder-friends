@@ -1,0 +1,255 @@
+{
+  "name": "Champion of the Enlightened",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/c-d/champion-of-the-enlightened/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Detect Chaos",
+          "description": "This ability functions like a paladin's detect evil ability, but detects chaos instead of evil."
+        },
+        {
+          "name": "Martial Artist",
+          "description": "The class levels of a champion of the enlightened stack with monk levels for determining the effect of his AC bonus, flurry of blows , stunning fist , and unarmed strike class features."
+        },
+        {
+          "name": "Smite Chaos",
+          "description": "At 1st level, a champion of the enlightened gains an additional use of his paladin's smite evil ability. In addition, he can choose to use his smite evil ability to smite chaos instead, affecting chaotic-aligned creatures and dealing 2 points of damage per class level on the first successful attack against outsiders with the chaotic subtype, chaotic-aligned aberrations , and fey . Levels in this class stack with paladin levels for the purpose of determining how much damage a paladin of the enlightened deals to targets of his smite . A champion of the enlightened cannot have both a smite evil and smite chaos effect active at the same time; using one while the other is active immediately ends the older effect. At 8th level, a champion of the enlightened gains an additional use of his smite evil ability."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 2,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Ki Pool",
+          "description": "At 2nd level, a champion of the enlightened gains a ki pool equal to 1/2 his class level + his Wisdom modifier; this functions like the monk ability of the same name, and levels in this class stack with levels in other classes that grant a ki pool . In addition to the normal uses of this ki pool , a champion of the enlightened may expend 2 ki points to trigger either his lay on hands ability (if he has it) or his smite evil ability. His class levels stack with paladin levels when determining the effect of such abilities."
+        },
+        {
+          "name": "Pursuit Of Knowledge",
+          "description": "At 2nd level, a champion of the enlightened adds 1/2 his class level on all Knowledge checks and can make Knowledge skill checks untrained."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 3,
+      "bab": 3,
+      "fort": 2,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Sweeping Smite (One Target)",
+          "description": "At 3rd level, as a standard action , a champion of the enlightened can make a single unarmed strike while using his smite evil or smite chaos ability. If the attack hits, he can make another attack at the same bonus against an evil or chaotic creature adjacent to the first and also within reach. He gains the benefits of smite chaos or smite evil (whichever he was already using), except for additional damage for the first attack, against that creature until the beginning of his next turn. This does not require an additional daily use of smite evil or smite chaos. At 6th level, a champion of the enlightened can use this ability to attack any number of opponents, as long as each is within his threatened area and adjacent to the previous target. This ability functions similarly to the Cleave and Great Cleave feats, but does not stack with them and does not result in an AC penalty."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 4,
+      "bab": 4,
+      "fort": 2,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Valiant Stand",
+          "description": "At 4th level, a champion of the enlightened gains a sacred bonus on attack rolls and to AC equal to 1/2 his class level when adjacent to more than one opponent. He does not gain this bonus if he is also adjacent to an ally."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 5,
+      "bab": 5,
+      "fort": 3,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Shield The Weak",
+          "description": "At 5th level, as an immediate action once per round, a champion of the enlightened can shield a number of adjacent allies equal to his Wisdom modifier from a burst, cone, line, or spread effect that allows a Reflex saving throw and which he and his allies are all affected by. The champion of the enlightened must forgo his own saving throw, but adjacent allies gain improved cover against the effect, providing a +4 bonus on Reflex saves and improved evasion against the effect."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 6,
+      "bab": 6,
+      "fort": 3,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Skill Mastery",
+          "description": "At 6th level, a champion of the enlightened becomes well practiced in a certain number of his skills. This ability functions exactly like the skill mastery advanced rogue talent ."
+        },
+        {
+          "name": "Sweeping Smite (Multiple Targets)",
+          "description": "At 3rd level, as a standard action , a champion of the enlightened can make a single unarmed strike while using his smite evil or smite chaos ability. If the attack hits, he can make another attack at the same bonus against an evil or chaotic creature adjacent to the first and also within reach. He gains the benefits of smite chaos or smite evil (whichever he was already using), except for additional damage for the first attack, against that creature until the beginning of his next turn. This does not require an additional daily use of smite evil or smite chaos. At 6th level, a champion of the enlightened can use this ability to attack any number of opponents, as long as each is within his threatened area and adjacent to the previous target. This ability functions similarly to the Cleave and Great Cleave feats, but does not stack with them and does not result in an AC penalty."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 7,
+      "bab": 7,
+      "fort": 4,
+      "ref": 4,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Perfect Opening",
+          "description": "At 7th level, once per round a champion of the enlightened can make an attack of opportunity against an enemy he threatens when that enemy confirms a critical hit against the champion or an ally. The champion of the enlightened can make this attack of opportunity even if he would be killed or incapacitated by the critical hit , resolving the attack after the critical hit deals damage but before he falls unconscious or dies. If the champion of the enlightened's attack of opportunity hits, it is automatically a critical threat."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 8,
+      "bab": 8,
+      "fort": 4,
+      "ref": 4,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "One Finger",
+          "description": "At 8th level, as a standard action , a champion of the enlightened can resolve a single unarmed attack as a melee touch attack ."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 9,
+      "bab": 9,
+      "fort": 5,
+      "ref": 5,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Perfect Strike",
+          "description": "At 9th level, a champion of the enlightened can expend 1 point from his ki pool as a swift action to perfect the next unarmed attack he makes before the end of his turn. Attack and damage rolls are rolled twice and the champion of the enlightened selects which result to use."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 10,
+      "bab": 10,
+      "fort": 5,
+      "ref": 5,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Whirlwind Smite",
+          "description": "At 10th level, as a full-round action , a champion of the enlightened can make one unarmed strike against every creature he threatens, as if he possessed the Whirlwind Attack feat (though he can use it only with unarmed strikes). He can also trigger either his smite evil or smite chaos ability while doing so, gaining its benefits against every creature he attacks for a number of rounds equal to his Wisdom bonus."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": null,
+  "spellcastingClass": false
+}

@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 
 const ROOT = path.resolve(__dirname, "..");
-const OUT = path.join(ROOT, "mundane-items.json");
+const OUT = path.join(ROOT, "data", "mundane-items.json");
 
 const SOURCES = [
   {

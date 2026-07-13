@@ -1,0 +1,709 @@
+{
+  "name": "Bard",
+  "type": "core",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/core-classes/bard/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 0,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Bardic Knowledge",
+          "description": "A bard adds half his class level (minimum 1) to all Knowledge skill checks and may make all Knowledge skill checks untrained."
+        },
+        {
+          "name": "Bardic Performance",
+          "description": "A bard is trained to use the Perform skill to create magical effects on those around him, including himself if desired. He can use this ability for a number of rounds per day equal to 4 + his Charisma modifier. At each level after 1st a bard can use bardic performance for 2 additional rounds per day. Each round, the bard can produce any one of the types of bardic performance that he has mastered, as indicated by his level. Starting a bardic performance is a standard action , but it can be maintained each round as a free action . Changing a bardic performance from one effect to another requires the bard to stop the previous performance and start a new one as a standard action . A bardic performance cannot be disrupted, but it ends immediately if the bard is killed, paralyzed , stunned , knocked unconscious , or otherwise prevented from taking a free action to maintain it each round. A bard cannot have more than one bardic performance in effect at one time. At 7th level, a bard can start a bardic performance as a move action instead of a standard action . At 13th level, a bard can start a bardic performance as a swift action . Each bardic performance has audible components , visual components , or both. If a bardic performance has audible components, the targets must be able to hear the bard for the performance to have any effect, and many such performances are language dependent (as noted in the description). A deaf bard has a 20% chance to fail when attempting to use a bardic performance with an audible component. If he fails this check, the attempt still counts against his"
+        },
+        {
+          "name": "Cantrips",
+          "description": "Bard's learn a number of cantrips, or 0-level spells, as noted on Table: Bard Spells Known under &#8220;Spells Known.&#8221; These spells are cast like any other spell, but they do not consume any slots and may be used again."
+        },
+        {
+          "name": "Countersong",
+          "description": ""
+        },
+        {
+          "name": "Distraction",
+          "description": ""
+        },
+        {
+          "name": "Fascinate",
+          "description": ""
+        },
+        {
+          "name": "Inspire Courage +1",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 0,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Versatile Performance",
+          "description": "At 2nd level, a bard can choose one type of Perform skill. He can use his bonus in that skill in place of his bonus in associated skills. When substituting in this way, the bard uses his total Perform skill bonus, including class skill bonus, in place of its associated skill's bonus, whether or not he has ranks in that skill or if it is a class skill. At 6th level, and every 4 levels thereafter, the bard can select an additional type of Perform to substitute. The types of Perform and their associated skills are: Act ( Bluff , Disguise ), Comedy ( Bluff , Intimidate ), Dance ( Acrobatics , Fly ), Keyboard Instruments ( Diplomacy , Intimidate ), Oratory ( Diplomacy , Sense Motive ), Percussion ( Handle Animal , Intimidate ), Sing ( Bluff , Sense Motive ), String ( Bluff , Diplomacy ), and Wind ( Diplomacy , Handle Animal )."
+        },
+        {
+          "name": "Well-Versed",
+          "description": "At 2nd level, the bard becomes resistant to the bardic performance of others, and to sonic effects in general. The bard gains a +4 bonus on saving throws made against bardic performance, sonic, and language-dependent effects."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 3,
+      "bab": 2,
+      "fort": 1,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Inspire Competence +2",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 4,
+      "bab": 3,
+      "fort": 1,
+      "ref": 4,
+      "will": 4,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 5,
+      "bab": 3,
+      "fort": 1,
+      "ref": 4,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Inspire Courage +2",
+          "description": ""
+        },
+        {
+          "name": "Lore Master 1/Day",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 6,
+      "bab": 4,
+      "fort": 2,
+      "ref": 5,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Suggestion",
+          "description": ""
+        },
+        {
+          "name": "Versatile Performance",
+          "description": "At 2nd level, a bard can choose one type of Perform skill. He can use his bonus in that skill in place of his bonus in associated skills. When substituting in this way, the bard uses his total Perform skill bonus, including class skill bonus, in place of its associated skill's bonus, whether or not he has ranks in that skill or if it is a class skill. At 6th level, and every 4 levels thereafter, the bard can select an additional type of Perform to substitute. The types of Perform and their associated skills are: Act ( Bluff , Disguise ), Comedy ( Bluff , Intimidate ), Dance ( Acrobatics , Fly ), Keyboard Instruments ( Diplomacy , Intimidate ), Oratory ( Diplomacy , Sense Motive ), Percussion ( Handle Animal , Intimidate ), Sing ( Bluff , Sense Motive ), String ( Bluff , Diplomacy ), and Wind ( Diplomacy , Handle Animal )."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 7,
+      "bab": 5,
+      "fort": 2,
+      "ref": 5,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Inspire Competence +3",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 8,
+      "bab": 6,
+      "fort": 2,
+      "ref": 6,
+      "will": 6,
+      "classFeatures": [
+        {
+          "name": "Dirge Of Doom",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 9,
+      "bab": 6,
+      "fort": 3,
+      "ref": 6,
+      "will": 6,
+      "classFeatures": [
+        {
+          "name": "Inspire Greatness",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 10,
+      "bab": 7,
+      "fort": 3,
+      "ref": 7,
+      "will": 7,
+      "classFeatures": [
+        {
+          "name": "Jack-Of-All-Trades",
+          "description": "At 10th level, the bard can use any skill, even if the skill normally requires him to be trained. At 16th level, the bard considers all skills to be class skills. At 19th level, the bard can take 10 on any skill check, even if it is not normally allowed."
+        },
+        {
+          "name": "Versatile Performance",
+          "description": "At 2nd level, a bard can choose one type of Perform skill. He can use his bonus in that skill in place of his bonus in associated skills. When substituting in this way, the bard uses his total Perform skill bonus, including class skill bonus, in place of its associated skill's bonus, whether or not he has ranks in that skill or if it is a class skill. At 6th level, and every 4 levels thereafter, the bard can select an additional type of Perform to substitute. The types of Perform and their associated skills are: Act ( Bluff , Disguise ), Comedy ( Bluff , Intimidate ), Dance ( Acrobatics , Fly ), Keyboard Instruments ( Diplomacy , Intimidate ), Oratory ( Diplomacy , Sense Motive ), Percussion ( Handle Animal , Intimidate ), Sing ( Bluff , Sense Motive ), String ( Bluff , Diplomacy ), and Wind ( Diplomacy , Handle Animal )."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 11,
+      "bab": 8,
+      "fort": 3,
+      "ref": 7,
+      "will": 7,
+      "classFeatures": [
+        {
+          "name": "Inspire Competence +4",
+          "description": ""
+        },
+        {
+          "name": "Inspire Courage +3",
+          "description": ""
+        },
+        {
+          "name": "Lore Master 2/Day",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 9,
+      "fort": 4,
+      "ref": 8,
+      "will": 8,
+      "classFeatures": [
+        {
+          "name": "Soothing Performance",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 9,
+      "fort": 4,
+      "ref": 8,
+      "will": 8,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 10,
+      "fort": 4,
+      "ref": 9,
+      "will": 9,
+      "classFeatures": [
+        {
+          "name": "Frightening Tune",
+          "description": ""
+        },
+        {
+          "name": "Versatile Performance",
+          "description": "At 2nd level, a bard can choose one type of Perform skill. He can use his bonus in that skill in place of his bonus in associated skills. When substituting in this way, the bard uses his total Perform skill bonus, including class skill bonus, in place of its associated skill's bonus, whether or not he has ranks in that skill or if it is a class skill. At 6th level, and every 4 levels thereafter, the bard can select an additional type of Perform to substitute. The types of Perform and their associated skills are: Act ( Bluff , Disguise ), Comedy ( Bluff , Intimidate ), Dance ( Acrobatics , Fly ), Keyboard Instruments ( Diplomacy , Intimidate ), Oratory ( Diplomacy , Sense Motive ), Percussion ( Handle Animal , Intimidate ), Sing ( Bluff , Sense Motive ), String ( Bluff , Diplomacy ), and Wind ( Diplomacy , Handle Animal )."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 11,
+      "fort": 5,
+      "ref": 9,
+      "will": 9,
+      "classFeatures": [
+        {
+          "name": "Inspire Competence +5",
+          "description": ""
+        },
+        {
+          "name": "Inspire Heroics",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 12,
+      "fort": 5,
+      "ref": 10,
+      "will": 10,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 12,
+      "fort": 5,
+      "ref": 10,
+      "will": 10,
+      "classFeatures": [
+        {
+          "name": "Inspire Courage +4",
+          "description": ""
+        },
+        {
+          "name": "Lore Master 3/Day",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 13,
+      "fort": 6,
+      "ref": 11,
+      "will": 11,
+      "classFeatures": [
+        {
+          "name": "Mass Suggestion",
+          "description": ""
+        },
+        {
+          "name": "Versatile Performance",
+          "description": "At 2nd level, a bard can choose one type of Perform skill. He can use his bonus in that skill in place of his bonus in associated skills. When substituting in this way, the bard uses his total Perform skill bonus, including class skill bonus, in place of its associated skill's bonus, whether or not he has ranks in that skill or if it is a class skill. At 6th level, and every 4 levels thereafter, the bard can select an additional type of Perform to substitute. The types of Perform and their associated skills are: Act ( Bluff , Disguise ), Comedy ( Bluff , Intimidate ), Dance ( Acrobatics , Fly ), Keyboard Instruments ( Diplomacy , Intimidate ), Oratory ( Diplomacy , Sense Motive ), Percussion ( Handle Animal , Intimidate ), Sing ( Bluff , Sense Motive ), String ( Bluff , Diplomacy ), and Wind ( Diplomacy , Handle Animal )."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 14,
+      "fort": 6,
+      "ref": 11,
+      "will": 11,
+      "classFeatures": [
+        {
+          "name": "Inspire Competence +6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 15,
+      "fort": 6,
+      "ref": 12,
+      "will": 12,
+      "classFeatures": [
+        {
+          "name": "Deadly Performance",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": {
+    "summary": "spontaneous 2/3 caster using CHA",
+    "castingType": "spontaneous",
+    "progression": "2/3",
+    "ability": "cha",
+    "preparation": "spontaneous",
+    "maxSpellLevel": 6,
+    "slotsByLevel": [
+      [
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        3,
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        4,
+        2,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        4,
+        3,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        4,
+        3,
+        1,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        4,
+        4,
+        2,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        5,
+        4,
+        3,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        5,
+        4,
+        3,
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        5,
+        4,
+        4,
+        2,
+        0,
+        0
+      ],
+      [
+        0,
+        5,
+        5,
+        4,
+        3,
+        0,
+        0
+      ],
+      [
+        0,
+        5,
+        5,
+        4,
+        3,
+        1,
+        0
+      ],
+      [
+        0,
+        5,
+        5,
+        4,
+        4,
+        2,
+        0
+      ],
+      [
+        0,
+        5,
+        5,
+        5,
+        4,
+        3,
+        0
+      ],
+      [
+        0,
+        5,
+        5,
+        5,
+        4,
+        3,
+        1
+      ],
+      [
+        0,
+        5,
+        5,
+        5,
+        4,
+        4,
+        2
+      ],
+      [
+        0,
+        5,
+        5,
+        5,
+        5,
+        4,
+        3
+      ],
+      [
+        0,
+        5,
+        5,
+        5,
+        5,
+        5,
+        4
+      ],
+      [
+        0,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5
+      ]
+    ],
+    "knownByLevel": [
+      [
+        4,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        5,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        6,
+        4,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        6,
+        4,
+        2,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        6,
+        4,
+        3,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        6,
+        4,
+        4,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        6,
+        5,
+        4,
+        2,
+        0,
+        0,
+        0
+      ],
+      [
+        6,
+        5,
+        4,
+        3,
+        0,
+        0,
+        0
+      ],
+      [
+        6,
+        5,
+        4,
+        4,
+        0,
+        0,
+        0
+      ],
+      [
+        6,
+        5,
+        5,
+        4,
+        2,
+        0,
+        0
+      ],
+      [
+        6,
+        6,
+        5,
+        4,
+        3,
+        0,
+        0
+      ],
+      [
+        6,
+        6,
+        5,
+        4,
+        4,
+        0,
+        0
+      ],
+      [
+        6,
+        6,
+        5,
+        5,
+        4,
+        2,
+        0
+      ],
+      [
+        6,
+        6,
+        6,
+        5,
+        4,
+        3,
+        0
+      ],
+      [
+        6,
+        6,
+        6,
+        5,
+        4,
+        4,
+        0
+      ],
+      [
+        6,
+        6,
+        6,
+        5,
+        5,
+        4,
+        2
+      ],
+      [
+        6,
+        6,
+        6,
+        6,
+        5,
+        4,
+        3
+      ],
+      [
+        6,
+        6,
+        6,
+        6,
+        5,
+        4,
+        4
+      ],
+      [
+        6,
+        6,
+        6,
+        6,
+        5,
+        5,
+        4
+      ],
+      [
+        6,
+        6,
+        6,
+        6,
+        6,
+        5,
+        5
+      ]
+    ]
+  },
+  "spellcastingClass": true
+}

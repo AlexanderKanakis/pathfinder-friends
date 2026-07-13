@@ -1,0 +1,259 @@
+{
+  "name": "Horizon Walker",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/apg/horizon-walker/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 1,
+      "fort": 1,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [
+        {
+          "name": "Favored Terrain",
+          "description": "At 1st level, a horizon walker may select a favored terrain from the ranger favored terrains table. This works exactly like the ranger favored terrain ability. The horizon walker gains an additional favored terrain at 2nd, 4th, 5th, 7th, 8th and 10th level, and he can increase the bonus from an existing favored terrain as described in the ranger ability. If the horizon walker has abilities from other classes that only work in a favored terrain (such as a ranger's camouflage and hide in plain sight abilities), those abilities work in favored terrains selected as a horizon walker."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 2,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Favored Terrain",
+          "description": "At 1st level, a horizon walker may select a favored terrain from the ranger favored terrains table. This works exactly like the ranger favored terrain ability. The horizon walker gains an additional favored terrain at 2nd, 4th, 5th, 7th, 8th and 10th level, and he can increase the bonus from an existing favored terrain as described in the ranger ability. If the horizon walker has abilities from other classes that only work in a favored terrain (such as a ranger's camouflage and hide in plain sight abilities), those abilities work in favored terrains selected as a horizon walker."
+        },
+        {
+          "name": "Terrain Mastery",
+          "description": "At 2nd level, a horizon walker selects a favored terrain to master. When within this terrain the horizon walker may, as a move action , grant a +2 bonus on Climb , Stealth , Perception and Survival checks made by all allies within 30 feet who can see and hear him. This bonus lasts for a number of rounds equal to the horizon walkerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Wisdom modifier (minimum 1). The character masters one additional terrain at 4th, 6th, and 8th levels. Mastery of each terrain has additional benefits, outlined below; these benefits apply to the horizon walker at all times whether or not he is in the relevant terrain. Astral Plane : The horizon walkerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s fly speed increases by +30 feet on planes with no gravity or subjective gravity. Cold : The horizon walker gains cold resistance 10. Desert : The horizon walker gains immunity to exhaustion ; anything that would cause him to become exhausted makes him fatigued instead. Ethereal Plane : The horizon walker ignores the 20% concealment miss chance from fog and mist, and treats total concealment from these sources as concealment . Forest : The horizon walker gains a +4 competence bonus on Stealth checks. Jungle : The horizon walker gains a +4 competence bonus on Escape Artist checks and increases his CMD against grapple maneuvers by +4. Mountain : The horizon walker gains a +4 competence bonus on Climb checks and does not lose his Dexterity modifier to AC while climbing. Plains : The horizon walkerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s movement is not reduced by wearing medium armor or carrying a medium load. Plane of Air : The horizon walker gains a +4 competence bonus on Fly checks a"
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 3,
+      "bab": 3,
+      "fort": 2,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Terrain Dominance",
+          "description": "At 3rd level, a horizon walker learns total dominance over one terrain he has already selected for terrain mastery. When dealing with creatures native to that terrain, the horizon walker treats his favored terrain bonus for that terrain as a favored enemy bonus (as the ranger class feature) against those creatures. This bonus overlaps (does not stack with) bonuses gained when fighting a favored enemy . Each terrain dominance grants additional abilities, detailed below. When the horizon walker gains a new terrain dominance he may, if he prefers, instead pick an additional terrain mastery. Astral Plane : The horizon walker gains a +1 competence bonus on attack and damage rolls against outsiders . He gains dimension door as a spell-like ability a number of times per day equal to 3 + the characterÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Wisdom modifier ( caster level equal to the characterÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s level). Cold : The horizon walker gains cold resistance 20 (this replaces the characterÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s cold resistance from mastery of the cold terrain) and a +1 competence bonus on all attack and damage rolls against creatures of the cold subtype. Desert : The horizon walker gains fire resistance 10 and immunity to fatigue . Ethereal Plane : The walker gains ethereal jaunt as a spell-like ability once per day ( caster level equal to the characterÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s level). He must be at least 7th level before selecting this power. Forest : The horizon walker gains hallucinatory terrain as a spell-like ability a number of times per day equal to 3 + the characterÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Wisdom modifier ( caster level equal to the characterÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s level). The horizon walker can only us"
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 4,
+      "bab": 4,
+      "fort": 2,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Favored Terrain",
+          "description": "At 1st level, a horizon walker may select a favored terrain from the ranger favored terrains table. This works exactly like the ranger favored terrain ability. The horizon walker gains an additional favored terrain at 2nd, 4th, 5th, 7th, 8th and 10th level, and he can increase the bonus from an existing favored terrain as described in the ranger ability. If the horizon walker has abilities from other classes that only work in a favored terrain (such as a ranger's camouflage and hide in plain sight abilities), those abilities work in favored terrains selected as a horizon walker."
+        },
+        {
+          "name": "Terrain Mastery",
+          "description": "At 2nd level, a horizon walker selects a favored terrain to master. When within this terrain the horizon walker may, as a move action , grant a +2 bonus on Climb , Stealth , Perception and Survival checks made by all allies within 30 feet who can see and hear him. This bonus lasts for a number of rounds equal to the horizon walkerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Wisdom modifier (minimum 1). The character masters one additional terrain at 4th, 6th, and 8th levels. Mastery of each terrain has additional benefits, outlined below; these benefits apply to the horizon walker at all times whether or not he is in the relevant terrain. Astral Plane : The horizon walkerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s fly speed increases by +30 feet on planes with no gravity or subjective gravity. Cold : The horizon walker gains cold resistance 10. Desert : The horizon walker gains immunity to exhaustion ; anything that would cause him to become exhausted makes him fatigued instead. Ethereal Plane : The horizon walker ignores the 20% concealment miss chance from fog and mist, and treats total concealment from these sources as concealment . Forest : The horizon walker gains a +4 competence bonus on Stealth checks. Jungle : The horizon walker gains a +4 competence bonus on Escape Artist checks and increases his CMD against grapple maneuvers by +4. Mountain : The horizon walker gains a +4 competence bonus on Climb checks and does not lose his Dexterity modifier to AC while climbing. Plains : The horizon walkerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s movement is not reduced by wearing medium armor or carrying a medium load. Plane of Air : The horizon walker gains a +4 competence bonus on Fly checks a"
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 5,
+      "bab": 5,
+      "fort": 3,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Favored Terrain",
+          "description": "At 1st level, a horizon walker may select a favored terrain from the ranger favored terrains table. This works exactly like the ranger favored terrain ability. The horizon walker gains an additional favored terrain at 2nd, 4th, 5th, 7th, 8th and 10th level, and he can increase the bonus from an existing favored terrain as described in the ranger ability. If the horizon walker has abilities from other classes that only work in a favored terrain (such as a ranger's camouflage and hide in plain sight abilities), those abilities work in favored terrains selected as a horizon walker."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 6,
+      "bab": 6,
+      "fort": 3,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Terrain Dominance",
+          "description": "At 3rd level, a horizon walker learns total dominance over one terrain he has already selected for terrain mastery. When dealing with creatures native to that terrain, the horizon walker treats his favored terrain bonus for that terrain as a favored enemy bonus (as the ranger class feature) against those creatures. This bonus overlaps (does not stack with) bonuses gained when fighting a favored enemy . Each terrain dominance grants additional abilities, detailed below. When the horizon walker gains a new terrain dominance he may, if he prefers, instead pick an additional terrain mastery. Astral Plane : The horizon walker gains a +1 competence bonus on attack and damage rolls against outsiders . He gains dimension door as a spell-like ability a number of times per day equal to 3 + the characterÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Wisdom modifier ( caster level equal to the characterÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s level). Cold : The horizon walker gains cold resistance 20 (this replaces the characterÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s cold resistance from mastery of the cold terrain) and a +1 competence bonus on all attack and damage rolls against creatures of the cold subtype. Desert : The horizon walker gains fire resistance 10 and immunity to fatigue . Ethereal Plane : The walker gains ethereal jaunt as a spell-like ability once per day ( caster level equal to the characterÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s level). He must be at least 7th level before selecting this power. Forest : The horizon walker gains hallucinatory terrain as a spell-like ability a number of times per day equal to 3 + the characterÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Wisdom modifier ( caster level equal to the characterÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s level). The horizon walker can only us"
+        },
+        {
+          "name": "Terrain Mastery",
+          "description": "At 2nd level, a horizon walker selects a favored terrain to master. When within this terrain the horizon walker may, as a move action , grant a +2 bonus on Climb , Stealth , Perception and Survival checks made by all allies within 30 feet who can see and hear him. This bonus lasts for a number of rounds equal to the horizon walkerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Wisdom modifier (minimum 1). The character masters one additional terrain at 4th, 6th, and 8th levels. Mastery of each terrain has additional benefits, outlined below; these benefits apply to the horizon walker at all times whether or not he is in the relevant terrain. Astral Plane : The horizon walkerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s fly speed increases by +30 feet on planes with no gravity or subjective gravity. Cold : The horizon walker gains cold resistance 10. Desert : The horizon walker gains immunity to exhaustion ; anything that would cause him to become exhausted makes him fatigued instead. Ethereal Plane : The horizon walker ignores the 20% concealment miss chance from fog and mist, and treats total concealment from these sources as concealment . Forest : The horizon walker gains a +4 competence bonus on Stealth checks. Jungle : The horizon walker gains a +4 competence bonus on Escape Artist checks and increases his CMD against grapple maneuvers by +4. Mountain : The horizon walker gains a +4 competence bonus on Climb checks and does not lose his Dexterity modifier to AC while climbing. Plains : The horizon walkerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s movement is not reduced by wearing medium armor or carrying a medium load. Plane of Air : The horizon walker gains a +4 competence bonus on Fly checks a"
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 7,
+      "bab": 7,
+      "fort": 4,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Favored Terrain",
+          "description": "At 1st level, a horizon walker may select a favored terrain from the ranger favored terrains table. This works exactly like the ranger favored terrain ability. The horizon walker gains an additional favored terrain at 2nd, 4th, 5th, 7th, 8th and 10th level, and he can increase the bonus from an existing favored terrain as described in the ranger ability. If the horizon walker has abilities from other classes that only work in a favored terrain (such as a ranger's camouflage and hide in plain sight abilities), those abilities work in favored terrains selected as a horizon walker."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 8,
+      "bab": 8,
+      "fort": 4,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Favored Terrain",
+          "description": "At 1st level, a horizon walker may select a favored terrain from the ranger favored terrains table. This works exactly like the ranger favored terrain ability. The horizon walker gains an additional favored terrain at 2nd, 4th, 5th, 7th, 8th and 10th level, and he can increase the bonus from an existing favored terrain as described in the ranger ability. If the horizon walker has abilities from other classes that only work in a favored terrain (such as a ranger's camouflage and hide in plain sight abilities), those abilities work in favored terrains selected as a horizon walker."
+        },
+        {
+          "name": "Terrain Mastery",
+          "description": "At 2nd level, a horizon walker selects a favored terrain to master. When within this terrain the horizon walker may, as a move action , grant a +2 bonus on Climb , Stealth , Perception and Survival checks made by all allies within 30 feet who can see and hear him. This bonus lasts for a number of rounds equal to the horizon walkerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Wisdom modifier (minimum 1). The character masters one additional terrain at 4th, 6th, and 8th levels. Mastery of each terrain has additional benefits, outlined below; these benefits apply to the horizon walker at all times whether or not he is in the relevant terrain. Astral Plane : The horizon walkerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s fly speed increases by +30 feet on planes with no gravity or subjective gravity. Cold : The horizon walker gains cold resistance 10. Desert : The horizon walker gains immunity to exhaustion ; anything that would cause him to become exhausted makes him fatigued instead. Ethereal Plane : The horizon walker ignores the 20% concealment miss chance from fog and mist, and treats total concealment from these sources as concealment . Forest : The horizon walker gains a +4 competence bonus on Stealth checks. Jungle : The horizon walker gains a +4 competence bonus on Escape Artist checks and increases his CMD against grapple maneuvers by +4. Mountain : The horizon walker gains a +4 competence bonus on Climb checks and does not lose his Dexterity modifier to AC while climbing. Plains : The horizon walkerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s movement is not reduced by wearing medium armor or carrying a medium load. Plane of Air : The horizon walker gains a +4 competence bonus on Fly checks a"
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 9,
+      "bab": 9,
+      "fort": 5,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Terrain Dominance",
+          "description": "At 3rd level, a horizon walker learns total dominance over one terrain he has already selected for terrain mastery. When dealing with creatures native to that terrain, the horizon walker treats his favored terrain bonus for that terrain as a favored enemy bonus (as the ranger class feature) against those creatures. This bonus overlaps (does not stack with) bonuses gained when fighting a favored enemy . Each terrain dominance grants additional abilities, detailed below. When the horizon walker gains a new terrain dominance he may, if he prefers, instead pick an additional terrain mastery. Astral Plane : The horizon walker gains a +1 competence bonus on attack and damage rolls against outsiders . He gains dimension door as a spell-like ability a number of times per day equal to 3 + the characterÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Wisdom modifier ( caster level equal to the characterÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s level). Cold : The horizon walker gains cold resistance 20 (this replaces the characterÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s cold resistance from mastery of the cold terrain) and a +1 competence bonus on all attack and damage rolls against creatures of the cold subtype. Desert : The horizon walker gains fire resistance 10 and immunity to fatigue . Ethereal Plane : The walker gains ethereal jaunt as a spell-like ability once per day ( caster level equal to the characterÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s level). He must be at least 7th level before selecting this power. Forest : The horizon walker gains hallucinatory terrain as a spell-like ability a number of times per day equal to 3 + the characterÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Wisdom modifier ( caster level equal to the characterÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s level). The horizon walker can only us"
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 10,
+      "bab": 10,
+      "fort": 5,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Favored Terrain",
+          "description": "At 1st level, a horizon walker may select a favored terrain from the ranger favored terrains table. This works exactly like the ranger favored terrain ability. The horizon walker gains an additional favored terrain at 2nd, 4th, 5th, 7th, 8th and 10th level, and he can increase the bonus from an existing favored terrain as described in the ranger ability. If the horizon walker has abilities from other classes that only work in a favored terrain (such as a ranger's camouflage and hide in plain sight abilities), those abilities work in favored terrains selected as a horizon walker."
+        },
+        {
+          "name": "Master Of All Lands",
+          "description": "At 10th level, the horizon walker becomes familiar with and comfortable in all possible terrains. His terrain bonus in all favored terrains increases by +2, and he treats all other terrains as if they were favored terrains (+2 bonus). If a naturally occurring condition of temperature or weather requires a check or saving throw , he automatically succeeds. All allies within 60 feet of him gain a +2 bonus on these checks and saves; if the horizon walker is in a mastered terrain, this bonus increases to +4. Section 15: Copyright Notice Advanced Player's Guide . Copyright 2010, Paizo Publishing, LLC; Author: Jason Bulmahn."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": null,
+  "spellcastingClass": false
+}

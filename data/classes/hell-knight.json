@@ -1,0 +1,279 @@
+{
+  "name": "Hell Knight",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/e-h/hellknight/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 1,
+      "fort": 1,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [
+        {
+          "name": "Aura Of Law",
+          "description": "A Hell KnightÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s lawful aura (see the detect law spell) functions as that of a cleric whose level is equal to the Hell Knight's character level."
+        },
+        {
+          "name": "Detect Chaos",
+          "description": "This ability functions like the paladin's detect evil ability, save that it grants the use of detect chaos instead."
+        },
+        {
+          "name": "Order",
+          "description": "A character must choose one Hell Knight order to join at 1st level. The choice of order determines what disciplines the character gains later access to."
+        },
+        {
+          "name": "Smite Chaos 1/Day",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 2,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Discern Lies",
+          "description": "At 2nd level, a Hell Knight can use discern lies as a spell-like ability a number of times per day equal to 3 + his Charisma modifier with a caster level equal to his character level."
+        },
+        {
+          "name": "Hell Knight Armor 1",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 3,
+      "bab": 3,
+      "fort": 2,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "1St Discipline",
+          "description": ""
+        },
+        {
+          "name": "Force Of Will 1",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 4,
+      "bab": 4,
+      "fort": 2,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Smite Chaos 2/Day",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 5,
+      "bab": 5,
+      "fort": 3,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Hell Knight Armor 2",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 6,
+      "bab": 6,
+      "fort": 3,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "2Nd Discipline",
+          "description": ""
+        },
+        {
+          "name": "Force Of Will 2",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 7,
+      "bab": 7,
+      "fort": 4,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Lawbringer",
+          "description": "At 7th level, a Hell KnightÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s attacks are treated as being lawful for the purpose of overcoming damage reduction ."
+        },
+        {
+          "name": "Smite Chaos 3/Day",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 8,
+      "bab": 8,
+      "fort": 4,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Hell Knight Armor 3",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 9,
+      "bab": 9,
+      "fort": 5,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "3Rd Discipline",
+          "description": ""
+        },
+        {
+          "name": "Force Of Will 3",
+          "description": ""
+        },
+        {
+          "name": "Infernal Armor",
+          "description": "As long as he wears Hell Knight armor , a 9th-level Hell Knight gains a +2 bonus on all Charisma -related checks made while interacting with lawful, nongood creatures. In addition, while wearing the armor , he gains the ability to see perfectly in darkness of any kind, resistance to fire 30, resistance to acid 10, and resistance to cold 10."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 10,
+      "bab": 10,
+      "fort": 5,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "HellÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢S Knight",
+          "description": "At 10th level, a Hell Knight can grant a weapon he wields or touches the axiomatic , flaming burst , or unholy weapon special ability. This weapon has this special ability as long as the Hell Knight remains within 100 feet of the weapon, but a Hell Knight can maintain only a single weaponÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s granted special ability at a time. The Hell Knight also becomes immune to fire while wearing Hell Knight plate . Section 15: Copyright Notice Pathfinder Campaign Setting: The Inner Sea World Guide. Ãƒâ€šÃ‚Â© 2011, Paizo Publishing, LLC; Authors: Keith Baker, Wolfgang Baur, Clinton J. Boomer, Jason Bulmahn, Joshua J. Frost, Ed Greenwood, Stephen S. Greer, Jeff Grubb, James Jacobs, Michael Kortes, Tito Leati, Mike McArtor, Rob McCreary, Erik Mona, Jason Eric Nelson, Jeff Quick, Sean K Reynolds, F. Wesley Schneider, Leandra Christine Schneider, David Schwartz, Amber E. Scott, Stan!, Owen K.C. Stephens, Todd Stewart, James L. Sutter, Greg A. Vaughan, Jeremy Walker, and JD Wiker. Pathfinder Roleplaying Game Adventurer's Guide Ãƒâ€šÃ‚Â© 2017, Paizo Inc.; Authors: Benjamin Bruck, John Compton, Crystal Frasier, Tim Hitchcock, Jenny Jarzabski, Isabelle Lee, Joe Pasini, Jessica Price, David Schwartz, and Josh Vogt."
+        },
+        {
+          "name": "Smite Chaos 4/Day",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": null,
+  "spellcastingClass": false
+}

@@ -1,0 +1,212 @@
+{
+  "name": "Justiciar",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/i-m/justiciar/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 0,
+      "classFeatures": [
+        {
+          "name": "Aura Of Law",
+          "description": "The power of a justiciarÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s aura of law (see the detect law spell) is equal to her character level. If the justiciar has cleric or paladin levels, the power of her aura of law is equal to her character level +4."
+        },
+        {
+          "name": "Authority",
+          "description": "A justiciar serves a religious or legal code and has absolute authority (granted by a higher-ranking agent of that code) to enforce it. This means that if the justiciar catches criminals, she may judge them guilty (given sufficient proof ) and order their execution, or do it herself if need be. Because the justiciar must act within the law, there is rarely any friction between her and established authorities other than disputes about jurisdiction and challenges from other forms of authority. (A religiously endorsed justiciar, for example, might come into conflict with secular governors who take exception to the execution of their subjects.) A justiciar may deputize others to aid her in her tasks, although she is responsible for their actions in her name. As part of a Diplomacy and Intimidate check regarding matters of the law and her authority, a justiciar may exert her authority to grant herself a +4 bonus on these checks. This ability negates any need to carry a badge or writ of office, and is mainly used to convince those unfamiliar with the justiciar of her legal powers. For example, a justiciar can use this ability to check an angry mob intent on lynching a jailed prisoner, or convince a stubborn mayor that interfering with the justiciarÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s efforts is likely to anger the lord they both work for. Even against individuals who donÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢t acknowledge his code of laws (such as thieves or warriors from other lands), the justicarÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s fervor still grants these skill bonuses. She does not, however, gain these bonuses in situations where her code of laws would not apply or hold no beari"
+        },
+        {
+          "name": "Lawkeeper",
+          "description": "Justiciars are not allowed to violate their code or any oath or contract they willingly agree to, nor can they go against the spirit of it while holding to the letter. A justiciar who willingly does so loses all prestige class abilities until she receives an atonement spell from her religious superiors or an official pardon from her secular superiors."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 2,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Sure Shot",
+          "description": "A justiciar is skilled with crossbows. At 2nd level, she gains the ability to make a sure shot. A number of times per day equal to her class level, a justiciar may add her Charisma bonus on an attack roll made with a crossbow and deal 1 extra point of damage per justiciar level."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 3,
+      "bab": 3,
+      "fort": 2,
+      "ref": 2,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Oathmark",
+          "description": "This ability magically seals an oath or agreement between two people. The justiciar chooses two willing creatures and presses her authority upon them. By accepting her authority and stating their agreement on something (whether a verbal promise, written contract, treaty, or the like), the two creatures are magically linked so that if one breaks the agreement, the other knows it. The expiration of the link does not explain the exact nature of the betrayal, only that it has occurred. If one target dies, the link ends and the other target knows the other party is dead . Direct and indirect attempts to violate the agreement end the link; swearing not to kill someone and then hiring someone else to do it is a violation, as is hiring assassins before the agreement with the orders to kill the person later. The link cannot penetrate other planes, areas where magic does not function, or spells such as mind blank that block mind reading. Once the interference ends, the link resumes and determines if the agreement has been broken. The other person in the link knows if the link is blocked, but not why. The creature who breaks the agreement is cursed with a raised physical mark on the forehead (or other obvious place) indicating his willing violation of the agreement. The target takes a -4 penalty on Diplomacy checks when dealing with those who dislike oathbreakers. Magical attempts to remove the mark - such as via remove curse - require a successful caster level check (DC 10 + justiciarÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s character level). Even if the curse is removed, the other party in the agreement still knows of th"
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 4,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 5,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 6,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 7,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 8,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 9,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 10,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": null,
+  "spellcastingClass": false
+}

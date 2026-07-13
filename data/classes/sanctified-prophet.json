@@ -1,0 +1,255 @@
+{
+  "name": "Sanctified Prophet",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/s-z/sanctified-prophet/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Auspicious Display +1",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "1"
+      }
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Purchase Spells",
+          "description": "Starting at 2nd level, a sanctified prophet can cast spells not normally available to him by expending a certain amount of gold. A sanctified prophet can spontaneously cast any 1st-level spell he knows-even if he has expended all of his spells for that day-by sacrificing 500 gp worth of currency (gp, sp, and so on) or gems. If the spell has a material component cost, it is added to the base cost of this ability. Currency or gems used in this way must be on the prophet's person, and goods other than standard currency or precious gems cannot be sacrificed to use this ability. Casting a spell in this way does not expend any of the prophet's uses of spells for that day, and once sacrificed, the currency spent to use this ability cannot be retrieved in any way-the money has effectively disappeared forever. At 4th level, the sanctified prophet can cast a 2nd-level spell he knows by sacrificing 1,500 gp. At 7th level, he can cast a 3rd-level spell by sacrificing 3,000 gp. At 10th level, he can cast a 4th-level spell by sacrificing 5,000 gp."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "2"
+      }
+    },
+    {
+      "level": 3,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [],
+      "spellcasting": {
+        "Spells per Day": "3"
+      }
+    },
+    {
+      "level": 4,
+      "bab": 3,
+      "fort": 1,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Auspicious Display +2",
+          "description": ""
+        },
+        {
+          "name": "Business Acumen",
+          "description": "At 4th level, a sanctified prophet can treat settlements as one size category larger when determining their base values and purchase limits. At 7th level, this ability improves so that the prophet can treat settlements as two size categories larger. At 10th level, the prophet can treat settlements as four size categories larger."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "3"
+      }
+    },
+    {
+      "level": 5,
+      "bab": 3,
+      "fort": 2,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 6,
+      "bab": 4,
+      "fort": 2,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Mystical Contacts",
+          "description": "At 6th level, once per week a sanctified prophet can call in favors from his trading partners to purchase a spellcasting service at half its normal price. The prophet must still find a spellcaster capable of casting the spell he desires (which usually means finding a large enough settlement), and must provide any expensive material components required by the spell at their full price."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 7,
+      "bab": 5,
+      "fort": 2,
+      "ref": 2,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Auspicious Display +3",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 8,
+      "bab": 6,
+      "fort": 3,
+      "ref": 3,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Prophet'S Chest",
+          "description": "At 8th level, a sanctified prophet can hide a chest on the Ethereal Plane , as per the spell secret chest , except that the prophet does not need an expensive chest or replica-any chest will do. The prophet can summon the chest back to the Material Plane as a standard action up to three times per day. So long as the prophet accesses the chest once every month, it suffers no chance of being lost on the Ethereal Plane . A sanctified prophet can have only one chest on the Ethereal Plane in this way."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 9,
+      "bab": 6,
+      "fort": 3,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Planar Contacts",
+          "description": "At 9th level, a sanctified prophet can purchase an outsider's services for half the normal cost when he casts a planar ally spell or is within 30 feet of an ally who casts a planar ally spell. When negotiating with a creature called by a planar binding spell (either his own or an ally's), the prophet gains a +4 bonus on any opposed Charisma checks."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "5"
+      }
+    },
+    {
+      "level": 10,
+      "bab": 7,
+      "fort": 3,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Auspicious Display +4",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "5"
+      }
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": {
+    "summary": "See level progression spell columns."
+  },
+  "spellcastingClass": true
+}

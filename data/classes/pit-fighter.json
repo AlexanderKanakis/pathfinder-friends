@@ -1,0 +1,251 @@
+{
+  "name": "Pit Fighter",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/n-r/pit-fighter/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 1,
+      "fort": 1,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [
+        {
+          "name": "Poor Equipment",
+          "description": "Pit fighters are often forced to fight with poorly maintained equipment. At 1st level, a pit fighter can spend a swift action to ignore the broken condition of a single weapon or piece of armor he wields or wears for the remainder of the encounter. The selected weapon or piece of armor is treated in all ways as though it did not have the broken condition, though its hit points remain unchanged. The pit fighter can affect only one item at a time with this ability; if he selects a second item, the first immediately regains the broken condition."
+        },
+        {
+          "name": "Showmanship 1/Day",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 2,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Arena Weapon Expertise +1",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 3,
+      "bab": 3,
+      "fort": 2,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Weapon Trick",
+          "description": "At 3rd level, a pit fighter gains Improved Dirty Trick as a bonus feat, and can use any weapon with the performance quality to perform a dirty trick combat maneuver . Once per round when the pit fighter performs a dirty trick maneuver against an enemy, he may deal damage to the enemy as if he had struck it with his normal melee attack. The pit fighter must be wielding a weapon and have at least one hand free to use this ability."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 4,
+      "bab": 4,
+      "fort": 2,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Showmanship 2/Day",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 5,
+      "bab": 5,
+      "fort": 3,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Arena Weapon Expertise +2",
+          "description": ""
+        },
+        {
+          "name": "Roar Of The Crowd",
+          "description": "At 5th level, the roar of applause spurs a pit fighter on to greater acts of violence and brutality. When fighting a performance combat, the pit fighter can enter a rage (as per the barbarian class ability) during any round in which the crowd's attitude toward him is helpful. This is in addition to the normal bonuses the crowd's attitude provides. The pit fighter can maintain his rage each round so long as the crowd's attitude toward him remains helpful. If the crowd's attitude ever drops below helpful, the pit fighter's rage immediately ends (though if he possesses the rage ability from another class, he may expend a round of his rage to continue the effect as normal for that class feature). If, after using this ability, the crowd's attitude ever drops to unfriendly or hostile, the pit fighter becomes fatigued . He remains fatigued for as long as the crowd remains unfriendly or hostile or until the end of the combat, whichever comes first."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 6,
+      "bab": 6,
+      "fort": 3,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Tricky Assault",
+          "description": "At 6th level, a pit fighter gains Quick Dirty Trick as a bonus feat. This allows the pit fighter to perform a single dirty trick combat maneuver in place of one of his melee attacks on his turn. He must choose the melee attack with the highest base attack bonus to make the dirty trick combat maneuver ."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 7,
+      "bab": 7,
+      "fort": 4,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Showmanship 3/Day",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 8,
+      "bab": 8,
+      "fort": 4,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Arena Weapon Expertise +3",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 9,
+      "bab": 9,
+      "fort": 5,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Brutal Trick",
+          "description": "At 9th level, a pit fighter gains Greater Dirty Trick as a bonus feat. In addition, a creature that spends a standard action to remove a condition applied by the pit fighter's dirty trick combat maneuver provokes an attack of opportunity from the pit fighter."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 10,
+      "bab": 10,
+      "fort": 5,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Greater Roar Of The Crowd",
+          "description": "At 10th level, the crowd's effect on a pit fighter grows even more pronounced. The pit fighter may enter and maintain a rage so long as the crowd's attitude toward him is friendly or better. If the crowd's attitude is helpful, the morale bonus to the pit fighter's Strength and Constitution increases to +6 and the morale bonus on his Will saves increases to +3. Additionally, after using this ability, the pit fighter does not become fatigued until the crowd's attitude becomes hostile. Section 15: Copyright Notice Pathfinder Campaign Setting: Paths of Prestige Ãƒâ€šÃ‚Â© 2012, Paizo Publishing, LLC; Authors: Benjamin Bruck, Jason Bulmahn, Matt Goodall, and Jason Nelson."
+        },
+        {
+          "name": "Showmanship 4/Day",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": null,
+  "spellcastingClass": false
+}

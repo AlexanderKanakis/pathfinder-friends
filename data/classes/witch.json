@@ -1,0 +1,1077 @@
+{
+  "name": "Witch",
+  "type": "base",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/base-classes/witch/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Cantrips",
+          "description": ""
+        },
+        {
+          "name": "Hex",
+          "description": "Witches learn a number of magic tricks, called hexes, that grant them powers or weaken foes. At 1st level, a witch gains one hex of her choice. She gains an additional hex at 2nd level and for every 2 levels attained after 2nd level, as noted on Table: Witch . A witch cannot select an individual hex more than once. Unless otherwise noted, using a hex is a standard action that does not provoke an attack of opportunity . The save to resist a hex is equal to 10 + 1/2 the witch's level + the witch's Intelligence modifier. Paizo Subpages Ameliorating (Su) Aura of Purity (Su) Beast of Ill-Omen (Su) Blight (Su) Cackle (Su) Cauldron* (Ex) Charm (Su) Child-Scent (Ex) City Sight (Su) Combat Hypnosis (Su) Congeal (Su) Coven (Ex) Cursed Wound (Su) Dark Apothecary (Ex) Deathcall (Su) Discord (Su) Disguise* (Su) Disrupt Connection (Su) Distraction (Su) Enemy Ground (Su) Evil Eye* (Su) Feral Speech (Su) Flight* (Su) Floating Lotus (Su) Fortune (Su) Gift of Consumption (Su) Greater Gift of Consumption (Su) Healing* (Su) Heralding Bloom (Su) Iceplant (Su) Leshy Summoning (Su) Minor Prophecy (Su) Misfortune (Su) Mother's Eye (Su) Mud Witch (Su) Murksight (Su) Nails (Ex) No Place Like Home (Su) Peacebond (Su) Poison Steep (Sp) Poison Touch (Ex) Pollute Water (Su) Polluting Glance (Su) Prehensile Hair (Su) Protective Luck (Su) Scar (Su) Seduction (Su) Sink (Su) Slumber (Su) Soothsayer (Su) Summer's Heat (Su) Swamp Hag (Sp) Swamp's Grasp (Su) Swine (Su) Tongues (Su) Unnerve Beasts (Su) Verdant Familiar (Ex) Ward (Su) Water Lung (Su) Witch's Bottle (Su) Other Publishers Subpages Jewe",
+          "pools": [
+            {
+              "name": "Hex",
+              "description": "Witches learn a number of magic tricks, called hexes, that grant them powers or weaken foes. At 1st level, a witch gains one hex of her choice. She gains an additional hex at 2nd level and for every 2 levels attained after 2nd level, as noted on Table: Witch . A witch cannot select an individual hex more than once. Unless otherwise noted, using a hex is a standard action that does not provoke an attack of opportunity . The save to resist a hex is equal to 10 + 1/2 the witch's level + the witch's Intelligence modifier. Paizo Subpages Ameliorating (Su) Aura of Purity (Su) Beast of Ill-Omen (Su) Blight (Su) Cackle (Su) Cauldron* (Ex) Charm (Su) Child-Scent (Ex) City Sight (Su) Combat Hypnosis (Su) Congeal (Su) Coven (Ex) Cursed Wound (Su) Dark Apothecary (Ex) Deathcall (Su) Discord (Su) Disguise* (Su) Disrupt Connection (Su) Distraction (Su) Enemy Ground (Su) Evil Eye* (Su) Feral Speech (Su) Flight* (Su) Floating Lotus (Su) Fortune (Su) Gift of Consumption (Su) Greater Gift of Consumption (Su) Healing* (Su) Heralding Bloom (Su) Iceplant (Su) Leshy Summoning (Su) Minor Prophecy (Su) Misfortune (Su) Mother's Eye (Su) Mud Witch (Su) Murksight (Su) Nails (Ex) No Place Like Home (Su) Peacebond (Su) Poison Steep (Sp) Poison Touch (Ex) Pollute Water (Su) Polluting Glance (Su) Prehensile Hair (Su) Protective Luck (Su) Scar (Su) Seduction (Su) Sink (Su) Slumber (Su) Soothsayer (Su) Summer's Heat (Su) Swamp Hag (Sp) Swamp's Grasp (Su) Swine (Su) Tongues (Su) Unnerve Beasts (Su) Verdant Familiar (Ex) Ward (Su) Water Lung (Su) Witch's Bottle (Su) Other Publishers Subpages Jewe",
+              "requirements": {
+                "minClassLevel": 2,
+                "text": "At 1st level, a witch gains one hex of her choice. She gains an additional hex at 2nd level and for every 2 levels attained after 2nd level, as noted on Table: Witch ."
+              },
+              "options": [
+                {
+                  "name": "Major Hex",
+                  "description": "Starting at 10th level, and every two levels thereafter, a witch can choose one of the following major hexes whenever she could select a new hex.",
+                  "requirements": {
+                    "minClassLevel": 10,
+                    "text": "Starting at 10th level, and every two levels thereafter, a witch can choose one of the following major hexes whenever she could select a new hex."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "Major Hexes",
+                  "description": "Subpages Agony (Su) Animal Skin (Su) Beast Eye (Su) BeastÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Gift (Su) Cook People (Su) Delicious Fright (Su) Drugged (Su) False Hospitality (Su) HagÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Eye (Su) Harrowing Curse (Su) Hidden Home (Sp) Hoarfrost (Su) Ice Tomb (Su) Infected Wounds (Su) Major Ameliorating (Su) Major Healing (Su) Nightmares (Su) Pariah (Su) Prophecy (Su) Regenerative Sinew (Su) Restless Slumber (Su) Retribution (Su) Speak in Dreams (Sp) Steal Voice (Su; Tiefling) Vision (Su) Waxen Image (Su) Weather Control (Su) Witch's Bounty (Su) Witch's Charge (Su) WitchÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Brew (Ex) Withering (Su)",
+                  "requirements": {},
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "Grand Hex",
+                  "description": "Starting at 18th level, and every two levels thereafter, a witch can choose one of the following grand hexes whenever she could select a new hex.",
+                  "requirements": {
+                    "minClassLevel": 18,
+                    "text": "Starting at 18th level, and every two levels thereafter, a witch can choose one of the following grand hexes whenever she could select a new hex."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "Grand Hexes",
+                  "description": "Subpages Abominate (Sp) Animal Servant (Su) Curse of Nonviolence (Su) Death Curse (Su) Death Interrupted (Su) Dire Prophecy (Su) Eternal Slumber (Su) Forced Reincarnation (Su) Lay to Rest (Sp) Life Giver (Su) Natural Disaster (Su) Summon Spirit (Sp) WitchÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Hut (Su)",
+                  "requirements": {},
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/base-classes/witch/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        },
+        {
+          "name": "Patron Spells",
+          "description": "At 1st level, when a witch gains her familiar, she must also select a patron. This patron is a vague and mysterious force, granting the witch power for reasons that she might not entirely understand. While these forces need not be named, they typically hold influence over one of the following forces. At 2nd level, and every two levels thereafter, a witch's patron adds new spells to a witch's list of spells known. These spells are also automatically added to the list of spells stored by the familiar. The spells gained depend upon the patron chosen. Each patron is listed by its theme. Its actual name is up to the GM and the witch to decide. See a complete list of witch patrons here ."
+        },
+        {
+          "name": "Witch'S Familiar",
+          "description": "At 1st level, a witch forms a close bond with a familiar, a creature that teaches her magic and helps to guide her along her path. Familiars also aid a witch by granting her skill bonuses, additional spells, and help with some types of magic. This functions like the wizard's arcane bond class feature, except as noted in the Witch's Familiar section . A witch must commune with her familiar each day to prepare her spells. Familiars store all of the spells that a witch knows, and a witch cannot prepare a spell that is not stored by her familiar. A witch's familiar begins play storing all of the 0-level witch spells plus three 1st level spells of the witch's choice. The witch also selects a number of additional 1st-level spells equal to her Intelligence modifier to store in her familiar. At each new witch level, she adds two new spells of any spell level or levels that she can cast (based on her new witch level) to her familiar. A witch can also add additional spells to her familiar through a special ritual."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "3"
+      }
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 0,
+      "ref": 0,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Hex",
+          "description": "Witches learn a number of magic tricks, called hexes, that grant them powers or weaken foes. At 1st level, a witch gains one hex of her choice. She gains an additional hex at 2nd level and for every 2 levels attained after 2nd level, as noted on Table: Witch . A witch cannot select an individual hex more than once. Unless otherwise noted, using a hex is a standard action that does not provoke an attack of opportunity . The save to resist a hex is equal to 10 + 1/2 the witch's level + the witch's Intelligence modifier. Paizo Subpages Ameliorating (Su) Aura of Purity (Su) Beast of Ill-Omen (Su) Blight (Su) Cackle (Su) Cauldron* (Ex) Charm (Su) Child-Scent (Ex) City Sight (Su) Combat Hypnosis (Su) Congeal (Su) Coven (Ex) Cursed Wound (Su) Dark Apothecary (Ex) Deathcall (Su) Discord (Su) Disguise* (Su) Disrupt Connection (Su) Distraction (Su) Enemy Ground (Su) Evil Eye* (Su) Feral Speech (Su) Flight* (Su) Floating Lotus (Su) Fortune (Su) Gift of Consumption (Su) Greater Gift of Consumption (Su) Healing* (Su) Heralding Bloom (Su) Iceplant (Su) Leshy Summoning (Su) Minor Prophecy (Su) Misfortune (Su) Mother's Eye (Su) Mud Witch (Su) Murksight (Su) Nails (Ex) No Place Like Home (Su) Peacebond (Su) Poison Steep (Sp) Poison Touch (Ex) Pollute Water (Su) Polluting Glance (Su) Prehensile Hair (Su) Protective Luck (Su) Scar (Su) Seduction (Su) Sink (Su) Slumber (Su) Soothsayer (Su) Summer's Heat (Su) Swamp Hag (Sp) Swamp's Grasp (Su) Swine (Su) Tongues (Su) Unnerve Beasts (Su) Verdant Familiar (Ex) Ward (Su) Water Lung (Su) Witch's Bottle (Su) Other Publishers Subpages Jewe",
+          "pools": [
+            {
+              "name": "Hex",
+              "description": "Witches learn a number of magic tricks, called hexes, that grant them powers or weaken foes. At 1st level, a witch gains one hex of her choice. She gains an additional hex at 2nd level and for every 2 levels attained after 2nd level, as noted on Table: Witch . A witch cannot select an individual hex more than once. Unless otherwise noted, using a hex is a standard action that does not provoke an attack of opportunity . The save to resist a hex is equal to 10 + 1/2 the witch's level + the witch's Intelligence modifier. Paizo Subpages Ameliorating (Su) Aura of Purity (Su) Beast of Ill-Omen (Su) Blight (Su) Cackle (Su) Cauldron* (Ex) Charm (Su) Child-Scent (Ex) City Sight (Su) Combat Hypnosis (Su) Congeal (Su) Coven (Ex) Cursed Wound (Su) Dark Apothecary (Ex) Deathcall (Su) Discord (Su) Disguise* (Su) Disrupt Connection (Su) Distraction (Su) Enemy Ground (Su) Evil Eye* (Su) Feral Speech (Su) Flight* (Su) Floating Lotus (Su) Fortune (Su) Gift of Consumption (Su) Greater Gift of Consumption (Su) Healing* (Su) Heralding Bloom (Su) Iceplant (Su) Leshy Summoning (Su) Minor Prophecy (Su) Misfortune (Su) Mother's Eye (Su) Mud Witch (Su) Murksight (Su) Nails (Ex) No Place Like Home (Su) Peacebond (Su) Poison Steep (Sp) Poison Touch (Ex) Pollute Water (Su) Polluting Glance (Su) Prehensile Hair (Su) Protective Luck (Su) Scar (Su) Seduction (Su) Sink (Su) Slumber (Su) Soothsayer (Su) Summer's Heat (Su) Swamp Hag (Sp) Swamp's Grasp (Su) Swine (Su) Tongues (Su) Unnerve Beasts (Su) Verdant Familiar (Ex) Ward (Su) Water Lung (Su) Witch's Bottle (Su) Other Publishers Subpages Jewe",
+              "requirements": {
+                "minClassLevel": 2,
+                "text": "At 1st level, a witch gains one hex of her choice. She gains an additional hex at 2nd level and for every 2 levels attained after 2nd level, as noted on Table: Witch ."
+              },
+              "options": [
+                {
+                  "name": "Major Hex",
+                  "description": "Starting at 10th level, and every two levels thereafter, a witch can choose one of the following major hexes whenever she could select a new hex.",
+                  "requirements": {
+                    "minClassLevel": 10,
+                    "text": "Starting at 10th level, and every two levels thereafter, a witch can choose one of the following major hexes whenever she could select a new hex."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "Major Hexes",
+                  "description": "Subpages Agony (Su) Animal Skin (Su) Beast Eye (Su) BeastÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Gift (Su) Cook People (Su) Delicious Fright (Su) Drugged (Su) False Hospitality (Su) HagÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Eye (Su) Harrowing Curse (Su) Hidden Home (Sp) Hoarfrost (Su) Ice Tomb (Su) Infected Wounds (Su) Major Ameliorating (Su) Major Healing (Su) Nightmares (Su) Pariah (Su) Prophecy (Su) Regenerative Sinew (Su) Restless Slumber (Su) Retribution (Su) Speak in Dreams (Sp) Steal Voice (Su; Tiefling) Vision (Su) Waxen Image (Su) Weather Control (Su) Witch's Bounty (Su) Witch's Charge (Su) WitchÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Brew (Ex) Withering (Su)",
+                  "requirements": {},
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "Grand Hex",
+                  "description": "Starting at 18th level, and every two levels thereafter, a witch can choose one of the following grand hexes whenever she could select a new hex.",
+                  "requirements": {
+                    "minClassLevel": 18,
+                    "text": "Starting at 18th level, and every two levels thereafter, a witch can choose one of the following grand hexes whenever she could select a new hex."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "Grand Hexes",
+                  "description": "Subpages Abominate (Sp) Animal Servant (Su) Curse of Nonviolence (Su) Death Curse (Su) Death Interrupted (Su) Dire Prophecy (Su) Eternal Slumber (Su) Forced Reincarnation (Su) Lay to Rest (Sp) Life Giver (Su) Natural Disaster (Su) Summon Spirit (Sp) WitchÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Hut (Su)",
+                  "requirements": {},
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/base-classes/witch/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 3,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 3,
+      "classFeatures": [],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 4,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Hex",
+          "description": "Witches learn a number of magic tricks, called hexes, that grant them powers or weaken foes. At 1st level, a witch gains one hex of her choice. She gains an additional hex at 2nd level and for every 2 levels attained after 2nd level, as noted on Table: Witch . A witch cannot select an individual hex more than once. Unless otherwise noted, using a hex is a standard action that does not provoke an attack of opportunity . The save to resist a hex is equal to 10 + 1/2 the witch's level + the witch's Intelligence modifier. Paizo Subpages Ameliorating (Su) Aura of Purity (Su) Beast of Ill-Omen (Su) Blight (Su) Cackle (Su) Cauldron* (Ex) Charm (Su) Child-Scent (Ex) City Sight (Su) Combat Hypnosis (Su) Congeal (Su) Coven (Ex) Cursed Wound (Su) Dark Apothecary (Ex) Deathcall (Su) Discord (Su) Disguise* (Su) Disrupt Connection (Su) Distraction (Su) Enemy Ground (Su) Evil Eye* (Su) Feral Speech (Su) Flight* (Su) Floating Lotus (Su) Fortune (Su) Gift of Consumption (Su) Greater Gift of Consumption (Su) Healing* (Su) Heralding Bloom (Su) Iceplant (Su) Leshy Summoning (Su) Minor Prophecy (Su) Misfortune (Su) Mother's Eye (Su) Mud Witch (Su) Murksight (Su) Nails (Ex) No Place Like Home (Su) Peacebond (Su) Poison Steep (Sp) Poison Touch (Ex) Pollute Water (Su) Polluting Glance (Su) Prehensile Hair (Su) Protective Luck (Su) Scar (Su) Seduction (Su) Sink (Su) Slumber (Su) Soothsayer (Su) Summer's Heat (Su) Swamp Hag (Sp) Swamp's Grasp (Su) Swine (Su) Tongues (Su) Unnerve Beasts (Su) Verdant Familiar (Ex) Ward (Su) Water Lung (Su) Witch's Bottle (Su) Other Publishers Subpages Jewe",
+          "pools": [
+            {
+              "name": "Hex",
+              "description": "Witches learn a number of magic tricks, called hexes, that grant them powers or weaken foes. At 1st level, a witch gains one hex of her choice. She gains an additional hex at 2nd level and for every 2 levels attained after 2nd level, as noted on Table: Witch . A witch cannot select an individual hex more than once. Unless otherwise noted, using a hex is a standard action that does not provoke an attack of opportunity . The save to resist a hex is equal to 10 + 1/2 the witch's level + the witch's Intelligence modifier. Paizo Subpages Ameliorating (Su) Aura of Purity (Su) Beast of Ill-Omen (Su) Blight (Su) Cackle (Su) Cauldron* (Ex) Charm (Su) Child-Scent (Ex) City Sight (Su) Combat Hypnosis (Su) Congeal (Su) Coven (Ex) Cursed Wound (Su) Dark Apothecary (Ex) Deathcall (Su) Discord (Su) Disguise* (Su) Disrupt Connection (Su) Distraction (Su) Enemy Ground (Su) Evil Eye* (Su) Feral Speech (Su) Flight* (Su) Floating Lotus (Su) Fortune (Su) Gift of Consumption (Su) Greater Gift of Consumption (Su) Healing* (Su) Heralding Bloom (Su) Iceplant (Su) Leshy Summoning (Su) Minor Prophecy (Su) Misfortune (Su) Mother's Eye (Su) Mud Witch (Su) Murksight (Su) Nails (Ex) No Place Like Home (Su) Peacebond (Su) Poison Steep (Sp) Poison Touch (Ex) Pollute Water (Su) Polluting Glance (Su) Prehensile Hair (Su) Protective Luck (Su) Scar (Su) Seduction (Su) Sink (Su) Slumber (Su) Soothsayer (Su) Summer's Heat (Su) Swamp Hag (Sp) Swamp's Grasp (Su) Swine (Su) Tongues (Su) Unnerve Beasts (Su) Verdant Familiar (Ex) Ward (Su) Water Lung (Su) Witch's Bottle (Su) Other Publishers Subpages Jewe",
+              "requirements": {
+                "minClassLevel": 2,
+                "text": "At 1st level, a witch gains one hex of her choice. She gains an additional hex at 2nd level and for every 2 levels attained after 2nd level, as noted on Table: Witch ."
+              },
+              "options": [
+                {
+                  "name": "Major Hex",
+                  "description": "Starting at 10th level, and every two levels thereafter, a witch can choose one of the following major hexes whenever she could select a new hex.",
+                  "requirements": {
+                    "minClassLevel": 10,
+                    "text": "Starting at 10th level, and every two levels thereafter, a witch can choose one of the following major hexes whenever she could select a new hex."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "Major Hexes",
+                  "description": "Subpages Agony (Su) Animal Skin (Su) Beast Eye (Su) BeastÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Gift (Su) Cook People (Su) Delicious Fright (Su) Drugged (Su) False Hospitality (Su) HagÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Eye (Su) Harrowing Curse (Su) Hidden Home (Sp) Hoarfrost (Su) Ice Tomb (Su) Infected Wounds (Su) Major Ameliorating (Su) Major Healing (Su) Nightmares (Su) Pariah (Su) Prophecy (Su) Regenerative Sinew (Su) Restless Slumber (Su) Retribution (Su) Speak in Dreams (Sp) Steal Voice (Su; Tiefling) Vision (Su) Waxen Image (Su) Weather Control (Su) Witch's Bounty (Su) Witch's Charge (Su) WitchÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Brew (Ex) Withering (Su)",
+                  "requirements": {},
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "Grand Hex",
+                  "description": "Starting at 18th level, and every two levels thereafter, a witch can choose one of the following grand hexes whenever she could select a new hex.",
+                  "requirements": {
+                    "minClassLevel": 18,
+                    "text": "Starting at 18th level, and every two levels thereafter, a witch can choose one of the following grand hexes whenever she could select a new hex."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "Grand Hexes",
+                  "description": "Subpages Abominate (Sp) Animal Servant (Su) Curse of Nonviolence (Su) Death Curse (Su) Death Interrupted (Su) Dire Prophecy (Su) Eternal Slumber (Su) Forced Reincarnation (Su) Lay to Rest (Sp) Life Giver (Su) Natural Disaster (Su) Summon Spirit (Sp) WitchÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Hut (Su)",
+                  "requirements": {},
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/base-classes/witch/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 5,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 4,
+      "classFeatures": [],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 6,
+      "bab": 3,
+      "fort": 2,
+      "ref": 2,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Hex",
+          "description": "Witches learn a number of magic tricks, called hexes, that grant them powers or weaken foes. At 1st level, a witch gains one hex of her choice. She gains an additional hex at 2nd level and for every 2 levels attained after 2nd level, as noted on Table: Witch . A witch cannot select an individual hex more than once. Unless otherwise noted, using a hex is a standard action that does not provoke an attack of opportunity . The save to resist a hex is equal to 10 + 1/2 the witch's level + the witch's Intelligence modifier. Paizo Subpages Ameliorating (Su) Aura of Purity (Su) Beast of Ill-Omen (Su) Blight (Su) Cackle (Su) Cauldron* (Ex) Charm (Su) Child-Scent (Ex) City Sight (Su) Combat Hypnosis (Su) Congeal (Su) Coven (Ex) Cursed Wound (Su) Dark Apothecary (Ex) Deathcall (Su) Discord (Su) Disguise* (Su) Disrupt Connection (Su) Distraction (Su) Enemy Ground (Su) Evil Eye* (Su) Feral Speech (Su) Flight* (Su) Floating Lotus (Su) Fortune (Su) Gift of Consumption (Su) Greater Gift of Consumption (Su) Healing* (Su) Heralding Bloom (Su) Iceplant (Su) Leshy Summoning (Su) Minor Prophecy (Su) Misfortune (Su) Mother's Eye (Su) Mud Witch (Su) Murksight (Su) Nails (Ex) No Place Like Home (Su) Peacebond (Su) Poison Steep (Sp) Poison Touch (Ex) Pollute Water (Su) Polluting Glance (Su) Prehensile Hair (Su) Protective Luck (Su) Scar (Su) Seduction (Su) Sink (Su) Slumber (Su) Soothsayer (Su) Summer's Heat (Su) Swamp Hag (Sp) Swamp's Grasp (Su) Swine (Su) Tongues (Su) Unnerve Beasts (Su) Verdant Familiar (Ex) Ward (Su) Water Lung (Su) Witch's Bottle (Su) Other Publishers Subpages Jewe",
+          "pools": [
+            {
+              "name": "Hex",
+              "description": "Witches learn a number of magic tricks, called hexes, that grant them powers or weaken foes. At 1st level, a witch gains one hex of her choice. She gains an additional hex at 2nd level and for every 2 levels attained after 2nd level, as noted on Table: Witch . A witch cannot select an individual hex more than once. Unless otherwise noted, using a hex is a standard action that does not provoke an attack of opportunity . The save to resist a hex is equal to 10 + 1/2 the witch's level + the witch's Intelligence modifier. Paizo Subpages Ameliorating (Su) Aura of Purity (Su) Beast of Ill-Omen (Su) Blight (Su) Cackle (Su) Cauldron* (Ex) Charm (Su) Child-Scent (Ex) City Sight (Su) Combat Hypnosis (Su) Congeal (Su) Coven (Ex) Cursed Wound (Su) Dark Apothecary (Ex) Deathcall (Su) Discord (Su) Disguise* (Su) Disrupt Connection (Su) Distraction (Su) Enemy Ground (Su) Evil Eye* (Su) Feral Speech (Su) Flight* (Su) Floating Lotus (Su) Fortune (Su) Gift of Consumption (Su) Greater Gift of Consumption (Su) Healing* (Su) Heralding Bloom (Su) Iceplant (Su) Leshy Summoning (Su) Minor Prophecy (Su) Misfortune (Su) Mother's Eye (Su) Mud Witch (Su) Murksight (Su) Nails (Ex) No Place Like Home (Su) Peacebond (Su) Poison Steep (Sp) Poison Touch (Ex) Pollute Water (Su) Polluting Glance (Su) Prehensile Hair (Su) Protective Luck (Su) Scar (Su) Seduction (Su) Sink (Su) Slumber (Su) Soothsayer (Su) Summer's Heat (Su) Swamp Hag (Sp) Swamp's Grasp (Su) Swine (Su) Tongues (Su) Unnerve Beasts (Su) Verdant Familiar (Ex) Ward (Su) Water Lung (Su) Witch's Bottle (Su) Other Publishers Subpages Jewe",
+              "requirements": {
+                "minClassLevel": 2,
+                "text": "At 1st level, a witch gains one hex of her choice. She gains an additional hex at 2nd level and for every 2 levels attained after 2nd level, as noted on Table: Witch ."
+              },
+              "options": [
+                {
+                  "name": "Major Hex",
+                  "description": "Starting at 10th level, and every two levels thereafter, a witch can choose one of the following major hexes whenever she could select a new hex.",
+                  "requirements": {
+                    "minClassLevel": 10,
+                    "text": "Starting at 10th level, and every two levels thereafter, a witch can choose one of the following major hexes whenever she could select a new hex."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "Major Hexes",
+                  "description": "Subpages Agony (Su) Animal Skin (Su) Beast Eye (Su) BeastÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Gift (Su) Cook People (Su) Delicious Fright (Su) Drugged (Su) False Hospitality (Su) HagÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Eye (Su) Harrowing Curse (Su) Hidden Home (Sp) Hoarfrost (Su) Ice Tomb (Su) Infected Wounds (Su) Major Ameliorating (Su) Major Healing (Su) Nightmares (Su) Pariah (Su) Prophecy (Su) Regenerative Sinew (Su) Restless Slumber (Su) Retribution (Su) Speak in Dreams (Sp) Steal Voice (Su; Tiefling) Vision (Su) Waxen Image (Su) Weather Control (Su) Witch's Bounty (Su) Witch's Charge (Su) WitchÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Brew (Ex) Withering (Su)",
+                  "requirements": {},
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "Grand Hex",
+                  "description": "Starting at 18th level, and every two levels thereafter, a witch can choose one of the following grand hexes whenever she could select a new hex.",
+                  "requirements": {
+                    "minClassLevel": 18,
+                    "text": "Starting at 18th level, and every two levels thereafter, a witch can choose one of the following grand hexes whenever she could select a new hex."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "Grand Hexes",
+                  "description": "Subpages Abominate (Sp) Animal Servant (Su) Curse of Nonviolence (Su) Death Curse (Su) Death Interrupted (Su) Dire Prophecy (Su) Eternal Slumber (Su) Forced Reincarnation (Su) Lay to Rest (Sp) Life Giver (Su) Natural Disaster (Su) Summon Spirit (Sp) WitchÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Hut (Su)",
+                  "requirements": {},
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/base-classes/witch/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 7,
+      "bab": 3,
+      "fort": 2,
+      "ref": 2,
+      "will": 5,
+      "classFeatures": [],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 8,
+      "bab": 4,
+      "fort": 2,
+      "ref": 2,
+      "will": 6,
+      "classFeatures": [
+        {
+          "name": "Hex",
+          "description": "Witches learn a number of magic tricks, called hexes, that grant them powers or weaken foes. At 1st level, a witch gains one hex of her choice. She gains an additional hex at 2nd level and for every 2 levels attained after 2nd level, as noted on Table: Witch . A witch cannot select an individual hex more than once. Unless otherwise noted, using a hex is a standard action that does not provoke an attack of opportunity . The save to resist a hex is equal to 10 + 1/2 the witch's level + the witch's Intelligence modifier. Paizo Subpages Ameliorating (Su) Aura of Purity (Su) Beast of Ill-Omen (Su) Blight (Su) Cackle (Su) Cauldron* (Ex) Charm (Su) Child-Scent (Ex) City Sight (Su) Combat Hypnosis (Su) Congeal (Su) Coven (Ex) Cursed Wound (Su) Dark Apothecary (Ex) Deathcall (Su) Discord (Su) Disguise* (Su) Disrupt Connection (Su) Distraction (Su) Enemy Ground (Su) Evil Eye* (Su) Feral Speech (Su) Flight* (Su) Floating Lotus (Su) Fortune (Su) Gift of Consumption (Su) Greater Gift of Consumption (Su) Healing* (Su) Heralding Bloom (Su) Iceplant (Su) Leshy Summoning (Su) Minor Prophecy (Su) Misfortune (Su) Mother's Eye (Su) Mud Witch (Su) Murksight (Su) Nails (Ex) No Place Like Home (Su) Peacebond (Su) Poison Steep (Sp) Poison Touch (Ex) Pollute Water (Su) Polluting Glance (Su) Prehensile Hair (Su) Protective Luck (Su) Scar (Su) Seduction (Su) Sink (Su) Slumber (Su) Soothsayer (Su) Summer's Heat (Su) Swamp Hag (Sp) Swamp's Grasp (Su) Swine (Su) Tongues (Su) Unnerve Beasts (Su) Verdant Familiar (Ex) Ward (Su) Water Lung (Su) Witch's Bottle (Su) Other Publishers Subpages Jewe",
+          "pools": [
+            {
+              "name": "Hex",
+              "description": "Witches learn a number of magic tricks, called hexes, that grant them powers or weaken foes. At 1st level, a witch gains one hex of her choice. She gains an additional hex at 2nd level and for every 2 levels attained after 2nd level, as noted on Table: Witch . A witch cannot select an individual hex more than once. Unless otherwise noted, using a hex is a standard action that does not provoke an attack of opportunity . The save to resist a hex is equal to 10 + 1/2 the witch's level + the witch's Intelligence modifier. Paizo Subpages Ameliorating (Su) Aura of Purity (Su) Beast of Ill-Omen (Su) Blight (Su) Cackle (Su) Cauldron* (Ex) Charm (Su) Child-Scent (Ex) City Sight (Su) Combat Hypnosis (Su) Congeal (Su) Coven (Ex) Cursed Wound (Su) Dark Apothecary (Ex) Deathcall (Su) Discord (Su) Disguise* (Su) Disrupt Connection (Su) Distraction (Su) Enemy Ground (Su) Evil Eye* (Su) Feral Speech (Su) Flight* (Su) Floating Lotus (Su) Fortune (Su) Gift of Consumption (Su) Greater Gift of Consumption (Su) Healing* (Su) Heralding Bloom (Su) Iceplant (Su) Leshy Summoning (Su) Minor Prophecy (Su) Misfortune (Su) Mother's Eye (Su) Mud Witch (Su) Murksight (Su) Nails (Ex) No Place Like Home (Su) Peacebond (Su) Poison Steep (Sp) Poison Touch (Ex) Pollute Water (Su) Polluting Glance (Su) Prehensile Hair (Su) Protective Luck (Su) Scar (Su) Seduction (Su) Sink (Su) Slumber (Su) Soothsayer (Su) Summer's Heat (Su) Swamp Hag (Sp) Swamp's Grasp (Su) Swine (Su) Tongues (Su) Unnerve Beasts (Su) Verdant Familiar (Ex) Ward (Su) Water Lung (Su) Witch's Bottle (Su) Other Publishers Subpages Jewe",
+              "requirements": {
+                "minClassLevel": 2,
+                "text": "At 1st level, a witch gains one hex of her choice. She gains an additional hex at 2nd level and for every 2 levels attained after 2nd level, as noted on Table: Witch ."
+              },
+              "options": [
+                {
+                  "name": "Major Hex",
+                  "description": "Starting at 10th level, and every two levels thereafter, a witch can choose one of the following major hexes whenever she could select a new hex.",
+                  "requirements": {
+                    "minClassLevel": 10,
+                    "text": "Starting at 10th level, and every two levels thereafter, a witch can choose one of the following major hexes whenever she could select a new hex."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "Major Hexes",
+                  "description": "Subpages Agony (Su) Animal Skin (Su) Beast Eye (Su) BeastÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Gift (Su) Cook People (Su) Delicious Fright (Su) Drugged (Su) False Hospitality (Su) HagÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Eye (Su) Harrowing Curse (Su) Hidden Home (Sp) Hoarfrost (Su) Ice Tomb (Su) Infected Wounds (Su) Major Ameliorating (Su) Major Healing (Su) Nightmares (Su) Pariah (Su) Prophecy (Su) Regenerative Sinew (Su) Restless Slumber (Su) Retribution (Su) Speak in Dreams (Sp) Steal Voice (Su; Tiefling) Vision (Su) Waxen Image (Su) Weather Control (Su) Witch's Bounty (Su) Witch's Charge (Su) WitchÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Brew (Ex) Withering (Su)",
+                  "requirements": {},
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "Grand Hex",
+                  "description": "Starting at 18th level, and every two levels thereafter, a witch can choose one of the following grand hexes whenever she could select a new hex.",
+                  "requirements": {
+                    "minClassLevel": 18,
+                    "text": "Starting at 18th level, and every two levels thereafter, a witch can choose one of the following grand hexes whenever she could select a new hex."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "Grand Hexes",
+                  "description": "Subpages Abominate (Sp) Animal Servant (Su) Curse of Nonviolence (Su) Death Curse (Su) Death Interrupted (Su) Dire Prophecy (Su) Eternal Slumber (Su) Forced Reincarnation (Su) Lay to Rest (Sp) Life Giver (Su) Natural Disaster (Su) Summon Spirit (Sp) WitchÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Hut (Su)",
+                  "requirements": {},
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/base-classes/witch/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 9,
+      "bab": 4,
+      "fort": 3,
+      "ref": 3,
+      "will": 6,
+      "classFeatures": [],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 10,
+      "bab": 5,
+      "fort": 3,
+      "ref": 3,
+      "will": 7,
+      "classFeatures": [
+        {
+          "name": "Hex",
+          "description": "Witches learn a number of magic tricks, called hexes, that grant them powers or weaken foes. At 1st level, a witch gains one hex of her choice. She gains an additional hex at 2nd level and for every 2 levels attained after 2nd level, as noted on Table: Witch . A witch cannot select an individual hex more than once. Unless otherwise noted, using a hex is a standard action that does not provoke an attack of opportunity . The save to resist a hex is equal to 10 + 1/2 the witch's level + the witch's Intelligence modifier. Paizo Subpages Ameliorating (Su) Aura of Purity (Su) Beast of Ill-Omen (Su) Blight (Su) Cackle (Su) Cauldron* (Ex) Charm (Su) Child-Scent (Ex) City Sight (Su) Combat Hypnosis (Su) Congeal (Su) Coven (Ex) Cursed Wound (Su) Dark Apothecary (Ex) Deathcall (Su) Discord (Su) Disguise* (Su) Disrupt Connection (Su) Distraction (Su) Enemy Ground (Su) Evil Eye* (Su) Feral Speech (Su) Flight* (Su) Floating Lotus (Su) Fortune (Su) Gift of Consumption (Su) Greater Gift of Consumption (Su) Healing* (Su) Heralding Bloom (Su) Iceplant (Su) Leshy Summoning (Su) Minor Prophecy (Su) Misfortune (Su) Mother's Eye (Su) Mud Witch (Su) Murksight (Su) Nails (Ex) No Place Like Home (Su) Peacebond (Su) Poison Steep (Sp) Poison Touch (Ex) Pollute Water (Su) Polluting Glance (Su) Prehensile Hair (Su) Protective Luck (Su) Scar (Su) Seduction (Su) Sink (Su) Slumber (Su) Soothsayer (Su) Summer's Heat (Su) Swamp Hag (Sp) Swamp's Grasp (Su) Swine (Su) Tongues (Su) Unnerve Beasts (Su) Verdant Familiar (Ex) Ward (Su) Water Lung (Su) Witch's Bottle (Su) Other Publishers Subpages Jewe",
+          "pools": [
+            {
+              "name": "Hex",
+              "description": "Witches learn a number of magic tricks, called hexes, that grant them powers or weaken foes. At 1st level, a witch gains one hex of her choice. She gains an additional hex at 2nd level and for every 2 levels attained after 2nd level, as noted on Table: Witch . A witch cannot select an individual hex more than once. Unless otherwise noted, using a hex is a standard action that does not provoke an attack of opportunity . The save to resist a hex is equal to 10 + 1/2 the witch's level + the witch's Intelligence modifier. Paizo Subpages Ameliorating (Su) Aura of Purity (Su) Beast of Ill-Omen (Su) Blight (Su) Cackle (Su) Cauldron* (Ex) Charm (Su) Child-Scent (Ex) City Sight (Su) Combat Hypnosis (Su) Congeal (Su) Coven (Ex) Cursed Wound (Su) Dark Apothecary (Ex) Deathcall (Su) Discord (Su) Disguise* (Su) Disrupt Connection (Su) Distraction (Su) Enemy Ground (Su) Evil Eye* (Su) Feral Speech (Su) Flight* (Su) Floating Lotus (Su) Fortune (Su) Gift of Consumption (Su) Greater Gift of Consumption (Su) Healing* (Su) Heralding Bloom (Su) Iceplant (Su) Leshy Summoning (Su) Minor Prophecy (Su) Misfortune (Su) Mother's Eye (Su) Mud Witch (Su) Murksight (Su) Nails (Ex) No Place Like Home (Su) Peacebond (Su) Poison Steep (Sp) Poison Touch (Ex) Pollute Water (Su) Polluting Glance (Su) Prehensile Hair (Su) Protective Luck (Su) Scar (Su) Seduction (Su) Sink (Su) Slumber (Su) Soothsayer (Su) Summer's Heat (Su) Swamp Hag (Sp) Swamp's Grasp (Su) Swine (Su) Tongues (Su) Unnerve Beasts (Su) Verdant Familiar (Ex) Ward (Su) Water Lung (Su) Witch's Bottle (Su) Other Publishers Subpages Jewe",
+              "requirements": {
+                "minClassLevel": 2,
+                "text": "At 1st level, a witch gains one hex of her choice. She gains an additional hex at 2nd level and for every 2 levels attained after 2nd level, as noted on Table: Witch ."
+              },
+              "options": [
+                {
+                  "name": "Major Hex",
+                  "description": "Starting at 10th level, and every two levels thereafter, a witch can choose one of the following major hexes whenever she could select a new hex.",
+                  "requirements": {
+                    "minClassLevel": 10,
+                    "text": "Starting at 10th level, and every two levels thereafter, a witch can choose one of the following major hexes whenever she could select a new hex."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "Major Hexes",
+                  "description": "Subpages Agony (Su) Animal Skin (Su) Beast Eye (Su) BeastÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Gift (Su) Cook People (Su) Delicious Fright (Su) Drugged (Su) False Hospitality (Su) HagÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Eye (Su) Harrowing Curse (Su) Hidden Home (Sp) Hoarfrost (Su) Ice Tomb (Su) Infected Wounds (Su) Major Ameliorating (Su) Major Healing (Su) Nightmares (Su) Pariah (Su) Prophecy (Su) Regenerative Sinew (Su) Restless Slumber (Su) Retribution (Su) Speak in Dreams (Sp) Steal Voice (Su; Tiefling) Vision (Su) Waxen Image (Su) Weather Control (Su) Witch's Bounty (Su) Witch's Charge (Su) WitchÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Brew (Ex) Withering (Su)",
+                  "requirements": {},
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "Grand Hex",
+                  "description": "Starting at 18th level, and every two levels thereafter, a witch can choose one of the following grand hexes whenever she could select a new hex.",
+                  "requirements": {
+                    "minClassLevel": 18,
+                    "text": "Starting at 18th level, and every two levels thereafter, a witch can choose one of the following grand hexes whenever she could select a new hex."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "Grand Hexes",
+                  "description": "Subpages Abominate (Sp) Animal Servant (Su) Curse of Nonviolence (Su) Death Curse (Su) Death Interrupted (Su) Dire Prophecy (Su) Eternal Slumber (Su) Forced Reincarnation (Su) Lay to Rest (Sp) Life Giver (Su) Natural Disaster (Su) Summon Spirit (Sp) WitchÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Hut (Su)",
+                  "requirements": {},
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/base-classes/witch/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        },
+        {
+          "name": "Major Hex",
+          "description": "Starting at 10th level, and every two levels thereafter, a witch can choose one of the following major hexes whenever she could select a new hex.",
+          "pools": [
+            {
+              "name": "Major Hex",
+              "description": "Starting at 10th level, and every two levels thereafter, a witch can choose one of the following major hexes whenever she could select a new hex.",
+              "requirements": {
+                "minClassLevel": 10,
+                "text": "Starting at 10th level, and every two levels thereafter, a witch can choose one of the following major hexes whenever she could select a new hex."
+              },
+              "options": [
+                {
+                  "name": "Major Hexes",
+                  "description": "Subpages Agony (Su) Animal Skin (Su) Beast Eye (Su) BeastÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Gift (Su) Cook People (Su) Delicious Fright (Su) Drugged (Su) False Hospitality (Su) HagÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Eye (Su) Harrowing Curse (Su) Hidden Home (Sp) Hoarfrost (Su) Ice Tomb (Su) Infected Wounds (Su) Major Ameliorating (Su) Major Healing (Su) Nightmares (Su) Pariah (Su) Prophecy (Su) Regenerative Sinew (Su) Restless Slumber (Su) Retribution (Su) Speak in Dreams (Sp) Steal Voice (Su; Tiefling) Vision (Su) Waxen Image (Su) Weather Control (Su) Witch's Bounty (Su) Witch's Charge (Su) WitchÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Brew (Ex) Withering (Su)",
+                  "requirements": {},
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/base-classes/witch/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 11,
+      "bab": 5,
+      "fort": 3,
+      "ref": 3,
+      "will": 7,
+      "classFeatures": [],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 12,
+      "bab": 6,
+      "fort": 4,
+      "ref": 4,
+      "will": 8,
+      "classFeatures": [
+        {
+          "name": "Hex",
+          "description": "Witches learn a number of magic tricks, called hexes, that grant them powers or weaken foes. At 1st level, a witch gains one hex of her choice. She gains an additional hex at 2nd level and for every 2 levels attained after 2nd level, as noted on Table: Witch . A witch cannot select an individual hex more than once. Unless otherwise noted, using a hex is a standard action that does not provoke an attack of opportunity . The save to resist a hex is equal to 10 + 1/2 the witch's level + the witch's Intelligence modifier. Paizo Subpages Ameliorating (Su) Aura of Purity (Su) Beast of Ill-Omen (Su) Blight (Su) Cackle (Su) Cauldron* (Ex) Charm (Su) Child-Scent (Ex) City Sight (Su) Combat Hypnosis (Su) Congeal (Su) Coven (Ex) Cursed Wound (Su) Dark Apothecary (Ex) Deathcall (Su) Discord (Su) Disguise* (Su) Disrupt Connection (Su) Distraction (Su) Enemy Ground (Su) Evil Eye* (Su) Feral Speech (Su) Flight* (Su) Floating Lotus (Su) Fortune (Su) Gift of Consumption (Su) Greater Gift of Consumption (Su) Healing* (Su) Heralding Bloom (Su) Iceplant (Su) Leshy Summoning (Su) Minor Prophecy (Su) Misfortune (Su) Mother's Eye (Su) Mud Witch (Su) Murksight (Su) Nails (Ex) No Place Like Home (Su) Peacebond (Su) Poison Steep (Sp) Poison Touch (Ex) Pollute Water (Su) Polluting Glance (Su) Prehensile Hair (Su) Protective Luck (Su) Scar (Su) Seduction (Su) Sink (Su) Slumber (Su) Soothsayer (Su) Summer's Heat (Su) Swamp Hag (Sp) Swamp's Grasp (Su) Swine (Su) Tongues (Su) Unnerve Beasts (Su) Verdant Familiar (Ex) Ward (Su) Water Lung (Su) Witch's Bottle (Su) Other Publishers Subpages Jewe",
+          "pools": [
+            {
+              "name": "Hex",
+              "description": "Witches learn a number of magic tricks, called hexes, that grant them powers or weaken foes. At 1st level, a witch gains one hex of her choice. She gains an additional hex at 2nd level and for every 2 levels attained after 2nd level, as noted on Table: Witch . A witch cannot select an individual hex more than once. Unless otherwise noted, using a hex is a standard action that does not provoke an attack of opportunity . The save to resist a hex is equal to 10 + 1/2 the witch's level + the witch's Intelligence modifier. Paizo Subpages Ameliorating (Su) Aura of Purity (Su) Beast of Ill-Omen (Su) Blight (Su) Cackle (Su) Cauldron* (Ex) Charm (Su) Child-Scent (Ex) City Sight (Su) Combat Hypnosis (Su) Congeal (Su) Coven (Ex) Cursed Wound (Su) Dark Apothecary (Ex) Deathcall (Su) Discord (Su) Disguise* (Su) Disrupt Connection (Su) Distraction (Su) Enemy Ground (Su) Evil Eye* (Su) Feral Speech (Su) Flight* (Su) Floating Lotus (Su) Fortune (Su) Gift of Consumption (Su) Greater Gift of Consumption (Su) Healing* (Su) Heralding Bloom (Su) Iceplant (Su) Leshy Summoning (Su) Minor Prophecy (Su) Misfortune (Su) Mother's Eye (Su) Mud Witch (Su) Murksight (Su) Nails (Ex) No Place Like Home (Su) Peacebond (Su) Poison Steep (Sp) Poison Touch (Ex) Pollute Water (Su) Polluting Glance (Su) Prehensile Hair (Su) Protective Luck (Su) Scar (Su) Seduction (Su) Sink (Su) Slumber (Su) Soothsayer (Su) Summer's Heat (Su) Swamp Hag (Sp) Swamp's Grasp (Su) Swine (Su) Tongues (Su) Unnerve Beasts (Su) Verdant Familiar (Ex) Ward (Su) Water Lung (Su) Witch's Bottle (Su) Other Publishers Subpages Jewe",
+              "requirements": {
+                "minClassLevel": 2,
+                "text": "At 1st level, a witch gains one hex of her choice. She gains an additional hex at 2nd level and for every 2 levels attained after 2nd level, as noted on Table: Witch ."
+              },
+              "options": [
+                {
+                  "name": "Major Hex",
+                  "description": "Starting at 10th level, and every two levels thereafter, a witch can choose one of the following major hexes whenever she could select a new hex.",
+                  "requirements": {
+                    "minClassLevel": 10,
+                    "text": "Starting at 10th level, and every two levels thereafter, a witch can choose one of the following major hexes whenever she could select a new hex."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "Major Hexes",
+                  "description": "Subpages Agony (Su) Animal Skin (Su) Beast Eye (Su) BeastÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Gift (Su) Cook People (Su) Delicious Fright (Su) Drugged (Su) False Hospitality (Su) HagÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Eye (Su) Harrowing Curse (Su) Hidden Home (Sp) Hoarfrost (Su) Ice Tomb (Su) Infected Wounds (Su) Major Ameliorating (Su) Major Healing (Su) Nightmares (Su) Pariah (Su) Prophecy (Su) Regenerative Sinew (Su) Restless Slumber (Su) Retribution (Su) Speak in Dreams (Sp) Steal Voice (Su; Tiefling) Vision (Su) Waxen Image (Su) Weather Control (Su) Witch's Bounty (Su) Witch's Charge (Su) WitchÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Brew (Ex) Withering (Su)",
+                  "requirements": {},
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "Grand Hex",
+                  "description": "Starting at 18th level, and every two levels thereafter, a witch can choose one of the following grand hexes whenever she could select a new hex.",
+                  "requirements": {
+                    "minClassLevel": 18,
+                    "text": "Starting at 18th level, and every two levels thereafter, a witch can choose one of the following grand hexes whenever she could select a new hex."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "Grand Hexes",
+                  "description": "Subpages Abominate (Sp) Animal Servant (Su) Curse of Nonviolence (Su) Death Curse (Su) Death Interrupted (Su) Dire Prophecy (Su) Eternal Slumber (Su) Forced Reincarnation (Su) Lay to Rest (Sp) Life Giver (Su) Natural Disaster (Su) Summon Spirit (Sp) WitchÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Hut (Su)",
+                  "requirements": {},
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/base-classes/witch/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 13,
+      "bab": 6,
+      "fort": 4,
+      "ref": 4,
+      "will": 8,
+      "classFeatures": [],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 14,
+      "bab": 7,
+      "fort": 4,
+      "ref": 4,
+      "will": 9,
+      "classFeatures": [
+        {
+          "name": "Hex",
+          "description": "Witches learn a number of magic tricks, called hexes, that grant them powers or weaken foes. At 1st level, a witch gains one hex of her choice. She gains an additional hex at 2nd level and for every 2 levels attained after 2nd level, as noted on Table: Witch . A witch cannot select an individual hex more than once. Unless otherwise noted, using a hex is a standard action that does not provoke an attack of opportunity . The save to resist a hex is equal to 10 + 1/2 the witch's level + the witch's Intelligence modifier. Paizo Subpages Ameliorating (Su) Aura of Purity (Su) Beast of Ill-Omen (Su) Blight (Su) Cackle (Su) Cauldron* (Ex) Charm (Su) Child-Scent (Ex) City Sight (Su) Combat Hypnosis (Su) Congeal (Su) Coven (Ex) Cursed Wound (Su) Dark Apothecary (Ex) Deathcall (Su) Discord (Su) Disguise* (Su) Disrupt Connection (Su) Distraction (Su) Enemy Ground (Su) Evil Eye* (Su) Feral Speech (Su) Flight* (Su) Floating Lotus (Su) Fortune (Su) Gift of Consumption (Su) Greater Gift of Consumption (Su) Healing* (Su) Heralding Bloom (Su) Iceplant (Su) Leshy Summoning (Su) Minor Prophecy (Su) Misfortune (Su) Mother's Eye (Su) Mud Witch (Su) Murksight (Su) Nails (Ex) No Place Like Home (Su) Peacebond (Su) Poison Steep (Sp) Poison Touch (Ex) Pollute Water (Su) Polluting Glance (Su) Prehensile Hair (Su) Protective Luck (Su) Scar (Su) Seduction (Su) Sink (Su) Slumber (Su) Soothsayer (Su) Summer's Heat (Su) Swamp Hag (Sp) Swamp's Grasp (Su) Swine (Su) Tongues (Su) Unnerve Beasts (Su) Verdant Familiar (Ex) Ward (Su) Water Lung (Su) Witch's Bottle (Su) Other Publishers Subpages Jewe",
+          "pools": [
+            {
+              "name": "Hex",
+              "description": "Witches learn a number of magic tricks, called hexes, that grant them powers or weaken foes. At 1st level, a witch gains one hex of her choice. She gains an additional hex at 2nd level and for every 2 levels attained after 2nd level, as noted on Table: Witch . A witch cannot select an individual hex more than once. Unless otherwise noted, using a hex is a standard action that does not provoke an attack of opportunity . The save to resist a hex is equal to 10 + 1/2 the witch's level + the witch's Intelligence modifier. Paizo Subpages Ameliorating (Su) Aura of Purity (Su) Beast of Ill-Omen (Su) Blight (Su) Cackle (Su) Cauldron* (Ex) Charm (Su) Child-Scent (Ex) City Sight (Su) Combat Hypnosis (Su) Congeal (Su) Coven (Ex) Cursed Wound (Su) Dark Apothecary (Ex) Deathcall (Su) Discord (Su) Disguise* (Su) Disrupt Connection (Su) Distraction (Su) Enemy Ground (Su) Evil Eye* (Su) Feral Speech (Su) Flight* (Su) Floating Lotus (Su) Fortune (Su) Gift of Consumption (Su) Greater Gift of Consumption (Su) Healing* (Su) Heralding Bloom (Su) Iceplant (Su) Leshy Summoning (Su) Minor Prophecy (Su) Misfortune (Su) Mother's Eye (Su) Mud Witch (Su) Murksight (Su) Nails (Ex) No Place Like Home (Su) Peacebond (Su) Poison Steep (Sp) Poison Touch (Ex) Pollute Water (Su) Polluting Glance (Su) Prehensile Hair (Su) Protective Luck (Su) Scar (Su) Seduction (Su) Sink (Su) Slumber (Su) Soothsayer (Su) Summer's Heat (Su) Swamp Hag (Sp) Swamp's Grasp (Su) Swine (Su) Tongues (Su) Unnerve Beasts (Su) Verdant Familiar (Ex) Ward (Su) Water Lung (Su) Witch's Bottle (Su) Other Publishers Subpages Jewe",
+              "requirements": {
+                "minClassLevel": 2,
+                "text": "At 1st level, a witch gains one hex of her choice. She gains an additional hex at 2nd level and for every 2 levels attained after 2nd level, as noted on Table: Witch ."
+              },
+              "options": [
+                {
+                  "name": "Major Hex",
+                  "description": "Starting at 10th level, and every two levels thereafter, a witch can choose one of the following major hexes whenever she could select a new hex.",
+                  "requirements": {
+                    "minClassLevel": 10,
+                    "text": "Starting at 10th level, and every two levels thereafter, a witch can choose one of the following major hexes whenever she could select a new hex."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "Major Hexes",
+                  "description": "Subpages Agony (Su) Animal Skin (Su) Beast Eye (Su) BeastÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Gift (Su) Cook People (Su) Delicious Fright (Su) Drugged (Su) False Hospitality (Su) HagÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Eye (Su) Harrowing Curse (Su) Hidden Home (Sp) Hoarfrost (Su) Ice Tomb (Su) Infected Wounds (Su) Major Ameliorating (Su) Major Healing (Su) Nightmares (Su) Pariah (Su) Prophecy (Su) Regenerative Sinew (Su) Restless Slumber (Su) Retribution (Su) Speak in Dreams (Sp) Steal Voice (Su; Tiefling) Vision (Su) Waxen Image (Su) Weather Control (Su) Witch's Bounty (Su) Witch's Charge (Su) WitchÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Brew (Ex) Withering (Su)",
+                  "requirements": {},
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "Grand Hex",
+                  "description": "Starting at 18th level, and every two levels thereafter, a witch can choose one of the following grand hexes whenever she could select a new hex.",
+                  "requirements": {
+                    "minClassLevel": 18,
+                    "text": "Starting at 18th level, and every two levels thereafter, a witch can choose one of the following grand hexes whenever she could select a new hex."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "Grand Hexes",
+                  "description": "Subpages Abominate (Sp) Animal Servant (Su) Curse of Nonviolence (Su) Death Curse (Su) Death Interrupted (Su) Dire Prophecy (Su) Eternal Slumber (Su) Forced Reincarnation (Su) Lay to Rest (Sp) Life Giver (Su) Natural Disaster (Su) Summon Spirit (Sp) WitchÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Hut (Su)",
+                  "requirements": {},
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/base-classes/witch/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 15,
+      "bab": 7,
+      "fort": 5,
+      "ref": 5,
+      "will": 9,
+      "classFeatures": [],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 16,
+      "bab": 8,
+      "fort": 5,
+      "ref": 5,
+      "will": 10,
+      "classFeatures": [
+        {
+          "name": "Hex",
+          "description": "Witches learn a number of magic tricks, called hexes, that grant them powers or weaken foes. At 1st level, a witch gains one hex of her choice. She gains an additional hex at 2nd level and for every 2 levels attained after 2nd level, as noted on Table: Witch . A witch cannot select an individual hex more than once. Unless otherwise noted, using a hex is a standard action that does not provoke an attack of opportunity . The save to resist a hex is equal to 10 + 1/2 the witch's level + the witch's Intelligence modifier. Paizo Subpages Ameliorating (Su) Aura of Purity (Su) Beast of Ill-Omen (Su) Blight (Su) Cackle (Su) Cauldron* (Ex) Charm (Su) Child-Scent (Ex) City Sight (Su) Combat Hypnosis (Su) Congeal (Su) Coven (Ex) Cursed Wound (Su) Dark Apothecary (Ex) Deathcall (Su) Discord (Su) Disguise* (Su) Disrupt Connection (Su) Distraction (Su) Enemy Ground (Su) Evil Eye* (Su) Feral Speech (Su) Flight* (Su) Floating Lotus (Su) Fortune (Su) Gift of Consumption (Su) Greater Gift of Consumption (Su) Healing* (Su) Heralding Bloom (Su) Iceplant (Su) Leshy Summoning (Su) Minor Prophecy (Su) Misfortune (Su) Mother's Eye (Su) Mud Witch (Su) Murksight (Su) Nails (Ex) No Place Like Home (Su) Peacebond (Su) Poison Steep (Sp) Poison Touch (Ex) Pollute Water (Su) Polluting Glance (Su) Prehensile Hair (Su) Protective Luck (Su) Scar (Su) Seduction (Su) Sink (Su) Slumber (Su) Soothsayer (Su) Summer's Heat (Su) Swamp Hag (Sp) Swamp's Grasp (Su) Swine (Su) Tongues (Su) Unnerve Beasts (Su) Verdant Familiar (Ex) Ward (Su) Water Lung (Su) Witch's Bottle (Su) Other Publishers Subpages Jewe",
+          "pools": [
+            {
+              "name": "Hex",
+              "description": "Witches learn a number of magic tricks, called hexes, that grant them powers or weaken foes. At 1st level, a witch gains one hex of her choice. She gains an additional hex at 2nd level and for every 2 levels attained after 2nd level, as noted on Table: Witch . A witch cannot select an individual hex more than once. Unless otherwise noted, using a hex is a standard action that does not provoke an attack of opportunity . The save to resist a hex is equal to 10 + 1/2 the witch's level + the witch's Intelligence modifier. Paizo Subpages Ameliorating (Su) Aura of Purity (Su) Beast of Ill-Omen (Su) Blight (Su) Cackle (Su) Cauldron* (Ex) Charm (Su) Child-Scent (Ex) City Sight (Su) Combat Hypnosis (Su) Congeal (Su) Coven (Ex) Cursed Wound (Su) Dark Apothecary (Ex) Deathcall (Su) Discord (Su) Disguise* (Su) Disrupt Connection (Su) Distraction (Su) Enemy Ground (Su) Evil Eye* (Su) Feral Speech (Su) Flight* (Su) Floating Lotus (Su) Fortune (Su) Gift of Consumption (Su) Greater Gift of Consumption (Su) Healing* (Su) Heralding Bloom (Su) Iceplant (Su) Leshy Summoning (Su) Minor Prophecy (Su) Misfortune (Su) Mother's Eye (Su) Mud Witch (Su) Murksight (Su) Nails (Ex) No Place Like Home (Su) Peacebond (Su) Poison Steep (Sp) Poison Touch (Ex) Pollute Water (Su) Polluting Glance (Su) Prehensile Hair (Su) Protective Luck (Su) Scar (Su) Seduction (Su) Sink (Su) Slumber (Su) Soothsayer (Su) Summer's Heat (Su) Swamp Hag (Sp) Swamp's Grasp (Su) Swine (Su) Tongues (Su) Unnerve Beasts (Su) Verdant Familiar (Ex) Ward (Su) Water Lung (Su) Witch's Bottle (Su) Other Publishers Subpages Jewe",
+              "requirements": {
+                "minClassLevel": 2,
+                "text": "At 1st level, a witch gains one hex of her choice. She gains an additional hex at 2nd level and for every 2 levels attained after 2nd level, as noted on Table: Witch ."
+              },
+              "options": [
+                {
+                  "name": "Major Hex",
+                  "description": "Starting at 10th level, and every two levels thereafter, a witch can choose one of the following major hexes whenever she could select a new hex.",
+                  "requirements": {
+                    "minClassLevel": 10,
+                    "text": "Starting at 10th level, and every two levels thereafter, a witch can choose one of the following major hexes whenever she could select a new hex."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "Major Hexes",
+                  "description": "Subpages Agony (Su) Animal Skin (Su) Beast Eye (Su) BeastÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Gift (Su) Cook People (Su) Delicious Fright (Su) Drugged (Su) False Hospitality (Su) HagÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Eye (Su) Harrowing Curse (Su) Hidden Home (Sp) Hoarfrost (Su) Ice Tomb (Su) Infected Wounds (Su) Major Ameliorating (Su) Major Healing (Su) Nightmares (Su) Pariah (Su) Prophecy (Su) Regenerative Sinew (Su) Restless Slumber (Su) Retribution (Su) Speak in Dreams (Sp) Steal Voice (Su; Tiefling) Vision (Su) Waxen Image (Su) Weather Control (Su) Witch's Bounty (Su) Witch's Charge (Su) WitchÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Brew (Ex) Withering (Su)",
+                  "requirements": {},
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "Grand Hex",
+                  "description": "Starting at 18th level, and every two levels thereafter, a witch can choose one of the following grand hexes whenever she could select a new hex.",
+                  "requirements": {
+                    "minClassLevel": 18,
+                    "text": "Starting at 18th level, and every two levels thereafter, a witch can choose one of the following grand hexes whenever she could select a new hex."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "Grand Hexes",
+                  "description": "Subpages Abominate (Sp) Animal Servant (Su) Curse of Nonviolence (Su) Death Curse (Su) Death Interrupted (Su) Dire Prophecy (Su) Eternal Slumber (Su) Forced Reincarnation (Su) Lay to Rest (Sp) Life Giver (Su) Natural Disaster (Su) Summon Spirit (Sp) WitchÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Hut (Su)",
+                  "requirements": {},
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/base-classes/witch/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 17,
+      "bab": 8,
+      "fort": 5,
+      "ref": 5,
+      "will": 10,
+      "classFeatures": [],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 18,
+      "bab": 9,
+      "fort": 6,
+      "ref": 6,
+      "will": 11,
+      "classFeatures": [
+        {
+          "name": "Hex",
+          "description": "Witches learn a number of magic tricks, called hexes, that grant them powers or weaken foes. At 1st level, a witch gains one hex of her choice. She gains an additional hex at 2nd level and for every 2 levels attained after 2nd level, as noted on Table: Witch . A witch cannot select an individual hex more than once. Unless otherwise noted, using a hex is a standard action that does not provoke an attack of opportunity . The save to resist a hex is equal to 10 + 1/2 the witch's level + the witch's Intelligence modifier. Paizo Subpages Ameliorating (Su) Aura of Purity (Su) Beast of Ill-Omen (Su) Blight (Su) Cackle (Su) Cauldron* (Ex) Charm (Su) Child-Scent (Ex) City Sight (Su) Combat Hypnosis (Su) Congeal (Su) Coven (Ex) Cursed Wound (Su) Dark Apothecary (Ex) Deathcall (Su) Discord (Su) Disguise* (Su) Disrupt Connection (Su) Distraction (Su) Enemy Ground (Su) Evil Eye* (Su) Feral Speech (Su) Flight* (Su) Floating Lotus (Su) Fortune (Su) Gift of Consumption (Su) Greater Gift of Consumption (Su) Healing* (Su) Heralding Bloom (Su) Iceplant (Su) Leshy Summoning (Su) Minor Prophecy (Su) Misfortune (Su) Mother's Eye (Su) Mud Witch (Su) Murksight (Su) Nails (Ex) No Place Like Home (Su) Peacebond (Su) Poison Steep (Sp) Poison Touch (Ex) Pollute Water (Su) Polluting Glance (Su) Prehensile Hair (Su) Protective Luck (Su) Scar (Su) Seduction (Su) Sink (Su) Slumber (Su) Soothsayer (Su) Summer's Heat (Su) Swamp Hag (Sp) Swamp's Grasp (Su) Swine (Su) Tongues (Su) Unnerve Beasts (Su) Verdant Familiar (Ex) Ward (Su) Water Lung (Su) Witch's Bottle (Su) Other Publishers Subpages Jewe",
+          "pools": [
+            {
+              "name": "Hex",
+              "description": "Witches learn a number of magic tricks, called hexes, that grant them powers or weaken foes. At 1st level, a witch gains one hex of her choice. She gains an additional hex at 2nd level and for every 2 levels attained after 2nd level, as noted on Table: Witch . A witch cannot select an individual hex more than once. Unless otherwise noted, using a hex is a standard action that does not provoke an attack of opportunity . The save to resist a hex is equal to 10 + 1/2 the witch's level + the witch's Intelligence modifier. Paizo Subpages Ameliorating (Su) Aura of Purity (Su) Beast of Ill-Omen (Su) Blight (Su) Cackle (Su) Cauldron* (Ex) Charm (Su) Child-Scent (Ex) City Sight (Su) Combat Hypnosis (Su) Congeal (Su) Coven (Ex) Cursed Wound (Su) Dark Apothecary (Ex) Deathcall (Su) Discord (Su) Disguise* (Su) Disrupt Connection (Su) Distraction (Su) Enemy Ground (Su) Evil Eye* (Su) Feral Speech (Su) Flight* (Su) Floating Lotus (Su) Fortune (Su) Gift of Consumption (Su) Greater Gift of Consumption (Su) Healing* (Su) Heralding Bloom (Su) Iceplant (Su) Leshy Summoning (Su) Minor Prophecy (Su) Misfortune (Su) Mother's Eye (Su) Mud Witch (Su) Murksight (Su) Nails (Ex) No Place Like Home (Su) Peacebond (Su) Poison Steep (Sp) Poison Touch (Ex) Pollute Water (Su) Polluting Glance (Su) Prehensile Hair (Su) Protective Luck (Su) Scar (Su) Seduction (Su) Sink (Su) Slumber (Su) Soothsayer (Su) Summer's Heat (Su) Swamp Hag (Sp) Swamp's Grasp (Su) Swine (Su) Tongues (Su) Unnerve Beasts (Su) Verdant Familiar (Ex) Ward (Su) Water Lung (Su) Witch's Bottle (Su) Other Publishers Subpages Jewe",
+              "requirements": {
+                "minClassLevel": 2,
+                "text": "At 1st level, a witch gains one hex of her choice. She gains an additional hex at 2nd level and for every 2 levels attained after 2nd level, as noted on Table: Witch ."
+              },
+              "options": [
+                {
+                  "name": "Major Hex",
+                  "description": "Starting at 10th level, and every two levels thereafter, a witch can choose one of the following major hexes whenever she could select a new hex.",
+                  "requirements": {
+                    "minClassLevel": 10,
+                    "text": "Starting at 10th level, and every two levels thereafter, a witch can choose one of the following major hexes whenever she could select a new hex."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "Major Hexes",
+                  "description": "Subpages Agony (Su) Animal Skin (Su) Beast Eye (Su) BeastÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Gift (Su) Cook People (Su) Delicious Fright (Su) Drugged (Su) False Hospitality (Su) HagÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Eye (Su) Harrowing Curse (Su) Hidden Home (Sp) Hoarfrost (Su) Ice Tomb (Su) Infected Wounds (Su) Major Ameliorating (Su) Major Healing (Su) Nightmares (Su) Pariah (Su) Prophecy (Su) Regenerative Sinew (Su) Restless Slumber (Su) Retribution (Su) Speak in Dreams (Sp) Steal Voice (Su; Tiefling) Vision (Su) Waxen Image (Su) Weather Control (Su) Witch's Bounty (Su) Witch's Charge (Su) WitchÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Brew (Ex) Withering (Su)",
+                  "requirements": {},
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "Grand Hex",
+                  "description": "Starting at 18th level, and every two levels thereafter, a witch can choose one of the following grand hexes whenever she could select a new hex.",
+                  "requirements": {
+                    "minClassLevel": 18,
+                    "text": "Starting at 18th level, and every two levels thereafter, a witch can choose one of the following grand hexes whenever she could select a new hex."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "Grand Hexes",
+                  "description": "Subpages Abominate (Sp) Animal Servant (Su) Curse of Nonviolence (Su) Death Curse (Su) Death Interrupted (Su) Dire Prophecy (Su) Eternal Slumber (Su) Forced Reincarnation (Su) Lay to Rest (Sp) Life Giver (Su) Natural Disaster (Su) Summon Spirit (Sp) WitchÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Hut (Su)",
+                  "requirements": {},
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/base-classes/witch/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        },
+        {
+          "name": "Grand Hex",
+          "description": "Starting at 18th level, and every two levels thereafter, a witch can choose one of the following grand hexes whenever she could select a new hex.",
+          "pools": [
+            {
+              "name": "Grand Hex",
+              "description": "Starting at 18th level, and every two levels thereafter, a witch can choose one of the following grand hexes whenever she could select a new hex.",
+              "requirements": {
+                "minClassLevel": 18,
+                "text": "Starting at 18th level, and every two levels thereafter, a witch can choose one of the following grand hexes whenever she could select a new hex."
+              },
+              "options": [
+                {
+                  "name": "Grand Hexes",
+                  "description": "Subpages Abominate (Sp) Animal Servant (Su) Curse of Nonviolence (Su) Death Curse (Su) Death Interrupted (Su) Dire Prophecy (Su) Eternal Slumber (Su) Forced Reincarnation (Su) Lay to Rest (Sp) Life Giver (Su) Natural Disaster (Su) Summon Spirit (Sp) WitchÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Hut (Su)",
+                  "requirements": {},
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/base-classes/witch/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 19,
+      "bab": 9,
+      "fort": 6,
+      "ref": 6,
+      "will": 11,
+      "classFeatures": [],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 20,
+      "bab": 10,
+      "fort": 6,
+      "ref": 6,
+      "will": 12,
+      "classFeatures": [
+        {
+          "name": "Hex",
+          "description": "Witches learn a number of magic tricks, called hexes, that grant them powers or weaken foes. At 1st level, a witch gains one hex of her choice. She gains an additional hex at 2nd level and for every 2 levels attained after 2nd level, as noted on Table: Witch . A witch cannot select an individual hex more than once. Unless otherwise noted, using a hex is a standard action that does not provoke an attack of opportunity . The save to resist a hex is equal to 10 + 1/2 the witch's level + the witch's Intelligence modifier. Paizo Subpages Ameliorating (Su) Aura of Purity (Su) Beast of Ill-Omen (Su) Blight (Su) Cackle (Su) Cauldron* (Ex) Charm (Su) Child-Scent (Ex) City Sight (Su) Combat Hypnosis (Su) Congeal (Su) Coven (Ex) Cursed Wound (Su) Dark Apothecary (Ex) Deathcall (Su) Discord (Su) Disguise* (Su) Disrupt Connection (Su) Distraction (Su) Enemy Ground (Su) Evil Eye* (Su) Feral Speech (Su) Flight* (Su) Floating Lotus (Su) Fortune (Su) Gift of Consumption (Su) Greater Gift of Consumption (Su) Healing* (Su) Heralding Bloom (Su) Iceplant (Su) Leshy Summoning (Su) Minor Prophecy (Su) Misfortune (Su) Mother's Eye (Su) Mud Witch (Su) Murksight (Su) Nails (Ex) No Place Like Home (Su) Peacebond (Su) Poison Steep (Sp) Poison Touch (Ex) Pollute Water (Su) Polluting Glance (Su) Prehensile Hair (Su) Protective Luck (Su) Scar (Su) Seduction (Su) Sink (Su) Slumber (Su) Soothsayer (Su) Summer's Heat (Su) Swamp Hag (Sp) Swamp's Grasp (Su) Swine (Su) Tongues (Su) Unnerve Beasts (Su) Verdant Familiar (Ex) Ward (Su) Water Lung (Su) Witch's Bottle (Su) Other Publishers Subpages Jewe",
+          "pools": [
+            {
+              "name": "Hex",
+              "description": "Witches learn a number of magic tricks, called hexes, that grant them powers or weaken foes. At 1st level, a witch gains one hex of her choice. She gains an additional hex at 2nd level and for every 2 levels attained after 2nd level, as noted on Table: Witch . A witch cannot select an individual hex more than once. Unless otherwise noted, using a hex is a standard action that does not provoke an attack of opportunity . The save to resist a hex is equal to 10 + 1/2 the witch's level + the witch's Intelligence modifier. Paizo Subpages Ameliorating (Su) Aura of Purity (Su) Beast of Ill-Omen (Su) Blight (Su) Cackle (Su) Cauldron* (Ex) Charm (Su) Child-Scent (Ex) City Sight (Su) Combat Hypnosis (Su) Congeal (Su) Coven (Ex) Cursed Wound (Su) Dark Apothecary (Ex) Deathcall (Su) Discord (Su) Disguise* (Su) Disrupt Connection (Su) Distraction (Su) Enemy Ground (Su) Evil Eye* (Su) Feral Speech (Su) Flight* (Su) Floating Lotus (Su) Fortune (Su) Gift of Consumption (Su) Greater Gift of Consumption (Su) Healing* (Su) Heralding Bloom (Su) Iceplant (Su) Leshy Summoning (Su) Minor Prophecy (Su) Misfortune (Su) Mother's Eye (Su) Mud Witch (Su) Murksight (Su) Nails (Ex) No Place Like Home (Su) Peacebond (Su) Poison Steep (Sp) Poison Touch (Ex) Pollute Water (Su) Polluting Glance (Su) Prehensile Hair (Su) Protective Luck (Su) Scar (Su) Seduction (Su) Sink (Su) Slumber (Su) Soothsayer (Su) Summer's Heat (Su) Swamp Hag (Sp) Swamp's Grasp (Su) Swine (Su) Tongues (Su) Unnerve Beasts (Su) Verdant Familiar (Ex) Ward (Su) Water Lung (Su) Witch's Bottle (Su) Other Publishers Subpages Jewe",
+              "requirements": {
+                "minClassLevel": 2,
+                "text": "At 1st level, a witch gains one hex of her choice. She gains an additional hex at 2nd level and for every 2 levels attained after 2nd level, as noted on Table: Witch ."
+              },
+              "options": [
+                {
+                  "name": "Major Hex",
+                  "description": "Starting at 10th level, and every two levels thereafter, a witch can choose one of the following major hexes whenever she could select a new hex.",
+                  "requirements": {
+                    "minClassLevel": 10,
+                    "text": "Starting at 10th level, and every two levels thereafter, a witch can choose one of the following major hexes whenever she could select a new hex."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "Major Hexes",
+                  "description": "Subpages Agony (Su) Animal Skin (Su) Beast Eye (Su) BeastÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Gift (Su) Cook People (Su) Delicious Fright (Su) Drugged (Su) False Hospitality (Su) HagÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Eye (Su) Harrowing Curse (Su) Hidden Home (Sp) Hoarfrost (Su) Ice Tomb (Su) Infected Wounds (Su) Major Ameliorating (Su) Major Healing (Su) Nightmares (Su) Pariah (Su) Prophecy (Su) Regenerative Sinew (Su) Restless Slumber (Su) Retribution (Su) Speak in Dreams (Sp) Steal Voice (Su; Tiefling) Vision (Su) Waxen Image (Su) Weather Control (Su) Witch's Bounty (Su) Witch's Charge (Su) WitchÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Brew (Ex) Withering (Su)",
+                  "requirements": {},
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "Grand Hex",
+                  "description": "Starting at 18th level, and every two levels thereafter, a witch can choose one of the following grand hexes whenever she could select a new hex.",
+                  "requirements": {
+                    "minClassLevel": 18,
+                    "text": "Starting at 18th level, and every two levels thereafter, a witch can choose one of the following grand hexes whenever she could select a new hex."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "Grand Hexes",
+                  "description": "Subpages Abominate (Sp) Animal Servant (Su) Curse of Nonviolence (Su) Death Curse (Su) Death Interrupted (Su) Dire Prophecy (Su) Eternal Slumber (Su) Forced Reincarnation (Su) Lay to Rest (Sp) Life Giver (Su) Natural Disaster (Su) Summon Spirit (Sp) WitchÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Hut (Su)",
+                  "requirements": {},
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/base-classes/witch/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    }
+  ],
+  "spellcasting": {
+    "summary": "prepared full caster using INT",
+    "castingType": "prepared",
+    "progression": "full",
+    "ability": "int",
+    "preparation": "spellbook",
+    "maxSpellLevel": 9,
+    "slotsByLevel": [
+      [
+        3,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        2,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        3,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        3,
+        2,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        3,
+        3,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        4,
+        3,
+        2,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        4,
+        3,
+        3,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        4,
+        4,
+        3,
+        2,
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        4,
+        4,
+        3,
+        3,
+        2,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        4,
+        4,
+        4,
+        3,
+        2,
+        1,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        4,
+        4,
+        4,
+        3,
+        3,
+        2,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        2,
+        1,
+        0,
+        0
+      ],
+      [
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        3,
+        2,
+        0,
+        0
+      ],
+      [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        2,
+        1,
+        0
+      ],
+      [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        3,
+        2,
+        0
+      ],
+      [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        2,
+        1
+      ],
+      [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        3,
+        2
+      ],
+      [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        3
+      ],
+      [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ]
+    ]
+  },
+  "spellcastingClass": true
+}

@@ -1,0 +1,283 @@
+{
+  "name": "Gray Corsair",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/e-h/gray-corsair/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "1St Favored Port",
+          "description": ""
+        },
+        {
+          "name": "Gray Focus",
+          "description": "Gray Corsair training works best when synergizing with the powers and talents of a limited range of classes that are particularly well-suited to the seaborne life of rescuing slaves and defeating slavers. When a character gains his first level as a Gray Corsair, he must choose one of the following classes as his gray focus: bard , cleric , fighter , gunslinger , inquisitor , investigator , magus , mesmerist , psychic , rogue , swashbuckler , sorcerer , or wizard . If he chose a spellcasting class, the Gray Corsair automatically succeeds at any concentration checks required to cast a spell while being subjected to vigorous or violent motion while either swimming or on a ship. If he chose a non-spellcasting class, the Gray Corsair doesn't provoke attacks of opportunity as a result of moving through a threatened square while on a ship or while swimming, unless he chooses to do so. A Gray Corsair who has no levels in any of the above classes must still choose a class as his gray focus, but until he gains a level in that chosen class, he does not gain any benefit for his gray focus or gray boons (see below). Once he gains at least 1 level in his gray focus class, he immediately gains the appropriate powers and boons due him from his Gray Corsair class levels."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Gray Boon",
+          "description": "At 2nd level and every 2 levels thereafter, a Gray Corsair gains some of the class features of the class he chose as his gray focus, provided he has at least 1 level in the class chosen. If his gray focus class is bard , cleric , inquisitor , magus , mesmerist , psychic , sorcerer , or wizard , he gains spells per day as if he'd gained an additional level of the class chosen. If his gray focus class is fighter , gunslinger , or swashbuckler , he gains a bonus Combat feat . If his gray focus class is investigator , he gains a +1d6 studied strike, as per the investigator class feature. This extra damage stacks with other sources of studied strike. If his gray focus class is rogue , he gains a +1d6 sneak attack , as per the rogue class feature. This extra damage stacks with other sources of sneak attack damage."
+        },
+        {
+          "name": "Know The Ropes",
+          "description": "Gray Corsairs spend a lot of time in the rigging of their ships, as this affords them the best view. At 2nd level, while climbing ropes or rigging, a Gray Corsair gains a +4 circumstance bonus on Climb checks and needs only one hand free to do so. In addition, in such circumstances he doesn't take a penalty when using the accelerated climbing option, doesn't lose his Dexterity bonus to AC, and doesn't need to attempt a Climb check to avoid falling when he takes damage."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 3,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "2Nd Favored Port",
+          "description": ""
+        },
+        {
+          "name": "Slaver Slayer +2",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 4,
+      "bab": 3,
+      "fort": 1,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Breathe Easy 1/Day",
+          "description": ""
+        },
+        {
+          "name": "Gray Boon",
+          "description": "At 2nd level and every 2 levels thereafter, a Gray Corsair gains some of the class features of the class he chose as his gray focus, provided he has at least 1 level in the class chosen. If his gray focus class is bard , cleric , inquisitor , magus , mesmerist , psychic , sorcerer , or wizard , he gains spells per day as if he'd gained an additional level of the class chosen. If his gray focus class is fighter , gunslinger , or swashbuckler , he gains a bonus Combat feat . If his gray focus class is investigator , he gains a +1d6 studied strike, as per the investigator class feature. This extra damage stacks with other sources of studied strike. If his gray focus class is rogue , he gains a +1d6 sneak attack , as per the rogue class feature. This extra damage stacks with other sources of sneak attack damage."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 5,
+      "bab": 3,
+      "fort": 2,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "3Rd Favored Port",
+          "description": ""
+        },
+        {
+          "name": "Grim Resolve",
+          "description": "A Gray Corsair has seen more suffering aboard a single slave ship than many will in their entire lives, but this only hardens his resolve-he knows all too well that there are fates worse than death. At 5th level, a Gray Corsair becomes immune to fear effects and adds his Wisdom bonus to attempts to stabilize when his hit points are reduced to below 0."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 6,
+      "bab": 4,
+      "fort": 2,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Gray Boon",
+          "description": "At 2nd level and every 2 levels thereafter, a Gray Corsair gains some of the class features of the class he chose as his gray focus, provided he has at least 1 level in the class chosen. If his gray focus class is bard , cleric , inquisitor , magus , mesmerist , psychic , sorcerer , or wizard , he gains spells per day as if he'd gained an additional level of the class chosen. If his gray focus class is fighter , gunslinger , or swashbuckler , he gains a bonus Combat feat . If his gray focus class is investigator , he gains a +1d6 studied strike, as per the investigator class feature. This extra damage stacks with other sources of studied strike. If his gray focus class is rogue , he gains a +1d6 sneak attack , as per the rogue class feature. This extra damage stacks with other sources of sneak attack damage."
+        },
+        {
+          "name": "Slaver Slayer +4",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 7,
+      "bab": 5,
+      "fort": 2,
+      "ref": 2,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "4Th Favored Port",
+          "description": ""
+        },
+        {
+          "name": "Breathe Easy 2/Day",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 8,
+      "bab": 6,
+      "fort": 3,
+      "ref": 3,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Gray Boon",
+          "description": "At 2nd level and every 2 levels thereafter, a Gray Corsair gains some of the class features of the class he chose as his gray focus, provided he has at least 1 level in the class chosen. If his gray focus class is bard , cleric , inquisitor , magus , mesmerist , psychic , sorcerer , or wizard , he gains spells per day as if he'd gained an additional level of the class chosen. If his gray focus class is fighter , gunslinger , or swashbuckler , he gains a bonus Combat feat . If his gray focus class is investigator , he gains a +1d6 studied strike, as per the investigator class feature. This extra damage stacks with other sources of studied strike. If his gray focus class is rogue , he gains a +1d6 sneak attack , as per the rogue class feature. This extra damage stacks with other sources of sneak attack damage."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 9,
+      "bab": 6,
+      "fort": 3,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "5Th Favored Port",
+          "description": ""
+        },
+        {
+          "name": "Grant Freedom",
+          "description": "At 9th level, a Gray Corsair gains the effects of freedom of movement as a constant spell-like ability (his effective caster level equals his class level). As a swift action , he can transfer this effect to a creature by touch , but in this case the effect persists for only 1 minute per effective caster level . When he does so, he regains the benefits of this ability 24 hours later."
+        },
+        {
+          "name": "Slaver Slayer +6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 10,
+      "bab": 7,
+      "fort": 3,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Breathe Easy 3/Day",
+          "description": ""
+        },
+        {
+          "name": "Gray Boon",
+          "description": "At 2nd level and every 2 levels thereafter, a Gray Corsair gains some of the class features of the class he chose as his gray focus, provided he has at least 1 level in the class chosen. If his gray focus class is bard , cleric , inquisitor , magus , mesmerist , psychic , sorcerer , or wizard , he gains spells per day as if he'd gained an additional level of the class chosen. If his gray focus class is fighter , gunslinger , or swashbuckler , he gains a bonus Combat feat . If his gray focus class is investigator , he gains a +1d6 studied strike, as per the investigator class feature. This extra damage stacks with other sources of studied strike. If his gray focus class is rogue , he gains a +1d6 sneak attack , as per the rogue class feature. This extra damage stacks with other sources of sneak attack damage."
+        },
+        {
+          "name": "Whisk Freedom",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": null,
+  "spellcastingClass": false
+}

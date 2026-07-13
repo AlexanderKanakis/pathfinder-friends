@@ -1,0 +1,241 @@
+{
+  "name": "Divine Scion",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/c-d/divine-scion/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Opposition Alignment",
+          "description": "A divine scion must pick one of the following alignment subtypes as her opposition alignment : chaotic, evil, good, or law. The opposition alignment she chooses must be one that she does not possess as part of her own alignment . She gains a +1 bonus on caster level checks made to overcome spell resistance of creatures with that alignment subtype."
+        }
+      ],
+      "spellcasting": {
+        "Spells": "+1 level of divine spellcasting class"
+      }
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [],
+      "spellcasting": {
+        "Spells": "+1 level of divine spellcasting class"
+      }
+    },
+    {
+      "level": 3,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Domain Specialization",
+          "description": "At 3rd level, a divine scion selects a domain granted by her deity-this domain becomes the divine scionÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s chosen specialization in representing her deity. Although most divine scions pick domains that theyÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ve gained from other classes (such as cleric ), they donÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢t have to do so. Every time a divine scion casts a domain spell from her specialized domain, she heals damage equal to twice the spellÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s level. In addition, each domain specialization grants a spell-like ability (which functions at a caster level equal to the divine scionÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s total character level) and a permanent sacred bonus (or profane, if the divine scion is evil) on a single type of d20 roll. The specific spell-like abilities and bonuses granted are listed below. Air : fly 1/day; +4 on Fly checks Animal : beast shape I 1/day; +4 on Handle Animal checks Artifice : crafterÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s fortune 3/day; +4 on Craft checks Chaos : detect law constant ; +2 on Will saves Charm : beguiling gift 3/day; +4 on Diplomacy checks Community : tongues 1/day; +4 on Diplomacy checks Darkness : shadow weapon 3/day; +4 on Perception checks Death : murderous command 3/day; +2 on Fortitude saves Destruction : break 3/day; +4 on Intimidate checks Earth : stone fist 3/day; +4 on Survival checks Evil : detect good constant; +2 on Will saves Fire : flame arrow 1/day; +4 on Acrobatics checks Glory : archonÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s aura 1/day; +4 on Intimidate checks Good : detect evil constant; +2 on Will saves Healing : symbol of healing 1/day; +4 on Heal checks Knowledge : identify 3/day; +4 on Knowledge checks (choose one) Law : detect chaos constant; +2 on Will saves Li"
+        }
+      ],
+      "spellcasting": {
+        "Spells": "+1 level of divine spellcasting class"
+      }
+    },
+    {
+      "level": 4,
+      "bab": 3,
+      "fort": 1,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Divine Wrath",
+          "description": "At 4th level, a divine scionÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s damaging spells deal +1 point of damage per die against creatures with an alignment subtype that matches the divine scionÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s opposition alignment ."
+        }
+      ],
+      "spellcasting": {
+        "Spells": "+1 level of divine spellcasting class"
+      }
+    },
+    {
+      "level": 5,
+      "bab": 3,
+      "fort": 1,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [],
+      "spellcasting": {
+        "Spells": "+1 level of divine spellcasting class"
+      }
+    },
+    {
+      "level": 6,
+      "bab": 4,
+      "fort": 2,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [],
+      "spellcasting": {
+        "Spells": "+1 level of divine spellcasting class"
+      }
+    },
+    {
+      "level": 7,
+      "bab": 5,
+      "fort": 2,
+      "ref": 2,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Deific Defense",
+          "description": "At 7th level, a divine scion gains DR 2, bypassed by attacks with the alignment subtype of her opposition alignment (so a divine scion with ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œevilÃƒÂ¢Ã¢â€šÂ¬Ã‚Â as her opposition alignment gains DR 2/evil)."
+        }
+      ],
+      "spellcasting": {
+        "Spells": "+1 level of divine spellcasting class"
+      }
+    },
+    {
+      "level": 8,
+      "bab": 6,
+      "fort": 3,
+      "ref": 3,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Divine Awe",
+          "description": "At 8th level, a divine scionÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s spells can stagger creatures that match the alignment subtypes of the divine scionÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s opposition alignment . When such a creature is affected by a divine scionÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s spell, it is staggered for 1 round if it fails its save against that spell. If the creature makes its save (or if the spell doesnÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢t allow a saving throw), this ability has no effect."
+        }
+      ],
+      "spellcasting": {
+        "Spells": "+1 level of divine spellcasting class"
+      }
+    },
+    {
+      "level": 9,
+      "bab": 6,
+      "fort": 3,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [],
+      "spellcasting": {
+        "Spells": "+1 level of divine spellcasting class"
+      }
+    },
+    {
+      "level": 10,
+      "bab": 7,
+      "fort": 3,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "True Scion",
+          "description": "At 10th level, a divine scion becomes a true scion of her deity. The amount of healing she gains from her domain specialization doubles. Her divine wrath ability now deals +2 points of damage per die against creatures of the appropriate alignment . The damage reduction granted by her deific defense increases to 5. Finally, she permanently increases her Wisdom or Charisma score (her choice) by +1. Section 15: Copyright Notice Pathfinder Campaign Setting: Inner Sea Magic. Ãƒâ€šÃ‚Â© 2011, Paizo Publishing, LLC; Authors: Jesse Benner, Jason Nelson, Sean K Reynolds, Owen K.C. Stephens, Russ Taylor."
+        }
+      ],
+      "spellcasting": {
+        "Spells": "+1 level of divine spellcasting class"
+      }
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": {
+    "summary": "See level progression spell columns."
+  },
+  "spellcastingClass": true
+}

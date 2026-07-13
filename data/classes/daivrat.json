@@ -1,0 +1,265 @@
+{
+  "name": "Daivrat",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/c-d/daivrat/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Elemental Focus",
+          "description": "At 1st level, the daivrat gains a measure of connection with elemental powers. Choose one of the following descriptors: acid, air, cold, earth, electricity, fire, or water. When casting spells of the chosen descriptor, the daivrat is considered to possess the Spell Focus feat for that spell. Only one Spell Focus or Greater Spell Focus applies to the casting of a spell."
+        },
+        {
+          "name": "Genie-Tongue",
+          "description": "A daivrat is well-versed in communicating with genies and genie-kin. A daivrat gains a +2 bonus on Charisma -based checks to influence the attitudes of genies and allies of genies, and a +4 bonus to Knowledge checks regarding genies."
+        }
+      ],
+      "spellcasting": {
+        "Spellcasting": "-"
+      }
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Spell-Fetch (3Rd)",
+          "description": "Once per day, while preparing spells (or spell slots, for spontaneous casters), a daivrat can conjure a minor genie to find an unusual spell for him. The daivrat chooses one spell he does not know, such as a spell from a prohibited school or from another classÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s spell list, and sends the genie to fetch magical energy matching that spell. The genie returns after 10 minutes and presents the daivrat with the matching spell energy. If the daivrat casts spells like a wizard , for the next 24 hours he can prepare the fetched spell as if it were in his spellbook. If he casts spells like a sorcerer , for the next 24 hours he may cast the fetched spell as if he knew it. At 2nd level, the genie can retrieve any spell of 3rd level or lower. At 5th level, the genie can retrieve any spell of 6th level or lower. At 8th level, the genie can retrieve any spell of 8th level or lower. The genie is incorporeal and has no other powers or abilities (it cannot be used to scout, send messages, and so on) and vanishes once it delivers the spell. Preparing or casting the fetched spell is more difficult than using spells the daivrat actually knows. If the fetched spell is on the daivratÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s spellcasting classÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s spell list, it is treated as 1 spell level higher than normal; otherwise it is treated as 2 spell levels higher than normal."
+        }
+      ],
+      "spellcasting": {
+        "Spellcasting": "+1 level of existing arcane spellcasting class"
+      }
+    },
+    {
+      "level": 3,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Genie'S Friend (+2)",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spellcasting": "+1 level of existing arcane spellcasting class"
+      }
+    },
+    {
+      "level": 4,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Elemental Attunement",
+          "description": "At 4th level, the daivrat gains energy resistance 5 against acid, cold, electricity, or fire."
+        }
+      ],
+      "spellcasting": {
+        "Spellcasting": "+1 level of existing arcane spellcasting class"
+      }
+    },
+    {
+      "level": 5,
+      "bab": 2,
+      "fort": 2,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Spell-Fetch (6Th)",
+          "description": "Once per day, while preparing spells (or spell slots, for spontaneous casters), a daivrat can conjure a minor genie to find an unusual spell for him. The daivrat chooses one spell he does not know, such as a spell from a prohibited school or from another classÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s spell list, and sends the genie to fetch magical energy matching that spell. The genie returns after 10 minutes and presents the daivrat with the matching spell energy. If the daivrat casts spells like a wizard , for the next 24 hours he can prepare the fetched spell as if it were in his spellbook. If he casts spells like a sorcerer , for the next 24 hours he may cast the fetched spell as if he knew it. At 2nd level, the genie can retrieve any spell of 3rd level or lower. At 5th level, the genie can retrieve any spell of 6th level or lower. At 8th level, the genie can retrieve any spell of 8th level or lower. The genie is incorporeal and has no other powers or abilities (it cannot be used to scout, send messages, and so on) and vanishes once it delivers the spell. Preparing or casting the fetched spell is more difficult than using spells the daivrat actually knows. If the fetched spell is on the daivratÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s spellcasting classÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s spell list, it is treated as 1 spell level higher than normal; otherwise it is treated as 2 spell levels higher than normal."
+        }
+      ],
+      "spellcasting": {
+        "Spellcasting": "+1 level of existing arcane spellcasting class"
+      }
+    },
+    {
+      "level": 6,
+      "bab": 3,
+      "fort": 2,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Zhyen Familiar",
+          "description": "At 6th level, a daivrat can select a zhyen to serve as his familiar, replacing any familiar he already possesses, as if he had the Improved Familiar feat."
+        }
+      ],
+      "spellcasting": {
+        "Spellcasting": "+1 level of existing arcane spellcasting class"
+      }
+    },
+    {
+      "level": 7,
+      "bab": 3,
+      "fort": 2,
+      "ref": 2,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Greater Elemental Focus",
+          "description": "At 7th level, the daivratÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s connection with his chosen element deepens. When casting spells with the descriptor chosen for his elemental focus ability, the daivrat is now considered to possess the Greater Spell Focus feat. Only one Spell Focus or Greater Spell Focus applies to the casting of a spell."
+        }
+      ],
+      "spellcasting": {
+        "Spellcasting": "+1 level of existing arcane spellcasting class"
+      }
+    },
+    {
+      "level": 8,
+      "bab": 4,
+      "fort": 3,
+      "ref": 3,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Spell-Fetch (8Th)",
+          "description": "Once per day, while preparing spells (or spell slots, for spontaneous casters), a daivrat can conjure a minor genie to find an unusual spell for him. The daivrat chooses one spell he does not know, such as a spell from a prohibited school or from another classÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s spell list, and sends the genie to fetch magical energy matching that spell. The genie returns after 10 minutes and presents the daivrat with the matching spell energy. If the daivrat casts spells like a wizard , for the next 24 hours he can prepare the fetched spell as if it were in his spellbook. If he casts spells like a sorcerer , for the next 24 hours he may cast the fetched spell as if he knew it. At 2nd level, the genie can retrieve any spell of 3rd level or lower. At 5th level, the genie can retrieve any spell of 6th level or lower. At 8th level, the genie can retrieve any spell of 8th level or lower. The genie is incorporeal and has no other powers or abilities (it cannot be used to scout, send messages, and so on) and vanishes once it delivers the spell. Preparing or casting the fetched spell is more difficult than using spells the daivrat actually knows. If the fetched spell is on the daivratÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s spellcasting classÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s spell list, it is treated as 1 spell level higher than normal; otherwise it is treated as 2 spell levels higher than normal."
+        }
+      ],
+      "spellcasting": {
+        "Spellcasting": "+1 level of existing arcane spellcasting class"
+      }
+    },
+    {
+      "level": 9,
+      "bab": 4,
+      "fort": 3,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Genie'S Friend (+4)",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spellcasting": "+1 level of existing arcane spellcasting class"
+      }
+    },
+    {
+      "level": 10,
+      "bab": 5,
+      "fort": 3,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Genie-Kin",
+          "description": "At 10th level, the daivratÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s type changes to outsider ( native ). He gains acid, cold, electricity, and fire resistance 5, resistance 10 against his chosen energy type from his elemental attunement ability, and damage reduction 5/-. Section 15: Copyright Notice Pathfinder Companion: Qadira, Gateway to the East . Copyright 2009, Paizo Publishing, LLC; Author: Brian Cortijo. Ãƒâ€šÃ‚Â© 2015, Paizo Inc.; Authors: Dennis Baker, Jesse Benner, Ross Beyers, Logan Bonner, Jason Bulmahn, Robert Emerson, Tim Hitchcock, Jason Nelson, Tom Phillips, Stephen Radney-MacFarland, Thomas M. Reid, Robert Schwalb, Mark Seifter, and Russ Taylor."
+        }
+      ],
+      "spellcasting": {
+        "Spellcasting": "+1 level of existing arcane spellcasting class"
+      }
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": {
+    "summary": "See level progression spell columns."
+  },
+  "spellcastingClass": true
+}

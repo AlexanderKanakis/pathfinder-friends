@@ -1,0 +1,247 @@
+{
+  "name": "Sanguine Angel",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/s-z/sanguine-angel/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 1,
+      "fort": 1,
+      "ref": 0,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Hardened Heart",
+          "description": "A sanguine angel adds twice her class level to the DC of any attempt to Intimidate her."
+        },
+        {
+          "name": "Maiden'S Shield",
+          "description": "A sanguine angel is treated as if she had the Two-Weapon Fighting feat as long as she is using a longsword and a shield. This allows her to take feats that require Two-Weapon Fighting as a prerequisite without meeting the Two-Weapon Fighting or Dexterity prerequisites, but she benefits from such feats only when she's wielding a longsword and shield."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 2,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Tyrant'S Discipline",
+          "description": "At 2nd level, a sanguine angel draws upon her indoctrination, tactical training, and devotion to tyranny to develop potent talents. A sanguine angel selects a discipline from the following list at 2nd level and every 2 levels thereafter. Castling : When the sanguine angel takes a 5-foot step, she can step into the space of a willing, adjacent ally. If she does, that ally immediately takes a 5-foot step into the sanguine angel's former space without spending an action to do so. Driving Assault : When making a full attack, the sanguine angel can take a -2 penalty on melee attack rolls for 1 round. If she does, the first time in that round that she hits a creature of her size or smaller with a melee attack, she can attempt a bull rush combat maneuver check to push the creature back 5 feet. She gains a +2 bonus on this combat maneuver check and does not provoke attacks of opportunity when performing the bull rush , but regardless of the result, she cannot push the target further than 5 feet. If the sanguine angel pushes a creature in this way, she can immediately move into its space without provoking attacks of opportunity . Erinyes Fury : The sanguine angel can enter a dispassionate, murderous state. This functions as the dreadnought barbarian's dead calm ability and is usable for a number of rounds each day equal to twice her class level. If the sanguine angel has levels in barbarian and has the dreadnought archetype, her sanguine angel levels instead stack with her barbarian levels to determine the duration of her rage. Furious Huntress : The sanguine angel adds "
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 3,
+      "bab": 3,
+      "fort": 2,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Armored Angel",
+          "description": "At 3rd level, a sanguine angel gains the armor training class feature, treating her class level as her fighter level while wearing Gray Maiden plate. If the sanguine angel has levels in another class that grants the armor training class feature, the levels stack to determine its benefits, but only when she is wearing Gray Maiden plate."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 4,
+      "bab": 4,
+      "fort": 2,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Tyrant'S Discipline",
+          "description": "At 2nd level, a sanguine angel draws upon her indoctrination, tactical training, and devotion to tyranny to develop potent talents. A sanguine angel selects a discipline from the following list at 2nd level and every 2 levels thereafter. Castling : When the sanguine angel takes a 5-foot step, she can step into the space of a willing, adjacent ally. If she does, that ally immediately takes a 5-foot step into the sanguine angel's former space without spending an action to do so. Driving Assault : When making a full attack, the sanguine angel can take a -2 penalty on melee attack rolls for 1 round. If she does, the first time in that round that she hits a creature of her size or smaller with a melee attack, she can attempt a bull rush combat maneuver check to push the creature back 5 feet. She gains a +2 bonus on this combat maneuver check and does not provoke attacks of opportunity when performing the bull rush , but regardless of the result, she cannot push the target further than 5 feet. If the sanguine angel pushes a creature in this way, she can immediately move into its space without provoking attacks of opportunity . Erinyes Fury : The sanguine angel can enter a dispassionate, murderous state. This functions as the dreadnought barbarian's dead calm ability and is usable for a number of rounds each day equal to twice her class level. If the sanguine angel has levels in barbarian and has the dreadnought archetype, her sanguine angel levels instead stack with her barbarian levels to determine the duration of her rage. Furious Huntress : The sanguine angel adds "
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 5,
+      "bab": 5,
+      "fort": 3,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Eye Of Alertness",
+          "description": "Sanguine angel's keen eyes pierce all deception. At 5th level, a sanguine angel gains Alertness as a bonus feat and gains a +4 profane bonus on Will saves against illusions. In addition, once per day as a swift action , the sanguine angel can take 1d4 points of Charisma damage to gain the benefits of the true seeing spell for a number of rounds equal to her class level."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 6,
+      "bab": 6,
+      "fort": 3,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Tyrant'S Discipline",
+          "description": "At 2nd level, a sanguine angel draws upon her indoctrination, tactical training, and devotion to tyranny to develop potent talents. A sanguine angel selects a discipline from the following list at 2nd level and every 2 levels thereafter. Castling : When the sanguine angel takes a 5-foot step, she can step into the space of a willing, adjacent ally. If she does, that ally immediately takes a 5-foot step into the sanguine angel's former space without spending an action to do so. Driving Assault : When making a full attack, the sanguine angel can take a -2 penalty on melee attack rolls for 1 round. If she does, the first time in that round that she hits a creature of her size or smaller with a melee attack, she can attempt a bull rush combat maneuver check to push the creature back 5 feet. She gains a +2 bonus on this combat maneuver check and does not provoke attacks of opportunity when performing the bull rush , but regardless of the result, she cannot push the target further than 5 feet. If the sanguine angel pushes a creature in this way, she can immediately move into its space without provoking attacks of opportunity . Erinyes Fury : The sanguine angel can enter a dispassionate, murderous state. This functions as the dreadnought barbarian's dead calm ability and is usable for a number of rounds each day equal to twice her class level. If the sanguine angel has levels in barbarian and has the dreadnought archetype, her sanguine angel levels instead stack with her barbarian levels to determine the duration of her rage. Furious Huntress : The sanguine angel adds "
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 7,
+      "bab": 7,
+      "fort": 4,
+      "ref": 2,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Mystique",
+          "description": "At 7th level, a sanguine angel gains a +4 bonus on Diplomacy and Intimidate checks against targets of the same creature type as the sanguine angel. Once per day, the sanguine angel can use dominate person as a spell-like ability (CL = her character level)."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 8,
+      "bab": 8,
+      "fort": 4,
+      "ref": 3,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Tyrant'S Discipline",
+          "description": "At 2nd level, a sanguine angel draws upon her indoctrination, tactical training, and devotion to tyranny to develop potent talents. A sanguine angel selects a discipline from the following list at 2nd level and every 2 levels thereafter. Castling : When the sanguine angel takes a 5-foot step, she can step into the space of a willing, adjacent ally. If she does, that ally immediately takes a 5-foot step into the sanguine angel's former space without spending an action to do so. Driving Assault : When making a full attack, the sanguine angel can take a -2 penalty on melee attack rolls for 1 round. If she does, the first time in that round that she hits a creature of her size or smaller with a melee attack, she can attempt a bull rush combat maneuver check to push the creature back 5 feet. She gains a +2 bonus on this combat maneuver check and does not provoke attacks of opportunity when performing the bull rush , but regardless of the result, she cannot push the target further than 5 feet. If the sanguine angel pushes a creature in this way, she can immediately move into its space without provoking attacks of opportunity . Erinyes Fury : The sanguine angel can enter a dispassionate, murderous state. This functions as the dreadnought barbarian's dead calm ability and is usable for a number of rounds each day equal to twice her class level. If the sanguine angel has levels in barbarian and has the dreadnought archetype, her sanguine angel levels instead stack with her barbarian levels to determine the duration of her rage. Furious Huntress : The sanguine angel adds "
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 9,
+      "bab": 9,
+      "fort": 5,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Hollowness",
+          "description": "At 9th level, a sanguine angel gains Diehard as a bonus feat. In addition, she gains a +4 profane bonus on saving throws against emotion and pain effects, and she is immune to fear effects."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 10,
+      "bab": 10,
+      "fort": 5,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Angel Of Death",
+          "description": "At 10th level, a sanguine angel's type changes to outsider ( evil , extraplanar , lawful), and Hell becomes her native plane. She gains fire resistance 30, telepathy with a range of 50 feet, and the see in darkness universal monster ability. Ebon-feathered wings emerge from the sanguine angel's back, granting her a fly speed of 50 feet with good maneuverability. Section 15: Copyright Notice Pathfinder Roleplaying Game Adventurer's Guide Ãƒâ€šÃ‚Â© 2017, Paizo Inc.; Authors: Benjamin Bruck, John Compton, Crystal Frasier, Tim Hitchcock, Jenny Jarzabski, Isabelle Lee, Joe Pasini, Jessica Price, David Schwartz, and Josh Vogt."
+        },
+        {
+          "name": "Tyrant'S Discipline",
+          "description": "At 2nd level, a sanguine angel draws upon her indoctrination, tactical training, and devotion to tyranny to develop potent talents. A sanguine angel selects a discipline from the following list at 2nd level and every 2 levels thereafter. Castling : When the sanguine angel takes a 5-foot step, she can step into the space of a willing, adjacent ally. If she does, that ally immediately takes a 5-foot step into the sanguine angel's former space without spending an action to do so. Driving Assault : When making a full attack, the sanguine angel can take a -2 penalty on melee attack rolls for 1 round. If she does, the first time in that round that she hits a creature of her size or smaller with a melee attack, she can attempt a bull rush combat maneuver check to push the creature back 5 feet. She gains a +2 bonus on this combat maneuver check and does not provoke attacks of opportunity when performing the bull rush , but regardless of the result, she cannot push the target further than 5 feet. If the sanguine angel pushes a creature in this way, she can immediately move into its space without provoking attacks of opportunity . Erinyes Fury : The sanguine angel can enter a dispassionate, murderous state. This functions as the dreadnought barbarian's dead calm ability and is usable for a number of rounds each day equal to twice her class level. If the sanguine angel has levels in barbarian and has the dreadnought archetype, her sanguine angel levels instead stack with her barbarian levels to determine the duration of her rage. Furious Huntress : The sanguine angel adds "
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": null,
+  "spellcastingClass": false
+}

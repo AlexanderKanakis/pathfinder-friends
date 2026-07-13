@@ -1,0 +1,1054 @@
+{
+  "name": "Monk (Unchained)",
+  "type": "unchained",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/unchained-classes/monk-unchained/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 1,
+      "fort": 2,
+      "ref": 2,
+      "will": 0,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": "At 1st level, 2nd level, and every 4 levels thereafter, a monk can select a bonus feat. These feats must be taken from the following list: Catch Off-Guard , Combat Reflexes , Deflect Arrows , Dodge , Improved Grapple , Scorpion Style , and Throw Anything . At 6th level, the following feats are added to the list: Gorgon's Fist , Improved Bull Rush , Improved Disarm , Improved Feint , Improved Trip , and Mobility . At 10th level, the following feats are added to the list: Improved Critical , Medusa's Wrath , Snatch Arrows , and Spring Attack . A monk need not have any of the prerequisites normally required for these feats to select them."
+        },
+        {
+          "name": "Flurry Of Blows (Bonus Attack)",
+          "description": "At 1st level, a monk can make a flurry of blows as a full-attack action. When making a flurry of blows, the monk can make one additional attack at his highest base attack bonus . This additional attack stacks with the bonus attacks from haste and other similar effects. When using this ability, the monk can make these attacks with any combination of his unarmed strikes and weapons that have the monk special weapon quality. He takes no penalty for using multiple weapons when making a flurry of blows, but he does not gain any additional attacks beyond what's already granted by the flurry for doing so. (He can still gain additional attacks from a high base attack bonus , from this ability, and from haste and similar effects). At 11th level, a monk can make an additional attack at his highest base attack bonus whenever he makes a flurry of blows. This stacks with the first attack from this ability and additional attacks from haste and similar effects."
+        },
+        {
+          "name": "Stunning Fist",
+          "description": "At 1st level, the monk gains Stunning Fist as a bonus feat, even if he does not meet the prerequisites. At 4th level, and every 4 levels thereafter, the monk gains the ability to apply a new condition to the target of his Stunning Fist . This condition replaces stunning the target for 1 round, and a successful saving throw still negates the effect. At 4th level, the monk can choose to make the target fatigued . At 8th level, he can make the target sickened for 1 minute. At 12th level, he can make the target staggered for 1d6+1 rounds. At 16th level, he can permanently blind or deafen the target. At 20th level, he can paralyze the target for 1d6+1 rounds. The monk must choose which condition will apply before the attack roll is made. These effects do not stack with themselves (a creature fatigued by Stunning Fist cannot become exhausted if hit by Stunning Fist again), but additional hits do increase the duration."
+        },
+        {
+          "name": "Unarmed Strike",
+          "description": "Table: Small or Large Monk Natural Damage Level Small Monk Damage Large Monk Damage) 1st-3rd 1d4 1d8 4th-7th 1d6 2d6 8th-11th 1d8 2d8 12th-15th 1d10 3d6 16th-19th 2d6 3d8 20th 2d8 4d8 At 1st level, a monk gains Improved Unarmed Strike as a bonus feat. A monk's attacks can be with fists, elbows, knees, and feet. This means that a monk can make unarmed strikes with his hands full. There is no such thing as an off-hand attack for a monk striking unarmed. A monk can apply his full Strength bonus on damage rolls for all his unarmed strikes. A monk's unarmed strikes deal lethal damage, although he can choose to deal nonlethal damage with no penalty on his attack roll . He can make this choice while grappling as well. A monk's unarmed strike is treated as both a manufactured weapon and a natural weapon for the purpose of spells and effects that enhance or improve either manufactured weapons or natural weapons . The damage dealt by a monk's unarmed strike is determined by the unarmed damage column on Table: Monk Unchained . The damage listed is for Medium monks . The damage for Small or Large monks is listed below."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 2,
+      "bab": 2,
+      "fort": 3,
+      "ref": 3,
+      "will": 0,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": "At 1st level, 2nd level, and every 4 levels thereafter, a monk can select a bonus feat. These feats must be taken from the following list: Catch Off-Guard , Combat Reflexes , Deflect Arrows , Dodge , Improved Grapple , Scorpion Style , and Throw Anything . At 6th level, the following feats are added to the list: Gorgon's Fist , Improved Bull Rush , Improved Disarm , Improved Feint , Improved Trip , and Mobility . At 10th level, the following feats are added to the list: Improved Critical , Medusa's Wrath , Snatch Arrows , and Spring Attack . A monk need not have any of the prerequisites normally required for these feats to select them."
+        },
+        {
+          "name": "Evasion",
+          "description": "At 2nd level, a monk can avoid damage from many area-effect attacks. If a monk succeeds at a Reflex saving throw against an attack that normally deals half damage on a successful save, he instead takes no damage. Evasion can be used only if a monk is wearing light armor or no armor. A helpless monk does not gain the benefit of evasion ."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 3,
+      "bab": 3,
+      "fort": 3,
+      "ref": 3,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Fast Movement",
+          "description": "At 3rd level, a monk gains an enhancement bonus to his land speed, as shown on Table: Monk Unchained . A monk in armor or carrying a medium or heavy load loses this extra speed."
+        },
+        {
+          "name": "Ki Pool",
+          "description": "At 3rd level, a monk gains a pool of ki points, supernatural energy he can use to accomplish amazing feats. The number of points in a monk's ki pool is equal to 1/2 his monk level + his Wisdom modifier. As long as he has at least 1 point in his ki pool, he can make a ki strike . At 3rd level, ki strike allows his unarmed attacks to be treated as magic weapons for the purpose of overcoming damage reduction . At 7th level, his unarmed attacks are also treated as cold iron and silver for the purpose of overcoming damage reduction . At 10th level, his unarmed attacks are also treated as lawful weapons for the purpose of overcoming damage reduction . At 16th level, his unarmed attacks are treated as adamantine weapons for the purpose of overcoming damage reduction and bypassing hardness . By spending 1 point from his ki pool as a swift action , a monk can make one additional unarmed strike at his highest attack bonus when making a flurry of blows attack. This bonus attack stacks with all bonus attacks gained from flurry of blows , as well as those from haste and similar effects. A monk gains additional powers that consume points from his ki pool as he gains levels. The ki pool is replenished each morning after 8 hours of rest or meditation; these hours do not need to be consecutive."
+        },
+        {
+          "name": "Ki Strike (Magic)",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 4,
+      "bab": 4,
+      "fort": 4,
+      "ref": 4,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Ki Power",
+          "description": "At 4th level and every 2 levels thereafter, a monk can select one ki power. These powers allow the monk to perform amazing feats of mystical power and acrobatic prowess by expending points from his ki pool. Once a ki power is selected, it cannot be changed. Some ki powers require the monk to be of a specific level or higher before they can be chosen. Unless otherwise noted, a monk cannot select an individual ki power more than once. Empty Body (Su) : A monk with this ki power gains the ability to assume an ethereal state for 1 minute as though using the spell etherealness , using his monk level as his caster level . Using this ability is a move action that consumes 3 points from the monk's ki pool. This ability affects only the monk and cannot be used to make other creatures ethereal. Feather Balance (Ex) : A monk with this ability can spend 1 ki point as a swift action to achieve perfect balance. While this is active, the monk treats any Acrobatics attempt made to balance as if he had rolled a 20. This ability lasts for 1 minute. High Jump (Ex) : A monk with this ki power adds his level as a bonus on all Acrobatics checks to jump, both for vertical jumps and horizontal jumps. In addition, he always counts as having a running start when attempting Acrobatics checks to jump. By spending 1 point from his ki pool as a swift action , the monk gains a +20 bonus on Acrobatics checks to jump for 1 round. Ki Metabolism (Su) : A monk with this ability uses his ki to control his metabolism. As long as he has at least 1 point remaining in his ki pool , the monk needs to eat and ",
+          "pools": [
+            {
+              "name": "Ki Power",
+              "description": "At 4th level and every 2 levels thereafter, a monk can select one ki power. These powers allow the monk to perform amazing feats of mystical power and acrobatic prowess by expending points from his ki pool. Once a ki power is selected, it cannot be changed. Some ki powers require the monk to be of a specific level or higher before they can be chosen. Unless otherwise noted, a monk cannot select an individual ki power more than once. Empty Body (Su) : A monk with this ki power gains the ability to assume an ethereal state for 1 minute as though using the spell etherealness , using his monk level as his caster level . Using this ability is a move action that consumes 3 points from the monk's ki pool. This ability affects only the monk and cannot be used to make other creatures ethereal. Feather Balance (Ex) : A monk with this ability can spend 1 ki point as a swift action to achieve perfect balance. While this is active, the monk treats any Acrobatics attempt made to balance as if he had rolled a 20. This ability lasts for 1 minute. High Jump (Ex) : A monk with this ki power adds his level as a bonus on all Acrobatics checks to jump, both for vertical jumps and horizontal jumps. In addition, he always counts as having a running start when attempting Acrobatics checks to jump. By spending 1 point from his ki pool as a swift action , the monk gains a +20 bonus on Acrobatics checks to jump for 1 round. Ki Metabolism (Su) : A monk with this ability uses his ki to control his metabolism. As long as he has at least 1 point remaining in his ki pool , the monk needs to eat and ",
+              "requirements": {
+                "minClassLevel": 2,
+                "text": "At 4th level and every 2 levels thereafter, a monk can select one ki power. Once a ki power is selected, it cannot be changed."
+              },
+              "options": [
+                {
+                  "name": "6Th Level Required:",
+                  "description": "Action Before Thought (Ex) : A monk with this ability can spend 2 ki points as a free action as part of rolling initiative to roll twice on the initiative check and take the higher result. A monk must be at least 6th level before selecting this ki power. Source PPC:MAH Diamond Mind (Su) : By spending 1 point from his ki pool as a swift action , a monk with this power can suppress a fear effect affecting him as if using remove fear , using his monk level as his caster level . He can spend 2 ki points to activate this ability even when frightened or panicked . A monk must be at least 6th level before selecting this ki power. Elemental Fury (Su) : A monk who selects this ki power must select one type of energy: acid, cold, electricity, or fire. Once this choice is made, it cannot be changed. The monk can expend 1 point from his ki pool as a swift action to imbue his natural attacks with this energy, causing them to deal 1d6 points of damage of the chosen type for a number of rounds equal to 1/2 his monk level. A monk must be at least 6th level before selecting this ki power. Ki Guardian (Su) : As an immediate action before he rolls a saving throw against a targeted effect that also targets other allies or an area effect whose area includes other allies, a monk with this ability can spend any number of ki points and designate a number of adjacent allies equal to the number of ki points spent. The monk rolls one saving throw for each designated ally, using his bonus instead of the ally&#8217;s. For each successful saving throw, the corresponding ally treats the effect as if that ally had succeeded at the saving throw, and for each saving throw failed, the corresponding ally treats the effect as if that ally had failed the saving throw. If the monk fails any of the saving thr",
+                  "requirements": {
+                    "minClassLevel": 6,
+                    "text": "Action Before Thought (Ex) : A monk with this ability can spend 2 ki points as a free action as part of rolling initiative to roll twice on the initiative check and take the higher result. A monk must be at least 6th level before selecting this ki power."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "7Th Level Required:",
+                  "description": "Formless Mastery (Ex) : A monk with this ability varies his styles, never repeating the same move twice and capitalizing on the weaknesses of an opponent&#8217;s style. As long as he does not possess any style feat, the monk can spend 1 point from his ki pool as an immediate action to gain the following against opponents in the stance of a style feat: a +4 dodge bonus to AC, a +4 circumstance bonus on attack rolls , and a bonus equal to his monk level on damage rolls. These bonuses last until the end of the monk&#8217;s next turn (or his current turn if he uses this ability on his own turn). The monk can activate this ability and the furious defense ki power with the same immediate action for a total cost of 3 ki points. A monk must be at least 7th level before selecting this ki power. Furious Defense (Ex) : By spending 1 point from his ki pool as an immediate action , a monk with this ki power can grant himself a +4 dodge bonus to AC until the end of his next turn. The monk can activate this ability and the formless mastery ki power with the same immediate action for a total cost of 3 ki points. A monk must be at least 7th level before selecting this ki power.",
+                  "requirements": {
+                    "minClassLevel": 7,
+                    "text": "As long as he does not possess any style feat, the monk can spend 1 point from his ki pool as an immediate action to gain the following against opponents in the stance of a style feat: a +4 dodge bonus to AC, a +4 circumstance bonus on attack rolls , and a bonus equal to his monk level on damage rolls. A monk must be at least 7th level before selecting this ki power."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "8Th Level Required:",
+                  "description": "Abundant Step (Su) : A monk with this ki power can slip magically between spaces, as if using the spell dimension door . Using this ability is a move action that consumes 2 points from his ki pool. The monk&#8217;s caster level for this effect is equal to his monk level. He cannot take other creatures with him when he uses this ability. A monk must be at least 8th level before selecting this ki power. Bare-Hand Block (Ex) : A monk with this ability can spend 1 ki point as an immediate action when attacked with a manufactured weapon to attempt an unarmed sunder combat maneuver check against it. If he successfully sunders the weapon and grants it the broken condition, the attack deals no damage. He can spend an additional 1 ki point when using this ability to activate ki sunder as a free action . A monk must be at least 8th level and have the ki sunder ki power before selecting this ki power. Source PPC:MAH Breaking-Down Koan (Su) : A monk with this ability can spend 1 ki point as a swift action to present a paradox, riddle, or complicated question to a creature within 30 feet. The creature must succeed at a Will save (DC = 10 + 1/2 the monkÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s level + his Wisdom modifier) or be confused for 1 round. This is a mind-affecting , language-dependent effect. A monk must be at least 8th level before selecting this ki power. Source PPC:MAH Building-Up Koan (Su) : A monk with this ability can spend 2 ki points as a swift action to ask himself a koan, which he then tries to answer. The monk must attempt a Will save (DC 15 + 1/2 the monkÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s level). If successful, he gains an insight bonus equal to his Wisdom modifier to AC and on attack rolls , saving throws, skill checks and until the end of the round. If he fails, the monk is instead confused for 1 round. This is a mind-affecting ,",
+                  "requirements": {
+                    "minClassLevel": 8,
+                    "text": "The monk&#8217;s caster level for this effect is equal to his monk level. A monk must be at least 8th level before selecting this ki power."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "10Th Level Required:",
+                  "description": "Ki Blocker (Su) : A monk with this ability can spend 1 ki point as a free action before making an unarmed strike against a foe. If the attack hits, the monk can interrupt the target&#8217;s flow of ki. If the monk successfully damages the target of his attack, that opponent&#8217;s cost to activate abilities with ki increases by 1 ki point for 1 hour. If the monk spends 2 points from his ki pool, he can use this ability to affect the target&#8217;s arcane pool, arcane reservoir, grit points, inspiration, or panache points instead of its ki pool. The effects of this ability do not stack, but multiple hits increase the duration by 1 hour for each hit. A monk must be at least 10th level before selecting this ki power. Ki Hurricane (Ex) : As a full-round action , a monk with this ability can move up to twice his speed. At any point in that movement, the monk can spend 1 ki point to make the first attack in his flurry of blows . He can later spend another ki point to make the next attack in his flurry of blows , and so on, until he either stops spending ki points or has exhausted all the attacks from his flurry of blows . A monk must be at least 10th level and possess the sudden speed ki power before selecting this ki power. Ki Visions (Su) : A monk with this ability often sees visions of spirits or hears the voice of his departed mentor in his dreams. On any given night during which the monk dreams, he can use this ability to gain the benefits of a divination . If he does, he spends 2 ki points from the next day&#8217;s total. A monk must be at least 10th level before selecting this ki power.",
+                  "requirements": {
+                    "minClassLevel": 10,
+                    "text": "Ki Blocker (Su) : A monk with this ability can spend 1 ki point as a free action before making an unarmed strike against a foe. A monk must be at least 10th level before selecting this ki power."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "12Th Level Required:",
+                  "description": "Cobra Breath (Su) : Whenever a monk with this ki power uses diamond body to neutralize a poison , he can instead release that poison as a ranged touch attack against a single foe within 30 feet. If the attack hits, the foe must succeed at a saving throw (using the poison&#8217;s original DC) or suffer the poison&#8217;s effects, even if it was not originally a contact poison . A monk must be at least 12th level and must possess the diamond body ki power before selecting this ki power. Diamond Resilience (Ex) : By spending 1 ki point as a swift action , the monk gains DR 2/-. At 16th level, the damage reduction increases to 4/-. At 19th level, it increases to DR 6/-. This DR lasts for 1 minute. A monk must be at least 12th level before selecting this ki power. Diamond Soul (Ex) : A monk can spend 2 points from his ki pool as a swift action to gain spell resistance equal to his monk level + 10. This spell resistance lasts for a number of rounds equal to the monk&#8217;s level. A monk must be at least 12th level before selecting this ki power. Master-Thought Koan (Su) : A monk with this ability can spend an additional 2 ki points when using either the breaking-down koan or building-up koan ki powers. When combined with master-thought koan, breaking-down koan affects a number of characters of your choice within 30 feet equal to the monkÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s wisdom modifier. When combined with master-thought koan, building-up koan can be used on an ally within 30 feet. A monk must be at least 12th level and have either the breaking-down koan or the building-up koan ki power before selecting this ki power. Source PPC:MAH One Touch (Ex) : As long as he has at least 1 point remaining in his ki pool, as a standard action , a monk with this power can make an unarmed strike against a foe as a touch ",
+                  "requirements": {
+                    "minClassLevel": 12,
+                    "text": "If the attack hits, the foe must succeed at a saving throw (using the poison&#8217;s original DC) or suffer the poison&#8217;s effects, even if it was not originally a contact poison . A monk must be at least 12th level and must possess the diamond body ki power before selecting this ki power."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "16Th Level Required:",
+                  "description": "Ki Volley (Su) : When a targeted spell or spell-like ability fails to overcome the monk&#8217;s spell resistance from diamond soul , he can spend 2 ki points as an immediate action to send that spell back at its caster as spell turning . A monk must be 16th level or higher and possess the diamond soul ki power before selecting this ki power. Quivering Palm (Su) : A monk can set up vibrations within the body of another creature that can thereafter be fatal if the monk so desires. Using this ability is a standard action that costs 4 ki points, and the monk must announce his intent to use this ability (and spend the ki points) before making the attack roll . Creatures immune to critical hits cannot be affected. Otherwise, if the attack hits and the target takes damage from the blow, the quivering palm attack succeeds. Thereafter, the monk can try to slay the victim at any time within a number of days equal to his monk level. To make such an attempt, the monk merely wills the target to die (a free action ); unless the target succeeds at a Fortitude saving throw (DC = 10 + 1/2 the monk&#8217;s level + the monk&#8217;s Wisdom modifier), it dies. If the saving throw is successful, the target is no longer in danger from that particular quivering palm attack, but it can still be affected by another one at a later time. A monk can have no more than one quivering palm in effect at one time. If a monk uses quivering palm while another is still in effect, the previous one is negated. A monk must be at least 16th level before selecting this ki power.",
+                  "requirements": {
+                    "minClassLevel": 16,
+                    "text": "A monk must be 16th level or higher and possess the diamond soul ki power before selecting this ki power. Using this ability is a standard action that costs 4 ki points, and the monk must announce his intent to use this ability (and spend the ki points) before making the attack roll ."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "18Th Level Required:",
+                  "description": "Elemental Burst (Su) : A monk with this ability can spend 4 ki points to unleash a gout of energy in a 30-foot cone. Creatures within the cone take 20d6 points of damage of the same type as the monk&#8217;s elemental fury ki power. A Reflex save (DC = 10 + 1/2 the monk&#8217;s level + his Wisdom modifier) halves the damage. A monk must be at least 18th level and must possess the elemental fury ki power before selecting this ki power.",
+                  "requirements": {
+                    "minClassLevel": 18,
+                    "text": "A Reflex save (DC = 10 + 1/2 the monk&#8217;s level + his Wisdom modifier) halves the damage. A monk must be at least 18th level and must possess the elemental fury ki power before selecting this ki power."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/unchained-classes/monk-unchained/",
+              "scrapeConfidence": "medium"
+            }
+          ]
+        },
+        {
+          "name": "Still Mind",
+          "description": "At 4th level, a monk gains a +2 bonus on saving throws against enchantment spells and effects."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 5,
+      "bab": 5,
+      "fort": 4,
+      "ref": 4,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Purity Of Body",
+          "description": "At 5th level, a monk gains immunity to all diseases, including supernatural and magical diseases."
+        },
+        {
+          "name": "Style Strike (1/Round)",
+          "description": "At 5th level, a monk can learn one type of style strike. Whenever he makes a flurry of blows , he can designate one of his unarmed strikes as a style strike. This attack is resolved as normal, but it has an additional effect depending on the type of strike chosen. At 9th level, and every 4 levels thereafter, a monk learns an additional style strike. He must choose which style strike to apply before the attack roll is made. At 15th level, he can designate up to two of his unarmed strikes each round as a style strike, and each one can be a different type. The monk can choose from any of the following strikes. Break : The monk combines a writhing twist with a violent strike against a foe that is grappling him. If the monkÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s attack is successful, he can attempt a grapple combat maneuver check or Escape Artist check as a free action to escape a grapple , adding the strikeÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s damage as a bonus on his check. Source PPC:MAH Defensive Spin : The monk spins about, confounding his foe. If the attack hits, the monk gains a +4 dodge bonus to AC against any attacks made by the target of the style strike until the start of his next turn. This bonus does not stack with itself. The monk must attack with a fist to use this style strike. Elbow Smash : The monk follows up a punch with a strike from his elbow. If the attack hits, the monk can make an additional attack using the same attack bonus as the punch at a -5 penalty. If this second attack hits, it deals damage as normal, but all of the damage is nonlethal . The monk must attack with a fist to use this style strike. Flying Kick : The monk"
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 6,
+      "bab": 6,
+      "fort": 5,
+      "ref": 5,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": "At 1st level, 2nd level, and every 4 levels thereafter, a monk can select a bonus feat. These feats must be taken from the following list: Catch Off-Guard , Combat Reflexes , Deflect Arrows , Dodge , Improved Grapple , Scorpion Style , and Throw Anything . At 6th level, the following feats are added to the list: Gorgon's Fist , Improved Bull Rush , Improved Disarm , Improved Feint , Improved Trip , and Mobility . At 10th level, the following feats are added to the list: Improved Critical , Medusa's Wrath , Snatch Arrows , and Spring Attack . A monk need not have any of the prerequisites normally required for these feats to select them."
+        },
+        {
+          "name": "Ki Power",
+          "description": "At 4th level and every 2 levels thereafter, a monk can select one ki power. These powers allow the monk to perform amazing feats of mystical power and acrobatic prowess by expending points from his ki pool. Once a ki power is selected, it cannot be changed. Some ki powers require the monk to be of a specific level or higher before they can be chosen. Unless otherwise noted, a monk cannot select an individual ki power more than once. Empty Body (Su) : A monk with this ki power gains the ability to assume an ethereal state for 1 minute as though using the spell etherealness , using his monk level as his caster level . Using this ability is a move action that consumes 3 points from the monk's ki pool. This ability affects only the monk and cannot be used to make other creatures ethereal. Feather Balance (Ex) : A monk with this ability can spend 1 ki point as a swift action to achieve perfect balance. While this is active, the monk treats any Acrobatics attempt made to balance as if he had rolled a 20. This ability lasts for 1 minute. High Jump (Ex) : A monk with this ki power adds his level as a bonus on all Acrobatics checks to jump, both for vertical jumps and horizontal jumps. In addition, he always counts as having a running start when attempting Acrobatics checks to jump. By spending 1 point from his ki pool as a swift action , the monk gains a +20 bonus on Acrobatics checks to jump for 1 round. Ki Metabolism (Su) : A monk with this ability uses his ki to control his metabolism. As long as he has at least 1 point remaining in his ki pool , the monk needs to eat and ",
+          "pools": [
+            {
+              "name": "Ki Power",
+              "description": "At 4th level and every 2 levels thereafter, a monk can select one ki power. These powers allow the monk to perform amazing feats of mystical power and acrobatic prowess by expending points from his ki pool. Once a ki power is selected, it cannot be changed. Some ki powers require the monk to be of a specific level or higher before they can be chosen. Unless otherwise noted, a monk cannot select an individual ki power more than once. Empty Body (Su) : A monk with this ki power gains the ability to assume an ethereal state for 1 minute as though using the spell etherealness , using his monk level as his caster level . Using this ability is a move action that consumes 3 points from the monk's ki pool. This ability affects only the monk and cannot be used to make other creatures ethereal. Feather Balance (Ex) : A monk with this ability can spend 1 ki point as a swift action to achieve perfect balance. While this is active, the monk treats any Acrobatics attempt made to balance as if he had rolled a 20. This ability lasts for 1 minute. High Jump (Ex) : A monk with this ki power adds his level as a bonus on all Acrobatics checks to jump, both for vertical jumps and horizontal jumps. In addition, he always counts as having a running start when attempting Acrobatics checks to jump. By spending 1 point from his ki pool as a swift action , the monk gains a +20 bonus on Acrobatics checks to jump for 1 round. Ki Metabolism (Su) : A monk with this ability uses his ki to control his metabolism. As long as he has at least 1 point remaining in his ki pool , the monk needs to eat and ",
+              "requirements": {
+                "minClassLevel": 2,
+                "text": "At 4th level and every 2 levels thereafter, a monk can select one ki power. Once a ki power is selected, it cannot be changed."
+              },
+              "options": [
+                {
+                  "name": "6Th Level Required:",
+                  "description": "Action Before Thought (Ex) : A monk with this ability can spend 2 ki points as a free action as part of rolling initiative to roll twice on the initiative check and take the higher result. A monk must be at least 6th level before selecting this ki power. Source PPC:MAH Diamond Mind (Su) : By spending 1 point from his ki pool as a swift action , a monk with this power can suppress a fear effect affecting him as if using remove fear , using his monk level as his caster level . He can spend 2 ki points to activate this ability even when frightened or panicked . A monk must be at least 6th level before selecting this ki power. Elemental Fury (Su) : A monk who selects this ki power must select one type of energy: acid, cold, electricity, or fire. Once this choice is made, it cannot be changed. The monk can expend 1 point from his ki pool as a swift action to imbue his natural attacks with this energy, causing them to deal 1d6 points of damage of the chosen type for a number of rounds equal to 1/2 his monk level. A monk must be at least 6th level before selecting this ki power. Ki Guardian (Su) : As an immediate action before he rolls a saving throw against a targeted effect that also targets other allies or an area effect whose area includes other allies, a monk with this ability can spend any number of ki points and designate a number of adjacent allies equal to the number of ki points spent. The monk rolls one saving throw for each designated ally, using his bonus instead of the ally&#8217;s. For each successful saving throw, the corresponding ally treats the effect as if that ally had succeeded at the saving throw, and for each saving throw failed, the corresponding ally treats the effect as if that ally had failed the saving throw. If the monk fails any of the saving thr",
+                  "requirements": {
+                    "minClassLevel": 6,
+                    "text": "Action Before Thought (Ex) : A monk with this ability can spend 2 ki points as a free action as part of rolling initiative to roll twice on the initiative check and take the higher result. A monk must be at least 6th level before selecting this ki power."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "7Th Level Required:",
+                  "description": "Formless Mastery (Ex) : A monk with this ability varies his styles, never repeating the same move twice and capitalizing on the weaknesses of an opponent&#8217;s style. As long as he does not possess any style feat, the monk can spend 1 point from his ki pool as an immediate action to gain the following against opponents in the stance of a style feat: a +4 dodge bonus to AC, a +4 circumstance bonus on attack rolls , and a bonus equal to his monk level on damage rolls. These bonuses last until the end of the monk&#8217;s next turn (or his current turn if he uses this ability on his own turn). The monk can activate this ability and the furious defense ki power with the same immediate action for a total cost of 3 ki points. A monk must be at least 7th level before selecting this ki power. Furious Defense (Ex) : By spending 1 point from his ki pool as an immediate action , a monk with this ki power can grant himself a +4 dodge bonus to AC until the end of his next turn. The monk can activate this ability and the formless mastery ki power with the same immediate action for a total cost of 3 ki points. A monk must be at least 7th level before selecting this ki power.",
+                  "requirements": {
+                    "minClassLevel": 7,
+                    "text": "As long as he does not possess any style feat, the monk can spend 1 point from his ki pool as an immediate action to gain the following against opponents in the stance of a style feat: a +4 dodge bonus to AC, a +4 circumstance bonus on attack rolls , and a bonus equal to his monk level on damage rolls. A monk must be at least 7th level before selecting this ki power."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "8Th Level Required:",
+                  "description": "Abundant Step (Su) : A monk with this ki power can slip magically between spaces, as if using the spell dimension door . Using this ability is a move action that consumes 2 points from his ki pool. The monk&#8217;s caster level for this effect is equal to his monk level. He cannot take other creatures with him when he uses this ability. A monk must be at least 8th level before selecting this ki power. Bare-Hand Block (Ex) : A monk with this ability can spend 1 ki point as an immediate action when attacked with a manufactured weapon to attempt an unarmed sunder combat maneuver check against it. If he successfully sunders the weapon and grants it the broken condition, the attack deals no damage. He can spend an additional 1 ki point when using this ability to activate ki sunder as a free action . A monk must be at least 8th level and have the ki sunder ki power before selecting this ki power. Source PPC:MAH Breaking-Down Koan (Su) : A monk with this ability can spend 1 ki point as a swift action to present a paradox, riddle, or complicated question to a creature within 30 feet. The creature must succeed at a Will save (DC = 10 + 1/2 the monkÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s level + his Wisdom modifier) or be confused for 1 round. This is a mind-affecting , language-dependent effect. A monk must be at least 8th level before selecting this ki power. Source PPC:MAH Building-Up Koan (Su) : A monk with this ability can spend 2 ki points as a swift action to ask himself a koan, which he then tries to answer. The monk must attempt a Will save (DC 15 + 1/2 the monkÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s level). If successful, he gains an insight bonus equal to his Wisdom modifier to AC and on attack rolls , saving throws, skill checks and until the end of the round. If he fails, the monk is instead confused for 1 round. This is a mind-affecting ,",
+                  "requirements": {
+                    "minClassLevel": 8,
+                    "text": "The monk&#8217;s caster level for this effect is equal to his monk level. A monk must be at least 8th level before selecting this ki power."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "10Th Level Required:",
+                  "description": "Ki Blocker (Su) : A monk with this ability can spend 1 ki point as a free action before making an unarmed strike against a foe. If the attack hits, the monk can interrupt the target&#8217;s flow of ki. If the monk successfully damages the target of his attack, that opponent&#8217;s cost to activate abilities with ki increases by 1 ki point for 1 hour. If the monk spends 2 points from his ki pool, he can use this ability to affect the target&#8217;s arcane pool, arcane reservoir, grit points, inspiration, or panache points instead of its ki pool. The effects of this ability do not stack, but multiple hits increase the duration by 1 hour for each hit. A monk must be at least 10th level before selecting this ki power. Ki Hurricane (Ex) : As a full-round action , a monk with this ability can move up to twice his speed. At any point in that movement, the monk can spend 1 ki point to make the first attack in his flurry of blows . He can later spend another ki point to make the next attack in his flurry of blows , and so on, until he either stops spending ki points or has exhausted all the attacks from his flurry of blows . A monk must be at least 10th level and possess the sudden speed ki power before selecting this ki power. Ki Visions (Su) : A monk with this ability often sees visions of spirits or hears the voice of his departed mentor in his dreams. On any given night during which the monk dreams, he can use this ability to gain the benefits of a divination . If he does, he spends 2 ki points from the next day&#8217;s total. A monk must be at least 10th level before selecting this ki power.",
+                  "requirements": {
+                    "minClassLevel": 10,
+                    "text": "Ki Blocker (Su) : A monk with this ability can spend 1 ki point as a free action before making an unarmed strike against a foe. A monk must be at least 10th level before selecting this ki power."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "12Th Level Required:",
+                  "description": "Cobra Breath (Su) : Whenever a monk with this ki power uses diamond body to neutralize a poison , he can instead release that poison as a ranged touch attack against a single foe within 30 feet. If the attack hits, the foe must succeed at a saving throw (using the poison&#8217;s original DC) or suffer the poison&#8217;s effects, even if it was not originally a contact poison . A monk must be at least 12th level and must possess the diamond body ki power before selecting this ki power. Diamond Resilience (Ex) : By spending 1 ki point as a swift action , the monk gains DR 2/-. At 16th level, the damage reduction increases to 4/-. At 19th level, it increases to DR 6/-. This DR lasts for 1 minute. A monk must be at least 12th level before selecting this ki power. Diamond Soul (Ex) : A monk can spend 2 points from his ki pool as a swift action to gain spell resistance equal to his monk level + 10. This spell resistance lasts for a number of rounds equal to the monk&#8217;s level. A monk must be at least 12th level before selecting this ki power. Master-Thought Koan (Su) : A monk with this ability can spend an additional 2 ki points when using either the breaking-down koan or building-up koan ki powers. When combined with master-thought koan, breaking-down koan affects a number of characters of your choice within 30 feet equal to the monkÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s wisdom modifier. When combined with master-thought koan, building-up koan can be used on an ally within 30 feet. A monk must be at least 12th level and have either the breaking-down koan or the building-up koan ki power before selecting this ki power. Source PPC:MAH One Touch (Ex) : As long as he has at least 1 point remaining in his ki pool, as a standard action , a monk with this power can make an unarmed strike against a foe as a touch ",
+                  "requirements": {
+                    "minClassLevel": 12,
+                    "text": "If the attack hits, the foe must succeed at a saving throw (using the poison&#8217;s original DC) or suffer the poison&#8217;s effects, even if it was not originally a contact poison . A monk must be at least 12th level and must possess the diamond body ki power before selecting this ki power."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "16Th Level Required:",
+                  "description": "Ki Volley (Su) : When a targeted spell or spell-like ability fails to overcome the monk&#8217;s spell resistance from diamond soul , he can spend 2 ki points as an immediate action to send that spell back at its caster as spell turning . A monk must be 16th level or higher and possess the diamond soul ki power before selecting this ki power. Quivering Palm (Su) : A monk can set up vibrations within the body of another creature that can thereafter be fatal if the monk so desires. Using this ability is a standard action that costs 4 ki points, and the monk must announce his intent to use this ability (and spend the ki points) before making the attack roll . Creatures immune to critical hits cannot be affected. Otherwise, if the attack hits and the target takes damage from the blow, the quivering palm attack succeeds. Thereafter, the monk can try to slay the victim at any time within a number of days equal to his monk level. To make such an attempt, the monk merely wills the target to die (a free action ); unless the target succeeds at a Fortitude saving throw (DC = 10 + 1/2 the monk&#8217;s level + the monk&#8217;s Wisdom modifier), it dies. If the saving throw is successful, the target is no longer in danger from that particular quivering palm attack, but it can still be affected by another one at a later time. A monk can have no more than one quivering palm in effect at one time. If a monk uses quivering palm while another is still in effect, the previous one is negated. A monk must be at least 16th level before selecting this ki power.",
+                  "requirements": {
+                    "minClassLevel": 16,
+                    "text": "A monk must be 16th level or higher and possess the diamond soul ki power before selecting this ki power. Using this ability is a standard action that costs 4 ki points, and the monk must announce his intent to use this ability (and spend the ki points) before making the attack roll ."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "18Th Level Required:",
+                  "description": "Elemental Burst (Su) : A monk with this ability can spend 4 ki points to unleash a gout of energy in a 30-foot cone. Creatures within the cone take 20d6 points of damage of the same type as the monk&#8217;s elemental fury ki power. A Reflex save (DC = 10 + 1/2 the monk&#8217;s level + his Wisdom modifier) halves the damage. A monk must be at least 18th level and must possess the elemental fury ki power before selecting this ki power.",
+                  "requirements": {
+                    "minClassLevel": 18,
+                    "text": "A Reflex save (DC = 10 + 1/2 the monk&#8217;s level + his Wisdom modifier) halves the damage. A monk must be at least 18th level and must possess the elemental fury ki power before selecting this ki power."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/unchained-classes/monk-unchained/",
+              "scrapeConfidence": "medium"
+            }
+          ]
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 7,
+      "bab": 7,
+      "fort": 5,
+      "ref": 5,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Ki Strike ( Cold Iron / Silver )",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 8,
+      "bab": 8,
+      "fort": 6,
+      "ref": 6,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Ki Power",
+          "description": "At 4th level and every 2 levels thereafter, a monk can select one ki power. These powers allow the monk to perform amazing feats of mystical power and acrobatic prowess by expending points from his ki pool. Once a ki power is selected, it cannot be changed. Some ki powers require the monk to be of a specific level or higher before they can be chosen. Unless otherwise noted, a monk cannot select an individual ki power more than once. Empty Body (Su) : A monk with this ki power gains the ability to assume an ethereal state for 1 minute as though using the spell etherealness , using his monk level as his caster level . Using this ability is a move action that consumes 3 points from the monk's ki pool. This ability affects only the monk and cannot be used to make other creatures ethereal. Feather Balance (Ex) : A monk with this ability can spend 1 ki point as a swift action to achieve perfect balance. While this is active, the monk treats any Acrobatics attempt made to balance as if he had rolled a 20. This ability lasts for 1 minute. High Jump (Ex) : A monk with this ki power adds his level as a bonus on all Acrobatics checks to jump, both for vertical jumps and horizontal jumps. In addition, he always counts as having a running start when attempting Acrobatics checks to jump. By spending 1 point from his ki pool as a swift action , the monk gains a +20 bonus on Acrobatics checks to jump for 1 round. Ki Metabolism (Su) : A monk with this ability uses his ki to control his metabolism. As long as he has at least 1 point remaining in his ki pool , the monk needs to eat and ",
+          "pools": [
+            {
+              "name": "Ki Power",
+              "description": "At 4th level and every 2 levels thereafter, a monk can select one ki power. These powers allow the monk to perform amazing feats of mystical power and acrobatic prowess by expending points from his ki pool. Once a ki power is selected, it cannot be changed. Some ki powers require the monk to be of a specific level or higher before they can be chosen. Unless otherwise noted, a monk cannot select an individual ki power more than once. Empty Body (Su) : A monk with this ki power gains the ability to assume an ethereal state for 1 minute as though using the spell etherealness , using his monk level as his caster level . Using this ability is a move action that consumes 3 points from the monk's ki pool. This ability affects only the monk and cannot be used to make other creatures ethereal. Feather Balance (Ex) : A monk with this ability can spend 1 ki point as a swift action to achieve perfect balance. While this is active, the monk treats any Acrobatics attempt made to balance as if he had rolled a 20. This ability lasts for 1 minute. High Jump (Ex) : A monk with this ki power adds his level as a bonus on all Acrobatics checks to jump, both for vertical jumps and horizontal jumps. In addition, he always counts as having a running start when attempting Acrobatics checks to jump. By spending 1 point from his ki pool as a swift action , the monk gains a +20 bonus on Acrobatics checks to jump for 1 round. Ki Metabolism (Su) : A monk with this ability uses his ki to control his metabolism. As long as he has at least 1 point remaining in his ki pool , the monk needs to eat and ",
+              "requirements": {
+                "minClassLevel": 2,
+                "text": "At 4th level and every 2 levels thereafter, a monk can select one ki power. Once a ki power is selected, it cannot be changed."
+              },
+              "options": [
+                {
+                  "name": "6Th Level Required:",
+                  "description": "Action Before Thought (Ex) : A monk with this ability can spend 2 ki points as a free action as part of rolling initiative to roll twice on the initiative check and take the higher result. A monk must be at least 6th level before selecting this ki power. Source PPC:MAH Diamond Mind (Su) : By spending 1 point from his ki pool as a swift action , a monk with this power can suppress a fear effect affecting him as if using remove fear , using his monk level as his caster level . He can spend 2 ki points to activate this ability even when frightened or panicked . A monk must be at least 6th level before selecting this ki power. Elemental Fury (Su) : A monk who selects this ki power must select one type of energy: acid, cold, electricity, or fire. Once this choice is made, it cannot be changed. The monk can expend 1 point from his ki pool as a swift action to imbue his natural attacks with this energy, causing them to deal 1d6 points of damage of the chosen type for a number of rounds equal to 1/2 his monk level. A monk must be at least 6th level before selecting this ki power. Ki Guardian (Su) : As an immediate action before he rolls a saving throw against a targeted effect that also targets other allies or an area effect whose area includes other allies, a monk with this ability can spend any number of ki points and designate a number of adjacent allies equal to the number of ki points spent. The monk rolls one saving throw for each designated ally, using his bonus instead of the ally&#8217;s. For each successful saving throw, the corresponding ally treats the effect as if that ally had succeeded at the saving throw, and for each saving throw failed, the corresponding ally treats the effect as if that ally had failed the saving throw. If the monk fails any of the saving thr",
+                  "requirements": {
+                    "minClassLevel": 6,
+                    "text": "Action Before Thought (Ex) : A monk with this ability can spend 2 ki points as a free action as part of rolling initiative to roll twice on the initiative check and take the higher result. A monk must be at least 6th level before selecting this ki power."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "7Th Level Required:",
+                  "description": "Formless Mastery (Ex) : A monk with this ability varies his styles, never repeating the same move twice and capitalizing on the weaknesses of an opponent&#8217;s style. As long as he does not possess any style feat, the monk can spend 1 point from his ki pool as an immediate action to gain the following against opponents in the stance of a style feat: a +4 dodge bonus to AC, a +4 circumstance bonus on attack rolls , and a bonus equal to his monk level on damage rolls. These bonuses last until the end of the monk&#8217;s next turn (or his current turn if he uses this ability on his own turn). The monk can activate this ability and the furious defense ki power with the same immediate action for a total cost of 3 ki points. A monk must be at least 7th level before selecting this ki power. Furious Defense (Ex) : By spending 1 point from his ki pool as an immediate action , a monk with this ki power can grant himself a +4 dodge bonus to AC until the end of his next turn. The monk can activate this ability and the formless mastery ki power with the same immediate action for a total cost of 3 ki points. A monk must be at least 7th level before selecting this ki power.",
+                  "requirements": {
+                    "minClassLevel": 7,
+                    "text": "As long as he does not possess any style feat, the monk can spend 1 point from his ki pool as an immediate action to gain the following against opponents in the stance of a style feat: a +4 dodge bonus to AC, a +4 circumstance bonus on attack rolls , and a bonus equal to his monk level on damage rolls. A monk must be at least 7th level before selecting this ki power."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "8Th Level Required:",
+                  "description": "Abundant Step (Su) : A monk with this ki power can slip magically between spaces, as if using the spell dimension door . Using this ability is a move action that consumes 2 points from his ki pool. The monk&#8217;s caster level for this effect is equal to his monk level. He cannot take other creatures with him when he uses this ability. A monk must be at least 8th level before selecting this ki power. Bare-Hand Block (Ex) : A monk with this ability can spend 1 ki point as an immediate action when attacked with a manufactured weapon to attempt an unarmed sunder combat maneuver check against it. If he successfully sunders the weapon and grants it the broken condition, the attack deals no damage. He can spend an additional 1 ki point when using this ability to activate ki sunder as a free action . A monk must be at least 8th level and have the ki sunder ki power before selecting this ki power. Source PPC:MAH Breaking-Down Koan (Su) : A monk with this ability can spend 1 ki point as a swift action to present a paradox, riddle, or complicated question to a creature within 30 feet. The creature must succeed at a Will save (DC = 10 + 1/2 the monkÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s level + his Wisdom modifier) or be confused for 1 round. This is a mind-affecting , language-dependent effect. A monk must be at least 8th level before selecting this ki power. Source PPC:MAH Building-Up Koan (Su) : A monk with this ability can spend 2 ki points as a swift action to ask himself a koan, which he then tries to answer. The monk must attempt a Will save (DC 15 + 1/2 the monkÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s level). If successful, he gains an insight bonus equal to his Wisdom modifier to AC and on attack rolls , saving throws, skill checks and until the end of the round. If he fails, the monk is instead confused for 1 round. This is a mind-affecting ,",
+                  "requirements": {
+                    "minClassLevel": 8,
+                    "text": "The monk&#8217;s caster level for this effect is equal to his monk level. A monk must be at least 8th level before selecting this ki power."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "10Th Level Required:",
+                  "description": "Ki Blocker (Su) : A monk with this ability can spend 1 ki point as a free action before making an unarmed strike against a foe. If the attack hits, the monk can interrupt the target&#8217;s flow of ki. If the monk successfully damages the target of his attack, that opponent&#8217;s cost to activate abilities with ki increases by 1 ki point for 1 hour. If the monk spends 2 points from his ki pool, he can use this ability to affect the target&#8217;s arcane pool, arcane reservoir, grit points, inspiration, or panache points instead of its ki pool. The effects of this ability do not stack, but multiple hits increase the duration by 1 hour for each hit. A monk must be at least 10th level before selecting this ki power. Ki Hurricane (Ex) : As a full-round action , a monk with this ability can move up to twice his speed. At any point in that movement, the monk can spend 1 ki point to make the first attack in his flurry of blows . He can later spend another ki point to make the next attack in his flurry of blows , and so on, until he either stops spending ki points or has exhausted all the attacks from his flurry of blows . A monk must be at least 10th level and possess the sudden speed ki power before selecting this ki power. Ki Visions (Su) : A monk with this ability often sees visions of spirits or hears the voice of his departed mentor in his dreams. On any given night during which the monk dreams, he can use this ability to gain the benefits of a divination . If he does, he spends 2 ki points from the next day&#8217;s total. A monk must be at least 10th level before selecting this ki power.",
+                  "requirements": {
+                    "minClassLevel": 10,
+                    "text": "Ki Blocker (Su) : A monk with this ability can spend 1 ki point as a free action before making an unarmed strike against a foe. A monk must be at least 10th level before selecting this ki power."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "12Th Level Required:",
+                  "description": "Cobra Breath (Su) : Whenever a monk with this ki power uses diamond body to neutralize a poison , he can instead release that poison as a ranged touch attack against a single foe within 30 feet. If the attack hits, the foe must succeed at a saving throw (using the poison&#8217;s original DC) or suffer the poison&#8217;s effects, even if it was not originally a contact poison . A monk must be at least 12th level and must possess the diamond body ki power before selecting this ki power. Diamond Resilience (Ex) : By spending 1 ki point as a swift action , the monk gains DR 2/-. At 16th level, the damage reduction increases to 4/-. At 19th level, it increases to DR 6/-. This DR lasts for 1 minute. A monk must be at least 12th level before selecting this ki power. Diamond Soul (Ex) : A monk can spend 2 points from his ki pool as a swift action to gain spell resistance equal to his monk level + 10. This spell resistance lasts for a number of rounds equal to the monk&#8217;s level. A monk must be at least 12th level before selecting this ki power. Master-Thought Koan (Su) : A monk with this ability can spend an additional 2 ki points when using either the breaking-down koan or building-up koan ki powers. When combined with master-thought koan, breaking-down koan affects a number of characters of your choice within 30 feet equal to the monkÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s wisdom modifier. When combined with master-thought koan, building-up koan can be used on an ally within 30 feet. A monk must be at least 12th level and have either the breaking-down koan or the building-up koan ki power before selecting this ki power. Source PPC:MAH One Touch (Ex) : As long as he has at least 1 point remaining in his ki pool, as a standard action , a monk with this power can make an unarmed strike against a foe as a touch ",
+                  "requirements": {
+                    "minClassLevel": 12,
+                    "text": "If the attack hits, the foe must succeed at a saving throw (using the poison&#8217;s original DC) or suffer the poison&#8217;s effects, even if it was not originally a contact poison . A monk must be at least 12th level and must possess the diamond body ki power before selecting this ki power."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "16Th Level Required:",
+                  "description": "Ki Volley (Su) : When a targeted spell or spell-like ability fails to overcome the monk&#8217;s spell resistance from diamond soul , he can spend 2 ki points as an immediate action to send that spell back at its caster as spell turning . A monk must be 16th level or higher and possess the diamond soul ki power before selecting this ki power. Quivering Palm (Su) : A monk can set up vibrations within the body of another creature that can thereafter be fatal if the monk so desires. Using this ability is a standard action that costs 4 ki points, and the monk must announce his intent to use this ability (and spend the ki points) before making the attack roll . Creatures immune to critical hits cannot be affected. Otherwise, if the attack hits and the target takes damage from the blow, the quivering palm attack succeeds. Thereafter, the monk can try to slay the victim at any time within a number of days equal to his monk level. To make such an attempt, the monk merely wills the target to die (a free action ); unless the target succeeds at a Fortitude saving throw (DC = 10 + 1/2 the monk&#8217;s level + the monk&#8217;s Wisdom modifier), it dies. If the saving throw is successful, the target is no longer in danger from that particular quivering palm attack, but it can still be affected by another one at a later time. A monk can have no more than one quivering palm in effect at one time. If a monk uses quivering palm while another is still in effect, the previous one is negated. A monk must be at least 16th level before selecting this ki power.",
+                  "requirements": {
+                    "minClassLevel": 16,
+                    "text": "A monk must be 16th level or higher and possess the diamond soul ki power before selecting this ki power. Using this ability is a standard action that costs 4 ki points, and the monk must announce his intent to use this ability (and spend the ki points) before making the attack roll ."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "18Th Level Required:",
+                  "description": "Elemental Burst (Su) : A monk with this ability can spend 4 ki points to unleash a gout of energy in a 30-foot cone. Creatures within the cone take 20d6 points of damage of the same type as the monk&#8217;s elemental fury ki power. A Reflex save (DC = 10 + 1/2 the monk&#8217;s level + his Wisdom modifier) halves the damage. A monk must be at least 18th level and must possess the elemental fury ki power before selecting this ki power.",
+                  "requirements": {
+                    "minClassLevel": 18,
+                    "text": "A Reflex save (DC = 10 + 1/2 the monk&#8217;s level + his Wisdom modifier) halves the damage. A monk must be at least 18th level and must possess the elemental fury ki power before selecting this ki power."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/unchained-classes/monk-unchained/",
+              "scrapeConfidence": "medium"
+            }
+          ]
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 9,
+      "bab": 9,
+      "fort": 6,
+      "ref": 6,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Improved Evasion",
+          "description": "At 9th level, a monk's evasion ability improves. He still takes no damage on successful Reflex saving throws against attacks, but henceforth he takes only half damage on failed saves. A helpless monk does not gain the benefit of improved evasion ."
+        },
+        {
+          "name": "Style Strike",
+          "description": "At 5th level, a monk can learn one type of style strike. Whenever he makes a flurry of blows , he can designate one of his unarmed strikes as a style strike. This attack is resolved as normal, but it has an additional effect depending on the type of strike chosen. At 9th level, and every 4 levels thereafter, a monk learns an additional style strike. He must choose which style strike to apply before the attack roll is made. At 15th level, he can designate up to two of his unarmed strikes each round as a style strike, and each one can be a different type. The monk can choose from any of the following strikes. Break : The monk combines a writhing twist with a violent strike against a foe that is grappling him. If the monkÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s attack is successful, he can attempt a grapple combat maneuver check or Escape Artist check as a free action to escape a grapple , adding the strikeÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s damage as a bonus on his check. Source PPC:MAH Defensive Spin : The monk spins about, confounding his foe. If the attack hits, the monk gains a +4 dodge bonus to AC against any attacks made by the target of the style strike until the start of his next turn. This bonus does not stack with itself. The monk must attack with a fist to use this style strike. Elbow Smash : The monk follows up a punch with a strike from his elbow. If the attack hits, the monk can make an additional attack using the same attack bonus as the punch at a -5 penalty. If this second attack hits, it deals damage as normal, but all of the damage is nonlethal . The monk must attack with a fist to use this style strike. Flying Kick : The monk"
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 10,
+      "bab": 10,
+      "fort": 7,
+      "ref": 7,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": "At 1st level, 2nd level, and every 4 levels thereafter, a monk can select a bonus feat. These feats must be taken from the following list: Catch Off-Guard , Combat Reflexes , Deflect Arrows , Dodge , Improved Grapple , Scorpion Style , and Throw Anything . At 6th level, the following feats are added to the list: Gorgon's Fist , Improved Bull Rush , Improved Disarm , Improved Feint , Improved Trip , and Mobility . At 10th level, the following feats are added to the list: Improved Critical , Medusa's Wrath , Snatch Arrows , and Spring Attack . A monk need not have any of the prerequisites normally required for these feats to select them."
+        },
+        {
+          "name": "Ki Power",
+          "description": "At 4th level and every 2 levels thereafter, a monk can select one ki power. These powers allow the monk to perform amazing feats of mystical power and acrobatic prowess by expending points from his ki pool. Once a ki power is selected, it cannot be changed. Some ki powers require the monk to be of a specific level or higher before they can be chosen. Unless otherwise noted, a monk cannot select an individual ki power more than once. Empty Body (Su) : A monk with this ki power gains the ability to assume an ethereal state for 1 minute as though using the spell etherealness , using his monk level as his caster level . Using this ability is a move action that consumes 3 points from the monk's ki pool. This ability affects only the monk and cannot be used to make other creatures ethereal. Feather Balance (Ex) : A monk with this ability can spend 1 ki point as a swift action to achieve perfect balance. While this is active, the monk treats any Acrobatics attempt made to balance as if he had rolled a 20. This ability lasts for 1 minute. High Jump (Ex) : A monk with this ki power adds his level as a bonus on all Acrobatics checks to jump, both for vertical jumps and horizontal jumps. In addition, he always counts as having a running start when attempting Acrobatics checks to jump. By spending 1 point from his ki pool as a swift action , the monk gains a +20 bonus on Acrobatics checks to jump for 1 round. Ki Metabolism (Su) : A monk with this ability uses his ki to control his metabolism. As long as he has at least 1 point remaining in his ki pool , the monk needs to eat and ",
+          "pools": [
+            {
+              "name": "Ki Power",
+              "description": "At 4th level and every 2 levels thereafter, a monk can select one ki power. These powers allow the monk to perform amazing feats of mystical power and acrobatic prowess by expending points from his ki pool. Once a ki power is selected, it cannot be changed. Some ki powers require the monk to be of a specific level or higher before they can be chosen. Unless otherwise noted, a monk cannot select an individual ki power more than once. Empty Body (Su) : A monk with this ki power gains the ability to assume an ethereal state for 1 minute as though using the spell etherealness , using his monk level as his caster level . Using this ability is a move action that consumes 3 points from the monk's ki pool. This ability affects only the monk and cannot be used to make other creatures ethereal. Feather Balance (Ex) : A monk with this ability can spend 1 ki point as a swift action to achieve perfect balance. While this is active, the monk treats any Acrobatics attempt made to balance as if he had rolled a 20. This ability lasts for 1 minute. High Jump (Ex) : A monk with this ki power adds his level as a bonus on all Acrobatics checks to jump, both for vertical jumps and horizontal jumps. In addition, he always counts as having a running start when attempting Acrobatics checks to jump. By spending 1 point from his ki pool as a swift action , the monk gains a +20 bonus on Acrobatics checks to jump for 1 round. Ki Metabolism (Su) : A monk with this ability uses his ki to control his metabolism. As long as he has at least 1 point remaining in his ki pool , the monk needs to eat and ",
+              "requirements": {
+                "minClassLevel": 2,
+                "text": "At 4th level and every 2 levels thereafter, a monk can select one ki power. Once a ki power is selected, it cannot be changed."
+              },
+              "options": [
+                {
+                  "name": "6Th Level Required:",
+                  "description": "Action Before Thought (Ex) : A monk with this ability can spend 2 ki points as a free action as part of rolling initiative to roll twice on the initiative check and take the higher result. A monk must be at least 6th level before selecting this ki power. Source PPC:MAH Diamond Mind (Su) : By spending 1 point from his ki pool as a swift action , a monk with this power can suppress a fear effect affecting him as if using remove fear , using his monk level as his caster level . He can spend 2 ki points to activate this ability even when frightened or panicked . A monk must be at least 6th level before selecting this ki power. Elemental Fury (Su) : A monk who selects this ki power must select one type of energy: acid, cold, electricity, or fire. Once this choice is made, it cannot be changed. The monk can expend 1 point from his ki pool as a swift action to imbue his natural attacks with this energy, causing them to deal 1d6 points of damage of the chosen type for a number of rounds equal to 1/2 his monk level. A monk must be at least 6th level before selecting this ki power. Ki Guardian (Su) : As an immediate action before he rolls a saving throw against a targeted effect that also targets other allies or an area effect whose area includes other allies, a monk with this ability can spend any number of ki points and designate a number of adjacent allies equal to the number of ki points spent. The monk rolls one saving throw for each designated ally, using his bonus instead of the ally&#8217;s. For each successful saving throw, the corresponding ally treats the effect as if that ally had succeeded at the saving throw, and for each saving throw failed, the corresponding ally treats the effect as if that ally had failed the saving throw. If the monk fails any of the saving thr",
+                  "requirements": {
+                    "minClassLevel": 6,
+                    "text": "Action Before Thought (Ex) : A monk with this ability can spend 2 ki points as a free action as part of rolling initiative to roll twice on the initiative check and take the higher result. A monk must be at least 6th level before selecting this ki power."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "7Th Level Required:",
+                  "description": "Formless Mastery (Ex) : A monk with this ability varies his styles, never repeating the same move twice and capitalizing on the weaknesses of an opponent&#8217;s style. As long as he does not possess any style feat, the monk can spend 1 point from his ki pool as an immediate action to gain the following against opponents in the stance of a style feat: a +4 dodge bonus to AC, a +4 circumstance bonus on attack rolls , and a bonus equal to his monk level on damage rolls. These bonuses last until the end of the monk&#8217;s next turn (or his current turn if he uses this ability on his own turn). The monk can activate this ability and the furious defense ki power with the same immediate action for a total cost of 3 ki points. A monk must be at least 7th level before selecting this ki power. Furious Defense (Ex) : By spending 1 point from his ki pool as an immediate action , a monk with this ki power can grant himself a +4 dodge bonus to AC until the end of his next turn. The monk can activate this ability and the formless mastery ki power with the same immediate action for a total cost of 3 ki points. A monk must be at least 7th level before selecting this ki power.",
+                  "requirements": {
+                    "minClassLevel": 7,
+                    "text": "As long as he does not possess any style feat, the monk can spend 1 point from his ki pool as an immediate action to gain the following against opponents in the stance of a style feat: a +4 dodge bonus to AC, a +4 circumstance bonus on attack rolls , and a bonus equal to his monk level on damage rolls. A monk must be at least 7th level before selecting this ki power."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "8Th Level Required:",
+                  "description": "Abundant Step (Su) : A monk with this ki power can slip magically between spaces, as if using the spell dimension door . Using this ability is a move action that consumes 2 points from his ki pool. The monk&#8217;s caster level for this effect is equal to his monk level. He cannot take other creatures with him when he uses this ability. A monk must be at least 8th level before selecting this ki power. Bare-Hand Block (Ex) : A monk with this ability can spend 1 ki point as an immediate action when attacked with a manufactured weapon to attempt an unarmed sunder combat maneuver check against it. If he successfully sunders the weapon and grants it the broken condition, the attack deals no damage. He can spend an additional 1 ki point when using this ability to activate ki sunder as a free action . A monk must be at least 8th level and have the ki sunder ki power before selecting this ki power. Source PPC:MAH Breaking-Down Koan (Su) : A monk with this ability can spend 1 ki point as a swift action to present a paradox, riddle, or complicated question to a creature within 30 feet. The creature must succeed at a Will save (DC = 10 + 1/2 the monkÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s level + his Wisdom modifier) or be confused for 1 round. This is a mind-affecting , language-dependent effect. A monk must be at least 8th level before selecting this ki power. Source PPC:MAH Building-Up Koan (Su) : A monk with this ability can spend 2 ki points as a swift action to ask himself a koan, which he then tries to answer. The monk must attempt a Will save (DC 15 + 1/2 the monkÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s level). If successful, he gains an insight bonus equal to his Wisdom modifier to AC and on attack rolls , saving throws, skill checks and until the end of the round. If he fails, the monk is instead confused for 1 round. This is a mind-affecting ,",
+                  "requirements": {
+                    "minClassLevel": 8,
+                    "text": "The monk&#8217;s caster level for this effect is equal to his monk level. A monk must be at least 8th level before selecting this ki power."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "10Th Level Required:",
+                  "description": "Ki Blocker (Su) : A monk with this ability can spend 1 ki point as a free action before making an unarmed strike against a foe. If the attack hits, the monk can interrupt the target&#8217;s flow of ki. If the monk successfully damages the target of his attack, that opponent&#8217;s cost to activate abilities with ki increases by 1 ki point for 1 hour. If the monk spends 2 points from his ki pool, he can use this ability to affect the target&#8217;s arcane pool, arcane reservoir, grit points, inspiration, or panache points instead of its ki pool. The effects of this ability do not stack, but multiple hits increase the duration by 1 hour for each hit. A monk must be at least 10th level before selecting this ki power. Ki Hurricane (Ex) : As a full-round action , a monk with this ability can move up to twice his speed. At any point in that movement, the monk can spend 1 ki point to make the first attack in his flurry of blows . He can later spend another ki point to make the next attack in his flurry of blows , and so on, until he either stops spending ki points or has exhausted all the attacks from his flurry of blows . A monk must be at least 10th level and possess the sudden speed ki power before selecting this ki power. Ki Visions (Su) : A monk with this ability often sees visions of spirits or hears the voice of his departed mentor in his dreams. On any given night during which the monk dreams, he can use this ability to gain the benefits of a divination . If he does, he spends 2 ki points from the next day&#8217;s total. A monk must be at least 10th level before selecting this ki power.",
+                  "requirements": {
+                    "minClassLevel": 10,
+                    "text": "Ki Blocker (Su) : A monk with this ability can spend 1 ki point as a free action before making an unarmed strike against a foe. A monk must be at least 10th level before selecting this ki power."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "12Th Level Required:",
+                  "description": "Cobra Breath (Su) : Whenever a monk with this ki power uses diamond body to neutralize a poison , he can instead release that poison as a ranged touch attack against a single foe within 30 feet. If the attack hits, the foe must succeed at a saving throw (using the poison&#8217;s original DC) or suffer the poison&#8217;s effects, even if it was not originally a contact poison . A monk must be at least 12th level and must possess the diamond body ki power before selecting this ki power. Diamond Resilience (Ex) : By spending 1 ki point as a swift action , the monk gains DR 2/-. At 16th level, the damage reduction increases to 4/-. At 19th level, it increases to DR 6/-. This DR lasts for 1 minute. A monk must be at least 12th level before selecting this ki power. Diamond Soul (Ex) : A monk can spend 2 points from his ki pool as a swift action to gain spell resistance equal to his monk level + 10. This spell resistance lasts for a number of rounds equal to the monk&#8217;s level. A monk must be at least 12th level before selecting this ki power. Master-Thought Koan (Su) : A monk with this ability can spend an additional 2 ki points when using either the breaking-down koan or building-up koan ki powers. When combined with master-thought koan, breaking-down koan affects a number of characters of your choice within 30 feet equal to the monkÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s wisdom modifier. When combined with master-thought koan, building-up koan can be used on an ally within 30 feet. A monk must be at least 12th level and have either the breaking-down koan or the building-up koan ki power before selecting this ki power. Source PPC:MAH One Touch (Ex) : As long as he has at least 1 point remaining in his ki pool, as a standard action , a monk with this power can make an unarmed strike against a foe as a touch ",
+                  "requirements": {
+                    "minClassLevel": 12,
+                    "text": "If the attack hits, the foe must succeed at a saving throw (using the poison&#8217;s original DC) or suffer the poison&#8217;s effects, even if it was not originally a contact poison . A monk must be at least 12th level and must possess the diamond body ki power before selecting this ki power."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "16Th Level Required:",
+                  "description": "Ki Volley (Su) : When a targeted spell or spell-like ability fails to overcome the monk&#8217;s spell resistance from diamond soul , he can spend 2 ki points as an immediate action to send that spell back at its caster as spell turning . A monk must be 16th level or higher and possess the diamond soul ki power before selecting this ki power. Quivering Palm (Su) : A monk can set up vibrations within the body of another creature that can thereafter be fatal if the monk so desires. Using this ability is a standard action that costs 4 ki points, and the monk must announce his intent to use this ability (and spend the ki points) before making the attack roll . Creatures immune to critical hits cannot be affected. Otherwise, if the attack hits and the target takes damage from the blow, the quivering palm attack succeeds. Thereafter, the monk can try to slay the victim at any time within a number of days equal to his monk level. To make such an attempt, the monk merely wills the target to die (a free action ); unless the target succeeds at a Fortitude saving throw (DC = 10 + 1/2 the monk&#8217;s level + the monk&#8217;s Wisdom modifier), it dies. If the saving throw is successful, the target is no longer in danger from that particular quivering palm attack, but it can still be affected by another one at a later time. A monk can have no more than one quivering palm in effect at one time. If a monk uses quivering palm while another is still in effect, the previous one is negated. A monk must be at least 16th level before selecting this ki power.",
+                  "requirements": {
+                    "minClassLevel": 16,
+                    "text": "A monk must be 16th level or higher and possess the diamond soul ki power before selecting this ki power. Using this ability is a standard action that costs 4 ki points, and the monk must announce his intent to use this ability (and spend the ki points) before making the attack roll ."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "18Th Level Required:",
+                  "description": "Elemental Burst (Su) : A monk with this ability can spend 4 ki points to unleash a gout of energy in a 30-foot cone. Creatures within the cone take 20d6 points of damage of the same type as the monk&#8217;s elemental fury ki power. A Reflex save (DC = 10 + 1/2 the monk&#8217;s level + his Wisdom modifier) halves the damage. A monk must be at least 18th level and must possess the elemental fury ki power before selecting this ki power.",
+                  "requirements": {
+                    "minClassLevel": 18,
+                    "text": "A Reflex save (DC = 10 + 1/2 the monk&#8217;s level + his Wisdom modifier) halves the damage. A monk must be at least 18th level and must possess the elemental fury ki power before selecting this ki power."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/unchained-classes/monk-unchained/",
+              "scrapeConfidence": "medium"
+            }
+          ]
+        },
+        {
+          "name": "Ki Strike (Lawful)",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 11,
+      "bab": 11,
+      "fort": 7,
+      "ref": 7,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Flurry Of Blows (Bonus Attack)",
+          "description": "At 1st level, a monk can make a flurry of blows as a full-attack action. When making a flurry of blows, the monk can make one additional attack at his highest base attack bonus . This additional attack stacks with the bonus attacks from haste and other similar effects. When using this ability, the monk can make these attacks with any combination of his unarmed strikes and weapons that have the monk special weapon quality. He takes no penalty for using multiple weapons when making a flurry of blows, but he does not gain any additional attacks beyond what's already granted by the flurry for doing so. (He can still gain additional attacks from a high base attack bonus , from this ability, and from haste and similar effects). At 11th level, a monk can make an additional attack at his highest base attack bonus whenever he makes a flurry of blows. This stacks with the first attack from this ability and additional attacks from haste and similar effects."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 12,
+      "fort": 8,
+      "ref": 8,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Ki Power",
+          "description": "At 4th level and every 2 levels thereafter, a monk can select one ki power. These powers allow the monk to perform amazing feats of mystical power and acrobatic prowess by expending points from his ki pool. Once a ki power is selected, it cannot be changed. Some ki powers require the monk to be of a specific level or higher before they can be chosen. Unless otherwise noted, a monk cannot select an individual ki power more than once. Empty Body (Su) : A monk with this ki power gains the ability to assume an ethereal state for 1 minute as though using the spell etherealness , using his monk level as his caster level . Using this ability is a move action that consumes 3 points from the monk's ki pool. This ability affects only the monk and cannot be used to make other creatures ethereal. Feather Balance (Ex) : A monk with this ability can spend 1 ki point as a swift action to achieve perfect balance. While this is active, the monk treats any Acrobatics attempt made to balance as if he had rolled a 20. This ability lasts for 1 minute. High Jump (Ex) : A monk with this ki power adds his level as a bonus on all Acrobatics checks to jump, both for vertical jumps and horizontal jumps. In addition, he always counts as having a running start when attempting Acrobatics checks to jump. By spending 1 point from his ki pool as a swift action , the monk gains a +20 bonus on Acrobatics checks to jump for 1 round. Ki Metabolism (Su) : A monk with this ability uses his ki to control his metabolism. As long as he has at least 1 point remaining in his ki pool , the monk needs to eat and ",
+          "pools": [
+            {
+              "name": "Ki Power",
+              "description": "At 4th level and every 2 levels thereafter, a monk can select one ki power. These powers allow the monk to perform amazing feats of mystical power and acrobatic prowess by expending points from his ki pool. Once a ki power is selected, it cannot be changed. Some ki powers require the monk to be of a specific level or higher before they can be chosen. Unless otherwise noted, a monk cannot select an individual ki power more than once. Empty Body (Su) : A monk with this ki power gains the ability to assume an ethereal state for 1 minute as though using the spell etherealness , using his monk level as his caster level . Using this ability is a move action that consumes 3 points from the monk's ki pool. This ability affects only the monk and cannot be used to make other creatures ethereal. Feather Balance (Ex) : A monk with this ability can spend 1 ki point as a swift action to achieve perfect balance. While this is active, the monk treats any Acrobatics attempt made to balance as if he had rolled a 20. This ability lasts for 1 minute. High Jump (Ex) : A monk with this ki power adds his level as a bonus on all Acrobatics checks to jump, both for vertical jumps and horizontal jumps. In addition, he always counts as having a running start when attempting Acrobatics checks to jump. By spending 1 point from his ki pool as a swift action , the monk gains a +20 bonus on Acrobatics checks to jump for 1 round. Ki Metabolism (Su) : A monk with this ability uses his ki to control his metabolism. As long as he has at least 1 point remaining in his ki pool , the monk needs to eat and ",
+              "requirements": {
+                "minClassLevel": 2,
+                "text": "At 4th level and every 2 levels thereafter, a monk can select one ki power. Once a ki power is selected, it cannot be changed."
+              },
+              "options": [
+                {
+                  "name": "6Th Level Required:",
+                  "description": "Action Before Thought (Ex) : A monk with this ability can spend 2 ki points as a free action as part of rolling initiative to roll twice on the initiative check and take the higher result. A monk must be at least 6th level before selecting this ki power. Source PPC:MAH Diamond Mind (Su) : By spending 1 point from his ki pool as a swift action , a monk with this power can suppress a fear effect affecting him as if using remove fear , using his monk level as his caster level . He can spend 2 ki points to activate this ability even when frightened or panicked . A monk must be at least 6th level before selecting this ki power. Elemental Fury (Su) : A monk who selects this ki power must select one type of energy: acid, cold, electricity, or fire. Once this choice is made, it cannot be changed. The monk can expend 1 point from his ki pool as a swift action to imbue his natural attacks with this energy, causing them to deal 1d6 points of damage of the chosen type for a number of rounds equal to 1/2 his monk level. A monk must be at least 6th level before selecting this ki power. Ki Guardian (Su) : As an immediate action before he rolls a saving throw against a targeted effect that also targets other allies or an area effect whose area includes other allies, a monk with this ability can spend any number of ki points and designate a number of adjacent allies equal to the number of ki points spent. The monk rolls one saving throw for each designated ally, using his bonus instead of the ally&#8217;s. For each successful saving throw, the corresponding ally treats the effect as if that ally had succeeded at the saving throw, and for each saving throw failed, the corresponding ally treats the effect as if that ally had failed the saving throw. If the monk fails any of the saving thr",
+                  "requirements": {
+                    "minClassLevel": 6,
+                    "text": "Action Before Thought (Ex) : A monk with this ability can spend 2 ki points as a free action as part of rolling initiative to roll twice on the initiative check and take the higher result. A monk must be at least 6th level before selecting this ki power."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "7Th Level Required:",
+                  "description": "Formless Mastery (Ex) : A monk with this ability varies his styles, never repeating the same move twice and capitalizing on the weaknesses of an opponent&#8217;s style. As long as he does not possess any style feat, the monk can spend 1 point from his ki pool as an immediate action to gain the following against opponents in the stance of a style feat: a +4 dodge bonus to AC, a +4 circumstance bonus on attack rolls , and a bonus equal to his monk level on damage rolls. These bonuses last until the end of the monk&#8217;s next turn (or his current turn if he uses this ability on his own turn). The monk can activate this ability and the furious defense ki power with the same immediate action for a total cost of 3 ki points. A monk must be at least 7th level before selecting this ki power. Furious Defense (Ex) : By spending 1 point from his ki pool as an immediate action , a monk with this ki power can grant himself a +4 dodge bonus to AC until the end of his next turn. The monk can activate this ability and the formless mastery ki power with the same immediate action for a total cost of 3 ki points. A monk must be at least 7th level before selecting this ki power.",
+                  "requirements": {
+                    "minClassLevel": 7,
+                    "text": "As long as he does not possess any style feat, the monk can spend 1 point from his ki pool as an immediate action to gain the following against opponents in the stance of a style feat: a +4 dodge bonus to AC, a +4 circumstance bonus on attack rolls , and a bonus equal to his monk level on damage rolls. A monk must be at least 7th level before selecting this ki power."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "8Th Level Required:",
+                  "description": "Abundant Step (Su) : A monk with this ki power can slip magically between spaces, as if using the spell dimension door . Using this ability is a move action that consumes 2 points from his ki pool. The monk&#8217;s caster level for this effect is equal to his monk level. He cannot take other creatures with him when he uses this ability. A monk must be at least 8th level before selecting this ki power. Bare-Hand Block (Ex) : A monk with this ability can spend 1 ki point as an immediate action when attacked with a manufactured weapon to attempt an unarmed sunder combat maneuver check against it. If he successfully sunders the weapon and grants it the broken condition, the attack deals no damage. He can spend an additional 1 ki point when using this ability to activate ki sunder as a free action . A monk must be at least 8th level and have the ki sunder ki power before selecting this ki power. Source PPC:MAH Breaking-Down Koan (Su) : A monk with this ability can spend 1 ki point as a swift action to present a paradox, riddle, or complicated question to a creature within 30 feet. The creature must succeed at a Will save (DC = 10 + 1/2 the monkÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s level + his Wisdom modifier) or be confused for 1 round. This is a mind-affecting , language-dependent effect. A monk must be at least 8th level before selecting this ki power. Source PPC:MAH Building-Up Koan (Su) : A monk with this ability can spend 2 ki points as a swift action to ask himself a koan, which he then tries to answer. The monk must attempt a Will save (DC 15 + 1/2 the monkÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s level). If successful, he gains an insight bonus equal to his Wisdom modifier to AC and on attack rolls , saving throws, skill checks and until the end of the round. If he fails, the monk is instead confused for 1 round. This is a mind-affecting ,",
+                  "requirements": {
+                    "minClassLevel": 8,
+                    "text": "The monk&#8217;s caster level for this effect is equal to his monk level. A monk must be at least 8th level before selecting this ki power."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "10Th Level Required:",
+                  "description": "Ki Blocker (Su) : A monk with this ability can spend 1 ki point as a free action before making an unarmed strike against a foe. If the attack hits, the monk can interrupt the target&#8217;s flow of ki. If the monk successfully damages the target of his attack, that opponent&#8217;s cost to activate abilities with ki increases by 1 ki point for 1 hour. If the monk spends 2 points from his ki pool, he can use this ability to affect the target&#8217;s arcane pool, arcane reservoir, grit points, inspiration, or panache points instead of its ki pool. The effects of this ability do not stack, but multiple hits increase the duration by 1 hour for each hit. A monk must be at least 10th level before selecting this ki power. Ki Hurricane (Ex) : As a full-round action , a monk with this ability can move up to twice his speed. At any point in that movement, the monk can spend 1 ki point to make the first attack in his flurry of blows . He can later spend another ki point to make the next attack in his flurry of blows , and so on, until he either stops spending ki points or has exhausted all the attacks from his flurry of blows . A monk must be at least 10th level and possess the sudden speed ki power before selecting this ki power. Ki Visions (Su) : A monk with this ability often sees visions of spirits or hears the voice of his departed mentor in his dreams. On any given night during which the monk dreams, he can use this ability to gain the benefits of a divination . If he does, he spends 2 ki points from the next day&#8217;s total. A monk must be at least 10th level before selecting this ki power.",
+                  "requirements": {
+                    "minClassLevel": 10,
+                    "text": "Ki Blocker (Su) : A monk with this ability can spend 1 ki point as a free action before making an unarmed strike against a foe. A monk must be at least 10th level before selecting this ki power."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "12Th Level Required:",
+                  "description": "Cobra Breath (Su) : Whenever a monk with this ki power uses diamond body to neutralize a poison , he can instead release that poison as a ranged touch attack against a single foe within 30 feet. If the attack hits, the foe must succeed at a saving throw (using the poison&#8217;s original DC) or suffer the poison&#8217;s effects, even if it was not originally a contact poison . A monk must be at least 12th level and must possess the diamond body ki power before selecting this ki power. Diamond Resilience (Ex) : By spending 1 ki point as a swift action , the monk gains DR 2/-. At 16th level, the damage reduction increases to 4/-. At 19th level, it increases to DR 6/-. This DR lasts for 1 minute. A monk must be at least 12th level before selecting this ki power. Diamond Soul (Ex) : A monk can spend 2 points from his ki pool as a swift action to gain spell resistance equal to his monk level + 10. This spell resistance lasts for a number of rounds equal to the monk&#8217;s level. A monk must be at least 12th level before selecting this ki power. Master-Thought Koan (Su) : A monk with this ability can spend an additional 2 ki points when using either the breaking-down koan or building-up koan ki powers. When combined with master-thought koan, breaking-down koan affects a number of characters of your choice within 30 feet equal to the monkÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s wisdom modifier. When combined with master-thought koan, building-up koan can be used on an ally within 30 feet. A monk must be at least 12th level and have either the breaking-down koan or the building-up koan ki power before selecting this ki power. Source PPC:MAH One Touch (Ex) : As long as he has at least 1 point remaining in his ki pool, as a standard action , a monk with this power can make an unarmed strike against a foe as a touch ",
+                  "requirements": {
+                    "minClassLevel": 12,
+                    "text": "If the attack hits, the foe must succeed at a saving throw (using the poison&#8217;s original DC) or suffer the poison&#8217;s effects, even if it was not originally a contact poison . A monk must be at least 12th level and must possess the diamond body ki power before selecting this ki power."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "16Th Level Required:",
+                  "description": "Ki Volley (Su) : When a targeted spell or spell-like ability fails to overcome the monk&#8217;s spell resistance from diamond soul , he can spend 2 ki points as an immediate action to send that spell back at its caster as spell turning . A monk must be 16th level or higher and possess the diamond soul ki power before selecting this ki power. Quivering Palm (Su) : A monk can set up vibrations within the body of another creature that can thereafter be fatal if the monk so desires. Using this ability is a standard action that costs 4 ki points, and the monk must announce his intent to use this ability (and spend the ki points) before making the attack roll . Creatures immune to critical hits cannot be affected. Otherwise, if the attack hits and the target takes damage from the blow, the quivering palm attack succeeds. Thereafter, the monk can try to slay the victim at any time within a number of days equal to his monk level. To make such an attempt, the monk merely wills the target to die (a free action ); unless the target succeeds at a Fortitude saving throw (DC = 10 + 1/2 the monk&#8217;s level + the monk&#8217;s Wisdom modifier), it dies. If the saving throw is successful, the target is no longer in danger from that particular quivering palm attack, but it can still be affected by another one at a later time. A monk can have no more than one quivering palm in effect at one time. If a monk uses quivering palm while another is still in effect, the previous one is negated. A monk must be at least 16th level before selecting this ki power.",
+                  "requirements": {
+                    "minClassLevel": 16,
+                    "text": "A monk must be 16th level or higher and possess the diamond soul ki power before selecting this ki power. Using this ability is a standard action that costs 4 ki points, and the monk must announce his intent to use this ability (and spend the ki points) before making the attack roll ."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "18Th Level Required:",
+                  "description": "Elemental Burst (Su) : A monk with this ability can spend 4 ki points to unleash a gout of energy in a 30-foot cone. Creatures within the cone take 20d6 points of damage of the same type as the monk&#8217;s elemental fury ki power. A Reflex save (DC = 10 + 1/2 the monk&#8217;s level + his Wisdom modifier) halves the damage. A monk must be at least 18th level and must possess the elemental fury ki power before selecting this ki power.",
+                  "requirements": {
+                    "minClassLevel": 18,
+                    "text": "A Reflex save (DC = 10 + 1/2 the monk&#8217;s level + his Wisdom modifier) halves the damage. A monk must be at least 18th level and must possess the elemental fury ki power before selecting this ki power."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/unchained-classes/monk-unchained/",
+              "scrapeConfidence": "medium"
+            }
+          ]
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 13,
+      "fort": 8,
+      "ref": 8,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Style Strike",
+          "description": "At 5th level, a monk can learn one type of style strike. Whenever he makes a flurry of blows , he can designate one of his unarmed strikes as a style strike. This attack is resolved as normal, but it has an additional effect depending on the type of strike chosen. At 9th level, and every 4 levels thereafter, a monk learns an additional style strike. He must choose which style strike to apply before the attack roll is made. At 15th level, he can designate up to two of his unarmed strikes each round as a style strike, and each one can be a different type. The monk can choose from any of the following strikes. Break : The monk combines a writhing twist with a violent strike against a foe that is grappling him. If the monkÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s attack is successful, he can attempt a grapple combat maneuver check or Escape Artist check as a free action to escape a grapple , adding the strikeÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s damage as a bonus on his check. Source PPC:MAH Defensive Spin : The monk spins about, confounding his foe. If the attack hits, the monk gains a +4 dodge bonus to AC against any attacks made by the target of the style strike until the start of his next turn. This bonus does not stack with itself. The monk must attack with a fist to use this style strike. Elbow Smash : The monk follows up a punch with a strike from his elbow. If the attack hits, the monk can make an additional attack using the same attack bonus as the punch at a -5 penalty. If this second attack hits, it deals damage as normal, but all of the damage is nonlethal . The monk must attack with a fist to use this style strike. Flying Kick : The monk"
+        },
+        {
+          "name": "Tongue Of The Sun And Moon",
+          "description": "At 13th level, a monk can understand and speak with any living creature, as if under a permanent tongues effect."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 14,
+      "fort": 9,
+      "ref": 9,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": "At 1st level, 2nd level, and every 4 levels thereafter, a monk can select a bonus feat. These feats must be taken from the following list: Catch Off-Guard , Combat Reflexes , Deflect Arrows , Dodge , Improved Grapple , Scorpion Style , and Throw Anything . At 6th level, the following feats are added to the list: Gorgon's Fist , Improved Bull Rush , Improved Disarm , Improved Feint , Improved Trip , and Mobility . At 10th level, the following feats are added to the list: Improved Critical , Medusa's Wrath , Snatch Arrows , and Spring Attack . A monk need not have any of the prerequisites normally required for these feats to select them."
+        },
+        {
+          "name": "Ki Power",
+          "description": "At 4th level and every 2 levels thereafter, a monk can select one ki power. These powers allow the monk to perform amazing feats of mystical power and acrobatic prowess by expending points from his ki pool. Once a ki power is selected, it cannot be changed. Some ki powers require the monk to be of a specific level or higher before they can be chosen. Unless otherwise noted, a monk cannot select an individual ki power more than once. Empty Body (Su) : A monk with this ki power gains the ability to assume an ethereal state for 1 minute as though using the spell etherealness , using his monk level as his caster level . Using this ability is a move action that consumes 3 points from the monk's ki pool. This ability affects only the monk and cannot be used to make other creatures ethereal. Feather Balance (Ex) : A monk with this ability can spend 1 ki point as a swift action to achieve perfect balance. While this is active, the monk treats any Acrobatics attempt made to balance as if he had rolled a 20. This ability lasts for 1 minute. High Jump (Ex) : A monk with this ki power adds his level as a bonus on all Acrobatics checks to jump, both for vertical jumps and horizontal jumps. In addition, he always counts as having a running start when attempting Acrobatics checks to jump. By spending 1 point from his ki pool as a swift action , the monk gains a +20 bonus on Acrobatics checks to jump for 1 round. Ki Metabolism (Su) : A monk with this ability uses his ki to control his metabolism. As long as he has at least 1 point remaining in his ki pool , the monk needs to eat and ",
+          "pools": [
+            {
+              "name": "Ki Power",
+              "description": "At 4th level and every 2 levels thereafter, a monk can select one ki power. These powers allow the monk to perform amazing feats of mystical power and acrobatic prowess by expending points from his ki pool. Once a ki power is selected, it cannot be changed. Some ki powers require the monk to be of a specific level or higher before they can be chosen. Unless otherwise noted, a monk cannot select an individual ki power more than once. Empty Body (Su) : A monk with this ki power gains the ability to assume an ethereal state for 1 minute as though using the spell etherealness , using his monk level as his caster level . Using this ability is a move action that consumes 3 points from the monk's ki pool. This ability affects only the monk and cannot be used to make other creatures ethereal. Feather Balance (Ex) : A monk with this ability can spend 1 ki point as a swift action to achieve perfect balance. While this is active, the monk treats any Acrobatics attempt made to balance as if he had rolled a 20. This ability lasts for 1 minute. High Jump (Ex) : A monk with this ki power adds his level as a bonus on all Acrobatics checks to jump, both for vertical jumps and horizontal jumps. In addition, he always counts as having a running start when attempting Acrobatics checks to jump. By spending 1 point from his ki pool as a swift action , the monk gains a +20 bonus on Acrobatics checks to jump for 1 round. Ki Metabolism (Su) : A monk with this ability uses his ki to control his metabolism. As long as he has at least 1 point remaining in his ki pool , the monk needs to eat and ",
+              "requirements": {
+                "minClassLevel": 2,
+                "text": "At 4th level and every 2 levels thereafter, a monk can select one ki power. Once a ki power is selected, it cannot be changed."
+              },
+              "options": [
+                {
+                  "name": "6Th Level Required:",
+                  "description": "Action Before Thought (Ex) : A monk with this ability can spend 2 ki points as a free action as part of rolling initiative to roll twice on the initiative check and take the higher result. A monk must be at least 6th level before selecting this ki power. Source PPC:MAH Diamond Mind (Su) : By spending 1 point from his ki pool as a swift action , a monk with this power can suppress a fear effect affecting him as if using remove fear , using his monk level as his caster level . He can spend 2 ki points to activate this ability even when frightened or panicked . A monk must be at least 6th level before selecting this ki power. Elemental Fury (Su) : A monk who selects this ki power must select one type of energy: acid, cold, electricity, or fire. Once this choice is made, it cannot be changed. The monk can expend 1 point from his ki pool as a swift action to imbue his natural attacks with this energy, causing them to deal 1d6 points of damage of the chosen type for a number of rounds equal to 1/2 his monk level. A monk must be at least 6th level before selecting this ki power. Ki Guardian (Su) : As an immediate action before he rolls a saving throw against a targeted effect that also targets other allies or an area effect whose area includes other allies, a monk with this ability can spend any number of ki points and designate a number of adjacent allies equal to the number of ki points spent. The monk rolls one saving throw for each designated ally, using his bonus instead of the ally&#8217;s. For each successful saving throw, the corresponding ally treats the effect as if that ally had succeeded at the saving throw, and for each saving throw failed, the corresponding ally treats the effect as if that ally had failed the saving throw. If the monk fails any of the saving thr",
+                  "requirements": {
+                    "minClassLevel": 6,
+                    "text": "Action Before Thought (Ex) : A monk with this ability can spend 2 ki points as a free action as part of rolling initiative to roll twice on the initiative check and take the higher result. A monk must be at least 6th level before selecting this ki power."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "7Th Level Required:",
+                  "description": "Formless Mastery (Ex) : A monk with this ability varies his styles, never repeating the same move twice and capitalizing on the weaknesses of an opponent&#8217;s style. As long as he does not possess any style feat, the monk can spend 1 point from his ki pool as an immediate action to gain the following against opponents in the stance of a style feat: a +4 dodge bonus to AC, a +4 circumstance bonus on attack rolls , and a bonus equal to his monk level on damage rolls. These bonuses last until the end of the monk&#8217;s next turn (or his current turn if he uses this ability on his own turn). The monk can activate this ability and the furious defense ki power with the same immediate action for a total cost of 3 ki points. A monk must be at least 7th level before selecting this ki power. Furious Defense (Ex) : By spending 1 point from his ki pool as an immediate action , a monk with this ki power can grant himself a +4 dodge bonus to AC until the end of his next turn. The monk can activate this ability and the formless mastery ki power with the same immediate action for a total cost of 3 ki points. A monk must be at least 7th level before selecting this ki power.",
+                  "requirements": {
+                    "minClassLevel": 7,
+                    "text": "As long as he does not possess any style feat, the monk can spend 1 point from his ki pool as an immediate action to gain the following against opponents in the stance of a style feat: a +4 dodge bonus to AC, a +4 circumstance bonus on attack rolls , and a bonus equal to his monk level on damage rolls. A monk must be at least 7th level before selecting this ki power."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "8Th Level Required:",
+                  "description": "Abundant Step (Su) : A monk with this ki power can slip magically between spaces, as if using the spell dimension door . Using this ability is a move action that consumes 2 points from his ki pool. The monk&#8217;s caster level for this effect is equal to his monk level. He cannot take other creatures with him when he uses this ability. A monk must be at least 8th level before selecting this ki power. Bare-Hand Block (Ex) : A monk with this ability can spend 1 ki point as an immediate action when attacked with a manufactured weapon to attempt an unarmed sunder combat maneuver check against it. If he successfully sunders the weapon and grants it the broken condition, the attack deals no damage. He can spend an additional 1 ki point when using this ability to activate ki sunder as a free action . A monk must be at least 8th level and have the ki sunder ki power before selecting this ki power. Source PPC:MAH Breaking-Down Koan (Su) : A monk with this ability can spend 1 ki point as a swift action to present a paradox, riddle, or complicated question to a creature within 30 feet. The creature must succeed at a Will save (DC = 10 + 1/2 the monkÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s level + his Wisdom modifier) or be confused for 1 round. This is a mind-affecting , language-dependent effect. A monk must be at least 8th level before selecting this ki power. Source PPC:MAH Building-Up Koan (Su) : A monk with this ability can spend 2 ki points as a swift action to ask himself a koan, which he then tries to answer. The monk must attempt a Will save (DC 15 + 1/2 the monkÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s level). If successful, he gains an insight bonus equal to his Wisdom modifier to AC and on attack rolls , saving throws, skill checks and until the end of the round. If he fails, the monk is instead confused for 1 round. This is a mind-affecting ,",
+                  "requirements": {
+                    "minClassLevel": 8,
+                    "text": "The monk&#8217;s caster level for this effect is equal to his monk level. A monk must be at least 8th level before selecting this ki power."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "10Th Level Required:",
+                  "description": "Ki Blocker (Su) : A monk with this ability can spend 1 ki point as a free action before making an unarmed strike against a foe. If the attack hits, the monk can interrupt the target&#8217;s flow of ki. If the monk successfully damages the target of his attack, that opponent&#8217;s cost to activate abilities with ki increases by 1 ki point for 1 hour. If the monk spends 2 points from his ki pool, he can use this ability to affect the target&#8217;s arcane pool, arcane reservoir, grit points, inspiration, or panache points instead of its ki pool. The effects of this ability do not stack, but multiple hits increase the duration by 1 hour for each hit. A monk must be at least 10th level before selecting this ki power. Ki Hurricane (Ex) : As a full-round action , a monk with this ability can move up to twice his speed. At any point in that movement, the monk can spend 1 ki point to make the first attack in his flurry of blows . He can later spend another ki point to make the next attack in his flurry of blows , and so on, until he either stops spending ki points or has exhausted all the attacks from his flurry of blows . A monk must be at least 10th level and possess the sudden speed ki power before selecting this ki power. Ki Visions (Su) : A monk with this ability often sees visions of spirits or hears the voice of his departed mentor in his dreams. On any given night during which the monk dreams, he can use this ability to gain the benefits of a divination . If he does, he spends 2 ki points from the next day&#8217;s total. A monk must be at least 10th level before selecting this ki power.",
+                  "requirements": {
+                    "minClassLevel": 10,
+                    "text": "Ki Blocker (Su) : A monk with this ability can spend 1 ki point as a free action before making an unarmed strike against a foe. A monk must be at least 10th level before selecting this ki power."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "12Th Level Required:",
+                  "description": "Cobra Breath (Su) : Whenever a monk with this ki power uses diamond body to neutralize a poison , he can instead release that poison as a ranged touch attack against a single foe within 30 feet. If the attack hits, the foe must succeed at a saving throw (using the poison&#8217;s original DC) or suffer the poison&#8217;s effects, even if it was not originally a contact poison . A monk must be at least 12th level and must possess the diamond body ki power before selecting this ki power. Diamond Resilience (Ex) : By spending 1 ki point as a swift action , the monk gains DR 2/-. At 16th level, the damage reduction increases to 4/-. At 19th level, it increases to DR 6/-. This DR lasts for 1 minute. A monk must be at least 12th level before selecting this ki power. Diamond Soul (Ex) : A monk can spend 2 points from his ki pool as a swift action to gain spell resistance equal to his monk level + 10. This spell resistance lasts for a number of rounds equal to the monk&#8217;s level. A monk must be at least 12th level before selecting this ki power. Master-Thought Koan (Su) : A monk with this ability can spend an additional 2 ki points when using either the breaking-down koan or building-up koan ki powers. When combined with master-thought koan, breaking-down koan affects a number of characters of your choice within 30 feet equal to the monkÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s wisdom modifier. When combined with master-thought koan, building-up koan can be used on an ally within 30 feet. A monk must be at least 12th level and have either the breaking-down koan or the building-up koan ki power before selecting this ki power. Source PPC:MAH One Touch (Ex) : As long as he has at least 1 point remaining in his ki pool, as a standard action , a monk with this power can make an unarmed strike against a foe as a touch ",
+                  "requirements": {
+                    "minClassLevel": 12,
+                    "text": "If the attack hits, the foe must succeed at a saving throw (using the poison&#8217;s original DC) or suffer the poison&#8217;s effects, even if it was not originally a contact poison . A monk must be at least 12th level and must possess the diamond body ki power before selecting this ki power."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "16Th Level Required:",
+                  "description": "Ki Volley (Su) : When a targeted spell or spell-like ability fails to overcome the monk&#8217;s spell resistance from diamond soul , he can spend 2 ki points as an immediate action to send that spell back at its caster as spell turning . A monk must be 16th level or higher and possess the diamond soul ki power before selecting this ki power. Quivering Palm (Su) : A monk can set up vibrations within the body of another creature that can thereafter be fatal if the monk so desires. Using this ability is a standard action that costs 4 ki points, and the monk must announce his intent to use this ability (and spend the ki points) before making the attack roll . Creatures immune to critical hits cannot be affected. Otherwise, if the attack hits and the target takes damage from the blow, the quivering palm attack succeeds. Thereafter, the monk can try to slay the victim at any time within a number of days equal to his monk level. To make such an attempt, the monk merely wills the target to die (a free action ); unless the target succeeds at a Fortitude saving throw (DC = 10 + 1/2 the monk&#8217;s level + the monk&#8217;s Wisdom modifier), it dies. If the saving throw is successful, the target is no longer in danger from that particular quivering palm attack, but it can still be affected by another one at a later time. A monk can have no more than one quivering palm in effect at one time. If a monk uses quivering palm while another is still in effect, the previous one is negated. A monk must be at least 16th level before selecting this ki power.",
+                  "requirements": {
+                    "minClassLevel": 16,
+                    "text": "A monk must be 16th level or higher and possess the diamond soul ki power before selecting this ki power. Using this ability is a standard action that costs 4 ki points, and the monk must announce his intent to use this ability (and spend the ki points) before making the attack roll ."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "18Th Level Required:",
+                  "description": "Elemental Burst (Su) : A monk with this ability can spend 4 ki points to unleash a gout of energy in a 30-foot cone. Creatures within the cone take 20d6 points of damage of the same type as the monk&#8217;s elemental fury ki power. A Reflex save (DC = 10 + 1/2 the monk&#8217;s level + his Wisdom modifier) halves the damage. A monk must be at least 18th level and must possess the elemental fury ki power before selecting this ki power.",
+                  "requirements": {
+                    "minClassLevel": 18,
+                    "text": "A Reflex save (DC = 10 + 1/2 the monk&#8217;s level + his Wisdom modifier) halves the damage. A monk must be at least 18th level and must possess the elemental fury ki power before selecting this ki power."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/unchained-classes/monk-unchained/",
+              "scrapeConfidence": "medium"
+            }
+          ]
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 15,
+      "fort": 9,
+      "ref": 9,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Style Strike (2/Round)",
+          "description": "At 5th level, a monk can learn one type of style strike. Whenever he makes a flurry of blows , he can designate one of his unarmed strikes as a style strike. This attack is resolved as normal, but it has an additional effect depending on the type of strike chosen. At 9th level, and every 4 levels thereafter, a monk learns an additional style strike. He must choose which style strike to apply before the attack roll is made. At 15th level, he can designate up to two of his unarmed strikes each round as a style strike, and each one can be a different type. The monk can choose from any of the following strikes. Break : The monk combines a writhing twist with a violent strike against a foe that is grappling him. If the monkÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s attack is successful, he can attempt a grapple combat maneuver check or Escape Artist check as a free action to escape a grapple , adding the strikeÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s damage as a bonus on his check. Source PPC:MAH Defensive Spin : The monk spins about, confounding his foe. If the attack hits, the monk gains a +4 dodge bonus to AC against any attacks made by the target of the style strike until the start of his next turn. This bonus does not stack with itself. The monk must attack with a fist to use this style strike. Elbow Smash : The monk follows up a punch with a strike from his elbow. If the attack hits, the monk can make an additional attack using the same attack bonus as the punch at a -5 penalty. If this second attack hits, it deals damage as normal, but all of the damage is nonlethal . The monk must attack with a fist to use this style strike. Flying Kick : The monk"
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 16,
+      "fort": 10,
+      "ref": 10,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Ki Power",
+          "description": "At 4th level and every 2 levels thereafter, a monk can select one ki power. These powers allow the monk to perform amazing feats of mystical power and acrobatic prowess by expending points from his ki pool. Once a ki power is selected, it cannot be changed. Some ki powers require the monk to be of a specific level or higher before they can be chosen. Unless otherwise noted, a monk cannot select an individual ki power more than once. Empty Body (Su) : A monk with this ki power gains the ability to assume an ethereal state for 1 minute as though using the spell etherealness , using his monk level as his caster level . Using this ability is a move action that consumes 3 points from the monk's ki pool. This ability affects only the monk and cannot be used to make other creatures ethereal. Feather Balance (Ex) : A monk with this ability can spend 1 ki point as a swift action to achieve perfect balance. While this is active, the monk treats any Acrobatics attempt made to balance as if he had rolled a 20. This ability lasts for 1 minute. High Jump (Ex) : A monk with this ki power adds his level as a bonus on all Acrobatics checks to jump, both for vertical jumps and horizontal jumps. In addition, he always counts as having a running start when attempting Acrobatics checks to jump. By spending 1 point from his ki pool as a swift action , the monk gains a +20 bonus on Acrobatics checks to jump for 1 round. Ki Metabolism (Su) : A monk with this ability uses his ki to control his metabolism. As long as he has at least 1 point remaining in his ki pool , the monk needs to eat and ",
+          "pools": [
+            {
+              "name": "Ki Power",
+              "description": "At 4th level and every 2 levels thereafter, a monk can select one ki power. These powers allow the monk to perform amazing feats of mystical power and acrobatic prowess by expending points from his ki pool. Once a ki power is selected, it cannot be changed. Some ki powers require the monk to be of a specific level or higher before they can be chosen. Unless otherwise noted, a monk cannot select an individual ki power more than once. Empty Body (Su) : A monk with this ki power gains the ability to assume an ethereal state for 1 minute as though using the spell etherealness , using his monk level as his caster level . Using this ability is a move action that consumes 3 points from the monk's ki pool. This ability affects only the monk and cannot be used to make other creatures ethereal. Feather Balance (Ex) : A monk with this ability can spend 1 ki point as a swift action to achieve perfect balance. While this is active, the monk treats any Acrobatics attempt made to balance as if he had rolled a 20. This ability lasts for 1 minute. High Jump (Ex) : A monk with this ki power adds his level as a bonus on all Acrobatics checks to jump, both for vertical jumps and horizontal jumps. In addition, he always counts as having a running start when attempting Acrobatics checks to jump. By spending 1 point from his ki pool as a swift action , the monk gains a +20 bonus on Acrobatics checks to jump for 1 round. Ki Metabolism (Su) : A monk with this ability uses his ki to control his metabolism. As long as he has at least 1 point remaining in his ki pool , the monk needs to eat and ",
+              "requirements": {
+                "minClassLevel": 2,
+                "text": "At 4th level and every 2 levels thereafter, a monk can select one ki power. Once a ki power is selected, it cannot be changed."
+              },
+              "options": [
+                {
+                  "name": "6Th Level Required:",
+                  "description": "Action Before Thought (Ex) : A monk with this ability can spend 2 ki points as a free action as part of rolling initiative to roll twice on the initiative check and take the higher result. A monk must be at least 6th level before selecting this ki power. Source PPC:MAH Diamond Mind (Su) : By spending 1 point from his ki pool as a swift action , a monk with this power can suppress a fear effect affecting him as if using remove fear , using his monk level as his caster level . He can spend 2 ki points to activate this ability even when frightened or panicked . A monk must be at least 6th level before selecting this ki power. Elemental Fury (Su) : A monk who selects this ki power must select one type of energy: acid, cold, electricity, or fire. Once this choice is made, it cannot be changed. The monk can expend 1 point from his ki pool as a swift action to imbue his natural attacks with this energy, causing them to deal 1d6 points of damage of the chosen type for a number of rounds equal to 1/2 his monk level. A monk must be at least 6th level before selecting this ki power. Ki Guardian (Su) : As an immediate action before he rolls a saving throw against a targeted effect that also targets other allies or an area effect whose area includes other allies, a monk with this ability can spend any number of ki points and designate a number of adjacent allies equal to the number of ki points spent. The monk rolls one saving throw for each designated ally, using his bonus instead of the ally&#8217;s. For each successful saving throw, the corresponding ally treats the effect as if that ally had succeeded at the saving throw, and for each saving throw failed, the corresponding ally treats the effect as if that ally had failed the saving throw. If the monk fails any of the saving thr",
+                  "requirements": {
+                    "minClassLevel": 6,
+                    "text": "Action Before Thought (Ex) : A monk with this ability can spend 2 ki points as a free action as part of rolling initiative to roll twice on the initiative check and take the higher result. A monk must be at least 6th level before selecting this ki power."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "7Th Level Required:",
+                  "description": "Formless Mastery (Ex) : A monk with this ability varies his styles, never repeating the same move twice and capitalizing on the weaknesses of an opponent&#8217;s style. As long as he does not possess any style feat, the monk can spend 1 point from his ki pool as an immediate action to gain the following against opponents in the stance of a style feat: a +4 dodge bonus to AC, a +4 circumstance bonus on attack rolls , and a bonus equal to his monk level on damage rolls. These bonuses last until the end of the monk&#8217;s next turn (or his current turn if he uses this ability on his own turn). The monk can activate this ability and the furious defense ki power with the same immediate action for a total cost of 3 ki points. A monk must be at least 7th level before selecting this ki power. Furious Defense (Ex) : By spending 1 point from his ki pool as an immediate action , a monk with this ki power can grant himself a +4 dodge bonus to AC until the end of his next turn. The monk can activate this ability and the formless mastery ki power with the same immediate action for a total cost of 3 ki points. A monk must be at least 7th level before selecting this ki power.",
+                  "requirements": {
+                    "minClassLevel": 7,
+                    "text": "As long as he does not possess any style feat, the monk can spend 1 point from his ki pool as an immediate action to gain the following against opponents in the stance of a style feat: a +4 dodge bonus to AC, a +4 circumstance bonus on attack rolls , and a bonus equal to his monk level on damage rolls. A monk must be at least 7th level before selecting this ki power."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "8Th Level Required:",
+                  "description": "Abundant Step (Su) : A monk with this ki power can slip magically between spaces, as if using the spell dimension door . Using this ability is a move action that consumes 2 points from his ki pool. The monk&#8217;s caster level for this effect is equal to his monk level. He cannot take other creatures with him when he uses this ability. A monk must be at least 8th level before selecting this ki power. Bare-Hand Block (Ex) : A monk with this ability can spend 1 ki point as an immediate action when attacked with a manufactured weapon to attempt an unarmed sunder combat maneuver check against it. If he successfully sunders the weapon and grants it the broken condition, the attack deals no damage. He can spend an additional 1 ki point when using this ability to activate ki sunder as a free action . A monk must be at least 8th level and have the ki sunder ki power before selecting this ki power. Source PPC:MAH Breaking-Down Koan (Su) : A monk with this ability can spend 1 ki point as a swift action to present a paradox, riddle, or complicated question to a creature within 30 feet. The creature must succeed at a Will save (DC = 10 + 1/2 the monkÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s level + his Wisdom modifier) or be confused for 1 round. This is a mind-affecting , language-dependent effect. A monk must be at least 8th level before selecting this ki power. Source PPC:MAH Building-Up Koan (Su) : A monk with this ability can spend 2 ki points as a swift action to ask himself a koan, which he then tries to answer. The monk must attempt a Will save (DC 15 + 1/2 the monkÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s level). If successful, he gains an insight bonus equal to his Wisdom modifier to AC and on attack rolls , saving throws, skill checks and until the end of the round. If he fails, the monk is instead confused for 1 round. This is a mind-affecting ,",
+                  "requirements": {
+                    "minClassLevel": 8,
+                    "text": "The monk&#8217;s caster level for this effect is equal to his monk level. A monk must be at least 8th level before selecting this ki power."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "10Th Level Required:",
+                  "description": "Ki Blocker (Su) : A monk with this ability can spend 1 ki point as a free action before making an unarmed strike against a foe. If the attack hits, the monk can interrupt the target&#8217;s flow of ki. If the monk successfully damages the target of his attack, that opponent&#8217;s cost to activate abilities with ki increases by 1 ki point for 1 hour. If the monk spends 2 points from his ki pool, he can use this ability to affect the target&#8217;s arcane pool, arcane reservoir, grit points, inspiration, or panache points instead of its ki pool. The effects of this ability do not stack, but multiple hits increase the duration by 1 hour for each hit. A monk must be at least 10th level before selecting this ki power. Ki Hurricane (Ex) : As a full-round action , a monk with this ability can move up to twice his speed. At any point in that movement, the monk can spend 1 ki point to make the first attack in his flurry of blows . He can later spend another ki point to make the next attack in his flurry of blows , and so on, until he either stops spending ki points or has exhausted all the attacks from his flurry of blows . A monk must be at least 10th level and possess the sudden speed ki power before selecting this ki power. Ki Visions (Su) : A monk with this ability often sees visions of spirits or hears the voice of his departed mentor in his dreams. On any given night during which the monk dreams, he can use this ability to gain the benefits of a divination . If he does, he spends 2 ki points from the next day&#8217;s total. A monk must be at least 10th level before selecting this ki power.",
+                  "requirements": {
+                    "minClassLevel": 10,
+                    "text": "Ki Blocker (Su) : A monk with this ability can spend 1 ki point as a free action before making an unarmed strike against a foe. A monk must be at least 10th level before selecting this ki power."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "12Th Level Required:",
+                  "description": "Cobra Breath (Su) : Whenever a monk with this ki power uses diamond body to neutralize a poison , he can instead release that poison as a ranged touch attack against a single foe within 30 feet. If the attack hits, the foe must succeed at a saving throw (using the poison&#8217;s original DC) or suffer the poison&#8217;s effects, even if it was not originally a contact poison . A monk must be at least 12th level and must possess the diamond body ki power before selecting this ki power. Diamond Resilience (Ex) : By spending 1 ki point as a swift action , the monk gains DR 2/-. At 16th level, the damage reduction increases to 4/-. At 19th level, it increases to DR 6/-. This DR lasts for 1 minute. A monk must be at least 12th level before selecting this ki power. Diamond Soul (Ex) : A monk can spend 2 points from his ki pool as a swift action to gain spell resistance equal to his monk level + 10. This spell resistance lasts for a number of rounds equal to the monk&#8217;s level. A monk must be at least 12th level before selecting this ki power. Master-Thought Koan (Su) : A monk with this ability can spend an additional 2 ki points when using either the breaking-down koan or building-up koan ki powers. When combined with master-thought koan, breaking-down koan affects a number of characters of your choice within 30 feet equal to the monkÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s wisdom modifier. When combined with master-thought koan, building-up koan can be used on an ally within 30 feet. A monk must be at least 12th level and have either the breaking-down koan or the building-up koan ki power before selecting this ki power. Source PPC:MAH One Touch (Ex) : As long as he has at least 1 point remaining in his ki pool, as a standard action , a monk with this power can make an unarmed strike against a foe as a touch ",
+                  "requirements": {
+                    "minClassLevel": 12,
+                    "text": "If the attack hits, the foe must succeed at a saving throw (using the poison&#8217;s original DC) or suffer the poison&#8217;s effects, even if it was not originally a contact poison . A monk must be at least 12th level and must possess the diamond body ki power before selecting this ki power."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "16Th Level Required:",
+                  "description": "Ki Volley (Su) : When a targeted spell or spell-like ability fails to overcome the monk&#8217;s spell resistance from diamond soul , he can spend 2 ki points as an immediate action to send that spell back at its caster as spell turning . A monk must be 16th level or higher and possess the diamond soul ki power before selecting this ki power. Quivering Palm (Su) : A monk can set up vibrations within the body of another creature that can thereafter be fatal if the monk so desires. Using this ability is a standard action that costs 4 ki points, and the monk must announce his intent to use this ability (and spend the ki points) before making the attack roll . Creatures immune to critical hits cannot be affected. Otherwise, if the attack hits and the target takes damage from the blow, the quivering palm attack succeeds. Thereafter, the monk can try to slay the victim at any time within a number of days equal to his monk level. To make such an attempt, the monk merely wills the target to die (a free action ); unless the target succeeds at a Fortitude saving throw (DC = 10 + 1/2 the monk&#8217;s level + the monk&#8217;s Wisdom modifier), it dies. If the saving throw is successful, the target is no longer in danger from that particular quivering palm attack, but it can still be affected by another one at a later time. A monk can have no more than one quivering palm in effect at one time. If a monk uses quivering palm while another is still in effect, the previous one is negated. A monk must be at least 16th level before selecting this ki power.",
+                  "requirements": {
+                    "minClassLevel": 16,
+                    "text": "A monk must be 16th level or higher and possess the diamond soul ki power before selecting this ki power. Using this ability is a standard action that costs 4 ki points, and the monk must announce his intent to use this ability (and spend the ki points) before making the attack roll ."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "18Th Level Required:",
+                  "description": "Elemental Burst (Su) : A monk with this ability can spend 4 ki points to unleash a gout of energy in a 30-foot cone. Creatures within the cone take 20d6 points of damage of the same type as the monk&#8217;s elemental fury ki power. A Reflex save (DC = 10 + 1/2 the monk&#8217;s level + his Wisdom modifier) halves the damage. A monk must be at least 18th level and must possess the elemental fury ki power before selecting this ki power.",
+                  "requirements": {
+                    "minClassLevel": 18,
+                    "text": "A Reflex save (DC = 10 + 1/2 the monk&#8217;s level + his Wisdom modifier) halves the damage. A monk must be at least 18th level and must possess the elemental fury ki power before selecting this ki power."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/unchained-classes/monk-unchained/",
+              "scrapeConfidence": "medium"
+            }
+          ]
+        },
+        {
+          "name": "Ki Strike ( Adamantine )",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 17,
+      "fort": 10,
+      "ref": 10,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Style Strike",
+          "description": "At 5th level, a monk can learn one type of style strike. Whenever he makes a flurry of blows , he can designate one of his unarmed strikes as a style strike. This attack is resolved as normal, but it has an additional effect depending on the type of strike chosen. At 9th level, and every 4 levels thereafter, a monk learns an additional style strike. He must choose which style strike to apply before the attack roll is made. At 15th level, he can designate up to two of his unarmed strikes each round as a style strike, and each one can be a different type. The monk can choose from any of the following strikes. Break : The monk combines a writhing twist with a violent strike against a foe that is grappling him. If the monkÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s attack is successful, he can attempt a grapple combat maneuver check or Escape Artist check as a free action to escape a grapple , adding the strikeÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s damage as a bonus on his check. Source PPC:MAH Defensive Spin : The monk spins about, confounding his foe. If the attack hits, the monk gains a +4 dodge bonus to AC against any attacks made by the target of the style strike until the start of his next turn. This bonus does not stack with itself. The monk must attack with a fist to use this style strike. Elbow Smash : The monk follows up a punch with a strike from his elbow. If the attack hits, the monk can make an additional attack using the same attack bonus as the punch at a -5 penalty. If this second attack hits, it deals damage as normal, but all of the damage is nonlethal . The monk must attack with a fist to use this style strike. Flying Kick : The monk"
+        },
+        {
+          "name": "Timeless Body",
+          "description": "At 17th level, a monk no longer takes penalties to his ability scores for aging and cannot be magically aged. Any such penalties that he has already taken, however, remain in place. Age bonuses still accrue, and the monk still dies of old age when his time is up."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 18,
+      "fort": 11,
+      "ref": 11,
+      "will": 6,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": "At 1st level, 2nd level, and every 4 levels thereafter, a monk can select a bonus feat. These feats must be taken from the following list: Catch Off-Guard , Combat Reflexes , Deflect Arrows , Dodge , Improved Grapple , Scorpion Style , and Throw Anything . At 6th level, the following feats are added to the list: Gorgon's Fist , Improved Bull Rush , Improved Disarm , Improved Feint , Improved Trip , and Mobility . At 10th level, the following feats are added to the list: Improved Critical , Medusa's Wrath , Snatch Arrows , and Spring Attack . A monk need not have any of the prerequisites normally required for these feats to select them."
+        },
+        {
+          "name": "Ki Power",
+          "description": "At 4th level and every 2 levels thereafter, a monk can select one ki power. These powers allow the monk to perform amazing feats of mystical power and acrobatic prowess by expending points from his ki pool. Once a ki power is selected, it cannot be changed. Some ki powers require the monk to be of a specific level or higher before they can be chosen. Unless otherwise noted, a monk cannot select an individual ki power more than once. Empty Body (Su) : A monk with this ki power gains the ability to assume an ethereal state for 1 minute as though using the spell etherealness , using his monk level as his caster level . Using this ability is a move action that consumes 3 points from the monk's ki pool. This ability affects only the monk and cannot be used to make other creatures ethereal. Feather Balance (Ex) : A monk with this ability can spend 1 ki point as a swift action to achieve perfect balance. While this is active, the monk treats any Acrobatics attempt made to balance as if he had rolled a 20. This ability lasts for 1 minute. High Jump (Ex) : A monk with this ki power adds his level as a bonus on all Acrobatics checks to jump, both for vertical jumps and horizontal jumps. In addition, he always counts as having a running start when attempting Acrobatics checks to jump. By spending 1 point from his ki pool as a swift action , the monk gains a +20 bonus on Acrobatics checks to jump for 1 round. Ki Metabolism (Su) : A monk with this ability uses his ki to control his metabolism. As long as he has at least 1 point remaining in his ki pool , the monk needs to eat and ",
+          "pools": [
+            {
+              "name": "Ki Power",
+              "description": "At 4th level and every 2 levels thereafter, a monk can select one ki power. These powers allow the monk to perform amazing feats of mystical power and acrobatic prowess by expending points from his ki pool. Once a ki power is selected, it cannot be changed. Some ki powers require the monk to be of a specific level or higher before they can be chosen. Unless otherwise noted, a monk cannot select an individual ki power more than once. Empty Body (Su) : A monk with this ki power gains the ability to assume an ethereal state for 1 minute as though using the spell etherealness , using his monk level as his caster level . Using this ability is a move action that consumes 3 points from the monk's ki pool. This ability affects only the monk and cannot be used to make other creatures ethereal. Feather Balance (Ex) : A monk with this ability can spend 1 ki point as a swift action to achieve perfect balance. While this is active, the monk treats any Acrobatics attempt made to balance as if he had rolled a 20. This ability lasts for 1 minute. High Jump (Ex) : A monk with this ki power adds his level as a bonus on all Acrobatics checks to jump, both for vertical jumps and horizontal jumps. In addition, he always counts as having a running start when attempting Acrobatics checks to jump. By spending 1 point from his ki pool as a swift action , the monk gains a +20 bonus on Acrobatics checks to jump for 1 round. Ki Metabolism (Su) : A monk with this ability uses his ki to control his metabolism. As long as he has at least 1 point remaining in his ki pool , the monk needs to eat and ",
+              "requirements": {
+                "minClassLevel": 2,
+                "text": "At 4th level and every 2 levels thereafter, a monk can select one ki power. Once a ki power is selected, it cannot be changed."
+              },
+              "options": [
+                {
+                  "name": "6Th Level Required:",
+                  "description": "Action Before Thought (Ex) : A monk with this ability can spend 2 ki points as a free action as part of rolling initiative to roll twice on the initiative check and take the higher result. A monk must be at least 6th level before selecting this ki power. Source PPC:MAH Diamond Mind (Su) : By spending 1 point from his ki pool as a swift action , a monk with this power can suppress a fear effect affecting him as if using remove fear , using his monk level as his caster level . He can spend 2 ki points to activate this ability even when frightened or panicked . A monk must be at least 6th level before selecting this ki power. Elemental Fury (Su) : A monk who selects this ki power must select one type of energy: acid, cold, electricity, or fire. Once this choice is made, it cannot be changed. The monk can expend 1 point from his ki pool as a swift action to imbue his natural attacks with this energy, causing them to deal 1d6 points of damage of the chosen type for a number of rounds equal to 1/2 his monk level. A monk must be at least 6th level before selecting this ki power. Ki Guardian (Su) : As an immediate action before he rolls a saving throw against a targeted effect that also targets other allies or an area effect whose area includes other allies, a monk with this ability can spend any number of ki points and designate a number of adjacent allies equal to the number of ki points spent. The monk rolls one saving throw for each designated ally, using his bonus instead of the ally&#8217;s. For each successful saving throw, the corresponding ally treats the effect as if that ally had succeeded at the saving throw, and for each saving throw failed, the corresponding ally treats the effect as if that ally had failed the saving throw. If the monk fails any of the saving thr",
+                  "requirements": {
+                    "minClassLevel": 6,
+                    "text": "Action Before Thought (Ex) : A monk with this ability can spend 2 ki points as a free action as part of rolling initiative to roll twice on the initiative check and take the higher result. A monk must be at least 6th level before selecting this ki power."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "7Th Level Required:",
+                  "description": "Formless Mastery (Ex) : A monk with this ability varies his styles, never repeating the same move twice and capitalizing on the weaknesses of an opponent&#8217;s style. As long as he does not possess any style feat, the monk can spend 1 point from his ki pool as an immediate action to gain the following against opponents in the stance of a style feat: a +4 dodge bonus to AC, a +4 circumstance bonus on attack rolls , and a bonus equal to his monk level on damage rolls. These bonuses last until the end of the monk&#8217;s next turn (or his current turn if he uses this ability on his own turn). The monk can activate this ability and the furious defense ki power with the same immediate action for a total cost of 3 ki points. A monk must be at least 7th level before selecting this ki power. Furious Defense (Ex) : By spending 1 point from his ki pool as an immediate action , a monk with this ki power can grant himself a +4 dodge bonus to AC until the end of his next turn. The monk can activate this ability and the formless mastery ki power with the same immediate action for a total cost of 3 ki points. A monk must be at least 7th level before selecting this ki power.",
+                  "requirements": {
+                    "minClassLevel": 7,
+                    "text": "As long as he does not possess any style feat, the monk can spend 1 point from his ki pool as an immediate action to gain the following against opponents in the stance of a style feat: a +4 dodge bonus to AC, a +4 circumstance bonus on attack rolls , and a bonus equal to his monk level on damage rolls. A monk must be at least 7th level before selecting this ki power."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "8Th Level Required:",
+                  "description": "Abundant Step (Su) : A monk with this ki power can slip magically between spaces, as if using the spell dimension door . Using this ability is a move action that consumes 2 points from his ki pool. The monk&#8217;s caster level for this effect is equal to his monk level. He cannot take other creatures with him when he uses this ability. A monk must be at least 8th level before selecting this ki power. Bare-Hand Block (Ex) : A monk with this ability can spend 1 ki point as an immediate action when attacked with a manufactured weapon to attempt an unarmed sunder combat maneuver check against it. If he successfully sunders the weapon and grants it the broken condition, the attack deals no damage. He can spend an additional 1 ki point when using this ability to activate ki sunder as a free action . A monk must be at least 8th level and have the ki sunder ki power before selecting this ki power. Source PPC:MAH Breaking-Down Koan (Su) : A monk with this ability can spend 1 ki point as a swift action to present a paradox, riddle, or complicated question to a creature within 30 feet. The creature must succeed at a Will save (DC = 10 + 1/2 the monkÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s level + his Wisdom modifier) or be confused for 1 round. This is a mind-affecting , language-dependent effect. A monk must be at least 8th level before selecting this ki power. Source PPC:MAH Building-Up Koan (Su) : A monk with this ability can spend 2 ki points as a swift action to ask himself a koan, which he then tries to answer. The monk must attempt a Will save (DC 15 + 1/2 the monkÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s level). If successful, he gains an insight bonus equal to his Wisdom modifier to AC and on attack rolls , saving throws, skill checks and until the end of the round. If he fails, the monk is instead confused for 1 round. This is a mind-affecting ,",
+                  "requirements": {
+                    "minClassLevel": 8,
+                    "text": "The monk&#8217;s caster level for this effect is equal to his monk level. A monk must be at least 8th level before selecting this ki power."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "10Th Level Required:",
+                  "description": "Ki Blocker (Su) : A monk with this ability can spend 1 ki point as a free action before making an unarmed strike against a foe. If the attack hits, the monk can interrupt the target&#8217;s flow of ki. If the monk successfully damages the target of his attack, that opponent&#8217;s cost to activate abilities with ki increases by 1 ki point for 1 hour. If the monk spends 2 points from his ki pool, he can use this ability to affect the target&#8217;s arcane pool, arcane reservoir, grit points, inspiration, or panache points instead of its ki pool. The effects of this ability do not stack, but multiple hits increase the duration by 1 hour for each hit. A monk must be at least 10th level before selecting this ki power. Ki Hurricane (Ex) : As a full-round action , a monk with this ability can move up to twice his speed. At any point in that movement, the monk can spend 1 ki point to make the first attack in his flurry of blows . He can later spend another ki point to make the next attack in his flurry of blows , and so on, until he either stops spending ki points or has exhausted all the attacks from his flurry of blows . A monk must be at least 10th level and possess the sudden speed ki power before selecting this ki power. Ki Visions (Su) : A monk with this ability often sees visions of spirits or hears the voice of his departed mentor in his dreams. On any given night during which the monk dreams, he can use this ability to gain the benefits of a divination . If he does, he spends 2 ki points from the next day&#8217;s total. A monk must be at least 10th level before selecting this ki power.",
+                  "requirements": {
+                    "minClassLevel": 10,
+                    "text": "Ki Blocker (Su) : A monk with this ability can spend 1 ki point as a free action before making an unarmed strike against a foe. A monk must be at least 10th level before selecting this ki power."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "12Th Level Required:",
+                  "description": "Cobra Breath (Su) : Whenever a monk with this ki power uses diamond body to neutralize a poison , he can instead release that poison as a ranged touch attack against a single foe within 30 feet. If the attack hits, the foe must succeed at a saving throw (using the poison&#8217;s original DC) or suffer the poison&#8217;s effects, even if it was not originally a contact poison . A monk must be at least 12th level and must possess the diamond body ki power before selecting this ki power. Diamond Resilience (Ex) : By spending 1 ki point as a swift action , the monk gains DR 2/-. At 16th level, the damage reduction increases to 4/-. At 19th level, it increases to DR 6/-. This DR lasts for 1 minute. A monk must be at least 12th level before selecting this ki power. Diamond Soul (Ex) : A monk can spend 2 points from his ki pool as a swift action to gain spell resistance equal to his monk level + 10. This spell resistance lasts for a number of rounds equal to the monk&#8217;s level. A monk must be at least 12th level before selecting this ki power. Master-Thought Koan (Su) : A monk with this ability can spend an additional 2 ki points when using either the breaking-down koan or building-up koan ki powers. When combined with master-thought koan, breaking-down koan affects a number of characters of your choice within 30 feet equal to the monkÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s wisdom modifier. When combined with master-thought koan, building-up koan can be used on an ally within 30 feet. A monk must be at least 12th level and have either the breaking-down koan or the building-up koan ki power before selecting this ki power. Source PPC:MAH One Touch (Ex) : As long as he has at least 1 point remaining in his ki pool, as a standard action , a monk with this power can make an unarmed strike against a foe as a touch ",
+                  "requirements": {
+                    "minClassLevel": 12,
+                    "text": "If the attack hits, the foe must succeed at a saving throw (using the poison&#8217;s original DC) or suffer the poison&#8217;s effects, even if it was not originally a contact poison . A monk must be at least 12th level and must possess the diamond body ki power before selecting this ki power."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "16Th Level Required:",
+                  "description": "Ki Volley (Su) : When a targeted spell or spell-like ability fails to overcome the monk&#8217;s spell resistance from diamond soul , he can spend 2 ki points as an immediate action to send that spell back at its caster as spell turning . A monk must be 16th level or higher and possess the diamond soul ki power before selecting this ki power. Quivering Palm (Su) : A monk can set up vibrations within the body of another creature that can thereafter be fatal if the monk so desires. Using this ability is a standard action that costs 4 ki points, and the monk must announce his intent to use this ability (and spend the ki points) before making the attack roll . Creatures immune to critical hits cannot be affected. Otherwise, if the attack hits and the target takes damage from the blow, the quivering palm attack succeeds. Thereafter, the monk can try to slay the victim at any time within a number of days equal to his monk level. To make such an attempt, the monk merely wills the target to die (a free action ); unless the target succeeds at a Fortitude saving throw (DC = 10 + 1/2 the monk&#8217;s level + the monk&#8217;s Wisdom modifier), it dies. If the saving throw is successful, the target is no longer in danger from that particular quivering palm attack, but it can still be affected by another one at a later time. A monk can have no more than one quivering palm in effect at one time. If a monk uses quivering palm while another is still in effect, the previous one is negated. A monk must be at least 16th level before selecting this ki power.",
+                  "requirements": {
+                    "minClassLevel": 16,
+                    "text": "A monk must be 16th level or higher and possess the diamond soul ki power before selecting this ki power. Using this ability is a standard action that costs 4 ki points, and the monk must announce his intent to use this ability (and spend the ki points) before making the attack roll ."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "18Th Level Required:",
+                  "description": "Elemental Burst (Su) : A monk with this ability can spend 4 ki points to unleash a gout of energy in a 30-foot cone. Creatures within the cone take 20d6 points of damage of the same type as the monk&#8217;s elemental fury ki power. A Reflex save (DC = 10 + 1/2 the monk&#8217;s level + his Wisdom modifier) halves the damage. A monk must be at least 18th level and must possess the elemental fury ki power before selecting this ki power.",
+                  "requirements": {
+                    "minClassLevel": 18,
+                    "text": "A Reflex save (DC = 10 + 1/2 the monk&#8217;s level + his Wisdom modifier) halves the damage. A monk must be at least 18th level and must possess the elemental fury ki power before selecting this ki power."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/unchained-classes/monk-unchained/",
+              "scrapeConfidence": "medium"
+            }
+          ]
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 19,
+      "fort": 11,
+      "ref": 11,
+      "will": 6,
+      "classFeatures": [
+        {
+          "name": "Flawless Mind",
+          "description": "At 19th level, a monk gains total control over his mental faculties. Whenever he attempts a Will save, he can roll twice and take the better result. If he fails a Will saving throw against a spell or effect that has a duration longer than 1 hour, the monk can attempt a new saving throw at the end of each hour to end the effect."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 20,
+      "fort": 12,
+      "ref": 12,
+      "will": 6,
+      "classFeatures": [
+        {
+          "name": "Ki Power",
+          "description": "At 4th level and every 2 levels thereafter, a monk can select one ki power. These powers allow the monk to perform amazing feats of mystical power and acrobatic prowess by expending points from his ki pool. Once a ki power is selected, it cannot be changed. Some ki powers require the monk to be of a specific level or higher before they can be chosen. Unless otherwise noted, a monk cannot select an individual ki power more than once. Empty Body (Su) : A monk with this ki power gains the ability to assume an ethereal state for 1 minute as though using the spell etherealness , using his monk level as his caster level . Using this ability is a move action that consumes 3 points from the monk's ki pool. This ability affects only the monk and cannot be used to make other creatures ethereal. Feather Balance (Ex) : A monk with this ability can spend 1 ki point as a swift action to achieve perfect balance. While this is active, the monk treats any Acrobatics attempt made to balance as if he had rolled a 20. This ability lasts for 1 minute. High Jump (Ex) : A monk with this ki power adds his level as a bonus on all Acrobatics checks to jump, both for vertical jumps and horizontal jumps. In addition, he always counts as having a running start when attempting Acrobatics checks to jump. By spending 1 point from his ki pool as a swift action , the monk gains a +20 bonus on Acrobatics checks to jump for 1 round. Ki Metabolism (Su) : A monk with this ability uses his ki to control his metabolism. As long as he has at least 1 point remaining in his ki pool , the monk needs to eat and ",
+          "pools": [
+            {
+              "name": "Ki Power",
+              "description": "At 4th level and every 2 levels thereafter, a monk can select one ki power. These powers allow the monk to perform amazing feats of mystical power and acrobatic prowess by expending points from his ki pool. Once a ki power is selected, it cannot be changed. Some ki powers require the monk to be of a specific level or higher before they can be chosen. Unless otherwise noted, a monk cannot select an individual ki power more than once. Empty Body (Su) : A monk with this ki power gains the ability to assume an ethereal state for 1 minute as though using the spell etherealness , using his monk level as his caster level . Using this ability is a move action that consumes 3 points from the monk's ki pool. This ability affects only the monk and cannot be used to make other creatures ethereal. Feather Balance (Ex) : A monk with this ability can spend 1 ki point as a swift action to achieve perfect balance. While this is active, the monk treats any Acrobatics attempt made to balance as if he had rolled a 20. This ability lasts for 1 minute. High Jump (Ex) : A monk with this ki power adds his level as a bonus on all Acrobatics checks to jump, both for vertical jumps and horizontal jumps. In addition, he always counts as having a running start when attempting Acrobatics checks to jump. By spending 1 point from his ki pool as a swift action , the monk gains a +20 bonus on Acrobatics checks to jump for 1 round. Ki Metabolism (Su) : A monk with this ability uses his ki to control his metabolism. As long as he has at least 1 point remaining in his ki pool , the monk needs to eat and ",
+              "requirements": {
+                "minClassLevel": 2,
+                "text": "At 4th level and every 2 levels thereafter, a monk can select one ki power. Once a ki power is selected, it cannot be changed."
+              },
+              "options": [
+                {
+                  "name": "6Th Level Required:",
+                  "description": "Action Before Thought (Ex) : A monk with this ability can spend 2 ki points as a free action as part of rolling initiative to roll twice on the initiative check and take the higher result. A monk must be at least 6th level before selecting this ki power. Source PPC:MAH Diamond Mind (Su) : By spending 1 point from his ki pool as a swift action , a monk with this power can suppress a fear effect affecting him as if using remove fear , using his monk level as his caster level . He can spend 2 ki points to activate this ability even when frightened or panicked . A monk must be at least 6th level before selecting this ki power. Elemental Fury (Su) : A monk who selects this ki power must select one type of energy: acid, cold, electricity, or fire. Once this choice is made, it cannot be changed. The monk can expend 1 point from his ki pool as a swift action to imbue his natural attacks with this energy, causing them to deal 1d6 points of damage of the chosen type for a number of rounds equal to 1/2 his monk level. A monk must be at least 6th level before selecting this ki power. Ki Guardian (Su) : As an immediate action before he rolls a saving throw against a targeted effect that also targets other allies or an area effect whose area includes other allies, a monk with this ability can spend any number of ki points and designate a number of adjacent allies equal to the number of ki points spent. The monk rolls one saving throw for each designated ally, using his bonus instead of the ally&#8217;s. For each successful saving throw, the corresponding ally treats the effect as if that ally had succeeded at the saving throw, and for each saving throw failed, the corresponding ally treats the effect as if that ally had failed the saving throw. If the monk fails any of the saving thr",
+                  "requirements": {
+                    "minClassLevel": 6,
+                    "text": "Action Before Thought (Ex) : A monk with this ability can spend 2 ki points as a free action as part of rolling initiative to roll twice on the initiative check and take the higher result. A monk must be at least 6th level before selecting this ki power."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "7Th Level Required:",
+                  "description": "Formless Mastery (Ex) : A monk with this ability varies his styles, never repeating the same move twice and capitalizing on the weaknesses of an opponent&#8217;s style. As long as he does not possess any style feat, the monk can spend 1 point from his ki pool as an immediate action to gain the following against opponents in the stance of a style feat: a +4 dodge bonus to AC, a +4 circumstance bonus on attack rolls , and a bonus equal to his monk level on damage rolls. These bonuses last until the end of the monk&#8217;s next turn (or his current turn if he uses this ability on his own turn). The monk can activate this ability and the furious defense ki power with the same immediate action for a total cost of 3 ki points. A monk must be at least 7th level before selecting this ki power. Furious Defense (Ex) : By spending 1 point from his ki pool as an immediate action , a monk with this ki power can grant himself a +4 dodge bonus to AC until the end of his next turn. The monk can activate this ability and the formless mastery ki power with the same immediate action for a total cost of 3 ki points. A monk must be at least 7th level before selecting this ki power.",
+                  "requirements": {
+                    "minClassLevel": 7,
+                    "text": "As long as he does not possess any style feat, the monk can spend 1 point from his ki pool as an immediate action to gain the following against opponents in the stance of a style feat: a +4 dodge bonus to AC, a +4 circumstance bonus on attack rolls , and a bonus equal to his monk level on damage rolls. A monk must be at least 7th level before selecting this ki power."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "8Th Level Required:",
+                  "description": "Abundant Step (Su) : A monk with this ki power can slip magically between spaces, as if using the spell dimension door . Using this ability is a move action that consumes 2 points from his ki pool. The monk&#8217;s caster level for this effect is equal to his monk level. He cannot take other creatures with him when he uses this ability. A monk must be at least 8th level before selecting this ki power. Bare-Hand Block (Ex) : A monk with this ability can spend 1 ki point as an immediate action when attacked with a manufactured weapon to attempt an unarmed sunder combat maneuver check against it. If he successfully sunders the weapon and grants it the broken condition, the attack deals no damage. He can spend an additional 1 ki point when using this ability to activate ki sunder as a free action . A monk must be at least 8th level and have the ki sunder ki power before selecting this ki power. Source PPC:MAH Breaking-Down Koan (Su) : A monk with this ability can spend 1 ki point as a swift action to present a paradox, riddle, or complicated question to a creature within 30 feet. The creature must succeed at a Will save (DC = 10 + 1/2 the monkÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s level + his Wisdom modifier) or be confused for 1 round. This is a mind-affecting , language-dependent effect. A monk must be at least 8th level before selecting this ki power. Source PPC:MAH Building-Up Koan (Su) : A monk with this ability can spend 2 ki points as a swift action to ask himself a koan, which he then tries to answer. The monk must attempt a Will save (DC 15 + 1/2 the monkÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s level). If successful, he gains an insight bonus equal to his Wisdom modifier to AC and on attack rolls , saving throws, skill checks and until the end of the round. If he fails, the monk is instead confused for 1 round. This is a mind-affecting ,",
+                  "requirements": {
+                    "minClassLevel": 8,
+                    "text": "The monk&#8217;s caster level for this effect is equal to his monk level. A monk must be at least 8th level before selecting this ki power."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "10Th Level Required:",
+                  "description": "Ki Blocker (Su) : A monk with this ability can spend 1 ki point as a free action before making an unarmed strike against a foe. If the attack hits, the monk can interrupt the target&#8217;s flow of ki. If the monk successfully damages the target of his attack, that opponent&#8217;s cost to activate abilities with ki increases by 1 ki point for 1 hour. If the monk spends 2 points from his ki pool, he can use this ability to affect the target&#8217;s arcane pool, arcane reservoir, grit points, inspiration, or panache points instead of its ki pool. The effects of this ability do not stack, but multiple hits increase the duration by 1 hour for each hit. A monk must be at least 10th level before selecting this ki power. Ki Hurricane (Ex) : As a full-round action , a monk with this ability can move up to twice his speed. At any point in that movement, the monk can spend 1 ki point to make the first attack in his flurry of blows . He can later spend another ki point to make the next attack in his flurry of blows , and so on, until he either stops spending ki points or has exhausted all the attacks from his flurry of blows . A monk must be at least 10th level and possess the sudden speed ki power before selecting this ki power. Ki Visions (Su) : A monk with this ability often sees visions of spirits or hears the voice of his departed mentor in his dreams. On any given night during which the monk dreams, he can use this ability to gain the benefits of a divination . If he does, he spends 2 ki points from the next day&#8217;s total. A monk must be at least 10th level before selecting this ki power.",
+                  "requirements": {
+                    "minClassLevel": 10,
+                    "text": "Ki Blocker (Su) : A monk with this ability can spend 1 ki point as a free action before making an unarmed strike against a foe. A monk must be at least 10th level before selecting this ki power."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "12Th Level Required:",
+                  "description": "Cobra Breath (Su) : Whenever a monk with this ki power uses diamond body to neutralize a poison , he can instead release that poison as a ranged touch attack against a single foe within 30 feet. If the attack hits, the foe must succeed at a saving throw (using the poison&#8217;s original DC) or suffer the poison&#8217;s effects, even if it was not originally a contact poison . A monk must be at least 12th level and must possess the diamond body ki power before selecting this ki power. Diamond Resilience (Ex) : By spending 1 ki point as a swift action , the monk gains DR 2/-. At 16th level, the damage reduction increases to 4/-. At 19th level, it increases to DR 6/-. This DR lasts for 1 minute. A monk must be at least 12th level before selecting this ki power. Diamond Soul (Ex) : A monk can spend 2 points from his ki pool as a swift action to gain spell resistance equal to his monk level + 10. This spell resistance lasts for a number of rounds equal to the monk&#8217;s level. A monk must be at least 12th level before selecting this ki power. Master-Thought Koan (Su) : A monk with this ability can spend an additional 2 ki points when using either the breaking-down koan or building-up koan ki powers. When combined with master-thought koan, breaking-down koan affects a number of characters of your choice within 30 feet equal to the monkÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s wisdom modifier. When combined with master-thought koan, building-up koan can be used on an ally within 30 feet. A monk must be at least 12th level and have either the breaking-down koan or the building-up koan ki power before selecting this ki power. Source PPC:MAH One Touch (Ex) : As long as he has at least 1 point remaining in his ki pool, as a standard action , a monk with this power can make an unarmed strike against a foe as a touch ",
+                  "requirements": {
+                    "minClassLevel": 12,
+                    "text": "If the attack hits, the foe must succeed at a saving throw (using the poison&#8217;s original DC) or suffer the poison&#8217;s effects, even if it was not originally a contact poison . A monk must be at least 12th level and must possess the diamond body ki power before selecting this ki power."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "16Th Level Required:",
+                  "description": "Ki Volley (Su) : When a targeted spell or spell-like ability fails to overcome the monk&#8217;s spell resistance from diamond soul , he can spend 2 ki points as an immediate action to send that spell back at its caster as spell turning . A monk must be 16th level or higher and possess the diamond soul ki power before selecting this ki power. Quivering Palm (Su) : A monk can set up vibrations within the body of another creature that can thereafter be fatal if the monk so desires. Using this ability is a standard action that costs 4 ki points, and the monk must announce his intent to use this ability (and spend the ki points) before making the attack roll . Creatures immune to critical hits cannot be affected. Otherwise, if the attack hits and the target takes damage from the blow, the quivering palm attack succeeds. Thereafter, the monk can try to slay the victim at any time within a number of days equal to his monk level. To make such an attempt, the monk merely wills the target to die (a free action ); unless the target succeeds at a Fortitude saving throw (DC = 10 + 1/2 the monk&#8217;s level + the monk&#8217;s Wisdom modifier), it dies. If the saving throw is successful, the target is no longer in danger from that particular quivering palm attack, but it can still be affected by another one at a later time. A monk can have no more than one quivering palm in effect at one time. If a monk uses quivering palm while another is still in effect, the previous one is negated. A monk must be at least 16th level before selecting this ki power.",
+                  "requirements": {
+                    "minClassLevel": 16,
+                    "text": "A monk must be 16th level or higher and possess the diamond soul ki power before selecting this ki power. Using this ability is a standard action that costs 4 ki points, and the monk must announce his intent to use this ability (and spend the ki points) before making the attack roll ."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "18Th Level Required:",
+                  "description": "Elemental Burst (Su) : A monk with this ability can spend 4 ki points to unleash a gout of energy in a 30-foot cone. Creatures within the cone take 20d6 points of damage of the same type as the monk&#8217;s elemental fury ki power. A Reflex save (DC = 10 + 1/2 the monk&#8217;s level + his Wisdom modifier) halves the damage. A monk must be at least 18th level and must possess the elemental fury ki power before selecting this ki power.",
+                  "requirements": {
+                    "minClassLevel": 18,
+                    "text": "A Reflex save (DC = 10 + 1/2 the monk&#8217;s level + his Wisdom modifier) halves the damage. A monk must be at least 18th level and must possess the elemental fury ki power before selecting this ki power."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/unchained-classes/monk-unchained/",
+              "scrapeConfidence": "medium"
+            }
+          ]
+        },
+        {
+          "name": "Perfect Self",
+          "description": "At 20th level, a monk becomes a magical creature. He is forevermore treated as an outsider rather than a humanoid (or whatever his original creature type was) for the purpose of spells and magical effects. Additionally, the monk gains damage reduction 10/chaotic, which allows him to ignore the first 10 points of damage from any attack made by a nonchaotic weapon. Unlike other outsiders , the monk can still be brought back from the dead as if he were a member of his previous creature type. Finally, the monk gains the ability to enter a state of perfect calm. During this time, the monk can take no actions, but he does regain ki at the rate of 1 point per 10 minutes spent at calm. He cannot use this ability to gain an amount of ki in excess of his maximum."
+        }
+      ],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": null,
+  "spellcastingClass": false
+}

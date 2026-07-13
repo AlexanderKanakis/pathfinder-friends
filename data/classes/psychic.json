@@ -1,0 +1,722 @@
+{
+  "name": "Psychic",
+  "type": "occult",
+  "sourceUrl": "https://www.d20pfsrd.com/alternative-rule-systems/occult-adventures/occult-classes/psychic",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 2,
+      "classFeatures": [],
+      "spellcasting": {
+        "summary": "psychic spellcasting"
+      }
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 0,
+      "ref": 0,
+      "will": 3,
+      "classFeatures": [],
+      "spellcasting": {
+        "summary": "psychic spellcasting"
+      }
+    },
+    {
+      "level": 3,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 3,
+      "classFeatures": [],
+      "spellcasting": {
+        "summary": "psychic spellcasting"
+      }
+    },
+    {
+      "level": 4,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 4,
+      "classFeatures": [],
+      "spellcasting": {
+        "summary": "psychic spellcasting"
+      }
+    },
+    {
+      "level": 5,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 4,
+      "classFeatures": [],
+      "spellcasting": {
+        "summary": "psychic spellcasting"
+      }
+    },
+    {
+      "level": 6,
+      "bab": 3,
+      "fort": 2,
+      "ref": 2,
+      "will": 5,
+      "classFeatures": [],
+      "spellcasting": {
+        "summary": "psychic spellcasting"
+      }
+    },
+    {
+      "level": 7,
+      "bab": 3,
+      "fort": 2,
+      "ref": 2,
+      "will": 5,
+      "classFeatures": [],
+      "spellcasting": {
+        "summary": "psychic spellcasting"
+      }
+    },
+    {
+      "level": 8,
+      "bab": 4,
+      "fort": 2,
+      "ref": 2,
+      "will": 6,
+      "classFeatures": [],
+      "spellcasting": {
+        "summary": "psychic spellcasting"
+      }
+    },
+    {
+      "level": 9,
+      "bab": 4,
+      "fort": 3,
+      "ref": 3,
+      "will": 6,
+      "classFeatures": [],
+      "spellcasting": {
+        "summary": "psychic spellcasting"
+      }
+    },
+    {
+      "level": 10,
+      "bab": 5,
+      "fort": 3,
+      "ref": 3,
+      "will": 7,
+      "classFeatures": [],
+      "spellcasting": {
+        "summary": "psychic spellcasting"
+      }
+    },
+    {
+      "level": 11,
+      "bab": 5,
+      "fort": 3,
+      "ref": 3,
+      "will": 7,
+      "classFeatures": [],
+      "spellcasting": {
+        "summary": "psychic spellcasting"
+      }
+    },
+    {
+      "level": 12,
+      "bab": 6,
+      "fort": 4,
+      "ref": 4,
+      "will": 8,
+      "classFeatures": [],
+      "spellcasting": {
+        "summary": "psychic spellcasting"
+      }
+    },
+    {
+      "level": 13,
+      "bab": 6,
+      "fort": 4,
+      "ref": 4,
+      "will": 8,
+      "classFeatures": [],
+      "spellcasting": {
+        "summary": "psychic spellcasting"
+      }
+    },
+    {
+      "level": 14,
+      "bab": 7,
+      "fort": 4,
+      "ref": 4,
+      "will": 9,
+      "classFeatures": [],
+      "spellcasting": {
+        "summary": "psychic spellcasting"
+      }
+    },
+    {
+      "level": 15,
+      "bab": 7,
+      "fort": 5,
+      "ref": 5,
+      "will": 9,
+      "classFeatures": [],
+      "spellcasting": {
+        "summary": "psychic spellcasting"
+      }
+    },
+    {
+      "level": 16,
+      "bab": 8,
+      "fort": 5,
+      "ref": 5,
+      "will": 10,
+      "classFeatures": [],
+      "spellcasting": {
+        "summary": "psychic spellcasting"
+      }
+    },
+    {
+      "level": 17,
+      "bab": 8,
+      "fort": 5,
+      "ref": 5,
+      "will": 10,
+      "classFeatures": [],
+      "spellcasting": {
+        "summary": "psychic spellcasting"
+      }
+    },
+    {
+      "level": 18,
+      "bab": 9,
+      "fort": 6,
+      "ref": 6,
+      "will": 11,
+      "classFeatures": [],
+      "spellcasting": {
+        "summary": "psychic spellcasting"
+      }
+    },
+    {
+      "level": 19,
+      "bab": 9,
+      "fort": 6,
+      "ref": 6,
+      "will": 11,
+      "classFeatures": [],
+      "spellcasting": {
+        "summary": "psychic spellcasting"
+      }
+    },
+    {
+      "level": 20,
+      "bab": 10,
+      "fort": 6,
+      "ref": 6,
+      "will": 12,
+      "classFeatures": [],
+      "spellcasting": {
+        "summary": "psychic spellcasting"
+      }
+    }
+  ],
+  "spellcasting": {
+    "summary": "spontaneous full caster using INT",
+    "castingType": "spontaneous",
+    "progression": "full",
+    "ability": "int",
+    "preparation": "spontaneous",
+    "maxSpellLevel": 9,
+    "slotsByLevel": [
+      [
+        3,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        4,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        4,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        5,
+        4,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        5,
+        4,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        5,
+        5,
+        4,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        6,
+        5,
+        4,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        6,
+        5,
+        5,
+        4,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        6,
+        6,
+        5,
+        4,
+        3,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        6,
+        6,
+        5,
+        5,
+        4,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        6,
+        6,
+        6,
+        5,
+        4,
+        3,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        6,
+        6,
+        6,
+        5,
+        5,
+        4,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        6,
+        6,
+        6,
+        6,
+        5,
+        4,
+        3,
+        0,
+        0
+      ],
+      [
+        4,
+        6,
+        6,
+        6,
+        6,
+        5,
+        5,
+        4,
+        0,
+        0
+      ],
+      [
+        4,
+        6,
+        6,
+        6,
+        6,
+        6,
+        5,
+        4,
+        3,
+        0
+      ],
+      [
+        4,
+        6,
+        6,
+        6,
+        6,
+        6,
+        5,
+        5,
+        4,
+        0
+      ],
+      [
+        4,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        5,
+        4,
+        3
+      ],
+      [
+        4,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        5,
+        5,
+        4
+      ],
+      [
+        4,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        5,
+        5
+      ],
+      [
+        4,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6
+      ]
+    ],
+    "knownByLevel": [
+      [
+        4,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        5,
+        3,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        5,
+        4,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        6,
+        4,
+        3,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        6,
+        4,
+        4,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        7,
+        5,
+        4,
+        3,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        7,
+        5,
+        4,
+        4,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        8,
+        5,
+        5,
+        4,
+        3,
+        2,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        8,
+        5,
+        5,
+        4,
+        4,
+        3,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        9,
+        5,
+        5,
+        5,
+        4,
+        3,
+        2,
+        0,
+        0,
+        0
+      ],
+      [
+        9,
+        5,
+        5,
+        5,
+        4,
+        4,
+        3,
+        0,
+        0,
+        0
+      ],
+      [
+        9,
+        5,
+        5,
+        5,
+        5,
+        4,
+        3,
+        2,
+        0,
+        0
+      ],
+      [
+        9,
+        5,
+        5,
+        5,
+        5,
+        4,
+        4,
+        3,
+        0,
+        0
+      ],
+      [
+        9,
+        5,
+        5,
+        5,
+        5,
+        5,
+        4,
+        3,
+        2,
+        0
+      ],
+      [
+        9,
+        5,
+        5,
+        5,
+        5,
+        5,
+        4,
+        4,
+        3,
+        0
+      ],
+      [
+        9,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        4,
+        3,
+        2
+      ],
+      [
+        9,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        4,
+        4,
+        3
+      ],
+      [
+        9,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        4,
+        4
+      ],
+      [
+        9,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5
+      ]
+    ]
+  },
+  "fallback": "progression chassis only",
+  "scrapeError": "404 Not Found: https://www.d20pfsrd.com/alternative-rule-systems/occult-adventures/occult-classes/psychic",
+  "spellcastingClass": true
+}

@@ -3,7 +3,7 @@ const path = require("path");
 
 const SOURCE_URL = "https://www.d20pfsrd.com/equipment/weapons/firearms/";
 const ROOT = path.resolve(__dirname, "..");
-const OUT = path.join(ROOT, "firearms.json");
+const OUT = path.join(ROOT, "data", "firearms.json");
 const DETAIL_CONCURRENCY = 6;
 
 function decodeEntities(value = "") {

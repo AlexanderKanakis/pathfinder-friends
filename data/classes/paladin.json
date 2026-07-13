@@ -1,0 +1,462 @@
+{
+  "name": "Paladin",
+  "type": "core",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/core-classes/paladin/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 1,
+      "fort": 2,
+      "ref": 0,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Aura Of Good",
+          "description": "The power of a paladin's aura of good (see the detect good spell) is equal to her paladin level."
+        },
+        {
+          "name": "Detect Evil",
+          "description": "At will, a paladin can use detect evil , as the spell. A paladin can, as a move action, concentrate on a single item or individual within 60 feet and determine if it is evil, learning the strength of its aura as if having studied it for 3 rounds. While focusing on one individual or object, the paladin does not detect evil in any other object or individual within range. FAQ Does smite evil bypass the defenses of the incorporeal special quality? Smite is not an effect on the weapon, it is an effect on the paladin. The weapon still needs to be magic to harm the incorporeal creature, and even a magic weapon still only deals half damage against it. [ Source ] Does a paladin's lay on hands use positive energy? Yes. [ Source ] If I have the channel energy ability from more than one class, do they stack? No-unless an ability specifically says it stacks with similar abilities (such as an assassin's sneak attack ), or adds in some way based on the character's total class levels (such as improved uncanny dodge ), the abilities don't stack and you have to use them separately. Therefore, cleric channeling doesn't stack with paladin channeling, necromancer channeling, oracle of life channeling, and so on. [ Source ]"
+        },
+        {
+          "name": "Smite Evil 1/Day",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 2,
+      "bab": 2,
+      "fort": 3,
+      "ref": 0,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Divine Grace",
+          "description": "At 2nd level, a paladin gains a bonus equal to her Charisma bonus (if any) on all Saving Throws ."
+        },
+        {
+          "name": "Lay On Hands",
+          "description": "Beginning at 2nd level, a paladin can heal wounds (her own or those of others) by touch. Each day she can use this ability a number of times equal to 1/2 her paladin level plus her Charisma modifier. With one use of this ability, a paladin can heal 1d6 hit points of damage for every two paladin levels she possesses. Using this ability is a standard action, unless the paladin targets herself, in which case it is a swift action. Despite the name of this ability, a paladin only needs one free hand to use this ability. Alternatively, a paladin can use this healing power to deal damage to undead creatures, dealing 1d6 points of damage for every two levels the paladin possesses. Using lay on hands in this way requires a successful melee touch attack and doesn't provoke an attack of opportunity . Undead do not receive a saving throw against this damage."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 3,
+      "bab": 3,
+      "fort": 3,
+      "ref": 1,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Aura Of Courage",
+          "description": "At 3rd level, a paladin is immune to fear (magical or otherwise). Each ally within 10 feet of her gains a +4 morale bonus on saving throws against fear effects. This ability functions only while the paladin is conscious, not if she is unconscious or dead."
+        },
+        {
+          "name": "Divine Health",
+          "description": "At 3rd level, a paladin is immune to all diseases, including supernatural and magical diseases, including mummy rot ."
+        },
+        {
+          "name": "Mercy",
+          "description": "At 3rd level, and every three levels thereafter, a paladin can select one mercy. Each mercy adds an effect to the paladin's lay on hands ability. Whenever the paladin uses lay on hands to heal damage to one target, the target also receives the additional effects from all of the mercies possessed by the paladin. A mercy can remove a condition caused by a curse, disease, or poison without curing the affliction. Such conditions return after 1 hour unless the mercy actually removes the affliction that causes the condition. At 3rd level, the paladin can select from the following initial mercies. Deceived : The target can immediately attempt a new saving throw to disbelieve any ongoing illusions that it failed to disbelieve within the last minute. Source PPC:HH Fatigued : The target is no longer fatigued . Riled : The paladinÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s lay on hands also acts as calm emotions , but only for the purpose of suppressing morale bonuses (such as from the rage spell) and emotion effects that arenÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢t fear effects. Use the paladinÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s level as the caster level . Source PPC:HH Shaken : The target is no longer shaken . Sickened : The target is no longer sickened . At 6th level, a paladin adds the following mercies to the list of those that can be selected. Dazed : The target is no longer dazed . Diseased : The paladin's lay on hands ability also acts as remove disease , using the paladin's level as the caster level. Enfeebled : The paladin dispels any magical effects that are reducing one of the targetÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s ability scores ( paladinÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s choice). Source PPC:HH Haunted : The paladinÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s lay on"
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 4,
+      "bab": 4,
+      "fort": 4,
+      "ref": 1,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Channel Positive Energy",
+          "description": "When a paladin reaches 4th level, she gains the supernatural ability to channel positive energy like a cleric. Using this ability consumes two uses of her lay on hands ability. A paladin uses her level as her effective cleric level when channeling positive energy. This is a Charisma -based ability."
+        },
+        {
+          "name": "Smite Evil 2/Day",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 5,
+      "bab": 5,
+      "fort": 4,
+      "ref": 1,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Divine Bond",
+          "description": "Upon reaching 5th level, a paladin forms a divine bond with her god. This bond can take one of two forms. Once the form is chosen, it cannot be changed. The first type of bond allows the paladin to enhance her weapon as a standard action by calling upon the aid of a celestial spirit for 1 minute per paladin level. When called, the spirit causes the weapon to shed light as a torch. At 5th level, this spirit grants the weapon a +1 enhancement bonus. For every three levels beyond 5th, the weapon gains another +1 enhancement bonus, to a maximum of +6 at 20th level. These bonuses can be added to the weapon, stacking with existing weapon bonuses to a maximum of +5, or they can be used to add any of the following weapon properties: axiomatic , brilliant energy , defending , disruption , flaming , flaming burst , holy , keen , merciful , and speed . Adding these properties consumes an amount of bonus equal to the property's cost (see Table: Melee Weapon Special Abilities ). These bonuses are added to any properties the weapon already has, but duplicate abilities do not stack. If the weapon is not magical, at least a +1 enhancement bonus must be added before any other properties can be added. The bonus and properties granted by the spirit are determined when the spirit is called and cannot be changed until the spirit is called again. The celestial spirit imparts no bonuses if the weapon is held by anyone other than the paladin but resumes giving bonuses if returned to the paladin. These bonuses apply to only one end of a double weapon. A paladin can use this ability once per d"
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 6,
+      "bab": 6,
+      "fort": 5,
+      "ref": 2,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Mercy",
+          "description": "At 3rd level, and every three levels thereafter, a paladin can select one mercy. Each mercy adds an effect to the paladin's lay on hands ability. Whenever the paladin uses lay on hands to heal damage to one target, the target also receives the additional effects from all of the mercies possessed by the paladin. A mercy can remove a condition caused by a curse, disease, or poison without curing the affliction. Such conditions return after 1 hour unless the mercy actually removes the affliction that causes the condition. At 3rd level, the paladin can select from the following initial mercies. Deceived : The target can immediately attempt a new saving throw to disbelieve any ongoing illusions that it failed to disbelieve within the last minute. Source PPC:HH Fatigued : The target is no longer fatigued . Riled : The paladinÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s lay on hands also acts as calm emotions , but only for the purpose of suppressing morale bonuses (such as from the rage spell) and emotion effects that arenÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢t fear effects. Use the paladinÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s level as the caster level . Source PPC:HH Shaken : The target is no longer shaken . Sickened : The target is no longer sickened . At 6th level, a paladin adds the following mercies to the list of those that can be selected. Dazed : The target is no longer dazed . Diseased : The paladin's lay on hands ability also acts as remove disease , using the paladin's level as the caster level. Enfeebled : The paladin dispels any magical effects that are reducing one of the targetÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s ability scores ( paladinÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s choice). Source PPC:HH Haunted : The paladinÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s lay on"
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 7,
+      "bab": 7,
+      "fort": 5,
+      "ref": 2,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Smite Evil 3/Day",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 8,
+      "bab": 8,
+      "fort": 6,
+      "ref": 2,
+      "will": 6,
+      "classFeatures": [
+        {
+          "name": "Aura Of Resolve",
+          "description": "At 8th level, a paladin is immune to charm spells and spell-like abilities. Each ally within 10 feet of her gains a +4 morale bonus on saving throws against charm effects. This ability functions only while the paladin is conscious, not if she is unconscious or dead."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 9,
+      "bab": 9,
+      "fort": 6,
+      "ref": 3,
+      "will": 6,
+      "classFeatures": [
+        {
+          "name": "Mercy",
+          "description": "At 3rd level, and every three levels thereafter, a paladin can select one mercy. Each mercy adds an effect to the paladin's lay on hands ability. Whenever the paladin uses lay on hands to heal damage to one target, the target also receives the additional effects from all of the mercies possessed by the paladin. A mercy can remove a condition caused by a curse, disease, or poison without curing the affliction. Such conditions return after 1 hour unless the mercy actually removes the affliction that causes the condition. At 3rd level, the paladin can select from the following initial mercies. Deceived : The target can immediately attempt a new saving throw to disbelieve any ongoing illusions that it failed to disbelieve within the last minute. Source PPC:HH Fatigued : The target is no longer fatigued . Riled : The paladinÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s lay on hands also acts as calm emotions , but only for the purpose of suppressing morale bonuses (such as from the rage spell) and emotion effects that arenÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢t fear effects. Use the paladinÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s level as the caster level . Source PPC:HH Shaken : The target is no longer shaken . Sickened : The target is no longer sickened . At 6th level, a paladin adds the following mercies to the list of those that can be selected. Dazed : The target is no longer dazed . Diseased : The paladin's lay on hands ability also acts as remove disease , using the paladin's level as the caster level. Enfeebled : The paladin dispels any magical effects that are reducing one of the targetÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s ability scores ( paladinÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s choice). Source PPC:HH Haunted : The paladinÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s lay on"
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 10,
+      "bab": 10,
+      "fort": 7,
+      "ref": 3,
+      "will": 7,
+      "classFeatures": [
+        {
+          "name": "Smite Evil 4/Day",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 11,
+      "bab": 11,
+      "fort": 7,
+      "ref": 3,
+      "will": 7,
+      "classFeatures": [
+        {
+          "name": "Aura Of Justice",
+          "description": "At 11th level, a paladin can expend two uses of her smite evil ability to grant the ability to smite evil to all allies within 10 feet, using her bonuses. Allies must use this smite evil ability by the start of the paladin's next turn and the bonuses last for 1 minute. Using this ability is a free action. Evil creatures gain no benefit from this ability."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 12,
+      "fort": 8,
+      "ref": 4,
+      "will": 8,
+      "classFeatures": [
+        {
+          "name": "Mercy",
+          "description": "At 3rd level, and every three levels thereafter, a paladin can select one mercy. Each mercy adds an effect to the paladin's lay on hands ability. Whenever the paladin uses lay on hands to heal damage to one target, the target also receives the additional effects from all of the mercies possessed by the paladin. A mercy can remove a condition caused by a curse, disease, or poison without curing the affliction. Such conditions return after 1 hour unless the mercy actually removes the affliction that causes the condition. At 3rd level, the paladin can select from the following initial mercies. Deceived : The target can immediately attempt a new saving throw to disbelieve any ongoing illusions that it failed to disbelieve within the last minute. Source PPC:HH Fatigued : The target is no longer fatigued . Riled : The paladinÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s lay on hands also acts as calm emotions , but only for the purpose of suppressing morale bonuses (such as from the rage spell) and emotion effects that arenÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢t fear effects. Use the paladinÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s level as the caster level . Source PPC:HH Shaken : The target is no longer shaken . Sickened : The target is no longer sickened . At 6th level, a paladin adds the following mercies to the list of those that can be selected. Dazed : The target is no longer dazed . Diseased : The paladin's lay on hands ability also acts as remove disease , using the paladin's level as the caster level. Enfeebled : The paladin dispels any magical effects that are reducing one of the targetÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s ability scores ( paladinÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s choice). Source PPC:HH Haunted : The paladinÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s lay on"
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 13,
+      "fort": 8,
+      "ref": 4,
+      "will": 8,
+      "classFeatures": [
+        {
+          "name": "Smite Evil 5/Day",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 14,
+      "fort": 9,
+      "ref": 4,
+      "will": 9,
+      "classFeatures": [
+        {
+          "name": "Aura Of Faith",
+          "description": "At 14th level, a paladin's weapons are treated as good-aligned for the purposes of overcoming Damage Reduction . Any attack made against an enemy within 10 feet of her is treated as good-aligned for the purposes of overcoming Damage Reduction . This ability functions only while the paladin is conscious, not if she is unconscious or dead."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 15,
+      "fort": 9,
+      "ref": 5,
+      "will": 9,
+      "classFeatures": [
+        {
+          "name": "Mercy",
+          "description": "At 3rd level, and every three levels thereafter, a paladin can select one mercy. Each mercy adds an effect to the paladin's lay on hands ability. Whenever the paladin uses lay on hands to heal damage to one target, the target also receives the additional effects from all of the mercies possessed by the paladin. A mercy can remove a condition caused by a curse, disease, or poison without curing the affliction. Such conditions return after 1 hour unless the mercy actually removes the affliction that causes the condition. At 3rd level, the paladin can select from the following initial mercies. Deceived : The target can immediately attempt a new saving throw to disbelieve any ongoing illusions that it failed to disbelieve within the last minute. Source PPC:HH Fatigued : The target is no longer fatigued . Riled : The paladinÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s lay on hands also acts as calm emotions , but only for the purpose of suppressing morale bonuses (such as from the rage spell) and emotion effects that arenÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢t fear effects. Use the paladinÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s level as the caster level . Source PPC:HH Shaken : The target is no longer shaken . Sickened : The target is no longer sickened . At 6th level, a paladin adds the following mercies to the list of those that can be selected. Dazed : The target is no longer dazed . Diseased : The paladin's lay on hands ability also acts as remove disease , using the paladin's level as the caster level. Enfeebled : The paladin dispels any magical effects that are reducing one of the targetÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s ability scores ( paladinÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s choice). Source PPC:HH Haunted : The paladinÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s lay on"
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 16,
+      "fort": 10,
+      "ref": 5,
+      "will": 10,
+      "classFeatures": [
+        {
+          "name": "Smite Evil 6/Day",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 17,
+      "fort": 10,
+      "ref": 5,
+      "will": 10,
+      "classFeatures": [
+        {
+          "name": "Aura Of Righteousness",
+          "description": "At 17th level, a paladin gains DR 5/evil and immunity to compulsion spells and spell-like abilities. Each ally within 10 feet of her gains a +4 morale bonus on saving throws against compulsion effects. This ability functions only while the paladin is conscious, not if she is unconscious or dead."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 18,
+      "fort": 11,
+      "ref": 6,
+      "will": 11,
+      "classFeatures": [
+        {
+          "name": "Mercy",
+          "description": "At 3rd level, and every three levels thereafter, a paladin can select one mercy. Each mercy adds an effect to the paladin's lay on hands ability. Whenever the paladin uses lay on hands to heal damage to one target, the target also receives the additional effects from all of the mercies possessed by the paladin. A mercy can remove a condition caused by a curse, disease, or poison without curing the affliction. Such conditions return after 1 hour unless the mercy actually removes the affliction that causes the condition. At 3rd level, the paladin can select from the following initial mercies. Deceived : The target can immediately attempt a new saving throw to disbelieve any ongoing illusions that it failed to disbelieve within the last minute. Source PPC:HH Fatigued : The target is no longer fatigued . Riled : The paladinÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s lay on hands also acts as calm emotions , but only for the purpose of suppressing morale bonuses (such as from the rage spell) and emotion effects that arenÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢t fear effects. Use the paladinÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s level as the caster level . Source PPC:HH Shaken : The target is no longer shaken . Sickened : The target is no longer sickened . At 6th level, a paladin adds the following mercies to the list of those that can be selected. Dazed : The target is no longer dazed . Diseased : The paladin's lay on hands ability also acts as remove disease , using the paladin's level as the caster level. Enfeebled : The paladin dispels any magical effects that are reducing one of the targetÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s ability scores ( paladinÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s choice). Source PPC:HH Haunted : The paladinÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s lay on"
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 19,
+      "fort": 11,
+      "ref": 6,
+      "will": 11,
+      "classFeatures": [
+        {
+          "name": "Smite Evil 7/Day",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 20,
+      "fort": 12,
+      "ref": 6,
+      "will": 12,
+      "classFeatures": [
+        {
+          "name": "Holy Champion",
+          "description": "At 20th level, a paladin becomes a conduit for the power of her god. Her DR increases to 10/evil. Whenever she uses smite evil and successfully strikes an evil outsider, the outsider is also subject to a banishment , using her paladin level as the caster level (her weapon and holy symbol automatically count as objects that the subject hates). After the banishment effect and the damage from the attack is resolved, the smite immediately ends. In addition, whenever she channels positive energy or uses lay on hands to heal a creature, she heals the maximum possible amount."
+        }
+      ],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": {
+    "summary": "prepared 1/2 caster using CHA",
+    "castingType": "prepared",
+    "progression": "1/2",
+    "ability": "cha",
+    "preparation": "daily-list",
+    "maxSpellLevel": 4,
+    "slotsByLevel": [
+      [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        1,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        1,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        1,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        1,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        1,
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        2,
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        2,
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        2,
+        1,
+        1,
+        0
+      ],
+      [
+        0,
+        2,
+        2,
+        1,
+        0
+      ],
+      [
+        0,
+        3,
+        2,
+        1,
+        0
+      ],
+      [
+        0,
+        3,
+        2,
+        1,
+        1
+      ],
+      [
+        0,
+        3,
+        2,
+        2,
+        1
+      ],
+      [
+        0,
+        3,
+        3,
+        2,
+        1
+      ],
+      [
+        0,
+        4,
+        3,
+        2,
+        1
+      ],
+      [
+        0,
+        4,
+        3,
+        2,
+        2
+      ],
+      [
+        0,
+        4,
+        3,
+        3,
+        2
+      ],
+      [
+        0,
+        4,
+        4,
+        3,
+        3
+      ]
+    ]
+  },
+  "spellcastingClass": true
+}

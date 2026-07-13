@@ -1,0 +1,269 @@
+{
+  "name": "Souldrinker (PZO1139)",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/s-z/souldrinker/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Apocalyptic Vow",
+          "description": "At 1st level, the souldrinker must select one of the Four Horsemen or a daemon harbinger to which she makes an apocalyptic vow. When a souldrinker dies, the entity to which she made her apocalyptic vow claims her soul. A character attempting to resurrect a slain souldrinker must succeed at a caster level check with a DC equal to 10 + the souldrinker's character level or the spell fails. That character cannot attempt to resurrect the souldrinker again until 24 hours have passed, though other characters can still attempt to do. This vow also grants the souldrinker a +3 bonus on saving throws against death effects and negative energy, which stacks with other such bonuses."
+        },
+        {
+          "name": "Cacodaemon Familiar",
+          "description": "At 1st level, the souldrinker gains a cacodaemon familiar , as if she had the Improved Familiar feat. If the souldrinker already has a familiar , the cacodaemon replaces that familiar by devouring the prior familiar (this does not penalize the souldrinker). The souldrinker counts as an evil outsider for the purpose of using soul gems created by a cacodaemon ."
+        },
+        {
+          "name": "Obedience",
+          "description": "In order to maintain her souldrinker abilities (including all spellcasting abilities that have been augmented by this prestige class), a souldrinker must indulge the Horseman or harbinger she worships with a daily obedience. This ceremony is incorporated into whatever method the souldrinker uses to regain spellcasting abilities (such as meditating, praying to a demigod, or studying a spellbook). When a character takes her first level of souldrinker, she must decide whether she is an evangelist, an exalted, or a sentinel of her daemonic patron. This choice determines which category of boons she earns as she gains levels, and once made, it cannot later be changed."
+        }
+      ],
+      "spellcasting": {
+        "Spells Per Day": "-"
+      }
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Enervation 2/Day",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells Per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 3,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Daemonic Boon 1",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells Per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 4,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Lesser Oblivion",
+          "description": "At 4th level, a souldrinker's apocalyptic vow invests her with a specific ability, depending on which Horseman she made her vow to, as listed below: Horseman of Pestilence : Immunity to diseases, including supernatural and magical diseases. Horseman of death : Immunity to aging effects and Constitution damage and drain. Horseman of war : Immunity to bleed effects and Strength damage and drain. Horseman of famine : Immunity to ingested and inhaled poisons and the souldrinker no longer needs to eat or drink."
+        }
+      ],
+      "spellcasting": {
+        "Spells Per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 5,
+      "bab": 2,
+      "fort": 2,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Enervation 4/Day",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells Per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 6,
+      "bab": 3,
+      "fort": 2,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Daemonic Boon 2",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells Per Day": "-"
+      }
+    },
+    {
+      "level": 7,
+      "bab": 3,
+      "fort": 2,
+      "ref": 2,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Oblivion",
+          "description": "At 7th level, the souldrinker is granted more power by her apocalyptic vow, gaining a spell-like ability usable at will but that costs 1 soul point for each use. Horseman of Pestilence : contagion Horseman of death : vampiric touch Horseman of war : rage Horseman of famine : bestow curse"
+        }
+      ],
+      "spellcasting": {
+        "Spells Per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 8,
+      "bab": 4,
+      "fort": 3,
+      "ref": 3,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Enervation 6/Day",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells Per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 9,
+      "bab": 4,
+      "fort": 3,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Daemonic Boon 3",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells Per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 10,
+      "bab": 5,
+      "fort": 3,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Greater Oblivion",
+          "description": "At 10th level, the souldrinker gains more power from her apocalyptic vow. The spell-like abilities listed here are usable at will but cost 3 soul points per use. Horseman of Pestilence : plague storm Horseman of death : wither limb Horseman of war : blade barrier Horseman of famine : quickened feast of ashes Section 15: Copyright Notice Pathfinder Roleplaying Game Book of the Damned Ãƒâ€šÃ‚Â© 2017, Paizo Inc.; Authors: John Compton, Adam Daigle, Amanda Hamon Kunz, James Jacobs, Isabelle Lee, F. Wesley Schneider, Todd Stewart, and Josh Vogt."
+        }
+      ],
+      "spellcasting": {
+        "Spells Per Day": "+1 level of existing class"
+      }
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": {
+    "summary": "See level progression spell columns."
+  },
+  "spellcastingClass": true
+}

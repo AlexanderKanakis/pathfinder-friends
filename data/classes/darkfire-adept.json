@@ -1,0 +1,261 @@
+{
+  "name": "Darkfire Adept",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/c-d/darkfire-adept/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Sacred Summons",
+          "description": "A darkfire adept gains Sacred Summons as a bonus feat at 1st level, as if she had an evil aura (regardless of her actual alignment )."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "-"
+      }
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Darkfire Taint",
+          "description": "At 2nd level, as a standard action , a darkfire adept can corrupt the planar substrate into strands of darkfire that create a destructive resonance between herself and a target within 30 feet. She gains a +1 profane bonus on attack rolls and caster level checks against the target, and the target takes a -1 penalty on saving throws against the adept's attacks (or -2 if the attack is a conjuration effect). The taint lasts a number of rounds equal to her class level, though a successful Will save (DC 10 + the Darkfire Adept's class level + the Darkfire Adept's Charisma modifier) reduces this to 1 round. The effect immediately ends if the target moves more than 30 feet away from the Darkfire Adept. The profane bonus and penalty become +2 and -2 (-3 against conjuration effects) at 6th level. They become +3 and -3 (-4 against conjuration effects) at 10th level."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of spellcasting class"
+      }
+    },
+    {
+      "level": 3,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "1St Darkfire Pact",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of spellcasting class"
+      }
+    },
+    {
+      "level": 4,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Darkfire Eruption",
+          "description": "At 4th level, a darkfire adept can sacrifice a prepared spell or spell slot of 4th level or higher, calling forth a searing ebon vortex in the spell's stead. A darkfire eruption acts as unholy blight , but its maximum damage is increased by 1d8 points (2d6 against good outsiders ) per level of the sacrificed spell above 4th. A darkfire eruption ignores the hardness of objects, as it unravels their fundamental reality. A creature slain or an object destroyed by a darkfire eruption is reduced to ash, as by the disintegrate spell. This is a conjuration effect."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of spellcasting class"
+      }
+    },
+    {
+      "level": 5,
+      "bab": 2,
+      "fort": 2,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Breaching",
+          "description": "At 5th level, when a darkfire adept attempts to call or summon a creature from one of her darkfire pact subtypes into an area where summoning is blocked by a magical effect (such as magic circle against evil , forbiddance , or dimensional lock ), or when a creature within 30 feet she has called or summoned from her darkfire pact would have its attacks against a creature blocked by such an effect, as a swift action she can sacrifice a prepared spell or spell slot of the same level as the warding effect. If her caster level is higher than the caster level of the warding effect, it is immediately negated. If it is the same or lower, a caster level check (DC 11 + the caster level of the warding) is required to negate the warding effect. At 10th level, a Darkfire Adept's breaching can penetrate and destroy an antimagic field , a prismatic sphere , or an extradimensional shelter like a mage's magnificent mansion, though a caster level check is always required regardless of the Darkfire Adept's caster level . She can summon creatures into a naturally magic-dead area with a successful DC 31 caster level check, but the magic-dead area is not negated."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "-"
+      }
+    },
+    {
+      "level": 6,
+      "bab": 3,
+      "fort": 2,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "2Nd Darkfire Pact",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of spellcasting class"
+      }
+    },
+    {
+      "level": 7,
+      "bab": 3,
+      "fort": 2,
+      "ref": 2,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Breaching Legion",
+          "description": "At 7th level, when a darkfire adept summons a creature from one of her darkfire pact subtypes, she can choose to allow that creature to use any innate summoning abilities it possesses. The creatures it summons are not under the Darkfire Adept's control. Once this decision is made, it cannot be reversed until the summoned creature is sent back to whence it came."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of spellcasting class"
+      }
+    },
+    {
+      "level": 8,
+      "bab": 4,
+      "fort": 3,
+      "ref": 3,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Accursed Sympathy",
+          "description": "At 8th level, whenever a darkfire adept or her called or summoned creature deals hit point damage to a target affected by her darkfire taint, as a swift action she can increase the damage dealt by the attack by 1 hit point per class level. If the target dies, the darkfire adept gains temporary hit points equal to 1/2 the target's total number of Hit Dice . These temporary hit points last 1 hour and do not stack."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of spellcasting class"
+      }
+    },
+    {
+      "level": 9,
+      "bab": 4,
+      "fort": 3,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "3Rd Darkfire Pact",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "-"
+      }
+    },
+    {
+      "level": 10,
+      "bab": 5,
+      "fort": 3,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Riftward Breaching",
+          "description": "At 10th level, whenever one or more creatures appear via a conjuration effect (including calling , summoning , or teleportation effects) within 30 feet of a Darkfire Adept, she can as an immediate action unleash a darkfire eruption that targets all such creatures within 30 feet (but does not affect other creatures). Creatures that fail their saving throws are immediately transported to a random plane in the evil Outer Planes as though affected by a planeshift spell. Section 15: Copyright Notice Pathfinder Campaign Setting: Paths of Prestige Ãƒâ€šÃ‚Â© 2012, Paizo Publishing, LLC; Authors: Benjamin Bruck, Jason Bulmahn, Matt Goodall, and Jason Nelson."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of spellcasting class"
+      }
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": {
+    "summary": "See level progression spell columns."
+  },
+  "spellcastingClass": true
+}

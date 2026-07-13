@@ -1,0 +1,534 @@
+{
+  "name": "Magus",
+  "type": "base",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/base-classes/magus/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 2,
+      "ref": 0,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Arcane Pool",
+          "description": "At 1st level, the magus gains a reservoir of mystical arcane energy that he can draw upon to fuel his powers and enhance his weapon. This arcane pool has a number of points equal to 1/2 his magus level (minimum 1) + his Intelligence modifier. The pool refreshes once per day when the magus prepares his spells. At 1st level, a magus can expend 1 point from his arcane pool as a swift action to grant any weapon he is holding a +1 enhancement bonus for 1 minute. For every four levels beyond 1st, the weapon gains another +1 enhancement bonus , to a maximum of +5 at 17th level. These bonuses can be added to the weapon, stacking with existing weapon enhancement to a maximum of +5. Multiple uses of this ability do not stack with themselves. At 5th level, these bonuses can be used to add any of the following weapon properties: dancing , flaming , flaming burst , frost , icy burst , keen , shock , shocking burst , speed , or vorpal . Adding these properties consumes an amount of bonus equal to the propertyÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s base price modifier. These properties are added to any the weapon already has, but duplicates do not stack. If the weapon is not magical, at least a +1 enhancement bonus must be added before any other properties can be added. These bonuses and properties are decided when the arcane pool point is spent and cannot be changed until the next time the magus uses this ability. These bonuses do not function if the weapon is wielded by anyone other than the magus. A magus can only enhance one weapon in this way at one time. If he uses this ability again, the first use immediately ends."
+        },
+        {
+          "name": "Cantrips",
+          "description": ""
+        },
+        {
+          "name": "Spell Combat",
+          "description": "[See FAQ] At 1st level, a magus learns to cast spells and wield his weapons at the same time. This functions much like two-weapon fighting , but the off-hand weapon is a spell that is being cast. To use this ability, the magus must have one hand free (even if the spell being cast does not have somatic components ), while wielding a light or one-handed melee weapon in the other hand. As a full-round action , he can make all of his attacks with his melee weapon at a -2 penalty and can also cast any spell from the magus spell list with a casting time of 1 standard action (any attack roll made as part of this spell also takes this penalty). If he casts this spell defensively, he can decide to take an additional penalty on his attack rolls , up to his Intelligence bonus, and add the same amount as a circumstance bonus on his concentration check. If the check fails, the spell is wasted, but the attacks still take the penalty. A magus can choose to cast the spell first or make the weapon attacks first, but if he has more than one attack, he cannot cast the spell between weapon attacks."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "3"
+      }
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 3,
+      "ref": 0,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Spellstrike",
+          "description": "[See FAQ] At 2nd level, whenever a magus casts a spell with a range of ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œtouchÃƒÂ¢Ã¢â€šÂ¬Ã‚Â from the magus spell list, he can deliver the spell through any weapon he is wielding as part of a melee attack. Instead of the free melee touch attack normally allowed to deliver the spell, a magus can make one free melee attack with his weapon (at his highest base attack bonus ) as part of casting this spell. If successful, this melee attack deals its normal damage as well as the effects of the spell. If the magus makes this attack in concert with spell combat, this melee attack takes all the penalties accrued by spell combat melee attacks. This attack uses the weaponÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s critical range (20, 19-20, or 18-20 and modified by the keen weapon property or similar effects), but the spell effect only deals ÃƒÆ’Ã¢â‚¬â€2 damage on a successful critical hit , while the weapon damage uses its own critical modifier. See FAQ for more information."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 3,
+      "bab": 2,
+      "fort": 3,
+      "ref": 1,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Magus Arcana",
+          "description": "As he gains levels, a magus learns arcane secrets tailored to his specific way of blending martial puissance and magical skill. Starting at 3rd level, a magus gains one magus arcana. He gains an additional magus arcana for every three levels of magus attained after 3rd level. Unless specifically noted in a magus arcanaÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s description, a magus cannot select a particular magus arcana more than once. Magus arcana that affect spells can only be used to modify spells from the magus spell list unless otherwise noted. A complete list of magus arcana can be found here: Magus Arcana"
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 4,
+      "bab": 3,
+      "fort": 4,
+      "ref": 1,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Spell Recall",
+          "description": "At 4th level, the magus learns to use his arcane pool to recall spells he has already cast. With a swift action he can recall any single magus spell that he has already prepared and cast that day by expending a number of points from his arcane pool equal to the spellÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s level (minimum 1). The spell is prepared again, just as if it had not been cast."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 5,
+      "bab": 3,
+      "fort": 4,
+      "ref": 1,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 6,
+      "bab": 4,
+      "fort": 5,
+      "ref": 2,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Magus Arcana",
+          "description": "As he gains levels, a magus learns arcane secrets tailored to his specific way of blending martial puissance and magical skill. Starting at 3rd level, a magus gains one magus arcana. He gains an additional magus arcana for every three levels of magus attained after 3rd level. Unless specifically noted in a magus arcanaÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s description, a magus cannot select a particular magus arcana more than once. Magus arcana that affect spells can only be used to modify spells from the magus spell list unless otherwise noted. A complete list of magus arcana can be found here: Magus Arcana"
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "5"
+      }
+    },
+    {
+      "level": 7,
+      "bab": 5,
+      "fort": 5,
+      "ref": 2,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Knowledge Pool",
+          "description": "At 7th level, when a magus prepares his magus spells, he can decide to expend 1 or more points from his arcane pool, up to his Intelligence bonus. For each point he expends, he can treat any one spell from the magus spell list as if it were in his spellbook and can prepare that spell as normal that day. If he does not cast spells prepared in this way before the next time he prepares spells, he loses those spells. He can also cast spells added in this way using his spell recall ability, but only until he prepares spells again."
+        },
+        {
+          "name": "Medium Armor",
+          "description": "At 7th level, a magus gains proficiency with medium armor. A magus can cast magus spells while wearing medium armor without incurring the normal arcane spell failure chance. Like any other arcane spellcaster, a magus wearing heavy armor or using a shield incurs a chance of arcane spell failure if the spell in question has a somatic component."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "5"
+      }
+    },
+    {
+      "level": 8,
+      "bab": 6,
+      "fort": 6,
+      "ref": 2,
+      "will": 6,
+      "classFeatures": [
+        {
+          "name": "Improved Spell Combat",
+          "description": "At 8th level, the magusÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s ability to cast spells and make melee attacks improves. When using the spell combat ability, the magus receives a +2 circumstance bonus on concentration checks, in addition to any bonus granted by taking an additional penalty on the attack roll ."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "5"
+      }
+    },
+    {
+      "level": 9,
+      "bab": 6,
+      "fort": 6,
+      "ref": 3,
+      "will": 6,
+      "classFeatures": [
+        {
+          "name": "Magus Arcana",
+          "description": "As he gains levels, a magus learns arcane secrets tailored to his specific way of blending martial puissance and magical skill. Starting at 3rd level, a magus gains one magus arcana. He gains an additional magus arcana for every three levels of magus attained after 3rd level. Unless specifically noted in a magus arcanaÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s description, a magus cannot select a particular magus arcana more than once. Magus arcana that affect spells can only be used to modify spells from the magus spell list unless otherwise noted. A complete list of magus arcana can be found here: Magus Arcana"
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "5"
+      }
+    },
+    {
+      "level": 10,
+      "bab": 7,
+      "fort": 7,
+      "ref": 3,
+      "will": 7,
+      "classFeatures": [
+        {
+          "name": "Fighter Training",
+          "description": "Starting at 10th level, a magus counts 1/2 his total magus level as his fighter level for the purpose of qualifying for feats. If he has levels in fighter , these levels stack."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "5"
+      }
+    },
+    {
+      "level": 11,
+      "bab": 8,
+      "fort": 7,
+      "ref": 3,
+      "will": 7,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": ""
+        },
+        {
+          "name": "Improved Spell Recall",
+          "description": "At 11th level, the magusÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s ability to recall spells using his arcane pool becomes more efficient. Whenever he recalls a spell with spell recall, he expends a number of points from his arcane pool equal to 1/2 the spellÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s level (minimum 1). Furthermore, instead of recalling a used spell, as a swift action the magus can prepare a spell of the same level that he has in his spellbook. He does so by expending a number of points from his arcane pool equal to the spellÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s level (minimum 1). The magus cannot apply metamagic feats to a spell prepared in this way. The magus does not need to reference his spellbook to prepare a spell in this way."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "5"
+      }
+    },
+    {
+      "level": 12,
+      "bab": 9,
+      "fort": 8,
+      "ref": 4,
+      "will": 8,
+      "classFeatures": [
+        {
+          "name": "Magus Arcana",
+          "description": "As he gains levels, a magus learns arcane secrets tailored to his specific way of blending martial puissance and magical skill. Starting at 3rd level, a magus gains one magus arcana. He gains an additional magus arcana for every three levels of magus attained after 3rd level. Unless specifically noted in a magus arcanaÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s description, a magus cannot select a particular magus arcana more than once. Magus arcana that affect spells can only be used to modify spells from the magus spell list unless otherwise noted. A complete list of magus arcana can be found here: Magus Arcana"
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "5"
+      }
+    },
+    {
+      "level": 13,
+      "bab": 9,
+      "fort": 8,
+      "ref": 4,
+      "will": 8,
+      "classFeatures": [
+        {
+          "name": "Heavy Armor",
+          "description": "At 13th level, a magus gains proficiency with heavy armor. A magus can cast magus spells while wearing heavy armor without incurring the normal arcane spell failure chance. Like any other arcane spellcaster, a magus using a shield incurs a chance of arcane spell failure if the spell in question has a somatic component."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "5"
+      }
+    },
+    {
+      "level": 14,
+      "bab": 10,
+      "fort": 9,
+      "ref": 4,
+      "will": 9,
+      "classFeatures": [
+        {
+          "name": "Greater Spell Combat",
+          "description": "At 14th level, the magus gains the ability to seamlessly cast spells and make melee attacks. Whenever he uses the spell combat ability, his concentration check bonus equals double the amount of the attack penalty taken."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "5"
+      }
+    },
+    {
+      "level": 15,
+      "bab": 11,
+      "fort": 9,
+      "ref": 5,
+      "will": 9,
+      "classFeatures": [
+        {
+          "name": "Magus Arcana",
+          "description": "As he gains levels, a magus learns arcane secrets tailored to his specific way of blending martial puissance and magical skill. Starting at 3rd level, a magus gains one magus arcana. He gains an additional magus arcana for every three levels of magus attained after 3rd level. Unless specifically noted in a magus arcanaÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s description, a magus cannot select a particular magus arcana more than once. Magus arcana that affect spells can only be used to modify spells from the magus spell list unless otherwise noted. A complete list of magus arcana can be found here: Magus Arcana"
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "5"
+      }
+    },
+    {
+      "level": 16,
+      "bab": 12,
+      "fort": 10,
+      "ref": 5,
+      "will": 10,
+      "classFeatures": [
+        {
+          "name": "Counterstrike",
+          "description": "At 16th level, whenever an enemy within reach of the magus successfully casts a spell defensively, that enemy provokes an attack of opportunity from the magus after the spell is complete. This attack of opportunity cannot disrupt the spell."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "5"
+      }
+    },
+    {
+      "level": 17,
+      "bab": 12,
+      "fort": 10,
+      "ref": 5,
+      "will": 10,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "5"
+      }
+    },
+    {
+      "level": 18,
+      "bab": 13,
+      "fort": 11,
+      "ref": 6,
+      "will": 11,
+      "classFeatures": [
+        {
+          "name": "Magus Arcana",
+          "description": "As he gains levels, a magus learns arcane secrets tailored to his specific way of blending martial puissance and magical skill. Starting at 3rd level, a magus gains one magus arcana. He gains an additional magus arcana for every three levels of magus attained after 3rd level. Unless specifically noted in a magus arcanaÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s description, a magus cannot select a particular magus arcana more than once. Magus arcana that affect spells can only be used to modify spells from the magus spell list unless otherwise noted. A complete list of magus arcana can be found here: Magus Arcana"
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "5"
+      }
+    },
+    {
+      "level": 19,
+      "bab": 14,
+      "fort": 11,
+      "ref": 6,
+      "will": 11,
+      "classFeatures": [
+        {
+          "name": "Greater Spell Access",
+          "description": "At 19th level, the magus gains access to an expanded spell list. He learns and places 14 spells from the wizardÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s spell list into his spellbook as magus spells of their wizard level. He gains two of each of the following wizard spells not on the magus spell list: 0-level, 1st-level, 2nd-level, 3rd-level, 4th-level, 5th-level, and 6th-level. He can ignore the somatic component of these spells, casting them without the normal chance of spell failure."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "5"
+      }
+    },
+    {
+      "level": 20,
+      "bab": 15,
+      "fort": 12,
+      "ref": 6,
+      "will": 12,
+      "classFeatures": [
+        {
+          "name": "True Magus",
+          "description": "At 20th level, the magus becomes a master of spells and combat. Whenever he uses his spell combat ability, he does not need to make a concentration check to cast the spell defensively. Whenever the magus uses spell combat and his spell targets the same creature as his melee attacks, he can choose to either increase the DC to resist the spell by +2, grant himself a +2 circumstance bonus on any checks made to overcome spell resistance , or grant himself a +2 circumstance bonus on all attack rolls made against the target during his turn."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "5"
+      }
+    }
+  ],
+  "spellcasting": {
+    "summary": "prepared 2/3 caster using INT",
+    "castingType": "prepared",
+    "progression": "2/3",
+    "ability": "int",
+    "preparation": "spellbook",
+    "maxSpellLevel": 6,
+    "slotsByLevel": [
+      [
+        3,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        3,
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        4,
+        2,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        5,
+        4,
+        3,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        5,
+        4,
+        3,
+        1,
+        0,
+        0,
+        0
+      ],
+      [
+        5,
+        4,
+        4,
+        2,
+        0,
+        0,
+        0
+      ],
+      [
+        5,
+        5,
+        4,
+        3,
+        0,
+        0,
+        0
+      ],
+      [
+        5,
+        5,
+        4,
+        3,
+        1,
+        0,
+        0
+      ],
+      [
+        5,
+        5,
+        4,
+        4,
+        2,
+        0,
+        0
+      ],
+      [
+        5,
+        5,
+        5,
+        4,
+        3,
+        0,
+        0
+      ],
+      [
+        5,
+        5,
+        5,
+        4,
+        3,
+        1,
+        0
+      ],
+      [
+        5,
+        5,
+        5,
+        4,
+        4,
+        2,
+        0
+      ],
+      [
+        5,
+        5,
+        5,
+        5,
+        4,
+        3,
+        0
+      ],
+      [
+        5,
+        5,
+        5,
+        5,
+        4,
+        3,
+        1
+      ],
+      [
+        5,
+        5,
+        5,
+        5,
+        4,
+        4,
+        2
+      ],
+      [
+        5,
+        5,
+        5,
+        5,
+        5,
+        4,
+        3
+      ],
+      [
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        4
+      ],
+      [
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5
+      ]
+    ]
+  },
+  "spellcastingClass": true
+}

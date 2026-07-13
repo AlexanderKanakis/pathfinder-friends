@@ -1,0 +1,309 @@
+{
+  "name": "Gray Warden",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/e-h/gray-warden/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 1,
+      "ref": 0,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Anonymity",
+          "description": "A Gray Warden receives a morale bonus equal to his class level on Bluff and Disguise checks made to conceal his identity."
+        },
+        {
+          "name": "Sneak Attack +1d6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "-"
+      }
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Harsh Judgment 1/Day",
+          "description": ""
+        },
+        {
+          "name": "Stern Gaze",
+          "description": "At 2nd level, a Gray Warden receives a morale bonus equal to 1/2 his class level on Intimidate and Sense Motive checks. A Gray Warden's class levels stack with levels in other classes that grant the stern gaze ability."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of divine spellcasting class"
+      }
+    },
+    {
+      "level": 3,
+      "bab": 2,
+      "fort": 2,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Bane",
+          "description": "At 3rd level, a Gray Warden can enhance his weapon so it excels against certain foes. This ability is identical to the inquisitor's bane ability, and he can use it for a number of rounds per day equal to his class level. These rounds don't need to be consecutive."
+        },
+        {
+          "name": "Dramatic Interrogation",
+          "description": "At 3rd level, if a Gray Warden threatens a helpless creature, he gains a +5 competence bonus on Diplomacy , Intimidate , and Perform checks to influence creatures that have a starting attitude of hostile, unfriendly, friendly, or helpful toward the helpless creature, including the helpless creature itself."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of divine spellcasting class"
+      }
+    },
+    {
+      "level": 4,
+      "bab": 3,
+      "fort": 2,
+      "ref": 1,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Execution Feat",
+          "description": ""
+        },
+        {
+          "name": "Grim Investigator",
+          "description": "At 4th level, a Gray Warden can use Intimidate instead of Diplomacy to gather information. He can reroll any Sense Motive check that opposes someone's Bluff check before the results of the check are revealed, but must take the result of the reroll, even it's worse than the original."
+        },
+        {
+          "name": "Second Judgment",
+          "description": "At 4th level, whenever a Gray Warden uses his judgment or harsh judgment ability, he selects two different judgments . This consumes only one use of this ability. As a swift action , he can change one of these judgments to another type."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of divine spellcasting class"
+      }
+    },
+    {
+      "level": 5,
+      "bab": 3,
+      "fort": 3,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Improved Bane",
+          "description": "At 5th level, whenever a Gray Warden uses his bane ability, the damage dealt by the weapon against creatures of the selected type increases to 3d6."
+        },
+        {
+          "name": "Sneak Attack +2d6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "-"
+      }
+    },
+    {
+      "level": 6,
+      "bab": 4,
+      "fort": 3,
+      "ref": 2,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Execution Feat",
+          "description": ""
+        },
+        {
+          "name": "Harsh Judgment 2/Day",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of divine spellcasting class"
+      }
+    },
+    {
+      "level": 7,
+      "bab": 5,
+      "fort": 4,
+      "ref": 2,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Sinister Bane",
+          "description": "At 7th level, whenever a Gray Warden uses the bane ability on a melee weapon, his weapon also gains the menacing weapon special ability."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of divine spellcasting class"
+      }
+    },
+    {
+      "level": 8,
+      "bab": 6,
+      "fort": 4,
+      "ref": 3,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Execution Feat",
+          "description": ""
+        },
+        {
+          "name": "Slaying Judgment",
+          "description": "At 8th level, while using the judgment or harsh judgment ability, a Gray Warden can declare a slaying judgment against a foe when he makes a melee attack (or ranged attack, if the foe is within 30 feet) against the target. If the attack hits, it deals damage normally and the creature must make a Fortitude saving throw as if struck by a slaying arrow of its creature type. The DC of this save is equal to 10 + the Gray Warden's class level + the Gray Warden's Wisdom modifier. A Gray Warden can use this ability once per day."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of divine spellcasting class"
+      }
+    },
+    {
+      "level": 9,
+      "bab": 6,
+      "fort": 5,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Greater Bane",
+          "description": "At 9th level, whenever a Gray Warden uses his bane ability the damage dealt by the weapon against creatures of the selected type increases to 4d6."
+        },
+        {
+          "name": "Sneak Attack +3d6",
+          "description": ""
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "-"
+      }
+    },
+    {
+      "level": 10,
+      "bab": 7,
+      "fort": 5,
+      "ref": 3,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Execution Feat",
+          "description": ""
+        },
+        {
+          "name": "Final Demise",
+          "description": "At 10th level, once per week, when a Gray Warden kills a creature with a melee weapon, he can draw the soul out of the dead body and imprison it in his weapon as if using a soul bind spell ( caster level equal to the Gray Warden's character level). Destroying the weapon or dispelling this effect frees the soul. After spending 24 hours in the weapon, the captured soul escapes. However, by touching the weapon holding a captured soul to a final blade, the Gray Warden can transfer the soul into the magical guillotine to remain trapped inside indefinitely. In addition, at 10th level, a Gray Warden receives initiation in the secret rituals that can release a soul from a final blade."
+        },
+        {
+          "name": "Harsh Judgment 3/Day",
+          "description": ""
+        },
+        {
+          "name": "True Death",
+          "description": "At 10th level, anyone slain by a Gray Warden becomes more difficult to bring back from the dead. Attempts to use raise dead or similar magic to resurrect such a creature require a successful DC 25 caster level check, or the spell fails and any material components are wasted. Section 15: Copyright Notice Pathfinder Campaign Setting: Paths of Prestige Ãƒâ€šÃ‚Â© 2012, Paizo Publishing, LLC; Authors: Benjamin Bruck, Jason Bulmahn, Matt Goodall, and Jason Nelson."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of divine spellcasting class"
+      }
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": {
+    "summary": "See level progression spell columns."
+  },
+  "spellcastingClass": true
+}

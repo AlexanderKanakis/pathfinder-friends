@@ -1,0 +1,455 @@
+{
+  "name": "Wizard",
+  "type": "core",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/core-classes/wizard/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Arcane Bond",
+          "description": "FAQ Can you identify an item that is the subject of an arcane bond from a wizard with detect magic or a similar affect, even if the item contains no other enchantments? Since the arcane bond class feature, when tied to an item, grants a wizard the ability to cast any one spell, it is safe to assume that it does radiate magic when it is the subject of detect magic . The aura power would be directly related to the highest level spell it could be used to cast, but there would be no school associated with the item unless it was further enchanted. [ Source ] Can I dismiss my familiar so I may select a new familiar? This isn't addressed in the rules anywhere, but yes, you should be able to dismiss a familiar if you want to select a new one. However, you must still wait 1 week and pay 200 gp for the 8-hour ritual. Dismissing a familiar is ending a link between your soul and it, so it should probably take about an hour. The exception to the above is if you take the Improved Familiar feat, which allows you to immediately replace your familiar with the new familiar, at no cost or time required (it is assumed this occurs during whatever preparations you make while leveling up). Once dismissed, an animal familiar is just a normal animal of its type (a special familiar from the Improved Familiar feat reverts to a normal creature of its type). Whether or not it wants to remain with you is up to your GM and probably based on how you treated the creature while it was your familiar. [ Source ] At 1st level, wizards form a powerful bond with an object or a creature. This bond can take "
+        },
+        {
+          "name": "Arcane School",
+          "description": "Classic Arcane Schools Abjuration Banishment Counterspell Conjuration Creation Extradimension Infernal Binder Teleportation Divination Prophecy Foresight Scryer Enchantment Controller Manipulator Evocation Admixture Generation Illusion Deception Mage of the Veil Phantasm Shadow Necromancy Life Undead Sin Magic Transmutation Enhancement Shapechange Universalist Arcane Crafter Elemental Arcane Schools Aether Air Ice Smoke Earth Magma Mud Fire Magma Smoke Metal Void Water Ice Mud Wood Other Arcane Schools Arcane Schools - Radiance House Aging Arcane School Occult Arcane School Fat Goblin Games - Arcane Schools Card Reader Frog God Games - Arcane Schools Commercial Wizard School Court Wizard School Entertainer Wizard School Hedge Wizard School Investigator School Lord School Mentor School Mystic School Falsehood Jon Brazer Enterprises - Arcane Schools Dragon Master School Legendary Games - Arcane Schools Song (Wizard Arcane School) Light (Wizard Elemental Arcane School) Hydraulic (Elemental Wizard School) Orphaned Bookworm Productions - Wizard Subschools Force Mastery Wizard Subschool Rogue Genius Games - Arcane Schools Cold Earth Wind Wizard Schools - Orphaned Bookworm Productions Runescribing Arcane School (Wizard) A wizard can choose to specialize in one school of magic, gaining additional spells and powers based on that school. This choice must be made at 1st level, and once made, it cannot be changed. A wizard that does not select a school receives the universalist school instead. A wizard that chooses to specialize in one school of magic must select two other schools as h"
+        },
+        {
+          "name": "Cantrips",
+          "description": "Wizards can prepare a number of cantrips, or 0-level spells, each day, as noted on Table: Wizard under ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œSpells per Day.ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â These spells are cast like any other spell, but they are not expended when cast and may be used again. A wizard can prepare a cantrip from an opposition school, but it uses up two of his available slots (see below)."
+        },
+        {
+          "name": "Scribe Scroll",
+          "description": "At 1st level, a wizard gains Scribe Scroll as a bonus feat."
+        }
+      ]
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 0,
+      "ref": 0,
+      "will": 3,
+      "classFeatures": []
+    },
+    {
+      "level": 3,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 3,
+      "classFeatures": []
+    },
+    {
+      "level": 4,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 4,
+      "classFeatures": []
+    },
+    {
+      "level": 5,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "level": 6,
+      "bab": 3,
+      "fort": 2,
+      "ref": 2,
+      "will": 5,
+      "classFeatures": []
+    },
+    {
+      "level": 7,
+      "bab": 3,
+      "fort": 2,
+      "ref": 2,
+      "will": 5,
+      "classFeatures": []
+    },
+    {
+      "level": 8,
+      "bab": 4,
+      "fort": 2,
+      "ref": 2,
+      "will": 6,
+      "classFeatures": []
+    },
+    {
+      "level": 9,
+      "bab": 4,
+      "fort": 3,
+      "ref": 3,
+      "will": 6,
+      "classFeatures": []
+    },
+    {
+      "level": 10,
+      "bab": 5,
+      "fort": 3,
+      "ref": 3,
+      "will": 7,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "level": 11,
+      "bab": 5,
+      "fort": 3,
+      "ref": 3,
+      "will": 7,
+      "classFeatures": []
+    },
+    {
+      "level": 12,
+      "bab": 6,
+      "fort": 4,
+      "ref": 4,
+      "will": 8,
+      "classFeatures": []
+    },
+    {
+      "level": 13,
+      "bab": 6,
+      "fort": 4,
+      "ref": 4,
+      "will": 8,
+      "classFeatures": []
+    },
+    {
+      "level": 14,
+      "bab": 7,
+      "fort": 4,
+      "ref": 4,
+      "will": 9,
+      "classFeatures": []
+    },
+    {
+      "level": 15,
+      "bab": 7,
+      "fort": 5,
+      "ref": 5,
+      "will": 9,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "level": 16,
+      "bab": 8,
+      "fort": 5,
+      "ref": 5,
+      "will": 10,
+      "classFeatures": []
+    },
+    {
+      "level": 17,
+      "bab": 8,
+      "fort": 5,
+      "ref": 5,
+      "will": 10,
+      "classFeatures": []
+    },
+    {
+      "level": 18,
+      "bab": 9,
+      "fort": 6,
+      "ref": 6,
+      "will": 11,
+      "classFeatures": []
+    },
+    {
+      "level": 19,
+      "bab": 9,
+      "fort": 6,
+      "ref": 6,
+      "will": 11,
+      "classFeatures": []
+    },
+    {
+      "level": 20,
+      "bab": 10,
+      "fort": 6,
+      "ref": 6,
+      "will": 12,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": ""
+        }
+      ]
+    }
+  ],
+  "spellcasting": {
+    "summary": "prepared full caster using INT",
+    "castingType": "prepared",
+    "progression": "full",
+    "ability": "int",
+    "preparation": "spellbook",
+    "maxSpellLevel": 9,
+    "slotsByLevel": [
+      [
+        3,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        2,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        3,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        3,
+        2,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        3,
+        3,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        4,
+        3,
+        2,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        4,
+        3,
+        3,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        4,
+        4,
+        3,
+        2,
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        4,
+        4,
+        3,
+        3,
+        2,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        4,
+        4,
+        4,
+        3,
+        2,
+        1,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        4,
+        4,
+        4,
+        3,
+        3,
+        2,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        2,
+        1,
+        0,
+        0
+      ],
+      [
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        3,
+        2,
+        0,
+        0
+      ],
+      [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        2,
+        1,
+        0
+      ],
+      [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        3,
+        2,
+        0
+      ],
+      [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        2,
+        1
+      ],
+      [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        3,
+        2
+      ],
+      [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        3
+      ],
+      [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ]
+    ]
+  },
+  "spellcastingClass": true
+}

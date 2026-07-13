@@ -1,0 +1,269 @@
+{
+  "name": "Stargazer",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/s-z/stargazer/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 0,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Guiding Light",
+          "description": "The stargazer gains a familiar , treating his stargazer level as his wizard level."
+        },
+        {
+          "name": "Mystery Magic (Hex)",
+          "description": "At 1st and 9th levels, the stargazer gains a hex from the witchÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s list of hexes . His stargazer levels count as (and stack with) witch levels when determining the effects of hexes . In addition, the stargazer adds all hexes available to a shaman with the heavens spirit to the witch list. At 3rd level, the stargazer gains the Stars subdomain in addition to any domains he already has. His stargazer levels count as (and stack with) cleric levels when determining which domain abilities he gains and their effects. If he isnÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢t a cleric , the subdomainÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s spells are added to his class spell list (if necessary) and to his spells known, spellbook , familiar , or similar source. Spells added this way may be cast only once per day, unless using the stars are right ability. He can use the stars are right ability regardless of his spellcasting class. A stargazer gains certain abilities from the heavens oracle mystery as he gains levels as well. At 5th level, the stargazer gains the coat of many stars oracle revelation. At 7th level, he gains the star chart revelation. His stargazer levels and cleric levels count as (and stack with) oracle levels when he is determining the effects of these revelations."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Sidereal Arcana",
+          "description": "As he studies the skies, the stargazer binds himself to constellations from the Cosmic Caravan, drawing on their unearthly power. At 2nd level and every 2 class levels thereafter, the stargazer gains one sidereal arcana of his choice from the list below. The Bridge : The stargazer is warded against winterÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s darkness. He gains cold resistance 5 and darkvision with a range of 30 feet. The stargazer can see through darkness created by demons without penalty. The Daughter : The Daughter emboldens hearts with the promise of springtime and new life. The stargazer and allies within 10 feet gain a +4 morale bonus on saving throws against fear, and the DC to demoralize them via Intimidate increases by 4. The stargazer is immune to fear effects created by demons . The Follower : The specter of death follows the stargazer, shielding him from doom. The stargazer gains a +4 bonus on saves against death effects. In addition, he is immune to all death effects, negative energy effects, and negative levels created by demons . The Lantern Bearer : The stargazerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s ability to conjure light increases. The radius of any light source he creates via magic increases by 10 feet, and its spell level is considered to be 2 higher. The Mother : Whenever the stargazer casts a cure spell, casts breath of life , or uses the healing hex, he adds twice his class level to the hit points restored. If the stargazer is a cleric with channel positive energy , his stargazer levels stack with his cleric levels to determine its effects. The Newlyweds : The sign of intertwined lovers grants the stargazer a romantic m"
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 3,
+      "bab": 2,
+      "fort": 1,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Mystery Magic ( Stars Subdomain )",
+          "description": "At 1st and 9th levels, the stargazer gains a hex from the witchÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s list of hexes . His stargazer levels count as (and stack with) witch levels when determining the effects of hexes . In addition, the stargazer adds all hexes available to a shaman with the heavens spirit to the witch list. At 3rd level, the stargazer gains the Stars subdomain in addition to any domains he already has. His stargazer levels count as (and stack with) cleric levels when determining which domain abilities he gains and their effects. If he isnÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢t a cleric , the subdomainÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s spells are added to his class spell list (if necessary) and to his spells known, spellbook , familiar , or similar source. Spells added this way may be cast only once per day, unless using the stars are right ability. He can use the stars are right ability regardless of his spellcasting class. A stargazer gains certain abilities from the heavens oracle mystery as he gains levels as well. At 5th level, the stargazer gains the coat of many stars oracle revelation. At 7th level, he gains the star chart revelation. His stargazer levels and cleric levels count as (and stack with) oracle levels when he is determining the effects of these revelations."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 4,
+      "bab": 3,
+      "fort": 1,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Sidereal Arcana",
+          "description": "As he studies the skies, the stargazer binds himself to constellations from the Cosmic Caravan, drawing on their unearthly power. At 2nd level and every 2 class levels thereafter, the stargazer gains one sidereal arcana of his choice from the list below. The Bridge : The stargazer is warded against winterÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s darkness. He gains cold resistance 5 and darkvision with a range of 30 feet. The stargazer can see through darkness created by demons without penalty. The Daughter : The Daughter emboldens hearts with the promise of springtime and new life. The stargazer and allies within 10 feet gain a +4 morale bonus on saving throws against fear, and the DC to demoralize them via Intimidate increases by 4. The stargazer is immune to fear effects created by demons . The Follower : The specter of death follows the stargazer, shielding him from doom. The stargazer gains a +4 bonus on saves against death effects. In addition, he is immune to all death effects, negative energy effects, and negative levels created by demons . The Lantern Bearer : The stargazerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s ability to conjure light increases. The radius of any light source he creates via magic increases by 10 feet, and its spell level is considered to be 2 higher. The Mother : Whenever the stargazer casts a cure spell, casts breath of life , or uses the healing hex, he adds twice his class level to the hit points restored. If the stargazer is a cleric with channel positive energy , his stargazer levels stack with his cleric levels to determine its effects. The Newlyweds : The sign of intertwined lovers grants the stargazer a romantic m"
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 5,
+      "bab": 3,
+      "fort": 2,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Mystery Magic (Coat Of Many Stars)",
+          "description": "At 1st and 9th levels, the stargazer gains a hex from the witchÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s list of hexes . His stargazer levels count as (and stack with) witch levels when determining the effects of hexes . In addition, the stargazer adds all hexes available to a shaman with the heavens spirit to the witch list. At 3rd level, the stargazer gains the Stars subdomain in addition to any domains he already has. His stargazer levels count as (and stack with) cleric levels when determining which domain abilities he gains and their effects. If he isnÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢t a cleric , the subdomainÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s spells are added to his class spell list (if necessary) and to his spells known, spellbook , familiar , or similar source. Spells added this way may be cast only once per day, unless using the stars are right ability. He can use the stars are right ability regardless of his spellcasting class. A stargazer gains certain abilities from the heavens oracle mystery as he gains levels as well. At 5th level, the stargazer gains the coat of many stars oracle revelation. At 7th level, he gains the star chart revelation. His stargazer levels and cleric levels count as (and stack with) oracle levels when he is determining the effects of these revelations."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 6,
+      "bab": 4,
+      "fort": 2,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Sidereal Arcana",
+          "description": "As he studies the skies, the stargazer binds himself to constellations from the Cosmic Caravan, drawing on their unearthly power. At 2nd level and every 2 class levels thereafter, the stargazer gains one sidereal arcana of his choice from the list below. The Bridge : The stargazer is warded against winterÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s darkness. He gains cold resistance 5 and darkvision with a range of 30 feet. The stargazer can see through darkness created by demons without penalty. The Daughter : The Daughter emboldens hearts with the promise of springtime and new life. The stargazer and allies within 10 feet gain a +4 morale bonus on saving throws against fear, and the DC to demoralize them via Intimidate increases by 4. The stargazer is immune to fear effects created by demons . The Follower : The specter of death follows the stargazer, shielding him from doom. The stargazer gains a +4 bonus on saves against death effects. In addition, he is immune to all death effects, negative energy effects, and negative levels created by demons . The Lantern Bearer : The stargazerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s ability to conjure light increases. The radius of any light source he creates via magic increases by 10 feet, and its spell level is considered to be 2 higher. The Mother : Whenever the stargazer casts a cure spell, casts breath of life , or uses the healing hex, he adds twice his class level to the hit points restored. If the stargazer is a cleric with channel positive energy , his stargazer levels stack with his cleric levels to determine its effects. The Newlyweds : The sign of intertwined lovers grants the stargazer a romantic m"
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 7,
+      "bab": 5,
+      "fort": 2,
+      "ref": 4,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Mystery Magic (Star Chart)",
+          "description": "At 1st and 9th levels, the stargazer gains a hex from the witchÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s list of hexes . His stargazer levels count as (and stack with) witch levels when determining the effects of hexes . In addition, the stargazer adds all hexes available to a shaman with the heavens spirit to the witch list. At 3rd level, the stargazer gains the Stars subdomain in addition to any domains he already has. His stargazer levels count as (and stack with) cleric levels when determining which domain abilities he gains and their effects. If he isnÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢t a cleric , the subdomainÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s spells are added to his class spell list (if necessary) and to his spells known, spellbook , familiar , or similar source. Spells added this way may be cast only once per day, unless using the stars are right ability. He can use the stars are right ability regardless of his spellcasting class. A stargazer gains certain abilities from the heavens oracle mystery as he gains levels as well. At 5th level, the stargazer gains the coat of many stars oracle revelation. At 7th level, he gains the star chart revelation. His stargazer levels and cleric levels count as (and stack with) oracle levels when he is determining the effects of these revelations."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 8,
+      "bab": 6,
+      "fort": 3,
+      "ref": 4,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Sidereal Arcana",
+          "description": "As he studies the skies, the stargazer binds himself to constellations from the Cosmic Caravan, drawing on their unearthly power. At 2nd level and every 2 class levels thereafter, the stargazer gains one sidereal arcana of his choice from the list below. The Bridge : The stargazer is warded against winterÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s darkness. He gains cold resistance 5 and darkvision with a range of 30 feet. The stargazer can see through darkness created by demons without penalty. The Daughter : The Daughter emboldens hearts with the promise of springtime and new life. The stargazer and allies within 10 feet gain a +4 morale bonus on saving throws against fear, and the DC to demoralize them via Intimidate increases by 4. The stargazer is immune to fear effects created by demons . The Follower : The specter of death follows the stargazer, shielding him from doom. The stargazer gains a +4 bonus on saves against death effects. In addition, he is immune to all death effects, negative energy effects, and negative levels created by demons . The Lantern Bearer : The stargazerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s ability to conjure light increases. The radius of any light source he creates via magic increases by 10 feet, and its spell level is considered to be 2 higher. The Mother : Whenever the stargazer casts a cure spell, casts breath of life , or uses the healing hex, he adds twice his class level to the hit points restored. If the stargazer is a cleric with channel positive energy , his stargazer levels stack with his cleric levels to determine its effects. The Newlyweds : The sign of intertwined lovers grants the stargazer a romantic m"
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 9,
+      "bab": 6,
+      "fort": 3,
+      "ref": 5,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Mystery Magic (Hex)",
+          "description": "At 1st and 9th levels, the stargazer gains a hex from the witchÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s list of hexes . His stargazer levels count as (and stack with) witch levels when determining the effects of hexes . In addition, the stargazer adds all hexes available to a shaman with the heavens spirit to the witch list. At 3rd level, the stargazer gains the Stars subdomain in addition to any domains he already has. His stargazer levels count as (and stack with) cleric levels when determining which domain abilities he gains and their effects. If he isnÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢t a cleric , the subdomainÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s spells are added to his class spell list (if necessary) and to his spells known, spellbook , familiar , or similar source. Spells added this way may be cast only once per day, unless using the stars are right ability. He can use the stars are right ability regardless of his spellcasting class. A stargazer gains certain abilities from the heavens oracle mystery as he gains levels as well. At 5th level, the stargazer gains the coat of many stars oracle revelation. At 7th level, he gains the star chart revelation. His stargazer levels and cleric levels count as (and stack with) oracle levels when he is determining the effects of these revelations."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 10,
+      "bab": 7,
+      "fort": 3,
+      "ref": 5,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Sidereal Arcana",
+          "description": "As he studies the skies, the stargazer binds himself to constellations from the Cosmic Caravan, drawing on their unearthly power. At 2nd level and every 2 class levels thereafter, the stargazer gains one sidereal arcana of his choice from the list below. The Bridge : The stargazer is warded against winterÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s darkness. He gains cold resistance 5 and darkvision with a range of 30 feet. The stargazer can see through darkness created by demons without penalty. The Daughter : The Daughter emboldens hearts with the promise of springtime and new life. The stargazer and allies within 10 feet gain a +4 morale bonus on saving throws against fear, and the DC to demoralize them via Intimidate increases by 4. The stargazer is immune to fear effects created by demons . The Follower : The specter of death follows the stargazer, shielding him from doom. The stargazer gains a +4 bonus on saves against death effects. In addition, he is immune to all death effects, negative energy effects, and negative levels created by demons . The Lantern Bearer : The stargazerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s ability to conjure light increases. The radius of any light source he creates via magic increases by 10 feet, and its spell level is considered to be 2 higher. The Mother : Whenever the stargazer casts a cure spell, casts breath of life , or uses the healing hex, he adds twice his class level to the hit points restored. If the stargazer is a cleric with channel positive energy , his stargazer levels stack with his cleric levels to determine its effects. The Newlyweds : The sign of intertwined lovers grants the stargazer a romantic m"
+        },
+        {
+          "name": "StarsÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Dance",
+          "description": "At 10th level, the stargazerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s mastery reaches its zenith. Once per day, the stargazer can replace one of his sidereal arcana with any other one. The new sidereal arcana can also be replaced using this ability, but the change is otherwise permanent. Section 15: Copyright Notice Pathfinder Player Companion: Paths of the Righteous Ãƒâ€šÃ‚Â© 2016, Paizo Inc.; Authors: Alexander Augunas, John Compton, Jenny Jarzabski, Isabelle Lee, Stephen Rowe, and Owen K.C. Stephens."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "+1 level of existing spellcasting class"
+      }
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": {
+    "summary": "See level progression spell columns."
+  },
+  "spellcastingClass": true
+}

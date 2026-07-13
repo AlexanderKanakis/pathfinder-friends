@@ -1,0 +1,247 @@
+{
+  "name": "Field Agent",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/e-h/field-agent/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 0,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Field Agent Training",
+          "description": "A field agent receives additional training that aids her in her fulfilling her duty to explore, report, and cooperate. She can't receive the same training more than once unless otherwise noted. A field agent gains additional field agent training at 3rd level and every 3 levels thereafter. Animal Magnetism (Ex) : This ability functions as the druid's wild empathy class ability, except the field agent's effective druid level to determine her wild empathy bonus is equal to her field agent level. Levels in field agent stack with levels from other classes that grant wild empathy for the purpose of determining a field agent's total wild empathy bonus. Deft Defender (Ex) : When the field agent successfully uses the aid another action to increase an ally's armor class , she gains a +1 dodge bonus to her AC until the start of her next turn. Eidetic Memory (Ex) : Years of training have given the field agent extraordinary recall. A field agent with this training adds half her class level (minimum 1) to all Knowledge skill checks and can attempt all Knowledge skill checks untrained. Greater Casting : The field agent gains new spells per day as if she had also gained a level in a spellcasting class she belonged to before adding the prestige class. She doesn't gain other benefits of that class other than spells per day, spells known, and an increased caster level . If the field agent has levels in more than one spellcasting class, she must choose which class to apply this increase to when she takes this field agent training. Know Thy Enemy (Ex) : The f"
+        },
+        {
+          "name": "Wayfinder Upgrade",
+          "description": "At 1st level and every 3 levels thereafter, a field agent can add an additional ability to her wayfinder. These abilities must be added to a standard wayfinder, not to a variant or modified wayfinder (though a field agent can possess more than one wayfinder at a time, if she chooses). If a field agent loses her upgraded wayfinder, she can purchase a new one at the normal cost plus 100 gp for each field agent level she possesses, keeping all previously selected upgrades. A field agent can choose from the wayfinder upgrades listed below. Any upgrades that grant additional spell effects use the wayfinder's caster level or the field agent's class level (whichever is higher) to determine effects that depend on caster level . Dancing Lights : The field agent replaces her wayfinder's ability to cast light with the ability to cast dancing lights at will. Daylight : Once per day, the field agent can use her wayfinder to cast daylight . This upgrade can be selected more than once. Each additional time it's selected, the field agent gains another use of the spell per day. Flask : A hidden compartment is carved into the wayfinder's casing, allowing a single potion , oil, or dose of poison to be hidden within. This substance can be retrieved with a swift action that doesn't provoke attacks of opportunity (as opposed to the normal move action required to retrieve a stored item). Drinking the potion or applying the oil or poison still requires a standard action that provokes attacks of opportunity . The field agent gains a +2 bonus on Sleight of Hand ch"
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": "At 2nd level and every 3 levels thereafter, a field agent can select a bonus feat. Each of these bonus feats must be Skill Focus or a teamwork feat. The field agent must meet the prerequisites of the selected bonus feat."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 3,
+      "bab": 2,
+      "fort": 1,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Field Agent Training",
+          "description": "A field agent receives additional training that aids her in her fulfilling her duty to explore, report, and cooperate. She can't receive the same training more than once unless otherwise noted. A field agent gains additional field agent training at 3rd level and every 3 levels thereafter. Animal Magnetism (Ex) : This ability functions as the druid's wild empathy class ability, except the field agent's effective druid level to determine her wild empathy bonus is equal to her field agent level. Levels in field agent stack with levels from other classes that grant wild empathy for the purpose of determining a field agent's total wild empathy bonus. Deft Defender (Ex) : When the field agent successfully uses the aid another action to increase an ally's armor class , she gains a +1 dodge bonus to her AC until the start of her next turn. Eidetic Memory (Ex) : Years of training have given the field agent extraordinary recall. A field agent with this training adds half her class level (minimum 1) to all Knowledge skill checks and can attempt all Knowledge skill checks untrained. Greater Casting : The field agent gains new spells per day as if she had also gained a level in a spellcasting class she belonged to before adding the prestige class. She doesn't gain other benefits of that class other than spells per day, spells known, and an increased caster level . If the field agent has levels in more than one spellcasting class, she must choose which class to apply this increase to when she takes this field agent training. Know Thy Enemy (Ex) : The f"
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 4,
+      "bab": 3,
+      "fort": 1,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Wayfinder Upgrade",
+          "description": "At 1st level and every 3 levels thereafter, a field agent can add an additional ability to her wayfinder. These abilities must be added to a standard wayfinder, not to a variant or modified wayfinder (though a field agent can possess more than one wayfinder at a time, if she chooses). If a field agent loses her upgraded wayfinder, she can purchase a new one at the normal cost plus 100 gp for each field agent level she possesses, keeping all previously selected upgrades. A field agent can choose from the wayfinder upgrades listed below. Any upgrades that grant additional spell effects use the wayfinder's caster level or the field agent's class level (whichever is higher) to determine effects that depend on caster level . Dancing Lights : The field agent replaces her wayfinder's ability to cast light with the ability to cast dancing lights at will. Daylight : Once per day, the field agent can use her wayfinder to cast daylight . This upgrade can be selected more than once. Each additional time it's selected, the field agent gains another use of the spell per day. Flask : A hidden compartment is carved into the wayfinder's casing, allowing a single potion , oil, or dose of poison to be hidden within. This substance can be retrieved with a swift action that doesn't provoke attacks of opportunity (as opposed to the normal move action required to retrieve a stored item). Drinking the potion or applying the oil or poison still requires a standard action that provokes attacks of opportunity . The field agent gains a +2 bonus on Sleight of Hand ch"
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 5,
+      "bab": 3,
+      "fort": 2,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": "At 2nd level and every 3 levels thereafter, a field agent can select a bonus feat. Each of these bonus feats must be Skill Focus or a teamwork feat. The field agent must meet the prerequisites of the selected bonus feat."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 6,
+      "bab": 4,
+      "fort": 2,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Field Agent Training",
+          "description": "A field agent receives additional training that aids her in her fulfilling her duty to explore, report, and cooperate. She can't receive the same training more than once unless otherwise noted. A field agent gains additional field agent training at 3rd level and every 3 levels thereafter. Animal Magnetism (Ex) : This ability functions as the druid's wild empathy class ability, except the field agent's effective druid level to determine her wild empathy bonus is equal to her field agent level. Levels in field agent stack with levels from other classes that grant wild empathy for the purpose of determining a field agent's total wild empathy bonus. Deft Defender (Ex) : When the field agent successfully uses the aid another action to increase an ally's armor class , she gains a +1 dodge bonus to her AC until the start of her next turn. Eidetic Memory (Ex) : Years of training have given the field agent extraordinary recall. A field agent with this training adds half her class level (minimum 1) to all Knowledge skill checks and can attempt all Knowledge skill checks untrained. Greater Casting : The field agent gains new spells per day as if she had also gained a level in a spellcasting class she belonged to before adding the prestige class. She doesn't gain other benefits of that class other than spells per day, spells known, and an increased caster level . If the field agent has levels in more than one spellcasting class, she must choose which class to apply this increase to when she takes this field agent training. Know Thy Enemy (Ex) : The f"
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 7,
+      "bab": 5,
+      "fort": 2,
+      "ref": 4,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Wayfinder Upgrade",
+          "description": "At 1st level and every 3 levels thereafter, a field agent can add an additional ability to her wayfinder. These abilities must be added to a standard wayfinder, not to a variant or modified wayfinder (though a field agent can possess more than one wayfinder at a time, if she chooses). If a field agent loses her upgraded wayfinder, she can purchase a new one at the normal cost plus 100 gp for each field agent level she possesses, keeping all previously selected upgrades. A field agent can choose from the wayfinder upgrades listed below. Any upgrades that grant additional spell effects use the wayfinder's caster level or the field agent's class level (whichever is higher) to determine effects that depend on caster level . Dancing Lights : The field agent replaces her wayfinder's ability to cast light with the ability to cast dancing lights at will. Daylight : Once per day, the field agent can use her wayfinder to cast daylight . This upgrade can be selected more than once. Each additional time it's selected, the field agent gains another use of the spell per day. Flask : A hidden compartment is carved into the wayfinder's casing, allowing a single potion , oil, or dose of poison to be hidden within. This substance can be retrieved with a swift action that doesn't provoke attacks of opportunity (as opposed to the normal move action required to retrieve a stored item). Drinking the potion or applying the oil or poison still requires a standard action that provokes attacks of opportunity . The field agent gains a +2 bonus on Sleight of Hand ch"
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 8,
+      "bab": 6,
+      "fort": 3,
+      "ref": 4,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": "At 2nd level and every 3 levels thereafter, a field agent can select a bonus feat. Each of these bonus feats must be Skill Focus or a teamwork feat. The field agent must meet the prerequisites of the selected bonus feat."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 9,
+      "bab": 6,
+      "fort": 3,
+      "ref": 5,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Field Agent Training",
+          "description": "A field agent receives additional training that aids her in her fulfilling her duty to explore, report, and cooperate. She can't receive the same training more than once unless otherwise noted. A field agent gains additional field agent training at 3rd level and every 3 levels thereafter. Animal Magnetism (Ex) : This ability functions as the druid's wild empathy class ability, except the field agent's effective druid level to determine her wild empathy bonus is equal to her field agent level. Levels in field agent stack with levels from other classes that grant wild empathy for the purpose of determining a field agent's total wild empathy bonus. Deft Defender (Ex) : When the field agent successfully uses the aid another action to increase an ally's armor class , she gains a +1 dodge bonus to her AC until the start of her next turn. Eidetic Memory (Ex) : Years of training have given the field agent extraordinary recall. A field agent with this training adds half her class level (minimum 1) to all Knowledge skill checks and can attempt all Knowledge skill checks untrained. Greater Casting : The field agent gains new spells per day as if she had also gained a level in a spellcasting class she belonged to before adding the prestige class. She doesn't gain other benefits of that class other than spells per day, spells known, and an increased caster level . If the field agent has levels in more than one spellcasting class, she must choose which class to apply this increase to when she takes this field agent training. Know Thy Enemy (Ex) : The f"
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 10,
+      "bab": 7,
+      "fort": 3,
+      "ref": 5,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Legends Uncovered (Su)",
+          "description": "At 10th level, a field agent has the ability to uncover the secrets of the distant past. Once per day when studying or researching a person, place, or artifact of antiquity, the agent can dedicate herself to the task to gain benefits as though she were casting the spell legend lore . Section 15: Copyright Notice Pathfinder Player Companion: Pathfinder Society Primer Ãƒâ€šÃ‚Â© 2013, Paizo Publishing, LLC; Authors: John Compton and Mark Moreland."
+        },
+        {
+          "name": "Wayfinder Upgrade",
+          "description": "At 1st level and every 3 levels thereafter, a field agent can add an additional ability to her wayfinder. These abilities must be added to a standard wayfinder, not to a variant or modified wayfinder (though a field agent can possess more than one wayfinder at a time, if she chooses). If a field agent loses her upgraded wayfinder, she can purchase a new one at the normal cost plus 100 gp for each field agent level she possesses, keeping all previously selected upgrades. A field agent can choose from the wayfinder upgrades listed below. Any upgrades that grant additional spell effects use the wayfinder's caster level or the field agent's class level (whichever is higher) to determine effects that depend on caster level . Dancing Lights : The field agent replaces her wayfinder's ability to cast light with the ability to cast dancing lights at will. Daylight : Once per day, the field agent can use her wayfinder to cast daylight . This upgrade can be selected more than once. Each additional time it's selected, the field agent gains another use of the spell per day. Flask : A hidden compartment is carved into the wayfinder's casing, allowing a single potion , oil, or dose of poison to be hidden within. This substance can be retrieved with a swift action that doesn't provoke attacks of opportunity (as opposed to the normal move action required to retrieve a stored item). Drinking the potion or applying the oil or poison still requires a standard action that provokes attacks of opportunity . The field agent gains a +2 bonus on Sleight of Hand ch"
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": null,
+  "spellcastingClass": false
+}

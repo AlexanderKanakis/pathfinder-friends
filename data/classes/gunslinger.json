@@ -1,0 +1,472 @@
+{
+  "name": "Gunslinger",
+  "type": "base",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/base-classes/gunslinger/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 1,
+      "fort": 2,
+      "ref": 2,
+      "will": 0,
+      "classFeatures": [
+        {
+          "name": "Deeds",
+          "description": "Gunslingers spend grit points to accomplish deeds. Most deeds grant the gunslinger some momentary bonus or effect, but there are some that provide longer-lasting effects. Some deeds stay in effect as long as the gunslinger has at least 1 grit point. The following is the list of base gunslinger deeds. A gunslinger can only perform deeds of her level or lower. Unless otherwise noted, a deed can be performed multiple successive times, as long as the appropriate amount of grit is spent to perform the deed. Deadeye (Ex) : At 1st level, the gunslinger can resolve an attack against touch AC instead of normal AC when firing beyond her firearmÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s first range increment. Performing this deed costs 1 grit point per range increment beyond the first. The gunslinger still takes the -2 penalty on attack rolls for each range increment beyond the first when she performs this deed. GunslingerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Dodge (Ex) : At 1st level, the gunslinger gains an uncanny knack for getting out of the way of ranged attacks. When a ranged attack is made against the gunslinger, she can spend 1 grit point to move 5 feet as an immediate action ; doing so grants the gunslinger a +2 bonus to AC against the triggering attack. This movement is not a 5-foot step, and provokes attacks of opportunity . Alternatively, the gunslinger can drop prone to gain a +4 bonus to AC against the triggering attack. The gunslinger can only perform this deed while wearing medium or light armor, and while carrying no more than a light load. Quick Clear (Ex) : At 1st level, as a standard action , the gunslinger can remove the broken condition",
+          "pools": [
+            {
+              "name": "Deeds",
+              "description": "Gunslingers spend grit points to accomplish deeds. Most deeds grant the gunslinger some momentary bonus or effect, but there are some that provide longer-lasting effects. Some deeds stay in effect as long as the gunslinger has at least 1 grit point. The following is the list of base gunslinger deeds. A gunslinger can only perform deeds of her level or lower. Unless otherwise noted, a deed can be performed multiple successive times, as long as the appropriate amount of grit is spent to perform the deed. Deadeye (Ex) : At 1st level, the gunslinger can resolve an attack against touch AC instead of normal AC when firing beyond her firearmÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s first range increment. Performing this deed costs 1 grit point per range increment beyond the first. The gunslinger still takes the -2 penalty on attack rolls for each range increment beyond the first when she performs this deed. GunslingerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Dodge (Ex) : At 1st level, the gunslinger gains an uncanny knack for getting out of the way of ranged attacks. When a ranged attack is made against the gunslinger, she can spend 1 grit point to move 5 feet as an immediate action ; doing so grants the gunslinger a +2 bonus to AC against the triggering attack. This movement is not a 5-foot step, and provokes attacks of opportunity . Alternatively, the gunslinger can drop prone to gain a +4 bonus to AC against the triggering attack. The gunslinger can only perform this deed while wearing medium or light armor, and while carrying no more than a light load. Quick Clear (Ex) : At 1st level, as a standard action , the gunslinger can remove the broken condition",
+              "requirements": {
+                "minClassLevel": 1,
+                "text": "A gunslinger can only perform deeds of her level or lower. Deadeye (Ex) : At 1st level, the gunslinger can resolve an attack against touch AC instead of normal AC when firing beyond her firearmÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s first range increment."
+              },
+              "options": []
+            }
+          ]
+        },
+        {
+          "name": "Grit",
+          "description": "A gunslinger makes her mark upon the world with daring deeds. Some gunslingers claim they belong to a mystical way of the gun, but itÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s more likely that the volatile nature of firearms simply prunes the unlucky and careless from their ranks. Whatever the reason, all gunslingers have grit. In game terms, grit is a fluctuating measure of a gunslingerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s ability to perform amazing actions in combat. At the start of each day, a gunslinger gains a number of grit points equal to her Wisdom modifier (minimum 1). Her grit goes up or down throughout the day, but usually cannot go higher than her Wisdom modifier (minimum 1), though some feats and magic items may affect this maximum. A gunslinger spends grit to accomplish deeds (see below), and regains grit in the following ways. Critical Hit with a Firearm : Each time the gunslinger confirms a critical hit with a firearm attack while in the heat of combat, she regains 1 grit point. Confirming a critical hit on a helpless or unaware creature or on a creature that has fewer Hit Dice than half the gunslingerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s character level does not restore grit. Killing Blow with a Firearm : When the gunslinger reduces a creature to 0 or fewer hit points with a firearm attack while in the heat of combat, she regains 1 grit point. Destroying an unattended object, reducing a helpless or unaware creature to 0 or fewer hit points , or reducing a creature that has fewer Hit Dice than half the gunslingerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s character level to 0 or fewer hit points does not restore any grit. Grit, Luck, and Panache Grit, luck, and panache represent three different means by wh"
+        },
+        {
+          "name": "Gunsmith",
+          "description": "At 1st level, a gunslinger gains one of the following firearms of her choice: blunderbuss, musket, or pistol . Her starting weapon is battered, and only she knows how to use it properly. All other creatures treat her gun as if it had the broken condition. If the weapon already has the broken condition, it does not work at all for anyone else trying to use it. This starting weapon can only be sold for scrap (itÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s worth 4d10 gp when sold). The gunslinger also gains Gunsmithing as a bonus feat."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 2,
+      "bab": 2,
+      "fort": 3,
+      "ref": 3,
+      "will": 0,
+      "classFeatures": [
+        {
+          "name": "Nimble +1",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 3,
+      "bab": 3,
+      "fort": 3,
+      "ref": 3,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Deeds",
+          "description": "Gunslingers spend grit points to accomplish deeds. Most deeds grant the gunslinger some momentary bonus or effect, but there are some that provide longer-lasting effects. Some deeds stay in effect as long as the gunslinger has at least 1 grit point. The following is the list of base gunslinger deeds. A gunslinger can only perform deeds of her level or lower. Unless otherwise noted, a deed can be performed multiple successive times, as long as the appropriate amount of grit is spent to perform the deed. Deadeye (Ex) : At 1st level, the gunslinger can resolve an attack against touch AC instead of normal AC when firing beyond her firearmÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s first range increment. Performing this deed costs 1 grit point per range increment beyond the first. The gunslinger still takes the -2 penalty on attack rolls for each range increment beyond the first when she performs this deed. GunslingerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Dodge (Ex) : At 1st level, the gunslinger gains an uncanny knack for getting out of the way of ranged attacks. When a ranged attack is made against the gunslinger, she can spend 1 grit point to move 5 feet as an immediate action ; doing so grants the gunslinger a +2 bonus to AC against the triggering attack. This movement is not a 5-foot step, and provokes attacks of opportunity . Alternatively, the gunslinger can drop prone to gain a +4 bonus to AC against the triggering attack. The gunslinger can only perform this deed while wearing medium or light armor, and while carrying no more than a light load. Quick Clear (Ex) : At 1st level, as a standard action , the gunslinger can remove the broken condition",
+          "pools": [
+            {
+              "name": "Deeds",
+              "description": "Gunslingers spend grit points to accomplish deeds. Most deeds grant the gunslinger some momentary bonus or effect, but there are some that provide longer-lasting effects. Some deeds stay in effect as long as the gunslinger has at least 1 grit point. The following is the list of base gunslinger deeds. A gunslinger can only perform deeds of her level or lower. Unless otherwise noted, a deed can be performed multiple successive times, as long as the appropriate amount of grit is spent to perform the deed. Deadeye (Ex) : At 1st level, the gunslinger can resolve an attack against touch AC instead of normal AC when firing beyond her firearmÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s first range increment. Performing this deed costs 1 grit point per range increment beyond the first. The gunslinger still takes the -2 penalty on attack rolls for each range increment beyond the first when she performs this deed. GunslingerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Dodge (Ex) : At 1st level, the gunslinger gains an uncanny knack for getting out of the way of ranged attacks. When a ranged attack is made against the gunslinger, she can spend 1 grit point to move 5 feet as an immediate action ; doing so grants the gunslinger a +2 bonus to AC against the triggering attack. This movement is not a 5-foot step, and provokes attacks of opportunity . Alternatively, the gunslinger can drop prone to gain a +4 bonus to AC against the triggering attack. The gunslinger can only perform this deed while wearing medium or light armor, and while carrying no more than a light load. Quick Clear (Ex) : At 1st level, as a standard action , the gunslinger can remove the broken condition",
+              "requirements": {
+                "minClassLevel": 1,
+                "text": "A gunslinger can only perform deeds of her level or lower. Deadeye (Ex) : At 1st level, the gunslinger can resolve an attack against touch AC instead of normal AC when firing beyond her firearmÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s first range increment."
+              },
+              "options": [
+                {
+                  "name": "Deeds",
+                  "description": "Gunslingers spend grit points to accomplish deeds. Most deeds grant the gunslinger some momentary bonus or effect, but there are some that provide longer-lasting effects. Some deeds stay in effect as long as the gunslinger has at least 1 grit point. The following is the list of base gunslinger deeds. A gunslinger can only perform deeds of her level or lower. Unless otherwise noted, a deed can be performed multiple successive times, as long as the appropriate amount of grit is spent to perform the deed. Deadeye (Ex) : At 1st level, the gunslinger can resolve an attack against touch AC instead of normal AC when firing beyond her firearmÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s first range increment. Performing this deed costs 1 grit point per range increment beyond the first. The gunslinger still takes the -2 penalty on attack rolls for each range increment beyond the first when she performs this deed. GunslingerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Dodge (Ex) : At 1st level, the gunslinger gains an uncanny knack for getting out of the way of ranged attacks. When a ranged attack is made against the gunslinger, she can spend 1 grit point to move 5 feet as an immediate action ; doing so grants the gunslinger a +2 bonus to AC against the triggering attack. This movement is not a 5-foot step, and provokes attacks of opportunity . Alternatively, the gunslinger can drop prone to gain a +4 bonus to AC against the triggering attack. The gunslinger can only perform this deed while wearing medium or light armor, and while carrying no more than a light load. Quick Clear (Ex) : At 1st level, as a standard action , the gunslinger can remove the broken condition from a single firearm she is currently wielding, as long as that condition was gained by a firearm misfire. The gunslinger must have at least 1 grit point to perform this deed. Alternatively, if the ",
+                  "requirements": {
+                    "minClassLevel": 1,
+                    "text": "A gunslinger can only perform deeds of her level or lower. Deadeye (Ex) : At 1st level, the gunslinger can resolve an attack against touch AC instead of normal AC when firing beyond her firearmÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s first range increment."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "Deeds Of Renown",
+                  "description": "Swashbucklers and gunslingers perform impressive deeds through their grit and panache, but some are capable of truly spectacular acts known as renowned deeds. A swashbuckler or gunslinger (though not members of other classes) can select a renowned deed for her class upon reaching the class level listed in the deedÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s description. This replaces the specific listed deed or deeds; if the character would not gain the appropriate deeds, she cannot select the renowned deed, as if selecting an archetype. Thundering Shot (Ex) : The gunslingerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s shots explode with deafening reports. At 1st level, as a standard action the gunslinger can spend 1 point of grit and make a single ranged attack with a firearm . All creatures in a 15-foot cone, starting at the corner of the gunslingerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s square closest to the target and extending directly toward the target, must succeed at a Fortitude save (DC = 10 + half the gunslingerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s class level + the gunslingerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Wisdom modifier) or be deafened for 1 minute. This deed replaces the gunslingerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s dodge deed and one other 1st-level deed. Source PPC:CoL Gruesome Parry (Ex) : Some gunslingers wield guns and blades in concert, readying a shot to unbalance attackers and then eviscerating their assailants. At 7th level, the gunslinger can spend 1 grit point when she readies an action to make a ranged attack with a firearm against a creature that declares a melee attack against her. If she does, the readied ranged attack does not provoke attacks of opportunity . If this readied attack hits, she gains a +4 dodge bonus to AC against the triggering attack, and she can make a single melee attack with a slashing or piercing weapon against the creature that attacked her; if this melee attack hits, it is considered to be a critical threat. This deed replaces the de",
+                  "requirements": {
+                    "minClassLevel": 1,
+                    "text": "A swashbuckler or gunslinger (though not members of other classes) can select a renowned deed for her class upon reaching the class level listed in the deedÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s description. At 1st level, as a standard action the gunslinger can spend 1 point of grit and make a single ranged attack with a firearm ."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/base-classes/gunslinger/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 4,
+      "bab": 4,
+      "fort": 4,
+      "ref": 4,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 5,
+      "bab": 5,
+      "fort": 4,
+      "ref": 4,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Gun Training 1",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 6,
+      "bab": 6,
+      "fort": 5,
+      "ref": 5,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Nimble +2",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 7,
+      "bab": 7,
+      "fort": 5,
+      "ref": 5,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Deeds",
+          "description": "Gunslingers spend grit points to accomplish deeds. Most deeds grant the gunslinger some momentary bonus or effect, but there are some that provide longer-lasting effects. Some deeds stay in effect as long as the gunslinger has at least 1 grit point. The following is the list of base gunslinger deeds. A gunslinger can only perform deeds of her level or lower. Unless otherwise noted, a deed can be performed multiple successive times, as long as the appropriate amount of grit is spent to perform the deed. Deadeye (Ex) : At 1st level, the gunslinger can resolve an attack against touch AC instead of normal AC when firing beyond her firearmÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s first range increment. Performing this deed costs 1 grit point per range increment beyond the first. The gunslinger still takes the -2 penalty on attack rolls for each range increment beyond the first when she performs this deed. GunslingerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Dodge (Ex) : At 1st level, the gunslinger gains an uncanny knack for getting out of the way of ranged attacks. When a ranged attack is made against the gunslinger, she can spend 1 grit point to move 5 feet as an immediate action ; doing so grants the gunslinger a +2 bonus to AC against the triggering attack. This movement is not a 5-foot step, and provokes attacks of opportunity . Alternatively, the gunslinger can drop prone to gain a +4 bonus to AC against the triggering attack. The gunslinger can only perform this deed while wearing medium or light armor, and while carrying no more than a light load. Quick Clear (Ex) : At 1st level, as a standard action , the gunslinger can remove the broken condition",
+          "pools": [
+            {
+              "name": "Deeds",
+              "description": "Gunslingers spend grit points to accomplish deeds. Most deeds grant the gunslinger some momentary bonus or effect, but there are some that provide longer-lasting effects. Some deeds stay in effect as long as the gunslinger has at least 1 grit point. The following is the list of base gunslinger deeds. A gunslinger can only perform deeds of her level or lower. Unless otherwise noted, a deed can be performed multiple successive times, as long as the appropriate amount of grit is spent to perform the deed. Deadeye (Ex) : At 1st level, the gunslinger can resolve an attack against touch AC instead of normal AC when firing beyond her firearmÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s first range increment. Performing this deed costs 1 grit point per range increment beyond the first. The gunslinger still takes the -2 penalty on attack rolls for each range increment beyond the first when she performs this deed. GunslingerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Dodge (Ex) : At 1st level, the gunslinger gains an uncanny knack for getting out of the way of ranged attacks. When a ranged attack is made against the gunslinger, she can spend 1 grit point to move 5 feet as an immediate action ; doing so grants the gunslinger a +2 bonus to AC against the triggering attack. This movement is not a 5-foot step, and provokes attacks of opportunity . Alternatively, the gunslinger can drop prone to gain a +4 bonus to AC against the triggering attack. The gunslinger can only perform this deed while wearing medium or light armor, and while carrying no more than a light load. Quick Clear (Ex) : At 1st level, as a standard action , the gunslinger can remove the broken condition",
+              "requirements": {
+                "minClassLevel": 1,
+                "text": "A gunslinger can only perform deeds of her level or lower. Deadeye (Ex) : At 1st level, the gunslinger can resolve an attack against touch AC instead of normal AC when firing beyond her firearmÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s first range increment."
+              },
+              "options": [
+                {
+                  "name": "Deeds",
+                  "description": "Gunslingers spend grit points to accomplish deeds. Most deeds grant the gunslinger some momentary bonus or effect, but there are some that provide longer-lasting effects. Some deeds stay in effect as long as the gunslinger has at least 1 grit point. The following is the list of base gunslinger deeds. A gunslinger can only perform deeds of her level or lower. Unless otherwise noted, a deed can be performed multiple successive times, as long as the appropriate amount of grit is spent to perform the deed. Deadeye (Ex) : At 1st level, the gunslinger can resolve an attack against touch AC instead of normal AC when firing beyond her firearmÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s first range increment. Performing this deed costs 1 grit point per range increment beyond the first. The gunslinger still takes the -2 penalty on attack rolls for each range increment beyond the first when she performs this deed. GunslingerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Dodge (Ex) : At 1st level, the gunslinger gains an uncanny knack for getting out of the way of ranged attacks. When a ranged attack is made against the gunslinger, she can spend 1 grit point to move 5 feet as an immediate action ; doing so grants the gunslinger a +2 bonus to AC against the triggering attack. This movement is not a 5-foot step, and provokes attacks of opportunity . Alternatively, the gunslinger can drop prone to gain a +4 bonus to AC against the triggering attack. The gunslinger can only perform this deed while wearing medium or light armor, and while carrying no more than a light load. Quick Clear (Ex) : At 1st level, as a standard action , the gunslinger can remove the broken condition from a single firearm she is currently wielding, as long as that condition was gained by a firearm misfire. The gunslinger must have at least 1 grit point to perform this deed. Alternatively, if the ",
+                  "requirements": {
+                    "minClassLevel": 1,
+                    "text": "A gunslinger can only perform deeds of her level or lower. Deadeye (Ex) : At 1st level, the gunslinger can resolve an attack against touch AC instead of normal AC when firing beyond her firearmÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s first range increment."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "Deeds Of Renown",
+                  "description": "Swashbucklers and gunslingers perform impressive deeds through their grit and panache, but some are capable of truly spectacular acts known as renowned deeds. A swashbuckler or gunslinger (though not members of other classes) can select a renowned deed for her class upon reaching the class level listed in the deedÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s description. This replaces the specific listed deed or deeds; if the character would not gain the appropriate deeds, she cannot select the renowned deed, as if selecting an archetype. Thundering Shot (Ex) : The gunslingerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s shots explode with deafening reports. At 1st level, as a standard action the gunslinger can spend 1 point of grit and make a single ranged attack with a firearm . All creatures in a 15-foot cone, starting at the corner of the gunslingerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s square closest to the target and extending directly toward the target, must succeed at a Fortitude save (DC = 10 + half the gunslingerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s class level + the gunslingerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Wisdom modifier) or be deafened for 1 minute. This deed replaces the gunslingerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s dodge deed and one other 1st-level deed. Source PPC:CoL Gruesome Parry (Ex) : Some gunslingers wield guns and blades in concert, readying a shot to unbalance attackers and then eviscerating their assailants. At 7th level, the gunslinger can spend 1 grit point when she readies an action to make a ranged attack with a firearm against a creature that declares a melee attack against her. If she does, the readied ranged attack does not provoke attacks of opportunity . If this readied attack hits, she gains a +4 dodge bonus to AC against the triggering attack, and she can make a single melee attack with a slashing or piercing weapon against the creature that attacked her; if this melee attack hits, it is considered to be a critical threat. This deed replaces the de",
+                  "requirements": {
+                    "minClassLevel": 1,
+                    "text": "A swashbuckler or gunslinger (though not members of other classes) can select a renowned deed for her class upon reaching the class level listed in the deedÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s description. At 1st level, as a standard action the gunslinger can spend 1 point of grit and make a single ranged attack with a firearm ."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/base-classes/gunslinger/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 8,
+      "bab": 8,
+      "fort": 6,
+      "ref": 6,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 9,
+      "bab": 9,
+      "fort": 6,
+      "ref": 6,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Gun Training 2",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 10,
+      "bab": 10,
+      "fort": 7,
+      "ref": 7,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Nimble +3",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 11,
+      "bab": 11,
+      "fort": 7,
+      "ref": 7,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Deeds",
+          "description": "Gunslingers spend grit points to accomplish deeds. Most deeds grant the gunslinger some momentary bonus or effect, but there are some that provide longer-lasting effects. Some deeds stay in effect as long as the gunslinger has at least 1 grit point. The following is the list of base gunslinger deeds. A gunslinger can only perform deeds of her level or lower. Unless otherwise noted, a deed can be performed multiple successive times, as long as the appropriate amount of grit is spent to perform the deed. Deadeye (Ex) : At 1st level, the gunslinger can resolve an attack against touch AC instead of normal AC when firing beyond her firearmÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s first range increment. Performing this deed costs 1 grit point per range increment beyond the first. The gunslinger still takes the -2 penalty on attack rolls for each range increment beyond the first when she performs this deed. GunslingerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Dodge (Ex) : At 1st level, the gunslinger gains an uncanny knack for getting out of the way of ranged attacks. When a ranged attack is made against the gunslinger, she can spend 1 grit point to move 5 feet as an immediate action ; doing so grants the gunslinger a +2 bonus to AC against the triggering attack. This movement is not a 5-foot step, and provokes attacks of opportunity . Alternatively, the gunslinger can drop prone to gain a +4 bonus to AC against the triggering attack. The gunslinger can only perform this deed while wearing medium or light armor, and while carrying no more than a light load. Quick Clear (Ex) : At 1st level, as a standard action , the gunslinger can remove the broken condition",
+          "pools": [
+            {
+              "name": "Deeds",
+              "description": "Gunslingers spend grit points to accomplish deeds. Most deeds grant the gunslinger some momentary bonus or effect, but there are some that provide longer-lasting effects. Some deeds stay in effect as long as the gunslinger has at least 1 grit point. The following is the list of base gunslinger deeds. A gunslinger can only perform deeds of her level or lower. Unless otherwise noted, a deed can be performed multiple successive times, as long as the appropriate amount of grit is spent to perform the deed. Deadeye (Ex) : At 1st level, the gunslinger can resolve an attack against touch AC instead of normal AC when firing beyond her firearmÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s first range increment. Performing this deed costs 1 grit point per range increment beyond the first. The gunslinger still takes the -2 penalty on attack rolls for each range increment beyond the first when she performs this deed. GunslingerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Dodge (Ex) : At 1st level, the gunslinger gains an uncanny knack for getting out of the way of ranged attacks. When a ranged attack is made against the gunslinger, she can spend 1 grit point to move 5 feet as an immediate action ; doing so grants the gunslinger a +2 bonus to AC against the triggering attack. This movement is not a 5-foot step, and provokes attacks of opportunity . Alternatively, the gunslinger can drop prone to gain a +4 bonus to AC against the triggering attack. The gunslinger can only perform this deed while wearing medium or light armor, and while carrying no more than a light load. Quick Clear (Ex) : At 1st level, as a standard action , the gunslinger can remove the broken condition",
+              "requirements": {
+                "minClassLevel": 1,
+                "text": "A gunslinger can only perform deeds of her level or lower. Deadeye (Ex) : At 1st level, the gunslinger can resolve an attack against touch AC instead of normal AC when firing beyond her firearmÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s first range increment."
+              },
+              "options": [
+                {
+                  "name": "Deeds",
+                  "description": "Gunslingers spend grit points to accomplish deeds. Most deeds grant the gunslinger some momentary bonus or effect, but there are some that provide longer-lasting effects. Some deeds stay in effect as long as the gunslinger has at least 1 grit point. The following is the list of base gunslinger deeds. A gunslinger can only perform deeds of her level or lower. Unless otherwise noted, a deed can be performed multiple successive times, as long as the appropriate amount of grit is spent to perform the deed. Deadeye (Ex) : At 1st level, the gunslinger can resolve an attack against touch AC instead of normal AC when firing beyond her firearmÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s first range increment. Performing this deed costs 1 grit point per range increment beyond the first. The gunslinger still takes the -2 penalty on attack rolls for each range increment beyond the first when she performs this deed. GunslingerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Dodge (Ex) : At 1st level, the gunslinger gains an uncanny knack for getting out of the way of ranged attacks. When a ranged attack is made against the gunslinger, she can spend 1 grit point to move 5 feet as an immediate action ; doing so grants the gunslinger a +2 bonus to AC against the triggering attack. This movement is not a 5-foot step, and provokes attacks of opportunity . Alternatively, the gunslinger can drop prone to gain a +4 bonus to AC against the triggering attack. The gunslinger can only perform this deed while wearing medium or light armor, and while carrying no more than a light load. Quick Clear (Ex) : At 1st level, as a standard action , the gunslinger can remove the broken condition from a single firearm she is currently wielding, as long as that condition was gained by a firearm misfire. The gunslinger must have at least 1 grit point to perform this deed. Alternatively, if the ",
+                  "requirements": {
+                    "minClassLevel": 1,
+                    "text": "A gunslinger can only perform deeds of her level or lower. Deadeye (Ex) : At 1st level, the gunslinger can resolve an attack against touch AC instead of normal AC when firing beyond her firearmÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s first range increment."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "Deeds Of Renown",
+                  "description": "Swashbucklers and gunslingers perform impressive deeds through their grit and panache, but some are capable of truly spectacular acts known as renowned deeds. A swashbuckler or gunslinger (though not members of other classes) can select a renowned deed for her class upon reaching the class level listed in the deedÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s description. This replaces the specific listed deed or deeds; if the character would not gain the appropriate deeds, she cannot select the renowned deed, as if selecting an archetype. Thundering Shot (Ex) : The gunslingerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s shots explode with deafening reports. At 1st level, as a standard action the gunslinger can spend 1 point of grit and make a single ranged attack with a firearm . All creatures in a 15-foot cone, starting at the corner of the gunslingerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s square closest to the target and extending directly toward the target, must succeed at a Fortitude save (DC = 10 + half the gunslingerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s class level + the gunslingerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Wisdom modifier) or be deafened for 1 minute. This deed replaces the gunslingerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s dodge deed and one other 1st-level deed. Source PPC:CoL Gruesome Parry (Ex) : Some gunslingers wield guns and blades in concert, readying a shot to unbalance attackers and then eviscerating their assailants. At 7th level, the gunslinger can spend 1 grit point when she readies an action to make a ranged attack with a firearm against a creature that declares a melee attack against her. If she does, the readied ranged attack does not provoke attacks of opportunity . If this readied attack hits, she gains a +4 dodge bonus to AC against the triggering attack, and she can make a single melee attack with a slashing or piercing weapon against the creature that attacked her; if this melee attack hits, it is considered to be a critical threat. This deed replaces the de",
+                  "requirements": {
+                    "minClassLevel": 1,
+                    "text": "A swashbuckler or gunslinger (though not members of other classes) can select a renowned deed for her class upon reaching the class level listed in the deedÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s description. At 1st level, as a standard action the gunslinger can spend 1 point of grit and make a single ranged attack with a firearm ."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/base-classes/gunslinger/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 12,
+      "fort": 8,
+      "ref": 8,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 13,
+      "fort": 8,
+      "ref": 8,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Gun Training 3",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 14,
+      "fort": 9,
+      "ref": 9,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Nimble +4",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 15,
+      "fort": 9,
+      "ref": 9,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Deeds",
+          "description": "Gunslingers spend grit points to accomplish deeds. Most deeds grant the gunslinger some momentary bonus or effect, but there are some that provide longer-lasting effects. Some deeds stay in effect as long as the gunslinger has at least 1 grit point. The following is the list of base gunslinger deeds. A gunslinger can only perform deeds of her level or lower. Unless otherwise noted, a deed can be performed multiple successive times, as long as the appropriate amount of grit is spent to perform the deed. Deadeye (Ex) : At 1st level, the gunslinger can resolve an attack against touch AC instead of normal AC when firing beyond her firearmÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s first range increment. Performing this deed costs 1 grit point per range increment beyond the first. The gunslinger still takes the -2 penalty on attack rolls for each range increment beyond the first when she performs this deed. GunslingerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Dodge (Ex) : At 1st level, the gunslinger gains an uncanny knack for getting out of the way of ranged attacks. When a ranged attack is made against the gunslinger, she can spend 1 grit point to move 5 feet as an immediate action ; doing so grants the gunslinger a +2 bonus to AC against the triggering attack. This movement is not a 5-foot step, and provokes attacks of opportunity . Alternatively, the gunslinger can drop prone to gain a +4 bonus to AC against the triggering attack. The gunslinger can only perform this deed while wearing medium or light armor, and while carrying no more than a light load. Quick Clear (Ex) : At 1st level, as a standard action , the gunslinger can remove the broken condition",
+          "pools": [
+            {
+              "name": "Deeds",
+              "description": "Gunslingers spend grit points to accomplish deeds. Most deeds grant the gunslinger some momentary bonus or effect, but there are some that provide longer-lasting effects. Some deeds stay in effect as long as the gunslinger has at least 1 grit point. The following is the list of base gunslinger deeds. A gunslinger can only perform deeds of her level or lower. Unless otherwise noted, a deed can be performed multiple successive times, as long as the appropriate amount of grit is spent to perform the deed. Deadeye (Ex) : At 1st level, the gunslinger can resolve an attack against touch AC instead of normal AC when firing beyond her firearmÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s first range increment. Performing this deed costs 1 grit point per range increment beyond the first. The gunslinger still takes the -2 penalty on attack rolls for each range increment beyond the first when she performs this deed. GunslingerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Dodge (Ex) : At 1st level, the gunslinger gains an uncanny knack for getting out of the way of ranged attacks. When a ranged attack is made against the gunslinger, she can spend 1 grit point to move 5 feet as an immediate action ; doing so grants the gunslinger a +2 bonus to AC against the triggering attack. This movement is not a 5-foot step, and provokes attacks of opportunity . Alternatively, the gunslinger can drop prone to gain a +4 bonus to AC against the triggering attack. The gunslinger can only perform this deed while wearing medium or light armor, and while carrying no more than a light load. Quick Clear (Ex) : At 1st level, as a standard action , the gunslinger can remove the broken condition",
+              "requirements": {
+                "minClassLevel": 1,
+                "text": "A gunslinger can only perform deeds of her level or lower. Deadeye (Ex) : At 1st level, the gunslinger can resolve an attack against touch AC instead of normal AC when firing beyond her firearmÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s first range increment."
+              },
+              "options": [
+                {
+                  "name": "Deeds",
+                  "description": "Gunslingers spend grit points to accomplish deeds. Most deeds grant the gunslinger some momentary bonus or effect, but there are some that provide longer-lasting effects. Some deeds stay in effect as long as the gunslinger has at least 1 grit point. The following is the list of base gunslinger deeds. A gunslinger can only perform deeds of her level or lower. Unless otherwise noted, a deed can be performed multiple successive times, as long as the appropriate amount of grit is spent to perform the deed. Deadeye (Ex) : At 1st level, the gunslinger can resolve an attack against touch AC instead of normal AC when firing beyond her firearmÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s first range increment. Performing this deed costs 1 grit point per range increment beyond the first. The gunslinger still takes the -2 penalty on attack rolls for each range increment beyond the first when she performs this deed. GunslingerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Dodge (Ex) : At 1st level, the gunslinger gains an uncanny knack for getting out of the way of ranged attacks. When a ranged attack is made against the gunslinger, she can spend 1 grit point to move 5 feet as an immediate action ; doing so grants the gunslinger a +2 bonus to AC against the triggering attack. This movement is not a 5-foot step, and provokes attacks of opportunity . Alternatively, the gunslinger can drop prone to gain a +4 bonus to AC against the triggering attack. The gunslinger can only perform this deed while wearing medium or light armor, and while carrying no more than a light load. Quick Clear (Ex) : At 1st level, as a standard action , the gunslinger can remove the broken condition from a single firearm she is currently wielding, as long as that condition was gained by a firearm misfire. The gunslinger must have at least 1 grit point to perform this deed. Alternatively, if the ",
+                  "requirements": {
+                    "minClassLevel": 1,
+                    "text": "A gunslinger can only perform deeds of her level or lower. Deadeye (Ex) : At 1st level, the gunslinger can resolve an attack against touch AC instead of normal AC when firing beyond her firearmÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s first range increment."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "Deeds Of Renown",
+                  "description": "Swashbucklers and gunslingers perform impressive deeds through their grit and panache, but some are capable of truly spectacular acts known as renowned deeds. A swashbuckler or gunslinger (though not members of other classes) can select a renowned deed for her class upon reaching the class level listed in the deedÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s description. This replaces the specific listed deed or deeds; if the character would not gain the appropriate deeds, she cannot select the renowned deed, as if selecting an archetype. Thundering Shot (Ex) : The gunslingerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s shots explode with deafening reports. At 1st level, as a standard action the gunslinger can spend 1 point of grit and make a single ranged attack with a firearm . All creatures in a 15-foot cone, starting at the corner of the gunslingerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s square closest to the target and extending directly toward the target, must succeed at a Fortitude save (DC = 10 + half the gunslingerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s class level + the gunslingerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Wisdom modifier) or be deafened for 1 minute. This deed replaces the gunslingerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s dodge deed and one other 1st-level deed. Source PPC:CoL Gruesome Parry (Ex) : Some gunslingers wield guns and blades in concert, readying a shot to unbalance attackers and then eviscerating their assailants. At 7th level, the gunslinger can spend 1 grit point when she readies an action to make a ranged attack with a firearm against a creature that declares a melee attack against her. If she does, the readied ranged attack does not provoke attacks of opportunity . If this readied attack hits, she gains a +4 dodge bonus to AC against the triggering attack, and she can make a single melee attack with a slashing or piercing weapon against the creature that attacked her; if this melee attack hits, it is considered to be a critical threat. This deed replaces the de",
+                  "requirements": {
+                    "minClassLevel": 1,
+                    "text": "A swashbuckler or gunslinger (though not members of other classes) can select a renowned deed for her class upon reaching the class level listed in the deedÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s description. At 1st level, as a standard action the gunslinger can spend 1 point of grit and make a single ranged attack with a firearm ."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/base-classes/gunslinger/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 16,
+      "fort": 10,
+      "ref": 10,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 17,
+      "fort": 10,
+      "ref": 10,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Gun Training 4",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 18,
+      "fort": 11,
+      "ref": 11,
+      "will": 6,
+      "classFeatures": [
+        {
+          "name": "Nimble +5",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 19,
+      "fort": 11,
+      "ref": 11,
+      "will": 6,
+      "classFeatures": [
+        {
+          "name": "Deeds",
+          "description": "Gunslingers spend grit points to accomplish deeds. Most deeds grant the gunslinger some momentary bonus or effect, but there are some that provide longer-lasting effects. Some deeds stay in effect as long as the gunslinger has at least 1 grit point. The following is the list of base gunslinger deeds. A gunslinger can only perform deeds of her level or lower. Unless otherwise noted, a deed can be performed multiple successive times, as long as the appropriate amount of grit is spent to perform the deed. Deadeye (Ex) : At 1st level, the gunslinger can resolve an attack against touch AC instead of normal AC when firing beyond her firearmÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s first range increment. Performing this deed costs 1 grit point per range increment beyond the first. The gunslinger still takes the -2 penalty on attack rolls for each range increment beyond the first when she performs this deed. GunslingerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Dodge (Ex) : At 1st level, the gunslinger gains an uncanny knack for getting out of the way of ranged attacks. When a ranged attack is made against the gunslinger, she can spend 1 grit point to move 5 feet as an immediate action ; doing so grants the gunslinger a +2 bonus to AC against the triggering attack. This movement is not a 5-foot step, and provokes attacks of opportunity . Alternatively, the gunslinger can drop prone to gain a +4 bonus to AC against the triggering attack. The gunslinger can only perform this deed while wearing medium or light armor, and while carrying no more than a light load. Quick Clear (Ex) : At 1st level, as a standard action , the gunslinger can remove the broken condition",
+          "pools": [
+            {
+              "name": "Deeds",
+              "description": "Gunslingers spend grit points to accomplish deeds. Most deeds grant the gunslinger some momentary bonus or effect, but there are some that provide longer-lasting effects. Some deeds stay in effect as long as the gunslinger has at least 1 grit point. The following is the list of base gunslinger deeds. A gunslinger can only perform deeds of her level or lower. Unless otherwise noted, a deed can be performed multiple successive times, as long as the appropriate amount of grit is spent to perform the deed. Deadeye (Ex) : At 1st level, the gunslinger can resolve an attack against touch AC instead of normal AC when firing beyond her firearmÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s first range increment. Performing this deed costs 1 grit point per range increment beyond the first. The gunslinger still takes the -2 penalty on attack rolls for each range increment beyond the first when she performs this deed. GunslingerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Dodge (Ex) : At 1st level, the gunslinger gains an uncanny knack for getting out of the way of ranged attacks. When a ranged attack is made against the gunslinger, she can spend 1 grit point to move 5 feet as an immediate action ; doing so grants the gunslinger a +2 bonus to AC against the triggering attack. This movement is not a 5-foot step, and provokes attacks of opportunity . Alternatively, the gunslinger can drop prone to gain a +4 bonus to AC against the triggering attack. The gunslinger can only perform this deed while wearing medium or light armor, and while carrying no more than a light load. Quick Clear (Ex) : At 1st level, as a standard action , the gunslinger can remove the broken condition",
+              "requirements": {
+                "minClassLevel": 1,
+                "text": "A gunslinger can only perform deeds of her level or lower. Deadeye (Ex) : At 1st level, the gunslinger can resolve an attack against touch AC instead of normal AC when firing beyond her firearmÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s first range increment."
+              },
+              "options": [
+                {
+                  "name": "Deeds",
+                  "description": "Gunslingers spend grit points to accomplish deeds. Most deeds grant the gunslinger some momentary bonus or effect, but there are some that provide longer-lasting effects. Some deeds stay in effect as long as the gunslinger has at least 1 grit point. The following is the list of base gunslinger deeds. A gunslinger can only perform deeds of her level or lower. Unless otherwise noted, a deed can be performed multiple successive times, as long as the appropriate amount of grit is spent to perform the deed. Deadeye (Ex) : At 1st level, the gunslinger can resolve an attack against touch AC instead of normal AC when firing beyond her firearmÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s first range increment. Performing this deed costs 1 grit point per range increment beyond the first. The gunslinger still takes the -2 penalty on attack rolls for each range increment beyond the first when she performs this deed. GunslingerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Dodge (Ex) : At 1st level, the gunslinger gains an uncanny knack for getting out of the way of ranged attacks. When a ranged attack is made against the gunslinger, she can spend 1 grit point to move 5 feet as an immediate action ; doing so grants the gunslinger a +2 bonus to AC against the triggering attack. This movement is not a 5-foot step, and provokes attacks of opportunity . Alternatively, the gunslinger can drop prone to gain a +4 bonus to AC against the triggering attack. The gunslinger can only perform this deed while wearing medium or light armor, and while carrying no more than a light load. Quick Clear (Ex) : At 1st level, as a standard action , the gunslinger can remove the broken condition from a single firearm she is currently wielding, as long as that condition was gained by a firearm misfire. The gunslinger must have at least 1 grit point to perform this deed. Alternatively, if the ",
+                  "requirements": {
+                    "minClassLevel": 1,
+                    "text": "A gunslinger can only perform deeds of her level or lower. Deadeye (Ex) : At 1st level, the gunslinger can resolve an attack against touch AC instead of normal AC when firing beyond her firearmÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s first range increment."
+                  },
+                  "scrapeConfidence": "medium"
+                },
+                {
+                  "name": "Deeds Of Renown",
+                  "description": "Swashbucklers and gunslingers perform impressive deeds through their grit and panache, but some are capable of truly spectacular acts known as renowned deeds. A swashbuckler or gunslinger (though not members of other classes) can select a renowned deed for her class upon reaching the class level listed in the deedÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s description. This replaces the specific listed deed or deeds; if the character would not gain the appropriate deeds, she cannot select the renowned deed, as if selecting an archetype. Thundering Shot (Ex) : The gunslingerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s shots explode with deafening reports. At 1st level, as a standard action the gunslinger can spend 1 point of grit and make a single ranged attack with a firearm . All creatures in a 15-foot cone, starting at the corner of the gunslingerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s square closest to the target and extending directly toward the target, must succeed at a Fortitude save (DC = 10 + half the gunslingerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s class level + the gunslingerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Wisdom modifier) or be deafened for 1 minute. This deed replaces the gunslingerÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s dodge deed and one other 1st-level deed. Source PPC:CoL Gruesome Parry (Ex) : Some gunslingers wield guns and blades in concert, readying a shot to unbalance attackers and then eviscerating their assailants. At 7th level, the gunslinger can spend 1 grit point when she readies an action to make a ranged attack with a firearm against a creature that declares a melee attack against her. If she does, the readied ranged attack does not provoke attacks of opportunity . If this readied attack hits, she gains a +4 dodge bonus to AC against the triggering attack, and she can make a single melee attack with a slashing or piercing weapon against the creature that attacked her; if this melee attack hits, it is considered to be a critical threat. This deed replaces the de",
+                  "requirements": {
+                    "minClassLevel": 1,
+                    "text": "A swashbuckler or gunslinger (though not members of other classes) can select a renowned deed for her class upon reaching the class level listed in the deedÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s description. At 1st level, as a standard action the gunslinger can spend 1 point of grit and make a single ranged attack with a firearm ."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/base-classes/gunslinger/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 20,
+      "fort": 12,
+      "ref": 12,
+      "will": 6,
+      "classFeatures": [
+        {
+          "name": "Bonus Feat",
+          "description": ""
+        },
+        {
+          "name": "True Grit",
+          "description": "At 20th level, a gunslinger picks two deeds that she has access to and that she must spend grit to perform. She can perform these deeds for 1 grit point fewer (minimum 0) than usual. If the number of grit points to perform a deed is reduced to 0, the gunslinger can perform this deed as long as she has at least 1 grit point. If a deed could already be performed as long as she had at least 1 grit point, she can now perform that deed even when she has no grit points."
+        }
+      ],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": null,
+  "spellcastingClass": false
+}

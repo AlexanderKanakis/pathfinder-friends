@@ -11,6 +11,65 @@
   <style>
     body { background-color: #121212; color: white; }
     .sheet-section { background: #1e1e1e; border-radius: 10px; padding: 12px; margin-bottom: 12px; }
+    .sheet-page-header { display: grid; gap: 8px; }
+    .sheet-page-actions { display: flex; align-items: center; gap: 8px; }
+    .sheet-page-actions-end { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+    .sheet-page-tabs { margin-left: auto; display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+    .sheet-page-effects-row { display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
+    .progression-grid { display: grid; grid-template-columns: minmax(180px, 360px); gap: 8px; }
+    .progression-card { background: #242424; border: 1px solid #444; border-radius: 8px; padding: 8px; }
+    .progression-card label { color: #aaa; font-size: 12px; }
+    .progression-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+    .progression-actions .btn { flex: 1 1 120px; }
+    .bab-grid { display: grid; grid-template-columns: repeat(3, minmax(64px, 96px)); gap: 8px; }
+    .class-feature-list { display: grid; gap: 8px; }
+    .class-feature-item { background: #242424; border: 1px solid #444; border-radius: 8px; padding: 8px; }
+    .class-feature-row { background: #2b2b2b; border-color: #555 !important; }
+    .class-feature-effects { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+    .class-feature-effect-pill { background: rgba(143, 209, 158, .08); border: 1px solid rgba(143, 209, 158, .35); color: #d9f5df; border-radius: 999px; padding: 1px 7px; font-size: 12px; }
+    .class-feature-pools { display: grid; gap: 4px; margin-top: 6px; }
+    .class-feature-pool { padding: 0; }
+    .class-feature-choice-row { display: grid; grid-template-columns: minmax(0, 1fr) 70px 34px; gap: 6px; align-items: center; max-width: 360px; }
+    .class-feature-choice-summary { min-width: 0; color: #f4f4f4; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .class-feature-choice-row .btn { text-align: center; }
+    .class-feature-choice-row .btn-icon { padding-left: 0; padding-right: 0; }
+    .class-feature-choice-warning { color: #ffc107; font-size: 12px; margin-top: 4px; }
+    .spellcasting-card { background: #242424; border: 1px solid #444; border-radius: 8px; padding: 10px; margin-bottom: 10px; }
+    .spellcasting-meta { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 10px; }
+    .spellcasting-meta span { border: 1px solid #555; border-radius: 999px; padding: 2px 8px; color: #ddd; font-size: 12px; }
+    .spell-grid-table { display: grid; gap: 6px; }
+    .spell-row { display: grid; grid-template-columns: 54px minmax(180px, 1fr); gap: 8px; align-items: start; background: #202020; border: 1px solid #3d3d3d; border-radius: 7px; padding: 7px; }
+    .spell-row textarea { min-height: 54px; }
+    .spell-row-value { color: #fff; font-weight: 700; }
+    .spell-bucket { display: grid; gap: 4px; margin-bottom: 7px; }
+    .spell-bucket-title { color: #aaa; font-size: 11px; text-transform: uppercase; }
+    .spell-casts-note { color: #f0d58c; font-size: 12px; line-height: 1.25; }
+    .spell-dual-buckets { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; align-items: start; }
+    .spell-mobile-tabs { display: none; gap: 6px; margin-bottom: 8px; }
+    .spell-action-stack { display: grid; gap: 6px; width: min(320px, 32vw); }
+    .spell-action-stack .btn { width: 100%; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .spell-action-stack .btn i { margin-right: 4px; }
+    .spell-action-row { display: grid; grid-template-columns: minmax(0, 1fr) 34px; gap: 6px; }
+    .spell-action-row > .btn-icon { text-align: center; padding-left: 0; padding-right: 0; }
+    .spell-selection-row { display: grid; grid-template-columns: minmax(0, 1fr) 34px; gap: 6px; align-items: center; }
+    .spell-selection-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #f4f4f4; font-size: 13px; }
+    .spell-selection-row .btn:not(.btn-icon) { text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .spell-slot-button.bonus-slot { border-color: #f0d58c; color: #f0d58c; }
+    .spell-slot-button.extra-slot { border-color: #ffc107; color: #ffc107; }
+    .spell-level-number { font-size: 26px; line-height: 1; font-weight: 800; color: #f0d58c; text-align: center; }
+    @media (max-width: 760px) {
+      .spell-row { grid-template-columns: 1fr; }
+      .spell-row .spell-notes { grid-column: auto; }
+      .spell-level-number { justify-self: center; }
+      .spell-action-stack { width: 100%; }
+      .spell-selection-row { grid-template-columns: minmax(0, 1fr) 34px; }
+      .class-feature-choice-row { max-width: none; }
+      .spell-dual-buckets { display: block; }
+      .spell-mobile-tabs { display: flex; }
+      .spell-mobile-tabs .btn { flex: 1 1 0; }
+      .spell-dual-buckets .spell-bucket { display: none; }
+      .spell-dual-buckets .spell-bucket.is-mobile-active { display: grid; }
+    }
     .sheet-card { background: #242424; border: 1px solid #444; border-radius: 8px; padding: 10px; container-type: inline-size; }
     .sheet-title { font-size: 13px; color: #aaa; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
     .sheet-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
@@ -163,6 +222,9 @@
     .slot-value i, .slot-value svg { color: #8fd19e; }
     .search-modal-dialog { width: min(1140px, calc(100vw - 2rem)); max-width: min(1140px, calc(100vw - 2rem)); }
     .search-modal-results { min-height: min(48vh, 460px); max-height: min(62vh, 680px); overflow: auto; }
+    #effectTrackerModal .modal-dialog { align-items: flex-start; margin-top: 1rem; margin-bottom: 1rem; }
+    #effectTrackerModal .modal-content { max-height: calc(100vh - 2rem); overflow: hidden; }
+    #effectTrackerModal .modal-body { min-height: 0; overflow-y: auto; }
     .source-results-panel { margin-top: 10px; max-height: min(62vh, 680px); overflow: auto; }
     .source-results-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
     .source-result-card { position: relative; background: #242424; border: 1px solid #444; border-radius: 8px; color: #f4f4f4; padding: 10px 42px 10px 10px; text-align: left; cursor: pointer; min-height: 92px; }
@@ -220,14 +282,22 @@
 <div id="appNavbar"></div>
 
 <main id="sheetMain" class="container-fluid mt-3 d-none">
-  <div class="d-flex justify-content-between align-items-center mb-2">
+  <div class="sheet-page-header mb-2">
     <h3 id="sheetPageTitle" class="mb-0">PathFriends Character Sheet</h3>
-    <div class="d-flex gap-2">
-      <a id="backToCharactersBtn" class="btn btn-outline-light btn-sm" href="characters.html">Back to Characters</a>
-      <a id="backToEnemiesBtn" class="btn btn-outline-light btn-sm d-none" href="enemies.html">Back to Enemies</a>
-      <button class="btn btn-outline-success btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#effectTrackerModal" onclick="openEffectTrackerModal()">Effects</button>
-      <button id="showAppliedBuffsToggle" class="btn btn-outline-info btn-sm" type="button" onclick="toggleAppliedBuffs()">Show Applied Buffs</button>
-      <button class="btn btn-primary btn-sm" type="button" onclick="saveSheetNow()">Save</button>
+    <div class="sheet-page-actions flex-wrap">
+      <a id="backToCharactersBtn" class="btn btn-outline-light btn-sm btn-icon" href="characters.html" title="Back to Characters" aria-label="Back to Characters"><i class="bi bi-arrow-left"></i></a>
+      <a id="backToEnemiesBtn" class="btn btn-outline-light btn-sm btn-icon d-none" href="enemies.html" title="Back to Enemies" aria-label="Back to Enemies"><i class="bi bi-arrow-left"></i></a>
+      <div class="sheet-page-tabs" role="group" aria-label="Character sheet detail tabs">
+        <button class="btn btn-primary btn-sm" type="button" data-sheet-info-tab="character">Character</button>
+        <button class="btn btn-outline-primary btn-sm" type="button" data-sheet-info-tab="levelProgression">Class Progression</button>
+        <button class="btn btn-outline-primary btn-sm" type="button" data-sheet-info-tab="classFeatures">Class Features</button>
+        <button class="btn btn-outline-primary btn-sm" type="button" data-sheet-info-tab="spells">Spells</button>
+        <button class="btn btn-outline-primary btn-sm" type="button" data-sheet-info-tab="feats">Feats</button>
+      </div>
+    </div>
+    <div class="sheet-page-effects-row">
+      <button id="openEffectTrackerButton" class="btn btn-outline-success btn-sm" type="button">Effects</button>
+      <button id="showAppliedBuffsToggle" class="btn btn-outline-info btn-sm" type="button" onclick="toggleAppliedBuffs()">Show Effects</button>
     </div>
   </div>
   <div class="btn-group btn-group-sm view-tabs mb-2" role="group" aria-label="Character sheet view">
@@ -238,6 +308,27 @@
   <div id="sheetStatus" class="alert d-none py-2"></div>
 
   <div id="fullSheetView">
+  <section class="sheet-section d-none" id="sheetInfoTabs">
+    <div id="levelProgressionPanel" data-sheet-info-panel="levelProgression">
+      <div class="d-flex justify-content-between align-items-center gap-2 flex-wrap mb-2">
+        <div class="sheet-title mb-0">Class Progression</div>
+      </div>
+      <div id="levelProgressionRows" class="progression-grid"></div>
+    </div>
+    <div id="classFeaturesPanel" class="d-none" data-sheet-info-panel="classFeatures">
+      <div class="sheet-title">Class Features</div>
+      <div id="classFeatureList" class="class-feature-list"></div>
+    </div>
+    <div id="spellsPanel" class="d-none" data-sheet-info-panel="spells">
+      <div class="sheet-title">Spells</div>
+      <div id="spellProgressionList" class="small-text"></div>
+    </div>
+    <div id="featsPanel" class="d-none" data-sheet-info-panel="feats">
+      <div class="sheet-title">Feats</div>
+      <div class="small-text">Feat planning will live here after class progression is in place.</div>
+    </div>
+  </section>
+  <div id="characterSheetPanel" data-sheet-info-panel="character">
   <section class="sheet-section">
     <div class="sheet-title">Character</div>
     <div class="character-layout">
@@ -284,8 +375,10 @@
 
       <section class="sheet-section">
         <div class="sheet-title">Base Attack Bonus</div>
-        <div class="sheet-grid">
-          <div><label for="bab">BAB</label><input id="bab" class="form-control form-control-sm sheet-input" type="number" value="0"></div>
+        <div class="bab-grid">
+          <div><label for="bab">BAB</label><input id="bab" class="form-control form-control-sm no-spinner" inputmode="numeric" value="0" readonly></div>
+          <div><label for="babBase">Base</label><input id="babBase" class="form-control form-control-sm no-spinner" inputmode="numeric" value="0" readonly></div>
+          <div><label for="babMisc">Misc</label><input id="babMisc" class="form-control form-control-sm sheet-input" type="number" value="0"></div>
         </div>
       </section>
 
@@ -365,7 +458,7 @@
         <div class="sheet-title">Saving Throws</div>
         <div class="table-responsive">
           <table class="table table-dark table-sm align-middle compact-table save-table">
-            <thead><tr><th>Save</th><th>Total</th><th>Base</th><th>Ability</th><th>Buff</th></tr></thead>
+            <thead><tr><th>Save</th><th>Total</th><th>Base</th><th>Misc</th><th>Ability</th><th>Buff</th></tr></thead>
             <tbody id="saveRows"></tbody>
           </table>
         </div>
@@ -457,6 +550,7 @@
     <textarea id="notes" class="form-control sheet-input"></textarea>
   </section>
   </div>
+  </div>
 
   <div id="simplifiedSheetView" class="simple-wrap d-none"></div>
 </main>
@@ -502,6 +596,10 @@
         <div class="form-check form-switch mt-2">
           <input id="inventoryWondrousItem" class="form-check-input" type="checkbox" role="switch">
           <label class="form-check-label" for="inventoryWondrousItem">Wondrous Item</label>
+        </div>
+        <div id="inventorySpecialMaterialField" class="mt-2 d-none">
+          <label for="inventorySpecialMaterial">Special Material</label>
+          <select id="inventorySpecialMaterial" class="form-select form-select-sm"></select>
         </div>
         <div id="inventoryWeaponFields" class="inventory-edit-grid mt-2 d-none">
           <div>
@@ -629,15 +727,19 @@
   </div>
 </div>
 
-<script src="navbar.js"></script>
+<script src="scripts/navbar.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase-config.js"></script>
-<script src="app-supabase.js"></script>
-<script src="buff-calculator.js"></script>
-<script src="buff-tracker-widget.js?v=extra-attack-widget-2"></script>
-<script src="wondrous.js?v=wondrous-refresh-1"></script>
-<script src="scripts.js"></script>
-<script src="item-editor.js"></script>
+<script src="scripts/supabase-config.js"></script>
+<script src="scripts/app-supabase.js"></script>
+<script src="scripts/buff-calculator.js"></script>
+<script src="scripts/class-data.js"></script>
+<script src="modals/effect-duration-editor.js"></script>
+<script src="modals/class-feature-choice-picker.js"></script>
+<script src="modals/spell-picker.js"></script>
+<script src="scripts/buff-tracker-widget.js?v=extra-attack-widget-2"></script>
+<script src="data/wondrous.js?v=wondrous-refresh-1"></script>
+<script src="scripts/scripts.js"></script>
+<script src="modals/item-editor.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 const ABILITIES = [
@@ -654,10 +756,15 @@ const SKILLS = [
   ["Perception", "wis"], ["Ride", "dex"], ["Sense Motive", "wis"], ["Sleight of Hand", "dex"],
   ["Spellcraft", "int"], ["Stealth", "dex"], ["Survival", "wis"], ["Swim", "str"], ["Use Magic Device", "cha"]
 ];
-const SIMPLE_FIELDS = ["characterName","imageUrl","classLevel","characterLevel","race","alignment","deity","homeland","size","gender","age","height","weight","hair","eyes","bab","currentHitPoints","hitPoints","hitPointsTotal","damageReduction","initMisc","speedBase","speedArmor","acNatural","acDeflection","acMisc","cmbMisc","cmdMisc","lightLoad","mediumLoad","heavyLoad","liftOverHead","liftOffGround","dragOrPush","GP","SP","CP","notes"];
+const SIMPLE_FIELDS = ["characterName","imageUrl","classLevel","characterLevel","race","alignment","deity","homeland","size","gender","age","height","weight","hair","eyes","bab","babBase","babMisc","currentHitPoints","hitPoints","hitPointsTotal","damageReduction","initMisc","speedBase","speedArmor","acNatural","acDeflection","acMisc","cmbMisc","cmdMisc","lightLoad","mediumLoad","heavyLoad","liftOverHead","liftOffGround","dragOrPush","GP","SP","CP","notes"];
 const ABILITY_STAT_NAMES = { str: "strength", dex: "dexterity", con: "constitution", int: "intelligence", wis: "wisdom", cha: "charisma" };
 const SCALE_ABILITIES = ["STR", "DEX", "CON", "INT", "WIS", "CHA"];
 const WEAPON_TYPES = ["Melee Weapon (Light)", "Melee Weapon (One-Handed)", "Melee Weapon (Two-Handed)", "Ranged Weapon", "Firearm (One-Handed)", "Firearm (Two-Handed)", "Natural"];
+const ZERO_LEVEL_SPELL_CLASSES = new Set([
+  "adept", "arcanist", "bard", "cleric", "druid", "hunter", "inquisitor", "magus", "medium",
+  "mesmerist", "occultist", "oracle", "psychic", "shaman", "skald", "sorcerer", "spiritualist",
+  "summoner", "summoner (unchained)", "warpriest", "witch", "wizard"
+]);
 const ITEM_SLOTS = PFItemEditor.DEFAULT_SLOTS;
 const WEAPON_ENCHANTMENTS = ["", "Adaptive", "Allying", "Anarchic", "Anchoring", "Axiomatic", "Bane", "Brilliant Energy", "Called", "Conductive", "Corrosive", "Corrosive Burst", "Cruel", "Cunning", "Dancing", "Defending", "Disruption", "Distance", "Flaming", "Flaming Burst", "Frost", "Furious", "Ghost Touch", "Holy", "Icy Burst", "Impact", "Keen", "Merciful", "Returning", "Seeking", "Shock", "Shocking Burst", "Speed", "Spell Storing", "Throwing", "Thundering", "Unholy", "Vicious", "Vorpal", "Wounding"];
 const ARMOR_ENCHANTMENTS = ["", "Balanced", "Benevolent", "Bitter", "Bolstering", "Brawling", "Champion", "Dastard", "Deathless", "Defiant", "Determination", "Energy Resistance", "Energy Resistance (Improved)", "Energy Resistance (Greater)", "Etherealness", "Fortification (Light)", "Fortification (Moderate)", "Fortification (Heavy)", "Ghost Touch", "Glamered", "Invulnerability", "Shadow", "Shadow (Improved)", "Shadow (Greater)", "Slick", "Slick (Improved)", "Slick (Greater)", "Spell Resistance (13)", "Spell Resistance (15)", "Spell Resistance (17)", "Spell Resistance (19)", "Wild"];
@@ -676,14 +783,22 @@ let isRestoringSheet = false;
 let activeBuffs = [];
 let lastBuffRefresh = "";
 let effectTrackerInstance = null;
+let effectTrackerModal = null;
 let currentUserId = "";
 let currentSheetOwnerId = "";
+let currentUserIsAdmin = false;
 let isEnemySheetMode = false;
 let enemySheetId = "";
+let classDefinitions = [];
+let classProgression = [];
+let activeSheetInfoTab = "character";
 let characterSheetReadyResolve = null;
 const characterSheetReady = new Promise(resolve => { characterSheetReadyResolve = resolve; });
 let sheetViewMode = sessionStorage.getItem("pf_character_sheet_view") || "full";
 let customSkills = [];
+let classFeatureChoices = {};
+let classFeatureChoicePickerConfigs = new Map();
+let characterSpells = {};
 let inventoryItemModal = null;
 let deleteInventoryItemModal = null;
 let editingInventoryItemId = null;
@@ -1204,7 +1319,7 @@ function totalForStat(stat) {
 }
 
 function simpleConditionalsByStat() {
-  const buffed = window.PFBuffs?.calculateStatsDetailed(activeBuffs, sheetToBaseline());
+  const buffed = window.PFBuffs?.calculateStatsDetailed(calculationBuffs(), sheetToBaseline());
   const groups = {};
   Object.entries(buffed?.breakdown || {}).forEach(([stat, items]) => {
     items
@@ -1545,21 +1660,21 @@ async function loadEnemySourceItems() {
     : [];
   let weapons = [];
   try {
-    const response = await fetch("./weapons.json", { cache: "no-cache" });
+    const response = await fetch("./data/weapons.json", { cache: "no-cache" });
     if (response.ok) weapons = (await response.json()).map(normalizeWeaponSourceItem);
   } catch (error) {
     console.info("No generated weapons.json found yet.", error);
   }
   let firearms = [];
   try {
-    const response = await fetch("./firearms.json", { cache: "no-cache" });
+    const response = await fetch("./data/firearms.json", { cache: "no-cache" });
     if (response.ok) firearms = (await response.json()).map(normalizeFirearmSourceItem);
   } catch (error) {
     console.info("No generated firearms.json found yet.", error);
   }
   let armorShields = [];
   try {
-    const response = await fetch("./armor-shields.json", { cache: "no-cache" });
+    const response = await fetch("./data/armor-shields.json", { cache: "no-cache" });
     if (response.ok) {
       const data = await response.json();
       armorShields = (Array.isArray(data) ? data : []).map(normalizeArmorShieldSourceItem);
@@ -1569,7 +1684,7 @@ async function loadEnemySourceItems() {
   }
   let alchemical = [];
   try {
-    const module = await import("./alchemical-crafts.js");
+    const module = await import("./data/alchemical-crafts.js");
     alchemical = (Array.isArray(module.items) ? module.items : [])
       .filter(item => item.name && item.dc)
       .map(normalizeAlchemicalSourceItem);
@@ -1578,7 +1693,7 @@ async function loadEnemySourceItems() {
   }
   let mundane = [];
   try {
-    const response = await fetch("./mundane-items.json", { cache: "no-cache" });
+    const response = await fetch("./data/mundane-items.json", { cache: "no-cache" });
     if (response.ok) {
       const data = await response.json();
       mundane = (Array.isArray(data) ? data : []).map(normalizeMundaneSourceItem);
@@ -1683,8 +1798,844 @@ function rememberedSheetCharacter(contextKey = sheetContextKey) {
   return localStorage.getItem(`pf_last_sheet_character_id_${contextKey}`) || "";
 }
 
+function classNameOf(definition) {
+  return definition?.name || definition?.class || "";
+}
+
+const CLASS_GROUPS = [
+  ["core", "Core"],
+  ["base", "Base"],
+  ["alternate", "Alternate"],
+  ["occult", "Occult"],
+  ["hybrid", "Hybrid"],
+  ["unchained", "Unchained"],
+  ["prestige", "Prestige"],
+  ["npc", "NPC"]
+];
+
+function classTypeOf(definition) {
+  return String(definition?.type || definition?.category || "base").toLowerCase();
+}
+
+function groupedClassOptions(definitions, selected = "") {
+  const selectedClass = String(selected || "");
+  return CLASS_GROUPS.map(([type, label]) => {
+    const options = definitions
+      .filter(definition => classTypeOf(definition) === type)
+      .sort((a, b) => classNameOf(a).localeCompare(classNameOf(b)));
+    if (!options.length) return "";
+    return `
+      <optgroup label="${escapeHtml(label)}">
+        ${options.map(definition => {
+          const name = classNameOf(definition);
+          return `<option value="${escapeHtml(name)}" ${name === selectedClass ? "selected" : ""}>${escapeHtml(name)}</option>`;
+        }).join("")}
+      </optgroup>
+    `;
+  }).join("");
+}
+
+function playableClassDefinitions() {
+  return classDefinitions.filter(definition => {
+    const type = classTypeOf(definition);
+    return classNameOf(definition) && !type.includes("prestige") && !type.includes("3rd");
+  });
+}
+
+async function loadClassDefinitions() {
+  if (classDefinitions.length) return classDefinitions;
+  try {
+    classDefinitions = await PFClassData.loadAllClasses();
+  } catch (error) {
+    console.warn("Could not load class data", error);
+    classDefinitions = [];
+  }
+  return classDefinitions;
+}
+
+function classDefinitionByName(name) {
+  const target = String(name || "").toLowerCase();
+  return classDefinitions.find(definition => classNameOf(definition).toLowerCase() === target) || null;
+}
+
+function normalizeClassProgression(raw = [], fallbackClass = "") {
+  const fallback = fallbackClass || "";
+  const byLevel = new Map((Array.isArray(raw) ? raw : []).map(row => [Number(row.level), row.className || row.class || ""]));
+  return Array.from({ length: 20 }, (_, index) => ({
+    level: index + 1,
+    className: byLevel.get(index + 1) || fallback
+  }));
+}
+
+function classLevelAt(definition, classLevel) {
+  const progression = definition?.levelProgression || definition?.levels || [];
+  return progression.find(row => Number(row.level) === Number(classLevel)) || null;
+}
+
+function progressionClassCounts(limit = Math.max(1, num("characterLevel"))) {
+  const counts = {};
+  classProgression.slice(0, Math.max(1, limit)).forEach(row => {
+    if (!row.className) return;
+    counts[row.className] = (counts[row.className] || 0) + 1;
+  });
+  return counts;
+}
+
+function collectClassFeatureBuffs() {
+  const limit = Math.max(1, num("characterLevel") || 1);
+  const counts = {};
+  const classLevels = progressionClassCounts(limit);
+  const buffs = [];
+  classProgression.slice(0, limit).forEach(row => {
+    const className = row.className;
+    if (!className) return;
+    counts[className] = (counts[className] || 0) + 1;
+    const classLevel = counts[className];
+    const definition = classDefinitionByName(className);
+    const levelData = classLevelAt(definition, classLevel);
+    const features = levelData?.classFeatures || levelData?.special || [];
+    features.forEach(feature => {
+      if (typeof feature === "string") return;
+      const context = {
+        category: "Class Feature",
+        sourceClass: className,
+        sourceClassLevel: classLevel,
+        characterLevel: limit,
+        classLevel,
+        classLevels,
+        casterLevel: classLevel,
+        permanent: true
+      };
+      if (Array.isArray(feature.effects) && feature.effects.length) {
+        buffs.push({
+          ...context,
+          name: feature.name || "Class Feature",
+          bonuses: feature.effects
+        });
+      }
+      featurePools(feature).forEach(pool => {
+        const key = classFeatureChoiceKey({
+          ...feature,
+          className,
+          classLevel,
+          characterLevel: row.level
+        }, pool, { className, classLevel, characterLevel: row.level });
+        const selected = classFeatureChoices[key];
+        const option = (pool.options || []).find(item => item.name === selected);
+        if (option && Array.isArray(option.effects) && option.effects.length) {
+          buffs.push({
+            ...context,
+            name: option.name || pool.name || "Class Feature Choice",
+            bonuses: option.effects
+          });
+        }
+      });
+    });
+  });
+  return buffs;
+}
+
+function calculationBuffs() {
+  return [...activeBuffs, ...collectClassFeatureBuffs()];
+}
+
+function computeClassProgressionTotals() {
+  const levelLimit = Math.max(1, Math.min(20, num("characterLevel") || 1));
+  const counts = {};
+  const totals = { bab: 0, fort: 0, reflex: 0, will: 0 };
+  classProgression.slice(0, levelLimit).forEach(row => {
+    const name = row.className;
+    if (!name) return;
+    counts[name] = (counts[name] || 0) + 1;
+    const definition = classDefinitionByName(name);
+    const current = classLevelAt(definition, counts[name]);
+    const previous = classLevelAt(definition, counts[name] - 1) || {};
+    totals.bab += Number(current?.bab ?? 0) - Number(previous?.bab ?? 0);
+    totals.fort += Number(current?.fort ?? current?.fortitude ?? 0) - Number(previous?.fort ?? previous?.fortitude ?? 0);
+    totals.reflex += Number(current?.ref ?? current?.reflex ?? 0) - Number(previous?.ref ?? previous?.reflex ?? 0);
+    totals.will += Number(current?.will ?? 0) - Number(previous?.will ?? 0);
+  });
+  return totals;
+}
+
+function applyClassProgressionStats() {
+  if (!classProgression.length || !classDefinitions.length) return;
+  const totals = computeClassProgressionTotals();
+  if (el("babBase")) el("babBase").value = totals.bab;
+  if (el("bab")) el("bab").value = totals.bab + num("babMisc");
+  if (el("fortBase")) el("fortBase").value = totals.fort;
+  if (el("reflexBase")) el("reflexBase").value = totals.reflex;
+  if (el("willBase")) el("willBase").value = totals.will;
+}
+
+function classOptions(selected = "") {
+  const classes = classDefinitions.filter(definition => classNameOf(definition));
+  return groupedClassOptions(classes, selected);
+}
+
+function renderLevelProgression() {
+  const root = el("levelProgressionRows");
+  if (!root) return;
+  if (!classDefinitions.length) {
+    root.innerHTML = `<div class="small-text">Class data is not loaded.</div>`;
+    return;
+  }
+  classProgression = normalizeClassProgression(classProgression);
+  root.innerHTML = classProgression.map((row, index) => {
+    const next = classProgression[index + 1];
+    const canDuplicate = row.level < 20 && row.className && next?.className !== row.className;
+    return `
+      <div class="progression-card">
+        <label for="classProgressionLevel${row.level}">Level ${row.level}</label>
+        <select id="classProgressionLevel${row.level}" class="form-select form-select-sm sheet-input" data-class-level="${row.level}">
+          ${classOptions(row.className)}
+        </select>
+        ${canDuplicate ? `
+          <div class="progression-actions">
+            <button class="btn btn-outline-info btn-sm" type="button" data-class-duplicate-next="${row.level}">Copy to Next</button>
+            <button class="btn btn-outline-info btn-sm" type="button" data-class-duplicate-rest="${row.level}">Copy to Rest</button>
+          </div>
+        ` : ""}
+      </div>
+    `;
+  }).join("");
+  root.querySelectorAll("[data-class-level]").forEach(select => {
+    select.addEventListener("change", () => {
+      const level = Number(select.dataset.classLevel);
+      const row = classProgression.find(item => item.level === level);
+      if (row) row.className = select.value;
+      updateClassDerivedViews();
+      recalculateSheet();
+      queueSheetSave();
+    });
+  });
+  root.querySelectorAll("[data-class-duplicate-next]").forEach(button => {
+    button.addEventListener("click", () => duplicateClassProgression(Number(button.dataset.classDuplicateNext), false));
+  });
+  root.querySelectorAll("[data-class-duplicate-rest]").forEach(button => {
+    button.addEventListener("click", () => duplicateClassProgression(Number(button.dataset.classDuplicateRest), true));
+  });
+}
+
+function duplicateClassProgression(level, rest = false) {
+  const source = classProgression.find(row => Number(row.level) === Number(level));
+  if (!source?.className || Number(level) >= 20) return;
+  classProgression.forEach(row => {
+    if (rest ? row.level > level : row.level === level + 1) {
+      row.className = source.className;
+    }
+  });
+  renderLevelProgression();
+  updateClassDerivedViews();
+  recalculateSheet();
+  queueSheetSave();
+}
+
+function updateClassLevelText() {
+  const counts = progressionClassCounts();
+  const text = Object.entries(counts).map(([name, level]) => `${name} ${level}`).join(" / ");
+  if (el("classLevel")) el("classLevel").value = text;
+}
+
+function capitalizedFeatureName(name = "") {
+  const text = String(name || "").trim();
+  return text ? text.charAt(0).toUpperCase() + text.slice(1) : "Class Feature";
+}
+
+function classFeatureScaleText(scale) {
+  if (!scale) return "";
+  const source = scale.source || { type: "caster" };
+  const sourceLabel = source.type === "character"
+    ? "character level"
+    : source.type === "class"
+      ? `${source.className || "class"} level`
+      : "caster level";
+  const parts = [];
+  const milestones = Array.isArray(scale.milestones) ? scale.milestones : [];
+  if (milestones.length) {
+    parts.push(milestones.map(milestone => `${sourceLabel} ${milestone.level}: ${signed(Number(milestone.value || 0))}`).join(", "));
+  }
+  const every = scale.every || {};
+  if (every.afterLevel && every.everyLevels && every.increase) {
+    parts.push(`after ${sourceLabel} ${every.afterLevel}, every ${every.everyLevels}: ${signed(Number(every.increase || 0))}`);
+  }
+  return parts.length ? `; scales ${parts.join("; ")}` : "";
+}
+
+function renderClassFeatureEffects(feature) {
+  const effects = Array.isArray(feature.effects) ? feature.effects : [];
+  if (!effects.length) return "";
+  return `
+    <div class="class-feature-effects">
+      ${effects.map(effect => {
+        const stat = titleCaseStat(effect.skillName || effect.stat || "effect");
+        const value = String(effect.stat || "").toLowerCase() === "remove dex bonus to ac"
+          ? "removes DEX bonus"
+          : `${signed(Number(effect.value || 0))} ${effect.type || "untyped"}`;
+        const conditional = effect.conditional ? ` (${effect.appliesWhen || "conditional"})` : "";
+        const stacks = effect.stacks ? "; stacks" : "";
+        const scale = classFeatureScaleText(effect.bonusScale || effect.scale);
+        return `<span class="class-feature-effect-pill">${escapeHtml(`${stat}: ${value}${conditional}${stacks}${scale}`)}</span>`;
+      }).join("")}
+    </div>
+  `;
+}
+
+function featurePools(feature) {
+  return Array.isArray(feature.pools) ? feature.pools : Array.isArray(feature.choicePools) ? feature.choicePools : [];
+}
+
+function requirementWarnings(requirements = {}, context = {}) {
+  const warnings = [];
+  const minClassLevel = Number(requirements.minClassLevel || requirements.minLevel || 0);
+  if (minClassLevel > 0 && Number(context.classLevel || 0) < minClassLevel) {
+    warnings.push(`requires ${context.className || "class"} level ${minClassLevel}`);
+  }
+  const race = String(requirements.race || "").trim();
+  if (race && String(el("race")?.value || "").trim().toLowerCase() !== race.toLowerCase()) {
+    warnings.push(`requires race: ${race}`);
+  }
+  const requiredChoices = Array.isArray(requirements.requiredChoices) ? requirements.requiredChoices : [];
+  const chosen = Object.values(classFeatureChoices || {}).map(String);
+  requiredChoices.forEach(choice => {
+    if (!chosen.some(value => classFeatureChoiceMatchesRequirement(choice, value))) warnings.push(`requires choice: ${choice}`);
+  });
+  if (requirements.text) warnings.push(requirements.text);
+  return warnings;
+}
+
+function normalizedClassFeatureChoice(value = "") {
+  return String(value)
+    .toLowerCase()
+    .replace(/\((?:ex|su|sp)\)/g, " ")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+function classFeatureChoiceMatchesRequirement(required = "", selected = "") {
+  const requiredText = normalizedClassFeatureChoice(required);
+  const selectedText = normalizedClassFeatureChoice(selected);
+  if (!requiredText || !selectedText) return false;
+  if (requiredText === selectedText) return true;
+  const requiredWords = requiredText.split(/\s+/).filter(word => !["rage", "power", "the"].includes(word));
+  const selectedWords = new Set(selectedText.split(/\s+/));
+  return requiredWords.length > 0 && requiredWords.every(word => selectedWords.has(word));
+}
+
+function requirementUnmetWarnings(requirements = {}, context = {}) {
+  const warnings = [];
+  const minClassLevel = Number(requirements.minClassLevel || requirements.minLevel || 0);
+  if (minClassLevel > 0 && Number(context.classLevel || 0) < minClassLevel) {
+    warnings.push(`requires ${context.className || "class"} level ${minClassLevel}`);
+  }
+  const race = String(requirements.race || "").trim();
+  if (race && String(el("race")?.value || "").trim().toLowerCase() !== race.toLowerCase()) {
+    warnings.push(`requires race: ${race}`);
+  }
+  const requiredChoices = Array.isArray(requirements.requiredChoices) ? requirements.requiredChoices : [];
+  const chosen = Object.values(classFeatureChoices || {}).map(String);
+  requiredChoices.forEach(choice => {
+    if (!chosen.some(value => classFeatureChoiceMatchesRequirement(choice, value))) warnings.push(`requires choice: ${choice}`);
+  });
+  return warnings;
+}
+
+function classFeatureChoiceKey(feature, pool, context = {}) {
+  return [
+    context.className || "",
+    context.characterLevel || "",
+    context.classLevel || "",
+    feature.name || "Class Feature",
+    pool.name || "Pool"
+  ].join("|");
+}
+
+function renderClassFeaturePools(feature) {
+  const pools = featurePools(feature);
+  if (!pools.length) return "";
+  return `
+    <div class="class-feature-pools">
+      ${pools.map(pool => {
+        const key = classFeatureChoiceKey(feature, pool, feature);
+        classFeatureChoicePickerConfigs.set(key, { feature, pool });
+        const selected = classFeatureChoices[key] || "";
+        return `
+          <div class="class-feature-pool">
+            <div class="class-feature-choice-row">
+              <div class="class-feature-choice-summary" title="${escapeHtml(selected || "No choice selected")}">${selected ? escapeHtml(selected) : `<span class="text-secondary">No choice selected</span>`}</div>
+              <button class="btn btn-outline-info btn-sm" type="button" data-class-feature-choice-button="${escapeHtml(key)}">Select</button>
+              ${selected ? `
+                <button class="btn btn-outline-danger btn-sm btn-icon" type="button" data-class-feature-choice-clear="${escapeHtml(key)}" aria-label="Clear ${escapeHtml(selected)}"><i class="bi bi-trash"></i></button>
+              ` : `<span></span>`}
+            </div>
+          </div>
+        `;
+      }).join("")}
+    </div>
+  `;
+}
+
+function renderClassFeatures() {
+  const root = el("classFeatureList");
+  if (!root) return;
+  classFeatureChoicePickerConfigs = new Map();
+  const counts = {};
+  const groups = new Map();
+  classProgression.slice(0, Math.max(1, num("characterLevel") || 1)).forEach(row => {
+    const definition = classDefinitionByName(row.className);
+    if (!definition) return;
+    counts[row.className] = (counts[row.className] || 0) + 1;
+    const classLevel = counts[row.className];
+    const levelData = classLevelAt(definition, classLevel);
+    const features = levelData?.classFeatures || levelData?.special || [];
+    if (!groups.has(row.level)) groups.set(row.level, []);
+    features.forEach(feature => {
+      const nextFeature = typeof feature === "string"
+        ? { className: row.className, classLevel, characterLevel: row.level, name: capitalizedFeatureName(feature), description: "" }
+        : { className: row.className, classLevel, characterLevel: row.level, name: capitalizedFeatureName(feature.name || "Class Feature"), description: feature.description || feature.desc || "", effects: Array.isArray(feature.effects) ? feature.effects : [], pools: featurePools(feature) };
+      groups.get(row.level).push(nextFeature);
+    });
+  });
+  const populated = [...groups.entries()].filter(([, features]) => features.length);
+  root.innerHTML = populated.length ? populated.map(([level, features]) => `
+    <section class="class-feature-item">
+      <div class="sheet-title mb-2">Level ${escapeHtml(level)}</div>
+      <div class="vstack gap-2">
+        ${features.map((feature, index) => {
+          const collapseId = `featureDescription${level}_${index}`;
+          return `
+            <article class="class-feature-row border rounded p-2">
+              <button class="btn btn-link text-start text-white p-0 text-decoration-none fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#${collapseId}" aria-expanded="false">
+                ${escapeHtml(feature.name)}
+              </button>
+              <div class="small-text">${escapeHtml(feature.className)} ${escapeHtml(feature.classLevel)}</div>
+              ${renderClassFeatureEffects(feature)}
+              ${renderClassFeaturePools(feature)}
+              <div id="${collapseId}" class="collapse small mt-2">${feature.description ? escapeHtml(feature.description) : "No description scraped."}</div>
+            </article>
+          `;
+        }).join("")}
+      </div>
+    </section>
+  `).join("") : `<div class="small-text">No class features listed for the current progression.</div>`;
+  root.querySelectorAll("[data-class-feature-choice-button]").forEach(button => {
+    button.addEventListener("click", async () => {
+      const key = button.dataset.classFeatureChoiceButton;
+      const config = classFeatureChoicePickerConfigs.get(key);
+      if (!config || !window.PFClassFeatureChoicePicker) return;
+      const { feature, pool } = config;
+      const selected = classFeatureChoices[key] || "";
+      const choice = await PFClassFeatureChoicePicker.open({
+        title: pool.name || "Choose Feature",
+        poolName: pool.name || "Class Feature",
+        description: pool.description || "",
+        selected,
+        poolWarnings: requirementWarnings(pool.requirements || {}, feature),
+        options: (pool.options || []).map(option => ({
+          ...option,
+          warnings: requirementWarnings(option.requirements || {}, feature),
+          unmet: requirementUnmetWarnings(option.requirements || {}, feature).length > 0
+        }))
+      });
+      if (choice === null) return;
+      if (choice) classFeatureChoices[key] = choice;
+      else delete classFeatureChoices[key];
+      renderClassFeatures();
+      queueSheetSave();
+    });
+  });
+  root.querySelectorAll("[data-class-feature-choice-clear]").forEach(button => {
+    button.addEventListener("click", () => {
+      const key = button.dataset.classFeatureChoiceClear;
+      delete classFeatureChoices[key];
+      renderClassFeatures();
+      queueSheetSave();
+    });
+  });
+}
+
+function spellAbilityMod(ability) {
+  const key = String(ability || "").toLowerCase().slice(0, 3);
+  if (!key || !el(`${key}Total`)) return 0;
+  const total = el(`${key}Total`).value || "";
+  const match = total.match(/\(([+-]?\d+)\)/);
+  if (match) return Number(match[1] || 0);
+  return window.PFBuffs?.abilityMod ? window.PFBuffs.abilityMod(Number(total || 10)) : Math.floor((Number(total || 10) - 10) / 2);
+}
+
+function bonusSlotsForSpellLevel(modifier, spellLevel) {
+  const level = Number(spellLevel || 0);
+  if (level <= 0 || modifier < level) return 0;
+  return 1 + Math.floor((modifier - level) / 4);
+}
+
+function spellcastingStateKey(className) {
+  return String(className || "Class").replace(/[^a-z0-9]+/gi, "_");
+}
+
+function spellcastingRowValue(rows, classLevel, spellLevel) {
+  const row = Array.isArray(rows) ? rows[Math.max(0, Number(classLevel || 1) - 1)] : null;
+  if (!Array.isArray(row)) return 0;
+  return Number(row[spellLevel] || 0);
+}
+
+function spellStateValue(className, bucket, spellLevel) {
+  const key = spellcastingStateKey(className);
+  const value = characterSpells?.[key]?.[bucket]?.[spellLevel];
+  if (Array.isArray(value)) return value;
+  if (typeof value === "string" && value.trim()) {
+    return value.split(/\n|,/).map(spell => spell.trim()).filter(Boolean);
+  }
+  return [];
+}
+
+function setSpellStateValue(className, bucket, spellLevel, spells, { unique = true } = {}) {
+  const key = spellcastingStateKey(className);
+  if (!characterSpells[key]) characterSpells[key] = {};
+  if (!characterSpells[key][bucket]) characterSpells[key][bucket] = {};
+  const values = unique ? (spells || []).filter(Boolean) : Array.from(spells || []).map(value => value || "");
+  characterSpells[key][bucket][spellLevel] = unique ? Array.from(new Set(values)).sort((a, b) => a.localeCompare(b)) : values;
+}
+
+function spellBucketLabel(bucket) {
+  return bucket === "book" ? "Known in book" : bucket === "known" ? "Known spells" : "Prepared today";
+}
+
+function spellExtraSlots(className, bucket, spellLevel) {
+  const key = spellcastingStateKey(className);
+  return Number(characterSpells?.[key]?.extraSlots?.[bucket]?.[spellLevel] || 0);
+}
+
+function addSpellExtraSlot(className, bucket, spellLevel) {
+  const key = spellcastingStateKey(className);
+  if (!characterSpells[key]) characterSpells[key] = {};
+  if (!characterSpells[key].extraSlots) characterSpells[key].extraSlots = {};
+  if (!characterSpells[key].extraSlots[bucket]) characterSpells[key].extraSlots[bucket] = {};
+  characterSpells[key].extraSlots[bucket][spellLevel] = spellExtraSlots(className, bucket, spellLevel) + 1;
+}
+
+function removeSpellExtraSlot(className, bucket, spellLevel, baseCount = 0, bonusCount = 0) {
+  const key = spellcastingStateKey(className);
+  const current = spellExtraSlots(className, bucket, spellLevel);
+  if (!current || !characterSpells[key]?.extraSlots?.[bucket]) return;
+  const nextExtra = current - 1;
+  characterSpells[key].extraSlots[bucket][spellLevel] = nextExtra;
+  const maxSlots = Math.max(0, Number(baseCount || 0)) + Math.max(0, Number(bonusCount || 0)) + nextExtra;
+  const nextSpells = spellStateValue(className, bucket, spellLevel).slice(0, maxSlots);
+  setSpellStateValue(className, bucket, spellLevel, nextSpells, { unique: bucket === "book" });
+}
+
+function renderSpellKnownList(className, bucket, spellLevel, options = {}) {
+  const spells = spellStateValue(className, bucket, spellLevel);
+  return `
+    <div class="spell-bucket${options.mobileActive ? " is-mobile-active" : ""}" data-spell-mobile-panel="${escapeHtml(bucket)}">
+      <div class="spell-bucket-title">${escapeHtml(spellBucketLabel(bucket))}</div>
+      <div class="spell-action-stack">
+        ${spells.map(spell => `
+          <div class="spell-selection-row">
+            <button class="btn btn-outline-info btn-sm" type="button" data-edit-known-spell="${escapeHtml(spell)}" data-spell-class-name="${escapeHtml(className)}" data-spell-bucket="${escapeHtml(bucket)}" data-spell-level="${spellLevel}" title="${escapeHtml(spell)}">${escapeHtml(spell)}</button>
+            <button class="btn btn-outline-danger btn-sm btn-icon" type="button" data-remove-spell="${escapeHtml(spell)}" data-spell-class-name="${escapeHtml(className)}" data-spell-bucket="${escapeHtml(bucket)}" data-spell-level="${spellLevel}" aria-label="Remove ${escapeHtml(spell)}"><i class="bi bi-trash"></i></button>
+          </div>
+        `).join("") || `<span class="small-text">None selected</span>`}
+        <button class="btn btn-outline-info btn-sm" type="button" data-add-spell data-spell-class-name="${escapeHtml(className)}" data-spell-bucket="${escapeHtml(bucket)}" data-spell-level="${spellLevel}">
+          <i class="bi bi-plus-lg"></i> Add Spell
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+function renderSpellSlotButtons(className, bucket, spellLevel, baseCount, bonusCount = 0, options = {}) {
+  const sourceBucket = options.sourceBucket || "";
+  const sourceCount = sourceBucket ? spellStateValue(className, sourceBucket, spellLevel).length : 0;
+  const extraCount = spellExtraSlots(className, bucket, spellLevel);
+  const total = Math.max(0, Number(baseCount || 0)) + Math.max(0, Number(bonusCount || 0)) + extraCount;
+  const spells = spellStateValue(className, bucket, spellLevel);
+  const extraLabel = options.extraLabel || "Extra Slot";
+  const removeExtraLabel = options.removeExtraLabel || "Remove Extra Slot";
+  return `
+    <div class="spell-bucket${options.mobileActive ? " is-mobile-active" : ""}" data-spell-mobile-panel="${escapeHtml(bucket)}">
+      <div class="spell-bucket-title">${escapeHtml(spellBucketLabel(bucket))}</div>
+      ${options.usageText ? `<div class="spell-casts-note">${escapeHtml(options.usageText)}</div>` : ""}
+      <div class="spell-action-stack">
+        ${Array.from({ length: total }, (_, index) => {
+          const name = spells[index] || "Choose Spell";
+          const bonus = index >= Number(baseCount || 0) && index < Number(baseCount || 0) + Number(bonusCount || 0);
+          const extra = index >= Number(baseCount || 0) + Number(bonusCount || 0);
+          const button = `<button class="btn btn-outline-info btn-sm spell-slot-button${bonus ? " bonus-slot" : ""}${extra ? " extra-slot" : ""}" type="button" data-pick-spell-slot="${index}" data-spell-current-name="${escapeHtml(spells[index] || "")}" data-spell-class-name="${escapeHtml(className)}" data-spell-bucket="${escapeHtml(bucket)}" data-spell-level="${spellLevel}" data-spell-source-bucket="${escapeHtml(sourceBucket)}" title="${escapeHtml(name)}" ${sourceBucket && !sourceCount ? "disabled" : ""}>${escapeHtml(name)}</button>`;
+          if (!spells[index]) return button;
+          return `
+            <div class="spell-selection-row">
+              ${button}
+              <button class="btn btn-outline-danger btn-sm btn-icon" type="button" data-clear-spell-slot="${index}" data-spell-class-name="${escapeHtml(className)}" data-spell-bucket="${escapeHtml(bucket)}" data-spell-level="${spellLevel}" aria-label="Clear ${escapeHtml(spells[index])}"><i class="bi bi-trash"></i></button>
+            </div>
+          `;
+        }).join("") || `<span class="small-text">No slots at this level.</span>`}
+        <button class="btn btn-outline-warning btn-sm" type="button" data-add-extra-spell-slot data-spell-class-name="${escapeHtml(className)}" data-spell-bucket="${escapeHtml(bucket)}" data-spell-level="${spellLevel}">
+          <i class="bi bi-plus-lg"></i> ${escapeHtml(extraLabel)}
+        </button>
+        ${extraCount ? `
+          <button class="btn btn-outline-danger btn-sm" type="button" data-remove-extra-spell-slot data-spell-class-name="${escapeHtml(className)}" data-spell-bucket="${escapeHtml(bucket)}" data-spell-level="${spellLevel}" data-spell-base-count="${Number(baseCount || 0)}" data-spell-bonus-count="${Number(bonusCount || 0)}">
+            <i class="bi bi-dash-lg"></i> ${escapeHtml(removeExtraLabel)}
+          </button>
+        ` : ""}
+      </div>
+      ${sourceBucket && !sourceCount ? `<div class="small-text">Add known spells at this level before preparing them.</div>` : ""}
+    </div>
+  `;
+}
+
+function spontaneousCastsPerDayText(spellLevel, base, bonus) {
+  if (Number(spellLevel || 0) === 0) return "Casts/day: at will";
+  const baseCount = Math.max(0, Number(base || 0));
+  const bonusCount = Math.max(0, Number(bonus || 0));
+  const total = baseCount + bonusCount;
+  return bonusCount
+    ? `Casts/day: ${total} (${baseCount} base + ${bonusCount} bonus)`
+    : `Casts/day: ${total}`;
+}
+
+function renderSpellbookBuckets(className, spellLevel, base, bonus, options = {}) {
+  const tabGroup = `${spellcastingStateKey(className)}_${spellLevel}`;
+  return `
+    <div class="spell-dual-buckets" data-spell-mobile-group="${escapeHtml(tabGroup)}">
+      <div class="spell-mobile-tabs" role="group" aria-label="${escapeHtml(className)} level ${spellLevel} spells">
+        <button class="btn btn-info btn-sm" type="button" data-spell-mobile-tab="book" data-spell-mobile-group="${escapeHtml(tabGroup)}">Known</button>
+        <button class="btn btn-outline-info btn-sm" type="button" data-spell-mobile-tab="prepared" data-spell-mobile-group="${escapeHtml(tabGroup)}">Prepared</button>
+      </div>
+      ${renderSpellKnownList(className, "book", spellLevel, { mobileActive: true })}
+      ${renderSpellSlotButtons(className, "prepared", spellLevel, base, bonus, { sourceBucket: "book", usageText: options.usageText || "" })}
+    </div>
+  `;
+}
+
+function renderSpellRows(className, meta, classLevel, mode) {
+  const maxLevel = Number(meta.maxSpellLevel ?? 9);
+  const abilityMod = spellAbilityMod(meta.ability);
+  const hasZeroLevelSpells = ZERO_LEVEL_SPELL_CLASSES.has(String(className || "").toLowerCase());
+  const rows = [];
+  for (let spellLevel = 0; spellLevel <= maxLevel; spellLevel += 1) {
+    const base = spellcastingRowValue(meta.slotsByLevel, classLevel, spellLevel);
+    const preparedBase = spellcastingRowValue(meta.preparedByLevel, classLevel, spellLevel);
+    const knownLimit = spellcastingRowValue(meta.knownByLevel, classLevel, spellLevel);
+    const bonus = bonusSlotsForSpellLevel(abilityMod, spellLevel);
+    if (spellLevel === 0 && !hasZeroLevelSpells) continue;
+    if (!base && !knownLimit && !preparedBase && spellLevel > 0) continue;
+    const preparedCount = preparedBase || base;
+    const preparedBonus = preparedBase ? 0 : bonus;
+    const castUsage = preparedBase
+      ? spontaneousCastsPerDayText(spellLevel, base, spellLevel === 0 ? 0 : bonus)
+      : "";
+    const notes = mode === "spontaneous"
+      ? renderSpellSlotButtons(className, "known", spellLevel, knownLimit, 0, {
+          usageText: spontaneousCastsPerDayText(spellLevel, base, bonus),
+          extraLabel: "Extra Known Spell",
+          removeExtraLabel: "Remove Extra Known Spell"
+        })
+      : mode === "spellbook"
+        ? renderSpellbookBuckets(className, spellLevel, preparedCount, preparedBonus, { usageText: castUsage })
+        : renderSpellSlotButtons(className, "prepared", spellLevel, base, bonus);
+    rows.push(`
+      <div class="spell-row">
+        <div><div class="spell-level-number">${spellLevel}</div></div>
+        <div class="spell-notes">${notes}</div>
+      </div>
+    `);
+  }
+  return rows.join("") || `<div class="small-text">No spell levels available at this class level.</div>`;
+}
+
+function renderSpellProgression() {
+  const root = el("spellProgressionList");
+  if (!root) return;
+  const counts = progressionClassCounts();
+  const rows = Object.entries(counts).map(([name, level]) => {
+    const definition = classDefinitionByName(name);
+    const meta = definition?.spellcasting;
+    if (!definition?.spellcastingClass || !meta || typeof meta !== "object") return "";
+    const mode = meta.preparation || (meta.castingType === "spontaneous" ? "spontaneous" : "daily-list");
+    const ability = String(meta.ability || "").toUpperCase() || "N/A";
+    const abilityMod = spellAbilityMod(meta.ability);
+    return `
+      <article class="spellcasting-card">
+        <h5 class="mb-0">${escapeHtml(name)} ${escapeHtml(level)}</h5>
+        <div class="spellcasting-meta">
+          <span>${escapeHtml(meta.castingType || "spellcasting")}</span>
+          <span>${escapeHtml(meta.progression || "progression unknown")}</span>
+          <span>${escapeHtml(ability)} ${signed(abilityMod)}</span>
+          <span>${escapeHtml(mode === "spellbook" ? "book + prepared" : mode === "spontaneous" ? "spontaneous" : "daily prepared")}</span>
+        </div>
+        <div class="spell-grid-table">${renderSpellRows(name, meta, level, mode)}</div>
+      </article>
+    `;
+  }).filter(Boolean);
+  root.innerHTML = rows.length ? rows.join("") : "No spellcasting data listed for the current progression.";
+  root.querySelectorAll("[data-spell-mobile-tab]").forEach(button => {
+    button.addEventListener("click", () => {
+      const group = button.getAttribute("data-spell-mobile-group") || "";
+      const target = button.getAttribute("data-spell-mobile-tab") || "";
+      const wrapper = [...root.querySelectorAll("[data-spell-mobile-group]")]
+        .find(candidate => candidate.getAttribute("data-spell-mobile-group") === group);
+      if (!wrapper) return;
+      wrapper.querySelectorAll("[data-spell-mobile-tab]").forEach(tab => {
+        const active = tab.getAttribute("data-spell-mobile-tab") === target;
+        tab.classList.toggle("btn-info", active);
+        tab.classList.toggle("btn-outline-info", !active);
+      });
+      wrapper.querySelectorAll("[data-spell-mobile-panel]").forEach(panel => {
+        panel.classList.toggle("is-mobile-active", panel.getAttribute("data-spell-mobile-panel") === target);
+      });
+    });
+  });
+  root.querySelectorAll("[data-add-spell]").forEach(button => {
+    button.addEventListener("click", async () => {
+      const className = button.dataset.spellClassName;
+      const bucket = button.dataset.spellBucket;
+      const spellLevel = Number(button.dataset.spellLevel || 0);
+      const selected = spellStateValue(className, bucket, spellLevel);
+      const spell = await PFSpellPicker.open({
+        title: `${className} ${spellLevel}: ${spellBucketLabel(bucket)}`,
+        className,
+        spellLevel,
+        selected
+      });
+      if (!spell?.name) return;
+      setSpellStateValue(className, bucket, spellLevel, [...selected, spell.name]);
+      renderSpellProgression();
+      queueSheetSave();
+    });
+  });
+  root.querySelectorAll("[data-pick-spell-slot]").forEach(button => {
+    button.addEventListener("click", async () => {
+      const className = button.getAttribute("data-spell-class-name") || "";
+      const bucket = button.getAttribute("data-spell-bucket") || "";
+      const spellLevel = Number(button.getAttribute("data-spell-level") || 0);
+      const slotIndex = Number(button.getAttribute("data-pick-spell-slot") || 0);
+      const sourceBucket = button.getAttribute("data-spell-source-bucket") || "";
+      const currentName = button.getAttribute("data-spell-current-name") || "";
+      const selected = spellStateValue(className, bucket, spellLevel);
+      const allowedNames = sourceBucket ? spellStateValue(className, sourceBucket, spellLevel) : null;
+      const spell = await PFSpellPicker.open({
+        title: `${className} ${spellLevel}: ${spellBucketLabel(bucket)}`,
+        className,
+        spellLevel,
+        selected: selected.filter(Boolean),
+        allowedNames,
+        allowDuplicates: bucket === "prepared",
+        initialSpellName: currentName,
+        emptyMessage: sourceBucket
+          ? `No known ${className} level ${spellLevel} spells are available to prepare.`
+          : ""
+      });
+      if (!spell?.name) return;
+      const next = [...selected];
+      next[slotIndex] = spell.name;
+      setSpellStateValue(className, bucket, spellLevel, next, { unique: bucket === "book" });
+      renderSpellProgression();
+      queueSheetSave();
+    });
+  });
+  root.querySelectorAll("[data-edit-known-spell]").forEach(button => {
+    button.addEventListener("click", async () => {
+      const className = button.getAttribute("data-spell-class-name") || "";
+      const bucket = button.getAttribute("data-spell-bucket") || "";
+      const spellLevel = Number(button.getAttribute("data-spell-level") || 0);
+      const spellName = button.getAttribute("data-edit-known-spell") || "";
+      const selected = spellStateValue(className, bucket, spellLevel);
+      const spell = await PFSpellPicker.open({
+        title: `${className} ${spellLevel}: ${spellBucketLabel(bucket)}`,
+        className,
+        spellLevel,
+        selected,
+        initialSpellName: spellName
+      });
+      if (!spell?.name) return;
+      const next = selected.map(current => current === spellName ? spell.name : current);
+      setSpellStateValue(className, bucket, spellLevel, next);
+      renderSpellProgression();
+      queueSheetSave();
+    });
+  });
+  root.querySelectorAll("[data-clear-spell-slot]").forEach(button => {
+    button.addEventListener("click", () => {
+      const className = button.getAttribute("data-spell-class-name") || "";
+      const bucket = button.getAttribute("data-spell-bucket") || "";
+      const spellLevel = Number(button.getAttribute("data-spell-level") || 0);
+      const slotIndex = Number(button.getAttribute("data-clear-spell-slot") || 0);
+      const next = [...spellStateValue(className, bucket, spellLevel)];
+      next[slotIndex] = "";
+      setSpellStateValue(className, bucket, spellLevel, next, { unique: false });
+      renderSpellProgression();
+      queueSheetSave();
+    });
+  });
+  root.querySelectorAll("[data-add-extra-spell-slot]").forEach(button => {
+    button.addEventListener("click", () => {
+      addSpellExtraSlot(button.getAttribute("data-spell-class-name") || "", button.getAttribute("data-spell-bucket") || "", Number(button.getAttribute("data-spell-level") || 0));
+      renderSpellProgression();
+      queueSheetSave();
+    });
+  });
+  root.querySelectorAll("[data-remove-extra-spell-slot]").forEach(button => {
+    button.addEventListener("click", () => {
+      removeSpellExtraSlot(
+        button.getAttribute("data-spell-class-name") || "",
+        button.getAttribute("data-spell-bucket") || "",
+        Number(button.getAttribute("data-spell-level") || 0),
+        Number(button.getAttribute("data-spell-base-count") || 0),
+        Number(button.getAttribute("data-spell-bonus-count") || 0)
+      );
+      renderSpellProgression();
+      queueSheetSave();
+    });
+  });
+  root.querySelectorAll("[data-remove-spell]").forEach(button => {
+    button.addEventListener("click", () => {
+      const className = button.dataset.spellClassName;
+      const bucket = button.dataset.spellBucket;
+      const spellLevel = Number(button.dataset.spellLevel || 0);
+      const next = spellStateValue(className, bucket, spellLevel).filter(spell => spell !== button.dataset.removeSpell);
+      setSpellStateValue(className, bucket, spellLevel, next);
+      if (bucket === "book") {
+        const prepared = spellStateValue(className, "prepared", spellLevel).filter(spell => spell !== button.dataset.removeSpell);
+        setSpellStateValue(className, "prepared", spellLevel, prepared);
+      }
+      renderSpellProgression();
+      queueSheetSave();
+    });
+  });
+}
+
+function updateClassDerivedViews() {
+  applyClassProgressionStats();
+  updateClassLevelText();
+  renderClassFeatures();
+  renderSpellProgression();
+}
+
+function setSheetInfoTab(tab) {
+  activeSheetInfoTab = tab || "character";
+  const isCharacter = activeSheetInfoTab === "character";
+  el("sheetInfoTabs")?.classList.toggle("d-none", isCharacter);
+  document.querySelectorAll("[data-sheet-info-panel]").forEach(panel => panel.classList.toggle("d-none", panel.dataset.sheetInfoPanel !== activeSheetInfoTab));
+  document.querySelector(".view-tabs")?.classList.toggle("d-none", !isCharacter);
+  document.querySelector(".sheet-page-effects-row")?.classList.toggle("d-none", !isCharacter);
+  document.querySelectorAll("[data-sheet-info-tab]").forEach(button => {
+    const active = button.dataset.sheetInfoTab === activeSheetInfoTab;
+    button.classList.toggle("btn-primary", active);
+    button.classList.toggle("btn-outline-primary", !active);
+  });
+  if (isCharacter) {
+    setSheetView(sheetViewMode);
+  } else {
+    el("fullSheetView")?.classList.remove("d-none");
+    el("simplifiedSheetView")?.classList.add("d-none");
+  }
+}
+
 function sheetToBaseline() {
   const gearAc = calculateGearAc();
+  const classLevels = progressionClassCounts(Math.max(1, num("characterLevel") || 1));
   return {
     str: num("strScore"),
     dex: num("dexScore"),
@@ -1694,6 +2645,9 @@ function sheetToBaseline() {
     cha: num("chaScore"),
     bab: num("bab"),
     hitPoints: num("hitPoints"),
+    level: Math.max(1, num("characterLevel") || 1),
+    characterLevel: Math.max(1, num("characterLevel") || 1),
+    classLevels,
     hitDice: Math.max(1, num("characterLevel")),
     armor: gearAc.armor,
     shield: gearAc.shield,
@@ -1702,9 +2656,9 @@ function sheetToBaseline() {
     acMisc: num("acMisc"),
     cmbMisc: num("cmbMisc"),
     cmdMisc: num("cmdMisc"),
-    fortBase: num("fortBase"),
-    reflexBase: num("reflexBase"),
-    willBase: num("willBase"),
+    fortBase: num("fortBase") + num("fortMisc"),
+    reflexBase: num("reflexBase") + num("reflexMisc"),
+    willBase: num("willBase") + num("willMisc"),
     initMisc: num("initMisc"),
     sizeAc: 0,
     sizeCombat: 0
@@ -1736,16 +2690,19 @@ function buildSheet() {
     <tr>
       <th>${label}</th>
       <td><input id="${key}Total" class="form-control form-control-sm total-first-input" readonly></td>
-      <td><input id="${key}Base" class="form-control form-control-sm sheet-input" type="number" value="0"></td>
+      <td><input id="${key}Base" class="form-control form-control-sm no-spinner" inputmode="numeric" value="0" readonly></td>
+      <td><input id="${key}Misc" class="form-control form-control-sm sheet-input" type="number" value="0"></td>
       <td><input id="${key}Ability" class="form-control form-control-sm" readonly></td>
       <td><input id="${key}Buff" class="form-control form-control-sm buff-field" readonly></td>
     </tr>
     <tr>
-      <td colspan="5"><div class="small-text calc-line" data-calc-for="${key}Total"></div></td>
+      <td colspan="6"><div class="small-text calc-line" data-calc-for="${key}Total"></div></td>
     </tr>
   `).join("");
 
   renderSkillRows();
+  renderLevelProgression();
+  setSheetInfoTab(activeSheetInfoTab);
 }
 
 function renderSkillRows(saved = {}) {
@@ -1832,6 +2789,7 @@ function addWeapon(data = {}) {
   const weaponType = data.weaponType || data.weapon_type || "Melee Weapon (One-Handed)";
   const enhancement = data.enhancement || "0";
   const enchantment = data.enchantment || "";
+  const specialMaterial = data.specialMaterial || data.special_material || "";
   card.innerHTML = `
     <div class="equipment-card-header">
       ${inventoryBacked
@@ -1857,6 +2815,12 @@ function addWeapon(data = {}) {
         <label>Enchantment</label>
         <select data-field="enchantment" class="form-select form-select-sm sheet-input">
           ${optionList(WEAPON_ENCHANTMENTS, enchantment)}
+        </select>
+      </div>
+      <div>
+        <label>Special Material</label>
+        <select data-field="specialMaterial" class="form-select form-select-sm sheet-input">
+          ${optionList(PFItemEditor.WEAPON_SPECIAL_MATERIALS, specialMaterial)}
         </select>
       </div>
     </div>
@@ -1986,6 +2950,7 @@ function addArmor(data = {}) {
   const itemName = data.item || `Armor / Shield ${i + 1}`;
   const enhancement = data.enhancement || "0";
   const enchantment = data.enchantment || "";
+  const specialMaterial = data.specialMaterial || data.special_material || "";
   card.innerHTML = `
     <div class="equipment-card-header">
       <input data-field="item" class="form-control form-control-sm sheet-input fw-semibold equipment-name-input" value="${escapeHtml(itemName)}">
@@ -2005,6 +2970,12 @@ function addArmor(data = {}) {
         <label>Enchantment</label>
         <select data-field="enchantment" class="form-select form-select-sm sheet-input">
           ${armorEnchantmentOptions(enchantment)}
+        </select>
+      </div>
+      <div>
+        <label>Special Material</label>
+        <select data-field="specialMaterial" class="form-select form-select-sm sheet-input">
+          ${optionList(PFItemEditor.ARMOR_SPECIAL_MATERIALS, specialMaterial)}
         </select>
       </div>
     </div>
@@ -2111,6 +3082,7 @@ function updateWornCardFromLoot(item) {
     weaponCard.querySelector('[data-field="misfire"]').value = details.misfire || "";
     weaponCard.querySelector('[data-field="enhancement"]').value = details.enhancement || "0";
     weaponCard.querySelector('[data-field="enchantment"]').value = details.enchantment || "";
+    weaponCard.querySelector('[data-field="specialMaterial"]').value = details.specialMaterial || "";
     const previousType = weaponCard.querySelector('[data-field="weaponType"]').value || "";
     const nextType = details.weaponType || "Melee Weapon (One-Handed)";
     weaponCard.querySelector('[data-field="weaponType"]').value = nextType;
@@ -2126,6 +3098,7 @@ function updateWornCardFromLoot(item) {
     armorCard.querySelector('[data-field="bonus"]').value = details.bonus || "0";
     armorCard.querySelector('[data-field="enhancement"]').value = details.enhancement || "0";
     armorCard.querySelector('[data-field="enchantment"]').value = details.enchantment || "";
+    armorCard.querySelector('[data-field="specialMaterial"]').value = details.specialMaterial || "";
   }
 
   if (gearCard && !["Weapon", "Armor", "Shield"].includes(item.type)) {
@@ -2147,6 +3120,7 @@ function updateWornCardFromLoot(item) {
       damageScale: details.damageScale || "STR",
       enhancement: details.enhancement || "0",
       enchantment: details.enchantment || "",
+      specialMaterial: details.specialMaterial || "",
       type: details.details || "",
       critical: details.critical || "",
       capacity: details.capacity || "",
@@ -2161,7 +3135,8 @@ function updateWornCardFromLoot(item) {
       type: item.type,
       bonus: details.bonus || "0",
       enhancement: details.enhancement || "0",
-      enchantment: details.enchantment || ""
+      enchantment: details.enchantment || "",
+      specialMaterial: details.specialMaterial || ""
     });
   } else if (!["Weapon", "Armor", "Shield"].includes(item.type) && !gearCard) {
     weaponCard?.remove();
@@ -2475,7 +3450,7 @@ function formatBreakdown(items = [], currentTotal = "") {
 function updateAppliedBuffsToggle() {
   const btn = el("showAppliedBuffsToggle");
   if (!btn) return;
-  btn.textContent = showCalculations ? "Hide Applied Buffs" : "Show Applied Buffs";
+  btn.textContent = showCalculations ? "Hide Effects" : "Show Effects";
   btn.classList.toggle("btn-info", showCalculations);
   btn.classList.toggle("btn-outline-info", !showCalculations);
 }
@@ -2488,11 +3463,13 @@ function toggleAppliedBuffs() {
 }
 
 function recalculateSheet() {
+  updateClassDerivedViews();
+  if (el("bab")) el("bab").value = num("babBase") + num("babMisc");
   const gearAc = calculateGearAc();
   syncArmorCardsDisplay();
   el("acArmor").value = gearAc.armor;
   el("acShield").value = gearAc.shield;
-  const buffed = window.PFBuffs?.calculateStatsDetailed(activeBuffs, sheetToBaseline());
+  const buffed = window.PFBuffs?.calculateStatsDetailed(calculationBuffs(), sheetToBaseline());
   const buffTotals = buffed?.totals || {};
   const buffBonuses = buffed?.bonuses || {};
   const buffBreakdown = buffed?.breakdown || {};
@@ -2534,9 +3511,10 @@ function recalculateSheet() {
   [["fort","con",con],["reflex","dex",dex],["will","wis",wis]].forEach(([key, abilityKey, abilityValue]) => {
     el(`${key}Ability`).value = signed(abilityValue);
     const buffKey = { fort: "fortitude", reflex: "reflex", will: "will" }[key];
+    const saveBaseTotal = num(`${key}Base`) + num(`${key}Misc`);
     el(`${key}Buff`).value = signed(buffBonuses[buffKey] || 0);
-    el(`${key}Total`).value = buffTotals[buffKey] !== undefined ? signed(buffTotals[buffKey]) : signed(num(`${key}Base`) + abilityValue);
-    setCalc(`${key}Total`, `base ${signed(num(`${key}Base`))} + ${abilityKey.toUpperCase()} ${signed(abilityValue)} + buffs ${signed(buffBonuses[buffKey] || 0)}`, combinedBreakdowns(buffed, [
+    el(`${key}Total`).value = buffTotals[buffKey] !== undefined ? signed(buffTotals[buffKey]) : signed(saveBaseTotal + abilityValue);
+    setCalc(`${key}Total`, `base ${signed(num(`${key}Base`))} + misc ${signed(num(`${key}Misc`))} + ${abilityKey.toUpperCase()} ${signed(abilityValue)} + buffs ${signed(buffBonuses[buffKey] || 0)}`, combinedBreakdowns(buffed, [
       { stat: ABILITY_STAT_NAMES[abilityKey], detail: `affects ${buffKey} through ${abilityKey.toUpperCase()}` },
       buffKey
     ]));
@@ -2652,6 +3630,7 @@ async function openEffectTrackerModal() {
 
   if (!effectTrackerInstance) {
     effectTrackerInstance = PFEffectTracker.mount(mount, options);
+    await effectTrackerInstance.ready;
   } else {
     await effectTrackerInstance.refresh(options);
   }
@@ -2662,6 +3641,7 @@ function renderInventoryAttributes(item) {
   const rows = [];
   if (item.type === "Weapon") {
     rows.push(["Weapon Type", details.weaponType || "Melee Weapon (One-Handed)"]);
+    if (details.specialMaterial) rows.push(["Material", details.specialMaterial]);
     rows.push(["Attack Scales", details.attackScale || "STR"]);
     if (details.damage) rows.push(["Damage", details.damage]);
     if (details.critical) rows.push(["Critical", details.critical]);
@@ -2673,6 +3653,7 @@ function renderInventoryAttributes(item) {
     if (details.details) rows.push(["Details", details.details]);
   } else if (["Armor", "Shield"].includes(item.type)) {
     rows.push(["Bonus", signed(Number(details.bonus || 0))]);
+    if (details.specialMaterial) rows.push(["Material", details.specialMaterial]);
     rows.push(["Enhancement", signed(Number(details.enhancement || 0))]);
     if (details.enchantment) rows.push(["Enchantment", details.enchantment]);
   }
@@ -2886,6 +3867,7 @@ function collectInventoryDetails() {
       damageScale: el("inventoryDamageScale").value.trim() || "STR",
       enhancement: el("inventoryWeaponEnhancement").value || "0",
       enchantment: el("inventoryWeaponEnchantment").value.trim(),
+      specialMaterial: el("inventorySpecialMaterial").value,
       details: el("inventoryWeaponDetails").value.trim()
     };
     if (isFirearmWeaponType(weaponType)) {
@@ -2899,7 +3881,8 @@ function collectInventoryDetails() {
       ...slotDetails,
       bonus: el("inventoryArmorBonus").value || "0",
       enhancement: el("inventoryArmorEnhancement").value || "0",
-      enchantment: el("inventoryArmorEnchantment").value.trim()
+      enchantment: el("inventoryArmorEnchantment").value.trim(),
+      specialMaterial: el("inventorySpecialMaterial").value
     };
   }
   return slotDetails;
@@ -2932,6 +3915,7 @@ function openInventoryItemEditor(itemId) {
   el("inventoryArmorBonus").value = details.bonus || "0";
   el("inventoryArmorEnhancement").value = details.enhancement || "0";
   el("inventoryArmorEnchantment").value = details.enchantment || "";
+  PFItemEditor.syncSpecialMaterialForType(inventoryEditorConfig(), details.specialMaterial || "");
   el("inventoryEffectRows").innerHTML = "";
   (Array.isArray(item.effects) ? item.effects : []).forEach(effect => addInventoryEffectRow(effect));
   toggleInventoryDetailFields();
@@ -3542,11 +4526,14 @@ function collectSheet() {
   const sheet = { fields: {}, abilities: {}, saves: {}, skills: {}, weapons: collectCards("weaponRows"), armor: collectCards("armorRows"), gear: collectCards("gearRows") };
   sheet.preferences = { showAppliedBuffs: showCalculations };
   sheet.customSkills = customSkills;
+  sheet.classFeatureChoices = classFeatureChoices;
+  sheet.classProgression = classProgression.map(row => ({ level: row.level, className: row.className }));
+  sheet.spells = characterSpells;
   if (isEnemySheetMode) sheet.enemyInventory = characterInventoryItems.map(item => ({ ...item, assigned_character_id: currentSheetId }));
   sheet.calculated = collectCalculatedSummary();
   SIMPLE_FIELDS.forEach(id => sheet.fields[id] = el(id)?.value || "");
   ABILITIES.forEach(([key]) => sheet.abilities[key] = { score: el(`${key}Score`).value });
-  SAVES.forEach(([key]) => sheet.saves[key] = { base: el(`${key}Base`).value });
+  SAVES.forEach(([key]) => sheet.saves[key] = { base: el(`${key}Base`).value, misc: el(`${key}Misc`).value });
   allSkills().forEach(([skill]) => {
     const id = skillId(skill);
     sheet.skills[id] = {
@@ -3573,12 +4560,25 @@ function restoreSheet(sheet) {
     el("currentHitPoints").value = data.fields?.hitPointsTotal || data.fields?.hitPoints || 0;
   }
   Object.entries(data.abilities || {}).forEach(([key, value]) => { if (el(`${key}Score`)) el(`${key}Score`).value = value.score || 10; });
-  Object.entries(data.saves || {}).forEach(([key, value]) => { if (el(`${key}Base`)) el(`${key}Base`).value = value.base || 0; });
+  Object.entries(data.saves || {}).forEach(([key, value]) => {
+    if (el(`${key}Base`)) el(`${key}Base`).value = value.base || 0;
+    if (el(`${key}Misc`)) el(`${key}Misc`).value = value.misc || 0;
+  });
   customSkills = Array.isArray(data.customSkills) ? data.customSkills : [];
+  classFeatureChoices = data.classFeatureChoices && typeof data.classFeatureChoices === "object" ? data.classFeatureChoices : {};
+  characterSpells = data.spells && typeof data.spells === "object" ? data.spells : {};
+  classProgression = normalizeClassProgression(data.classProgression || data.classes || [], data.fields?.classLevel?.split(/\s+\d+$/)[0] || "");
+  if (!Array.isArray(data.classProgression)) {
+    if (data.fields?.bab !== undefined && el("babMisc")) el("babMisc").value = data.fields.bab;
+    Object.entries(data.saves || {}).forEach(([key, value]) => {
+      if (el(`${key}Misc`) && value?.misc === undefined) el(`${key}Misc`).value = value.base || 0;
+    });
+  }
   characterInventoryItems = isEnemySheetMode && Array.isArray(data.enemyInventory)
     ? data.enemyInventory.map(item => ({ ...item, assigned_character_id: currentSheetId }))
     : [];
   renderSkillRows(data.skills || {});
+  renderLevelProgression();
   Object.entries(data.skills || {}).forEach(([id, value]) => {
     if (el(`${id}Ability`)) el(`${id}Ability`).value = value.ability || 0;
     if (el(`${id}Ranks`)) el(`${id}Ranks`).value = value.ranks || 0;
@@ -3606,6 +4606,7 @@ function restoreSheet(sheet) {
     if (!Number(armorBonus || 0) && !Number(shieldBonus || 0)) addArmor();
   }
   updateCharacterImagePreview();
+  updateClassDerivedViews();
   recalculateSheet();
   isRestoringSheet = false;
 }
@@ -3648,14 +4649,20 @@ function attachInputListeners(root = document) {
 
 function queueSheetSave() {
   if (isRestoringSheet) return;
-  if (!isEnemySheetMode && currentSheetOwnerId && currentSheetOwnerId !== currentUserId) return;
+  if (!isSheetEditable()) return;
   clearTimeout(sheetSaveTimer);
   sheetSaveTimer = setTimeout(() => saveSheetNow(true), 500);
 }
 
+function isSheetEditable() {
+  if (isEnemySheetMode) return true;
+  if (!currentSheetOwnerId) return true;
+  return currentSheetOwnerId === currentUserId || currentUserIsAdmin;
+}
+
 async function saveSheetNow(silent = false) {
-  if (!isEnemySheetMode && currentSheetOwnerId && currentSheetOwnerId !== currentUserId) {
-    if (!silent) setStatus("You can view this campaign character, but only its owner can save changes.", "warning");
+  if (!isSheetEditable()) {
+    if (!silent) setStatus("You can view this campaign character, but only its owner or an admin can save changes.", "warning");
     return;
   }
 
@@ -3727,7 +4734,7 @@ async function loadCurrentSheet(sheetId = currentSheetId) {
     el("characterName").value = saved.character_name;
     await loadCharacterInventory();
     setStatus(
-      currentSheetOwnerId !== currentUserId
+      currentSheetOwnerId !== currentUserId && !currentUserIsAdmin
         ? "Campaign character loaded in view-only mode."
         : "Character sheet loaded.",
       "info"
@@ -3811,6 +4818,8 @@ function inventoryEditorConfig() {
     slotFieldId: "inventorySlotField",
     typeInputId: "inventoryItemType",
     descriptionId: "inventoryItemDescription",
+    materialFieldId: "inventorySpecialMaterialField",
+    materialInputId: "inventorySpecialMaterial",
     slots: ITEM_SLOTS,
     onSlotChange: updateInventorySlotPreview
   };
@@ -3822,7 +4831,9 @@ async function initCharacterSheet() {
   sheetContextKey = await PFApp.requireGameContext();
   if (!sheetContextKey) return;
   currentUserId = user.id;
+  currentUserIsAdmin = await PFApp.isAppAdmin?.() || false;
   currentSheetOwnerId = user.id;
+  await loadClassDefinitions();
   const params = new URLSearchParams(window.location.search);
   const bridgeMode = params.get("bridge") === "1";
   const requestedCharacterId = params.get("characterId") || "";
@@ -3892,6 +4903,20 @@ async function initCharacterSheet() {
   });
   updateCharacterImagePreview();
   PFItemEditor.init(inventoryEditorConfig());
+  document.querySelectorAll("[data-sheet-info-tab]").forEach(button => {
+    button.addEventListener("click", () => setSheetInfoTab(button.dataset.sheetInfoTab));
+  });
+  effectTrackerModal = bootstrap.Modal.getOrCreateInstance(el("effectTrackerModal"));
+  el("openEffectTrackerButton").addEventListener("click", async event => {
+    const button = event.currentTarget;
+    button.disabled = true;
+    try {
+      await openEffectTrackerModal();
+      effectTrackerModal.show();
+    } finally {
+      button.disabled = false;
+    }
+  });
   el("characterName").addEventListener("change", async () => {
     if (isEnemySheetMode) return;
     const saved = await PFApp.loadCharacterSheet(el("characterName").value.trim(), sheetContextKey);

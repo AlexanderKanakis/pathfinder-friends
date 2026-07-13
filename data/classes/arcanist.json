@@ -1,0 +1,1014 @@
+{
+  "name": "Arcanist",
+  "type": "hybrid",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/hybrid-classes/arcanist/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Arcane Reservoir",
+          "description": "An arcanist has an innate pool of magical energy that she can draw upon to fuel her arcanist exploits and enhance her spells. The arcanist's arcane reservoir can hold a maximum amount of magical energy equal to 3 + the arcanist's level. Each day, when preparing spells, the arcanist's arcane reservoir fills with raw magical energy, gaining a number of points equal to 3 + 1/2 her arcanist level. Any points she had from the previous day are lost. She can also regain these points through the consume spells class feature and some arcanist exploits. The arcane reservoir can never hold more points than the maximum amount noted above; points gained in excess of this total are lost. Points from the arcanist reservoir are used to fuel many of the arcanist's powers. In addition, the arcanist can expend 1 point from her arcane reservoir as a free action whenever she casts an arcanist spell. If she does, she can choose to increase the caster level by 1 or increase the spell's DC by 1. She can expend no more than 1 point from her reservoir on a given spell in this way."
+        },
+        {
+          "name": "Arcanist Exploit",
+          "description": "",
+          "pools": [
+            {
+              "name": "Arcanist Exploit",
+              "description": "",
+              "requirements": {},
+              "options": [
+                {
+                  "name": "Arcanist Exploits",
+                  "description": "By bending and sometimes even breaking the rules of magic, the arcanist learns to exploit gaps and exceptions in the laws of magic. Some of these exploits allow her to break down various forms of magic, adding their essence to her arcane reservoir. At 1st level and every 2 levels thereafter, the arcanist learns a new arcane exploit selected from the following list. An arcanist exploit cannot be selected more than once. Once an arcanist exploit has been selected, it cannot be changed. Most arcanist exploits require the arcanist to expend points from her arcane reservoir to function. Unless otherwise noted, the saving throw DC for an arcanist exploit is equal to 10 + 1/2 the arcanist&#8217;s level + the arcanist&#8217;s Charisma modifier. For a complete list of Arcanist Exploits, see here",
+                  "requirements": {
+                    "minClassLevel": 2,
+                    "text": "At 1st level and every 2 levels thereafter, the arcanist learns a new arcane exploit selected from the following list. An arcanist exploit cannot be selected more than once."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/hybrid-classes/arcanist/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        },
+        {
+          "name": "Cantrips",
+          "description": "Arcanists can prepare a number of cantrips, or 0-level spells, each day as noted on Table: Arcanist Spells Prepared . These spells are cast like any other spell, but they do not consume spell slots. As with her other spells, these spells are not expended when cast."
+        },
+        {
+          "name": "Consume Spells",
+          "description": "At 1st level, an arcanist can expend an available arcanist spell slot as a move action , making it unavailable for the rest of the day, just as if she had used it to cast a spell. She can use this ability a number of times per day equal to her Charisma modifier (minimum 1). Doing this adds a number of points to her arcane reservoir equal to the level of the spell slot consumed. She cannot consume cantrips (0 level spells) in this way. Points gained in excess of the reservoir's maximum are lost."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "2"
+      }
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 0,
+      "ref": 0,
+      "will": 3,
+      "classFeatures": [],
+      "spellcasting": {
+        "Spells per Day": "3"
+      }
+    },
+    {
+      "level": 3,
+      "bab": 1,
+      "fort": 1,
+      "ref": 1,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Arcanist Exploit",
+          "description": "",
+          "pools": [
+            {
+              "name": "Arcanist Exploit",
+              "description": "",
+              "requirements": {},
+              "options": [
+                {
+                  "name": "Arcanist Exploits",
+                  "description": "By bending and sometimes even breaking the rules of magic, the arcanist learns to exploit gaps and exceptions in the laws of magic. Some of these exploits allow her to break down various forms of magic, adding their essence to her arcane reservoir. At 1st level and every 2 levels thereafter, the arcanist learns a new arcane exploit selected from the following list. An arcanist exploit cannot be selected more than once. Once an arcanist exploit has been selected, it cannot be changed. Most arcanist exploits require the arcanist to expend points from her arcane reservoir to function. Unless otherwise noted, the saving throw DC for an arcanist exploit is equal to 10 + 1/2 the arcanist&#8217;s level + the arcanist&#8217;s Charisma modifier. For a complete list of Arcanist Exploits, see here",
+                  "requirements": {
+                    "minClassLevel": 2,
+                    "text": "At 1st level and every 2 levels thereafter, the arcanist learns a new arcane exploit selected from the following list. An arcanist exploit cannot be selected more than once."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/hybrid-classes/arcanist/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 4,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 4,
+      "classFeatures": [],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 5,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Arcanist Exploit",
+          "description": "",
+          "pools": [
+            {
+              "name": "Arcanist Exploit",
+              "description": "",
+              "requirements": {},
+              "options": [
+                {
+                  "name": "Arcanist Exploits",
+                  "description": "By bending and sometimes even breaking the rules of magic, the arcanist learns to exploit gaps and exceptions in the laws of magic. Some of these exploits allow her to break down various forms of magic, adding their essence to her arcane reservoir. At 1st level and every 2 levels thereafter, the arcanist learns a new arcane exploit selected from the following list. An arcanist exploit cannot be selected more than once. Once an arcanist exploit has been selected, it cannot be changed. Most arcanist exploits require the arcanist to expend points from her arcane reservoir to function. Unless otherwise noted, the saving throw DC for an arcanist exploit is equal to 10 + 1/2 the arcanist&#8217;s level + the arcanist&#8217;s Charisma modifier. For a complete list of Arcanist Exploits, see here",
+                  "requirements": {
+                    "minClassLevel": 2,
+                    "text": "At 1st level and every 2 levels thereafter, the arcanist learns a new arcane exploit selected from the following list. An arcanist exploit cannot be selected more than once."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/hybrid-classes/arcanist/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 6,
+      "bab": 3,
+      "fort": 2,
+      "ref": 2,
+      "will": 5,
+      "classFeatures": [],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 7,
+      "bab": 3,
+      "fort": 2,
+      "ref": 2,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Arcanist Exploit",
+          "description": "",
+          "pools": [
+            {
+              "name": "Arcanist Exploit",
+              "description": "",
+              "requirements": {},
+              "options": [
+                {
+                  "name": "Arcanist Exploits",
+                  "description": "By bending and sometimes even breaking the rules of magic, the arcanist learns to exploit gaps and exceptions in the laws of magic. Some of these exploits allow her to break down various forms of magic, adding their essence to her arcane reservoir. At 1st level and every 2 levels thereafter, the arcanist learns a new arcane exploit selected from the following list. An arcanist exploit cannot be selected more than once. Once an arcanist exploit has been selected, it cannot be changed. Most arcanist exploits require the arcanist to expend points from her arcane reservoir to function. Unless otherwise noted, the saving throw DC for an arcanist exploit is equal to 10 + 1/2 the arcanist&#8217;s level + the arcanist&#8217;s Charisma modifier. For a complete list of Arcanist Exploits, see here",
+                  "requirements": {
+                    "minClassLevel": 2,
+                    "text": "At 1st level and every 2 levels thereafter, the arcanist learns a new arcane exploit selected from the following list. An arcanist exploit cannot be selected more than once."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/hybrid-classes/arcanist/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 8,
+      "bab": 4,
+      "fort": 2,
+      "ref": 2,
+      "will": 6,
+      "classFeatures": [],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 9,
+      "bab": 4,
+      "fort": 3,
+      "ref": 3,
+      "will": 6,
+      "classFeatures": [
+        {
+          "name": "Arcanist Exploit",
+          "description": "",
+          "pools": [
+            {
+              "name": "Arcanist Exploit",
+              "description": "",
+              "requirements": {},
+              "options": [
+                {
+                  "name": "Arcanist Exploits",
+                  "description": "By bending and sometimes even breaking the rules of magic, the arcanist learns to exploit gaps and exceptions in the laws of magic. Some of these exploits allow her to break down various forms of magic, adding their essence to her arcane reservoir. At 1st level and every 2 levels thereafter, the arcanist learns a new arcane exploit selected from the following list. An arcanist exploit cannot be selected more than once. Once an arcanist exploit has been selected, it cannot be changed. Most arcanist exploits require the arcanist to expend points from her arcane reservoir to function. Unless otherwise noted, the saving throw DC for an arcanist exploit is equal to 10 + 1/2 the arcanist&#8217;s level + the arcanist&#8217;s Charisma modifier. For a complete list of Arcanist Exploits, see here",
+                  "requirements": {
+                    "minClassLevel": 2,
+                    "text": "At 1st level and every 2 levels thereafter, the arcanist learns a new arcane exploit selected from the following list. An arcanist exploit cannot be selected more than once."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/hybrid-classes/arcanist/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 10,
+      "bab": 5,
+      "fort": 3,
+      "ref": 3,
+      "will": 7,
+      "classFeatures": [],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 11,
+      "bab": 5,
+      "fort": 3,
+      "ref": 3,
+      "will": 7,
+      "classFeatures": [
+        {
+          "name": "Arcanist Exploit",
+          "description": "",
+          "pools": [
+            {
+              "name": "Arcanist Exploit",
+              "description": "",
+              "requirements": {},
+              "options": [
+                {
+                  "name": "Arcanist Exploits",
+                  "description": "By bending and sometimes even breaking the rules of magic, the arcanist learns to exploit gaps and exceptions in the laws of magic. Some of these exploits allow her to break down various forms of magic, adding their essence to her arcane reservoir. At 1st level and every 2 levels thereafter, the arcanist learns a new arcane exploit selected from the following list. An arcanist exploit cannot be selected more than once. Once an arcanist exploit has been selected, it cannot be changed. Most arcanist exploits require the arcanist to expend points from her arcane reservoir to function. Unless otherwise noted, the saving throw DC for an arcanist exploit is equal to 10 + 1/2 the arcanist&#8217;s level + the arcanist&#8217;s Charisma modifier. For a complete list of Arcanist Exploits, see here",
+                  "requirements": {
+                    "minClassLevel": 2,
+                    "text": "At 1st level and every 2 levels thereafter, the arcanist learns a new arcane exploit selected from the following list. An arcanist exploit cannot be selected more than once."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/hybrid-classes/arcanist/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        },
+        {
+          "name": "Greater Exploits",
+          "description": "At 11th level and every 2 levels thereafter, an arcanist can choose one of the following greater exploits in place of an arcanist exploit. For a complete list of Greater Exploits, see here",
+          "pools": [
+            {
+              "name": "Greater Exploits",
+              "description": "At 11th level and every 2 levels thereafter, an arcanist can choose one of the following greater exploits in place of an arcanist exploit. For a complete list of Greater Exploits, see here",
+              "requirements": {
+                "minClassLevel": 2,
+                "text": "At 11th level and every 2 levels thereafter, an arcanist can choose one of the following greater exploits in place of an arcanist exploit."
+              },
+              "options": [
+                {
+                  "name": "Greater Exploits",
+                  "description": "At 11th level and every 2 levels thereafter, an arcanist can choose one of the following greater exploits in place of an arcanist exploit. For a complete list of Greater Exploits, see here",
+                  "requirements": {
+                    "minClassLevel": 2,
+                    "text": "At 11th level and every 2 levels thereafter, an arcanist can choose one of the following greater exploits in place of an arcanist exploit."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/hybrid-classes/arcanist/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 12,
+      "bab": 6,
+      "fort": 4,
+      "ref": 4,
+      "will": 8,
+      "classFeatures": [],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 13,
+      "bab": 6,
+      "fort": 4,
+      "ref": 4,
+      "will": 8,
+      "classFeatures": [
+        {
+          "name": "Arcanist Exploit",
+          "description": "",
+          "pools": [
+            {
+              "name": "Arcanist Exploit",
+              "description": "",
+              "requirements": {},
+              "options": [
+                {
+                  "name": "Arcanist Exploits",
+                  "description": "By bending and sometimes even breaking the rules of magic, the arcanist learns to exploit gaps and exceptions in the laws of magic. Some of these exploits allow her to break down various forms of magic, adding their essence to her arcane reservoir. At 1st level and every 2 levels thereafter, the arcanist learns a new arcane exploit selected from the following list. An arcanist exploit cannot be selected more than once. Once an arcanist exploit has been selected, it cannot be changed. Most arcanist exploits require the arcanist to expend points from her arcane reservoir to function. Unless otherwise noted, the saving throw DC for an arcanist exploit is equal to 10 + 1/2 the arcanist&#8217;s level + the arcanist&#8217;s Charisma modifier. For a complete list of Arcanist Exploits, see here",
+                  "requirements": {
+                    "minClassLevel": 2,
+                    "text": "At 1st level and every 2 levels thereafter, the arcanist learns a new arcane exploit selected from the following list. An arcanist exploit cannot be selected more than once."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/hybrid-classes/arcanist/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 14,
+      "bab": 7,
+      "fort": 4,
+      "ref": 4,
+      "will": 9,
+      "classFeatures": [],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 15,
+      "bab": 7,
+      "fort": 5,
+      "ref": 5,
+      "will": 9,
+      "classFeatures": [
+        {
+          "name": "Arcanist Exploit",
+          "description": "",
+          "pools": [
+            {
+              "name": "Arcanist Exploit",
+              "description": "",
+              "requirements": {},
+              "options": [
+                {
+                  "name": "Arcanist Exploits",
+                  "description": "By bending and sometimes even breaking the rules of magic, the arcanist learns to exploit gaps and exceptions in the laws of magic. Some of these exploits allow her to break down various forms of magic, adding their essence to her arcane reservoir. At 1st level and every 2 levels thereafter, the arcanist learns a new arcane exploit selected from the following list. An arcanist exploit cannot be selected more than once. Once an arcanist exploit has been selected, it cannot be changed. Most arcanist exploits require the arcanist to expend points from her arcane reservoir to function. Unless otherwise noted, the saving throw DC for an arcanist exploit is equal to 10 + 1/2 the arcanist&#8217;s level + the arcanist&#8217;s Charisma modifier. For a complete list of Arcanist Exploits, see here",
+                  "requirements": {
+                    "minClassLevel": 2,
+                    "text": "At 1st level and every 2 levels thereafter, the arcanist learns a new arcane exploit selected from the following list. An arcanist exploit cannot be selected more than once."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/hybrid-classes/arcanist/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 16,
+      "bab": 8,
+      "fort": 5,
+      "ref": 5,
+      "will": 10,
+      "classFeatures": [],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 17,
+      "bab": 8,
+      "fort": 5,
+      "ref": 5,
+      "will": 10,
+      "classFeatures": [
+        {
+          "name": "Arcanist Exploit",
+          "description": "",
+          "pools": [
+            {
+              "name": "Arcanist Exploit",
+              "description": "",
+              "requirements": {},
+              "options": [
+                {
+                  "name": "Arcanist Exploits",
+                  "description": "By bending and sometimes even breaking the rules of magic, the arcanist learns to exploit gaps and exceptions in the laws of magic. Some of these exploits allow her to break down various forms of magic, adding their essence to her arcane reservoir. At 1st level and every 2 levels thereafter, the arcanist learns a new arcane exploit selected from the following list. An arcanist exploit cannot be selected more than once. Once an arcanist exploit has been selected, it cannot be changed. Most arcanist exploits require the arcanist to expend points from her arcane reservoir to function. Unless otherwise noted, the saving throw DC for an arcanist exploit is equal to 10 + 1/2 the arcanist&#8217;s level + the arcanist&#8217;s Charisma modifier. For a complete list of Arcanist Exploits, see here",
+                  "requirements": {
+                    "minClassLevel": 2,
+                    "text": "At 1st level and every 2 levels thereafter, the arcanist learns a new arcane exploit selected from the following list. An arcanist exploit cannot be selected more than once."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/hybrid-classes/arcanist/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 18,
+      "bab": 9,
+      "fort": 6,
+      "ref": 6,
+      "will": 11,
+      "classFeatures": [],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 19,
+      "bab": 9,
+      "fort": 6,
+      "ref": 6,
+      "will": 11,
+      "classFeatures": [
+        {
+          "name": "Arcanist Exploit",
+          "description": "",
+          "pools": [
+            {
+              "name": "Arcanist Exploit",
+              "description": "",
+              "requirements": {},
+              "options": [
+                {
+                  "name": "Arcanist Exploits",
+                  "description": "By bending and sometimes even breaking the rules of magic, the arcanist learns to exploit gaps and exceptions in the laws of magic. Some of these exploits allow her to break down various forms of magic, adding their essence to her arcane reservoir. At 1st level and every 2 levels thereafter, the arcanist learns a new arcane exploit selected from the following list. An arcanist exploit cannot be selected more than once. Once an arcanist exploit has been selected, it cannot be changed. Most arcanist exploits require the arcanist to expend points from her arcane reservoir to function. Unless otherwise noted, the saving throw DC for an arcanist exploit is equal to 10 + 1/2 the arcanist&#8217;s level + the arcanist&#8217;s Charisma modifier. For a complete list of Arcanist Exploits, see here",
+                  "requirements": {
+                    "minClassLevel": 2,
+                    "text": "At 1st level and every 2 levels thereafter, the arcanist learns a new arcane exploit selected from the following list. An arcanist exploit cannot be selected more than once."
+                  },
+                  "scrapeConfidence": "medium"
+                }
+              ],
+              "scrapeSource": "https://www.d20pfsrd.com/classes/hybrid-classes/arcanist/",
+              "scrapeConfidence": "low"
+            }
+          ]
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    },
+    {
+      "level": 20,
+      "bab": 10,
+      "fort": 6,
+      "ref": 6,
+      "will": 12,
+      "classFeatures": [
+        {
+          "name": "Magical Supremacy",
+          "description": "At 20th level, the arcanist learns how to convert her arcane reservoir into spells and back again. She can cast any spell she has prepared by expending a number of points from her arcane reservoir equal to 1 + the level of the spell to be cast instead of expending a spell slot. When she casts a spell in this fashion, she treats her caster level as 2 higher than normal, and the DCs of any saving throws associated with the spell increase by 2. She cannot further expend points from her arcane reservoir to enhance a spell cast in this way."
+        }
+      ],
+      "spellcasting": {
+        "Spells per Day": "4"
+      }
+    }
+  ],
+  "spellcasting": {
+    "summary": "prepared hybrid caster using INT; prepares spells but casts them spontaneously from daily slots",
+    "castingType": "prepared",
+    "progression": "full",
+    "ability": "int",
+    "preparation": "spellbook",
+    "maxSpellLevel": 9,
+    "slotsByLevel": [
+      [
+        0,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        4,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        4,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        4,
+        4,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        4,
+        4,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        4,
+        4,
+        4,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        4,
+        4,
+        4,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        4,
+        4,
+        4,
+        4,
+        2,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        4,
+        4,
+        4,
+        4,
+        3,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        4,
+        4,
+        4,
+        4,
+        4,
+        2,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        2,
+        0,
+        0
+      ],
+      [
+        0,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        0,
+        0
+      ],
+      [
+        0,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        2,
+        0
+      ],
+      [
+        0,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        0
+      ],
+      [
+        0,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        2
+      ],
+      [
+        0,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        3
+      ],
+      [
+        0,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      [
+        0,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ]
+    ],
+    "preparedByLevel": [
+      [
+        4,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        5,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        5,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        6,
+        3,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        6,
+        4,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        7,
+        4,
+        2,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        7,
+        5,
+        3,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        8,
+        5,
+        3,
+        2,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        8,
+        5,
+        4,
+        3,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        9,
+        5,
+        4,
+        3,
+        2,
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        9,
+        5,
+        5,
+        4,
+        3,
+        2,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        9,
+        5,
+        5,
+        4,
+        3,
+        2,
+        1,
+        0,
+        0,
+        0
+      ],
+      [
+        9,
+        5,
+        5,
+        4,
+        4,
+        3,
+        2,
+        0,
+        0,
+        0
+      ],
+      [
+        9,
+        5,
+        5,
+        4,
+        4,
+        3,
+        2,
+        1,
+        0,
+        0
+      ],
+      [
+        9,
+        5,
+        5,
+        4,
+        4,
+        4,
+        3,
+        2,
+        0,
+        0
+      ],
+      [
+        9,
+        5,
+        5,
+        4,
+        4,
+        4,
+        3,
+        2,
+        1,
+        0
+      ],
+      [
+        9,
+        5,
+        5,
+        4,
+        4,
+        4,
+        3,
+        3,
+        2,
+        0
+      ],
+      [
+        9,
+        5,
+        5,
+        4,
+        4,
+        4,
+        3,
+        3,
+        2,
+        1
+      ],
+      [
+        9,
+        5,
+        5,
+        4,
+        4,
+        4,
+        3,
+        3,
+        3,
+        2
+      ],
+      [
+        9,
+        5,
+        5,
+        4,
+        4,
+        4,
+        3,
+        3,
+        3,
+        3
+      ]
+    ]
+  },
+  "spellcastingClass": true
+}

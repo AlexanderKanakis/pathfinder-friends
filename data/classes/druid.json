@@ -1,0 +1,529 @@
+{
+  "name": "Druid",
+  "type": "core",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/core-classes/druid/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 0,
+      "fort": 2,
+      "ref": 0,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Nature Bond",
+          "description": "FAQ Can druids, inquisitors , and other classes with access to domains take subdomains? Yes, as long as they follow the rules for subdomains. A character who does not worship a deity (such as some druids and paladins ) may select any one subdomain appropriate to a domain available to his or her class. [ Source ] At 1st level, a druid forms a bond with nature. This bond can take one of two forms. The first is a close tie to the natural world, granting the druid one of the following cleric domains: Air , Animal , Earth , Fire , Plant , Water , or Weather . Druids also have access to a set of Animal and Terrain Domains . When determining the powers and bonus spells granted by this domain, the druid's effective cleric level is equal to her druid level. A druid that selects this option also receives additional domain spell slots, just like a cleric. She must prepare the spell from her domain in this slot and this spell cannot be used to cast a spell spontaneously. The second option is to form a close bond with an animal companion . A druid may begin play with any of the animals listed in Animal Choices . This animal is a loyal companion that accompanies the druid on her adventures. (Editor: Details on how animal companions work can found be here: Animal Companions / Drake Companions ) Unlike normal animals of its kind, an animal companion's Hit Dice, abilities, skills, and feats advance as the druid advances in level. If a character receives an animal companion from more than one source, her effective druid levels stack for the purposes of determining the statistics "
+        },
+        {
+          "name": "Nature Sense",
+          "description": "A druid gains a +2 bonus on Knowledge (nature) and Survival checks."
+        },
+        {
+          "name": "Orisons",
+          "description": "Druids can prepare a number of orisons, or 0-level spells, each day, as noted on Table: Druid under ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ Spells per Day .ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â These spells are cast like any other spell, but they are not expended when cast and may be used again."
+        },
+        {
+          "name": "Wild Empathy",
+          "description": "A druid can improve the attitude of an animal . This ability functions just like a Diplomacy check made to improve the attitude of a person. The druid rolls 1d20 and adds her druid level and her Charisma modifier to determine the wild empathy check result. The typical domestic animal has a starting attitude of indifferent, while wild animals are usually unfriendly. To use wild empathy, the druid and the animal must be able to study each other, which means that they must be within 30 feet of one another under normal conditions. Generally, influencing an animal in this way takes 1 minute but, as with influencing people, it might take more or less time. A druid can also use this ability to influence a magical beast with an Intelligence score of 1 or 2, but she takes a -4 penalty on the check."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 2,
+      "bab": 1,
+      "fort": 3,
+      "ref": 0,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Woodland Stride",
+          "description": "Starting at 2nd level, a druid may move through any sort of undergrowth (such as natural thorns, briars, overgrown areas, and similar terrain) at her normal speed and without taking damage or suffering any other impairment. Thorns, briars, and overgrown areas that have been magically manipulated to impede motion, however, still affect her."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 3,
+      "bab": 2,
+      "fort": 3,
+      "ref": 1,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Trackless Step",
+          "description": "Starting at 3rd level, a druid leaves no trail in natural surroundings and cannot be tracked. She may choose to leave a trail if so desired."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 4,
+      "bab": 3,
+      "fort": 4,
+      "ref": 1,
+      "will": 4,
+      "classFeatures": [
+        {
+          "name": "Resist Nature'S Lure",
+          "description": "Starting at 4th level, a druid gains a +4 bonus on saving throws against the spell-like and supernatural abilities of fey. This bonus also applies to spells and effects that target plants, such as blight , entangle , spike growth , and warp wood ."
+        },
+        {
+          "name": "Wild Shape (1/Day)",
+          "description": "At 4th level, a druid gains the ability to turn herself into any small or Medium animal and back again once per day. Her options for new forms include all creatures with the animal type. This ability functions like the beast shape I spell, except as noted here. The effect lasts for 1 hour per druid level, or until she changes back. Changing form (to animal or back) is a standard action and doesn't provoke an attack of opportunity. The form chosen must be that of an animal the druid is familiar with. A druid loses her ability to speak while in animal form because she is limited to the sounds that a normal, untrained animal can make, but she can communicate normally with other animals of the same general grouping as her new form. (The normal sound a wild parrot makes is a squawk, so changing to this form does not permit speech.) A druid can use this ability an additional time per day at 6th level and every two levels thereafter, for a total of eight times at 18th level. At 20th level, a druid can use wild shape at will. As a druid gains in levels, this ability allows the druid to take on the form of larger and smaller animals, elementals , and plants. Each form expends one daily usage of this ability, regardless of the form taken. At 6th level, a druid can use wild shape to change into a Large or Tiny animal or a Small elemental . When taking the form of an animal , a druid's wild shape now functions as beast shape II . When taking the form of an elemental , the druid's wild shape functions as elemental body I . At 8th level, a druid can use wild shape to ch"
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 5,
+      "bab": 3,
+      "fort": 4,
+      "ref": 1,
+      "will": 4,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 6,
+      "bab": 4,
+      "fort": 5,
+      "ref": 2,
+      "will": 5,
+      "classFeatures": [
+        {
+          "name": "Wild Shape (2/Day)",
+          "description": "At 4th level, a druid gains the ability to turn herself into any small or Medium animal and back again once per day. Her options for new forms include all creatures with the animal type. This ability functions like the beast shape I spell, except as noted here. The effect lasts for 1 hour per druid level, or until she changes back. Changing form (to animal or back) is a standard action and doesn't provoke an attack of opportunity. The form chosen must be that of an animal the druid is familiar with. A druid loses her ability to speak while in animal form because she is limited to the sounds that a normal, untrained animal can make, but she can communicate normally with other animals of the same general grouping as her new form. (The normal sound a wild parrot makes is a squawk, so changing to this form does not permit speech.) A druid can use this ability an additional time per day at 6th level and every two levels thereafter, for a total of eight times at 18th level. At 20th level, a druid can use wild shape at will. As a druid gains in levels, this ability allows the druid to take on the form of larger and smaller animals, elementals , and plants. Each form expends one daily usage of this ability, regardless of the form taken. At 6th level, a druid can use wild shape to change into a Large or Tiny animal or a Small elemental . When taking the form of an animal , a druid's wild shape now functions as beast shape II . When taking the form of an elemental , the druid's wild shape functions as elemental body I . At 8th level, a druid can use wild shape to ch"
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 7,
+      "bab": 5,
+      "fort": 5,
+      "ref": 2,
+      "will": 5,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 8,
+      "bab": 6,
+      "fort": 6,
+      "ref": 2,
+      "will": 6,
+      "classFeatures": [
+        {
+          "name": "Wild Shape (3/Day)",
+          "description": "At 4th level, a druid gains the ability to turn herself into any small or Medium animal and back again once per day. Her options for new forms include all creatures with the animal type. This ability functions like the beast shape I spell, except as noted here. The effect lasts for 1 hour per druid level, or until she changes back. Changing form (to animal or back) is a standard action and doesn't provoke an attack of opportunity. The form chosen must be that of an animal the druid is familiar with. A druid loses her ability to speak while in animal form because she is limited to the sounds that a normal, untrained animal can make, but she can communicate normally with other animals of the same general grouping as her new form. (The normal sound a wild parrot makes is a squawk, so changing to this form does not permit speech.) A druid can use this ability an additional time per day at 6th level and every two levels thereafter, for a total of eight times at 18th level. At 20th level, a druid can use wild shape at will. As a druid gains in levels, this ability allows the druid to take on the form of larger and smaller animals, elementals , and plants. Each form expends one daily usage of this ability, regardless of the form taken. At 6th level, a druid can use wild shape to change into a Large or Tiny animal or a Small elemental . When taking the form of an animal , a druid's wild shape now functions as beast shape II . When taking the form of an elemental , the druid's wild shape functions as elemental body I . At 8th level, a druid can use wild shape to ch"
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 9,
+      "bab": 6,
+      "fort": 6,
+      "ref": 3,
+      "will": 6,
+      "classFeatures": [
+        {
+          "name": "Venom Immunity",
+          "description": "At 9th level, a druid gains immunity to all poisons."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 10,
+      "bab": 7,
+      "fort": 7,
+      "ref": 3,
+      "will": 7,
+      "classFeatures": [
+        {
+          "name": "Wild Shape (4/Day)",
+          "description": "At 4th level, a druid gains the ability to turn herself into any small or Medium animal and back again once per day. Her options for new forms include all creatures with the animal type. This ability functions like the beast shape I spell, except as noted here. The effect lasts for 1 hour per druid level, or until she changes back. Changing form (to animal or back) is a standard action and doesn't provoke an attack of opportunity. The form chosen must be that of an animal the druid is familiar with. A druid loses her ability to speak while in animal form because she is limited to the sounds that a normal, untrained animal can make, but she can communicate normally with other animals of the same general grouping as her new form. (The normal sound a wild parrot makes is a squawk, so changing to this form does not permit speech.) A druid can use this ability an additional time per day at 6th level and every two levels thereafter, for a total of eight times at 18th level. At 20th level, a druid can use wild shape at will. As a druid gains in levels, this ability allows the druid to take on the form of larger and smaller animals, elementals , and plants. Each form expends one daily usage of this ability, regardless of the form taken. At 6th level, a druid can use wild shape to change into a Large or Tiny animal or a Small elemental . When taking the form of an animal , a druid's wild shape now functions as beast shape II . When taking the form of an elemental , the druid's wild shape functions as elemental body I . At 8th level, a druid can use wild shape to ch"
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 11,
+      "bab": 8,
+      "fort": 7,
+      "ref": 3,
+      "will": 7,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 9,
+      "fort": 8,
+      "ref": 4,
+      "will": 8,
+      "classFeatures": [
+        {
+          "name": "Wild Shape (5/Day)",
+          "description": "At 4th level, a druid gains the ability to turn herself into any small or Medium animal and back again once per day. Her options for new forms include all creatures with the animal type. This ability functions like the beast shape I spell, except as noted here. The effect lasts for 1 hour per druid level, or until she changes back. Changing form (to animal or back) is a standard action and doesn't provoke an attack of opportunity. The form chosen must be that of an animal the druid is familiar with. A druid loses her ability to speak while in animal form because she is limited to the sounds that a normal, untrained animal can make, but she can communicate normally with other animals of the same general grouping as her new form. (The normal sound a wild parrot makes is a squawk, so changing to this form does not permit speech.) A druid can use this ability an additional time per day at 6th level and every two levels thereafter, for a total of eight times at 18th level. At 20th level, a druid can use wild shape at will. As a druid gains in levels, this ability allows the druid to take on the form of larger and smaller animals, elementals , and plants. Each form expends one daily usage of this ability, regardless of the form taken. At 6th level, a druid can use wild shape to change into a Large or Tiny animal or a Small elemental . When taking the form of an animal , a druid's wild shape now functions as beast shape II . When taking the form of an elemental , the druid's wild shape functions as elemental body I . At 8th level, a druid can use wild shape to ch"
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 9,
+      "fort": 8,
+      "ref": 4,
+      "will": 8,
+      "classFeatures": [
+        {
+          "name": "A Thousand Faces",
+          "description": "At 13th level, a druid gains the ability to change her appearance at will, as if using the alter self spell, but only while in her normal form."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 10,
+      "fort": 9,
+      "ref": 4,
+      "will": 9,
+      "classFeatures": [
+        {
+          "name": "Wild Shape (6/Day)",
+          "description": "At 4th level, a druid gains the ability to turn herself into any small or Medium animal and back again once per day. Her options for new forms include all creatures with the animal type. This ability functions like the beast shape I spell, except as noted here. The effect lasts for 1 hour per druid level, or until she changes back. Changing form (to animal or back) is a standard action and doesn't provoke an attack of opportunity. The form chosen must be that of an animal the druid is familiar with. A druid loses her ability to speak while in animal form because she is limited to the sounds that a normal, untrained animal can make, but she can communicate normally with other animals of the same general grouping as her new form. (The normal sound a wild parrot makes is a squawk, so changing to this form does not permit speech.) A druid can use this ability an additional time per day at 6th level and every two levels thereafter, for a total of eight times at 18th level. At 20th level, a druid can use wild shape at will. As a druid gains in levels, this ability allows the druid to take on the form of larger and smaller animals, elementals , and plants. Each form expends one daily usage of this ability, regardless of the form taken. At 6th level, a druid can use wild shape to change into a Large or Tiny animal or a Small elemental . When taking the form of an animal , a druid's wild shape now functions as beast shape II . When taking the form of an elemental , the druid's wild shape functions as elemental body I . At 8th level, a druid can use wild shape to ch"
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 11,
+      "fort": 9,
+      "ref": 5,
+      "will": 9,
+      "classFeatures": [
+        {
+          "name": "Timeless Body",
+          "description": "After attaining 15th level, a druid no longer takes ability score penalties for aging and cannot be magically aged. Any penalties she may have already incurred, however, remain in place. Bonuses still accrue, and the druid still dies of old age when her time is up."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 12,
+      "fort": 10,
+      "ref": 5,
+      "will": 10,
+      "classFeatures": [
+        {
+          "name": "Wild Shape (7/Day)",
+          "description": "At 4th level, a druid gains the ability to turn herself into any small or Medium animal and back again once per day. Her options for new forms include all creatures with the animal type. This ability functions like the beast shape I spell, except as noted here. The effect lasts for 1 hour per druid level, or until she changes back. Changing form (to animal or back) is a standard action and doesn't provoke an attack of opportunity. The form chosen must be that of an animal the druid is familiar with. A druid loses her ability to speak while in animal form because she is limited to the sounds that a normal, untrained animal can make, but she can communicate normally with other animals of the same general grouping as her new form. (The normal sound a wild parrot makes is a squawk, so changing to this form does not permit speech.) A druid can use this ability an additional time per day at 6th level and every two levels thereafter, for a total of eight times at 18th level. At 20th level, a druid can use wild shape at will. As a druid gains in levels, this ability allows the druid to take on the form of larger and smaller animals, elementals , and plants. Each form expends one daily usage of this ability, regardless of the form taken. At 6th level, a druid can use wild shape to change into a Large or Tiny animal or a Small elemental . When taking the form of an animal , a druid's wild shape now functions as beast shape II . When taking the form of an elemental , the druid's wild shape functions as elemental body I . At 8th level, a druid can use wild shape to ch"
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 12,
+      "fort": 10,
+      "ref": 5,
+      "will": 10,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 13,
+      "fort": 11,
+      "ref": 6,
+      "will": 11,
+      "classFeatures": [
+        {
+          "name": "Wild Shape (8/Day)",
+          "description": "At 4th level, a druid gains the ability to turn herself into any small or Medium animal and back again once per day. Her options for new forms include all creatures with the animal type. This ability functions like the beast shape I spell, except as noted here. The effect lasts for 1 hour per druid level, or until she changes back. Changing form (to animal or back) is a standard action and doesn't provoke an attack of opportunity. The form chosen must be that of an animal the druid is familiar with. A druid loses her ability to speak while in animal form because she is limited to the sounds that a normal, untrained animal can make, but she can communicate normally with other animals of the same general grouping as her new form. (The normal sound a wild parrot makes is a squawk, so changing to this form does not permit speech.) A druid can use this ability an additional time per day at 6th level and every two levels thereafter, for a total of eight times at 18th level. At 20th level, a druid can use wild shape at will. As a druid gains in levels, this ability allows the druid to take on the form of larger and smaller animals, elementals , and plants. Each form expends one daily usage of this ability, regardless of the form taken. At 6th level, a druid can use wild shape to change into a Large or Tiny animal or a Small elemental . When taking the form of an animal , a druid's wild shape now functions as beast shape II . When taking the form of an elemental , the druid's wild shape functions as elemental body I . At 8th level, a druid can use wild shape to ch"
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 14,
+      "fort": 11,
+      "ref": 6,
+      "will": 11,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 15,
+      "fort": 12,
+      "ref": 6,
+      "will": 12,
+      "classFeatures": [
+        {
+          "name": "Wild Shape (At Will)",
+          "description": "At 4th level, a druid gains the ability to turn herself into any small or Medium animal and back again once per day. Her options for new forms include all creatures with the animal type. This ability functions like the beast shape I spell, except as noted here. The effect lasts for 1 hour per druid level, or until she changes back. Changing form (to animal or back) is a standard action and doesn't provoke an attack of opportunity. The form chosen must be that of an animal the druid is familiar with. A druid loses her ability to speak while in animal form because she is limited to the sounds that a normal, untrained animal can make, but she can communicate normally with other animals of the same general grouping as her new form. (The normal sound a wild parrot makes is a squawk, so changing to this form does not permit speech.) A druid can use this ability an additional time per day at 6th level and every two levels thereafter, for a total of eight times at 18th level. At 20th level, a druid can use wild shape at will. As a druid gains in levels, this ability allows the druid to take on the form of larger and smaller animals, elementals , and plants. Each form expends one daily usage of this ability, regardless of the form taken. At 6th level, a druid can use wild shape to change into a Large or Tiny animal or a Small elemental . When taking the form of an animal , a druid's wild shape now functions as beast shape II . When taking the form of an elemental , the druid's wild shape functions as elemental body I . At 8th level, a druid can use wild shape to ch"
+        }
+      ],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": {
+    "summary": "prepared full caster using WIS",
+    "castingType": "prepared",
+    "progression": "full",
+    "ability": "wis",
+    "preparation": "daily-list",
+    "maxSpellLevel": 9,
+    "slotsByLevel": [
+      [
+        3,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        2,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        3,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        3,
+        2,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        3,
+        3,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        4,
+        3,
+        2,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        4,
+        3,
+        3,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        4,
+        4,
+        3,
+        2,
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        4,
+        4,
+        3,
+        3,
+        2,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        4,
+        4,
+        4,
+        3,
+        2,
+        1,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        4,
+        4,
+        4,
+        3,
+        3,
+        2,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        2,
+        1,
+        0,
+        0
+      ],
+      [
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        3,
+        2,
+        0,
+        0
+      ],
+      [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        2,
+        1,
+        0
+      ],
+      [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        3,
+        2,
+        0
+      ],
+      [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        2,
+        1
+      ],
+      [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        3,
+        2
+      ],
+      [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        3
+      ],
+      [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ]
+    ]
+  },
+  "spellcastingClass": true
+}

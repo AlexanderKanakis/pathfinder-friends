@@ -1,0 +1,958 @@
+{
+    "name":  "Oracle",
+    "type":  "base",
+    "sourceUrl":  "https://www.d20pfsrd.com/classes/base-classes/oracle/",
+    "levelProgression":  [
+                             {
+                                 "level":  1,
+                                 "bab":  0,
+                                 "fort":  0,
+                                 "ref":  0,
+                                 "will":  2,
+                                 "classFeatures":  [
+                                                       {
+                                                           "name":  "Mystery",
+                                                           "description":  "Each oracle draws upon a divine mystery to grant her spells and powers. This mystery also grants additional class skills and other special abilities. This mystery can represent a devotion to one ideal, prayers to deities that support the concept, or a natural calling to champion a cause. For example, an oracle with the waves mystery might have been born at sea and found a natural calling to worship the gods of the oceans, rivers, and lakes, be they benign or malevolent. Regardless of its source, the mystery manifests in a number of ways as the oracle gains levels. An oracle must pick one mystery upon taking her first level of oracle. Once made, this choice cannot be changed. At 2nd level, and every two levels thereafter, an oracle learns an additional spell derived from her mystery. These spells are in addition to the number of spells given on Table: Oracle Spells Known . They cannot be exchanged for different spells at higher levels. Each oracle must choose from among the following mysteries."
+                                                       },
+                                                       {
+                                                           "name":  "OracleÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢S Curse",
+                                                           "description":  "Each oracle is cursed, but this curse comes with a benefit as well as a hindrance. This choice is made at 1st level, and once made, it cannot be changed. The oracleÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢s curse cannot be removed or dispelled without the aid of a deity. An oracleÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢s curse is based on her oracle level plus one for every two levels or Hit Dice other than oracle. Each oracle must choose one of the following curses. A complete listing of Oracle Curses can be found here: Oracle Curses"
+                                                       },
+                                                       {
+                                                           "name":  "Orisons",
+                                                           "description":  "Oracles learn a number of orisons, or 0-level spells, as noted on Table: Oracle Spells Known under ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã¢â‚¬Å“Spells Known.ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â These spells are cast like any other spell, but they do not consume any slots and may be used again."
+                                                       },
+                                                       {
+                                                           "name":  "Revelation",
+                                                           "description":  "At 1st level, 3rd level, and every four levels thereafter (7th, 11th, and so on), an oracle uncovers a new secret about her mystery that grants her powers and abilities. The oracle must select a revelation from the list of revelations available to her mystery (see FAQ at right). If a revelation is chosen at a later level, the oracle gains all of the abilities and bonuses granted by that revelation based on her current level. Unless otherwise noted, activating the power of a revelation is a standard action . Unless otherwise noted, the DC to save against these revelations is equal to 10 + 1/2 the oracleÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢s level + the oracleÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢s Charisma modifier. Editor\u0027s Note Can an oracle select a revelation more than once? No, unless the revelation specifically states you can. [ Source ]",
+                                                           "pools":  [
+                                                                         {
+                                                                             "name":  "Revelation",
+                                                                             "description":  "At 1st level, 3rd level, and every four levels thereafter (7th, 11th, and so on), an oracle uncovers a new secret about her mystery that grants her powers and abilities. The oracle must select a revelation from the list of revelations available to her mystery (see FAQ at right). If a revelation is chosen at a later level, the oracle gains all of the abilities and bonuses granted by that revelation based on her current level. Unless otherwise noted, activating the power of a revelation is a standard action . Unless otherwise noted, the DC to save against these revelations is equal to 10 + 1/2 the oracleÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢s level + the oracleÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢s Charisma modifier. Editor\u0027s Note Can an oracle select a revelation more than once? No, unless the revelation specifically states you can. [ Source ]",
+                                                                             "requirements":  {
+                                                                                                  "minClassLevel":  1,
+                                                                                                  "text":  "At 1st level, 3rd level, and every four levels thereafter (7th, 11th, and so on), an oracle uncovers a new secret about her mystery that grants her powers and abilities. The oracle must select a revelation from the list of revelations available to her mystery (see FAQ at right)."
+                                                                                              },
+                                                                             "options":  [
+                                                                                             {
+                                                                                                 "name":  "Final Revelation",
+                                                                                                 "description":  "At 20th level, an oracle learns the final revelation about her mystery, granting her amazing powers and abilities. The nature of these bonuses depends upon the oracleÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢s mystery.",
+                                                                                                 "requirements":  {
+                                                                                                                      "minClassLevel":  20,
+                                                                                                                      "text":  "At 20th level, an oracle learns the final revelation about her mystery, granting her amazing powers and abilities."
+                                                                                                                  },
+                                                                                                 "scrapeConfidence":  "medium"
+                                                                                             }
+                                                                                         ],
+                                                                             "scrapeSource":  "https://www.d20pfsrd.com/classes/base-classes/oracle/",
+                                                                             "scrapeConfidence":  "low"
+                                                                         }
+                                                                     ]
+                                                       }
+                                                   ],
+                                 "spellcasting":  {
+                                                      "Spells":  "3"
+                                                  }
+                             },
+                             {
+                                 "level":  2,
+                                 "bab":  1,
+                                 "fort":  0,
+                                 "ref":  0,
+                                 "will":  3,
+                                 "classFeatures":  [
+                                                       {
+                                                           "name":  "Mystery Spell",
+                                                           "description":  ""
+                                                       }
+                                                   ],
+                                 "spellcasting":  {
+                                                      "Spells":  "4"
+                                                  }
+                             },
+                             {
+                                 "level":  3,
+                                 "bab":  2,
+                                 "fort":  1,
+                                 "ref":  1,
+                                 "will":  3,
+                                 "classFeatures":  [
+                                                       {
+                                                           "name":  "Revelation",
+                                                           "description":  "At 1st level, 3rd level, and every four levels thereafter (7th, 11th, and so on), an oracle uncovers a new secret about her mystery that grants her powers and abilities. The oracle must select a revelation from the list of revelations available to her mystery (see FAQ at right). If a revelation is chosen at a later level, the oracle gains all of the abilities and bonuses granted by that revelation based on her current level. Unless otherwise noted, activating the power of a revelation is a standard action . Unless otherwise noted, the DC to save against these revelations is equal to 10 + 1/2 the oracleÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢s level + the oracleÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢s Charisma modifier. Editor\u0027s Note Can an oracle select a revelation more than once? No, unless the revelation specifically states you can. [ Source ]",
+                                                           "pools":  [
+                                                                         {
+                                                                             "name":  "Revelation",
+                                                                             "description":  "At 1st level, 3rd level, and every four levels thereafter (7th, 11th, and so on), an oracle uncovers a new secret about her mystery that grants her powers and abilities. The oracle must select a revelation from the list of revelations available to her mystery (see FAQ at right). If a revelation is chosen at a later level, the oracle gains all of the abilities and bonuses granted by that revelation based on her current level. Unless otherwise noted, activating the power of a revelation is a standard action . Unless otherwise noted, the DC to save against these revelations is equal to 10 + 1/2 the oracleÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢s level + the oracleÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢s Charisma modifier. Editor\u0027s Note Can an oracle select a revelation more than once? No, unless the revelation specifically states you can. [ Source ]",
+                                                                             "requirements":  {
+                                                                                                  "minClassLevel":  1,
+                                                                                                  "text":  "At 1st level, 3rd level, and every four levels thereafter (7th, 11th, and so on), an oracle uncovers a new secret about her mystery that grants her powers and abilities. The oracle must select a revelation from the list of revelations available to her mystery (see FAQ at right)."
+                                                                                              },
+                                                                             "options":  [
+                                                                                             {
+                                                                                                 "name":  "Final Revelation",
+                                                                                                 "description":  "At 20th level, an oracle learns the final revelation about her mystery, granting her amazing powers and abilities. The nature of these bonuses depends upon the oracleÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢s mystery.",
+                                                                                                 "requirements":  {
+                                                                                                                      "minClassLevel":  20,
+                                                                                                                      "text":  "At 20th level, an oracle learns the final revelation about her mystery, granting her amazing powers and abilities."
+                                                                                                                  },
+                                                                                                 "scrapeConfidence":  "medium"
+                                                                                             }
+                                                                                         ],
+                                                                             "scrapeSource":  "https://www.d20pfsrd.com/classes/base-classes/oracle/",
+                                                                             "scrapeConfidence":  "low"
+                                                                         }
+                                                                     ]
+                                                       }
+                                                   ],
+                                 "spellcasting":  {
+                                                      "Spells":  "5"
+                                                  }
+                             },
+                             {
+                                 "level":  4,
+                                 "bab":  3,
+                                 "fort":  1,
+                                 "ref":  1,
+                                 "will":  4,
+                                 "classFeatures":  [
+                                                       {
+                                                           "name":  "Mystery Spell",
+                                                           "description":  ""
+                                                       }
+                                                   ],
+                                 "spellcasting":  {
+                                                      "Spells":  "6"
+                                                  }
+                             },
+                             {
+                                 "level":  5,
+                                 "bab":  3,
+                                 "fort":  1,
+                                 "ref":  1,
+                                 "will":  4,
+                                 "classFeatures":  [
+
+                                                   ],
+                                 "spellcasting":  {
+                                                      "Spells":  "6"
+                                                  }
+                             },
+                             {
+                                 "level":  6,
+                                 "bab":  4,
+                                 "fort":  2,
+                                 "ref":  2,
+                                 "will":  5,
+                                 "classFeatures":  [
+                                                       {
+                                                           "name":  "Mystery Spell",
+                                                           "description":  ""
+                                                       }
+                                                   ],
+                                 "spellcasting":  {
+                                                      "Spells":  "6"
+                                                  }
+                             },
+                             {
+                                 "level":  7,
+                                 "bab":  5,
+                                 "fort":  2,
+                                 "ref":  2,
+                                 "will":  5,
+                                 "classFeatures":  [
+                                                       {
+                                                           "name":  "Revelation",
+                                                           "description":  "At 1st level, 3rd level, and every four levels thereafter (7th, 11th, and so on), an oracle uncovers a new secret about her mystery that grants her powers and abilities. The oracle must select a revelation from the list of revelations available to her mystery (see FAQ at right). If a revelation is chosen at a later level, the oracle gains all of the abilities and bonuses granted by that revelation based on her current level. Unless otherwise noted, activating the power of a revelation is a standard action . Unless otherwise noted, the DC to save against these revelations is equal to 10 + 1/2 the oracleÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢s level + the oracleÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢s Charisma modifier. Editor\u0027s Note Can an oracle select a revelation more than once? No, unless the revelation specifically states you can. [ Source ]",
+                                                           "pools":  [
+                                                                         {
+                                                                             "name":  "Revelation",
+                                                                             "description":  "At 1st level, 3rd level, and every four levels thereafter (7th, 11th, and so on), an oracle uncovers a new secret about her mystery that grants her powers and abilities. The oracle must select a revelation from the list of revelations available to her mystery (see FAQ at right). If a revelation is chosen at a later level, the oracle gains all of the abilities and bonuses granted by that revelation based on her current level. Unless otherwise noted, activating the power of a revelation is a standard action . Unless otherwise noted, the DC to save against these revelations is equal to 10 + 1/2 the oracleÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢s level + the oracleÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢s Charisma modifier. Editor\u0027s Note Can an oracle select a revelation more than once? No, unless the revelation specifically states you can. [ Source ]",
+                                                                             "requirements":  {
+                                                                                                  "minClassLevel":  1,
+                                                                                                  "text":  "At 1st level, 3rd level, and every four levels thereafter (7th, 11th, and so on), an oracle uncovers a new secret about her mystery that grants her powers and abilities. The oracle must select a revelation from the list of revelations available to her mystery (see FAQ at right)."
+                                                                                              },
+                                                                             "options":  [
+                                                                                             {
+                                                                                                 "name":  "Final Revelation",
+                                                                                                 "description":  "At 20th level, an oracle learns the final revelation about her mystery, granting her amazing powers and abilities. The nature of these bonuses depends upon the oracleÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢s mystery.",
+                                                                                                 "requirements":  {
+                                                                                                                      "minClassLevel":  20,
+                                                                                                                      "text":  "At 20th level, an oracle learns the final revelation about her mystery, granting her amazing powers and abilities."
+                                                                                                                  },
+                                                                                                 "scrapeConfidence":  "medium"
+                                                                                             }
+                                                                                         ],
+                                                                             "scrapeSource":  "https://www.d20pfsrd.com/classes/base-classes/oracle/",
+                                                                             "scrapeConfidence":  "low"
+                                                                         }
+                                                                     ]
+                                                       }
+                                                   ],
+                                 "spellcasting":  {
+                                                      "Spells":  "6"
+                                                  }
+                             },
+                             {
+                                 "level":  8,
+                                 "bab":  6,
+                                 "fort":  2,
+                                 "ref":  2,
+                                 "will":  6,
+                                 "classFeatures":  [
+                                                       {
+                                                           "name":  "Mystery Spell",
+                                                           "description":  ""
+                                                       }
+                                                   ],
+                                 "spellcasting":  {
+                                                      "Spells":  "6"
+                                                  }
+                             },
+                             {
+                                 "level":  9,
+                                 "bab":  6,
+                                 "fort":  3,
+                                 "ref":  3,
+                                 "will":  6,
+                                 "classFeatures":  [
+
+                                                   ],
+                                 "spellcasting":  {
+                                                      "Spells":  "6"
+                                                  }
+                             },
+                             {
+                                 "level":  10,
+                                 "bab":  7,
+                                 "fort":  3,
+                                 "ref":  3,
+                                 "will":  7,
+                                 "classFeatures":  [
+                                                       {
+                                                           "name":  "Mystery Spell",
+                                                           "description":  ""
+                                                       }
+                                                   ],
+                                 "spellcasting":  {
+                                                      "Spells":  "6"
+                                                  }
+                             },
+                             {
+                                 "level":  11,
+                                 "bab":  8,
+                                 "fort":  3,
+                                 "ref":  3,
+                                 "will":  7,
+                                 "classFeatures":  [
+                                                       {
+                                                           "name":  "Revelation",
+                                                           "description":  "At 1st level, 3rd level, and every four levels thereafter (7th, 11th, and so on), an oracle uncovers a new secret about her mystery that grants her powers and abilities. The oracle must select a revelation from the list of revelations available to her mystery (see FAQ at right). If a revelation is chosen at a later level, the oracle gains all of the abilities and bonuses granted by that revelation based on her current level. Unless otherwise noted, activating the power of a revelation is a standard action . Unless otherwise noted, the DC to save against these revelations is equal to 10 + 1/2 the oracleÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢s level + the oracleÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢s Charisma modifier. Editor\u0027s Note Can an oracle select a revelation more than once? No, unless the revelation specifically states you can. [ Source ]",
+                                                           "pools":  [
+                                                                         {
+                                                                             "name":  "Revelation",
+                                                                             "description":  "At 1st level, 3rd level, and every four levels thereafter (7th, 11th, and so on), an oracle uncovers a new secret about her mystery that grants her powers and abilities. The oracle must select a revelation from the list of revelations available to her mystery (see FAQ at right). If a revelation is chosen at a later level, the oracle gains all of the abilities and bonuses granted by that revelation based on her current level. Unless otherwise noted, activating the power of a revelation is a standard action . Unless otherwise noted, the DC to save against these revelations is equal to 10 + 1/2 the oracleÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢s level + the oracleÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢s Charisma modifier. Editor\u0027s Note Can an oracle select a revelation more than once? No, unless the revelation specifically states you can. [ Source ]",
+                                                                             "requirements":  {
+                                                                                                  "minClassLevel":  1,
+                                                                                                  "text":  "At 1st level, 3rd level, and every four levels thereafter (7th, 11th, and so on), an oracle uncovers a new secret about her mystery that grants her powers and abilities. The oracle must select a revelation from the list of revelations available to her mystery (see FAQ at right)."
+                                                                                              },
+                                                                             "options":  [
+                                                                                             {
+                                                                                                 "name":  "Final Revelation",
+                                                                                                 "description":  "At 20th level, an oracle learns the final revelation about her mystery, granting her amazing powers and abilities. The nature of these bonuses depends upon the oracleÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢s mystery.",
+                                                                                                 "requirements":  {
+                                                                                                                      "minClassLevel":  20,
+                                                                                                                      "text":  "At 20th level, an oracle learns the final revelation about her mystery, granting her amazing powers and abilities."
+                                                                                                                  },
+                                                                                                 "scrapeConfidence":  "medium"
+                                                                                             }
+                                                                                         ],
+                                                                             "scrapeSource":  "https://www.d20pfsrd.com/classes/base-classes/oracle/",
+                                                                             "scrapeConfidence":  "low"
+                                                                         }
+                                                                     ]
+                                                       }
+                                                   ],
+                                 "spellcasting":  {
+                                                      "Spells":  "6"
+                                                  }
+                             },
+                             {
+                                 "level":  12,
+                                 "bab":  9,
+                                 "fort":  4,
+                                 "ref":  4,
+                                 "will":  8,
+                                 "classFeatures":  [
+                                                       {
+                                                           "name":  "Mystery Spell",
+                                                           "description":  ""
+                                                       }
+                                                   ],
+                                 "spellcasting":  {
+                                                      "Spells":  "6"
+                                                  }
+                             },
+                             {
+                                 "level":  13,
+                                 "bab":  9,
+                                 "fort":  4,
+                                 "ref":  4,
+                                 "will":  8,
+                                 "classFeatures":  [
+
+                                                   ],
+                                 "spellcasting":  {
+                                                      "Spells":  "6"
+                                                  }
+                             },
+                             {
+                                 "level":  14,
+                                 "bab":  10,
+                                 "fort":  4,
+                                 "ref":  4,
+                                 "will":  9,
+                                 "classFeatures":  [
+                                                       {
+                                                           "name":  "Mystery Spell",
+                                                           "description":  ""
+                                                       }
+                                                   ],
+                                 "spellcasting":  {
+                                                      "Spells":  "6"
+                                                  }
+                             },
+                             {
+                                 "level":  15,
+                                 "bab":  11,
+                                 "fort":  5,
+                                 "ref":  5,
+                                 "will":  9,
+                                 "classFeatures":  [
+                                                       {
+                                                           "name":  "Revelation",
+                                                           "description":  "At 1st level, 3rd level, and every four levels thereafter (7th, 11th, and so on), an oracle uncovers a new secret about her mystery that grants her powers and abilities. The oracle must select a revelation from the list of revelations available to her mystery (see FAQ at right). If a revelation is chosen at a later level, the oracle gains all of the abilities and bonuses granted by that revelation based on her current level. Unless otherwise noted, activating the power of a revelation is a standard action . Unless otherwise noted, the DC to save against these revelations is equal to 10 + 1/2 the oracleÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢s level + the oracleÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢s Charisma modifier. Editor\u0027s Note Can an oracle select a revelation more than once? No, unless the revelation specifically states you can. [ Source ]",
+                                                           "pools":  [
+                                                                         {
+                                                                             "name":  "Revelation",
+                                                                             "description":  "At 1st level, 3rd level, and every four levels thereafter (7th, 11th, and so on), an oracle uncovers a new secret about her mystery that grants her powers and abilities. The oracle must select a revelation from the list of revelations available to her mystery (see FAQ at right). If a revelation is chosen at a later level, the oracle gains all of the abilities and bonuses granted by that revelation based on her current level. Unless otherwise noted, activating the power of a revelation is a standard action . Unless otherwise noted, the DC to save against these revelations is equal to 10 + 1/2 the oracleÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢s level + the oracleÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢s Charisma modifier. Editor\u0027s Note Can an oracle select a revelation more than once? No, unless the revelation specifically states you can. [ Source ]",
+                                                                             "requirements":  {
+                                                                                                  "minClassLevel":  1,
+                                                                                                  "text":  "At 1st level, 3rd level, and every four levels thereafter (7th, 11th, and so on), an oracle uncovers a new secret about her mystery that grants her powers and abilities. The oracle must select a revelation from the list of revelations available to her mystery (see FAQ at right)."
+                                                                                              },
+                                                                             "options":  [
+                                                                                             {
+                                                                                                 "name":  "Final Revelation",
+                                                                                                 "description":  "At 20th level, an oracle learns the final revelation about her mystery, granting her amazing powers and abilities. The nature of these bonuses depends upon the oracleÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢s mystery.",
+                                                                                                 "requirements":  {
+                                                                                                                      "minClassLevel":  20,
+                                                                                                                      "text":  "At 20th level, an oracle learns the final revelation about her mystery, granting her amazing powers and abilities."
+                                                                                                                  },
+                                                                                                 "scrapeConfidence":  "medium"
+                                                                                             }
+                                                                                         ],
+                                                                             "scrapeSource":  "https://www.d20pfsrd.com/classes/base-classes/oracle/",
+                                                                             "scrapeConfidence":  "low"
+                                                                         }
+                                                                     ]
+                                                       }
+                                                   ],
+                                 "spellcasting":  {
+                                                      "Spells":  "6"
+                                                  }
+                             },
+                             {
+                                 "level":  16,
+                                 "bab":  12,
+                                 "fort":  5,
+                                 "ref":  5,
+                                 "will":  10,
+                                 "classFeatures":  [
+                                                       {
+                                                           "name":  "Mystery Spell",
+                                                           "description":  ""
+                                                       }
+                                                   ],
+                                 "spellcasting":  {
+                                                      "Spells":  "6"
+                                                  }
+                             },
+                             {
+                                 "level":  17,
+                                 "bab":  12,
+                                 "fort":  5,
+                                 "ref":  5,
+                                 "will":  10,
+                                 "classFeatures":  [
+
+                                                   ],
+                                 "spellcasting":  {
+                                                      "Spells":  "6"
+                                                  }
+                             },
+                             {
+                                 "level":  18,
+                                 "bab":  13,
+                                 "fort":  6,
+                                 "ref":  6,
+                                 "will":  11,
+                                 "classFeatures":  [
+                                                       {
+                                                           "name":  "Mystery Spell",
+                                                           "description":  ""
+                                                       }
+                                                   ],
+                                 "spellcasting":  {
+                                                      "Spells":  "6"
+                                                  }
+                             },
+                             {
+                                 "level":  19,
+                                 "bab":  14,
+                                 "fort":  6,
+                                 "ref":  6,
+                                 "will":  11,
+                                 "classFeatures":  [
+                                                       {
+                                                           "name":  "Revelation",
+                                                           "description":  "At 1st level, 3rd level, and every four levels thereafter (7th, 11th, and so on), an oracle uncovers a new secret about her mystery that grants her powers and abilities. The oracle must select a revelation from the list of revelations available to her mystery (see FAQ at right). If a revelation is chosen at a later level, the oracle gains all of the abilities and bonuses granted by that revelation based on her current level. Unless otherwise noted, activating the power of a revelation is a standard action . Unless otherwise noted, the DC to save against these revelations is equal to 10 + 1/2 the oracleÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢s level + the oracleÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢s Charisma modifier. Editor\u0027s Note Can an oracle select a revelation more than once? No, unless the revelation specifically states you can. [ Source ]",
+                                                           "pools":  [
+                                                                         {
+                                                                             "name":  "Revelation",
+                                                                             "description":  "At 1st level, 3rd level, and every four levels thereafter (7th, 11th, and so on), an oracle uncovers a new secret about her mystery that grants her powers and abilities. The oracle must select a revelation from the list of revelations available to her mystery (see FAQ at right). If a revelation is chosen at a later level, the oracle gains all of the abilities and bonuses granted by that revelation based on her current level. Unless otherwise noted, activating the power of a revelation is a standard action . Unless otherwise noted, the DC to save against these revelations is equal to 10 + 1/2 the oracleÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢s level + the oracleÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢s Charisma modifier. Editor\u0027s Note Can an oracle select a revelation more than once? No, unless the revelation specifically states you can. [ Source ]",
+                                                                             "requirements":  {
+                                                                                                  "minClassLevel":  1,
+                                                                                                  "text":  "At 1st level, 3rd level, and every four levels thereafter (7th, 11th, and so on), an oracle uncovers a new secret about her mystery that grants her powers and abilities. The oracle must select a revelation from the list of revelations available to her mystery (see FAQ at right)."
+                                                                                              },
+                                                                             "options":  [
+                                                                                             {
+                                                                                                 "name":  "Final Revelation",
+                                                                                                 "description":  "At 20th level, an oracle learns the final revelation about her mystery, granting her amazing powers and abilities. The nature of these bonuses depends upon the oracleÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢s mystery.",
+                                                                                                 "requirements":  {
+                                                                                                                      "minClassLevel":  20,
+                                                                                                                      "text":  "At 20th level, an oracle learns the final revelation about her mystery, granting her amazing powers and abilities."
+                                                                                                                  },
+                                                                                                 "scrapeConfidence":  "medium"
+                                                                                             }
+                                                                                         ],
+                                                                             "scrapeSource":  "https://www.d20pfsrd.com/classes/base-classes/oracle/",
+                                                                             "scrapeConfidence":  "low"
+                                                                         }
+                                                                     ]
+                                                       }
+                                                   ],
+                                 "spellcasting":  {
+                                                      "Spells":  "6"
+                                                  }
+                             },
+                             {
+                                 "level":  20,
+                                 "bab":  15,
+                                 "fort":  6,
+                                 "ref":  6,
+                                 "will":  12,
+                                 "classFeatures":  [
+                                                       {
+                                                           "name":  "Final Revelation",
+                                                           "description":  "At 20th level, an oracle learns the final revelation about her mystery, granting her amazing powers and abilities. The nature of these bonuses depends upon the oracleÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢s mystery."
+                                                       }
+                                                   ],
+                                 "spellcasting":  {
+                                                      "Spells":  "6"
+                                                  }
+                             }
+                         ],
+    "spellcasting":  {
+                         "summary":  "spontaneous full caster using CHA",
+                         "castingType":  "spontaneous",
+                         "progression":  "full",
+                         "ability":  "cha",
+                         "preparation":  "spontaneous",
+                         "maxSpellLevel":  9,
+                         "slotsByLevel":  [
+                                              [
+                                                  0,
+                                                  3,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0
+                                              ],
+                                              [
+                                                  0,
+                                                  4,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0
+                                              ],
+                                              [
+                                                  0,
+                                                  5,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0
+                                              ],
+                                              [
+                                                  0,
+                                                  6,
+                                                  3,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0
+                                              ],
+                                              [
+                                                  0,
+                                                  6,
+                                                  4,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0
+                                              ],
+                                              [
+                                                  0,
+                                                  6,
+                                                  5,
+                                                  3,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0
+                                              ],
+                                              [
+                                                  0,
+                                                  6,
+                                                  6,
+                                                  4,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0
+                                              ],
+                                              [
+                                                  0,
+                                                  6,
+                                                  6,
+                                                  5,
+                                                  3,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0
+                                              ],
+                                              [
+                                                  0,
+                                                  6,
+                                                  6,
+                                                  6,
+                                                  4,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0
+                                              ],
+                                              [
+                                                  0,
+                                                  6,
+                                                  6,
+                                                  6,
+                                                  5,
+                                                  3,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0
+                                              ],
+                                              [
+                                                  0,
+                                                  6,
+                                                  6,
+                                                  6,
+                                                  6,
+                                                  4,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0
+                                              ],
+                                              [
+                                                  0,
+                                                  6,
+                                                  6,
+                                                  6,
+                                                  6,
+                                                  5,
+                                                  3,
+                                                  0,
+                                                  0,
+                                                  0
+                                              ],
+                                              [
+                                                  0,
+                                                  6,
+                                                  6,
+                                                  6,
+                                                  6,
+                                                  6,
+                                                  4,
+                                                  0,
+                                                  0,
+                                                  0
+                                              ],
+                                              [
+                                                  0,
+                                                  6,
+                                                  6,
+                                                  6,
+                                                  6,
+                                                  6,
+                                                  5,
+                                                  3,
+                                                  0,
+                                                  0
+                                              ],
+                                              [
+                                                  0,
+                                                  6,
+                                                  6,
+                                                  6,
+                                                  6,
+                                                  6,
+                                                  6,
+                                                  4,
+                                                  0,
+                                                  0
+                                              ],
+                                              [
+                                                  0,
+                                                  6,
+                                                  6,
+                                                  6,
+                                                  6,
+                                                  6,
+                                                  6,
+                                                  5,
+                                                  3,
+                                                  0
+                                              ],
+                                              [
+                                                  0,
+                                                  6,
+                                                  6,
+                                                  6,
+                                                  6,
+                                                  6,
+                                                  6,
+                                                  6,
+                                                  4,
+                                                  0
+                                              ],
+                                              [
+                                                  0,
+                                                  6,
+                                                  6,
+                                                  6,
+                                                  6,
+                                                  6,
+                                                  6,
+                                                  6,
+                                                  5,
+                                                  3
+                                              ],
+                                              [
+                                                  0,
+                                                  6,
+                                                  6,
+                                                  6,
+                                                  6,
+                                                  6,
+                                                  6,
+                                                  6,
+                                                  6,
+                                                  4
+                                              ],
+                                              [
+                                                  0,
+                                                  6,
+                                                  6,
+                                                  6,
+                                                  6,
+                                                  6,
+                                                  6,
+                                                  6,
+                                                  6,
+                                                  6
+                                              ]
+                                          ],
+                         "knownByLevel":  [
+                                              [
+                                                  4,
+                                                  2,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0
+                                              ],
+                                              [
+                                                  5,
+                                                  2,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0
+                                              ],
+                                              [
+                                                  5,
+                                                  3,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0
+                                              ],
+                                              [
+                                                  6,
+                                                  3,
+                                                  1,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0
+                                              ],
+                                              [
+                                                  6,
+                                                  4,
+                                                  2,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0
+                                              ],
+                                              [
+                                                  7,
+                                                  4,
+                                                  2,
+                                                  1,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0
+                                              ],
+                                              [
+                                                  7,
+                                                  5,
+                                                  3,
+                                                  2,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0
+                                              ],
+                                              [
+                                                  8,
+                                                  5,
+                                                  3,
+                                                  2,
+                                                  1,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0
+                                              ],
+                                              [
+                                                  8,
+                                                  5,
+                                                  4,
+                                                  3,
+                                                  2,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0
+                                              ],
+                                              [
+                                                  9,
+                                                  5,
+                                                  4,
+                                                  3,
+                                                  2,
+                                                  1,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0
+                                              ],
+                                              [
+                                                  9,
+                                                  5,
+                                                  5,
+                                                  4,
+                                                  3,
+                                                  2,
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0
+                                              ],
+                                              [
+                                                  9,
+                                                  5,
+                                                  5,
+                                                  4,
+                                                  3,
+                                                  2,
+                                                  1,
+                                                  0,
+                                                  0,
+                                                  0
+                                              ],
+                                              [
+                                                  9,
+                                                  5,
+                                                  5,
+                                                  4,
+                                                  4,
+                                                  3,
+                                                  2,
+                                                  0,
+                                                  0,
+                                                  0
+                                              ],
+                                              [
+                                                  9,
+                                                  5,
+                                                  5,
+                                                  4,
+                                                  4,
+                                                  3,
+                                                  2,
+                                                  1,
+                                                  0,
+                                                  0
+                                              ],
+                                              [
+                                                  9,
+                                                  5,
+                                                  5,
+                                                  4,
+                                                  4,
+                                                  4,
+                                                  3,
+                                                  2,
+                                                  0,
+                                                  0
+                                              ],
+                                              [
+                                                  9,
+                                                  5,
+                                                  5,
+                                                  4,
+                                                  4,
+                                                  4,
+                                                  3,
+                                                  2,
+                                                  1,
+                                                  0
+                                              ],
+                                              [
+                                                  9,
+                                                  5,
+                                                  5,
+                                                  4,
+                                                  4,
+                                                  4,
+                                                  3,
+                                                  3,
+                                                  2,
+                                                  0
+                                              ],
+                                              [
+                                                  9,
+                                                  5,
+                                                  5,
+                                                  4,
+                                                  4,
+                                                  4,
+                                                  3,
+                                                  3,
+                                                  2,
+                                                  1
+                                              ],
+                                              [
+                                                  9,
+                                                  5,
+                                                  5,
+                                                  4,
+                                                  4,
+                                                  4,
+                                                  3,
+                                                  3,
+                                                  3,
+                                                  2
+                                              ],
+                                              [
+                                                  9,
+                                                  5,
+                                                  5,
+                                                  4,
+                                                  4,
+                                                  4,
+                                                  3,
+                                                  3,
+                                                  3,
+                                                  3
+                                              ]
+                                          ]
+                     },
+    "spellcastingClass":  true
+}

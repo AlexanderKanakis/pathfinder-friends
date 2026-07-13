@@ -1,0 +1,291 @@
+{
+  "name": "Pain Taster",
+  "type": "prestige",
+  "sourceUrl": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/n-r/pain-taster/",
+  "levelProgression": [
+    {
+      "level": 1,
+      "bab": 1,
+      "fort": 1,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [
+        {
+          "name": "Disciple Of Pain",
+          "description": "At 1st level, a pain taster can focus her agony through the use of six torture routines. Each routine grants her a different day-long benefit. The first time a pain taster performs a particular torture routine, she must spend 1 hour inflicting self-harm using materials that cost 2,000 gp. The method of self-torture is detailed in the routines below. After performing a routine for the first time, she can subsequently perform a less strenuous version of that routine to gain its benefits for 24 hours without needing to expend any further money on torture implements, ritual incense, and pain heightening drugs. If the pain taster wishes to change her routine, she must spend 2,000 gp when first performing the new ritual. She must pay this cost each time she changes her routine, even if returning to a routine she had previously paid for. A pain taster can benefit from only one routine at a time. Disciple of Acuity : By spending an hour reciting a lengthy series of mantras while clutching a length of razor-edged metal, the pain taster gains a +2 enhancement bonus to Intelligence for 24 hours. The initial torture session for this routine involves making dozens of arterial incisions and writing the mantras in blood. Disciple of Flexibility : By spending an hour painfully hyper-extending each joint, the pain taster gains a +2 enhancement bonus to Dexterity for 24 hours. The initial torture session for this routine involves tearing major tendons in each limb. Disciple of Insight : By spending an hour whipping or bludgeoning herself while meditating on her failures and regrets, a pain t"
+        },
+        {
+          "name": "Masochism 1",
+          "description": ""
+        },
+        {
+          "name": "Scourge",
+          "description": "Pain tasters are masters of torture, and at 1st level they receive Weapon Focus ( whip ) as a bonus feat. If the pain taster already has Weapon Focus ( whip ), she instead receives Whip Mastery as a bonus feat."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 2,
+      "bab": 2,
+      "fort": 1,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Cruelty +1d6",
+          "description": ""
+        },
+        {
+          "name": "Damage Reduction 1/-",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 3,
+      "bab": 3,
+      "fort": 2,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Blood Control",
+          "description": "At 3rd level, the pain taster gains the ability to control the blood pressure throughout her body. Anytime the pain taster is dealt bleed damage, she reduces the amount of damage taken by 1 per pain taster level (minimum 0). When taking Constitution damage as a result of blood loss (such as a stirge or a vampire's bite), a pain taster reduces the amount of ability damage dealt by an amount equal to half the pain taster's class level (minimum 0). As an immediate action , a pain taster can delay the onset of injury or contact poisons by succeeding at a Will save. The DC of this check is equal to the poison's save DC. If the save is successful, the poison's initial and secondary damage are both delayed by 1 minute per pain taster level."
+        },
+        {
+          "name": "Torturer'S Mettle 1/Day",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 4,
+      "bab": 4,
+      "fort": 2,
+      "ref": 1,
+      "will": 1,
+      "classFeatures": [
+        {
+          "name": "Cruelty +2d6",
+          "description": ""
+        },
+        {
+          "name": "Damage Reduction 2/-",
+          "description": ""
+        },
+        {
+          "name": "Masochism 2",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 5,
+      "bab": 5,
+      "fort": 3,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Pain Mastery",
+          "description": "At 5th level, when using her masochism ability, the pain taster can combine two of her daily routines into one. The pain taster must still self-inflict the combined amount of hit point damage for both routines, though she can perform both routines simultaneously in 1 hour. When she does so, she gains the benefits from both routines (a pair of +2 enhancement bonuses). To gain access to a second routine for the first time or to change out one of the paired routines, the pain taster must still perform the new routine's initial torture session in full, and must pay the cost for it."
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 6,
+      "bab": 6,
+      "fort": 3,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Cruelty +3d6",
+          "description": ""
+        },
+        {
+          "name": "Damage Reduction 3/-",
+          "description": ""
+        },
+        {
+          "name": "Torturer'S Mettle 2/Day",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 7,
+      "bab": 7,
+      "fort": 4,
+      "ref": 2,
+      "will": 2,
+      "classFeatures": [
+        {
+          "name": "Exquisite Lash",
+          "description": "At 7th level, a pain taster's aptitude with the whip increases. She receives Whip Mastery as a bonus feat. If the pain taster already has Whip Mastery , she instead receives Improved Whip Mastery as a bonus feat."
+        },
+        {
+          "name": "Masochism 3",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 8,
+      "bab": 8,
+      "fort": 4,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Cruelty +4d6",
+          "description": ""
+        },
+        {
+          "name": "Damage Reduction 4/-",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 9,
+      "bab": 9,
+      "fort": 5,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Sadism",
+          "description": "At 9th level, a pain taster becomes worked into a frenzy when dealing damage to other targets. When she deals bonus damage to a target using her cruelty ability, she halves the number of points of damage she must self-inflict as part of her masochism ability until the end of her next turn. Section 15: Copyright Notice Pathfinder Campaign Setting: Occult Mysteries Ãƒâ€šÃ‚Â© 2014, Paizo Inc.; Authors: Jason Bulmahn, Crystal Frasier, Jim Groves, Brandon Hodge, James Jacobs, Erik Mona, F. Wesley Schneider, and Jerome Virnich."
+        },
+        {
+          "name": "Torturer'S Mettle 3/Day",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 10,
+      "bab": 10,
+      "fort": 5,
+      "ref": 3,
+      "will": 3,
+      "classFeatures": [
+        {
+          "name": "Cruelty +5d6",
+          "description": ""
+        },
+        {
+          "name": "Damage Reduction 5/-",
+          "description": ""
+        },
+        {
+          "name": "Masochism 4",
+          "description": ""
+        }
+      ],
+      "spellcasting": {}
+    },
+    {
+      "level": 11,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 12,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 13,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 14,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 15,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 16,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 17,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 18,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 19,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    },
+    {
+      "level": 20,
+      "bab": 0,
+      "fort": 0,
+      "ref": 0,
+      "will": 0,
+      "classFeatures": [],
+      "spellcasting": {}
+    }
+  ],
+  "spellcasting": null,
+  "spellcastingClass": false
+}
