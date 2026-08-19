@@ -47,6 +47,24 @@
         border: 1px solid #555;
         color: #8fd19e;
       }
+      #spellPickerResults .source-results-grid {
+        align-items: start;
+      }
+      .spell-picker-card {
+        min-height: 0;
+        align-self: start;
+        padding: 8px 38px 8px 10px;
+      }
+      .spell-picker-modal .modal-header {
+        padding: 8px 12px;
+      }
+      .spell-picker-modal .modal-title {
+        font-size: 16px;
+        line-height: 1.2;
+      }
+      .spell-picker-modal .modal-body {
+        overflow-y: auto;
+      }
       .spell-picker-description {
         color: #ddd;
         font-size: 13px;
@@ -55,9 +73,23 @@
       }
       .spell-picker-filters {
         display: grid;
-        grid-template-columns: minmax(140px, 1fr) minmax(86px, 120px) minmax(140px, 1fr);
+        grid-template-columns: minmax(120px, 1fr) 62px minmax(120px, .85fr);
         gap: 8px;
         margin-bottom: 8px;
+      }
+      .spell-picker-filters label {
+        font-size: 12px;
+        margin-bottom: 2px;
+      }
+      #spellPickerSearch::placeholder {
+        color: #f2f2f2;
+        opacity: 1;
+      }
+      #spellPickerResults {
+        min-height: 0;
+        max-height: none;
+        overflow: visible;
+        margin-top: 8px;
       }
       .spell-picker-detail-stack {
         margin-top: 8px;
@@ -86,7 +118,7 @@
         gap: 2px;
       }
       @media (max-width: 760px) {
-        .spell-picker-filters { grid-template-columns: 1fr; }
+        .spell-picker-filters { grid-template-columns: minmax(0, 1fr) 60px minmax(0, 1fr); }
       }
     `;
     document.head.appendChild(style);
@@ -98,12 +130,9 @@
     document.body.insertAdjacentHTML("beforeend", `
       <div class="modal fade" id="${MODAL_ID}" tabindex="-1" aria-labelledby="${MODAL_ID}Label" aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable search-modal-dialog">
-          <div class="modal-content bg-dark text-white border-secondary">
+          <div class="modal-content bg-dark text-white border-secondary spell-picker-modal">
             <div class="modal-header">
-              <div>
-                <h5 class="modal-title" id="${MODAL_ID}Label">Choose Spell</h5>
-                <div id="spellPickerCount" class="small text-secondary"></div>
-              </div>
+              <h5 class="modal-title" id="${MODAL_ID}Label">Choose Spell</h5>
               <button type="button" class="btn-close btn-close-white d-none" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -121,7 +150,7 @@
                   <select id="spellPickerSchool" class="form-select form-select-sm"></select>
                 </div>
               </div>
-              <input id="spellPickerSearch" class="form-control form-control-sm mb-3" placeholder="Search spells">
+              <input id="spellPickerSearch" class="form-control form-control-sm mb-2" placeholder="Search spell name or description">
               <div id="spellPickerResults" class="source-results-panel search-modal-results"></div>
             </div>
             <div class="modal-footer">
@@ -228,7 +257,6 @@
 
   function renderResults() {
     const wrapper = document.getElementById("spellPickerResults");
-    const count = document.getElementById("spellPickerCount");
     const term = state.search || "";
     const results = state.spells
       .filter(spellMatches)
@@ -239,7 +267,6 @@
         return rankA - rankB || String(a.name || "").localeCompare(String(b.name || ""));
       });
 
-    count.textContent = `${results.length} spell${results.length === 1 ? "" : "s"}`;
     if (!results.length) {
       wrapper.innerHTML = `<div class="small text-secondary">${escapeHtml(state.emptyMessage || "No matching spells found.")}</div>`;
       updateSelectButton();
@@ -268,7 +295,7 @@
     if (state.scrollToExpanded && state.expanded) {
       const focused = [...wrapper.querySelectorAll("[data-spell-name]")]
         .find(card => card.getAttribute("data-spell-name") === state.expanded);
-      focused?.scrollIntoView({ block: "nearest" });
+      focused?.scrollIntoView({ block: "start" });
       state.scrollToExpanded = false;
     }
 
@@ -276,6 +303,7 @@
       card.addEventListener("click", () => {
         const spell = results[Number(card.dataset.spellExpand)];
         state.expanded = state.expanded === spell?.name ? "" : spell?.name || "";
+        state.scrollToExpanded = Boolean(state.expanded);
         renderResults();
       });
       card.addEventListener("keydown", event => {
@@ -283,6 +311,7 @@
         event.preventDefault();
         const spell = results[Number(card.dataset.spellExpand)];
         state.expanded = state.expanded === spell?.name ? "" : spell?.name || "";
+        state.scrollToExpanded = Boolean(state.expanded);
         renderResults();
       });
     });
