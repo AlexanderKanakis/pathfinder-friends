@@ -7,6 +7,12 @@
     config.anonKey.includes("YOUR_SUPABASE_ANON_KEY");
 
   let client = null;
+  let contextsCache = null;
+  let contextsCacheUserId = "";
+  let contextsPromise = null;
+  let campaignsCache = null;
+  let campaignsCacheUserId = "";
+  let campaignsPromise = null;
 
   if (!missingConfig && window.supabase) {
     client = window.supabase.createClient(config.url, config.anonKey);
@@ -179,6 +185,25 @@
     }
   }
 
+  function invalidateContextCaches() {
+    contextsCache = null;
+    contextsCacheUserId = "";
+    contextsPromise = null;
+    campaignsCache = null;
+    campaignsCacheUserId = "";
+    campaignsPromise = null;
+  }
+
+  function characterLevelFromSheet(sheet = {}) {
+    const raw = sheet?.fields?.characterLevel
+      ?? sheet?.characterLevel
+      ?? sheet?.fields?.level
+      ?? sheet?.level
+      ?? null;
+    const value = Number.parseInt(String(raw ?? "").trim(), 10);
+    return Number.isFinite(value) ? value : null;
+  }
+
   function showLockedMessage(message) {
     const container = document.querySelector(".container");
     if (!container) return;
@@ -191,6 +216,7 @@
 
   async function signOut() {
     if (!client) return;
+    invalidateContextCaches();
     await client.auth.signOut();
     window.location.href = "auth.html";
   }
@@ -314,25 +340,34 @@
   async function loadContexts() {
     const user = await getUser();
     if (!client || !user) return [{ key: "general", label: "General", gameId: null }];
+    if (contextsCache && contextsCacheUserId === user.id) return contextsCache;
+    if (contextsPromise && contextsCacheUserId === user.id) return contextsPromise;
 
-    const { data, error } = await client
-      .from("games")
-      .select("id,name")
-      .order("name", { ascending: true });
+    contextsCacheUserId = user.id;
+    contextsPromise = (async () => {
+      const { data, error } = await client
+        .from("games")
+        .select("id,name")
+        .order("name", { ascending: true });
 
-    if (error) {
-      console.error(error);
-      return [{ key: "general", label: "General", gameId: null }];
-    }
+      if (error) {
+        console.error(error);
+        return [{ key: "general", label: "General", gameId: null }];
+      }
 
-    return [
-      { key: "general", label: "General", gameId: null },
-      ...(data || []).map(game => ({
-        key: `game:${game.id}`,
-        label: game.name,
-        gameId: game.id
-      }))
-    ];
+      return [
+        { key: "general", label: "General", gameId: null },
+        ...(data || []).map(game => ({
+          key: `game:${game.id}`,
+          label: game.name,
+          gameId: game.id
+        }))
+      ];
+    })();
+
+    contextsCache = await contextsPromise;
+    contextsPromise = null;
+    return contextsCache;
   }
 
   async function createCampaign(name, description) {
@@ -346,6 +381,7 @@
       console.error(error);
       return { error };
     }
+    invalidateContextCaches();
     return { data };
   }
 
@@ -374,12 +410,22 @@
   async function loadCampaigns() {
     const user = await getUser();
     if (!user) return [];
-    const { data, error } = await client.rpc("get_my_campaigns");
-    if (error) {
-      console.error(error);
-      return [];
-    }
-    return data || [];
+    if (campaignsCache && campaignsCacheUserId === user.id) return campaignsCache;
+    if (campaignsPromise && campaignsCacheUserId === user.id) return campaignsPromise;
+
+    campaignsCacheUserId = user.id;
+    campaignsPromise = (async () => {
+      const { data, error } = await client.rpc("get_my_campaigns");
+      if (error) {
+        console.error(error);
+        return [];
+      }
+      return data || [];
+    })();
+
+    campaignsCache = await campaignsPromise;
+    campaignsPromise = null;
+    return campaignsCache;
   }
 
   async function isGameManager(contextKey = getSelectedContextKey()) {
@@ -409,12 +455,14 @@
       accept_request: Boolean(accepted)
     });
     if (error) console.error(error);
+    if (!error) invalidateContextCaches();
     return { error };
   }
 
   async function leaveCampaign(gameId) {
     const { error } = await client.rpc("leave_campaign", { target_game_id: gameId });
     if (error) console.error(error);
+    if (!error) invalidateContextCaches();
     return { error };
   }
 
@@ -424,12 +472,14 @@
       target_user_id: userId
     });
     if (error) console.error(error);
+    if (!error) invalidateContextCaches();
     return { error };
   }
 
   async function deleteCampaign(gameId) {
     const { error } = await client.from("games").delete().eq("id", gameId);
     if (error) console.error(error);
+    if (!error) invalidateContextCaches();
     return { error };
   }
 
@@ -445,6 +495,7 @@
       .single();
 
     if (error) console.error(error);
+    if (!error) invalidateContextCaches();
     return { data, error };
   }
 
@@ -987,15 +1038,28 @@
     if (!user) return [];
 
     const context = normalizeContext(contextKey);
-    let query = client
-      .from("character_sheets")
-      .select(options.includeSheet ? "id,character_name,user_id,updated_at,sheet" : "id,character_name,user_id,updated_at")
-      .eq("context_key", context.contextKey)
-      .order("updated_at", { ascending: false });
+    const selectFields = options.summaryOnly
+      ? "id,character_name,user_id,updated_at,character_level"
+      : options.includeSheet
+        ? "id,character_name,user_id,updated_at,sheet"
+        : "id,character_name,user_id,updated_at";
 
-    if (!context.gameId || options.ownOnly) query = query.eq("user_id", user.id);
+    const runQuery = async fields => {
+      let query = client
+        .from("character_sheets")
+        .select(fields)
+        .eq("context_key", context.contextKey)
+        .order("updated_at", { ascending: false });
 
-    const { data, error } = await query;
+      if (!context.gameId || options.ownOnly) query = query.eq("user_id", user.id);
+      return query;
+    };
+
+    let { data, error } = await runQuery(selectFields);
+
+    if (error && options.summaryOnly && String(error.message || "").includes("character_level")) {
+      ({ data, error } = await runQuery("id,character_name,user_id,updated_at,sheet"));
+    }
 
     if (error) {
       console.error(error);
@@ -1094,6 +1158,7 @@
       .from("character_sheets")
       .update({
         sheet,
+        character_level: characterLevelFromSheet(sheet),
         updated_at: new Date().toISOString()
       })
       .eq("id", sheetId)
@@ -1101,9 +1166,26 @@
 
     if (context.gameId) query = query.eq("game_id", context.gameId);
 
-    const { data, error } = await query
+    let { data, error } = await query
       .select("id,character_name,user_id,sheet")
       .single();
+
+    if (error && String(error.message || "").includes("character_level")) {
+      let fallbackQuery = client
+        .from("character_sheets")
+        .update({
+          sheet,
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", sheetId)
+        .eq("context_key", context.contextKey);
+
+      if (context.gameId) fallbackQuery = fallbackQuery.eq("game_id", context.gameId);
+
+      ({ data, error } = await fallbackQuery
+        .select("id,character_name,user_id,sheet")
+        .single());
+    }
 
     if (error) {
       console.error(error);
@@ -1139,17 +1221,28 @@
       context_key: context.contextKey,
       game_id: context.gameId,
       character_name: characterName,
+      character_level: characterLevelFromSheet(sheet),
       sheet,
       updated_at: new Date().toISOString()
     };
 
     if (sheetId) {
-      const { data, error } = await client
+      let { data, error } = await client
         .from("character_sheets")
         .update(payload)
         .eq("id", sheetId)
         .select("id")
         .single();
+
+      if (error && String(error.message || "").includes("character_level")) {
+        const { character_level, ...fallbackPayload } = payload;
+        ({ data, error } = await client
+          .from("character_sheets")
+          .update(fallbackPayload)
+          .eq("id", sheetId)
+          .select("id")
+          .single());
+      }
 
       if (error) console.error(error);
       return data;
@@ -1160,11 +1253,20 @@
       return saveCharacterSheet(characterName, sheet, contextKey, existing.id);
     }
 
-    const { data, error } = await client
+    let { data, error } = await client
       .from("character_sheets")
       .insert({ ...payload, user_id: user.id })
       .select("id")
       .single();
+
+    if (error && String(error.message || "").includes("character_level")) {
+      const { character_level, ...fallbackPayload } = payload;
+      ({ data, error } = await client
+        .from("character_sheets")
+        .insert({ ...fallbackPayload, user_id: user.id })
+        .select("id")
+        .single());
+    }
 
     if (error) console.error(error);
     return data;

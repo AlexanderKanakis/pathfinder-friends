@@ -71,7 +71,7 @@
                 <h5 class="modal-title" id="${MODAL_ID}Label">Choose Feature</h5>
                 <div id="classFeatureChoicePickerCount" class="small text-secondary"></div>
               </div>
-              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+              <button type="button" class="btn-close btn-close-white d-none" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
               <div id="classFeatureChoicePickerDescription" class="small-text mb-2"></div>

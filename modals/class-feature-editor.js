@@ -67,7 +67,7 @@
           <form id="classFeatureEditorForm" class="modal-content bg-dark text-white border-secondary">
             <div class="modal-header">
               <h5 class="modal-title" id="classFeatureEditorModalLabel">Class Feature</h5>
-              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+              <button type="button" class="btn-close btn-close-white d-none" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
               <div class="mb-2">
@@ -101,7 +101,7 @@
           <div class="modal-content bg-dark text-white border-secondary">
             <div class="modal-header">
               <h5 class="modal-title" id="classFeatureScaleModalLabel">Bonus Scale</h5>
-              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+              <button type="button" class="btn-close btn-close-white d-none" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
               <div class="row g-2 mb-3">

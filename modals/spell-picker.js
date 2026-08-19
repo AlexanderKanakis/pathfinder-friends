@@ -104,7 +104,7 @@
                 <h5 class="modal-title" id="${MODAL_ID}Label">Choose Spell</h5>
                 <div id="spellPickerCount" class="small text-secondary"></div>
               </div>
-              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+              <button type="button" class="btn-close btn-close-white d-none" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
               <div class="spell-picker-filters">
