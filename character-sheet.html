@@ -1180,11 +1180,14 @@ function isEnemySpellMetadataKey(key = "") {
 function isEnemySpellRowKey(key = "") {
   const clean = String(key || "").trim();
   return /^constant$/i.test(clean)
+    || /^constant\s*\(level\s*\d+\)$/i.test(clean)
     || /^atWill$/i.test(clean)
     || /^at will$/i.test(clean)
+    || /^at will\s*\(level\s*\d+\)$/i.test(clean)
     || /^\d+PerDay$/i.test(clean)
     || /^\d+\s*per\s*day$/i.test(clean)
     || /^\d+\/day$/i.test(clean)
+    || /^\d+\/day\s*\(level\s*\d+\)$/i.test(clean)
     || /^level\s*\d+/i.test(clean)
     || /^\d+(st|nd|rd|th)?$/i.test(clean);
 }
