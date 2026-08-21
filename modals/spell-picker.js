@@ -81,10 +81,6 @@
         font-size: 12px;
         margin-bottom: 2px;
       }
-      #spellPickerSearch::placeholder {
-        color: #f2f2f2;
-        opacity: 1;
-      }
       #spellPickerResults {
         min-height: 0;
         max-height: none;

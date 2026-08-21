@@ -32,7 +32,6 @@
     .sheet-view-tab { border: 0; border-bottom: 2px solid transparent; border-radius: 0; background: transparent; color: #bbb; min-width: 92px; padding: 8px 14px 9px; line-height: 1.1; text-align: center; }
     .sheet-view-tab:hover, .sheet-view-tab:focus { color: #fff; background: #1b1b1b; outline: none; }
     .sheet-view-tab.active { color: #fff; border-bottom-color: #0dcaf0; background: #202020; }
-    .sheet-page-effects-row { display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
     .sheet-loading-shell { max-width: 1320px; }
     .sheet-skeleton-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
     .sheet-skeleton-section { background: #1e1e1e; border-radius: 10px; padding: 12px; min-height: 150px; overflow: hidden; }
@@ -114,6 +113,59 @@
     .sheet-title { font-size: 13px; color: #aaa; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
     .sheet-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
     .sheet-grid-wide { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 8px; }
+    .enemy-only { display: none !important; }
+    body.enemy-sheet-mode .enemy-only { display: block !important; }
+    body.enemy-sheet-mode .enemy-section-stack.enemy-only { display: grid !important; }
+    body.enemy-sheet-mode .character-only { display: none !important; }
+    body.enemy-sheet-mode .enemy-only label { display: block; }
+    body.enemy-sheet-mode .enemy-full-line { grid-column: 1 / -1; }
+    body.enemy-sheet-mode .enemy-double-field { grid-column: span 2; }
+    body.enemy-sheet-mode .enemy-field-pair {
+      grid-column: 1 / -1;
+      display: grid !important;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+    .enemy-textarea { min-height: 82px; }
+    .enemy-section-stack { display: grid; gap: 12px; }
+    .enemy-auto-input.form-control {
+      field-sizing: content;
+      width: auto;
+      min-width: 7rem;
+      max-width: 100%;
+      display: inline-block;
+    }
+    .enemy-spell-meta-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+    .enemy-spell-meta-grid label { display: block; }
+    .enemy-spell-source { display: grid; gap: 6px; margin-bottom: 10px; }
+    .enemy-spell-source:last-child { margin-bottom: 0; }
+    .enemy-spell-source-title { color: #f0d58c; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
+    .enemy-spell-source-meta { color: #aaa; font-size: 12px; }
+    .enemy-spell-grid { display: grid; gap: 6px; }
+    .enemy-spell-header,
+    .enemy-spell-row { display: grid; grid-template-columns: minmax(105px, 150px) minmax(0, 1fr) 32px; gap: 8px; align-items: start; }
+    .enemy-spell-header { color: #aaa; font-size: 12px; padding: 0 2px; }
+    .enemy-spell-row { padding: 0; }
+    .enemy-spell-row textarea,
+    .enemy-auto-textarea { min-height: 34px; overflow: hidden; resize: none; }
+    .enemy-spell-row textarea { min-height: 31px; }
+    .enemy-spell-delete { width: 31px; height: 31px; display: inline-flex; align-items: center; justify-content: center; padding: 0; }
+    .enemy-header-control.form-control-sm {
+      min-height: 31px;
+      height: 31px;
+      line-height: 1.5;
+      width: 100%;
+      display: block;
+    }
+    @media (max-width: 520px) {
+      .enemy-spell-header,
+      .enemy-spell-row { grid-template-columns: 1fr 32px; }
+      .enemy-spell-header span:first-child,
+      .enemy-spell-row [data-enemy-spell-label] { grid-column: 1 / -1; }
+      .enemy-spell-header span:nth-child(2) { grid-column: 1; }
+      body.enemy-sheet-mode .enemy-field-pair { grid-template-columns: 1fr; }
+      body.enemy-sheet-mode .enemy-double-field { grid-column: 1 / -1; }
+    }
     .character-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(88px, 100px); gap: 12px; align-items: start; }
     .character-image-panel { display: grid; gap: 8px; }
     .character-image-frame { aspect-ratio: 1 / 1; border: 1px solid #444; border-radius: 8px; background: #181818; display: grid; place-items: center; overflow: hidden; color: #777; font-size: 12px; text-align: center; }
@@ -261,6 +313,10 @@
     .skill-summary-total { font-weight: 800; color: #fff; }
     .skill-summary-accordion .accordion-button { background: #242424; color: #fff; padding: 8px 10px; }
     .skill-summary-accordion .accordion-button:not(.collapsed) { background: #2b2b2b; color: #fff; box-shadow: none; }
+    .skill-summary-accordion .accordion-button::after { display: none; }
+    .skill-summary-accordion .accordion-button { justify-content: space-between; gap: 8px; }
+    .skill-summary-icon { transition: transform .18s ease; }
+    .skill-summary-accordion .accordion-button:not(.collapsed) .skill-summary-icon { transform: rotate(180deg); }
     .skill-summary-accordion .accordion-body { background: #1e1e1e; padding: 8px 10px; }
     @media (max-width: 1024px) {
       .skill-table {
@@ -311,6 +367,13 @@
     input, textarea, select { background-color: #2b2b2b !important; color: white !important; border-color: #555 !important; }
     input[readonly] { background-color: #202020 !important; color: #ddd !important; }
     textarea { min-height: 92px; }
+    textarea.enemy-header-control.form-control-sm {
+      min-height: 31px !important;
+      height: 31px;
+      line-height: 1.5;
+      overflow: hidden;
+      resize: none;
+    }
     .small-text { font-size: 12px; color: #aaa; }
     .calc-line { margin-top: 6px; }
     .calc-formula { color: #777; }
@@ -369,9 +432,15 @@
       .inventory-condition-inline { grid-column: auto; }
       .source-results-grid { grid-template-columns: 1fr; }
     }
-    .simple-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, max-content)); gap: 6px; align-items: stretch; }
+    .simple-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 6px; align-items: stretch; }
+    .simple-top-grid { grid-template-columns: repeat(7, minmax(0, 1fr)); }
     .simple-grid-tight { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 6px; }
     .simple-section { background: #1e1e1e; border-radius: 8px; padding: 8px; margin-bottom: 8px; }
+    .simple-core-section { min-height: max-content; }
+    .simple-core-section .simple-table { font-size: 15px; }
+    .simple-core-section .simple-table th,
+    .simple-core-section .simple-table td { padding: 8px 9px; }
+    .simple-core-section .simple-table th { padding: 7px 9px; }
     .simple-card { background: #242424; border: 1px solid #444; border-radius: 8px; padding: 6px 8px; min-width: 120px; }
     .simple-label { color: #aaa; font-size: 11px; text-transform: uppercase; }
     .simple-value { font-weight: 700; overflow-wrap: anywhere; }
@@ -379,7 +448,11 @@
     .simple-table th, .simple-table td { padding: 4px 6px; }
     .simple-table tr.simple-conditional td { background: rgba(240, 213, 140, .08); color: #f0d58c; }
     .simple-table tr.simple-conditional td:first-child { border-left: 3px solid #f0d58c; }
-    .simple-wrap { max-width: 1180px; }
+    .simple-wrap { width: min(100%, 900px); max-width: 900px; margin-inline: auto; }
+    .simple-core-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; align-items: stretch; }
+    .simple-core-grid > div { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+    .simple-core-grid .simple-core-section { flex: 1 0 auto; margin-bottom: 0; }
+    .simple-core-grid + .simple-section { margin-top: 8px; }
     .simple-chip-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, max-content)); gap: 6px; align-items: start; }
     .simple-chip { background: #242424; border: 1px solid #444; border-radius: 8px; padding: 5px 8px; min-width: 150px; }
     .simple-card.simple-conditional, .simple-chip.simple-conditional { border-left: 3px solid #f0d58c; background: rgba(240, 213, 140, .08); }
@@ -394,16 +467,28 @@
     .simple-list-main { font-weight: 700; }
     .simple-list-sub { color: #ddd; font-weight: 700; white-space: nowrap; }
     .simple-weapon-block { display: grid; gap: 6px; }
-    .simple-weapon-card { width: 280px; max-width: 100%; container-type: normal; }
+    .simple-weapon-card { width: 100%; max-width: 100%; container-type: normal; }
     .simple-weapon-name { min-width: 0; overflow-wrap: break-word; word-break: normal; white-space: normal; }
-    .simple-weapon-block .simple-card,
-    .simple-weapon-block .simple-list-row { width: 260px; max-width: 100%; }
-    .simple-weapon-block .simple-list { width: fit-content; max-width: 100%; }
+    .simple-detail-list { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; }
+    .simple-detail-row { display: grid; gap: 2px; align-items: start; padding: 2px 0; min-width: 120px; max-width: 100%; }
+    .simple-detail-label { color: #aaa; font-size: 11px; text-transform: uppercase; }
+    .simple-detail-value { color: #f4f4f4; font-weight: 700; min-width: 0; overflow-wrap: anywhere; }
+    .simple-detail-row.simple-conditional { border-left: 3px solid #f0d58c; padding-left: 6px; background: rgba(240, 213, 140, .05); }
+    .simple-skills-list .simple-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .simple-skills-list .simple-list-row { min-width: 0; }
     @media (min-width: 1200px) {
       .simple-section { padding: 8px; margin-bottom: 6px; }
       .simple-grid-tight { grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); }
       .simple-table th, .simple-table td { padding: 3px 6px; }
       .simple-chip-grid { grid-template-columns: repeat(auto-fill, minmax(160px, max-content)); }
+    }
+    @media (max-width: 760px) {
+      .simple-wrap { width: 100%; max-width: 100%; }
+      .simple-top-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .simple-core-grid { grid-template-columns: 1fr; }
+      .simple-detail-list { display: grid; grid-template-columns: 1fr; gap: 4px; }
+      .simple-detail-row { gap: 0; }
+      .simple-skills-list .simple-list { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -442,10 +527,6 @@
       <a id="backToEnemiesBtn" class="btn btn-outline-light btn-sm btn-icon d-none" href="enemies.html" title="Back to Enemies" aria-label="Back to Enemies"><i class="bi bi-arrow-left"></i></a>
       <h3 id="sheetPageTitle" class="mb-0">Character Sheet</h3>
     </div>
-    <div class="sheet-page-effects-row">
-      <button id="openEffectTrackerButton" class="btn btn-outline-success btn-sm" type="button">Effects</button>
-      <button id="showAppliedBuffsToggle" class="btn btn-outline-info btn-sm" type="button" onclick="toggleAppliedBuffs()">Show Effects</button>
-    </div>
   </div>
   <div id="sheetStickySentinel" class="sheet-sticky-sentinel" aria-hidden="true"></div>
   <div id="sheetStickyPlaceholder" class="sheet-sticky-placeholder"></div>
@@ -457,6 +538,7 @@
       <button class="sheet-info-tab" type="button" data-sheet-info-tab="skills" role="tab" aria-selected="false" title="Skills" aria-label="Skills"><i class="bi bi-list-check"></i><span>Skills</span></button>
       <button class="sheet-info-tab" type="button" data-sheet-info-tab="spells" role="tab" aria-selected="false" title="Spells" aria-label="Spells"><i class="bi bi-book"></i><span>Spells</span></button>
       <button class="sheet-info-tab" type="button" data-sheet-info-tab="feats" role="tab" aria-selected="false" title="Feats" aria-label="Feats"><i class="bi bi-award"></i><span>Feats</span></button>
+      <button id="openEffectTrackerButton" class="sheet-info-tab" type="button" title="Effects" aria-label="Effects"><i class="bi bi-magic"></i><span>Effects</span></button>
     </nav>
   </div>
   <div class="view-tabs" role="tablist" aria-label="Character sheet view">
@@ -511,17 +593,23 @@
         <div><label for="characterName">Character Name</label><input id="characterName" class="form-control form-control-sm sheet-input" required></div>
         <div><label for="classLevel">Class / Level</label><input id="classLevel" class="form-control form-control-sm sheet-input"></div>
         <div><label for="characterLevel">Character Level</label><input id="characterLevel" class="form-control form-control-sm sheet-input" type="number" min="1" value="1"></div>
-        <div><label for="race">Race</label><input id="race" class="form-control form-control-sm sheet-input"></div>
-        <div><label for="alignment">Alignment</label><input id="alignment" class="form-control form-control-sm sheet-input"></div>
-        <div><label for="deity">Deity</label><input id="deity" class="form-control form-control-sm sheet-input"></div>
-        <div><label for="homeland">Homeland</label><input id="homeland" class="form-control form-control-sm sheet-input"></div>
+        <div><label for="race">Race</label><select id="race" class="form-select form-select-sm sheet-input"></select></div>
+        <div class="enemy-only enemy-double-field"><label for="subtype">Subtype</label><textarea id="subtype" class="form-control form-control-sm sheet-input enemy-auto-textarea enemy-header-control" rows="1" readonly></textarea></div>
+        <div><label for="alignment">Alignment</label><select id="alignment" class="form-select form-select-sm sheet-input"></select></div>
+        <div class="enemy-only"><label for="xp">XP</label><input id="xp" class="form-control form-control-sm sheet-input enemy-header-control" readonly></div>
+        <div class="character-only"><label for="deity">Deity</label><input id="deity" class="form-control form-control-sm sheet-input"></div>
+        <div class="character-only"><label for="homeland">Homeland</label><input id="homeland" class="form-control form-control-sm sheet-input"></div>
         <div><label for="size">Size</label><input id="size" class="form-control form-control-sm sheet-input" value="Medium"></div>
-        <div><label for="gender">Gender</label><input id="gender" class="form-control form-control-sm sheet-input"></div>
-        <div><label for="age">Age</label><input id="age" class="form-control form-control-sm sheet-input"></div>
-        <div><label for="height">Height</label><input id="height" class="form-control form-control-sm sheet-input"></div>
-        <div><label for="weight">Weight</label><input id="weight" class="form-control form-control-sm sheet-input"></div>
-        <div><label for="hair">Hair</label><input id="hair" class="form-control form-control-sm sheet-input"></div>
-        <div><label for="eyes">Eyes</label><input id="eyes" class="form-control form-control-sm sheet-input"></div>
+        <div class="enemy-only enemy-field-pair">
+          <div><label for="senses">Senses</label><textarea id="senses" class="form-control form-control-sm sheet-input enemy-auto-textarea enemy-header-control" rows="1" readonly></textarea></div>
+          <div><label for="aura">Aura</label><textarea id="aura" class="form-control form-control-sm sheet-input enemy-auto-textarea enemy-header-control" rows="1" readonly></textarea></div>
+        </div>
+        <div class="character-only"><label for="gender">Gender</label><input id="gender" class="form-control form-control-sm sheet-input"></div>
+        <div class="character-only"><label for="age">Age</label><input id="age" class="form-control form-control-sm sheet-input"></div>
+        <div class="character-only"><label for="height">Height</label><input id="height" class="form-control form-control-sm sheet-input"></div>
+        <div class="character-only"><label for="weight">Weight</label><input id="weight" class="form-control form-control-sm sheet-input"></div>
+        <div class="character-only"><label for="hair">Hair</label><input id="hair" class="form-control form-control-sm sheet-input"></div>
+        <div class="character-only"><label for="eyes">Eyes</label><input id="eyes" class="form-control form-control-sm sheet-input"></div>
       </div>
       <div class="character-image-panel">
         <div class="character-image-frame">
@@ -549,22 +637,18 @@
       </section>
 
       <section class="sheet-section">
-        <div class="sheet-title">Base Attack Bonus</div>
-        <div class="bab-grid">
-          <div><label for="bab">BAB</label><input id="bab" class="form-control form-control-sm no-spinner" inputmode="numeric" value="0" readonly></div>
-          <div><label for="babBase">Base</label><input id="babBase" class="form-control form-control-sm no-spinner" inputmode="numeric" value="0" readonly></div>
-          <div><label for="babMisc">Misc</label><input id="babMisc" class="form-control form-control-sm sheet-input" type="number" value="0"></div>
-        </div>
-      </section>
-
-      <section class="sheet-section">
         <div class="sheet-title">HP</div>
         <div class="sheet-grid">
           <div><label for="currentHitPoints">Current HP</label><input id="currentHitPoints" class="form-control form-control-sm sheet-input" type="number" value="0"></div>
           <div><label for="hitPoints">Base HP</label><input id="hitPoints" class="form-control form-control-sm sheet-input" type="number" value="0"></div>
           <div><label for="hitPointsBuff">Buff</label><input id="hitPointsBuff" class="form-control form-control-sm buff-field" readonly></div>
           <div><label for="hitPointsTotal">Total HP</label><input id="hitPointsTotal" class="form-control form-control-sm" readonly></div>
+          <div class="enemy-only enemy-full-line"><label for="regeneration">Regeneration</label><textarea id="regeneration" class="form-control form-control-sm sheet-input enemy-auto-textarea" readonly></textarea></div>
           <div><label for="damageReduction">DR</label><input id="damageReduction" class="form-control form-control-sm sheet-input"></div>
+          <div class="enemy-only enemy-full-line"><label for="resistances">Resistances</label><textarea id="resistances" class="form-control form-control-sm sheet-input enemy-auto-textarea" readonly></textarea></div>
+          <div class="enemy-only enemy-full-line"><label for="immunities">Immunities</label><textarea id="immunities" class="form-control form-control-sm sheet-input enemy-auto-textarea" readonly></textarea></div>
+          <div class="enemy-only"><label for="spellResistance">SR</label><input id="spellResistance" class="form-control form-control-sm sheet-input enemy-auto-input" readonly></div>
+          <div class="enemy-only enemy-full-line"><label for="weaknesses">Weakness</label><textarea id="weaknesses" class="form-control form-control-sm sheet-input enemy-auto-textarea" readonly></textarea></div>
         </div>
         <div class="small-text calc-line" data-calc-for="hitPointsTotal"></div>
       </section>
@@ -585,24 +669,32 @@
         <div class="sheet-grid">
           <div><label for="speedBase">Base Speed</label><input id="speedBase" class="form-control form-control-sm sheet-input"></div>
           <div><label for="speedArmor">Armor Speed</label><input id="speedArmor" class="form-control form-control-sm sheet-input"></div>
+          <div class="enemy-only"><label for="flySpeed">Fly Speed</label><textarea id="flySpeed" class="form-control form-control-sm sheet-input enemy-auto-textarea" readonly></textarea></div>
         </div>
       </section>
 
       <section class="sheet-section">
-        <div class="accordion skill-summary-accordion" id="skillSummaryAccordion">
-          <div class="accordion-item bg-transparent border-secondary">
-            <h2 class="accordion-header" id="skillSummaryHeading">
-              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#skillSummaryCollapse" aria-expanded="false" aria-controls="skillSummaryCollapse">
-                Skills
-              </button>
-            </h2>
-            <div id="skillSummaryCollapse" class="accordion-collapse collapse" aria-labelledby="skillSummaryHeading" data-bs-parent="#skillSummaryAccordion">
-              <div class="accordion-body">
-                <div id="skillSummaryRows" class="skill-summary-list"></div>
-              </div>
-            </div>
-          </div>
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <div class="sheet-title mb-0">Weapons</div>
+          <button class="btn btn-primary btn-sm" type="button" onclick="addWeapon()">Add Weapon</button>
         </div>
+        <div id="weaponRows" class="vstack gap-2"></div>
+      </section>
+
+      <section class="sheet-section">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <div class="sheet-title mb-0">Armor & Shields</div>
+          <button class="btn btn-primary btn-sm" type="button" onclick="addArmor()">Add Armor/Shield</button>
+        </div>
+        <div id="armorRows" class="vstack gap-2"></div>
+      </section>
+
+      <section class="sheet-section">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <div class="sheet-title mb-0">Other Equipment</div>
+          <button class="btn btn-primary btn-sm" type="button" onclick="addGear()">Add Equipment</button>
+        </div>
+        <div id="gearRows" class="vstack gap-2"></div>
       </section>
     </div>
 
@@ -637,9 +729,16 @@
           </table>
         </div>
       </section>
-    </div>
 
-    <div class="col-xl-4">
+      <section class="sheet-section">
+        <div class="sheet-title">Base Attack Bonus</div>
+        <div class="bab-grid">
+          <div><label for="bab">BAB</label><input id="bab" class="form-control form-control-sm no-spinner" inputmode="numeric" value="0" readonly></div>
+          <div><label for="babBase">Base</label><input id="babBase" class="form-control form-control-sm no-spinner" inputmode="numeric" value="0" readonly></div>
+          <div><label for="babMisc">Misc</label><input id="babMisc" class="form-control form-control-sm sheet-input" type="number" value="0"></div>
+        </div>
+      </section>
+
       <section class="sheet-section">
         <div class="sheet-title">Combat Maneuvers</div>
         <div class="maneuver-grid">
@@ -664,31 +763,77 @@
         </div>
       </section>
 
-      <section class="sheet-section">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <div class="sheet-title mb-0">Weapons</div>
-          <button class="btn btn-primary btn-sm" type="button" onclick="addWeapon()">Add Weapon</button>
-        </div>
-        <div id="weaponRows" class="vstack gap-2"></div>
-      </section>
+      <div class="enemy-section-stack enemy-only">
+        <section class="sheet-section">
+          <div class="sheet-title">Defensive Abilities</div>
+          <textarea id="defensiveAbilities" class="form-control sheet-input enemy-textarea enemy-auto-textarea" readonly></textarea>
+        </section>
 
-      <section class="sheet-section">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <div class="sheet-title mb-0">Armor & Shields</div>
-          <button class="btn btn-primary btn-sm" type="button" onclick="addArmor()">Add Armor/Shield</button>
-        </div>
-        <div id="armorRows" class="vstack gap-2"></div>
-      </section>
+        <section class="sheet-section">
+          <div class="sheet-title">Special Attacks</div>
+          <textarea id="specialAttacks" class="form-control sheet-input enemy-textarea enemy-auto-textarea" readonly></textarea>
+        </section>
 
+        <section class="sheet-section">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <div class="sheet-title mb-0">Spell-Like Abilities</div>
+            <button class="btn btn-outline-info btn-sm" type="button" onclick="addEnemySpellRow('spellLikeAbilityRows')">Add</button>
+          </div>
+          <div class="enemy-spell-meta-grid">
+            <div><label for="spellLikeCl">CL</label><input id="spellLikeCl" class="form-control form-control-sm sheet-input enemy-auto-input" readonly></div>
+            <div><label for="spellLikeConcentration">Concentration</label><input id="spellLikeConcentration" class="form-control form-control-sm sheet-input enemy-auto-input" readonly></div>
+          </div>
+          <input id="spellLikeAbilities" class="sheet-input" type="hidden">
+          <div id="spellLikeAbilityRows" class="enemy-spell-grid"></div>
+        </section>
+
+        <section class="sheet-section">
+          <div class="sheet-title">Spells</div>
+          <input id="enemySpells" class="sheet-input" type="hidden">
+          <input id="enemySpellsKnown" class="sheet-input" type="hidden">
+          <input id="enemySpellsPrepared" class="sheet-input" type="hidden">
+          <input id="enemyPsychicMagic" class="sheet-input" type="hidden">
+          <div id="enemySpellGroups" class="enemy-spell-grid"></div>
+        </section>
+      </div>
+    </div>
+
+    <div class="col-xl-4">
       <section class="sheet-section">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <div class="sheet-title mb-0">Gear</div>
-          <button class="btn btn-primary btn-sm" type="button" onclick="addGear()">Add Gear</button>
+        <div class="accordion skill-summary-accordion" id="skillSummaryAccordion">
+          <div class="accordion-item bg-transparent border-secondary">
+            <h2 class="accordion-header" id="skillSummaryHeading">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#skillSummaryCollapse" aria-expanded="false" aria-controls="skillSummaryCollapse">
+                <span>Skills</span>
+                <i class="bi bi-chevron-down skill-summary-icon" aria-hidden="true"></i>
+              </button>
+            </h2>
+            <div id="skillSummaryCollapse" class="accordion-collapse collapse" aria-labelledby="skillSummaryHeading" data-bs-parent="#skillSummaryAccordion">
+              <div class="accordion-body">
+                <div id="skillSummaryRows" class="skill-summary-list"></div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div id="gearRows" class="vstack gap-2"></div>
       </section>
+      <div class="enemy-section-stack enemy-only">
+        <section class="sheet-section">
+          <div class="sheet-title">Languages</div>
+          <textarea id="languages" class="form-control sheet-input enemy-textarea enemy-auto-textarea" readonly></textarea>
+        </section>
+
+        <section class="sheet-section">
+          <div class="sheet-title">SQ</div>
+          <textarea id="sq" class="form-control sheet-input enemy-textarea enemy-auto-textarea" readonly></textarea>
+        </section>
+      </div>
     </div>
   </div>
+
+  <section class="sheet-section enemy-only">
+    <div class="sheet-title">Special Abilities</div>
+    <textarea id="specialAbilities" class="form-control sheet-input enemy-auto-textarea" readonly></textarea>
+  </section>
 
   <section class="sheet-section">
     <div class="d-flex justify-content-between align-items-center mb-2">
@@ -865,7 +1010,10 @@
     <div class="modal-content bg-dark text-white border-secondary">
       <div class="modal-header">
         <h5 class="modal-title" id="effectTrackerModalLabel">Effects</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="ms-auto d-flex align-items-center gap-2">
+          <button id="showAppliedBuffsToggle" class="btn btn-outline-info btn-sm" type="button" onclick="toggleAppliedBuffs()">Show Effects</button>
+          <button type="button" class="btn-close btn-close-white m-0" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
       </div>
       <div class="modal-body">
         <div id="sheetEffectTracker"></div>
@@ -931,10 +1079,23 @@ const SKILLS = [
   ["Perception", "wis"], ["Ride", "dex"], ["Sense Motive", "wis"], ["Sleight of Hand", "dex"],
   ["Spellcraft", "int"], ["Stealth", "dex"], ["Survival", "wis"], ["Swim", "str"], ["Use Magic Device", "cha"]
 ];
-const SIMPLE_FIELDS = ["characterName","imageUrl","classLevel","characterLevel","race","alignment","deity","homeland","size","gender","age","height","weight","hair","eyes","bab","babBase","babMisc","currentHitPoints","hitPoints","hitPointsTotal","damageReduction","initMisc","speedBase","speedArmor","acNatural","acDeflection","acMisc","cmbMisc","cmdMisc","lightLoad","mediumLoad","heavyLoad","liftOverHead","liftOffGround","dragOrPush","GP","SP","CP","notes"];
+const SIMPLE_FIELDS = ["characterName","imageUrl","classLevel","characterLevel","race","subtype","alignment","xp","deity","homeland","size","senses","aura","gender","age","height","weight","hair","eyes","bab","babBase","babMisc","currentHitPoints","hitPoints","hitPointsTotal","regeneration","damageReduction","resistances","immunities","spellResistance","weaknesses","initMisc","speedBase","speedArmor","flySpeed","acNatural","acDeflection","acMisc","cmbMisc","cmdMisc","defensiveAbilities","specialAttacks","spellLikeCl","spellLikeConcentration","spellLikeAbilities","enemySpells","enemySpellsKnown","enemySpellsPrepared","enemyPsychicMagic","languages","sq","specialAbilities","lightLoad","mediumLoad","heavyLoad","liftOverHead","liftOffGround","dragOrPush","GP","SP","CP","notes"];
 const ABILITY_STAT_NAMES = { str: "strength", dex: "dexterity", con: "constitution", int: "intelligence", wis: "wisdom", cha: "charisma" };
 const SCALE_ABILITIES = ["STR", "DEX", "CON", "INT", "WIS", "CHA"];
 const WEAPON_TYPES = ["Melee Weapon (Light)", "Melee Weapon (One-Handed)", "Melee Weapon (Two-Handed)", "Ranged Weapon", "Firearm (One-Handed)", "Firearm (Two-Handed)", "Natural"];
+const ALIGNMENTS = [
+  ["LG", "Lawful Good"],
+  ["NG", "Neutral Good"],
+  ["CG", "Chaotic Good"],
+  ["LN", "Lawful Neutral"],
+  ["N", "Neutral"],
+  ["CN", "Chaotic Neutral"],
+  ["LE", "Lawful Evil"],
+  ["NE", "Neutral Evil"],
+  ["CE", "Chaotic Evil"]
+];
+const ALIGNMENT_BY_CODE = Object.fromEntries(ALIGNMENTS);
+const ALIGNMENT_CODE_BY_NAME = Object.fromEntries(ALIGNMENTS.map(([code, name]) => [name.toLowerCase(), code]));
 const ZERO_LEVEL_SPELL_CLASSES = new Set([
   "adept", "arcanist", "bard", "cleric", "druid", "hunter", "inquisitor", "magus", "medium",
   "mesmerist", "occultist", "oracle", "psychic", "shaman", "skald", "sorcerer", "spiritualist",
@@ -986,6 +1147,7 @@ let enemySourceItems = [];
 let enemySourceItemSearchTerm = "";
 let enemySourceItemCategory = "all";
 let enemySourceItemMundaneCategory = "Adventuring Gear";
+let raceDefinitions = { groups: [], races: [] };
 const MUNDANE_CATEGORIES = ["Adventuring Gear", "Alchemical Creations", "Books, Paper, & Writing Supplies", "Clothing & Containers", "Locks, Keys, Tools & Kits", "Religious Items", "Toys & Games"];
 
 const PDF_SAMPLE = {
@@ -1007,6 +1169,274 @@ function allSkills() { return [...SKILLS, ...customSkills.map(skill => [skill.na
 function abilityMod(key) { return mod(num(`${key}Score`)); }
 function abilityModFor(key, buffed) {
   return buffed?.abilityMods?.[ABILITY_STAT_NAMES[key]] ?? abilityMod(key);
+}
+
+const ENEMY_SPELL_METADATA_KEYS = new Set(["cl", "concentration", "notes", "levels", "classname", "class"]);
+
+function isEnemySpellMetadataKey(key = "") {
+  return ENEMY_SPELL_METADATA_KEYS.has(String(key || "").trim().toLowerCase());
+}
+
+function isEnemySpellRowKey(key = "") {
+  const clean = String(key || "").trim();
+  return /^constant$/i.test(clean)
+    || /^atWill$/i.test(clean)
+    || /^at will$/i.test(clean)
+    || /^\d+PerDay$/i.test(clean)
+    || /^\d+\s*per\s*day$/i.test(clean)
+    || /^\d+\/day$/i.test(clean)
+    || /^level\s*\d+/i.test(clean)
+    || /^\d+(st|nd|rd|th)?$/i.test(clean);
+}
+
+function prettifyEnemySpellLabel(key = "") {
+  return String(key || "")
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .replace(/^(\d+)PerDay$/i, "$1/day")
+    .replace(/^at Will$/i, "At will")
+    .replace(/^constant$/i, "Constant")
+    .replace(/^level\s*(\d+)$/i, "Level $1")
+    .trim();
+}
+
+function signedEnemyValue(value) {
+  const number = Number(value);
+  if (!Number.isFinite(number)) return String(value || "");
+  return number >= 0 ? `+${number}` : String(number);
+}
+
+function maybePopulateSpellLikeMeta(payload) {
+  if (!payload || typeof payload !== "object" || Array.isArray(payload)) return;
+  if (el("spellLikeCl") && !el("spellLikeCl").value && payload.cl !== undefined && payload.cl !== null) {
+    el("spellLikeCl").value = String(payload.cl);
+  }
+  if (el("spellLikeConcentration") && !el("spellLikeConcentration").value && payload.concentration !== undefined && payload.concentration !== null) {
+    el("spellLikeConcentration").value = String(payload.concentration);
+  }
+}
+
+function normalizeEnemySpellRows(value = "") {
+  if (!value) return [];
+  if (typeof value === "object" && !Array.isArray(value) && Array.isArray(value.rows)) {
+    return normalizeEnemySpellRows(value.rows);
+  }
+  if (typeof value === "object" && !Array.isArray(value) && Array.isArray(value.levels) && value.levels.length) {
+    return value.levels.map(row => ({
+      label: row.frequency
+        ? `${prettifyEnemySpellLabel(row.frequency)} ${row.level !== undefined && row.level !== null ? `(Level ${row.level})` : ""}`.trim()
+        : `Level ${row.level ?? ""}`.trim(),
+      spells: Array.isArray(row.spells) ? row.spells.join(", ") : String(row.spells || "")
+    })).filter(row => row.label || row.spells);
+  }
+  if (Array.isArray(value)) return value.map(row => {
+    const rawLabel = String(row?.label || row?.frequency || row?.level || "");
+    const spells = Array.isArray(row?.spells) ? row.spells.join(", ") : String(row?.spells || row?.value || "");
+    if (/^CL\b/i.test(spells) && /concentration/i.test(spells)) {
+      const clMatch = spells.match(/\bCL\s*([^,]+)/i);
+      const concentrationMatch = spells.match(/\bconcentration\s*([+-]?\d+)/i);
+      if (el("spellLikeCl") && !el("spellLikeCl").value && clMatch) el("spellLikeCl").value = clMatch[1].trim();
+      if (el("spellLikeConcentration") && !el("spellLikeConcentration").value && concentrationMatch) el("spellLikeConcentration").value = concentrationMatch[1].trim();
+      return null;
+    }
+    if (isEnemySpellMetadataKey(rawLabel) || !isEnemySpellRowKey(rawLabel)) return null;
+    return {
+      label: prettifyEnemySpellLabel(rawLabel),
+      spells
+    };
+  }).filter(row => row && (row.label || row.spells));
+  if (typeof value === "object") {
+    maybePopulateSpellLikeMeta(value);
+    return Object.entries(value)
+    .filter(([label, spells]) => !isEnemySpellMetadataKey(label) && isEnemySpellRowKey(label) && spells)
+    .map(([label, spells]) => ({
+      label: prettifyEnemySpellLabel(label),
+      spells: Array.isArray(spells) ? spells.join(", ") : String(spells || "")
+    })).filter(row => row.label || row.spells);
+  }
+  const text = String(value || "").trim();
+  if (!text) return [];
+  try {
+    return normalizeEnemySpellRows(JSON.parse(text));
+  } catch {
+    return text.split(/\n+/).map(line => {
+      if (/^CL\b/i.test(line) && /concentration/i.test(line)) {
+        const clMatch = line.match(/\bCL\s*([^,]+)/i);
+        const concentrationMatch = line.match(/\bconcentration\s*([+-]?\d+)/i);
+        if (el("spellLikeCl") && !el("spellLikeCl").value && clMatch) el("spellLikeCl").value = clMatch[1].trim();
+        if (el("spellLikeConcentration") && !el("spellLikeConcentration").value && concentrationMatch) el("spellLikeConcentration").value = concentrationMatch[1].trim();
+        return null;
+      }
+      const index = line.indexOf(":");
+      if (index >= 0) {
+        const label = line.slice(0, index).trim();
+        if (isEnemySpellMetadataKey(label) || !isEnemySpellRowKey(label)) return null;
+        return { label: prettifyEnemySpellLabel(label), spells: line.slice(index + 1).trim() };
+      }
+      return null;
+    }).filter(row => row && (row.label || row.spells));
+  }
+}
+
+function normalizeEnemySpellSource(value = {}, fallbackTitle = "Spells") {
+  let parsed = value || {};
+  if (typeof parsed === "string") {
+    try {
+      parsed = JSON.parse(parsed);
+    } catch {
+      parsed = { rows: normalizeEnemySpellRows(parsed) };
+    }
+  }
+  const source = parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : { rows: normalizeEnemySpellRows(parsed) };
+  return {
+    title: source.title || fallbackTitle,
+    className: source.className || "",
+    cl: source.cl ?? "",
+    concentration: source.concentration ?? "",
+    rows: normalizeEnemySpellRows(source.rows || source)
+  };
+}
+
+function collectEnemySpellRows(containerId) {
+  return [...(el(containerId)?.querySelectorAll("[data-enemy-spell-row]") || [])].map(row => ({
+    label: row.querySelector("[data-enemy-spell-label]")?.value?.trim() || "",
+    spells: row.querySelector("[data-enemy-spell-list]")?.value?.trim() || ""
+  })).filter(row => row.label || row.spells);
+}
+
+function collectEnemySpellSource(group) {
+  const source = normalizeEnemySpellSource(el(group.hiddenId)?.value || "{}", group.title);
+  source.rows = collectEnemySpellRows(group.rowsId);
+  return source;
+}
+
+const ENEMY_SPELL_GROUPS = [
+  { title: "Spells", hiddenId: "enemySpells", rowsId: "enemySpellRows" },
+  { title: "Spells Known", hiddenId: "enemySpellsKnown", rowsId: "enemySpellsKnownRows" },
+  { title: "Spells Prepared", hiddenId: "enemySpellsPrepared", rowsId: "enemySpellsPreparedRows" },
+  { title: "Psychic Magic", hiddenId: "enemyPsychicMagic", rowsId: "enemyPsychicMagicRows" }
+];
+
+function renderEnemySpellRows(containerId, hiddenId, emptyText) {
+  const container = el(containerId);
+  if (!container) return;
+  const rows = normalizeEnemySpellRows(el(hiddenId)?.value || "");
+  container.innerHTML = rows.length
+    ? `${enemySpellGridHeader()}${rows.map(row => enemySpellRowMarkup(row)).join("")}`
+    : `<div class="small-text" data-enemy-spell-empty>${emptyText}</div>`;
+}
+
+function enemySpellSourceMeta(source) {
+  return [
+    source.className || "",
+    source.cl !== "" && source.cl !== null && source.cl !== undefined ? `CL ${source.cl}` : "",
+    source.concentration !== "" && source.concentration !== null && source.concentration !== undefined ? `Concentration ${signedEnemyValue(source.concentration)}` : ""
+  ].filter(Boolean).join(" | ");
+}
+
+function renderEnemySpellGroups() {
+  const container = el("enemySpellGroups");
+  if (!container) return;
+  const groups = ENEMY_SPELL_GROUPS
+    .map(group => ({ ...group, source: normalizeEnemySpellSource(el(group.hiddenId)?.value || "{}", group.title) }));
+  container.innerHTML = groups.map(group => `
+      <div class="enemy-spell-source" data-enemy-spell-source="${group.rowsId}">
+        <div class="d-flex justify-content-between align-items-center gap-2">
+          <div>
+            <div class="enemy-spell-source-title">${escapeHtml(group.source.title || group.title)}</div>
+            ${enemySpellSourceMeta(group.source) ? `<div class="enemy-spell-source-meta">${escapeHtml(enemySpellSourceMeta(group.source))}</div>` : ""}
+          </div>
+          <button class="btn btn-outline-info btn-sm" type="button" onclick="addEnemySpellRow('${group.rowsId}')">Add</button>
+        </div>
+        <div id="${group.rowsId}" class="enemy-spell-grid" data-enemy-spell-hidden="${group.hiddenId}">
+          ${group.source.rows.length
+            ? `${enemySpellGridHeader()}${group.source.rows.map(row => enemySpellRowMarkup(row)).join("")}`
+            : `<div class="small-text" data-enemy-spell-empty>No entries.</div>`}
+        </div>
+      </div>
+    `).join("");
+}
+
+function enemySpellGridHeader() {
+  return `
+    <div class="enemy-spell-header" data-enemy-spell-header>
+      <span>Frequency / Level</span>
+      <span>Spells</span>
+      <span></span>
+    </div>
+  `;
+}
+
+function enemySpellRowMarkup(row = {}) {
+  return `
+      <div class="enemy-spell-row" data-enemy-spell-row>
+        <input class="form-control form-control-sm sheet-input enemy-auto-input" data-enemy-spell-label value="${escapeHtml(row.label || "")}" aria-label="Frequency or spell level">
+        <textarea class="form-control form-control-sm sheet-input" data-enemy-spell-list aria-label="Spells">${escapeHtml(row.spells || "")}</textarea>
+        <button class="btn btn-outline-danger btn-sm enemy-spell-delete" type="button" data-delete-enemy-spell-row aria-label="Delete row"><i class="bi bi-trash"></i></button>
+      </div>
+    `;
+}
+
+function addEnemySpellRow(containerId) {
+  const container = el(containerId);
+  if (!container) return;
+  container.querySelector("[data-enemy-spell-empty]")?.remove();
+  if (!container.querySelector("[data-enemy-spell-header]")) {
+    const header = document.createElement("div");
+    header.innerHTML = enemySpellGridHeader().trim();
+    container.appendChild(header.firstElementChild);
+  }
+  const wrapper = document.createElement("div");
+  wrapper.innerHTML = enemySpellRowMarkup({ label: "", spells: "" }).trim();
+  const row = wrapper.firstElementChild;
+  container.appendChild(row);
+  attachInputListeners(row);
+  updateEnemyAutoInputSizes(row);
+  autosizeEnemyTextareas(row);
+  row.querySelector("[data-enemy-spell-label]")?.focus();
+  syncEnemyStructuredSpellFields();
+  queueSheetSave();
+}
+
+function deleteEnemySpellRow(button) {
+  const row = button.closest("[data-enemy-spell-row]");
+  const container = row?.parentElement;
+  if (!row || !container) return;
+  row.remove();
+  if (!container.querySelector("[data-enemy-spell-row]")) {
+    container.querySelector("[data-enemy-spell-header]")?.remove();
+    container.innerHTML = `<div class="small-text" data-enemy-spell-empty>No entries.</div>`;
+  }
+  syncEnemyStructuredSpellFields();
+  queueSheetSave();
+}
+
+function autosizeEnemyTextareas(root = document) {
+  root.querySelectorAll(".enemy-spell-row textarea, .enemy-auto-textarea").forEach(textarea => {
+    const baseHeight = textarea.classList.contains("enemy-header-control") ? 31 : 0;
+    textarea.style.height = "auto";
+    textarea.style.height = `${Math.max(baseHeight, textarea.scrollHeight)}px`;
+  });
+}
+
+function renderEnemyStructuredSpellFields() {
+  renderEnemySpellRows("spellLikeAbilityRows", "spellLikeAbilities", "No spell-like abilities.");
+  renderEnemySpellGroups();
+  updateEnemyAutoInputSizes();
+  autosizeEnemyTextareas();
+}
+
+function syncEnemyStructuredSpellFields() {
+  if (el("spellLikeAbilities")) el("spellLikeAbilities").value = JSON.stringify(collectEnemySpellRows("spellLikeAbilityRows"));
+  ENEMY_SPELL_GROUPS.forEach(group => {
+    if (el(group.hiddenId) && el(group.rowsId)) el(group.hiddenId).value = JSON.stringify(collectEnemySpellSource(group));
+  });
+}
+
+function updateEnemyAutoInputSizes(root = document) {
+  root.querySelectorAll(".enemy-auto-input").forEach(input => {
+    const length = String(input.value || input.placeholder || "").length;
+    input.size = Math.max(7, Math.min(44, length || 7));
+  });
 }
 
 function parseScalingKeys(value) {
@@ -1310,6 +1740,51 @@ function optionList(options, selected = "") {
   return options.map(value => `<option value="${escapeHtml(value)}" ${value === selected ? "selected" : ""}>${value || "None"}</option>`).join("");
 }
 
+function selectOption(value, label = value, selected = "") {
+  return `<option value="${escapeHtml(value)}" ${value === selected ? "selected" : ""}>${escapeHtml(label || value || "None")}</option>`;
+}
+
+function normalizeAlignmentValue(value = "") {
+  const text = String(value || "").trim();
+  if (!text) return "";
+  const upper = text.toUpperCase();
+  if (ALIGNMENT_BY_CODE[upper]) return ALIGNMENT_BY_CODE[upper];
+  return ALIGNMENT_BY_CODE[ALIGNMENT_CODE_BY_NAME[text.toLowerCase()]] || text;
+}
+
+function alignmentOptions(selected = "") {
+  const normalized = normalizeAlignmentValue(selected);
+  return [
+    selectOption("", "None", normalized),
+    ...ALIGNMENTS.map(([, name]) => selectOption(name, name, normalized))
+  ].join("");
+}
+
+function raceOptions(selected = "") {
+  const normalized = String(selected || "").trim();
+  const knownNames = new Set((raceDefinitions.races || []).map(race => race.name));
+  const customOption = normalized && !knownNames.has(normalized) ? selectOption(normalized, normalized, normalized) : "";
+  const groups = (raceDefinitions.groups || []).map(group => `
+    <optgroup label="${escapeHtml(group.name)}">
+      ${(group.races || []).map(race => selectOption(race.name, race.name, normalized)).join("")}
+    </optgroup>
+  `).join("");
+  return `${selectOption("", "None", normalized)}${customOption}${groups}`;
+}
+
+function setSelectValuePreservingUnknown(id, value = "") {
+  const select = el(id);
+  if (!select) return;
+  const nextValue = id === "alignment" ? normalizeAlignmentValue(value) : String(value || "").trim();
+  if (id === "alignment") select.innerHTML = alignmentOptions(nextValue);
+  if (id === "race") select.innerHTML = raceOptions(nextValue);
+  select.value = nextValue;
+  if (nextValue && select.value !== nextValue) {
+    select.insertAdjacentHTML("afterbegin", selectOption(nextValue, nextValue, nextValue));
+    select.value = nextValue;
+  }
+}
+
 function armorEnchantmentOptions(selected = "") {
   return `
     <option value="" ${selected === "" ? "selected" : ""}>None</option>
@@ -1511,6 +1986,30 @@ function simpleList(rows, emptyText = "None.") {
   `).join("")}</div>`;
 }
 
+function simpleDetailRows(rows = [], emptyText = "") {
+  const filtered = rows.filter(row => row && (row.value || row.detail));
+  if (!filtered.length) return emptyText ? `<div class="small-text">${escapeHtml(emptyText)}</div>` : "";
+  return `<div class="simple-detail-list">${filtered.map(row => `
+    <div class="simple-detail-row${row.conditional ? " simple-conditional" : ""}">
+      <div class="simple-detail-label">${escapeHtml(row.label || "")}</div>
+      <div>
+        <div class="simple-detail-value">${escapeHtml(row.value || "-")}</div>
+        ${row.detail ? `<div class="simple-chip-sub">${escapeHtml(row.detail)}</div>` : ""}
+      </div>
+    </div>
+  `).join("")}</div>`;
+}
+
+function simpleEquipmentCards(rows, emptyText = "None.") {
+  if (!rows.length) return `<div class="small-text">${escapeHtml(emptyText)}</div>`;
+  return `<div class="vstack gap-2">${rows.map(row => `
+    <div class="sheet-card simple-weapon-card">
+      <div class="simple-value simple-weapon-name mb-1">${escapeHtml(row.name || "-")}</div>
+      ${simpleDetailRows(row.details || [])}
+    </div>
+  `).join("")}</div>`;
+}
+
 function statDisplayLabel(stat) {
   const key = String(stat || "").toLowerCase();
   const ability = Object.entries(ABILITY_STAT_NAMES).find(([, value]) => value === key);
@@ -1630,17 +2129,13 @@ function simpleWeaponCards(rows) {
         <div class="simple-value simple-weapon-name">${escapeHtml(row[0] || "-")}</div>
       </div>
       <div class="simple-weapon-block">
-        <div>
-          ${simpleStat("Attack Bonus", row[1])}
-          ${row[4]?.length ? simpleList(row[4]) : ""}
-        </div>
-        <div>
-          ${simpleStat("Damage", row[2])}
-          ${row[5]?.length ? simpleList(row[5]) : ""}
-        </div>
-        <div>
-          ${simpleStat("Critical", row[3])}
-        </div>
+        ${simpleDetailRows([
+          { label: "Attack Bonus", value: row[1] },
+          ...(row[4] || []).map(item => ({ label: "Attack", value: item.main, detail: item.detail, conditional: item.conditional })),
+          { label: "Damage", value: row[2] },
+          ...(row[5] || []).map(item => ({ label: "Damage", value: item.main, detail: item.detail, conditional: item.conditional })),
+          { label: "Critical", value: row[3] }
+        ])}
       </div>
     </div>
   `).join("")}</div>`;
@@ -2095,6 +2590,24 @@ async function loadClassDefinitions() {
     classDefinitions = [];
   }
   return classDefinitions;
+}
+
+async function loadRaceDefinitions() {
+  if (raceDefinitions.races?.length) return raceDefinitions;
+  try {
+    const response = await fetch("./data/races.json", { cache: "no-cache" });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+    raceDefinitions = {
+      groups: Array.isArray(data.groups) ? data.groups : [],
+      races: Array.isArray(data.races) ? data.races : []
+    };
+  } catch (error) {
+    console.warn("Could not load race data", error);
+    const coreRaces = ["Dwarf", "Elf", "Gnome", "Half-Elf", "Half-Orc", "Halfling", "Human"].map(name => ({ name, race: name, group: "Core Races" }));
+    raceDefinitions = { groups: [{ name: "Core Races", races: coreRaces }], races: coreRaces };
+  }
+  return raceDefinitions;
 }
 
 function classDefinitionByName(name) {
@@ -2883,7 +3396,6 @@ function setSheetInfoTab(tab) {
   el("sheetInfoTabs")?.classList.toggle("d-none", isCharacter);
   document.querySelectorAll("[data-sheet-info-panel]").forEach(panel => panel.classList.toggle("d-none", panel.dataset.sheetInfoPanel !== activeSheetInfoTab));
   document.querySelector(".view-tabs")?.classList.toggle("d-none", !isCharacter);
-  document.querySelector(".sheet-page-effects-row")?.classList.toggle("d-none", !isCharacter);
   document.querySelectorAll("[data-sheet-info-tab]").forEach(button => {
     const active = button.dataset.sheetInfoTab === activeSheetInfoTab;
     button.classList.toggle("active", active);
@@ -2939,6 +3451,8 @@ function setStatus(message, type = "info") {
 }
 
 function buildSheet() {
+  setSelectValuePreservingUnknown("race", el("race")?.value || "");
+  setSelectValuePreservingUnknown("alignment", el("alignment")?.value || "");
   el("abilityRows").innerHTML = ABILITIES.map(([key, label]) => `
     <tr>
       <th>${label}</th>
@@ -3112,6 +3626,7 @@ function addWeapon(data = {}) {
       </div>
     </div>
     <input data-field="sourceLootId" class="sheet-input" type="hidden" value="${sourceLootId}">
+    <input data-field="templateAttack" class="sheet-input" type="hidden" value="${escapeHtml(data.templateAttack || data.template_attack || "")}">
     <div class="weapon-summary">
       <div class="weapon-attack-summary"><label>Attack Bonus</label><input data-attack-total class="form-control form-control-sm" readonly></div>
       <div><label>Damage</label><input data-damage-total class="form-control form-control-sm" readonly></div>
@@ -3615,14 +4130,24 @@ function calculateWeaponAttack(card, buffed, buffBonuses) {
   };
   const weaponType = field("weaponType") || "Melee Weapon (One-Handed)";
   const isRanged = isRangedWeaponType(weaponType) || Boolean(field("range").trim()) || parseScalingKeys(field("attackScale")).includes("dex");
-  const scalingTerms = parseScalingTerms(field("attackScale"), String(isRanged ? "DEX" : "STR"));
-  const scalingBonus = scalingTerms.reduce((total, term) => total + Math.floor(abilityModFor(term.key, buffed) * term.multiplier), 0);
-  const enhancement = enhancementValue(field("enhancement"));
   const miscBonus = Number(field("attackMisc") || 0);
-  const feat = weaponFeatAdjustments(card);
   const buffBonus =
     Number(buffBonuses.attack || 0) +
     Number(buffBonuses[isRanged ? "ranged attack" : "melee attack"] || 0);
+  const templateAttack = field("templateAttack");
+  if (templateAttack) {
+    const attackValues = String(templateAttack).match(/[+\-]?\d+/g)?.map(value => signed(Number(value) + miscBonus + buffBonus)) || [];
+    const directItems = [
+      ...breakdownForStat(buffed, "attack").map(item => ({ ...item, targetLabel: "Attack" })),
+      ...breakdownForStat(buffed, isRanged ? "ranged attack" : "melee attack").map(item => ({ ...item, targetLabel: isRanged ? "Ranged attack" : "Melee attack" }))
+    ];
+    const formula = `template ${templateAttack} + misc ${signed(miscBonus)} + buffs ${signed(buffBonus)}`;
+    return { buffBonus, attacks: attackValues.join("/"), formula, breakdown: directItems };
+  }
+  const scalingTerms = parseScalingTerms(field("attackScale"), String(isRanged ? "DEX" : "STR"));
+  const scalingBonus = scalingTerms.reduce((total, term) => total + Math.floor(abilityModFor(term.key, buffed) * term.multiplier), 0);
+  const enhancement = enhancementValue(field("enhancement"));
+  const feat = weaponFeatAdjustments(card);
   const extraAttacks = Math.max(0, Math.floor(Number(buffBonuses["extra attack"] || 0)));
   const twf = twfMode(card);
   const offhandCards = activeOffhandWeaponCards();
@@ -4749,19 +5274,23 @@ function renderSimplifiedSheet() {
     );
     return [name, attackTotal, damageTotal, critical, attackConditionals, damageConditionals];
   });
-  const armorRows = [...el("armorRows").querySelectorAll(".sheet-card")].map(card => [
-    card.querySelector('[data-field="item"]')?.value || "Unnamed item",
-    card.querySelector("[data-armor-total]")?.value || ""
-  ]);
+  const armorRows = [...el("armorRows").querySelectorAll(".sheet-card")].map(card => ({
+    name: card.querySelector('[data-field="item"]')?.value || "Unnamed item",
+    details: [
+      { label: "Total", value: card.querySelector("[data-armor-total]")?.value || "" }
+    ]
+  }));
   const gearRows = [...el("gearRows").querySelectorAll(".sheet-card")].map(card => ({
-    main: card.querySelector('[data-field="item"]')?.value || "Unnamed gear",
-    sub: card.querySelector('[data-field="details"]')?.value || ""
+    name: card.querySelector('[data-field="item"]')?.value || "Unnamed equipment",
+    details: [
+      { label: "Details", value: card.querySelector('[data-field="details"]')?.value || "" }
+    ]
   }));
   const inventoryRows = characterInventoryItems.filter(item => item.assigned_character_id === currentSheetId);
 
   container.innerHTML = `
     <section class="simple-section">
-      <div class="simple-grid">
+      <div class="simple-grid simple-top-grid">
         ${simpleStat("Character", fieldValue("characterName"))}
         ${simpleStat("Level", fieldValue("characterLevel"))}
         ${simpleStat("HP", `${fieldValue("currentHitPoints", "0")}/${fieldValue("hitPointsTotal", "0")}`)}
@@ -4774,15 +5303,15 @@ function renderSimplifiedSheet() {
       </div>
     </section>
 
-    <div class="row g-2">
-      <div class="col-xl-3 col-lg-4">
-        <section class="simple-section">
+    <div class="simple-core-grid">
+      <div>
+        <section class="simple-section simple-core-section">
           <div class="sheet-title">Abilities</div>
           ${simpleTable(["Ability", "Total"], abilityRows)}
         </section>
       </div>
-      <div class="col-xl-3 col-lg-4">
-        <section class="simple-section">
+      <div>
+        <section class="simple-section simple-core-section">
           <div class="sheet-title">Armor Class</div>
           <div class="simple-grid-tight">
             ${simpleStat("AC", fieldValue("acTotal"))}
@@ -4793,7 +5322,7 @@ function renderSimplifiedSheet() {
             ${simpleConditionalStats("flat-footed ac", conditionalGroups)}
           </div>
         </section>
-        <section class="simple-section">
+        <section class="simple-section simple-core-section">
           <div class="sheet-title">Combat Maneuvers</div>
           <div class="simple-grid-tight">
             ${simpleStat("CMB", fieldValue("cmbTotal"))}
@@ -4803,8 +5332,8 @@ function renderSimplifiedSheet() {
           </div>
         </section>
       </div>
-      <div class="col-xl-3 col-lg-4">
-        <section class="simple-section">
+      <div>
+        <section class="simple-section simple-core-section">
           <div class="sheet-title">Saving Throws</div>
           ${simpleTable(["Save", "Total"], saveRows)}
         </section>
@@ -4818,17 +5347,17 @@ function renderSimplifiedSheet() {
 
     <section class="simple-section">
       <div class="sheet-title">Armor & Shields</div>
-      ${simpleChips(armorRows.map(row => ({ main: row[0], sub: `Total ${row[1] || "-"}` })), "No armor or shields.")}
+      ${simpleEquipmentCards(armorRows, "No armor or shields.")}
     </section>
 
     <section class="simple-section">
-      <div class="sheet-title">Gear</div>
-      ${simpleChips(gearRows, "No gear.")}
+      <div class="sheet-title">Other Equipment</div>
+      ${simpleEquipmentCards(gearRows, "No other equipment.")}
     </section>
 
     <section class="simple-section">
       <div class="sheet-title">Skills</div>
-      ${simpleList(skillRows, "No skills.")}
+      <div class="simple-skills-list">${simpleList(skillRows, "No skills.")}</div>
     </section>
 
     <section class="simple-section">
@@ -4851,6 +5380,7 @@ function collectSheet() {
   sheet.spells = characterSpells;
   if (isEnemySheetMode) sheet.enemyInventory = characterInventoryItems.map(item => ({ ...item, assigned_character_id: currentSheetId }));
   sheet.calculated = collectCalculatedSummary();
+  syncEnemyStructuredSpellFields();
   SIMPLE_FIELDS.forEach(id => sheet.fields[id] = el(id)?.value || "");
   ABILITIES.forEach(([key]) => sheet.abilities[key] = { score: el(`${key}Score`).value });
   SAVES.forEach(([key]) => sheet.saves[key] = { base: el(`${key}Base`).value, misc: el(`${key}Misc`).value });
@@ -4872,10 +5402,18 @@ function restoreSheet(sheet) {
   SIMPLE_FIELDS.forEach(id => {
     if (el(id)) el(id).value = el(id).defaultValue || "";
   });
-  Object.entries(data.fields || {}).forEach(([id, value]) => { if (el(id)) el(id).value = value; });
-  Object.entries(data).forEach(([id, value]) => {
-    if (typeof value !== "object" && el(id)) el(id).value = value;
+  setSelectValuePreservingUnknown("race", data.fields?.race || data.race || "");
+  setSelectValuePreservingUnknown("alignment", data.fields?.alignment || data.alignment || "");
+  Object.entries(data.fields || {}).forEach(([id, value]) => {
+    if (id === "race" || id === "alignment") setSelectValuePreservingUnknown(id, value);
+    else if (el(id)) el(id).value = value;
   });
+  Object.entries(data).forEach(([id, value]) => {
+    if (id === "race" || id === "alignment") setSelectValuePreservingUnknown(id, value);
+    else if (typeof value !== "object" && el(id)) el(id).value = value;
+  });
+  renderEnemyStructuredSpellFields();
+  updateEnemyAutoInputSizes();
   if (el("currentHitPoints") && data.fields?.currentHitPoints === undefined && data.currentHitPoints === undefined) {
     el("currentHitPoints").value = data.fields?.hitPointsTotal || data.fields?.hitPoints || 0;
   }
@@ -4917,13 +5455,11 @@ function restoreSheet(sheet) {
     else addArmor(item);
   });
   (data.gear || []).forEach(addGear);
-  if (!data.weapons?.length) addWeapon();
   if (!data.armor?.length) {
     const armorBonus = data.fields?.acArmor || data.acArmor;
     const shieldBonus = data.fields?.acShield || data.acShield;
     if (Number(armorBonus || 0)) addArmor({ item: "Saved armor", bonus: armorBonus, type: "Armor" });
     if (Number(shieldBonus || 0)) addArmor({ item: "Saved shield", bonus: shieldBonus, type: "Shield" });
-    if (!Number(armorBonus || 0) && !Number(shieldBonus || 0)) addArmor();
   }
   updateCharacterImagePreview();
   updateClassDerivedViews();
@@ -4932,7 +5468,10 @@ function restoreSheet(sheet) {
 }
 
 function loadSampleValues() {
-  Object.entries(PDF_SAMPLE).forEach(([id, value]) => { if (el(id)) el(id).value = value; });
+  Object.entries(PDF_SAMPLE).forEach(([id, value]) => {
+    if (id === "race" || id === "alignment") setSelectValuePreservingUnknown(id, value);
+    else if (el(id)) el(id).value = value;
+  });
 }
 
 function updateCharacterImagePreview() {
@@ -4953,13 +5492,24 @@ function updateCharacterImagePreview() {
 }
 
 function attachInputListeners(root = document) {
+  updateEnemyAutoInputSizes(root);
+  autosizeEnemyTextareas(root);
+  root.querySelectorAll("[data-delete-enemy-spell-row]").forEach(button => {
+    if (button.dataset.enemySpellDeleteBound === "true") return;
+    button.dataset.enemySpellDeleteBound = "true";
+    button.addEventListener("click", () => deleteEnemySpellRow(button));
+  });
   root.querySelectorAll(".sheet-input, #characterName").forEach(input => {
     input.addEventListener("input", () => {
+      if (input.classList.contains("enemy-auto-input")) updateEnemyAutoInputSizes(input.parentElement || document);
+      if (input.classList.contains("enemy-auto-textarea") || input.matches("[data-enemy-spell-list]")) autosizeEnemyTextareas(input.parentElement || document);
+      if (input.matches("[data-enemy-spell-label], [data-enemy-spell-list]")) syncEnemyStructuredSpellFields();
       if (input.id === "imageUrl") updateCharacterImagePreview();
       recalculateSheet();
       queueSheetSave();
     });
     input.addEventListener("change", () => {
+      if (input.matches("[data-enemy-spell-label], [data-enemy-spell-list]")) syncEnemyStructuredSpellFields();
       if (input.id === "imageUrl") updateCharacterImagePreview();
       recalculateSheet();
       queueSheetSave();
@@ -5148,11 +5698,13 @@ async function initCharacterSheet() {
   currentUserIsAdmin = await PFApp.isAppAdmin?.() || false;
   currentSheetOwnerId = user.id;
   await loadClassDefinitions();
+  await loadRaceDefinitions();
   const params = new URLSearchParams(window.location.search);
   const bridgeMode = params.get("bridge") === "1";
   const requestedCharacterId = params.get("characterId") || "";
   enemySheetId = params.get("enemyId") || "";
   isEnemySheetMode = Boolean(enemySheetId);
+  document.body.classList.toggle("enemy-sheet-mode", isEnemySheetMode);
   buildSheet();
   if (isEnemySheetMode) {
     const canManageEnemies = await PFApp.isGameManager(sheetContextKey);

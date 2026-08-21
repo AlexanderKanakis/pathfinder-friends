@@ -1,0 +1,5389 @@
+[
+  {
+    "url": "https://www.aonprd.com/MonsterDisplay.aspx?ItemName=Mephistopheles",
+    "name": "Mephistopheles",
+    "cr": "30",
+    "xp": 9830400,
+    "alignment": "LE",
+    "alignmentName": "Lawful Evil",
+    "size": "Large",
+    "creatureType": "outsider",
+    "subtypes": [
+      "devil",
+      "evil",
+      "extraplanar",
+      "lawful"
+    ],
+    "init": 14,
+    "senses": [
+      "darkvision 60 ft.",
+      "detect chaos",
+      "detect good",
+      "discern lies",
+      "see in darkness",
+      "true seeing"
+    ],
+    "aura": [
+      "frightful presence (120 ft., DC 41)",
+      "shield of law (DC 32)"
+    ],
+    "ac": {
+      "total": 48,
+      "touch": 40,
+      "flatFooted": 37,
+      "bonuses": [
+        {
+          "type": "deflection",
+          "value": 4
+        },
+        {
+          "type": "dex",
+          "value": 10
+        },
+        {
+          "type": "dodge",
+          "value": 1
+        },
+        {
+          "type": "natural",
+          "value": 8
+        },
+        {
+          "type": "profane",
+          "value": 16
+        },
+        {
+          "type": "size",
+          "value": -1
+        }
+      ],
+      "armor": 0,
+      "shield": 0,
+      "dex": 10,
+      "size": -1,
+      "natural": 8,
+      "deflection": 4,
+      "dodge": 1,
+      "misc": 0
+    },
+    "hp": 752,
+    "hpText": "752 (35d10+560); regeneration 30 (deific or mythic)",
+    "fortitude": 31,
+    "reflex": 33,
+    "will": 37,
+    "defensiveAbilities": [
+      "ashen essence",
+      "freedom of movement",
+      "infernal resurrection",
+      "mind blank"
+    ],
+    "dr": "20/epic, good, and silver",
+    "immunities": [
+      "ability damage",
+      "ability drain",
+      "bleed",
+      "blindness",
+      "blood drain",
+      "charm",
+      "compulsion",
+      "critical hits",
+      "dazzled",
+      "deafness",
+      "death effects",
+      "energy drain",
+      "fire",
+      "petrification",
+      "poison",
+      "precision damage"
+    ],
+    "resistances": [
+      {
+        "type": "acid",
+        "amount": 30
+      },
+      {
+        "type": "cold",
+        "amount": 30
+      }
+    ],
+    "spellResistance": 41,
+    "speed": [
+      "50 ft.",
+      "fly 100 ft. (perfect)"
+    ],
+    "flySpeed": "fly 100 ft. (perfect)",
+    "meleeAttackText": [
+      "+5 axiomatic flaming unholy trident +55/+50/+45/+40 (2d6+29/19-20 plus 1d6 fire)",
+      "gore +50 (2d8+8)",
+      "6 wings +48 (1d8+8/19-20)"
+    ],
+    "meleeAttacks": [
+      {
+        "raw": "+5 axiomatic flaming unholy trident +55/+50/+45/+40 (2d6+29/19-20 plus 1d6 fire)",
+        "mode": "melee",
+        "count": 1,
+        "name": "+5 axiomatic flaming unholy trident",
+        "attackBonus": "+55/+50/+45/+40",
+        "attackBonuses": [
+          55,
+          50,
+          45,
+          40
+        ],
+        "attackInstances": [
+          55,
+          50,
+          45,
+          40
+        ],
+        "attackRoutine": "+55/+50/+45/+40",
+        "damage": {
+          "raw": "2d6+29/19-20 plus 1d6 fire",
+          "text": "2d6+29",
+          "dice": "2d6",
+          "staticModifier": 29,
+          "threatRange": "19-20",
+          "criticalMultiplier": "x2",
+          "critical": "19-20/x2",
+          "extra": [
+            "1d6 fire"
+          ]
+        },
+        "damageText": "2d6+29",
+        "critical": "19-20/x2",
+        "extraDamage": [
+          "1d6 fire"
+        ],
+        "weaponType": "Melee Weapon (One-Handed)",
+        "attackScale": "STR",
+        "damageScale": "STR",
+        "notes": [],
+        "characterSheet": {
+          "name": "+5 axiomatic flaming unholy trident",
+          "weaponType": "Melee Weapon (One-Handed)",
+          "attackScale": "STR",
+          "damageScale": "STR",
+          "attack": "+55/+50/+45/+40",
+          "damage": "2d6+29",
+          "critical": "19-20/x2",
+          "details": "+5 axiomatic flaming unholy trident +55/+50/+45/+40 (2d6+29/19-20 plus 1d6 fire)"
+        }
+      },
+      {
+        "raw": "gore +50 (2d8+8)",
+        "mode": "melee",
+        "count": 1,
+        "name": "gore",
+        "attackBonus": "+50",
+        "attackBonuses": [
+          50
+        ],
+        "attackInstances": [
+          50
+        ],
+        "attackRoutine": "+50",
+        "damage": {
+          "raw": "2d8+8",
+          "text": "2d8+8",
+          "dice": "2d8",
+          "staticModifier": 8,
+          "threatRange": "20",
+          "criticalMultiplier": "x2",
+          "critical": "20/x2",
+          "extra": []
+        },
+        "damageText": "2d8+8",
+        "critical": "20/x2",
+        "extraDamage": [],
+        "weaponType": "Natural",
+        "attackScale": "STR",
+        "damageScale": "STR",
+        "notes": [],
+        "characterSheet": {
+          "name": "gore",
+          "weaponType": "Natural",
+          "attackScale": "STR",
+          "damageScale": "STR",
+          "attack": "+50",
+          "damage": "2d8+8",
+          "critical": "20/x2",
+          "details": "gore +50 (2d8+8)"
+        }
+      },
+      {
+        "raw": "6 wings +48 (1d8+8/19-20)",
+        "mode": "melee",
+        "count": 6,
+        "name": "wings",
+        "attackBonus": "+48",
+        "attackBonuses": [
+          48
+        ],
+        "attackInstances": [
+          48,
+          48,
+          48,
+          48,
+          48,
+          48
+        ],
+        "attackRoutine": "+48/+48/+48/+48/+48/+48",
+        "damage": {
+          "raw": "1d8+8/19-20",
+          "text": "1d8+8",
+          "dice": "1d8",
+          "staticModifier": 8,
+          "threatRange": "19-20",
+          "criticalMultiplier": "x2",
+          "critical": "19-20/x2",
+          "extra": []
+        },
+        "damageText": "1d8+8",
+        "critical": "19-20/x2",
+        "extraDamage": [],
+        "weaponType": "Natural",
+        "attackScale": "STR",
+        "damageScale": "STR",
+        "notes": [],
+        "characterSheet": {
+          "name": "wings",
+          "weaponType": "Natural",
+          "attackScale": "STR",
+          "damageScale": "STR",
+          "attack": "+48/+48/+48/+48/+48/+48",
+          "damage": "1d8+8",
+          "critical": "19-20/x2",
+          "details": "6 wings +48 (1d8+8/19-20)"
+        }
+      }
+    ],
+    "specialAttacks": [
+      "infernal wings",
+      "profane gift"
+    ],
+    "rangedAttackText": [],
+    "rangedAttacks": [],
+    "weapons": [
+      {
+        "raw": "+5 axiomatic flaming unholy trident +55/+50/+45/+40 (2d6+29/19-20 plus 1d6 fire)",
+        "mode": "melee",
+        "count": 1,
+        "name": "+5 axiomatic flaming unholy trident",
+        "attackBonus": "+55/+50/+45/+40",
+        "attackBonuses": [
+          55,
+          50,
+          45,
+          40
+        ],
+        "attackInstances": [
+          55,
+          50,
+          45,
+          40
+        ],
+        "attackRoutine": "+55/+50/+45/+40",
+        "damage": {
+          "raw": "2d6+29/19-20 plus 1d6 fire",
+          "text": "2d6+29",
+          "dice": "2d6",
+          "staticModifier": 29,
+          "threatRange": "19-20",
+          "criticalMultiplier": "x2",
+          "critical": "19-20/x2",
+          "extra": [
+            "1d6 fire"
+          ]
+        },
+        "damageText": "2d6+29",
+        "critical": "19-20/x2",
+        "extraDamage": [
+          "1d6 fire"
+        ],
+        "weaponType": "Melee Weapon (One-Handed)",
+        "attackScale": "STR",
+        "damageScale": "STR",
+        "notes": [],
+        "characterSheet": {
+          "name": "+5 axiomatic flaming unholy trident",
+          "weaponType": "Melee Weapon (One-Handed)",
+          "attackScale": "STR",
+          "damageScale": "STR",
+          "attack": "+55/+50/+45/+40",
+          "damage": "2d6+29",
+          "critical": "19-20/x2",
+          "details": "+5 axiomatic flaming unholy trident +55/+50/+45/+40 (2d6+29/19-20 plus 1d6 fire)"
+        }
+      },
+      {
+        "raw": "gore +50 (2d8+8)",
+        "mode": "melee",
+        "count": 1,
+        "name": "gore",
+        "attackBonus": "+50",
+        "attackBonuses": [
+          50
+        ],
+        "attackInstances": [
+          50
+        ],
+        "attackRoutine": "+50",
+        "damage": {
+          "raw": "2d8+8",
+          "text": "2d8+8",
+          "dice": "2d8",
+          "staticModifier": 8,
+          "threatRange": "20",
+          "criticalMultiplier": "x2",
+          "critical": "20/x2",
+          "extra": []
+        },
+        "damageText": "2d8+8",
+        "critical": "20/x2",
+        "extraDamage": [],
+        "weaponType": "Natural",
+        "attackScale": "STR",
+        "damageScale": "STR",
+        "notes": [],
+        "characterSheet": {
+          "name": "gore",
+          "weaponType": "Natural",
+          "attackScale": "STR",
+          "damageScale": "STR",
+          "attack": "+50",
+          "damage": "2d8+8",
+          "critical": "20/x2",
+          "details": "gore +50 (2d8+8)"
+        }
+      },
+      {
+        "raw": "6 wings +48 (1d8+8/19-20)",
+        "mode": "melee",
+        "count": 6,
+        "name": "wings",
+        "attackBonus": "+48",
+        "attackBonuses": [
+          48
+        ],
+        "attackInstances": [
+          48,
+          48,
+          48,
+          48,
+          48,
+          48
+        ],
+        "attackRoutine": "+48/+48/+48/+48/+48/+48",
+        "damage": {
+          "raw": "1d8+8/19-20",
+          "text": "1d8+8",
+          "dice": "1d8",
+          "staticModifier": 8,
+          "threatRange": "19-20",
+          "criticalMultiplier": "x2",
+          "critical": "19-20/x2",
+          "extra": []
+        },
+        "damageText": "1d8+8",
+        "critical": "19-20/x2",
+        "extraDamage": [],
+        "weaponType": "Natural",
+        "attackScale": "STR",
+        "damageScale": "STR",
+        "notes": [],
+        "characterSheet": {
+          "name": "wings",
+          "weaponType": "Natural",
+          "attackScale": "STR",
+          "damageScale": "STR",
+          "attack": "+48/+48/+48/+48/+48/+48",
+          "damage": "1d8+8",
+          "critical": "19-20/x2",
+          "details": "6 wings +48 (1d8+8/19-20)"
+        }
+      }
+    ],
+    "spellLikeAbilities": {
+      "cl": 30,
+      "concentration": 44,
+      "notes": [
+        "Mephistopheles can use this ability's mythic version in his realm."
+      ],
+      "levels": [],
+      "className": "",
+      "constant": [
+        "detect chaos",
+        "detect good",
+        "discern lies (DC 28)",
+        "freedom of movement",
+        "mind blank",
+        "shield of law (DC 32)",
+        "true seeing"
+      ],
+      "atWill": [
+        "astral projection",
+        "deeper darkness",
+        "desecrate",
+        "dictum (DC 31)",
+        "dominate person (DC 29)",
+        "greater dispel magic",
+        "greater scrying (DC 31)",
+        "greater teleport",
+        "order's wrath (DC 28)",
+        "secret page",
+        "unhallow"
+      ],
+      "3PerDay": [
+        "quickened dominate person (DC 29)",
+        "fire storm (DC 32)",
+        "globe of invulnerability",
+        "mass charm monster (DC 32)",
+        "mislead (DC 30)",
+        "summon devils"
+      ],
+      "1PerDay": [
+        "soul bind (DC 33)",
+        "time stop",
+        "wish"
+      ]
+    },
+    "weaknesses": [],
+    "spells": {
+      "cl": null,
+      "concentration": null,
+      "notes": [],
+      "levels": [],
+      "className": ""
+    },
+    "spellsKnown": {
+      "cl": null,
+      "concentration": null,
+      "notes": [],
+      "levels": [],
+      "className": ""
+    },
+    "spellsPrepared": {
+      "cl": null,
+      "concentration": null,
+      "notes": [],
+      "levels": [],
+      "className": ""
+    },
+    "psychicMagic": {
+      "cl": null,
+      "concentration": null,
+      "notes": [],
+      "levels": []
+    },
+    "strength": 42,
+    "dexterity": 30,
+    "constitution": 43,
+    "intelligence": 35,
+    "wisdom": 34,
+    "charisma": 39,
+    "bab": 35,
+    "cmb": 52,
+    "cmd": 93,
+    "conditions": {
+      "will": [
+        {
+          "value": 8,
+          "appliesWhen": "vs. mind-affecting effects"
+        }
+      ]
+    },
+    "feats": [
+      "Combat Expertise",
+      "Craft Construct",
+      "Craft Magic Arms and Armor",
+      "Craft Rod",
+      "Craft Wondrous Item",
+      "Critical Focus",
+      "Deceitful",
+      "Dodge",
+      "Flyby Attack",
+      "Forge Ring",
+      "Improved Critical (trident, wing)",
+      "Improved Initiative",
+      "Iron Will",
+      "Multiattack",
+      "Power Attack",
+      "Quicken Spell-Like Ability (dominate person)",
+      "Staggering Critical"
+    ],
+    "skills": [
+      {
+        "name": "Bluff",
+        "bonus": 56
+      },
+      {
+        "name": "Diplomacy",
+        "bonus": 52
+      },
+      {
+        "name": "Disguise",
+        "bonus": 56
+      },
+      {
+        "name": "Fly",
+        "bonus": 54
+      },
+      {
+        "name": "Intimidate",
+        "bonus": 52
+      },
+      {
+        "name": "Knowledge (arcana)",
+        "bonus": 47
+      },
+      {
+        "name": "Knowledge (history)",
+        "bonus": 47
+      },
+      {
+        "name": "Knowledge (local)",
+        "bonus": 47
+      },
+      {
+        "name": "Knowledge (nobility)",
+        "bonus": 47
+      },
+      {
+        "name": "Knowledge (religion)",
+        "bonus": 47
+      },
+      {
+        "name": "Knowledge (planes)",
+        "bonus": 50
+      },
+      {
+        "name": "Linguistics",
+        "bonus": 50
+      },
+      {
+        "name": "Perception",
+        "bonus": 50
+      },
+      {
+        "name": "Sense Motive",
+        "bonus": 50
+      },
+      {
+        "name": "Sleight of Hand",
+        "bonus": 45
+      },
+      {
+        "name": "Spellcraft",
+        "bonus": 47
+      },
+      {
+        "name": "Stealth",
+        "bonus": 44
+      },
+      {
+        "name": "Use Magic Device",
+        "bonus": 49
+      }
+    ],
+    "languages": [
+      "all (language mastery); telepathy 300 ft"
+    ],
+    "gear": [],
+    "combatGear": [],
+    "otherGear": [],
+    "sq": [
+      "flattering inquisitor"
+    ],
+    "environment": "any (Hell)",
+    "organization": "solitary (unique)",
+    "treasure": "triple (+5 axiomatic flaming unholy trident, Visineir, other treasure)",
+    "specialAbilities": [
+      {
+        "name": "Ashen Essence (Ex)",
+        "description": "Despite his appearance, Mephistopheles has a body formed of the ashes and brimstone of Hell rather than flesh and blood. He cannot be blinded, dazzled, or deafened, and he is immune to bleed damage, blood drain, critical hits, and precision-based damage. In addition, once per minute when he is hit by a melee or ranged attack, as an immediate action Mephistopheles can cause his body and all of his gear to collapse into ashes while he teleports to any point within 30 feet of his prior position and re-forms, taking no damage from the attack. Within his realm of Caina, he can trigger this power by expending one use of his mythic power and can teleport up to 300 feet, or up to 30 feet even when subject to effects that normally prevent teleportation."
+      },
+      {
+        "name": "Flattering Inquisitor (Su)",
+        "description": "Mephistopheles is unsurpassed at inveigling himself into a creature's good graces and ferreting out secrets. His discern lies spell-like ability automatically affects all creatures within 30 feet of him, and he does not need to concentrate to know whether a target is lying (although each time a creature tries to lie in this area it can attempt a Will save to negate the effect as normal). Anyone who attempts to lie when responding to a direct question posed by Mephistopheles must succeed at a DC 41 Will save or take 1d3 points of Wisdom drain and be unable to speak for 24 hours (Mephistopheles can end this enforced vow of silence at will as a free action). This is a mind-affecting effect. The save DC is Charisma-based."
+      },
+      {
+        "name": "Infernal Wings (Su)",
+        "description": "Mephistopheles has three pairs of wings, and while the damage caused by all six wings is identical, the additional effect caused by a strike from a wing depends on its nature. A hit from one of his burning wings deals 1d6 additional points of fire damage and the creature struck must succeed at a DC 43 Reflex save or catch fire. A hit from one of his draconic wings deals 2d6 points of bleed damage. A hit from one of his raven wings causes permanent blindness unless the creature struck succeeds at a DC 43 Fortitude save. The save DCs are Constitution-based."
+      },
+      {
+        "name": "Profane Gift (Su)",
+        "description": "As a full-round action, Mephistopheles can grant a willing non-devil a +4 profane bonus to one ability score; this also allows him to communicate telepathically with and use his mind-affecting spell-like abilities on the creature at any distance (even across planar boundaries). A creature can have only one such gift at a time. The profane gift can be removed with dispel evil or dispel law, or Mephistopheles can remove it as a free action, dealing 3d6 points of Charisma drain to the target (no save). In addition, a creature that accepts a wish from Mephistopheles immediately becomes lawful evil (Will DC 41 negates) and gains the benefits of good hope for 1 week, followed by the effects of crushing despair for 1d6 months (CL 30th). The save DC is Charisma-based."
+      }
+    ],
+    "description": "Mephistopheles was formed by Asmodeus from the ashes and hellfire of the plane of Hell itself. He is an artist of flattery and guile, a master of the infernal contract, and a warden of the chained prison plane of Caina. He is tireless in his hunt for new souls, and constantly seeks to lure mortals into signing theirs away in all manner of complex bargains and contracts. Mephistopheles appears as a muscular, 12-foot-tall, red-skinned humanoid."
+  },
+  {
+    "url": "https://www.aonprd.com/MonsterDisplay.aspx?ItemName=Oliphaunt%20of%20Jandelay",
+    "name": "Oliphaunt of Jandelay",
+    "cr": "30",
+    "xp": 9830400,
+    "alignment": "CN",
+    "alignmentName": "Chaotic Neutral",
+    "size": "Colossal",
+    "creatureType": "outsider",
+    "subtypes": [
+      "chaotic",
+      "extraplanar"
+    ],
+    "init": 8,
+    "senses": [
+      "darkvision 60 ft.",
+      "true seeing"
+    ],
+    "aura": [
+      "dimensional lock (500 ft., DC 41)"
+    ],
+    "ac": {
+      "total": 50,
+      "touch": 30,
+      "flatFooted": 42,
+      "bonuses": [
+        {
+          "type": "deflection",
+          "value": 20
+        },
+        {
+          "type": "dex",
+          "value": 8
+        },
+        {
+          "type": "natural",
+          "value": 20
+        },
+        {
+          "type": "size",
+          "value": -8
+        }
+      ],
+      "armor": 0,
+      "shield": 0,
+      "dex": 8,
+      "size": -8,
+      "natural": 20,
+      "deflection": 20,
+      "dodge": 0,
+      "misc": 0
+    },
+    "hp": 740,
+    "hpText": "740 (40d10+520); regeneration 35 (acid from a mythic spell or item)",
+    "fortitude": 37,
+    "reflex": 21,
+    "will": 27,
+    "defensiveAbilities": [
+      "guardian of Jandelay",
+      "ward against command",
+      "wards of Jandelay"
+    ],
+    "dr": "20/epic",
+    "immunities": [
+      "ability damage",
+      "disease",
+      "energy drain",
+      "paralysis",
+      "petrification",
+      "poison",
+      "polymorph"
+    ],
+    "resistances": [],
+    "spellResistance": 41,
+    "speed": [
+      "120 ft.",
+      "air walk"
+    ],
+    "flySpeed": "",
+    "meleeAttackText": [
+      "bite +49 (4d10+17/19-20 plus grab)",
+      "4 gores +49 (4d10+17/19-20)",
+      "2 slams +50 (4d10+17/19-20)",
+      "trunk +47 (4d8+8 plus grab)"
+    ],
+    "meleeAttacks": [
+      {
+        "raw": "bite +49 (4d10+17/19-20 plus grab)",
+        "mode": "melee",
+        "count": 1,
+        "name": "bite",
+        "attackBonus": "+49",
+        "attackBonuses": [
+          49
+        ],
+        "attackInstances": [
+          49
+        ],
+        "attackRoutine": "+49",
+        "damage": {
+          "raw": "4d10+17/19-20 plus grab",
+          "text": "4d10+17",
+          "dice": "4d10",
+          "staticModifier": 17,
+          "threatRange": "19-20",
+          "criticalMultiplier": "x2",
+          "critical": "19-20/x2",
+          "extra": [
+            "grab"
+          ]
+        },
+        "damageText": "4d10+17",
+        "critical": "19-20/x2",
+        "extraDamage": [
+          "grab"
+        ],
+        "weaponType": "Natural",
+        "attackScale": "STR",
+        "damageScale": "STR",
+        "notes": [],
+        "characterSheet": {
+          "name": "bite",
+          "weaponType": "Natural",
+          "attackScale": "STR",
+          "damageScale": "STR",
+          "attack": "+49",
+          "damage": "4d10+17",
+          "critical": "19-20/x2",
+          "details": "bite +49 (4d10+17/19-20 plus grab)"
+        }
+      },
+      {
+        "raw": "4 gores +49 (4d10+17/19-20)",
+        "mode": "melee",
+        "count": 4,
+        "name": "gores",
+        "attackBonus": "+49",
+        "attackBonuses": [
+          49
+        ],
+        "attackInstances": [
+          49,
+          49,
+          49,
+          49
+        ],
+        "attackRoutine": "+49/+49/+49/+49",
+        "damage": {
+          "raw": "4d10+17/19-20",
+          "text": "4d10+17",
+          "dice": "4d10",
+          "staticModifier": 17,
+          "threatRange": "19-20",
+          "criticalMultiplier": "x2",
+          "critical": "19-20/x2",
+          "extra": []
+        },
+        "damageText": "4d10+17",
+        "critical": "19-20/x2",
+        "extraDamage": [],
+        "weaponType": "Melee Weapon (One-Handed)",
+        "attackScale": "STR",
+        "damageScale": "STR",
+        "notes": [],
+        "characterSheet": {
+          "name": "gores",
+          "weaponType": "Melee Weapon (One-Handed)",
+          "attackScale": "STR",
+          "damageScale": "STR",
+          "attack": "+49/+49/+49/+49",
+          "damage": "4d10+17",
+          "critical": "19-20/x2",
+          "details": "4 gores +49 (4d10+17/19-20)"
+        }
+      },
+      {
+        "raw": "2 slams +50 (4d10+17/19-20)",
+        "mode": "melee",
+        "count": 2,
+        "name": "slams",
+        "attackBonus": "+50",
+        "attackBonuses": [
+          50
+        ],
+        "attackInstances": [
+          50,
+          50
+        ],
+        "attackRoutine": "+50/+50",
+        "damage": {
+          "raw": "4d10+17/19-20",
+          "text": "4d10+17",
+          "dice": "4d10",
+          "staticModifier": 17,
+          "threatRange": "19-20",
+          "criticalMultiplier": "x2",
+          "critical": "19-20/x2",
+          "extra": []
+        },
+        "damageText": "4d10+17",
+        "critical": "19-20/x2",
+        "extraDamage": [],
+        "weaponType": "Natural",
+        "attackScale": "STR",
+        "damageScale": "STR",
+        "notes": [],
+        "characterSheet": {
+          "name": "slams",
+          "weaponType": "Natural",
+          "attackScale": "STR",
+          "damageScale": "STR",
+          "attack": "+50/+50",
+          "damage": "4d10+17",
+          "critical": "19-20/x2",
+          "details": "2 slams +50 (4d10+17/19-20)"
+        }
+      },
+      {
+        "raw": "trunk +47 (4d8+8 plus grab)",
+        "mode": "melee",
+        "count": 1,
+        "name": "trunk",
+        "attackBonus": "+47",
+        "attackBonuses": [
+          47
+        ],
+        "attackInstances": [
+          47
+        ],
+        "attackRoutine": "+47",
+        "damage": {
+          "raw": "4d8+8 plus grab",
+          "text": "4d8+8",
+          "dice": "4d8",
+          "staticModifier": 8,
+          "threatRange": "20",
+          "criticalMultiplier": "x2",
+          "critical": "20/x2",
+          "extra": [
+            "grab"
+          ]
+        },
+        "damageText": "4d8+8",
+        "critical": "20/x2",
+        "extraDamage": [
+          "grab"
+        ],
+        "weaponType": "Natural",
+        "attackScale": "STR",
+        "damageScale": "STR",
+        "notes": [],
+        "characterSheet": {
+          "name": "trunk",
+          "weaponType": "Natural",
+          "attackScale": "STR",
+          "damageScale": "STR",
+          "attack": "+47",
+          "damage": "4d8+8",
+          "critical": "20/x2",
+          "details": "trunk +47 (4d8+8 plus grab)"
+        }
+      }
+    ],
+    "specialAttacks": [
+      "constrict (4d8+25)",
+      "ruinous tusks",
+      "swallow whole (4d10+17 damage, AC 20, 74 hp)",
+      "trample (4d10+25, DC 47)",
+      "weather sphere"
+    ],
+    "rangedAttackText": [],
+    "rangedAttacks": [],
+    "weapons": [
+      {
+        "raw": "bite +49 (4d10+17/19-20 plus grab)",
+        "mode": "melee",
+        "count": 1,
+        "name": "bite",
+        "attackBonus": "+49",
+        "attackBonuses": [
+          49
+        ],
+        "attackInstances": [
+          49
+        ],
+        "attackRoutine": "+49",
+        "damage": {
+          "raw": "4d10+17/19-20 plus grab",
+          "text": "4d10+17",
+          "dice": "4d10",
+          "staticModifier": 17,
+          "threatRange": "19-20",
+          "criticalMultiplier": "x2",
+          "critical": "19-20/x2",
+          "extra": [
+            "grab"
+          ]
+        },
+        "damageText": "4d10+17",
+        "critical": "19-20/x2",
+        "extraDamage": [
+          "grab"
+        ],
+        "weaponType": "Natural",
+        "attackScale": "STR",
+        "damageScale": "STR",
+        "notes": [],
+        "characterSheet": {
+          "name": "bite",
+          "weaponType": "Natural",
+          "attackScale": "STR",
+          "damageScale": "STR",
+          "attack": "+49",
+          "damage": "4d10+17",
+          "critical": "19-20/x2",
+          "details": "bite +49 (4d10+17/19-20 plus grab)"
+        }
+      },
+      {
+        "raw": "4 gores +49 (4d10+17/19-20)",
+        "mode": "melee",
+        "count": 4,
+        "name": "gores",
+        "attackBonus": "+49",
+        "attackBonuses": [
+          49
+        ],
+        "attackInstances": [
+          49,
+          49,
+          49,
+          49
+        ],
+        "attackRoutine": "+49/+49/+49/+49",
+        "damage": {
+          "raw": "4d10+17/19-20",
+          "text": "4d10+17",
+          "dice": "4d10",
+          "staticModifier": 17,
+          "threatRange": "19-20",
+          "criticalMultiplier": "x2",
+          "critical": "19-20/x2",
+          "extra": []
+        },
+        "damageText": "4d10+17",
+        "critical": "19-20/x2",
+        "extraDamage": [],
+        "weaponType": "Melee Weapon (One-Handed)",
+        "attackScale": "STR",
+        "damageScale": "STR",
+        "notes": [],
+        "characterSheet": {
+          "name": "gores",
+          "weaponType": "Melee Weapon (One-Handed)",
+          "attackScale": "STR",
+          "damageScale": "STR",
+          "attack": "+49/+49/+49/+49",
+          "damage": "4d10+17",
+          "critical": "19-20/x2",
+          "details": "4 gores +49 (4d10+17/19-20)"
+        }
+      },
+      {
+        "raw": "2 slams +50 (4d10+17/19-20)",
+        "mode": "melee",
+        "count": 2,
+        "name": "slams",
+        "attackBonus": "+50",
+        "attackBonuses": [
+          50
+        ],
+        "attackInstances": [
+          50,
+          50
+        ],
+        "attackRoutine": "+50/+50",
+        "damage": {
+          "raw": "4d10+17/19-20",
+          "text": "4d10+17",
+          "dice": "4d10",
+          "staticModifier": 17,
+          "threatRange": "19-20",
+          "criticalMultiplier": "x2",
+          "critical": "19-20/x2",
+          "extra": []
+        },
+        "damageText": "4d10+17",
+        "critical": "19-20/x2",
+        "extraDamage": [],
+        "weaponType": "Natural",
+        "attackScale": "STR",
+        "damageScale": "STR",
+        "notes": [],
+        "characterSheet": {
+          "name": "slams",
+          "weaponType": "Natural",
+          "attackScale": "STR",
+          "damageScale": "STR",
+          "attack": "+50/+50",
+          "damage": "4d10+17",
+          "critical": "19-20/x2",
+          "details": "2 slams +50 (4d10+17/19-20)"
+        }
+      },
+      {
+        "raw": "trunk +47 (4d8+8 plus grab)",
+        "mode": "melee",
+        "count": 1,
+        "name": "trunk",
+        "attackBonus": "+47",
+        "attackBonuses": [
+          47
+        ],
+        "attackInstances": [
+          47
+        ],
+        "attackRoutine": "+47",
+        "damage": {
+          "raw": "4d8+8 plus grab",
+          "text": "4d8+8",
+          "dice": "4d8",
+          "staticModifier": 8,
+          "threatRange": "20",
+          "criticalMultiplier": "x2",
+          "critical": "20/x2",
+          "extra": [
+            "grab"
+          ]
+        },
+        "damageText": "4d8+8",
+        "critical": "20/x2",
+        "extraDamage": [
+          "grab"
+        ],
+        "weaponType": "Natural",
+        "attackScale": "STR",
+        "damageScale": "STR",
+        "notes": [],
+        "characterSheet": {
+          "name": "trunk",
+          "weaponType": "Natural",
+          "attackScale": "STR",
+          "damageScale": "STR",
+          "attack": "+47",
+          "damage": "4d8+8",
+          "critical": "20/x2",
+          "details": "trunk +47 (4d8+8 plus grab)"
+        }
+      }
+    ],
+    "spellLikeAbilities": {
+      "cl": 40,
+      "concentration": 51,
+      "notes": [],
+      "levels": [],
+      "className": "",
+      "constant": [
+        "air walk",
+        "freedom",
+        "true seeing"
+      ],
+      "atWill": [
+        "greater shout (DC 29)"
+      ],
+      "3PerDay": [
+        "transmute rock to mud"
+      ]
+    },
+    "weaknesses": [],
+    "spells": {
+      "cl": null,
+      "concentration": null,
+      "notes": [],
+      "levels": [],
+      "className": ""
+    },
+    "spellsKnown": {
+      "cl": null,
+      "concentration": null,
+      "notes": [],
+      "levels": [],
+      "className": ""
+    },
+    "spellsPrepared": {
+      "cl": null,
+      "concentration": null,
+      "notes": [],
+      "levels": [],
+      "className": ""
+    },
+    "psychicMagic": {
+      "cl": null,
+      "concentration": null,
+      "notes": [],
+      "levels": []
+    },
+    "strength": 44,
+    "dexterity": 27,
+    "constitution": 37,
+    "intelligence": 14,
+    "wisdom": 17,
+    "charisma": 32,
+    "bab": 40,
+    "cmb": 65,
+    "cmd": 103,
+    "conditions": {
+      "cmd": [
+        {
+          "value": 105,
+          "appliesWhen": "vs. sunder"
+        },
+        {
+          "value": 107,
+          "appliesWhen": "vs. grapple or trip"
+        }
+      ]
+    },
+    "feats": [
+      "Ability Focus (greater shout)",
+      "Cleave",
+      "Combat Expertise",
+      "Critical Focus",
+      "Empower Spell-Like Ability (greater shout)",
+      "Great Cleave",
+      "Great Fortitude",
+      "Greater Sunder",
+      "Improved Critical (bite)",
+      "Improved Critical (gore)",
+      "Improved Critical (slam)",
+      "Improved Sunder",
+      "Iron Will",
+      "Multiattack",
+      "Power Attack",
+      "Run",
+      "Skill Focus (Perception)",
+      "Staggering Critical",
+      "Stunning Critical",
+      "Weapon Focus (slam)"
+    ],
+    "skills": [
+      {
+        "name": "Climb",
+        "bonus": 37
+      },
+      {
+        "name": "Diplomacy",
+        "bonus": 51
+      },
+      {
+        "name": "Intimidate",
+        "bonus": 54
+      },
+      {
+        "name": "Knowledge (arcana)",
+        "bonus": 25
+      },
+      {
+        "name": "Knowledge (religion)",
+        "bonus": 25
+      },
+      {
+        "name": "Knowledge (planes)",
+        "bonus": 45
+      },
+      {
+        "name": "Perception",
+        "bonus": 52
+      },
+      {
+        "name": "Sense Motive",
+        "bonus": 46
+      },
+      {
+        "name": "Spellcraft",
+        "bonus": 45
+      },
+      {
+        "name": "Swim",
+        "bonus": 37
+      }
+    ],
+    "languages": [
+      "Celestial",
+      "Jandelayan"
+    ],
+    "gear": [],
+    "combatGear": [],
+    "otherGear": [],
+    "sq": [
+      "massive"
+    ],
+    "environment": "",
+    "organization": "",
+    "treasure": "",
+    "specialAbilities": [
+      {
+        "name": "Guardian of Jandelay (Su)",
+        "description": "The Oliphaunt was created to live in Jandelay, and attempting to remove it from the place is almost impossible. The Oliphaunt can prevent a gate or similar effect from opening inside Jandelay's borders unless the effect was created by an artifact or cast by a mythic character. If brought outside Jandelay, the Oliphaunt attempts a Will saving throw each day to return. The DC is equal to the DC of the spell that transported it, or the DC that spell would have if it allowed a saving throw. The return of the Oliphaunt triggers a magical punishment on those that stole it, laying waste to people and land. Centered on the point from which the Oliphaunt just departed, the ward triggers a mass hold monster spell targeting all creatures in a 5-mile radius. Then, that area is affected by an earthquake and storm of vengeance that last 1d12 months. While in Jandelay, the Oliphaunt's dimensional lock aura extends to protect the entire realm."
+      },
+      {
+        "name": "Massive (Ex)",
+        "description": "The Oliphaunt is so enormous in scale that it gains the benefits of a kaiju's massive ability (see Pathfinder RPG Bestiary 4)."
+      },
+      {
+        "name": "Ruinous Tusks (Ex)",
+        "description": "The Oliphaunt's gore attacks are treated as adamantine, and any creature hit by one is affected by a targeted greater dispel magic spell."
+      },
+      {
+        "name": "Ward against Command (Su)",
+        "description": "The Oliphaunt is immune to any mind-affecting spell or effect unless the Oliphaunt has line of sight to the caster. Even then, all mind-affecting spells and effects gain the language-dependent descriptor. Magical means of translation such as tongues do not bypass this restriction."
+      },
+      {
+        "name": "Wards of Jandelay (Su)",
+        "description": "Ancient protective magic was bound into the essence of the Oliphaunt. The wards give it a +20 deflection bonus to AC, spell resistance 41, and a constant freedom effect."
+      },
+      {
+        "name": "Weather Sphere (Su)",
+        "description": "The Oliphaunt can continuously change the environment around it, as control weather with a 5-mile radius. The Oliphaunt can change the weather to that of any season, and the effects manifest 1 round thereafter. If the Oliphaunt creates stormy weather, it can call down one lightning bolt per round as a free action, as if using call lightning storm."
+      }
+    ],
+    "description": "Only once did the Oliphaunt of Jandelay set foot on Golarion. A runelord of Thassilon, a precursor of Karzoug, had the knowledge to call the creature, and the ambition and ego to do so despite the risks. He erected the Spindlehorn, a slender tower of dark slate thousands of feet tall, in the Wyvern Mountains simply so he could look the Oliphaunt in the eye and attempt to control it. And control it he did. The Oliphaunt caused the carnage the runelord intended, destroying an invading army from Azlant. Black clouds sprang from a clear sky around the mountain of a creature, and lightning and hail shot down on the amassed troops. Every impact of the thing's foot shook the ground, and the thunder of the Oliphaunt's march through the armies drowned out even the screams of the dying thousands. A massive valley marked the path where the Oliphaunt trod, with entire cities lying buried underneath the earth by the crushing footfalls. But even a runelord couldn't control such power forever, and the wards protecting the Oliphaunt continued to draw it back to its home realm of Jandelay. The legion following the runelord's ally, Runelord Xanderghul, suffered the parting punishment when the Oliphaunt vanished, torn back to Jandelay. A quarter of Xanderghul's legion froze still in their tracks, then were ripped apart by chaotic, bloody storms and repeated earthquakes left in the Oliphaunt's wake. In spite of the repercussions of calling the Oliphaunt of Jandelay, spellcasters of great influence and arrogance still attempt to recreate the singular feat of calling it to Golarion. Desperation drives most who try, most notably the Runelord Alaznist, who was prepared to call the beast down upon Karzoug as he prepared to finally march on her territory. Only Earthfall cut Alaznist's plans short. Since the fall of the runelords and Thassilon, lore about the Oliphaunt and Jandelay has become much harder to come by-but it's far from forgotten. Ancient liches still work away in secluded laboratories to recreate the complicated means that once before called forth the great Oliphaunt, meticulously reconstructing what few scraps of ancient records they can find. Speculators collect all sorts of relics purported to be chunks of tusk that sloughed off the beast, vials of water collected from lakes formed by the Oliphaunt's tears, and all manner of other curiosities. Few eyewitness accounts remain, since most who saw the Oliphaunt died. Few alive on Golarion even know about the Oliphaunt, but even fewer understand what Jandelay itself is. Some believe it's the name of the person who first scribed a tale of the Oliphaunt, others think it's an even greater progenitor beast that spawned the creature. Those who've deeply researched to topic found only a few hints. The most compelling of these are within the epic poem Jandelay, as inscribed at the base of the Spindlehorn. The poem tells of the Oliphaunt's rampage and the other legendary acts of the runelord who summoned it (though lacking specific details of how the runelord pulled off this feat). However, within the poem is a cipher that when translated reveals these words: Jandelay, proof against the Maelstrom, Jandelay, of green fields and faultless spires; No sane soul born dares trespass fair Jandelay For the Oliphaunt guards you always."
+  },
+  {
+    "url": "https://www.aonprd.com/MonsterDisplay.aspx?ItemName=Burning%20Child",
+    "name": "Burning Child",
+    "cr": "10",
+    "xp": 9600,
+    "alignment": "CN",
+    "alignmentName": "Chaotic Neutral",
+    "size": "Small",
+    "creatureType": "undead",
+    "subtypes": [
+      "fire"
+    ],
+    "init": 7,
+    "senses": [
+      "Perception +17"
+    ],
+    "aura": [
+      "elemental aura (fire, DC 17)",
+      "frightful presence (60 ft., DC 21)"
+    ],
+    "ac": {
+      "total": 17,
+      "touch": 15,
+      "flatFooted": 13,
+      "bonuses": [
+        {
+          "type": "dex",
+          "value": 3
+        },
+        {
+          "type": "dodge",
+          "value": 1
+        },
+        {
+          "type": "natural",
+          "value": 2
+        },
+        {
+          "type": "size",
+          "value": 1
+        }
+      ],
+      "armor": 0,
+      "shield": 0,
+      "dex": 3,
+      "size": 1,
+      "natural": 2,
+      "deflection": 0,
+      "dodge": 1,
+      "misc": 0
+    },
+    "hp": 150,
+    "hpText": "150 (15d8+75)",
+    "fortitude": 9,
+    "reflex": 12,
+    "will": 11,
+    "defensiveAbilities": [
+      "channel resistance +4",
+      "final embrace"
+    ],
+    "dr": "",
+    "immunities": [
+      "fire",
+      "undead traits"
+    ],
+    "resistances": [],
+    "spellResistance": null,
+    "speed": [
+      "40 ft"
+    ],
+    "flySpeed": "",
+    "meleeAttackText": [
+      "slam +10 (1d4-2 plus burn)"
+    ],
+    "meleeAttacks": [
+      {
+        "raw": "slam +10 (1d4-2 plus burn)",
+        "mode": "melee",
+        "count": 1,
+        "name": "slam",
+        "attackBonus": "+10",
+        "attackBonuses": [
+          10
+        ],
+        "attackInstances": [
+          10
+        ],
+        "attackRoutine": "+10",
+        "damage": {
+          "raw": "1d4-2 plus burn",
+          "text": "1d4-2",
+          "dice": "1d4",
+          "staticModifier": -2,
+          "threatRange": "20",
+          "criticalMultiplier": "x2",
+          "critical": "20/x2",
+          "extra": [
+            "burn"
+          ]
+        },
+        "damageText": "1d4-2",
+        "critical": "20/x2",
+        "extraDamage": [
+          "burn"
+        ],
+        "weaponType": "Natural",
+        "attackScale": "STR",
+        "damageScale": "STR",
+        "notes": [],
+        "characterSheet": {
+          "name": "slam",
+          "weaponType": "Natural",
+          "attackScale": "STR",
+          "damageScale": "STR",
+          "attack": "+10",
+          "damage": "1d4-2",
+          "critical": "20/x2",
+          "details": "slam +10 (1d4-2 plus burn)"
+        }
+      }
+    ],
+    "specialAttacks": [
+      "breath weapon (60-ft. cone, 10d6 fire damage, Reflex DC 21 half)",
+      "burn (2d8, DC 21)"
+    ],
+    "rangedAttackText": [],
+    "rangedAttacks": [],
+    "weapons": [
+      {
+        "raw": "slam +10 (1d4-2 plus burn)",
+        "mode": "melee",
+        "count": 1,
+        "name": "slam",
+        "attackBonus": "+10",
+        "attackBonuses": [
+          10
+        ],
+        "attackInstances": [
+          10
+        ],
+        "attackRoutine": "+10",
+        "damage": {
+          "raw": "1d4-2 plus burn",
+          "text": "1d4-2",
+          "dice": "1d4",
+          "staticModifier": -2,
+          "threatRange": "20",
+          "criticalMultiplier": "x2",
+          "critical": "20/x2",
+          "extra": [
+            "burn"
+          ]
+        },
+        "damageText": "1d4-2",
+        "critical": "20/x2",
+        "extraDamage": [
+          "burn"
+        ],
+        "weaponType": "Natural",
+        "attackScale": "STR",
+        "damageScale": "STR",
+        "notes": [],
+        "characterSheet": {
+          "name": "slam",
+          "weaponType": "Natural",
+          "attackScale": "STR",
+          "damageScale": "STR",
+          "attack": "+10",
+          "damage": "1d4-2",
+          "critical": "20/x2",
+          "details": "slam +10 (1d4-2 plus burn)"
+        }
+      }
+    ],
+    "spellLikeAbilities": {
+      "cl": 11,
+      "concentration": 15,
+      "notes": [],
+      "levels": [],
+      "className": "",
+      "constant": [
+        "elemental aura (fire only; DC 17)",
+        "fire trail (DC 17)"
+      ],
+      "atWill": [
+        "burning hands (DC 16)",
+        "scorching ray (DC 16)"
+      ],
+      "3PerDay": [
+        "quickened fireball (DC 17)"
+      ]
+    },
+    "weaknesses": [
+      "vulnerable to cold"
+    ],
+    "spells": {
+      "cl": null,
+      "concentration": null,
+      "notes": [],
+      "levels": [],
+      "className": ""
+    },
+    "spellsKnown": {
+      "cl": null,
+      "concentration": null,
+      "notes": [],
+      "levels": [],
+      "className": ""
+    },
+    "spellsPrepared": {
+      "cl": null,
+      "concentration": null,
+      "notes": [],
+      "levels": [],
+      "className": ""
+    },
+    "psychicMagic": {
+      "cl": null,
+      "concentration": null,
+      "notes": [],
+      "levels": []
+    },
+    "strength": 6,
+    "dexterity": 17,
+    "constitution": null,
+    "intelligence": 10,
+    "wisdom": 15,
+    "charisma": 18,
+    "bab": 7,
+    "cmb": 14,
+    "cmd": 17,
+    "conditions": {},
+    "feats": [
+      "Dodge",
+      "Improved Initiative",
+      "Lightning Reflexes",
+      "Quicken Spell-Like Ability (fireball)",
+      "Toughness",
+      "Weapon Finesse"
+    ],
+    "skills": [
+      {
+        "name": "Escape Artist",
+        "bonus": 18
+      },
+      {
+        "name": "Intimidate",
+        "bonus": 19
+      },
+      {
+        "name": "Perception",
+        "bonus": 17
+      },
+      {
+        "name": "Sense Motive",
+        "bonus": 17
+      }
+    ],
+    "languages": [
+      "Common"
+    ],
+    "gear": [],
+    "combatGear": [],
+    "otherGear": [],
+    "sq": [
+      "binary state"
+    ],
+    "environment": "temperate plains",
+    "organization": "unique",
+    "treasure": "none",
+    "specialAbilities": [
+      {
+        "name": "Binary State (Su)",
+        "description": "Most of the time the Burning Child is in a passive state, during which he's incorporeal and invisible, though his soft sobs and the scent of burning flesh allow a creature to pinpoint his location with a successful DC 30 Perception check. If the Burning Child comes across a battle, the chance he enters his active state is equal to 1% per creature fighting (to a maximum of 100%). While active, the Burning Child is corporeal and visible. After 1d4 hours without being attacked or seeing conflict, the Burning Child reenters his passive state."
+      },
+      {
+        "name": "Breath Weapon (Su)",
+        "description": "The Burning Child can use his breath weapon only when in his active state, and only once each time he becomes active."
+      },
+      {
+        "name": "Final Embrace (Ex)",
+        "description": "If the Burning Child is destroyed, he reforms in 2d4 days. He can be permanently destroyed only when active, by a humanoid embracing and calming him. This requires succeeding at DC 28 Diplomacy checks for 3 consecutive rounds."
+      }
+    ],
+    "description": "Born from the traumatic death of an abducted human child at the hands of orc alchemists seeking to unlock the mysteries of his sorcerous bloodline and convert him into a weapon, the Burning Child has haunted a wide stretch of wasteland in eastern Belkzen for centuries. First seen during the battle that bears his name, the Burning Child continues to wander in an endless search for his parents, constantly reliving the terrifying experience of his first fiery death. While in his passive state, he's little more than disembodied sobbing and the scent of burning flesh. But when he happens upon the scene of a battle, the memory of his agonizing death pushes him to manifest, and he wanders into the fray crying out for rescue, all the while unintentionally sowing devastation as the uncontrollable energies coursing through him spill out of his unstable form."
+  },
+  {
+    "url": "https://www.aonprd.com/MonsterDisplay.aspx?ItemName=Giant%20Centipede",
+    "name": "Giant Centipede",
+    "cr": "1/2",
+    "xp": 200,
+    "alignment": "N",
+    "alignmentName": "Neutral",
+    "size": "Medium",
+    "creatureType": "vermin",
+    "subtypes": [],
+    "init": 2,
+    "senses": [
+      "darkvision 60 ft"
+    ],
+    "aura": [],
+    "ac": {
+      "total": 14,
+      "touch": 12,
+      "flatFooted": 12,
+      "bonuses": [
+        {
+          "type": "dex",
+          "value": 2
+        },
+        {
+          "type": "natural",
+          "value": 2
+        }
+      ],
+      "armor": 0,
+      "shield": 0,
+      "dex": 2,
+      "size": 0,
+      "natural": 2,
+      "deflection": 0,
+      "dodge": 0,
+      "misc": 0
+    },
+    "hp": 5,
+    "hpText": "5 (1d8+1)",
+    "fortitude": 3,
+    "reflex": 2,
+    "will": 0,
+    "defensiveAbilities": [],
+    "dr": "",
+    "immunities": [
+      "mind-affecting effects"
+    ],
+    "resistances": [],
+    "spellResistance": null,
+    "speed": [
+      "40 ft.",
+      "climb 40 ft"
+    ],
+    "flySpeed": "",
+    "meleeAttackText": [
+      "bite +2 (1d6-1 plus poison)"
+    ],
+    "meleeAttacks": [
+      {
+        "raw": "bite +2 (1d6-1 plus poison)",
+        "mode": "melee",
+        "count": 1,
+        "name": "bite",
+        "attackBonus": "+2",
+        "attackBonuses": [
+          2
+        ],
+        "attackInstances": [
+          2
+        ],
+        "attackRoutine": "+2",
+        "damage": {
+          "raw": "1d6-1 plus poison",
+          "text": "1d6-1",
+          "dice": "1d6",
+          "staticModifier": -1,
+          "threatRange": "20",
+          "criticalMultiplier": "x2",
+          "critical": "20/x2",
+          "extra": [
+            "poison"
+          ]
+        },
+        "damageText": "1d6-1",
+        "critical": "20/x2",
+        "extraDamage": [
+          "poison"
+        ],
+        "weaponType": "Natural",
+        "attackScale": "STR",
+        "damageScale": "STR",
+        "notes": [],
+        "characterSheet": {
+          "name": "bite",
+          "weaponType": "Natural",
+          "attackScale": "STR",
+          "damageScale": "STR",
+          "attack": "+2",
+          "damage": "1d6-1",
+          "critical": "20/x2",
+          "details": "bite +2 (1d6-1 plus poison)"
+        }
+      }
+    ],
+    "specialAttacks": [
+      "poison"
+    ],
+    "rangedAttackText": [],
+    "rangedAttacks": [],
+    "weapons": [
+      {
+        "raw": "bite +2 (1d6-1 plus poison)",
+        "mode": "melee",
+        "count": 1,
+        "name": "bite",
+        "attackBonus": "+2",
+        "attackBonuses": [
+          2
+        ],
+        "attackInstances": [
+          2
+        ],
+        "attackRoutine": "+2",
+        "damage": {
+          "raw": "1d6-1 plus poison",
+          "text": "1d6-1",
+          "dice": "1d6",
+          "staticModifier": -1,
+          "threatRange": "20",
+          "criticalMultiplier": "x2",
+          "critical": "20/x2",
+          "extra": [
+            "poison"
+          ]
+        },
+        "damageText": "1d6-1",
+        "critical": "20/x2",
+        "extraDamage": [
+          "poison"
+        ],
+        "weaponType": "Natural",
+        "attackScale": "STR",
+        "damageScale": "STR",
+        "notes": [],
+        "characterSheet": {
+          "name": "bite",
+          "weaponType": "Natural",
+          "attackScale": "STR",
+          "damageScale": "STR",
+          "attack": "+2",
+          "damage": "1d6-1",
+          "critical": "20/x2",
+          "details": "bite +2 (1d6-1 plus poison)"
+        }
+      }
+    ],
+    "spellLikeAbilities": {
+      "cl": null,
+      "concentration": null,
+      "notes": [],
+      "levels": []
+    },
+    "weaknesses": [],
+    "spells": {
+      "cl": null,
+      "concentration": null,
+      "notes": [],
+      "levels": [],
+      "className": ""
+    },
+    "spellsKnown": {
+      "cl": null,
+      "concentration": null,
+      "notes": [],
+      "levels": [],
+      "className": ""
+    },
+    "spellsPrepared": {
+      "cl": null,
+      "concentration": null,
+      "notes": [],
+      "levels": [],
+      "className": ""
+    },
+    "psychicMagic": {
+      "cl": null,
+      "concentration": null,
+      "notes": [],
+      "levels": []
+    },
+    "strength": 9,
+    "dexterity": 15,
+    "constitution": 12,
+    "intelligence": null,
+    "wisdom": 10,
+    "charisma": 2,
+    "bab": 0,
+    "cmb": -1,
+    "cmd": 11,
+    "conditions": {},
+    "feats": [
+      "Weapon Finesse"
+    ],
+    "skills": [
+      {
+        "name": "Climb",
+        "bonus": 10
+      },
+      {
+        "name": "Perception",
+        "bonus": 4
+      },
+      {
+        "name": "Stealth",
+        "bonus": 10
+      }
+    ],
+    "languages": [],
+    "gear": [],
+    "combatGear": [],
+    "otherGear": [],
+    "sq": [],
+    "environment": "temperate or warm forest or underground",
+    "organization": "solitary, pair, or colony (3-6)",
+    "treasure": "none",
+    "specialAbilities": [
+      {
+        "name": "Poison (EX)",
+        "description": "Bite-injury; save Fort DC 13; frequency 1/round for 6 rounds; effect 1d3 Dex damage; cure 1 save. The save DC is Constitution-based and includes a +2 racial bonus."
+      }
+    ],
+    "description": "Giant centipedes attack nearly any living creatures with their poisonous jaws. These creatures adapt to many environments and feed voraciously on the local fauna, including humanoids. The coloration of giant centipedes mirrors that of normal centipedes and spans the spectrum, ranging from dull hues to bright reds and fiery oranges. Other species of giant centipedes exist as well, some smaller but most quite a bit larger. You can adjust the stats given here by changing Hit Dice and size (changing Strength, Dexterity, and Constitution as appropriate) to represent a wide range of giant centipede species. The following table lists the most common variants. Species CR Size HD House centipede 1/8 Tiny 1d8 Sewer centipede 1/4 Small 1d8 Hissing centipede 1 Large 2d8 Giant whiptail centipede 2 Huge 4d8 Great forest centipede 6 Gargantuan 7d8 Titan centipede 9 Colossal 10d8"
+  },
+  {
+    "url": "https://www.aonprd.com/MonsterDisplay.aspx?ItemName=Balisse",
+    "name": "Balisse",
+    "cr": "8",
+    "xp": 4800,
+    "alignment": "NG",
+    "alignmentName": "Neutral Good",
+    "size": "Medium",
+    "creatureType": "outsider",
+    "subtypes": [
+      "angel",
+      "extraplanar",
+      "good"
+    ],
+    "init": 6,
+    "senses": [
+      "darkvision 60 ft.",
+      "detect evil"
+    ],
+    "aura": [
+      "protective aura"
+    ],
+    "ac": {
+      "total": 21,
+      "touch": 13,
+      "flatFooted": 18,
+      "bonuses": [
+        {
+          "type": "dex",
+          "value": 2
+        },
+        {
+          "type": "dodge",
+          "value": 1
+        },
+        {
+          "type": "natural",
+          "value": 8
+        },
+        {
+          "type": "deflection vs. evil",
+          "value": 4
+        }
+      ],
+      "armor": 0,
+      "shield": 0,
+      "dex": 2,
+      "size": 0,
+      "natural": 8,
+      "deflection": 4,
+      "dodge": 1,
+      "misc": 0
+    },
+    "hp": 95,
+    "hpText": "95 (10d10+40)",
+    "fortitude": 11,
+    "reflex": 7,
+    "will": 10,
+    "defensiveAbilities": [],
+    "dr": "10/evil",
+    "immunities": [
+      "acid",
+      "cold",
+      "petrification"
+    ],
+    "resistances": [
+      {
+        "type": "electricity",
+        "amount": 10
+      },
+      {
+        "type": "fire",
+        "amount": 10
+      }
+    ],
+    "spellResistance": 19,
+    "speed": [
+      "40 ft.",
+      "fly 60 ft. (good)"
+    ],
+    "flySpeed": "fly 60 ft. (good)",
+    "meleeAttackText": [
+      "+1 flaming heavy mace +14/+9 (1d8+4 plus 1d6 fire)"
+    ],
+    "meleeAttacks": [
+      {
+        "raw": "+1 flaming heavy mace +14/+9 (1d8+4 plus 1d6 fire)",
+        "mode": "melee",
+        "count": 1,
+        "name": "+1 flaming heavy mace",
+        "attackBonus": "+14/+9",
+        "attackBonuses": [
+          14,
+          9
+        ],
+        "attackInstances": [
+          14,
+          9
+        ],
+        "attackRoutine": "+14/+9",
+        "damage": {
+          "raw": "1d8+4 plus 1d6 fire",
+          "text": "1d8+4",
+          "dice": "1d8",
+          "staticModifier": 4,
+          "threatRange": "20",
+          "criticalMultiplier": "x2",
+          "critical": "20/x2",
+          "extra": [
+            "1d6 fire"
+          ]
+        },
+        "damageText": "1d8+4",
+        "critical": "20/x2",
+        "extraDamage": [
+          "1d6 fire"
+        ],
+        "weaponType": "Melee Weapon (One-Handed)",
+        "attackScale": "STR",
+        "damageScale": "STR",
+        "notes": [],
+        "characterSheet": {
+          "name": "+1 flaming heavy mace",
+          "weaponType": "Melee Weapon (One-Handed)",
+          "attackScale": "STR",
+          "damageScale": "STR",
+          "attack": "+14/+9",
+          "damage": "1d8+4",
+          "critical": "20/x2",
+          "details": "+1 flaming heavy mace +14/+9 (1d8+4 plus 1d6 fire)"
+        }
+      }
+    ],
+    "specialAttacks": [
+      "brand of the impenitent"
+    ],
+    "rangedAttackText": [],
+    "rangedAttacks": [],
+    "weapons": [
+      {
+        "raw": "+1 flaming heavy mace +14/+9 (1d8+4 plus 1d6 fire)",
+        "mode": "melee",
+        "count": 1,
+        "name": "+1 flaming heavy mace",
+        "attackBonus": "+14/+9",
+        "attackBonuses": [
+          14,
+          9
+        ],
+        "attackInstances": [
+          14,
+          9
+        ],
+        "attackRoutine": "+14/+9",
+        "damage": {
+          "raw": "1d8+4 plus 1d6 fire",
+          "text": "1d8+4",
+          "dice": "1d8",
+          "staticModifier": 4,
+          "threatRange": "20",
+          "criticalMultiplier": "x2",
+          "critical": "20/x2",
+          "extra": [
+            "1d6 fire"
+          ]
+        },
+        "damageText": "1d8+4",
+        "critical": "20/x2",
+        "extraDamage": [
+          "1d6 fire"
+        ],
+        "weaponType": "Melee Weapon (One-Handed)",
+        "attackScale": "STR",
+        "damageScale": "STR",
+        "notes": [],
+        "characterSheet": {
+          "name": "+1 flaming heavy mace",
+          "weaponType": "Melee Weapon (One-Handed)",
+          "attackScale": "STR",
+          "damageScale": "STR",
+          "attack": "+14/+9",
+          "damage": "1d8+4",
+          "critical": "20/x2",
+          "details": "+1 flaming heavy mace +14/+9 (1d8+4 plus 1d6 fire)"
+        }
+      }
+    ],
+    "spellLikeAbilities": {
+      "cl": 10,
+      "concentration": 14,
+      "notes": [],
+      "levels": [],
+      "className": "",
+      "constant": [
+        "detect evil"
+      ],
+      "atWill": [
+        "aid",
+        "dispel evil (DC 19)",
+        "dispel magic",
+        "holy smite (DC 18)",
+        "invisibility (self only)",
+        "plane shift (self only)",
+        "remove curse",
+        "remove disease",
+        "remove fear"
+      ],
+      "3PerDay": [
+        "cure serious wounds",
+        "hold person (DC 16)"
+      ],
+      "1PerDay": [
+        "atonement",
+        "mark of justice"
+      ]
+    },
+    "weaknesses": [],
+    "spells": {
+      "cl": null,
+      "concentration": null,
+      "notes": [],
+      "levels": [],
+      "className": ""
+    },
+    "spellsKnown": {
+      "cl": null,
+      "concentration": null,
+      "notes": [],
+      "levels": [],
+      "className": ""
+    },
+    "spellsPrepared": {
+      "cl": null,
+      "concentration": null,
+      "notes": [],
+      "levels": [],
+      "className": ""
+    },
+    "psychicMagic": {
+      "cl": null,
+      "concentration": null,
+      "notes": [],
+      "levels": []
+    },
+    "strength": 17,
+    "dexterity": 15,
+    "constitution": 18,
+    "intelligence": 13,
+    "wisdom": 16,
+    "charisma": 18,
+    "bab": 10,
+    "cmb": 13,
+    "cmd": 26,
+    "conditions": {
+      "will": [
+        {
+          "value": 4,
+          "appliesWhen": "vs. poison"
+        },
+        {
+          "value": 4,
+          "appliesWhen": "resistance vs. evil"
+        }
+      ]
+    },
+    "feats": [
+      "Dodge",
+      "Improved Initiative",
+      "Lightning Reflexes",
+      "Mobility",
+      "Power Attack"
+    ],
+    "skills": [
+      {
+        "name": "Acrobatics",
+        "bonus": 15
+      },
+      {
+        "name": "Diplomacy",
+        "bonus": 17
+      },
+      {
+        "name": "Fly",
+        "bonus": 19
+      },
+      {
+        "name": "Knowledge (planes)",
+        "bonus": 14
+      },
+      {
+        "name": "Knowledge (religion)",
+        "bonus": 14
+      },
+      {
+        "name": "Perception",
+        "bonus": 16
+      },
+      {
+        "name": "Sense Motive",
+        "bonus": 16
+      }
+    ],
+    "languages": [
+      "Celestial",
+      "Draconic",
+      "Infernal; truespeech"
+    ],
+    "gear": [],
+    "combatGear": [],
+    "otherGear": [],
+    "sq": [],
+    "environment": "any good-aligned planes",
+    "organization": "solitary",
+    "treasure": "double (+1 flaming heavy mace, other treasure)",
+    "specialAbilities": [
+      {
+        "name": "Brand of the Impenitent (Su)",
+        "description": "Three times per day, a balisse can brand a target within 30 feet (Will DC 19 negates) with a painless, glowing icon on its chest-usually the holy symbol of the deity or empyreal lord the balisse serves. This brand lasts for a number of days equal to the balisse's Hit Dice (10 days for most balisses). Anyone who attacks the branded target gains a +2 sacred bonus on weapon attack and damage rolls and a +2 sacred bonus on caster level checks to overcome the target's spell resistance. The save DC is Charisma-based."
+      }
+    ],
+    "description": "Balisses, sometimes called confessor angels, appear to good individuals on the horns of moral dilemmas or who are struggling with crises of faith. Though balisses may appear stern and unyielding, they prefer to guide individuals to their own moral decisions rather than ordering them to conform to a specific ideal of good, knowing that the goodness found on one's own is stronger than mere obedience. Balisses are formed from the souls of individuals who committed evil acts but were later redeemed and died while living an exemplary, moral life. Some balisses seek out mortals in need of their help, while others are given specific assignments by deities or empyreal lords. Balisses are used to dealing with stubbornness, and have an eternity's worth of patience. Though they brook no physical attacks, they can endure almost any other hostility for the sake of their mission. The average balisse is 7 feet tall and weighs 200 pounds."
+  },
+  {
+    "url": "https://www.aonprd.com/MonsterDisplay.aspx?ItemName=Amalya",
+    "name": "Amalya",
+    "cr": "6",
+    "xp": 2400,
+    "alignment": "CG",
+    "alignmentName": "Chaotic Good",
+    "size": "Medium",
+    "creatureType": "fey",
+    "subtypes": [],
+    "init": 5,
+    "senses": [
+      "low-light vision"
+    ],
+    "aura": [],
+    "ac": {
+      "total": 19,
+      "touch": 16,
+      "flatFooted": 14,
+      "bonuses": [
+        {
+          "type": "deflection",
+          "value": 1
+        },
+        {
+          "type": "dex",
+          "value": 5
+        },
+        {
+          "type": "natural",
+          "value": 3
+        }
+      ],
+      "armor": 0,
+      "shield": 0,
+      "dex": 5,
+      "size": 0,
+      "natural": 3,
+      "deflection": 1,
+      "dodge": 0,
+      "misc": 0
+    },
+    "hp": 73,
+    "hpText": "73 (9 HD; 6d6+3d8+39)",
+    "fortitude": 10,
+    "reflex": 11,
+    "will": 12,
+    "defensiveAbilities": [],
+    "dr": "5/cold iron",
+    "immunities": [],
+    "resistances": [],
+    "spellResistance": null,
+    "speed": [
+      "30 ft"
+    ],
+    "flySpeed": "",
+    "meleeAttackText": [
+      "club +5 (1d6)",
+      "dagger +10 (1d4)"
+    ],
+    "meleeAttacks": [
+      {
+        "raw": "club +5 (1d6)",
+        "mode": "melee",
+        "count": 1,
+        "name": "club",
+        "attackBonus": "+5",
+        "attackBonuses": [
+          5
+        ],
+        "attackInstances": [
+          5
+        ],
+        "attackRoutine": "+5",
+        "damage": {
+          "raw": "1d6",
+          "text": "1d6",
+          "dice": "1d6",
+          "staticModifier": 0,
+          "threatRange": "20",
+          "criticalMultiplier": "x2",
+          "critical": "20/x2",
+          "extra": []
+        },
+        "damageText": "1d6",
+        "critical": "20/x2",
+        "extraDamage": [],
+        "weaponType": "Melee Weapon (One-Handed)",
+        "attackScale": "STR",
+        "damageScale": "STR",
+        "notes": [],
+        "characterSheet": {
+          "name": "club",
+          "weaponType": "Melee Weapon (One-Handed)",
+          "attackScale": "STR",
+          "damageScale": "STR",
+          "attack": "+5",
+          "damage": "1d6",
+          "critical": "20/x2",
+          "details": "club +5 (1d6)"
+        }
+      },
+      {
+        "raw": "dagger +10 (1d4)",
+        "mode": "melee",
+        "count": 1,
+        "name": "dagger",
+        "attackBonus": "+10",
+        "attackBonuses": [
+          10
+        ],
+        "attackInstances": [
+          10
+        ],
+        "attackRoutine": "+10",
+        "damage": {
+          "raw": "1d4",
+          "text": "1d4",
+          "dice": "1d4",
+          "staticModifier": 0,
+          "threatRange": "20",
+          "criticalMultiplier": "x2",
+          "critical": "20/x2",
+          "extra": []
+        },
+        "damageText": "1d4",
+        "critical": "20/x2",
+        "extraDamage": [],
+        "weaponType": "Melee Weapon (One-Handed)",
+        "attackScale": "STR",
+        "damageScale": "STR",
+        "notes": [],
+        "characterSheet": {
+          "name": "dagger",
+          "weaponType": "Melee Weapon (One-Handed)",
+          "attackScale": "STR",
+          "damageScale": "STR",
+          "attack": "+10",
+          "damage": "1d4",
+          "critical": "20/x2",
+          "details": "dagger +10 (1d4)"
+        }
+      }
+    ],
+    "specialAttacks": [],
+    "rangedAttackText": [
+      "mwk longbow +11 (1d8/×3)"
+    ],
+    "rangedAttacks": [
+      {
+        "raw": "mwk longbow +11 (1d8/×3)",
+        "mode": "ranged",
+        "count": 1,
+        "name": "mwk longbow",
+        "attackBonus": "+11",
+        "attackBonuses": [
+          11
+        ],
+        "attackInstances": [
+          11
+        ],
+        "attackRoutine": "+11",
+        "damage": {
+          "raw": "1d8/×3",
+          "text": "1d8",
+          "dice": "1d8",
+          "staticModifier": 0,
+          "threatRange": "20",
+          "criticalMultiplier": "x3",
+          "critical": "20/x3",
+          "extra": []
+        },
+        "damageText": "1d8",
+        "critical": "20/x3",
+        "extraDamage": [],
+        "weaponType": "Ranged Weapon",
+        "attackScale": "DEX",
+        "damageScale": "",
+        "notes": [],
+        "characterSheet": {
+          "name": "mwk longbow",
+          "weaponType": "Ranged Weapon",
+          "attackScale": "DEX",
+          "damageScale": "",
+          "attack": "+11",
+          "damage": "1d8",
+          "critical": "20/x3",
+          "details": "mwk longbow +11 (1d8/×3)"
+        }
+      }
+    ],
+    "weapons": [
+      {
+        "raw": "club +5 (1d6)",
+        "mode": "melee",
+        "count": 1,
+        "name": "club",
+        "attackBonus": "+5",
+        "attackBonuses": [
+          5
+        ],
+        "attackInstances": [
+          5
+        ],
+        "attackRoutine": "+5",
+        "damage": {
+          "raw": "1d6",
+          "text": "1d6",
+          "dice": "1d6",
+          "staticModifier": 0,
+          "threatRange": "20",
+          "criticalMultiplier": "x2",
+          "critical": "20/x2",
+          "extra": []
+        },
+        "damageText": "1d6",
+        "critical": "20/x2",
+        "extraDamage": [],
+        "weaponType": "Melee Weapon (One-Handed)",
+        "attackScale": "STR",
+        "damageScale": "STR",
+        "notes": [],
+        "characterSheet": {
+          "name": "club",
+          "weaponType": "Melee Weapon (One-Handed)",
+          "attackScale": "STR",
+          "damageScale": "STR",
+          "attack": "+5",
+          "damage": "1d6",
+          "critical": "20/x2",
+          "details": "club +5 (1d6)"
+        }
+      },
+      {
+        "raw": "dagger +10 (1d4)",
+        "mode": "melee",
+        "count": 1,
+        "name": "dagger",
+        "attackBonus": "+10",
+        "attackBonuses": [
+          10
+        ],
+        "attackInstances": [
+          10
+        ],
+        "attackRoutine": "+10",
+        "damage": {
+          "raw": "1d4",
+          "text": "1d4",
+          "dice": "1d4",
+          "staticModifier": 0,
+          "threatRange": "20",
+          "criticalMultiplier": "x2",
+          "critical": "20/x2",
+          "extra": []
+        },
+        "damageText": "1d4",
+        "critical": "20/x2",
+        "extraDamage": [],
+        "weaponType": "Melee Weapon (One-Handed)",
+        "attackScale": "STR",
+        "damageScale": "STR",
+        "notes": [],
+        "characterSheet": {
+          "name": "dagger",
+          "weaponType": "Melee Weapon (One-Handed)",
+          "attackScale": "STR",
+          "damageScale": "STR",
+          "attack": "+10",
+          "damage": "1d4",
+          "critical": "20/x2",
+          "details": "dagger +10 (1d4)"
+        }
+      },
+      {
+        "raw": "mwk longbow +11 (1d8/×3)",
+        "mode": "ranged",
+        "count": 1,
+        "name": "mwk longbow",
+        "attackBonus": "+11",
+        "attackBonuses": [
+          11
+        ],
+        "attackInstances": [
+          11
+        ],
+        "attackRoutine": "+11",
+        "damage": {
+          "raw": "1d8/×3",
+          "text": "1d8",
+          "dice": "1d8",
+          "staticModifier": 0,
+          "threatRange": "20",
+          "criticalMultiplier": "x3",
+          "critical": "20/x3",
+          "extra": []
+        },
+        "damageText": "1d8",
+        "critical": "20/x3",
+        "extraDamage": [],
+        "weaponType": "Ranged Weapon",
+        "attackScale": "DEX",
+        "damageScale": "",
+        "notes": [],
+        "characterSheet": {
+          "name": "mwk longbow",
+          "weaponType": "Ranged Weapon",
+          "attackScale": "DEX",
+          "damageScale": "",
+          "attack": "+11",
+          "damage": "1d8",
+          "critical": "20/x3",
+          "details": "mwk longbow +11 (1d8/×3)"
+        }
+      }
+    ],
+    "spellLikeAbilities": {
+      "cl": 6,
+      "concentration": 11,
+      "notes": [],
+      "levels": [],
+      "className": "",
+      "constant": [
+        "speak with plants"
+      ],
+      "atWill": [
+        "entangle (DC 16)",
+        "tree shape",
+        "wood shape (1 lb. only)"
+      ],
+      "3PerDay": [
+        "charm person (DC 16)",
+        "deep slumber (DC 18)",
+        "tree stride"
+      ],
+      "1PerDay": [
+        "suggestion (DC 18)"
+      ]
+    },
+    "weaknesses": [
+      "tree dependent"
+    ],
+    "spells": {
+      "cl": null,
+      "concentration": null,
+      "notes": [],
+      "levels": [],
+      "className": ""
+    },
+    "spellsKnown": {
+      "cl": null,
+      "concentration": null,
+      "notes": [],
+      "levels": [],
+      "className": ""
+    },
+    "spellsPrepared": {
+      "cl": 3,
+      "concentration": 7,
+      "notes": [],
+      "levels": [
+        {
+          "level": 2,
+          "frequency": "",
+          "spells": [
+            "barkskin",
+            "lesser restoration",
+            "summon swarm"
+          ]
+        },
+        {
+          "level": 1,
+          "frequency": "",
+          "spells": [
+            "cure light wounds",
+            "enlarge person",
+            "obscuring mist",
+            "shillelagh"
+          ]
+        },
+        {
+          "level": 0,
+          "frequency": "at will",
+          "spells": [
+            "create water",
+            "guidance",
+            "mending",
+            "stabilize"
+          ]
+        }
+      ],
+      "className": "Druid",
+      "level2": [
+        "barkskin",
+        "lesser restoration",
+        "summon swarm"
+      ],
+      "level1": [
+        "cure light wounds",
+        "enlarge person",
+        "obscuring mist",
+        "shillelagh"
+      ],
+      "level0": [
+        "create water",
+        "guidance",
+        "mending",
+        "stabilize"
+      ]
+    },
+    "psychicMagic": {
+      "cl": null,
+      "concentration": null,
+      "notes": [],
+      "levels": []
+    },
+    "strength": 10,
+    "dexterity": 21,
+    "constitution": 17,
+    "intelligence": 12,
+    "wisdom": 19,
+    "charisma": 20,
+    "bab": 5,
+    "cmb": 5,
+    "cmd": 21,
+    "conditions": {},
+    "feats": [
+      "Great Fortitude",
+      "Self-Sufficient",
+      "Stealthy",
+      "Toughness",
+      "Weapon Finesse"
+    ],
+    "skills": [
+      {
+        "name": "Climb",
+        "bonus": 9
+      },
+      {
+        "name": "Craft (wood)",
+        "bonus": 19
+      },
+      {
+        "name": "Escape Artist",
+        "bonus": 19
+      },
+      {
+        "name": "Handle Animal",
+        "bonus": 14
+      },
+      {
+        "name": "Heal",
+        "bonus": 6
+      },
+      {
+        "name": "Knowledge (nature)",
+        "bonus": 12
+      },
+      {
+        "name": "Perception",
+        "bonus": 13
+      },
+      {
+        "name": "Stealth",
+        "bonus": 19
+      },
+      {
+        "name": "Survival",
+        "bonus": 17
+      }
+    ],
+    "languages": [
+      "Abyssal",
+      "Common",
+      "Druidic",
+      "Elven",
+      "Sylvan; speak with plants"
+    ],
+    "gear": [],
+    "combatGear": [
+      "potions of cure moderate wounds (2)",
+      "potion of remove curse",
+      "scrolls of resist energy (2)",
+      "wand of calm animals (24 charges)"
+    ],
+    "otherGear": [
+      "club",
+      "dagger",
+      "mwk longbow with 20 arrows",
+      "ring of protection +1",
+      "pinecone amulet (divine focus)",
+      "wooden art objects worth 600 gp",
+      "35 gp"
+    ],
+    "sq": [
+      "enlarge (7/day)",
+      "nature bond (Plant domain [Growth subdomain])",
+      "nature sense",
+      "trackless step",
+      "tree meld",
+      "wild empathy +14",
+      "woodcraft",
+      "woodland stride"
+    ],
+    "environment": "",
+    "organization": "",
+    "treasure": "",
+    "specialAbilities": [],
+    "description": "A still untainted fey in the northern stretch of the Shudderwood, Amalya is a bastion of nature among a perverse land, where denizens are beginning to succumb to the Worldwound's demonic hordes. To survive, she has formed a particularly close bond with her natural surroundings. She's studied the earth's struggle to survive against the Worldwound's onslaught; this scholarly curiosity has granted her powerful spells that she uses to protect herself, her tree, and the forest's remaining natural creatures. Given the danger she faces daily, Amalya is better at hiding than most dryads-however, the prevalence of half-fiends and other unspeakably abhorrent creatures also makes her a pragmatist of the highest order. She allies with like-minded adventurers who can stave off these threats more readily than others do of her kind."
+  },
+  {
+    "url": "https://www.aonprd.com/MonsterDisplay.aspx?ItemName=Akilep,%20Lady%20of%20Stone",
+    "name": "Akilep, Lady of Stone",
+    "cr": "13",
+    "xp": 25600,
+    "alignment": "N",
+    "alignmentName": "Neutral",
+    "size": "Gargantuan",
+    "creatureType": "magical beast",
+    "subtypes": [],
+    "init": 3,
+    "senses": [
+      "darkvision 60 ft.",
+      "low-light vision"
+    ],
+    "aura": [],
+    "ac": {
+      "total": 28,
+      "touch": 5,
+      "flatFooted": 28,
+      "bonuses": [
+        {
+          "type": "dex",
+          "value": -1
+        },
+        {
+          "type": "natural",
+          "value": 23
+        },
+        {
+          "type": "size",
+          "value": -4
+        }
+      ],
+      "armor": 0,
+      "shield": 0,
+      "dex": -1,
+      "size": -4,
+      "natural": 23,
+      "deflection": 0,
+      "dodge": 0,
+      "misc": 0
+    },
+    "hp": 207,
+    "hpText": "207 (18d10+108)",
+    "fortitude": 17,
+    "reflex": 10,
+    "will": 13,
+    "defensiveAbilities": [],
+    "dr": "10/magic",
+    "immunities": [],
+    "resistances": [],
+    "spellResistance": null,
+    "speed": [
+      "40 ft.",
+      "fly 60 ft. (poor)"
+    ],
+    "flySpeed": "fly 60 ft. (poor)",
+    "meleeAttackText": [
+      "2 claws +26 (4d6+12/19-20 plus grab)"
+    ],
+    "meleeAttacks": [
+      {
+        "raw": "2 claws +26 (4d6+12/19-20 plus grab)",
+        "mode": "melee",
+        "count": 2,
+        "name": "claws",
+        "attackBonus": "+26",
+        "attackBonuses": [
+          26
+        ],
+        "attackInstances": [
+          26,
+          26
+        ],
+        "attackRoutine": "+26/+26",
+        "damage": {
+          "raw": "4d6+12/19-20 plus grab",
+          "text": "4d6+12",
+          "dice": "4d6",
+          "staticModifier": 12,
+          "threatRange": "19-20",
+          "criticalMultiplier": "x2",
+          "critical": "19-20/x2",
+          "extra": [
+            "grab"
+          ]
+        },
+        "damageText": "4d6+12",
+        "critical": "19-20/x2",
+        "extraDamage": [
+          "grab"
+        ],
+        "weaponType": "Natural",
+        "attackScale": "STR",
+        "damageScale": "STR",
+        "notes": [],
+        "characterSheet": {
+          "name": "claws",
+          "weaponType": "Natural",
+          "attackScale": "STR",
+          "damageScale": "STR",
+          "attack": "+26/+26",
+          "damage": "4d6+12",
+          "critical": "19-20/x2",
+          "details": "2 claws +26 (4d6+12/19-20 plus grab)"
+        }
+      }
+    ],
+    "specialAttacks": [
+      "pounce",
+      "rake (4d6+12)",
+      "trample (4d6+18, DC 31)"
+    ],
+    "rangedAttackText": [],
+    "rangedAttacks": [],
+    "weapons": [
+      {
+        "raw": "2 claws +26 (4d6+12/19-20 plus grab)",
+        "mode": "melee",
+        "count": 2,
+        "name": "claws",
+        "attackBonus": "+26",
+        "attackBonuses": [
+          26
+        ],
+        "attackInstances": [
+          26,
+          26
+        ],
+        "attackRoutine": "+26/+26",
+        "damage": {
+          "raw": "4d6+12/19-20 plus grab",
+          "text": "4d6+12",
+          "dice": "4d6",
+          "staticModifier": 12,
+          "threatRange": "19-20",
+          "criticalMultiplier": "x2",
+          "critical": "19-20/x2",
+          "extra": [
+            "grab"
+          ]
+        },
+        "damageText": "4d6+12",
+        "critical": "19-20/x2",
+        "extraDamage": [
+          "grab"
+        ],
+        "weaponType": "Natural",
+        "attackScale": "STR",
+        "damageScale": "STR",
+        "notes": [],
+        "characterSheet": {
+          "name": "claws",
+          "weaponType": "Natural",
+          "attackScale": "STR",
+          "damageScale": "STR",
+          "attack": "+26/+26",
+          "damage": "4d6+12",
+          "critical": "19-20/x2",
+          "details": "2 claws +26 (4d6+12/19-20 plus grab)"
+        }
+      }
+    ],
+    "spellLikeAbilities": {
+      "cl": 18,
+      "concentration": 23,
+      "notes": [],
+      "levels": [],
+      "className": "",
+      "constant": [
+        "comprehend languages",
+        "detect magic",
+        "read magic",
+        "see invisibility"
+      ],
+      "atWill": [
+        "clairaudience/clairvoyance",
+        "statue"
+      ],
+      "1PerDay": [
+        "commune",
+        "contact other plane",
+        "dispel magic",
+        "legend lore",
+        "locate object",
+        "remove curse"
+      ],
+      "1PerWeek": [
+        "Any three of the following: symbol of fear (DC 21)",
+        "symbol of pain (DC 20)",
+        "symbol of persuasion (DC 21)",
+        "symbol of sleep (DC 20)",
+        "symbol of stunning (DC 22); all symbols last for 1 week maximum"
+      ]
+    },
+    "weaknesses": [],
+    "spells": {
+      "cl": null,
+      "concentration": null,
+      "notes": [],
+      "levels": [],
+      "className": ""
+    },
+    "spellsKnown": {
+      "cl": null,
+      "concentration": null,
+      "notes": [],
+      "levels": [],
+      "className": ""
+    },
+    "spellsPrepared": {
+      "cl": null,
+      "concentration": null,
+      "notes": [],
+      "levels": [],
+      "className": ""
+    },
+    "psychicMagic": {
+      "cl": null,
+      "concentration": null,
+      "notes": [],
+      "levels": []
+    },
+    "strength": 34,
+    "dexterity": 8,
+    "constitution": 22,
+    "intelligence": 27,
+    "wisdom": 21,
+    "charisma": 21,
+    "bab": 18,
+    "cmb": 34,
+    "cmd": 43,
+    "conditions": {
+      "cmd": [
+        {
+          "value": 47,
+          "appliesWhen": "vs. trip"
+        }
+      ]
+    },
+    "feats": [
+      "Alertness",
+      "Cleave",
+      "Combat Casting",
+      "Flyby Attack",
+      "Hover",
+      "Improved Critical (claw)",
+      "Improved Initiative",
+      "Iron Will",
+      "Power Attack"
+    ],
+    "skills": [
+      {
+        "name": "Diplomacy",
+        "bonus": 23
+      },
+      {
+        "name": "Fly",
+        "bonus": 10
+      },
+      {
+        "name": "Intimidate",
+        "bonus": 23
+      },
+      {
+        "name": "Knowledge (arcana)",
+        "bonus": 26
+      },
+      {
+        "name": "Knowledge (engineering)",
+        "bonus": 17
+      },
+      {
+        "name": "Knowledge (history)",
+        "bonus": 26
+      },
+      {
+        "name": "Knowledge (local)",
+        "bonus": 26
+      },
+      {
+        "name": "Knowledge (religion)",
+        "bonus": 15
+      },
+      {
+        "name": "Linguistics",
+        "bonus": 10
+      },
+      {
+        "name": "Perception",
+        "bonus": 30
+      },
+      {
+        "name": "Sense Motive",
+        "bonus": 16
+      },
+      {
+        "name": "Spellcraft",
+        "bonus": 26
+      },
+      {
+        "name": "Use Magic Device",
+        "bonus": 14
+      }
+    ],
+    "languages": [
+      "Aklo",
+      "Ancient Osiriani",
+      "Celestial",
+      "Common",
+      "Cyclops",
+      "Draconic",
+      "Elven",
+      "Infernal",
+      "Osiriani",
+      "Kelish",
+      "Polyglot",
+      "Sphinx"
+    ],
+    "gear": [
+      "chime of opening (7 uses left)",
+      "goggles of minute seeing",
+      "marvelous pigments",
+      "2",
+      "000 gp in assorted gems"
+    ],
+    "combatGear": [],
+    "otherGear": [],
+    "sq": [],
+    "environment": "",
+    "organization": "",
+    "treasure": "",
+    "specialAbilities": [],
+    "description": "Obsessed with the unearthing information about Aucturn-the mysterious thirteenth planet in Golarion's solar system, whose very existence may be the greatest riddle of them all-the elder gynosphinx known as Akilep, Lady of Stone, was legendary even among the sphinxes. And then one day, more than 300 years ago, Akilep came across a hidden tomb in the stony wastes of southeastern Thuvia. Markings on the tomb's surface suggested that she had just stumbled upon the final resting place of a heretofore unknown pharaoh from the height of Ancient Osirion, and furthermore that this pharaoh was believed to have made contact with beings from the stars. At last, Akilep had found the mother lode-and yet the tomb was warded with magic more powerful than anything at her disposal, the lock an inhumanly complex affair of twisted levers and strange, sealed cylinders that even her chime of opening couldn't budge. For decades, Akilep worked studiously at the mechanism, quietly seeking out those who might be able to assist her. At last, with no other recourse, Akilep settled down in front of the tomb to await a time when circumstances might change, sleeping away the years as a statue. Of late, however, rumors of the tomb's existence have surfaced in caravan waystations across the desert, and it may be that Akilep's centuries of solitude are drawing to a close."
+  },
+  {
+    "url": "https://www.aonprd.com/MonsterDisplay.aspx?ItemName=Enisysian",
+    "name": "Enisysian",
+    "cr": "4",
+    "xp": 1200,
+    "alignment": "LE",
+    "alignmentName": "Lawful Evil",
+    "size": "Small",
+    "creatureType": "aberration",
+    "subtypes": [
+      "aquatic",
+      "shapechanger"
+    ],
+    "init": 3,
+    "senses": [
+      "darkvision 120 ft"
+    ],
+    "aura": [
+      "mental disarmament (100 ft., DC 17)",
+      "mucus cloud (5 ft., DC 14)"
+    ],
+    "ac": {
+      "total": 17,
+      "touch": 15,
+      "flatFooted": 13,
+      "bonuses": [
+        {
+          "type": "dex",
+          "value": 3
+        },
+        {
+          "type": "dodge",
+          "value": 1
+        },
+        {
+          "type": "natural",
+          "value": 2
+        },
+        {
+          "type": "size",
+          "value": 1
+        }
+      ],
+      "armor": 0,
+      "shield": 0,
+      "dex": 3,
+      "size": 1,
+      "natural": 2,
+      "deflection": 0,
+      "dodge": 1,
+      "misc": 0
+    },
+    "hp": 37,
+    "hpText": "37 (5d8+15)",
+    "fortitude": 3,
+    "reflex": 4,
+    "will": 7,
+    "defensiveAbilities": [],
+    "dr": "",
+    "immunities": [
+      "mind-affecting effects"
+    ],
+    "resistances": [],
+    "spellResistance": 15,
+    "speed": [
+      "20 ft.",
+      "swim 60 ft"
+    ],
+    "flySpeed": "",
+    "meleeAttackText": [
+      "2 tentacles +4 (1d4 plus grab and slime)"
+    ],
+    "meleeAttacks": [
+      {
+        "raw": "2 tentacles +4 (1d4 plus grab and slime)",
+        "mode": "melee",
+        "count": 2,
+        "name": "tentacles",
+        "attackBonus": "+4",
+        "attackBonuses": [
+          4
+        ],
+        "attackInstances": [
+          4,
+          4
+        ],
+        "attackRoutine": "+4/+4",
+        "damage": {
+          "raw": "1d4 plus grab and slime",
+          "text": "1d4",
+          "dice": "1d4",
+          "staticModifier": 0,
+          "threatRange": "20",
+          "criticalMultiplier": "x2",
+          "critical": "20/x2",
+          "extra": [
+            "grab and slime"
+          ]
+        },
+        "damageText": "1d4",
+        "critical": "20/x2",
+        "extraDamage": [
+          "grab and slime"
+        ],
+        "weaponType": "Natural",
+        "attackScale": "STR",
+        "damageScale": "STR",
+        "notes": [],
+        "characterSheet": {
+          "name": "tentacles",
+          "weaponType": "Natural",
+          "attackScale": "STR",
+          "damageScale": "STR",
+          "attack": "+4/+4",
+          "damage": "1d4",
+          "critical": "20/x2",
+          "details": "2 tentacles +4 (1d4 plus grab and slime)"
+        }
+      }
+    ],
+    "specialAttacks": [
+      "alghollthu's bane",
+      "grab (Large)"
+    ],
+    "rangedAttackText": [],
+    "rangedAttacks": [],
+    "weapons": [
+      {
+        "raw": "2 tentacles +4 (1d4 plus grab and slime)",
+        "mode": "melee",
+        "count": 2,
+        "name": "tentacles",
+        "attackBonus": "+4",
+        "attackBonuses": [
+          4
+        ],
+        "attackInstances": [
+          4,
+          4
+        ],
+        "attackRoutine": "+4/+4",
+        "damage": {
+          "raw": "1d4 plus grab and slime",
+          "text": "1d4",
+          "dice": "1d4",
+          "staticModifier": 0,
+          "threatRange": "20",
+          "criticalMultiplier": "x2",
+          "critical": "20/x2",
+          "extra": [
+            "grab and slime"
+          ]
+        },
+        "damageText": "1d4",
+        "critical": "20/x2",
+        "extraDamage": [
+          "grab and slime"
+        ],
+        "weaponType": "Natural",
+        "attackScale": "STR",
+        "damageScale": "STR",
+        "notes": [],
+        "characterSheet": {
+          "name": "tentacles",
+          "weaponType": "Natural",
+          "attackScale": "STR",
+          "damageScale": "STR",
+          "attack": "+4/+4",
+          "damage": "1d4",
+          "critical": "20/x2",
+          "details": "2 tentacles +4 (1d4 plus grab and slime)"
+        }
+      }
+    ],
+    "spellLikeAbilities": {
+      "cl": 5,
+      "concentration": 5,
+      "notes": [],
+      "levels": [],
+      "className": "",
+      "atWill": [
+        "detect thoughts (DC 12)",
+        "hypnotic pattern (DC 13)"
+      ],
+      "3PerDay": [
+        "unwilling shield (DC 17)"
+      ]
+    },
+    "weaknesses": [],
+    "spells": {
+      "cl": null,
+      "concentration": null,
+      "notes": [],
+      "levels": [],
+      "className": ""
+    },
+    "spellsKnown": {
+      "cl": null,
+      "concentration": null,
+      "notes": [],
+      "levels": [],
+      "className": ""
+    },
+    "spellsPrepared": {
+      "cl": null,
+      "concentration": null,
+      "notes": [],
+      "levels": [],
+      "className": ""
+    },
+    "psychicMagic": {
+      "cl": null,
+      "concentration": null,
+      "notes": [],
+      "levels": []
+    },
+    "strength": 11,
+    "dexterity": 16,
+    "constitution": 14,
+    "intelligence": 13,
+    "wisdom": 16,
+    "charisma": 12,
+    "bab": 3,
+    "cmb": 2,
+    "cmd": 16,
+    "conditions": {},
+    "feats": [
+      "Ability Focus (mental disarmament)",
+      "Dodge",
+      "Toughness"
+    ],
+    "skills": [
+      {
+        "name": "Bluff",
+        "bonus": 4
+      },
+      {
+        "name": "Escape Artist",
+        "bonus": 9
+      },
+      {
+        "name": "Knowledge (dungeoneering)",
+        "bonus": 5
+      },
+      {
+        "name": "Perception",
+        "bonus": 10
+      },
+      {
+        "name": "Spellcraft",
+        "bonus": 8
+      },
+      {
+        "name": "Stealth",
+        "bonus": 14
+      },
+      {
+        "name": "Swim",
+        "bonus": 13
+      }
+    ],
+    "languages": [
+      "Aboleth",
+      "Aquan; telepathy 100 ft"
+    ],
+    "gear": [],
+    "combatGear": [],
+    "otherGear": [],
+    "sq": [
+      "change shape (Tiny or Small animal; greater polymorph)",
+      "symbiotic bond"
+    ],
+    "environment": "any water",
+    "organization": "solitary or with 1 veiled master",
+    "treasure": "none",
+    "specialAbilities": [
+      {
+        "name": "Alghollthu's Bane (Su)",
+        "description": "As a standard action, an enisysian can make a touch attack against another alghollthu- creatures including aboleths, omnipaths, and veiled masters, among others. On a hit, the target's immunity to mind-affecting effects is completely suppressed as long as it remains within 50 feet of the enisysian (no save)."
+      },
+      {
+        "name": "Mental Disarmament (Su)",
+        "description": "An enisysian emits a constant telepathic barrage that lowers the mental defenses of nearby creatures. Anyone within 100 feet of an enisysian must succeed at a DC 17 Will saving throw or take a -4 penalty on Will saving throws while in range. A creature that succeeds at this saving throw is immune to the enisysian's mental disarmament for 24 hours. The enisysian and any creature bonded with it via its symbiotic bond are immune to this ability. An enisysian can suppress or reactivate this ability as a swift action. Mental disarmament is a mind-affecting effect. The save DC is Wisdom-based."
+      },
+      {
+        "name": "Mucus Cloud (Ex)",
+        "description": "An underwater enisysian exudes a cloud of clear slime extending 5 feet from itself in all directions. Any creature in this area must succeed at a DC 14 Fortitude saving throw each round or it loses its ability to breathe air (but gains the ability to breathe water) for 24 hours. Renewed contact with the mucus cloud and failing another saving throw extends the effect for another 24 hours. An enisysian can suppress or reactivate this ability as a swift action. The save DC is Constitution-based."
+      },
+      {
+        "name": "Slime (Ex)",
+        "description": "A creature hit by an enisysian's tentacles must succeed at a DC 14 Fortitude saving throw or have its flesh and skin transform into a clear, slimy membrane over the course of 1d4 rounds. The creature's new flesh is soft and tender, reducing its Constitution score by 4 as long as the condition persists. If the creature's flesh isn't kept moist, it dries quickly and the victim takes 1d12 points of damage every 10 minutes. Remove disease and similar effects can restore an afflicted creature to normal, but immunity to disease offers no protection from this attack. The save DC is Constitution-based."
+      },
+      {
+        "name": "Symbiotic Bond (Su)",
+        "description": "An enisysian is able to form a symbiotic bond with another willing, living creature. This amplifies the host creature's mental abilities and boosts its ability to control others. To do this, the enisysian must successfully grapple the target, after which, instead of pinning or maintaining the grapple, it can burrow into the skin as a standard action that deals 10 points of damage; this damage cannot be healed until the enisysian detaches or dies. If the host is Large or larger, the enisysian (but not the host) is considered to have the grappled condition while thus attached. If the host is Medium or smaller, both are considered to have the grappled condition while attached. Over the next 24 hours the enisysian and the host form a mental and mystical bond, after which the host gains the following bonuses: a +2 enhancement bonus to its Intelligence, Wisdom, and Charisma scores, and a +2 bonus to the caster level and DC of spells and spell-like abilities with the mind-affecting descriptor."
+      }
+    ],
+    "description": "Of all the races of alghollthus, none are as poorly understood by the scholars of the surface world as the enisysians. Their very existence is only a rumor, kept a closely guarded secret by an elite group of veiled masters known as the Fifth Dictum. These individuals coexist with enisysians in an asymmetrical physical and psychic symbiosis. In exchange for their protection, the much weaker enisysians grant their veiled master hosts not only increased mental capacity but also the ability to use their powers to influence other alghollthus. This relationship is far from equal, however, as the enisysians have been bred to be subservient to their masters for thousands of years, directly in opposition to the second dictum of their people: an alghollthu is to control. It should therefore never be controlled. Members of the Fifth Dictum rightly fear that should it become known that they created a race of alghollthu slaves, their kind would quickly turn against them. Enisysians were first created during the Age of Darkness from aboleth stock by the Fifth Dictum as a response to the cataclysm of Earthfall. These veiled masters had been vocal opponents of the human experiment (as they called the Azlanti civilization) from the beginning, believing that the humanoids were too free willed and unpredictable to be of lasting use. The destruction that Earthfall caused not only to the surface races but also to the alghollthu civilization at the time confirmed their worst fears. In the ruins of their broken cities, the Fifth Dictum began secretly fleshwarping the enisysians in order to give themselves the power to intervene against their own kin and prevent such a disastrous decision from ever being made again. Over the following millennia, however, members of the Fifth Dictum have grown arrogant, and they now believe themselves to be the true masters of alghollthu culture. A typical enisysian is about 3 feet in length and weighs approximately 40 pounds."
+  },
+  {
+    "url": "https://www.aonprd.com/MonsterDisplay.aspx?ItemName=Ancient%20Dream%20Dragon",
+    "name": "Ancient Dream Dragon",
+    "cr": "19",
+    "xp": 204800,
+    "alignment": "N",
+    "alignmentName": "Neutral",
+    "size": "Gargantuan",
+    "creatureType": "dragon",
+    "subtypes": [
+      "extraplanar"
+    ],
+    "init": 3,
+    "senses": [
+      "dragon senses",
+      "dreamsight"
+    ],
+    "aura": [
+      "frightful presence (300 ft., DC 30)"
+    ],
+    "ac": {
+      "total": 38,
+      "touch": 5,
+      "flatFooted": 38,
+      "bonuses": [
+        {
+          "type": "dex",
+          "value": -1
+        },
+        {
+          "type": "natural",
+          "value": 33
+        },
+        {
+          "type": "size",
+          "value": -4
+        }
+      ],
+      "armor": 0,
+      "shield": 0,
+      "dex": -1,
+      "size": -4,
+      "natural": 33,
+      "deflection": 0,
+      "dodge": 0,
+      "misc": 0
+    },
+    "hp": 337,
+    "hpText": "337 (25d12+175)",
+    "fortitude": 21,
+    "reflex": 15,
+    "will": 22,
+    "defensiveAbilities": [
+      "dream fortress"
+    ],
+    "dr": "15/magic",
+    "immunities": [
+      "paralysis",
+      "sleep"
+    ],
+    "resistances": [],
+    "spellResistance": 30,
+    "speed": [
+      "40 ft.",
+      "fly 250 ft. (clumsy)"
+    ],
+    "flySpeed": "fly 250 ft. (clumsy)",
+    "meleeAttackText": [
+      "bite +33 (4d6+16)",
+      "2 claws +32 (2d8+11)",
+      "2 wings +30 (2d6+5)",
+      "tail slap +30 (2d8+16)"
+    ],
+    "meleeAttacks": [
+      {
+        "raw": "bite +33 (4d6+16)",
+        "mode": "melee",
+        "count": 1,
+        "name": "bite",
+        "attackBonus": "+33",
+        "attackBonuses": [
+          33
+        ],
+        "attackInstances": [
+          33
+        ],
+        "attackRoutine": "+33",
+        "damage": {
+          "raw": "4d6+16",
+          "text": "4d6+16",
+          "dice": "4d6",
+          "staticModifier": 16,
+          "threatRange": "20",
+          "criticalMultiplier": "x2",
+          "critical": "20/x2",
+          "extra": []
+        },
+        "damageText": "4d6+16",
+        "critical": "20/x2",
+        "extraDamage": [],
+        "weaponType": "Natural",
+        "attackScale": "STR",
+        "damageScale": "STR",
+        "notes": [],
+        "characterSheet": {
+          "name": "bite",
+          "weaponType": "Natural",
+          "attackScale": "STR",
+          "damageScale": "STR",
+          "attack": "+33",
+          "damage": "4d6+16",
+          "critical": "20/x2",
+          "details": "bite +33 (4d6+16)"
+        }
+      },
+      {
+        "raw": "2 claws +32 (2d8+11)",
+        "mode": "melee",
+        "count": 2,
+        "name": "claws",
+        "attackBonus": "+32",
+        "attackBonuses": [
+          32
+        ],
+        "attackInstances": [
+          32,
+          32
+        ],
+        "attackRoutine": "+32/+32",
+        "damage": {
+          "raw": "2d8+11",
+          "text": "2d8+11",
+          "dice": "2d8",
+          "staticModifier": 11,
+          "threatRange": "20",
+          "criticalMultiplier": "x2",
+          "critical": "20/x2",
+          "extra": []
+        },
+        "damageText": "2d8+11",
+        "critical": "20/x2",
+        "extraDamage": [],
+        "weaponType": "Natural",
+        "attackScale": "STR",
+        "damageScale": "STR",
+        "notes": [],
+        "characterSheet": {
+          "name": "claws",
+          "weaponType": "Natural",
+          "attackScale": "STR",
+          "damageScale": "STR",
+          "attack": "+32/+32",
+          "damage": "2d8+11",
+          "critical": "20/x2",
+          "details": "2 claws +32 (2d8+11)"
+        }
+      },
+      {
+        "raw": "2 wings +30 (2d6+5)",
+        "mode": "melee",
+        "count": 2,
+        "name": "wings",
+        "attackBonus": "+30",
+        "attackBonuses": [
+          30
+        ],
+        "attackInstances": [
+          30,
+          30
+        ],
+        "attackRoutine": "+30/+30",
+        "damage": {
+          "raw": "2d6+5",
+          "text": "2d6+5",
+          "dice": "2d6",
+          "staticModifier": 5,
+          "threatRange": "20",
+          "criticalMultiplier": "x2",
+          "critical": "20/x2",
+          "extra": []
+        },
+        "damageText": "2d6+5",
+        "critical": "20/x2",
+        "extraDamage": [],
+        "weaponType": "Natural",
+        "attackScale": "STR",
+        "damageScale": "STR",
+        "notes": [],
+        "characterSheet": {
+          "name": "wings",
+          "weaponType": "Natural",
+          "attackScale": "STR",
+          "damageScale": "STR",
+          "attack": "+30/+30",
+          "damage": "2d6+5",
+          "critical": "20/x2",
+          "details": "2 wings +30 (2d6+5)"
+        }
+      },
+      {
+        "raw": "tail slap +30 (2d8+16)",
+        "mode": "melee",
+        "count": 1,
+        "name": "tail slap",
+        "attackBonus": "+30",
+        "attackBonuses": [
+          30
+        ],
+        "attackInstances": [
+          30
+        ],
+        "attackRoutine": "+30",
+        "damage": {
+          "raw": "2d8+16",
+          "text": "2d8+16",
+          "dice": "2d8",
+          "staticModifier": 16,
+          "threatRange": "20",
+          "criticalMultiplier": "x2",
+          "critical": "20/x2",
+          "extra": []
+        },
+        "damageText": "2d8+16",
+        "critical": "20/x2",
+        "extraDamage": [],
+        "weaponType": "Natural",
+        "attackScale": "STR",
+        "damageScale": "STR",
+        "notes": [],
+        "characterSheet": {
+          "name": "tail slap",
+          "weaponType": "Natural",
+          "attackScale": "STR",
+          "damageScale": "STR",
+          "attack": "+30",
+          "damage": "2d8+16",
+          "critical": "20/x2",
+          "details": "tail slap +30 (2d8+16)"
+        }
+      }
+    ],
+    "specialAttacks": [
+      "breath weapon (60-ft. cone, DC 29, 20d6)",
+      "crush",
+      "sleeping breath 3/day",
+      "tail sweep"
+    ],
+    "rangedAttackText": [],
+    "rangedAttacks": [],
+    "weapons": [
+      {
+        "raw": "bite +33 (4d6+16)",
+        "mode": "melee",
+        "count": 1,
+        "name": "bite",
+        "attackBonus": "+33",
+        "attackBonuses": [
+          33
+        ],
+        "attackInstances": [
+          33
+        ],
+        "attackRoutine": "+33",
+        "damage": {
+          "raw": "4d6+16",
+          "text": "4d6+16",
+          "dice": "4d6",
+          "staticModifier": 16,
+          "threatRange": "20",
+          "criticalMultiplier": "x2",
+          "critical": "20/x2",
+          "extra": []
+        },
+        "damageText": "4d6+16",
+        "critical": "20/x2",
+        "extraDamage": [],
+        "weaponType": "Natural",
+        "attackScale": "STR",
+        "damageScale": "STR",
+        "notes": [],
+        "characterSheet": {
+          "name": "bite",
+          "weaponType": "Natural",
+          "attackScale": "STR",
+          "damageScale": "STR",
+          "attack": "+33",
+          "damage": "4d6+16",
+          "critical": "20/x2",
+          "details": "bite +33 (4d6+16)"
+        }
+      },
+      {
+        "raw": "2 claws +32 (2d8+11)",
+        "mode": "melee",
+        "count": 2,
+        "name": "claws",
+        "attackBonus": "+32",
+        "attackBonuses": [
+          32
+        ],
+        "attackInstances": [
+          32,
+          32
+        ],
+        "attackRoutine": "+32/+32",
+        "damage": {
+          "raw": "2d8+11",
+          "text": "2d8+11",
+          "dice": "2d8",
+          "staticModifier": 11,
+          "threatRange": "20",
+          "criticalMultiplier": "x2",
+          "critical": "20/x2",
+          "extra": []
+        },
+        "damageText": "2d8+11",
+        "critical": "20/x2",
+        "extraDamage": [],
+        "weaponType": "Natural",
+        "attackScale": "STR",
+        "damageScale": "STR",
+        "notes": [],
+        "characterSheet": {
+          "name": "claws",
+          "weaponType": "Natural",
+          "attackScale": "STR",
+          "damageScale": "STR",
+          "attack": "+32/+32",
+          "damage": "2d8+11",
+          "critical": "20/x2",
+          "details": "2 claws +32 (2d8+11)"
+        }
+      },
+      {
+        "raw": "2 wings +30 (2d6+5)",
+        "mode": "melee",
+        "count": 2,
+        "name": "wings",
+        "attackBonus": "+30",
+        "attackBonuses": [
+          30
+        ],
+        "attackInstances": [
+          30,
+          30
+        ],
+        "attackRoutine": "+30/+30",
+        "damage": {
+          "raw": "2d6+5",
+          "text": "2d6+5",
+          "dice": "2d6",
+          "staticModifier": 5,
+          "threatRange": "20",
+          "criticalMultiplier": "x2",
+          "critical": "20/x2",
+          "extra": []
+        },
+        "damageText": "2d6+5",
+        "critical": "20/x2",
+        "extraDamage": [],
+        "weaponType": "Natural",
+        "attackScale": "STR",
+        "damageScale": "STR",
+        "notes": [],
+        "characterSheet": {
+          "name": "wings",
+          "weaponType": "Natural",
+          "attackScale": "STR",
+          "damageScale": "STR",
+          "attack": "+30/+30",
+          "damage": "2d6+5",
+          "critical": "20/x2",
+          "details": "2 wings +30 (2d6+5)"
+        }
+      },
+      {
+        "raw": "tail slap +30 (2d8+16)",
+        "mode": "melee",
+        "count": 1,
+        "name": "tail slap",
+        "attackBonus": "+30",
+        "attackBonuses": [
+          30
+        ],
+        "attackInstances": [
+          30
+        ],
+        "attackRoutine": "+30",
+        "damage": {
+          "raw": "2d8+16",
+          "text": "2d8+16",
+          "dice": "2d8",
+          "staticModifier": 16,
+          "threatRange": "20",
+          "criticalMultiplier": "x2",
+          "critical": "20/x2",
+          "extra": []
+        },
+        "damageText": "2d8+16",
+        "critical": "20/x2",
+        "extraDamage": [],
+        "weaponType": "Natural",
+        "attackScale": "STR",
+        "damageScale": "STR",
+        "notes": [],
+        "characterSheet": {
+          "name": "tail slap",
+          "weaponType": "Natural",
+          "attackScale": "STR",
+          "damageScale": "STR",
+          "attack": "+30",
+          "damage": "2d8+16",
+          "critical": "20/x2",
+          "details": "tail slap +30 (2d8+16)"
+        }
+      }
+    ],
+    "spellLikeAbilities": {
+      "cl": null,
+      "concentration": null,
+      "notes": [],
+      "levels": []
+    },
+    "weaknesses": [],
+    "spells": {
+      "cl": null,
+      "concentration": null,
+      "notes": [],
+      "levels": [],
+      "className": ""
+    },
+    "spellsKnown": {
+      "cl": 15,
+      "concentration": 22,
+      "notes": [],
+      "levels": [
+        {
+          "level": 7,
+          "frequency": "5/day",
+          "spells": [
+            "limited wish",
+            "waves of exhaustion"
+          ]
+        },
+        {
+          "level": 6,
+          "frequency": "7/day",
+          "spells": [
+            "cloak of dreams (DC 23)",
+            "dream council",
+            "mental barrier V"
+          ]
+        },
+        {
+          "level": 5,
+          "frequency": "7/day",
+          "spells": [
+            "dismissal (DC 22)",
+            "major creation",
+            "wall of force",
+            "waves of fatigue"
+          ]
+        },
+        {
+          "level": 4,
+          "frequency": "7/day",
+          "spells": [
+            "anti-incorporeal shell",
+            "dimension door",
+            "freedom of movement"
+          ]
+        },
+        {
+          "level": 3,
+          "frequency": "8/day",
+          "spells": [
+            "clairaudience/clairvoyance",
+            "deep slumber (DC 20)",
+            "displacement",
+            "purge spirit"
+          ]
+        },
+        {
+          "level": 2,
+          "frequency": "8/day",
+          "spells": [
+            "aversion",
+            "augury",
+            "blindness/deafness (DC 19)",
+            "calm emotions (DC 19)",
+            "mind thrust II"
+          ]
+        },
+        {
+          "level": 1,
+          "frequency": "8/day",
+          "spells": [
+            "blurred movement",
+            "color spray (DC 18)",
+            "shield",
+            "sleep (DC 18)",
+            "true strike"
+          ]
+        },
+        {
+          "level": 0,
+          "frequency": "at will",
+          "spells": [
+            "arcane mark",
+            "dancing light",
+            "detect magic",
+            "daze (DC 17)",
+            "ghost sound (DC 17)",
+            "mage hand",
+            "mending",
+            "message",
+            "resistance"
+          ]
+        }
+      ],
+      "className": "Psychic",
+      "level7": [
+        "limited wish",
+        "waves of exhaustion"
+      ],
+      "level6": [
+        "cloak of dreams (DC 23)",
+        "dream council",
+        "mental barrier V"
+      ],
+      "level5": [
+        "dismissal (DC 22)",
+        "major creation",
+        "wall of force",
+        "waves of fatigue"
+      ],
+      "level4": [
+        "anti-incorporeal shell",
+        "dimension door",
+        "freedom of movement"
+      ],
+      "level3": [
+        "clairaudience/clairvoyance",
+        "deep slumber (DC 20)",
+        "displacement",
+        "purge spirit"
+      ],
+      "level2": [
+        "aversion",
+        "augury",
+        "blindness/deafness (DC 19)",
+        "calm emotions (DC 19)",
+        "mind thrust II"
+      ],
+      "level1": [
+        "blurred movement",
+        "color spray (DC 18)",
+        "shield",
+        "sleep (DC 18)",
+        "true strike"
+      ],
+      "level0": [
+        "arcane mark",
+        "dancing light",
+        "detect magic",
+        "daze (DC 17)",
+        "ghost sound (DC 17)",
+        "mage hand",
+        "mending",
+        "message",
+        "resistance"
+      ]
+    },
+    "spellsPrepared": {
+      "cl": null,
+      "concentration": null,
+      "notes": [],
+      "levels": [],
+      "className": ""
+    },
+    "psychicMagic": {
+      "cl": 25,
+      "concentration": 33,
+      "notes": [],
+      "levels": [],
+      "className": "",
+      "pe19": [
+        "dream (4 PE)",
+        "dream travel (5 PE)",
+        "euphoric cloud (2 PE, DC 21)",
+        "invisibility (2 PE)",
+        "lullaby (0 PE, DC 19)",
+        "mirror strike (1 PE)",
+        "thought shield II"
+      ]
+    },
+    "strength": 33,
+    "dexterity": 9,
+    "constitution": 24,
+    "intelligence": 24,
+    "wisdom": 23,
+    "charisma": 26,
+    "bab": 25,
+    "cmb": 40,
+    "cmd": 49,
+    "conditions": {
+      "cmd": [
+        {
+          "value": 53,
+          "appliesWhen": "vs. trip"
+        }
+      ]
+    },
+    "feats": [
+      "Alertness",
+      "Flyby Attack",
+      "Hover",
+      "Improved Initiative",
+      "Iron Will",
+      "Lightning Reflexes",
+      "Multiattack",
+      "Power Attack",
+      "Skill Focus (Perception)",
+      "Snatch",
+      "Vital Strike",
+      "Weapon Focus (bite)",
+      "Wingover"
+    ],
+    "skills": [
+      {
+        "name": "Bluff",
+        "bonus": 36
+      },
+      {
+        "name": "Diplomacy",
+        "bonus": 36
+      },
+      {
+        "name": "Fly",
+        "bonus": 13
+      },
+      {
+        "name": "Intimidate",
+        "bonus": 36
+      },
+      {
+        "name": "Knowledge (arcana)",
+        "bonus": 35
+      },
+      {
+        "name": "Knowledge (dungeoneering)",
+        "bonus": 35
+      },
+      {
+        "name": "Knowledge (history)",
+        "bonus": 35
+      },
+      {
+        "name": "Knowledge (planes)",
+        "bonus": 35
+      },
+      {
+        "name": "Knowledge (religion)",
+        "bonus": 35
+      },
+      {
+        "name": "Perception",
+        "bonus": 44
+      },
+      {
+        "name": "Sense Motive",
+        "bonus": 38
+      },
+      {
+        "name": "Stealth",
+        "bonus": 15
+      },
+      {
+        "name": "Survival",
+        "bonus": 34
+      }
+    ],
+    "languages": [
+      "Aklo",
+      "Auran",
+      "Celestial",
+      "Common",
+      "Draconic",
+      "Infernal"
+    ],
+    "gear": [],
+    "combatGear": [],
+    "otherGear": [],
+    "sq": [
+      "change shape",
+      "join dreamscape These self-styled masters of the Dimension of Dreams hunt that strange plane's shifting expanse"
+    ],
+    "environment": "any (Dimension of Dreams)",
+    "organization": "solitary",
+    "treasure": "triple",
+    "specialAbilities": [
+      {
+        "name": "Change Shape (Su)",
+        "description": "An adult or older dream dragon can assume any humanoid form three times per day as if using polymorph."
+      },
+      {
+        "name": "Dream Fortress (Su)",
+        "description": "A juvenile or older young adult dream dragon is immune to dream, nightmare, and similar spells."
+      },
+      {
+        "name": "Dreamsight (Su)",
+        "description": "With a brief glance, a very young or older dragon can see a hazy image of the current dreams of sleeping creatures."
+      },
+      {
+        "name": "Exodus of Dreams (Sp)",
+        "description": "A great wyrm dream dragon can use dream voyage at will."
+      },
+      {
+        "name": "Join Dreamscape (Su)",
+        "description": "An old or older dream dragon who sees a sleeping creature's dream can enter that dream as a lucid body (Occult Adventures 241), while still acting with its physical body."
+      },
+      {
+        "name": "Psychic Magic (Sp)",
+        "description": "A dream dragon gains the following psychic spells upon reaching the listed age category: Young-lullaby (0 PE), mirror strike (1 PE); young adult-euphoric cloud (2 PE), invisibility (2 PE), thought shield II (3 PE); mature adult-dream (4 PE); very old-dream travel (5 PE); wyrm- maze (8 PE)."
+      },
+      {
+        "name": "Sleeping Breath (Su)",
+        "description": "A limited number of times per day, a dream dragon can cause those who fail their saving throws against its breath attack to fall asleep for 1d4 rounds, as per the sleep spell. This is a mind-affecting sleep effect."
+      }
+    ],
+    "description": ""
+  },
+  {
+    "url": "https://www.aonprd.com/MonsterDisplay.aspx?ItemName=Solar",
+    "name": "Solar",
+    "cr": "23",
+    "xp": 819200,
+    "alignment": "NG",
+    "alignmentName": "Neutral Good",
+    "size": "Large",
+    "creatureType": "outsider",
+    "subtypes": [
+      "angel",
+      "extraplanar",
+      "good"
+    ],
+    "init": 9,
+    "senses": [
+      "darkvision 60 ft.",
+      "low-light vision",
+      "detect evil",
+      "detect snares and pits",
+      "true seeing"
+    ],
+    "aura": [
+      "protective aura"
+    ],
+    "ac": {
+      "total": 44,
+      "touch": 11,
+      "flatFooted": 42,
+      "bonuses": [
+        {
+          "type": "armor",
+          "value": 14
+        },
+        {
+          "type": "dex",
+          "value": 1
+        },
+        {
+          "type": "dodge",
+          "value": 1
+        },
+        {
+          "type": "natural",
+          "value": 19
+        },
+        {
+          "type": "size",
+          "value": -1
+        },
+        {
+          "type": "deflection vs. evil",
+          "value": 4
+        }
+      ],
+      "armor": 14,
+      "shield": 0,
+      "dex": 1,
+      "size": -1,
+      "natural": 19,
+      "deflection": 4,
+      "dodge": 1,
+      "misc": 0
+    },
+    "hp": 363,
+    "hpText": "363 (22d10+242); regeneration 15 (evil artifacts, effects, and spells)",
+    "fortitude": 25,
+    "reflex": 14,
+    "will": 23,
+    "defensiveAbilities": [],
+    "dr": "15/epic and evil",
+    "immunities": [
+      "acid",
+      "cold",
+      "petrification"
+    ],
+    "resistances": [
+      {
+        "type": "electricity",
+        "amount": 10
+      },
+      {
+        "type": "fire",
+        "amount": 10
+      }
+    ],
+    "spellResistance": 34,
+    "speed": [
+      "50 ft.",
+      "fly 150 ft. (good); 35 ft.",
+      "fly 100 ft. (good) in armor"
+    ],
+    "flySpeed": "fly 150 ft. (good); 35 ft.",
+    "meleeAttackText": [
+      "+5 dancing greatsword +35/+30/+25/+20 (3d6+18) or slam +30 (2d8+13)"
+    ],
+    "meleeAttacks": [
+      {
+        "raw": "+5 dancing greatsword +35/+30/+25/+20 (3d6+18)",
+        "mode": "melee",
+        "count": 1,
+        "name": "+5 dancing greatsword",
+        "attackBonus": "+35/+30/+25/+20",
+        "attackBonuses": [
+          35,
+          30,
+          25,
+          20
+        ],
+        "attackInstances": [
+          35,
+          30,
+          25,
+          20
+        ],
+        "attackRoutine": "+35/+30/+25/+20",
+        "damage": {
+          "raw": "3d6+18",
+          "text": "3d6+18",
+          "dice": "3d6",
+          "staticModifier": 18,
+          "threatRange": "20",
+          "criticalMultiplier": "x2",
+          "critical": "20/x2",
+          "extra": []
+        },
+        "damageText": "3d6+18",
+        "critical": "20/x2",
+        "extraDamage": [],
+        "weaponType": "Melee Weapon (Two-Handed)",
+        "attackScale": "STR",
+        "damageScale": "STR",
+        "notes": [],
+        "characterSheet": {
+          "name": "+5 dancing greatsword",
+          "weaponType": "Melee Weapon (Two-Handed)",
+          "attackScale": "STR",
+          "damageScale": "STR",
+          "attack": "+35/+30/+25/+20",
+          "damage": "3d6+18",
+          "critical": "20/x2",
+          "details": "+5 dancing greatsword +35/+30/+25/+20 (3d6+18)"
+        }
+      },
+      {
+        "raw": "slam +30 (2d8+13)",
+        "mode": "melee",
+        "count": 1,
+        "name": "slam",
+        "attackBonus": "+30",
+        "attackBonuses": [
+          30
+        ],
+        "attackInstances": [
+          30
+        ],
+        "attackRoutine": "+30",
+        "damage": {
+          "raw": "2d8+13",
+          "text": "2d8+13",
+          "dice": "2d8",
+          "staticModifier": 13,
+          "threatRange": "20",
+          "criticalMultiplier": "x2",
+          "critical": "20/x2",
+          "extra": []
+        },
+        "damageText": "2d8+13",
+        "critical": "20/x2",
+        "extraDamage": [],
+        "weaponType": "Natural",
+        "attackScale": "STR",
+        "damageScale": "STR",
+        "notes": [],
+        "characterSheet": {
+          "name": "slam",
+          "weaponType": "Natural",
+          "attackScale": "STR",
+          "damageScale": "STR",
+          "attack": "+30",
+          "damage": "2d8+13",
+          "critical": "20/x2",
+          "details": "slam +30 (2d8+13)"
+        }
+      }
+    ],
+    "specialAttacks": [],
+    "rangedAttackText": [
+      "+5 composite longbow (+9 Str bonus) +31/+26/+21/+16 (2d6+14 plus slaying arrow)"
+    ],
+    "rangedAttacks": [
+      {
+        "raw": "+5 composite longbow (+9 Str bonus) +31/+26/+21/+16 (2d6+14 plus slaying arrow)",
+        "mode": "ranged",
+        "count": 1,
+        "name": "+5 composite longbow",
+        "attackBonus": "+31/+26/+21/+16",
+        "attackBonuses": [
+          31,
+          26,
+          21,
+          16
+        ],
+        "attackInstances": [
+          31,
+          26,
+          21,
+          16
+        ],
+        "attackRoutine": "+31/+26/+21/+16",
+        "damage": {
+          "raw": "2d6+14 plus slaying arrow",
+          "text": "2d6+14",
+          "dice": "2d6",
+          "staticModifier": 14,
+          "threatRange": "20",
+          "criticalMultiplier": "x2",
+          "critical": "20/x2",
+          "extra": [
+            "slaying arrow"
+          ]
+        },
+        "damageText": "2d6+14",
+        "critical": "20/x2",
+        "extraDamage": [
+          "slaying arrow"
+        ],
+        "weaponType": "Ranged Weapon",
+        "attackScale": "DEX",
+        "damageScale": "STR",
+        "notes": [
+          "+9 Str bonus"
+        ],
+        "characterSheet": {
+          "name": "+5 composite longbow",
+          "weaponType": "Ranged Weapon",
+          "attackScale": "DEX",
+          "damageScale": "STR",
+          "attack": "+31/+26/+21/+16",
+          "damage": "2d6+14",
+          "critical": "20/x2",
+          "details": "+5 composite longbow (+9 Str bonus) +31/+26/+21/+16 (2d6+14 plus slaying arrow); +9 Str bonus"
+        }
+      }
+    ],
+    "weapons": [
+      {
+        "raw": "+5 dancing greatsword +35/+30/+25/+20 (3d6+18)",
+        "mode": "melee",
+        "count": 1,
+        "name": "+5 dancing greatsword",
+        "attackBonus": "+35/+30/+25/+20",
+        "attackBonuses": [
+          35,
+          30,
+          25,
+          20
+        ],
+        "attackInstances": [
+          35,
+          30,
+          25,
+          20
+        ],
+        "attackRoutine": "+35/+30/+25/+20",
+        "damage": {
+          "raw": "3d6+18",
+          "text": "3d6+18",
+          "dice": "3d6",
+          "staticModifier": 18,
+          "threatRange": "20",
+          "criticalMultiplier": "x2",
+          "critical": "20/x2",
+          "extra": []
+        },
+        "damageText": "3d6+18",
+        "critical": "20/x2",
+        "extraDamage": [],
+        "weaponType": "Melee Weapon (Two-Handed)",
+        "attackScale": "STR",
+        "damageScale": "STR",
+        "notes": [],
+        "characterSheet": {
+          "name": "+5 dancing greatsword",
+          "weaponType": "Melee Weapon (Two-Handed)",
+          "attackScale": "STR",
+          "damageScale": "STR",
+          "attack": "+35/+30/+25/+20",
+          "damage": "3d6+18",
+          "critical": "20/x2",
+          "details": "+5 dancing greatsword +35/+30/+25/+20 (3d6+18)"
+        }
+      },
+      {
+        "raw": "slam +30 (2d8+13)",
+        "mode": "melee",
+        "count": 1,
+        "name": "slam",
+        "attackBonus": "+30",
+        "attackBonuses": [
+          30
+        ],
+        "attackInstances": [
+          30
+        ],
+        "attackRoutine": "+30",
+        "damage": {
+          "raw": "2d8+13",
+          "text": "2d8+13",
+          "dice": "2d8",
+          "staticModifier": 13,
+          "threatRange": "20",
+          "criticalMultiplier": "x2",
+          "critical": "20/x2",
+          "extra": []
+        },
+        "damageText": "2d8+13",
+        "critical": "20/x2",
+        "extraDamage": [],
+        "weaponType": "Natural",
+        "attackScale": "STR",
+        "damageScale": "STR",
+        "notes": [],
+        "characterSheet": {
+          "name": "slam",
+          "weaponType": "Natural",
+          "attackScale": "STR",
+          "damageScale": "STR",
+          "attack": "+30",
+          "damage": "2d8+13",
+          "critical": "20/x2",
+          "details": "slam +30 (2d8+13)"
+        }
+      },
+      {
+        "raw": "+5 composite longbow (+9 Str bonus) +31/+26/+21/+16 (2d6+14 plus slaying arrow)",
+        "mode": "ranged",
+        "count": 1,
+        "name": "+5 composite longbow",
+        "attackBonus": "+31/+26/+21/+16",
+        "attackBonuses": [
+          31,
+          26,
+          21,
+          16
+        ],
+        "attackInstances": [
+          31,
+          26,
+          21,
+          16
+        ],
+        "attackRoutine": "+31/+26/+21/+16",
+        "damage": {
+          "raw": "2d6+14 plus slaying arrow",
+          "text": "2d6+14",
+          "dice": "2d6",
+          "staticModifier": 14,
+          "threatRange": "20",
+          "criticalMultiplier": "x2",
+          "critical": "20/x2",
+          "extra": [
+            "slaying arrow"
+          ]
+        },
+        "damageText": "2d6+14",
+        "critical": "20/x2",
+        "extraDamage": [
+          "slaying arrow"
+        ],
+        "weaponType": "Ranged Weapon",
+        "attackScale": "DEX",
+        "damageScale": "STR",
+        "notes": [
+          "+9 Str bonus"
+        ],
+        "characterSheet": {
+          "name": "+5 composite longbow",
+          "weaponType": "Ranged Weapon",
+          "attackScale": "DEX",
+          "damageScale": "STR",
+          "attack": "+31/+26/+21/+16",
+          "damage": "2d6+14",
+          "critical": "20/x2",
+          "details": "+5 composite longbow (+9 Str bonus) +31/+26/+21/+16 (2d6+14 plus slaying arrow); +9 Str bonus"
+        }
+      }
+    ],
+    "spellLikeAbilities": {
+      "cl": 20,
+      "concentration": null,
+      "notes": [],
+      "levels": [],
+      "className": "",
+      "constant": [
+        "detect evil",
+        "detect snares and pits",
+        "discern lies (DC 21)",
+        "true seeing"
+      ],
+      "atWill": [
+        "aid",
+        "animate objects",
+        "commune",
+        "continual flame",
+        "dimensional anchor",
+        "greater dispel magic",
+        "holy smite (DC 21)",
+        "imprisonment (DC 26)",
+        "invisibility (self only)",
+        "lesser restoration",
+        "remove curse",
+        "remove disease",
+        "remove fear",
+        "resist energy",
+        "summon monster VII",
+        "speak with dead (DC 20)",
+        "waves of fatigue"
+      ],
+      "3PerDay": [
+        "blade barrier (DC 23)",
+        "earthquake (DC 25)",
+        "heal",
+        "mass charm monster (DC 25)",
+        "permanency",
+        "resurrection",
+        "waves of exhaustion"
+      ],
+      "1PerDay": [
+        "greater restoration",
+        "power word blind",
+        "power word kill",
+        "power word stun",
+        "prismatic spray (DC 24)",
+        "wish"
+      ]
+    },
+    "weaknesses": [],
+    "spells": {
+      "cl": null,
+      "concentration": null,
+      "notes": [],
+      "levels": [],
+      "className": ""
+    },
+    "spellsKnown": {
+      "cl": null,
+      "concentration": null,
+      "notes": [],
+      "levels": [],
+      "className": ""
+    },
+    "spellsPrepared": {
+      "cl": 20,
+      "concentration": null,
+      "notes": [],
+      "levels": [
+        {
+          "level": 9,
+          "frequency": "",
+          "spells": [
+            "etherealness",
+            "mass heal",
+            "miracle",
+            "storm of vengeance (DC 27)"
+          ]
+        },
+        {
+          "level": 8,
+          "frequency": "",
+          "spells": [
+            "fire storm (DC 26)",
+            "holy aura (2) (DC 26)",
+            "mass cure critical wounds (2)"
+          ]
+        },
+        {
+          "level": 7,
+          "frequency": "",
+          "spells": [
+            "destruction (DC 25)",
+            "dictum (DC 25)",
+            "ethereal jaunt",
+            "holy word (DC 25)",
+            "regenerate"
+          ]
+        },
+        {
+          "level": 6,
+          "frequency": "",
+          "spells": [
+            "banishment (DC 24)",
+            "heroes' feast",
+            "mass cure moderate wounds",
+            "undeath to death (DC 24)",
+            "word of recall"
+          ]
+        },
+        {
+          "level": 5,
+          "frequency": "",
+          "spells": [
+            "break enchantment",
+            "breath of life",
+            "dispel evil (DC 23)",
+            "plane shift (DC 23)",
+            "righteous might",
+            "symbol of sleep (DC 23)"
+          ]
+        },
+        {
+          "level": 4,
+          "frequency": "",
+          "spells": [
+            "cure critical wounds (3)",
+            "death ward",
+            "dismissal (DC 22)",
+            "neutralize poison (2) (DC 22)"
+          ]
+        },
+        {
+          "level": 3,
+          "frequency": "",
+          "spells": [
+            "cure serious wounds",
+            "daylight",
+            "invisibility purge",
+            "magic circle against evil",
+            "prayer",
+            "protection from energy",
+            "wind wall"
+          ]
+        },
+        {
+          "level": 2,
+          "frequency": "",
+          "spells": [
+            "align weapon",
+            "bear's endurance",
+            "bull's strength",
+            "consecrate",
+            "cure moderate wounds (2)",
+            "eagle's splendor"
+          ]
+        },
+        {
+          "level": 1,
+          "frequency": "",
+          "spells": [
+            "bless",
+            "cure light wounds (3)",
+            "divine favor",
+            "entropic shield",
+            "shield of faith"
+          ]
+        },
+        {
+          "level": 0,
+          "frequency": "at will",
+          "spells": [
+            "detect magic",
+            "purify food and drink",
+            "stabilize",
+            "virtue"
+          ]
+        }
+      ],
+      "className": "",
+      "level9": [
+        "etherealness",
+        "mass heal",
+        "miracle",
+        "storm of vengeance (DC 27)"
+      ],
+      "level8": [
+        "fire storm (DC 26)",
+        "holy aura (2) (DC 26)",
+        "mass cure critical wounds (2)"
+      ],
+      "level7": [
+        "destruction (DC 25)",
+        "dictum (DC 25)",
+        "ethereal jaunt",
+        "holy word (DC 25)",
+        "regenerate"
+      ],
+      "level6": [
+        "banishment (DC 24)",
+        "heroes' feast",
+        "mass cure moderate wounds",
+        "undeath to death (DC 24)",
+        "word of recall"
+      ],
+      "level5": [
+        "break enchantment",
+        "breath of life",
+        "dispel evil (DC 23)",
+        "plane shift (DC 23)",
+        "righteous might",
+        "symbol of sleep (DC 23)"
+      ],
+      "level4": [
+        "cure critical wounds (3)",
+        "death ward",
+        "dismissal (DC 22)",
+        "neutralize poison (2) (DC 22)"
+      ],
+      "level3": [
+        "cure serious wounds",
+        "daylight",
+        "invisibility purge",
+        "magic circle against evil",
+        "prayer",
+        "protection from energy",
+        "wind wall"
+      ],
+      "level2": [
+        "align weapon",
+        "bear's endurance",
+        "bull's strength",
+        "consecrate",
+        "cure moderate wounds (2)",
+        "eagle's splendor"
+      ],
+      "level1": [
+        "bless",
+        "cure light wounds (3)",
+        "divine favor",
+        "entropic shield",
+        "shield of faith"
+      ],
+      "level0": [
+        "detect magic",
+        "purify food and drink",
+        "stabilize",
+        "virtue"
+      ]
+    },
+    "psychicMagic": {
+      "cl": null,
+      "concentration": null,
+      "notes": [],
+      "levels": []
+    },
+    "strength": 28,
+    "dexterity": 20,
+    "constitution": 30,
+    "intelligence": 23,
+    "wisdom": 27,
+    "charisma": 25,
+    "bab": 22,
+    "cmb": 32,
+    "cmd": 47,
+    "conditions": {
+      "will": [
+        {
+          "value": 4,
+          "appliesWhen": "vs. poison"
+        },
+        {
+          "value": 4,
+          "appliesWhen": "resistance vs. evil"
+        }
+      ]
+    },
+    "feats": [
+      "Cleave",
+      "Deadly Aim",
+      "Dodge",
+      "Great Fortitude",
+      "Improved Initiative",
+      "Improved Sunder",
+      "Iron Will",
+      "Lightning Reflexes",
+      "Mobility",
+      "Power Attack",
+      "Toughness"
+    ],
+    "skills": [
+      {
+        "name": "Craft (any one)",
+        "bonus": 31
+      },
+      {
+        "name": "Diplomacy",
+        "bonus": 32
+      },
+      {
+        "name": "Fly",
+        "bonus": 32
+      },
+      {
+        "name": "Knowledge (history)",
+        "bonus": 31
+      },
+      {
+        "name": "Knowledge (nature)",
+        "bonus": 31
+      },
+      {
+        "name": "Knowledge (planes)",
+        "bonus": 31
+      },
+      {
+        "name": "Knowledge (religion)",
+        "bonus": 31
+      },
+      {
+        "name": "Perception",
+        "bonus": 33
+      },
+      {
+        "name": "Sense Motive",
+        "bonus": 33
+      },
+      {
+        "name": "Spellcraft",
+        "bonus": 31
+      },
+      {
+        "name": "Stealth",
+        "bonus": 21
+      },
+      {
+        "name": "Survival",
+        "bonus": 31
+      }
+    ],
+    "languages": [
+      "Celestial",
+      "Draconic",
+      "Infernal; truespeech"
+    ],
+    "gear": [],
+    "combatGear": [],
+    "otherGear": [],
+    "sq": [
+      "change shape (alter self)"
+    ],
+    "environment": "any good-aligned plane",
+    "organization": "solitary or pair",
+    "treasure": "double (+5 full plate, +5 dancing greatsword, +5 composite longbow [+9 Str bonus])",
+    "specialAbilities": [
+      {
+        "name": "Spells",
+        "description": "Solars can cast divine spells as 20th-level clerics. They do not gain access to domains or other cleric abilities."
+      },
+      {
+        "name": "Slaying Arrow (Su)",
+        "description": "A solar's bow needs no ammunition, and automatically creates a slaying arrow of the solar's choice when drawn."
+      }
+    ],
+    "description": "Solars are the greatest type of angel, usually serving at the right hand of a deity or championing a cause that benefits an entire world or plane. A typical solar looks roughly human, though some physically resemble other humanoid races and a rare few have even more unusual forms. A solar stands about 9 feet tall and weighs about 500 pounds, with a strong, commanding voice that is impossible to ignore. Most have silvery or golden skin. Blessed with an array of magical powers and the spellcasting abilities of the most powerful clerics, solars are powerful opponents capable of single-handedly slaying mighty evils. They are the greatest trackers among the celestials, the most masterful of which are said to be able to track the days-old wake of a pit fiend flying through the Astral Plane. Some take on the mantle of monster-slayers and hunt powerful fiends and undead such as devourers, night hags, night shades, and pit fiends, even making forays into the evil planes and the Negative Energy Plane to destroy these creatures at their source before they can bring harm to mortals. A few very old solars have succeeded at this task and bear slayer-names of dread creatures that are now extinct by the solar's hand. Solars accept roles as guardians, usually of fundamental supernatural concepts, or objects or creatures of great importance. On one world, a group of solars patrols the energy conduits of the sun, alert for any attempts by evil races such as drow to snuff out the light and bring eternal darkness. On another, seven solars stand watch over seven mystical chains keeping evil gods bound within a prison demiplane. On yet another, a solar with a flaming sword stands watch over the original mortal paradise so that no creature may enter. In worlds where the gods cannot take physical form, they send solars to be their prophets and gurus (often pretending to be mortals), laying the foundation for cults that grow to become great religions. Likewise, in worlds oppressed by evil, solars are the secret priests who bring hope to the downtrodden, or in some cases allow themselves to be martyred so that their holy essence can explode outward to land and grow in the hearts of great heroes-to-be. Though they are not gods, the solars' power approaches that of demigods, and they often have an advisory role for younger or weaker deities. In some polytheistic faiths, mortals worship one or more solars as aspects or near-equal servants of the true deities-never without the deity's approval-or consider notable solars to be offspring, consorts, lovers, or spouses of true deities (which they may be, depending on the deity). Unlike other angels, most solars are created from an amalgam of good souls and raw divine energy to directly serve the gods, but an increasing number of these powerful angels have been \"promoted\" to their existence as solars from lesser creatures like planetars or devas. A few rare and powerful good souls ascend directly to the status of solar. The oldest solars predate mortality and are among the gods' first creations. These strange solars are paragons of their kind and have little direct interaction with mortals, focusing on the protection or destruction of abstract concepts such as gravity, dark matter, entropy, and primordial evil. Solars who spend a long time in the Material Plane, especially those in the guise of mortals, are sometimes the source of half-celestial or aasimar bloodlines in mortal families, due either to romantic dalliances or simply the mortals' proximity to celestial energy. Actual offspring are rare, and when they occur, it is always a mortal mother that bears the child-while solars can appear as either sex, the gods have not granted them the capacity for pregnancy or motherhood. Indeed, this fundamental truth is often what drives a solar to seek out a mortal lover. Since begetting a child upon a mortal is generally frowned upon by other solars, a solar father rarely interacts directly with the fate of his lover or child, so as to avoid bringing shame upon himself or his responsibilities. Yet such solars still watch over their progeny from afar, and in times of peril, they might even be moved to intercede to aid one of their endangered children, albiet in subtle and mysterious ways. All angels respect the power and wisdom of solars, and though these mightiest of angels usually work alone, they sometimes command multiple armies led by planetars, acting as great field marshals for massive incursions against the legions of Hell or the hordes of the Abyss."
+  },
+  {
+    "url": "https://www.aonprd.com/MythicMonsterDisplay.aspx?ItemName=The%20Whispering%20Tyrant",
+    "name": "The Whispering Tyrant",
+    "cr": "26/MR 10",
+    "xp": 2457600,
+    "alignment": "NE",
+    "alignmentName": "Neutral Evil",
+    "size": "Medium",
+    "creatureType": "undead",
+    "subtypes": [
+      "augmented humanoid",
+      "human",
+      "mythic"
+    ],
+    "init": 18,
+    "senses": [
+      "darkvision 60 ft.",
+      "see in darkness",
+      "spell perception"
+    ],
+    "aura": [
+      "absolute terror (60-ft. radius, DC 39)"
+    ],
+    "ac": {
+      "total": 46,
+      "touch": 19,
+      "flatFooted": 42,
+      "bonuses": [
+        {
+          "type": "armor",
+          "value": 8
+        },
+        {
+          "type": "deflection",
+          "value": 5
+        },
+        {
+          "type": "dex",
+          "value": 4
+        },
+        {
+          "type": "natural",
+          "value": 19
+        }
+      ],
+      "armor": 8,
+      "shield": 0,
+      "dex": 4,
+      "size": 0,
+      "natural": 19,
+      "deflection": 5,
+      "dodge": 0,
+      "misc": 0
+    },
+    "hp": 392,
+    "hpText": "392 (20d6+320)",
+    "fortitude": 21,
+    "reflex": 16,
+    "will": 22,
+    "defensiveAbilities": [
+      "channel resistance +12",
+      "rejuvenation"
+    ],
+    "dr": "15/bludgeoning and magic",
+    "immunities": [
+      "acid",
+      "channel energy from non-mythic sources",
+      "cold",
+      "electricity",
+      "undead traits"
+    ],
+    "resistances": [
+      {
+        "type": "half damage from positive energy",
+        "amount": null
+      }
+    ],
+    "spellResistance": 42,
+    "speed": [
+      "30 ft"
+    ],
+    "flySpeed": "",
+    "meleeAttackText": [
+      "+2 keen wounding dagger +15/+10 (1d4+5/19-20)",
+      "touch +8 (1d8+10 plus 5d6 negative energy plus paralysis)"
+    ],
+    "meleeAttacks": [
+      {
+        "raw": "+2 keen wounding dagger +15/+10 (1d4+5/19-20)",
+        "mode": "melee",
+        "count": 1,
+        "name": "+2 keen wounding dagger",
+        "attackBonus": "+15/+10",
+        "attackBonuses": [
+          15,
+          10
+        ],
+        "attackInstances": [
+          15,
+          10
+        ],
+        "attackRoutine": "+15/+10",
+        "damage": {
+          "raw": "1d4+5/19-20",
+          "text": "1d4+5",
+          "dice": "1d4",
+          "staticModifier": 5,
+          "threatRange": "19-20",
+          "criticalMultiplier": "x2",
+          "critical": "19-20/x2",
+          "extra": []
+        },
+        "damageText": "1d4+5",
+        "critical": "19-20/x2",
+        "extraDamage": [],
+        "weaponType": "Melee Weapon (One-Handed)",
+        "attackScale": "STR",
+        "damageScale": "STR",
+        "notes": [],
+        "characterSheet": {
+          "name": "+2 keen wounding dagger",
+          "weaponType": "Melee Weapon (One-Handed)",
+          "attackScale": "STR",
+          "damageScale": "STR",
+          "attack": "+15/+10",
+          "damage": "1d4+5",
+          "critical": "19-20/x2",
+          "details": "+2 keen wounding dagger +15/+10 (1d4+5/19-20)"
+        }
+      },
+      {
+        "raw": "touch +8 (1d8+10 plus 5d6 negative energy plus paralysis)",
+        "mode": "melee",
+        "count": 1,
+        "name": "touch",
+        "attackBonus": "+8",
+        "attackBonuses": [
+          8
+        ],
+        "attackInstances": [
+          8
+        ],
+        "attackRoutine": "+8",
+        "damage": {
+          "raw": "1d8+10 plus 5d6 negative energy plus paralysis",
+          "text": "1d8+10",
+          "dice": "1d8",
+          "staticModifier": 10,
+          "threatRange": "20",
+          "criticalMultiplier": "x2",
+          "critical": "20/x2",
+          "extra": [
+            "5d6 negative energy",
+            "paralysis"
+          ]
+        },
+        "damageText": "1d8+10",
+        "critical": "20/x2",
+        "extraDamage": [
+          "5d6 negative energy",
+          "paralysis"
+        ],
+        "weaponType": "Melee Weapon (One-Handed)",
+        "attackScale": "STR",
+        "damageScale": "STR",
+        "notes": [],
+        "characterSheet": {
+          "name": "touch",
+          "weaponType": "Melee Weapon (One-Handed)",
+          "attackScale": "STR",
+          "damageScale": "STR",
+          "attack": "+8",
+          "damage": "1d8+10",
+          "critical": "20/x2",
+          "details": "touch +8 (1d8+10 plus 5d6 negative energy plus paralysis)"
+        }
+      }
+    ],
+    "specialAttacks": [
+      "animate touch",
+      "channel negative energy (DC 29, 16/day)",
+      "immediate counterspell",
+      "mythic power (12/day, surge +1d12)",
+      "mythic spells (2/day)",
+      "paralyzing touch (DC 39)",
+      "wild arcana"
+    ],
+    "rangedAttackText": [],
+    "rangedAttacks": [],
+    "weapons": [
+      {
+        "raw": "+2 keen wounding dagger +15/+10 (1d4+5/19-20)",
+        "mode": "melee",
+        "count": 1,
+        "name": "+2 keen wounding dagger",
+        "attackBonus": "+15/+10",
+        "attackBonuses": [
+          15,
+          10
+        ],
+        "attackInstances": [
+          15,
+          10
+        ],
+        "attackRoutine": "+15/+10",
+        "damage": {
+          "raw": "1d4+5/19-20",
+          "text": "1d4+5",
+          "dice": "1d4",
+          "staticModifier": 5,
+          "threatRange": "19-20",
+          "criticalMultiplier": "x2",
+          "critical": "19-20/x2",
+          "extra": []
+        },
+        "damageText": "1d4+5",
+        "critical": "19-20/x2",
+        "extraDamage": [],
+        "weaponType": "Melee Weapon (One-Handed)",
+        "attackScale": "STR",
+        "damageScale": "STR",
+        "notes": [],
+        "characterSheet": {
+          "name": "+2 keen wounding dagger",
+          "weaponType": "Melee Weapon (One-Handed)",
+          "attackScale": "STR",
+          "damageScale": "STR",
+          "attack": "+15/+10",
+          "damage": "1d4+5",
+          "critical": "19-20/x2",
+          "details": "+2 keen wounding dagger +15/+10 (1d4+5/19-20)"
+        }
+      },
+      {
+        "raw": "touch +8 (1d8+10 plus 5d6 negative energy plus paralysis)",
+        "mode": "melee",
+        "count": 1,
+        "name": "touch",
+        "attackBonus": "+8",
+        "attackBonuses": [
+          8
+        ],
+        "attackInstances": [
+          8
+        ],
+        "attackRoutine": "+8",
+        "damage": {
+          "raw": "1d8+10 plus 5d6 negative energy plus paralysis",
+          "text": "1d8+10",
+          "dice": "1d8",
+          "staticModifier": 10,
+          "threatRange": "20",
+          "criticalMultiplier": "x2",
+          "critical": "20/x2",
+          "extra": [
+            "5d6 negative energy",
+            "paralysis"
+          ]
+        },
+        "damageText": "1d8+10",
+        "critical": "20/x2",
+        "extraDamage": [
+          "5d6 negative energy",
+          "paralysis"
+        ],
+        "weaponType": "Melee Weapon (One-Handed)",
+        "attackScale": "STR",
+        "damageScale": "STR",
+        "notes": [],
+        "characterSheet": {
+          "name": "touch",
+          "weaponType": "Melee Weapon (One-Handed)",
+          "attackScale": "STR",
+          "damageScale": "STR",
+          "attack": "+8",
+          "damage": "1d8+10",
+          "critical": "20/x2",
+          "details": "touch +8 (1d8+10 plus 5d6 negative energy plus paralysis)"
+        }
+      }
+    ],
+    "spellLikeAbilities": {
+      "cl": null,
+      "concentration": null,
+      "notes": [],
+      "levels": []
+    },
+    "weaknesses": [],
+    "spells": {
+      "cl": null,
+      "concentration": null,
+      "notes": [],
+      "levels": [],
+      "className": ""
+    },
+    "spellsKnown": {
+      "cl": null,
+      "concentration": null,
+      "notes": [],
+      "levels": [],
+      "className": ""
+    },
+    "spellsPrepared": {
+      "cl": 20,
+      "concentration": 39,
+      "notes": [],
+      "levels": [
+        {
+          "level": 9,
+          "frequency": "",
+          "spells": [
+            "energy drain (DC 36)",
+            "foresight",
+            "mage's disjunction",
+            "meteor swarm (DC 32)",
+            "time stop",
+            "wail of the banshee (DC 36)",
+            "wish"
+          ]
+        },
+        {
+          "level": 8,
+          "frequency": "",
+          "spells": [
+            "empowered disintegrate",
+            "horrid wilting (DC 35)",
+            "maze",
+            "moment of prescience",
+            "power word stun",
+            "protection from spells",
+            "trap the soul"
+          ]
+        },
+        {
+          "level": 7,
+          "frequency": "",
+          "spells": [
+            "finger of death (2, DC 34)",
+            "force cage",
+            "greater scrying (DC 30)",
+            "limited wish",
+            "quickened fireball",
+            "spell turning"
+          ]
+        },
+        {
+          "level": 6,
+          "frequency": "",
+          "spells": [
+            "acid fog",
+            "disintegrate (DC 29)",
+            "greater dispel magic (2)",
+            "repulsion (DC 29)",
+            "true seeing",
+            "empowered vampiric touch"
+          ]
+        },
+        {
+          "level": 5,
+          "frequency": "",
+          "spells": [
+            "cone of cold (DC 28)",
+            "silent dimension door",
+            "dismissal (DC 28)",
+            "dominate person (DC 28)",
+            "quickened magic missile (2)",
+            "wall of force",
+            "waves of fatigue"
+          ]
+        },
+        {
+          "level": 4,
+          "frequency": "",
+          "spells": [
+            "black tentacles",
+            "detect scrying",
+            "dimension door",
+            "enervation (2)",
+            "greater invisibility",
+            "empowered scorching ray",
+            "stoneskin"
+          ]
+        },
+        {
+          "level": 3,
+          "frequency": "",
+          "spells": [
+            "dispel magic (2)",
+            "displacement",
+            "fireball (DC 26)",
+            "fly",
+            "haste",
+            "vampiric touch (2)"
+          ]
+        },
+        {
+          "level": 2,
+          "frequency": "",
+          "spells": [
+            "detect thoughts (DC 25)",
+            "false life (2)",
+            "resist energy (3)",
+            "extended shield (2)"
+          ]
+        },
+        {
+          "level": 1,
+          "frequency": "",
+          "spells": [
+            "expeditious retreat",
+            "grease",
+            "magic missile (3)",
+            "ray of enfeeblement (2, DC 28)",
+            "true strike (2)"
+          ]
+        },
+        {
+          "level": 0,
+          "frequency": "at will",
+          "spells": [
+            "detect magic",
+            "mage hand",
+            "message",
+            "read magic"
+          ]
+        }
+      ],
+      "className": "Necromancer",
+      "level9": [
+        "energy drain (DC 36)",
+        "foresight",
+        "mage's disjunction",
+        "meteor swarm (DC 32)",
+        "time stop",
+        "wail of the banshee (DC 36)",
+        "wish"
+      ],
+      "level8": [
+        "empowered disintegrate",
+        "horrid wilting (DC 35)",
+        "maze",
+        "moment of prescience",
+        "power word stun",
+        "protection from spells",
+        "trap the soul"
+      ],
+      "level7": [
+        "finger of death (2, DC 34)",
+        "force cage",
+        "greater scrying (DC 30)",
+        "limited wish",
+        "quickened fireball",
+        "spell turning"
+      ],
+      "level6": [
+        "acid fog",
+        "disintegrate (DC 29)",
+        "greater dispel magic (2)",
+        "repulsion (DC 29)",
+        "true seeing",
+        "empowered vampiric touch"
+      ],
+      "level5": [
+        "cone of cold (DC 28)",
+        "silent dimension door",
+        "dismissal (DC 28)",
+        "dominate person (DC 28)",
+        "quickened magic missile (2)",
+        "wall of force",
+        "waves of fatigue"
+      ],
+      "level4": [
+        "black tentacles",
+        "detect scrying",
+        "dimension door",
+        "enervation (2)",
+        "greater invisibility",
+        "empowered scorching ray",
+        "stoneskin"
+      ],
+      "level3": [
+        "dispel magic (2)",
+        "displacement",
+        "fireball (DC 26)",
+        "fly",
+        "haste",
+        "vampiric touch (2)"
+      ],
+      "level2": [
+        "detect thoughts (DC 25)",
+        "false life (2)",
+        "resist energy (3)",
+        "extended shield (2)"
+      ],
+      "level1": [
+        "expeditious retreat",
+        "grease",
+        "magic missile (3)",
+        "ray of enfeeblement (2, DC 28)",
+        "true strike (2)"
+      ],
+      "level0": [
+        "detect magic",
+        "mage hand",
+        "message",
+        "read magic"
+      ]
+    },
+    "psychicMagic": {
+      "cl": null,
+      "concentration": null,
+      "notes": [],
+      "levels": []
+    },
+    "strength": 14,
+    "dexterity": 19,
+    "constitution": null,
+    "intelligence": 36,
+    "wisdom": 14,
+    "charisma": 28,
+    "bab": 10,
+    "cmb": 12,
+    "cmd": 19,
+    "conditions": {},
+    "feats": [
+      "Command Undead",
+      "Craft Construct",
+      "Craft Wondrous Item",
+      "Empower Spell",
+      "Eschew Materials",
+      "Extend Spell",
+      "Extra Mythic Power",
+      "Greater Spell Focus (necromancy)",
+      "Improved Initiative",
+      "Improved Iron Will",
+      "Iron Will",
+      "Mythic Spell Lore",
+      "Quicken Spell",
+      "Scribe Scroll",
+      "Silent Spell",
+      "Spell Focus (necromancy)",
+      "Spell Penetration",
+      "Still Spell",
+      "Toughness"
+    ],
+    "skills": [
+      {
+        "name": "Acrobatics",
+        "bonus": 25
+      },
+      {
+        "name": "Bluff",
+        "bonus": 30
+      },
+      {
+        "name": "Diplomacy",
+        "bonus": 30
+      },
+      {
+        "name": "Escape Artist",
+        "bonus": 25
+      },
+      {
+        "name": "Fly",
+        "bonus": 28
+      },
+      {
+        "name": "Intimidate",
+        "bonus": 33
+      },
+      {
+        "name": "Knowledge (arcana)",
+        "bonus": 37
+      },
+      {
+        "name": "Knowledge (dungeoneering)",
+        "bonus": 37
+      },
+      {
+        "name": "Knowledge (history)",
+        "bonus": 37
+      },
+      {
+        "name": "Knowledge (planes)",
+        "bonus": 37
+      },
+      {
+        "name": "Knowledge (religion)",
+        "bonus": 37
+      },
+      {
+        "name": "Perception",
+        "bonus": 34
+      },
+      {
+        "name": "Sense Motive",
+        "bonus": 34
+      },
+      {
+        "name": "Spellcraft",
+        "bonus": 37
+      },
+      {
+        "name": "Stealth",
+        "bonus": 36
+      },
+      {
+        "name": "Use Magic Device",
+        "bonus": 30
+      }
+    ],
+    "languages": [
+      "Abyssal",
+      "Aklo",
+      "Celestial",
+      "Common",
+      "Draconic",
+      "Dwarven",
+      "Elven",
+      "Giant",
+      "Infernal",
+      "Orc",
+      "Undercommon"
+    ],
+    "gear": [],
+    "combatGear": [
+      "greater silent metamagic rod",
+      "maximize metamagic rod",
+      "quicken metamagic rod",
+      "scrolls (contingency, discern location, gate, greater teleport, harm [2], mage's disjunction, mass charm monster, project image, soul bind, time stop, and wish)",
+      "wand of inflict critical wounds"
+    ],
+    "otherGear": [
+      "+2 keen wounding dagger",
+      "amulet of natural armor +4",
+      "belt of physical might +4 (Str, Dex)",
+      "boots of teleportation",
+      "bracers of armor +8",
+      "cloak of resistance +5",
+      "gloves of the shortened path",
+      "headband of mental prowess +6 (Int, Cha)",
+      "Horns of Naraga",
+      "lavender and green ellipsoid ioun stone",
+      "pale green prism ioun stone",
+      "ring of protection +5",
+      "robe of the archmagi (black)",
+      "tyrant's ring (minor artifact, acts as a ring of freedom of movement and a ring of greater spell storing containing antilife shell and spell immunity)",
+      "unfettered shirt"
+    ],
+    "sq": [
+      "arcane bond (amulet)",
+      "life sight (40 feet, 20 rounds/day)",
+      "mythic phylactery",
+      "perfect necromancer"
+    ],
+    "environment": "",
+    "organization": "",
+    "treasure": "",
+    "specialAbilities": [
+      {
+        "name": "Animate Touch (Su)",
+        "description": "As a standard action, the Whispering Tyrant can touch a dead creature and animate it as a skeleton or zombie, as if using animate dead. He can expend one use of mythic power when using this ability to animate the body as a different type of undead, as if using greater create undead. The Whispering Tyrant treats his total Hit Dice as his caster level for these effects. Undead created in this way are automatically under his control. The Whispering Tyrant does not need to expend any material components when using this ability. This ability replaces the creeping paralysis mythic lich ability."
+      },
+      {
+        "name": "Aura of Absolute Terror (Su)",
+        "description": "Living creatures within 60 feet of the Whispering Tyrant are paralyzed by absolute terror for 1d4 rounds, after which they are shaken as long as they remain within his aura. Once a creature has been paralyzed by this aura, it is immune for 24 hours. Mythic creatures receive a DC 29 Will save to negate the paralysis, but are still shaken as long as they remain within the aura. This is a mind-affecting fear effect. This ability replaces the formidable animation mythic lich ability."
+      },
+      {
+        "name": "Perfect Necromancer (Ex)",
+        "description": "The Whispering Tyrant can prepare spells from his opposition schools without needing to expend an additional spell slot. He always succeeds at concentration checks to cast spells. He can have any number of undead under his control, and he is not limited by the total Hit Dice of those undead. This ability replaces the enhanced spellcasting mythic lich ability."
+      }
+    ],
+    "description": "The Whispering Tyrant was perhaps the greatest threat that the people of the Inner Sea have ever known. Even after his defeat atop Gallowspire, he wasn't finished. The forces that brought him low had no choice but to seal him within the tower that was once his capital. Before becoming a lich, the Whispering Tyrant was a powerful necromancer by the name Tar-Baphon. Though his origins are lost to time, it's thought that he grew up on the shores of Lake Encarthan, where he first studied the necromantic arts. As his power grew, so did his ambition, eventually leading him to the Cenotaph, the resting place of the slumbering runelord of gluttony. After unlocking the powers of Zutha, Tar-Baphon gained power beyond that of mortals. He realized then that true greatness required bringing the world itself under his control-alive or dead, all would serve him. His campaign was brutal. Enlisting nearby orcs and undead, he quickly conquered Ustalav and began a conquest that consumed most of central Avistan. He set down stones on the Isle of Terror, intent upon making it his capital. His actions drew the attention of Aroden, the Last Azlanti, who knew what destruction the runelords had caused, and refused to allow the world to return to those ancient ways. The two met on the Isle of Terror in 896 ar. The battle raged for days and leveled the entire surface of the island. Tar-Baphon's broken form lay among the rubble, and Aroden buried him there, thinking that was the end of the threat. However, Tar-Baphon had intended to die by Aroden's hand all along. His studies had revealed to him that his only true path to immortality lay in undeath. For Tar-Baphon's last step in becoming a lich beyond compare, he needed to be killed by a god, and Aroden served this purpose. The process sparked by Aroden took time, however, and for 2,307 years Tar-Baphon's body laid dead in the ground before he returned to grim unlife. The Whispering Tyrant was born. He soon reestablished his power, animating thousands of dead. For centuries, the forces of the living were unable to resist the tide of the dead-with Aroden gone, nothing could stop the Whispering Tyrant. Only the Shining Crusade had a chance to end his threat. Bearing the Shield of Aroden, General Arnisant faced the lich, but when the Whispering Tyrant used a wish to summon the general's heart to his waiting claw, the symbol of Aroden flared to life, the shield shattered, and the lich's body was destroyed. Without a means to locate the Tyrant's phylactery, let alone destroy it, the crusaders instead sealed him away in his tower, where their descendants remain ever watchful for his return."
+  }
+]

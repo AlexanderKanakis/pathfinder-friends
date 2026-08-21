@@ -26,6 +26,7 @@
     const page = currentPage();
     if (page === "auth.html") {
       mount.innerHTML = "";
+      injectNavbarStyles();
       return;
     }
 
@@ -84,6 +85,12 @@
       #authNav .nav-session-field { min-width: 0; }
       #authNav .nav-session-field select { width: clamp(140px, 16vw, 240px); max-width: 100%; }
       #authNav .nav-profile-link span { max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      input::placeholder,
+      textarea::placeholder,
+      .form-control::placeholder {
+        color: #c7c7c7 !important;
+        opacity: 1 !important;
+      }
       @media (min-width: 1400px) {
         #navbarMain .navbar-nav { flex-wrap: nowrap; align-items: center; }
         #navbarMain .nav-link { white-space: nowrap; }

@@ -30,3 +30,11 @@ Thumbs.db
 .idea/
 
 supabase-schema.sql
+
+# Local data scrapers / extraction utilities
+scripts/scrape-*.js
+scripts/extract-*.js
+scripts/aon-monsters.js
+scripts/alchemist-discoveries.js
+scripts/races.js
+scripts/rage-powers.js

@@ -2,23 +2,31 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>PathFriends Enemies</title>
+  <title>Enemies</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
   <style>
     body { background: #121212; color: #fff; }
     .enemy-shell { max-width: 1100px; }
-    .enemy-toolbar { display: grid; grid-template-columns: minmax(180px, 1fr) auto; gap: 10px; align-items: end; }
     .enemy-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
-    .enemy-card { background: #242424; border: 1px solid #444; border-radius: 8px; padding: 10px; cursor: pointer; min-width: 0; }
-    .enemy-card:hover { border-color: #777; }
+    .enemy-card { position: relative; background: #242424; border: 1px solid #444; border-radius: 8px; padding: 10px; cursor: pointer; min-width: 0; min-height: 92px; }
+    .enemy-card:hover, .enemy-card:focus { border-color: #777; outline: none; }
     .enemy-card-title { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .enemy-card-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+    .enemy-card-actions { display: flex; gap: 6px; align-items: center; margin-top: 8px; }
+    .enemy-card-actions [data-delete-enemy] { margin-left: auto; flex: 0 0 auto; }
+    .enemy-icon-btn { width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; padding: 0; }
+    .enemy-skeleton { pointer-events: none; cursor: default; overflow: hidden; }
+    .enemy-skeleton-line { height: 13px; border-radius: 999px; background: linear-gradient(90deg, #2b2b2b 0%, #3a3a3a 45%, #2b2b2b 90%); background-size: 220% 100%; animation: enemySkeleton 1.1s ease-in-out infinite; }
+    .enemy-skeleton-title { width: 68%; height: 16px; margin-bottom: 12px; }
+    .enemy-skeleton-meta { width: 44%; }
     .enemy-json { min-height: 260px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; }
+    .enemy-modal-section-title { display: flex; align-items: center; gap: 10px; color: #adb5bd; font-size: 0.78rem; letter-spacing: 0.06em; text-transform: uppercase; }
+    .enemy-modal-section-title::before, .enemy-modal-section-title::after { content: ""; flex: 1; border-top: 1px solid #444; }
     input, textarea, select { background-color: #2b2b2b !important; color: white !important; border-color: #555 !important; }
-    @media (max-width: 520px) {
-      .enemy-toolbar { grid-template-columns: 1fr; }
+    @keyframes enemySkeleton {
+      0% { background-position: 120% 0; }
+      100% { background-position: -120% 0; }
     }
   </style>
 </head>
@@ -28,29 +36,19 @@
 <main class="container enemy-shell mt-4">
   <div class="d-flex justify-content-between align-items-center gap-2 mb-3">
     <div>
-      <h3 class="mb-0">PathFriends Enemies</h3>
+      <h3 class="mb-0">Enemies</h3>
       <div id="enemyContextLabel" class="small text-secondary"></div>
     </div>
-    <button id="addEnemyBtn" class="btn btn-primary btn-sm" type="button">
-      <i class="bi bi-plus-lg"></i> Add Enemy
-    </button>
+    <div class="d-flex gap-2 flex-wrap justify-content-end">
+      <button id="addEnemyBtn" class="btn btn-primary btn-sm" type="button">
+        <i class="bi bi-plus-lg"></i> Add Enemy
+      </button>
+    </div>
   </div>
 
   <div id="enemyStatus" class="alert d-none py-2" role="alert"></div>
 
-  <section class="card bg-black border-secondary text-white mb-3">
-    <div class="card-body">
-      <div class="enemy-toolbar">
-        <div>
-          <label for="enemySearch" class="form-label">Search Enemies</label>
-          <input id="enemySearch" class="form-control form-control-sm" placeholder="Name">
-        </div>
-        <button id="refreshEnemiesBtn" class="btn btn-outline-light btn-sm" type="button">
-          <i class="bi bi-arrow-clockwise"></i> Refresh
-        </button>
-      </div>
-    </div>
-  </section>
+  <input id="enemySearch" class="form-control form-control-sm mb-3" placeholder="Enemy Name">
 
   <section>
     <div id="enemyList" class="enemy-grid"></div>
@@ -58,7 +56,7 @@
 </main>
 
 <div class="modal fade" id="enemyModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-centered">
+  <div class="modal-dialog modal-dialog-centered">
     <form id="enemyForm" class="modal-content bg-dark text-white border-secondary">
       <div class="modal-header border-secondary">
         <h5 id="enemyModalTitle" class="modal-title">Enemy</h5>
@@ -66,13 +64,24 @@
       </div>
       <div class="modal-body">
         <input id="enemyId" type="hidden">
+        <div class="enemy-modal-section-title mb-3">Create New</div>
         <div class="row g-2">
-          <div class="col-md-8">
+          <div class="col-12">
             <label for="enemyName" class="form-label">Name</label>
             <input id="enemyName" class="form-control form-control-sm" required>
           </div>
+          <div class="col-12">
+            <label for="enemyClass" class="form-label">Starting Class</label>
+            <select id="enemyClass" class="form-select form-select-sm"></select>
+          </div>
         </div>
-        <div class="small text-secondary mt-3">After creation, the full character sheet editor will open for this enemy.</div>
+        <div id="enemyTemplateHint" class="small text-info mt-2 d-none"></div>
+        <div id="enemyTemplateSection">
+          <div class="enemy-modal-section-title my-3">Use Template</div>
+          <button id="enemyTemplatesModalBtn" class="btn btn-outline-info btn-sm w-100" type="button">
+            <i class="bi bi-list-stars"></i> Enemy Templates
+          </button>
+        </div>
       </div>
       <div class="modal-footer border-secondary">
         <button id="duplicateEnemyBtn" type="button" class="btn btn-outline-info btn-sm">
@@ -85,15 +94,77 @@
   </div>
 </div>
 
+<div class="modal fade" id="deleteEnemyModal" tabindex="-1" aria-labelledby="deleteEnemyModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <form id="deleteEnemyForm" class="modal-content bg-dark text-white border-secondary">
+      <div class="modal-header border-secondary">
+        <h5 class="modal-title" id="deleteEnemyModalLabel">Delete Enemy</h5>
+        <button type="button" class="btn-close btn-close-white d-none" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="mb-1">Delete <strong id="deleteEnemyName"></strong>?</p>
+        <div class="small text-secondary">This removes the enemy sheet from this campaign.</div>
+      </div>
+      <div class="modal-footer border-secondary">
+        <span id="deleteEnemyStatus" class="small text-secondary me-auto"></span>
+        <button type="button" class="btn btn-outline-light btn-sm" data-bs-dismiss="modal">Cancel</button>
+        <button id="confirmDeleteEnemyBtn" class="btn btn-danger btn-sm" type="submit">
+          <i class="bi bi-trash"></i> Delete
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <script src="scripts/navbar.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="scripts/supabase-config.js"></script>
 <script src="scripts/app-supabase.js"></script>
+<script src="scripts/class-data.js"></script>
+<script src="modals/enemy-template-picker.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 let enemyContextKey = "";
 let enemies = [];
 let enemyModal = null;
+let deleteEnemyModal = null;
+let pendingDeleteEnemyId = "";
+let classDefinitions = [];
+let selectedEnemyTemplate = null;
+
+const SKILL_ABILITIES = {
+  "Acrobatics": "dex",
+  "Appraise": "int",
+  "Bluff": "cha",
+  "Climb": "str",
+  "Diplomacy": "cha",
+  "Disable Device": "dex",
+  "Disguise": "cha",
+  "Escape Artist": "dex",
+  "Fly": "dex",
+  "Heal": "wis",
+  "Intimidate": "cha",
+  "Knowledge (arcana)": "int",
+  "Knowledge (dungeoneering)": "int",
+  "Knowledge (engineering)": "int",
+  "Knowledge (geography)": "int",
+  "Knowledge (history)": "int",
+  "Knowledge (local)": "int",
+  "Knowledge (nature)": "int",
+  "Knowledge (nobility)": "int",
+  "Knowledge (planes)": "int",
+  "Knowledge (religion)": "int",
+  "Linguistics": "int",
+  "Perception": "wis",
+  "Ride": "dex",
+  "Sense Motive": "wis",
+  "Sleight of Hand": "dex",
+  "Spellcraft": "int",
+  "Stealth": "dex",
+  "Survival": "wis",
+  "Swim": "str",
+  "Use Magic Device": "cha"
+};
 
 function el(id) { return document.getElementById(id); }
 function escapeHtml(value) {
@@ -112,19 +183,466 @@ function setEnemyStatus(message, type = "info") {
   status.classList.remove("d-none");
 }
 
-function defaultEnemySheet(name) {
+function classNameOf(definition) {
+  return definition?.name || definition?.class || "";
+}
+
+const CLASS_GROUPS = [
+  ["core", "Core"],
+  ["base", "Base"],
+  ["alternate", "Alternate"],
+  ["occult", "Occult"],
+  ["hybrid", "Hybrid"],
+  ["unchained", "Unchained"],
+  ["prestige", "Prestige"],
+  ["npc", "NPC"]
+];
+
+function classTypeOf(definition) {
+  return String(definition?.type || definition?.category || "base").toLowerCase();
+}
+
+function groupedClassOptions(definitions, selected = "") {
+  const selectedClass = String(selected || "");
+  return CLASS_GROUPS.map(([type, label]) => {
+    const options = definitions
+      .filter(definition => classTypeOf(definition) === type)
+      .sort((a, b) => classNameOf(a).localeCompare(classNameOf(b)));
+    if (!options.length) return "";
+    return `
+      <optgroup label="${escapeHtml(label)}">
+        ${options.map(definition => {
+          const name = classNameOf(definition);
+          return `<option value="${escapeHtml(name)}" ${name === selectedClass ? "selected" : ""}>${escapeHtml(name)}</option>`;
+        }).join("")}
+      </optgroup>
+    `;
+  }).join("");
+}
+
+function playableClassDefinitions() {
+  return classDefinitions.filter(definition => {
+    const type = classTypeOf(definition);
+    return classNameOf(definition) && !type.includes("prestige") && !type.includes("3rd");
+  });
+}
+
+async function loadClassDefinitions() {
+  try {
+    classDefinitions = await PFClassData.loadIndex();
+  } catch (error) {
+    console.warn("Could not load classes", error);
+    classDefinitions = [];
+  }
+  const select = el("enemyClass");
+  const options = playableClassDefinitions();
+  select.innerHTML = [
+    `<option value="">No class</option>`,
+    options.length ? groupedClassOptions(options) : `<option value="">No class data found</option>`
+  ].join("");
+}
+
+function defaultClassProgression(startingClass = "") {
+  return Array.from({ length: 20 }, (_, index) => ({ level: index + 1, className: startingClass || "" }));
+}
+
+function signed(value) {
+  return value >= 0 ? `+${value}` : String(value);
+}
+
+function scoreMod(score) {
+  return Math.floor((Number(score || 10) - 10) / 2);
+}
+
+function skillId(skill) {
+  return String(skill || "").replace(/[^a-z0-9]/gi, "");
+}
+
+function hitDiceFromTemplate(template = {}) {
+  const match = String(template.hpText || "").match(/\((\d+)d/i);
+  return match ? Number(match[1]) : 1;
+}
+
+function abilityScoresFromTemplate(template = {}) {
+  return {
+    str: Number(template.strength ?? 10),
+    dex: Number(template.dexterity ?? 10),
+    con: Number(template.constitution ?? 10),
+    int: Number(template.intelligence ?? 10),
+    wis: Number(template.wisdom ?? 10),
+    cha: Number(template.charisma ?? 10)
+  };
+}
+
+function baseSkillName(name = "") {
+  return String(name || "").replace(/\s*\+.*$/, "").trim();
+}
+
+function expandCombinedKnowledgeSkill(name = "") {
+  const clean = baseSkillName(name);
+  const match = clean.match(/^Knowledge\s*\(([^)]+)\)$/i);
+  if (!match || !match[1].includes(",")) return [clean].filter(Boolean);
+  return match[1]
+    .split(",")
+    .map(part => part.trim())
+    .filter(Boolean)
+    .map(part => `Knowledge (${part})`);
+}
+
+function monsterSkillsForSheet(template = {}, scores = abilityScoresFromTemplate(template)) {
+  const skills = {};
+  const customSkills = [];
+  (template.skills || []).forEach(skill => {
+    expandCombinedKnowledgeSkill(skill.name).forEach(name => {
+      if (!name) return;
+      const ability = SKILL_ABILITIES[name] || (/^Craft\b/i.test(name) ? "int" : /^Profession\b/i.test(name) ? "wis" : "int");
+      const id = skillId(name);
+      const bonus = Number(skill.bonus || 0);
+      const currentTotal = Number(skills[id]?.misc || 0) + scoreMod(scores[ability]);
+      if (skills[id] && currentTotal >= bonus) return;
+      skills[id] = {
+        ranks: "0",
+        misc: String(bonus - scoreMod(scores[ability]))
+      };
+      if (!SKILL_ABILITIES[name] && !customSkills.some(custom => custom.name === name)) customSkills.push({ name, ability });
+    });
+  });
+  return { skills, customSkills };
+}
+
+function armorRowsFromTemplate(template = {}) {
+  const ac = template.ac || {};
+  return [
+    Number(ac.armor || 0) ? { item: "Armor bonus entry", type: "Armor", bonus: String(ac.armor), enhancement: "0" } : null,
+    Number(ac.shield || 0) ? { item: "Shield bonus entry", type: "Shield", bonus: String(ac.shield), enhancement: "0" } : null
+  ].filter(Boolean);
+}
+
+function gearRowsFromTemplate(template = {}) {
+  return [
+    ...(Array.isArray(template.gear) ? template.gear : []),
+    ...(Array.isArray(template.combatGear) ? template.combatGear : []),
+    ...(Array.isArray(template.otherGear) ? template.otherGear : [])
+  ].map(item => ({
+    item,
+    type: "Gear",
+    details: "Monster template gear"
+  }));
+}
+
+function templateConditionBaseValue(template = {}, stat = "") {
+  const key = String(stat || "").toLowerCase();
+  if (key === "fortitude") return Number(template.fortitude || 0);
+  if (key === "reflex") return Number(template.reflex || 0);
+  if (key === "will") return Number(template.will || 0);
+  if (key === "cmb") return Number(template.cmb || 0);
+  if (key === "cmd") return Number(template.cmd || 0);
+  if (key === "bab") return Number(template.bab || 0);
+  return 0;
+}
+
+function templateConditionalBonusValue(template = {}, stat = "", condition = {}) {
+  const raw = Number(condition.value);
+  if (!Number.isFinite(raw)) return 0;
+  const base = templateConditionBaseValue(template, stat);
+  if (["cmb", "cmd", "bab"].includes(String(stat || "").toLowerCase()) && base && raw > base) {
+    return raw - base;
+  }
+  return raw;
+}
+
+function templateConditionStat(stat = "") {
+  const key = String(stat || "").toLowerCase();
+  if (key === "bab") return "attack";
+  return key;
+}
+
+function activeBuffsFromTemplateConditions(template = {}) {
+  const bonuses = [];
+  Object.entries(template.conditions || {}).forEach(([stat, rows]) => {
+    (Array.isArray(rows) ? rows : []).forEach(row => {
+      if (!row?.appliesWhen) return;
+      bonuses.push({
+        stat: templateConditionStat(stat),
+        value: templateConditionalBonusValue(template, stat, row),
+        type: "condition",
+        conditional: true,
+        appliesWhen: row.appliesWhen,
+        stacks: true
+      });
+    });
+  });
+  return bonuses.length
+    ? [{
+      name: "Monster Conditionals",
+      type: "Condition",
+      permanent: true,
+      bonuses
+    }]
+    : [];
+}
+
+function monsterWeaponsForSheet(template = {}) {
+  const weapons = Array.isArray(template.weapons) ? template.weapons : [
+    ...(Array.isArray(template.meleeAttacks) ? template.meleeAttacks : []),
+    ...(Array.isArray(template.rangedAttacks) ? template.rangedAttacks : [])
+  ];
+  return weapons.map(weapon => ({
+    name: weapon.characterSheet?.name || weapon.name || "Attack",
+    type: "Weapon",
+    weaponType: weapon.characterSheet?.weaponType || weapon.weaponType || "Natural",
+    attackScale: weapon.characterSheet?.attackScale || weapon.attackScale || "STR",
+    damageScale: "",
+    templateAttack: weapon.attackRoutine || weapon.characterSheet?.attack || weapon.attackBonus || "",
+    damage: weapon.damage?.dice || "",
+    critical: weapon.characterSheet?.critical || weapon.critical || "20/x2",
+    details: [weapon.characterSheet?.details || weapon.raw || "", ...(weapon.extraDamage || [])].filter(Boolean).join("; "),
+    attackMisc: "0",
+    damageMisc: String(weapon.damage?.staticModifier ?? 0)
+  }));
+}
+
+function formatMonsterList(value, separator = ", ") {
+  if (!value) return "";
+  if (Array.isArray(value)) {
+    return value
+      .map(entry => formatMonsterList(entry, separator))
+      .filter(Boolean)
+      .join(separator);
+  }
+  if (typeof value === "object") {
+    if ("type" in value || "amount" in value) return [value.type, value.amount].filter(Boolean).join(" ");
+    if ("name" in value || "bonus" in value) return [value.name, value.bonus ? signed(Number(value.bonus)) : ""].filter(Boolean).join(" ");
+    return Object.entries(value)
+      .filter(([, entryValue]) => entryValue !== undefined && entryValue !== null && entryValue !== "")
+      .map(([key, entryValue]) => `${key}: ${formatMonsterList(entryValue, separator)}`)
+      .join(separator);
+  }
+  return String(value);
+}
+
+function formatMonsterBlock(value) {
+  if (!value) return "";
+  if (Array.isArray(value)) return value.map(entry => formatMonsterList(entry)).filter(Boolean).join("\n");
+  if (typeof value === "object") return formatMonsterList(value, "\n");
+  return String(value);
+}
+
+function prettifyMonsterSpellRowLabel(key = "") {
+  return String(key || "")
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .replace(/^(\d+)PerDay$/i, "$1/day")
+    .replace(/^at Will$/i, "At will")
+    .replace(/^constant$/i, "Constant")
+    .trim();
+}
+
+function isMonsterSpellMetadataKey(key = "") {
+  return ["cl", "concentration", "notes", "levels", "classname", "class"].includes(String(key || "").trim().toLowerCase());
+}
+
+function isMonsterSpellRowKey(key = "") {
+  const clean = String(key || "").trim();
+  return /^constant$/i.test(clean)
+    || /^atWill$/i.test(clean)
+    || /^at will$/i.test(clean)
+    || /^\d+PerDay$/i.test(clean)
+    || /^\d+\s*per\s*day$/i.test(clean)
+    || /^\d+\/day$/i.test(clean)
+    || /^level\s*\d+/i.test(clean)
+    || /^\d+(st|nd|rd|th)?$/i.test(clean);
+}
+
+function structuredMonsterRows(value, ignoredKeys = []) {
+  if (!value) return [];
+  if (typeof value === "object" && !Array.isArray(value) && Array.isArray(value.levels) && value.levels.length) {
+    return value.levels.map(entry => ({
+      label: entry.frequency
+        ? `${prettifyMonsterSpellRowLabel(entry.frequency)} ${entry.level !== undefined && entry.level !== null ? `(Level ${entry.level})` : ""}`.trim()
+        : `Level ${entry.level ?? ""}`.trim(),
+      spells: formatMonsterList(entry.spells)
+    })).filter(row => row.label || row.spells);
+  }
+  if (Array.isArray(value)) {
+    return value.map(entry => {
+      if (typeof entry === "object" && entry) {
+        const label = entry.label || entry.frequency || entry.level || entry.name || "Entry";
+        if (!isMonsterSpellRowKey(label)) return null;
+        return {
+          label: prettifyMonsterSpellRowLabel(label),
+          spells: formatMonsterList(entry.spells || entry.value || entry.description || entry)
+        };
+      }
+      const text = String(entry || "");
+      const index = text.indexOf(":");
+      return index >= 0
+        ? { label: text.slice(0, index).trim(), spells: text.slice(index + 1).trim() }
+        : { label: "Entry", spells: text };
+    }).filter(row => row && (row.label || row.spells));
+  }
+  if (typeof value === "object") {
+    return Object.entries(value)
+      .filter(([key, entryValue]) => !ignoredKeys.includes(key) && !isMonsterSpellMetadataKey(key) && isMonsterSpellRowKey(key) && entryValue)
+      .map(([key, entryValue]) => ({
+        label: prettifyMonsterSpellRowLabel(key),
+        spells: formatMonsterList(entryValue)
+      }))
+      .filter(row => row.label || row.spells);
+  }
+  return String(value || "")
+    .split(/\n+/)
+    .map(line => {
+      const index = line.indexOf(":");
+      return index >= 0
+        ? { label: line.slice(0, index).trim(), spells: line.slice(index + 1).trim() }
+        : null;
+    })
+    .filter(row => row && !isMonsterSpellMetadataKey(row.label) && isMonsterSpellRowKey(row.label) && (row.label || row.spells));
+}
+
+function structuredMonsterSpellSource(title, value) {
+  const source = value && typeof value === "object" && !Array.isArray(value) ? value : {};
+  return JSON.stringify({
+    title,
+    className: source.className || "",
+    cl: source.cl ?? "",
+    concentration: source.concentration ?? "",
+    rows: structuredMonsterRows(value)
+  });
+}
+
+function formatSpellLikeAbilities(value) {
+  if (!value) return "";
+  if (Array.isArray(value) || typeof value !== "object") return formatMonsterBlock(value);
+  const lines = [];
+  if (value.cl || value.concentration) {
+    const concentration = Number(value.concentration);
+    lines.push([
+      value.cl ? `CL ${value.cl}` : "",
+      Number.isFinite(concentration) ? `Concentration ${signed(concentration)}` : (value.concentration ? `Concentration ${value.concentration}` : "")
+    ].filter(Boolean).join(", "));
+  }
+  Object.entries(value).forEach(([key, entryValue]) => {
+    if (["cl", "concentration"].includes(key) || !entryValue) return;
+    const label = key
+      .replace(/([a-z])([A-Z])/g, "$1 $2")
+      .replace(/^(\d+)PerDay$/i, "$1/day")
+      .replace(/^at Will$/i, "At will")
+      .replace(/^constant$/i, "Constant");
+    lines.push(`${label}: ${formatMonsterList(entryValue)}`);
+  });
+  return lines.join("\n");
+}
+
+function formatSpecialAbilities(value) {
+  if (!Array.isArray(value)) return formatMonsterBlock(value);
+  return value
+    .map(ability => [ability?.name, ability?.description].filter(Boolean).join("\n"))
+    .filter(Boolean)
+    .join("\n\n");
+}
+
+function regenerationFromHpText(template = {}) {
+  const match = String(template.regeneration || template.hpText || "").match(/\bregeneration\s+([^;]+)/i);
+  return match ? match[1].trim() : "";
+}
+
+function defaultEnemySheet(name, startingClass = "", template = null) {
+  const scores = abilityScoresFromTemplate(template || {});
+  const str = scoreMod(scores.str);
+  const dex = scoreMod(scores.dex);
+  const con = scoreMod(scores.con);
+  const wis = scoreMod(scores.wis);
+  const ac = template?.ac || {};
+  const bab = Number(template?.bab || 0);
+  const hp = Number(template?.hp || 0);
+  const characterLevel = template ? hitDiceFromTemplate(template) : (startingClass ? 1 : "");
+  const skillData = template ? monsterSkillsForSheet(template, scores) : { skills: {}, customSkills: [] };
+  const acArmor = Number(ac.armor || 0);
+  const acShield = Number(ac.shield || 0);
+  const acNatural = Number(ac.natural || 0);
+  const acDeflection = Number(ac.deflection || 0);
+  const acMisc = template ? Number(ac.total || 10) - 10 - acArmor - acShield - dex - acNatural - acDeflection : 0;
+  const templateFields = template ? {
+    alignment: template.alignmentName || template.alignment || "",
+    race: template.creatureType || "",
+    subtype: formatMonsterList(template.subtypes),
+    xp: template.xp ? String(template.xp) : "",
+    size: template.size || "",
+    senses: formatMonsterList(template.senses),
+    aura: formatMonsterList(template.aura),
+    currentHitPoints: String(hp || ""),
+    hitPoints: String(hp || ""),
+    hitPointsTotal: String(hp || ""),
+    regeneration: regenerationFromHpText(template),
+    damageReduction: formatMonsterList(template.dr),
+    resistances: formatMonsterList(template.resistances),
+    immunities: formatMonsterList(template.immunities),
+    spellResistance: template.spellResistance === undefined || template.spellResistance === null ? "" : String(template.spellResistance),
+    weaknesses: formatMonsterList(template.weaknesses),
+    classLevel: startingClass ? `${startingClass} 1` : "",
+    characterLevel: String(characterLevel || ""),
+    babMisc: String(bab),
+    initMisc: String(Number(template.init || 0) - dex),
+    speedBase: Array.isArray(template.speed) ? template.speed[0] || "" : "",
+    flySpeed: formatMonsterList(template.flySpeed),
+    acNatural: String(acNatural),
+    acDeflection: String(acDeflection),
+    acMisc: String(acMisc),
+    cmbMisc: String(Number(template.cmb || 0) - bab - str),
+    cmdMisc: String(Number(template.cmd || 0) - 10 - bab - str - dex),
+    defensiveAbilities: formatMonsterList(template.defensiveAbilities),
+    specialAttacks: formatMonsterList(template.specialAttacks),
+    spellLikeCl: template.spellLikeAbilities?.cl ? String(template.spellLikeAbilities.cl) : "",
+    spellLikeConcentration: template.spellLikeAbilities?.concentration === undefined || template.spellLikeAbilities?.concentration === null ? "" : String(template.spellLikeAbilities.concentration),
+    spellLikeAbilities: JSON.stringify(structuredMonsterRows(template.spellLikeAbilities, ["cl", "concentration"])),
+    enemySpells: structuredMonsterSpellSource("Spells", template.spells),
+    enemySpellsKnown: structuredMonsterSpellSource("Spells Known", template.spellsKnown),
+    enemySpellsPrepared: structuredMonsterSpellSource("Spells Prepared", template.spellsPrepared),
+    enemyPsychicMagic: structuredMonsterSpellSource("Psychic Magic", template.psychicMagic),
+    languages: formatMonsterList(template.languages),
+    sq: formatMonsterList(template.sq),
+    specialAbilities: formatSpecialAbilities(template.specialAbilities),
+    notes: [
+      template.hpText ? `HP: ${template.hpText}` : "",
+      Array.isArray(template.feats) && template.feats.length ? `Feats: ${template.feats.join(", ")}` : "",
+      template.description || ""
+    ].filter(Boolean).join("\n\n")
+  } : {};
   return {
     fields: {
       characterName: name || "Enemy",
       currentHitPoints: "",
-      hitPointsTotal: ""
+      hitPointsTotal: "",
+      classLevel: startingClass ? `${startingClass} 1` : "",
+      characterLevel: startingClass ? "1" : "",
+      ...templateFields
     },
-    abilities: {},
-    saves: {},
-    skills: {},
-    weapons: [],
-    armor: [],
-    gear: []
+    abilities: template ? {
+      str: { score: String(scores.str) },
+      dex: { score: String(scores.dex) },
+      con: { score: String(scores.con) },
+      int: { score: String(scores.int) },
+      wis: { score: String(scores.wis) },
+      cha: { score: String(scores.cha) }
+    } : {},
+    saves: template ? {
+      fort: { base: "0", misc: String(Number(template.fortitude || 0) - con) },
+      reflex: { base: "0", misc: String(Number(template.reflex || 0) - dex) },
+      will: { base: "0", misc: String(Number(template.will || 0) - wis) }
+    } : {},
+    skills: skillData.skills,
+    weapons: template ? monsterWeaponsForSheet(template) : [],
+    armor: template ? armorRowsFromTemplate(template) : [],
+    gear: template ? gearRowsFromTemplate(template) : [],
+    customSkills: skillData.customSkills,
+    activeBuffs: template ? activeBuffsFromTemplateConditions(template) : [],
+    classProgression: defaultClassProgression(startingClass),
+    monsterTemplate: template ? {
+      name: template.name || "",
+      cr: template.cr || "",
+      url: template.url || ""
+    } : null
   };
 }
 
@@ -134,22 +652,27 @@ function filteredEnemies() {
   return enemies.filter(enemy => enemy.name.toLowerCase().includes(term));
 }
 
+function renderEnemySkeletons(count = 6) {
+  el("enemyList").innerHTML = Array.from({ length: count }, () => `
+    <article class="enemy-card enemy-skeleton" aria-hidden="true">
+      <div class="enemy-skeleton-line enemy-skeleton-title"></div>
+      <div class="enemy-skeleton-line enemy-skeleton-meta"></div>
+    </article>
+  `).join("");
+}
+
 function renderEnemies() {
   const rows = filteredEnemies();
   el("enemyList").innerHTML = rows.length
     ? rows.map(enemy => `
       <article class="enemy-card" data-enemy-id="${escapeHtml(enemy.id)}">
-        <div class="d-flex justify-content-between gap-2">
-          <div class="enemy-card-title">${escapeHtml(enemy.name)}</div>
-          <span class="badge text-bg-danger">Enemy</span>
-        </div>
-        <div class="small text-secondary mt-1">Updated ${escapeHtml(enemy.updatedAt ? new Date(enemy.updatedAt).toLocaleString() : "-")}</div>
+        <div class="enemy-card-title">${escapeHtml(enemy.name)}</div>
         <div class="enemy-card-actions">
-          <button class="btn btn-outline-light btn-sm" type="button" data-edit-enemy="${escapeHtml(enemy.id)}">
-            <i class="bi bi-pencil"></i> Edit
-          </button>
           <button class="btn btn-outline-info btn-sm" type="button" data-duplicate-enemy="${escapeHtml(enemy.id)}">
             <i class="bi bi-copy"></i> Duplicate
+          </button>
+          <button class="btn btn-outline-danger btn-sm enemy-icon-btn" type="button" data-delete-enemy="${escapeHtml(enemy.id)}" aria-label="Delete ${escapeHtml(enemy.name || "enemy")}">
+            <i class="bi bi-trash"></i>
           </button>
         </div>
       </article>
@@ -162,11 +685,11 @@ function renderEnemies() {
       openEnemySheet(card.dataset.enemyId);
     });
   });
-  el("enemyList").querySelectorAll("[data-edit-enemy]").forEach(button => {
-    button.addEventListener("click", () => openEnemySheet(button.dataset.editEnemy));
-  });
   el("enemyList").querySelectorAll("[data-duplicate-enemy]").forEach(button => {
     button.addEventListener("click", async () => duplicateEnemy(button.dataset.duplicateEnemy));
+  });
+  el("enemyList").querySelectorAll("[data-delete-enemy]").forEach(button => {
+    button.addEventListener("click", () => openDeleteEnemyModal(button.dataset.deleteEnemy));
   });
 }
 
@@ -176,6 +699,7 @@ function openEnemySheet(enemyId) {
 }
 
 async function loadEnemies() {
+  renderEnemySkeletons();
   enemies = await PFApp.loadEnemies(enemyContextKey);
   renderEnemies();
 }
@@ -183,23 +707,60 @@ async function loadEnemies() {
 function openEnemyModal(enemyId = "") {
   const enemy = enemies.find(item => item.id === enemyId);
   const name = enemy?.name || "";
+  selectedEnemyTemplate = null;
   el("enemyId").value = enemy?.id || "";
   el("enemyName").value = name;
+  el("enemyClass").value = enemy?.sheet?.classProgression?.[0]?.className || "";
+  el("enemyTemplateHint").classList.add("d-none");
+  el("enemyTemplateHint").textContent = "";
   el("enemyModalTitle").textContent = enemy ? `Edit ${enemy.name}` : "Add Enemy";
   el("duplicateEnemyBtn").classList.toggle("d-none", !enemy?.id);
+  el("enemyTemplateSection").classList.toggle("d-none", !!enemy?.id);
   enemyModal.show();
   setTimeout(() => el("enemyName").focus(), 150);
+}
+
+function openEnemyTemplateModal() {
+  enemyModal?.hide();
+  PFEnemyTemplatePicker.open({
+    async onSelect(template) {
+      await createEnemyFromTemplate(template);
+    }
+  });
+}
+
+async function createEnemyFromTemplate(template) {
+  if (!template?.name) return;
+  setEnemyStatus(`Creating ${template.name}...`, "info");
+  const enemy = await PFApp.saveEnemy({
+    name: template.name,
+    visible: true,
+    sheet: defaultEnemySheet(template.name, "", template)
+  }, enemyContextKey);
+  if (!enemy) {
+    setEnemyStatus("Could not create enemy from template.", "danger");
+    return;
+  }
+  setEnemyStatus(`${template.name} created from template.`, "success");
+  await loadEnemies();
+  openEnemySheet(enemy.id);
 }
 
 async function saveEnemy(event) {
   event.preventDefault();
   const name = el("enemyName").value.trim();
+  const startingClass = el("enemyClass").value.trim();
+  const enemyId = el("enemyId").value || "";
+  const existingEnemy = enemies.find(item => item.id === enemyId);
+  const sheet = existingEnemy?.sheet
+    ? { ...existingEnemy.sheet, fields: { ...(existingEnemy.sheet.fields || {}), characterName: name } }
+    : defaultEnemySheet(name, startingClass, selectedEnemyTemplate);
 
   const enemy = await PFApp.saveEnemy({
-    id: el("enemyId").value || "",
+    id: enemyId,
     name,
     visible: true,
-    sheet: defaultEnemySheet(name)
+    sheet
   }, enemyContextKey);
 
   if (!enemy) {
@@ -208,6 +769,7 @@ async function saveEnemy(event) {
   }
 
   enemyModal.hide();
+  selectedEnemyTemplate = null;
   setEnemyStatus("Enemy created.", "success");
   await loadEnemies();
   openEnemySheet(enemy.id);
@@ -222,6 +784,36 @@ async function duplicateEnemy(enemyId = el("enemyId").value) {
   }
   enemyModal.hide();
   setEnemyStatus("Enemy duplicated.", "success");
+  await loadEnemies();
+}
+
+function openDeleteEnemyModal(enemyId) {
+  const enemy = enemies.find(item => item.id === enemyId);
+  if (!enemy) return;
+  pendingDeleteEnemyId = enemy.id;
+  el("deleteEnemyName").textContent = enemy.name || "Unnamed enemy";
+  el("deleteEnemyStatus").textContent = "";
+  deleteEnemyModal.show();
+}
+
+async function deleteEnemy(event) {
+  event.preventDefault();
+  if (!pendingDeleteEnemyId) return;
+
+  const button = el("confirmDeleteEnemyBtn");
+  button.disabled = true;
+  el("deleteEnemyStatus").textContent = "Deleting...";
+
+  const { error } = await PFApp.deleteEnemy(pendingDeleteEnemyId, enemyContextKey);
+  button.disabled = false;
+
+  if (error) {
+    el("deleteEnemyStatus").textContent = error.message || "Could not delete enemy.";
+    return;
+  }
+
+  pendingDeleteEnemyId = "";
+  deleteEnemyModal.hide();
   await loadEnemies();
 }
 
@@ -249,10 +841,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   el("enemyContextLabel").textContent = current?.label || "Current campaign";
 
   enemyModal = new bootstrap.Modal(el("enemyModal"));
+  deleteEnemyModal = new bootstrap.Modal(el("deleteEnemyModal"));
+  await loadClassDefinitions();
   el("enemySearch").addEventListener("input", renderEnemies);
-  el("refreshEnemiesBtn").addEventListener("click", loadEnemies);
   el("addEnemyBtn").addEventListener("click", () => openEnemyModal());
+  el("enemyTemplatesModalBtn").addEventListener("click", openEnemyTemplateModal);
   el("enemyForm").addEventListener("submit", saveEnemy);
+  el("deleteEnemyForm").addEventListener("submit", deleteEnemy);
   el("duplicateEnemyBtn").addEventListener("click", () => duplicateEnemy());
 
   await loadEnemies();

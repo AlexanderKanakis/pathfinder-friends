@@ -1511,6 +1511,49 @@
     }, contextKey);
   }
 
+  async function deleteEnemy(enemyId, contextKey = getSelectedContextKey()) {
+    const user = await getUser();
+    if (!client || !user || !enemyId) return { error: new Error("Missing enemy") };
+
+    const context = normalizeContext(contextKey);
+    if (!context.gameId) return { error: new Error("Missing campaign") };
+
+    const { error } = await client
+      .from("enemies")
+      .delete()
+      .eq("id", enemyId)
+      .eq("context_key", context.contextKey)
+      .eq("game_id", context.gameId);
+
+    if (error) console.error(error);
+    if (!error) await removeEnemyFromMapState(enemyId, contextKey);
+    return { error };
+  }
+
+  async function removeEnemyFromMapState(enemyId, contextKey = getSelectedContextKey()) {
+    const state = await loadMapState(contextKey);
+    if (!state || !Array.isArray(state.tokens)) return state;
+
+    const removedTokenIds = new Set(
+      state.tokens
+        .filter(token => token.kind === "enemy" && token.enemyId === enemyId)
+        .map(token => token.id)
+    );
+    if (!removedTokenIds.size) return state;
+
+    const nextState = {
+      ...state,
+      tokens: state.tokens.filter(token => !removedTokenIds.has(token.id)),
+      initiative: Array.isArray(state.initiative)
+        ? state.initiative.filter(entry => !removedTokenIds.has(entry.tokenId))
+        : state.initiative
+    };
+    if (Array.isArray(nextState.initiative)) {
+      nextState.activeTurn = Math.max(0, Math.min(Number(nextState.activeTurn || 0), Math.max(0, nextState.initiative.length - 1)));
+    }
+    return saveMapState(nextState, contextKey);
+  }
+
   async function loadLootItems(contextKey = getSelectedContextKey()) {
     const user = await getUser();
     if (!user) return [];
@@ -1693,6 +1736,7 @@
     saveEnemy,
     updateEnemyCurrentHp,
     duplicateEnemy,
+    deleteEnemy,
     loadLootItems,
     saveLootItem,
     deleteLootItem,
