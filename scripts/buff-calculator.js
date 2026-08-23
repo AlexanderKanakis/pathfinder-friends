@@ -234,7 +234,7 @@
       abilityScores[stat] = score;
       abilityMods[stat] = abilityMod(score);
       abilityCauses[stat] = describeBonuses(applied.used);
-      totals[stat] = `${score} (${fmt(abilityMods[stat])})`;
+      totals[stat] = score;
       addBreakdown(breakdown, stat, "Base", Number(baseline[key] || 0), "score");
       applied.used.forEach(b => addBreakdown(breakdown, stat, b.source, b.value, b.type));
       applied.ignored.forEach(b => addIgnoredBreakdown(breakdown, stat, b));

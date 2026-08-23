@@ -1,0 +1,1 @@
+PFApp.setupAdminPage();

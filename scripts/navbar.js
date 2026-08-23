@@ -17,7 +17,11 @@
 
   function currentPage() {
     const page = window.location.pathname.split("/").pop() || "dice-roller.html";
-    return page === "character-sheet.html" ? "characters.html" : page;
+    if (page === "character-sheet.html") {
+      const params = new URLSearchParams(window.location.search);
+      return params.get("enemyId") ? "enemies.html" : "characters.html";
+    }
+    return page;
   }
 
   function renderNavbar() {

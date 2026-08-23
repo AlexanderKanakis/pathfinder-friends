@@ -1,0 +1,298 @@
+let characterContextKey = "";
+let characters = [];
+let characterSearchTerm = "";
+let currentUserId = "";
+let canViewCampaignCharacters = false;
+let isAppAdminUser = false;
+let newCharacterModal = null;
+let deleteCharacterModal = null;
+let pendingDeleteCharacterId = "";
+let classDefinitions = [];
+
+function el(id) { return document.getElementById(id); }
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function status(message, type = "info") {
+  const box = el("characterStatus");
+  box.className = `alert alert-${type} py-2`;
+  box.textContent = message;
+  box.classList.toggle("d-none", !message);
+}
+
+function rememberCharacter(characterId) {
+  if (characterId) localStorage.setItem(`pf_last_sheet_character_id_${characterContextKey}`, characterId);
+}
+
+function openCharacter(characterId) {
+  rememberCharacter(characterId);
+  window.location.href = `character-sheet.html?characterId=${encodeURIComponent(characterId)}`;
+}
+
+function characterLevelText(sheet = {}) {
+  const value = sheet.character_level
+    ?? sheet.fields?.characterLevel
+    ?? sheet.characterLevel
+    ?? sheet.fields?.level
+    ?? sheet.level
+    ?? "";
+  const text = String(value || "").trim();
+  return text && text !== "0" ? text : "-";
+}
+
+function characterOwnerLabel(character) {
+  if (!canViewCampaignCharacters || character.user_id === currentUserId) return "";
+  return character.username || character.email || "Other player";
+}
+
+function canDeleteCharacter(character) {
+  return isAppAdminUser || character.user_id === currentUserId;
+}
+
+function classNameOf(definition) {
+  return definition?.name || definition?.class || "";
+}
+
+const CLASS_GROUPS = [
+  ["core", "Core"],
+  ["base", "Base"],
+  ["alternate", "Alternate"],
+  ["occult", "Occult"],
+  ["hybrid", "Hybrid"],
+  ["unchained", "Unchained"],
+  ["prestige", "Prestige"],
+  ["npc", "NPC"]
+];
+
+function classTypeOf(definition) {
+  return String(definition?.type || definition?.category || "base").toLowerCase();
+}
+
+function groupedClassOptions(definitions, selected = "") {
+  const selectedClass = String(selected || "");
+  return CLASS_GROUPS.map(([type, label]) => {
+    const options = definitions
+      .filter(definition => classTypeOf(definition) === type)
+      .sort((a, b) => classNameOf(a).localeCompare(classNameOf(b)));
+    if (!options.length) return "";
+    return `
+      <optgroup label="${escapeHtml(label)}">
+        ${options.map(definition => {
+          const name = classNameOf(definition);
+          return `<option value="${escapeHtml(name)}" ${name === selectedClass ? "selected" : ""}>${escapeHtml(name)}</option>`;
+        }).join("")}
+      </optgroup>
+    `;
+  }).join("");
+}
+
+function playableClassDefinitions() {
+  return classDefinitions.filter(definition => {
+    const type = classTypeOf(definition);
+    return classNameOf(definition) && !type.includes("prestige") && !type.includes("3rd");
+  });
+}
+
+async function loadClassDefinitions() {
+  try {
+    classDefinitions = await PFClassData.loadIndex();
+  } catch (error) {
+    console.warn("Could not load classes", error);
+    classDefinitions = [];
+  }
+  const select = el("newCharacterClass");
+  const options = playableClassDefinitions();
+  select.innerHTML = options.length
+    ? groupedClassOptions(options)
+    : `<option value="">No class data found</option>`;
+}
+
+function renderCharacters() {
+  const term = characterSearchTerm.trim().toLowerCase();
+  const rows = characters
+    .filter(character => !term || String(character.character_name || "").toLowerCase().includes(term))
+    .sort((a, b) => String(a.character_name || "").localeCompare(String(b.character_name || "")));
+
+  el("characterList").innerHTML = rows.length
+    ? rows.map(character => `
+      <article class="character-card" role="button" tabindex="0" data-character-id="${escapeHtml(character.id)}">
+        <div class="character-card-name">${escapeHtml(character.character_name || "Unnamed character")}</div>
+        <div class="character-card-meta">
+          Level ${escapeHtml(characterLevelText(character))}
+          ${characterOwnerLabel(character) ? ` | ${escapeHtml(characterOwnerLabel(character))}` : ""}
+        </div>
+        ${canDeleteCharacter(character) ? `
+          <div class="character-card-actions">
+            <button class="btn btn-outline-danger btn-sm character-icon-btn" type="button" data-delete-character="${escapeHtml(character.id)}" aria-label="Delete ${escapeHtml(character.character_name || "character")}">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+        ` : ""}
+      </article>
+    `).join("")
+    : `<div class="text-secondary small">No characters found.</div>`;
+
+  el("characterList").querySelectorAll("[data-character-id]").forEach(button => {
+    button.addEventListener("click", event => {
+      if (event.target.closest("[data-delete-character]")) return;
+      openCharacter(button.dataset.characterId);
+    });
+  });
+  el("characterList").querySelectorAll("[data-delete-character]").forEach(button => {
+    button.addEventListener("click", () => openDeleteCharacterModal(button.dataset.deleteCharacter));
+  });
+}
+
+function renderCharacterSkeletons(count = 6) {
+  el("characterList").setAttribute("aria-busy", "true");
+  el("characterList").innerHTML = Array.from({ length: count }, () => `
+    <article class="character-card character-skeleton" aria-hidden="true">
+      <div class="character-skeleton-line character-skeleton-title"></div>
+      <div class="character-skeleton-line character-skeleton-meta"></div>
+    </article>
+  `).join("");
+}
+
+async function loadCharacters() {
+  renderCharacterSkeletons();
+  const [canViewAll, contexts] = await Promise.all([
+    PFApp.isGameManager(characterContextKey),
+    PFApp.loadContexts()
+  ]);
+  canViewCampaignCharacters = canViewAll;
+  characters = await PFApp.loadCharacterSheets(characterContextKey, { ownOnly: !canViewCampaignCharacters, summaryOnly: true });
+  if (canViewCampaignCharacters) {
+    const contextCharacters = await PFApp.loadContextCharacters(characterContextKey);
+    const metaById = new Map(contextCharacters.map(character => [character.id, character]));
+    characters = characters.map(character => {
+      const meta = metaById.get(character.id);
+      return meta ? { ...character, username: meta.username, email: meta.email } : character;
+    });
+  }
+  characters = characters.map(character => character.character_level == null && character.sheet
+    ? { ...character, character_level: characterLevelText(character.sheet) }
+    : character);
+  updateCharacterContextLabel(contexts);
+  el("characterList").setAttribute("aria-busy", "false");
+  renderCharacters();
+}
+
+function updateCharacterContextLabel(contexts = []) {
+  const context = contexts.find(item => item.key === characterContextKey);
+  el("characterContextLabel").textContent = context?.label || "";
+}
+
+function defaultCharacterSheet(name, startingClass) {
+  const classProgression = Array.from({ length: 20 }, (_, index) => ({ level: index + 1, className: startingClass || "" }));
+  return {
+    fields: {
+      characterName: name,
+      classLevel: startingClass ? `${startingClass} 1` : "",
+      characterLevel: "1",
+      currentHitPoints: "0",
+      hitPointsTotal: "0"
+    },
+    abilities: {},
+    saves: {},
+    skills: {},
+    weapons: [],
+    armor: [],
+    gear: [],
+    classProgression,
+    preferences: { showAppliedBuffs: true }
+  };
+}
+
+async function createCharacter(event) {
+  event.preventDefault();
+  const name = el("newCharacterName").value.trim();
+  const startingClass = el("newCharacterClass").value.trim();
+  if (!name) return;
+  if (!startingClass) {
+    el("newCharacterStatus").textContent = "Choose a starting class.";
+    return;
+  }
+
+  const button = el("createCharacterButton");
+  const modalStatus = el("newCharacterStatus");
+  button.disabled = true;
+  modalStatus.textContent = "Creating...";
+
+  const saved = await PFApp.saveCharacterSheet(name, defaultCharacterSheet(name, startingClass), characterContextKey);
+  button.disabled = false;
+
+  if (!saved?.id) {
+    modalStatus.textContent = "Could not create character.";
+    return;
+  }
+
+  newCharacterModal.hide();
+  event.target.reset();
+  openCharacter(saved.id);
+}
+
+function openDeleteCharacterModal(characterId) {
+  const character = characters.find(item => item.id === characterId);
+  if (!character || !canDeleteCharacter(character)) return;
+  pendingDeleteCharacterId = character.id;
+  el("deleteCharacterName").textContent = character.character_name || "Unnamed character";
+  el("deleteCharacterStatus").textContent = "";
+  deleteCharacterModal.show();
+}
+
+async function deleteCharacter(event) {
+  event.preventDefault();
+  if (!pendingDeleteCharacterId) return;
+
+  const button = el("confirmDeleteCharacterBtn");
+  button.disabled = true;
+  el("deleteCharacterStatus").textContent = "Deleting...";
+
+  const { error } = await PFApp.deleteCharacterSheet(pendingDeleteCharacterId, characterContextKey);
+  button.disabled = false;
+
+  if (error) {
+    el("deleteCharacterStatus").textContent = error.message || "Could not delete character.";
+    return;
+  }
+
+  if (localStorage.getItem(`pf_last_sheet_character_id_${characterContextKey}`) === pendingDeleteCharacterId) {
+    localStorage.removeItem(`pf_last_sheet_character_id_${characterContextKey}`);
+  }
+  pendingDeleteCharacterId = "";
+  deleteCharacterModal.hide();
+  status("Character deleted.", "success");
+  await loadCharacters();
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+  const user = await PFApp.requireAuth();
+  if (!user) return;
+  currentUserId = user.id;
+  isAppAdminUser = await PFApp.isAppAdmin();
+  characterContextKey = await PFApp.requireGameContext();
+  if (!characterContextKey) return;
+
+  newCharacterModal = bootstrap.Modal.getOrCreateInstance(el("newCharacterModal"));
+  deleteCharacterModal = bootstrap.Modal.getOrCreateInstance(el("deleteCharacterModal"));
+  el("newCharacterForm").addEventListener("submit", createCharacter);
+  el("deleteCharacterForm").addEventListener("submit", deleteCharacter);
+  el("characterSearch").addEventListener("input", event => {
+    characterSearchTerm = event.target.value.trim();
+    renderCharacters();
+  });
+  window.addEventListener("pf-context-change", async event => {
+    if (!event.detail.contextKey || event.detail.contextKey === "general") return;
+    characterContextKey = event.detail.contextKey;
+    await loadCharacters();
+  });
+
+  await Promise.all([loadClassDefinitions(), loadCharacters()]);
+});
