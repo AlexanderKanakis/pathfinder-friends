@@ -1,106 +1,181 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Enemies</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-  <link href="css/enemies.css" rel="stylesheet">
-</head>
-<body>
-<div id="appNavbar"></div>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Enemies</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+    <link href="css/enemies.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div id="appNavbar"></div>
 
-<main class="container enemy-shell mt-4">
-  <div class="d-flex justify-content-between align-items-center gap-2 mb-3">
-    <div>
-      <h3 class="mb-0">Enemies</h3>
-      <div id="enemyContextLabel" class="small text-secondary"></div>
-    </div>
-    <div class="d-flex gap-2 flex-wrap justify-content-end">
-      <button id="addEnemyBtn" class="btn btn-primary btn-sm" type="button">
-        <i class="bi bi-plus-lg"></i> Add Enemy
-      </button>
-    </div>
-  </div>
-
-  <div id="enemyStatus" class="alert d-none py-2" role="alert"></div>
-
-  <input id="enemySearch" class="form-control form-control-sm mb-3" placeholder="Enemy Name">
-
-  <section>
-    <div id="enemyList" class="enemy-grid"></div>
-  </section>
-</main>
-
-<div class="modal fade" id="enemyModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <form id="enemyForm" class="modal-content bg-dark text-white border-secondary">
-      <div class="modal-header border-secondary">
-        <h5 id="enemyModalTitle" class="modal-title">Enemy</h5>
-        <button type="button" class="btn-close btn-close-white d-none" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <input id="enemyId" type="hidden">
-        <div class="enemy-modal-section-title mb-3">Create New</div>
-        <div class="row g-2">
-          <div class="col-12">
-            <label for="enemyName" class="form-label">Name</label>
-            <input id="enemyName" class="form-control form-control-sm" required>
-          </div>
-          <div class="col-12">
-            <label for="enemyClass" class="form-label">Starting Class</label>
-            <select id="enemyClass" class="form-select form-select-sm"></select>
-          </div>
+    <main class="container enemy-shell mt-4">
+      <div class="d-flex justify-content-between align-items-center gap-2 mb-3">
+        <div>
+          <h3 class="mb-0">Enemies</h3>
+          <div id="enemyContextLabel" class="small text-secondary"></div>
         </div>
-        <div id="enemyTemplateHint" class="small text-info mt-2 d-none"></div>
-        <div id="enemyTemplateSection">
-          <div class="enemy-modal-section-title my-3">Use Template</div>
-          <button id="enemyTemplatesModalBtn" class="btn btn-outline-info btn-sm w-100" type="button">
-            <i class="bi bi-list-stars"></i> Enemy Templates
+        <div class="d-flex gap-2 flex-wrap justify-content-end">
+          <button id="addEnemyBtn" class="btn btn-primary btn-sm" type="button">
+            <i class="bi bi-plus-lg"></i> Add Enemy
           </button>
         </div>
       </div>
-      <div class="modal-footer border-secondary">
-        <button id="duplicateEnemyBtn" type="button" class="btn btn-outline-info btn-sm">
-          <i class="bi bi-copy"></i> Duplicate
-        </button>
-        <button type="button" class="btn btn-outline-light btn-sm" data-bs-dismiss="modal">Cancel</button>
-        <button class="btn btn-primary btn-sm" type="submit">Save Enemy</button>
-      </div>
-    </form>
-  </div>
-</div>
 
-<div class="modal fade" id="deleteEnemyModal" tabindex="-1" aria-labelledby="deleteEnemyModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <form id="deleteEnemyForm" class="modal-content bg-dark text-white border-secondary">
-      <div class="modal-header border-secondary">
-        <h5 class="modal-title" id="deleteEnemyModalLabel">Delete Enemy</h5>
-        <button type="button" class="btn-close btn-close-white d-none" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <p class="mb-1">Delete <strong id="deleteEnemyName"></strong>?</p>
-        <div class="small text-secondary">This removes the enemy sheet from this campaign.</div>
-      </div>
-      <div class="modal-footer border-secondary">
-        <span id="deleteEnemyStatus" class="small text-secondary me-auto"></span>
-        <button type="button" class="btn btn-outline-light btn-sm" data-bs-dismiss="modal">Cancel</button>
-        <button id="confirmDeleteEnemyBtn" class="btn btn-danger btn-sm" type="submit">
-          <i class="bi bi-trash"></i> Delete
-        </button>
-      </div>
-    </form>
-  </div>
-</div>
+      <div id="enemyStatus" class="alert d-none py-2" role="alert"></div>
 
-<script src="scripts/navbar.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="scripts/supabase-config.js"></script>
-<script src="scripts/app-supabase.js"></script>
-<script src="scripts/class-data.js"></script>
-<script src="modals/enemy-template-picker.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="scripts/pages/enemies.js"></script>
-</body>
+      <input
+        id="enemySearch"
+        class="form-control form-control-sm mb-3"
+        placeholder="Enemy Name"
+      />
+
+      <section>
+        <div id="enemyList" class="enemy-grid"></div>
+      </section>
+    </main>
+
+    <div class="modal fade" id="enemyModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <form
+          id="enemyForm"
+          class="modal-content bg-dark text-white border-secondary"
+        >
+          <div class="modal-header border-secondary">
+            <h5 id="enemyModalTitle" class="modal-title">Enemy</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white d-none"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <input id="enemyId" type="hidden" />
+            <div class="enemy-modal-section-title mb-3">Create New</div>
+            <div class="row g-2">
+              <div class="col-12">
+                <label for="enemyName" class="form-label">Name</label>
+                <input
+                  id="enemyName"
+                  class="form-control form-control-sm"
+                  required
+                />
+              </div>
+              <div class="col-12">
+                <label for="enemyClass" class="form-label"
+                  >Starting Class</label
+                >
+                <select
+                  id="enemyClass"
+                  class="form-select form-select-sm"
+                ></select>
+              </div>
+            </div>
+            <div
+              id="enemyTemplateHint"
+              class="small text-info mt-2 d-none"
+            ></div>
+            <div id="enemyTemplateSection">
+              <div class="enemy-modal-section-title my-3">Use Template</div>
+              <button
+                id="enemyTemplatesModalBtn"
+                class="btn btn-outline-info btn-sm w-100"
+                type="button"
+              >
+                <i class="bi bi-list-stars"></i> Enemy Templates
+              </button>
+            </div>
+          </div>
+          <div class="modal-footer border-secondary">
+            <button
+              id="duplicateEnemyBtn"
+              type="button"
+              class="btn btn-outline-info btn-sm"
+            >
+              <i class="bi bi-copy"></i> Duplicate
+            </button>
+            <button
+              type="button"
+              class="btn btn-outline-light btn-sm"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
+            <button class="btn btn-primary btn-sm" type="submit">
+              Save Enemy
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div
+      class="modal fade"
+      id="deleteEnemyModal"
+      tabindex="-1"
+      aria-labelledby="deleteEnemyModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <form
+          id="deleteEnemyForm"
+          class="modal-content bg-dark text-white border-secondary"
+        >
+          <div class="modal-header border-secondary">
+            <h5 class="modal-title" id="deleteEnemyModalLabel">Delete Enemy</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white d-none"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <p class="mb-1">Delete <strong id="deleteEnemyName"></strong>?</p>
+            <div class="small text-secondary">
+              This removes the enemy sheet from this campaign.
+            </div>
+          </div>
+          <div class="modal-footer border-secondary">
+            <span
+              id="deleteEnemyStatus"
+              class="small text-secondary me-auto"
+            ></span>
+            <button
+              type="button"
+              class="btn btn-outline-light btn-sm"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
+            <button
+              id="confirmDeleteEnemyBtn"
+              class="btn btn-danger btn-sm"
+              type="submit"
+            >
+              <i class="bi bi-trash"></i> Delete
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script src="scripts/navbar.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="scripts/supabase-config.js"></script>
+    <script src="scripts/app-supabase.js"></script>
+    <script src="scripts/class-data.js"></script>
+    <script src="modals/enemy-template-picker.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="scripts/pages/enemies.js"></script>
+  </body>
 </html>

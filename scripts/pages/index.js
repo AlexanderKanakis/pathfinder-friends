@@ -1,2 +1,1 @@
-    window.location.replace("dice-roller.html");
-
+window.location.replace("dice-roller.html");

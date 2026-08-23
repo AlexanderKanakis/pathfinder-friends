@@ -12,14 +12,18 @@
   }
 
   function modeLabel(mode) {
-    if (mode === "spellbook") return "Known spellbook plus prepared daily slots";
-    if (mode === "spontaneous") return "Spontaneous spells known and casts per day";
+    if (mode === "spellbook")
+      return "Known spellbook plus prepared daily slots";
+    if (mode === "spontaneous")
+      return "Spontaneous spells known and casts per day";
     return "Daily prepared from the class spell list";
   }
 
   function ensureModal() {
     if (document.getElementById(MODAL_ID)) return;
-    document.body.insertAdjacentHTML("beforeend", `
+    document.body.insertAdjacentHTML(
+      "beforeend",
+      `
       <div class="modal fade" id="${MODAL_ID}" tabindex="-1" aria-labelledby="${MODAL_ID}Label" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
           <div class="modal-content bg-dark text-white border-secondary">
@@ -35,7 +39,8 @@
           </div>
         </div>
       </div>
-    `);
+    `,
+    );
   }
 
   function detail(label, value) {
@@ -50,7 +55,8 @@
   window.PFSpellcastingInfo = {
     open(config = {}) {
       ensureModal();
-      document.getElementById(`${MODAL_ID}Label`).textContent = `${config.className || "Class"} Spellcasting`;
+      document.getElementById(`${MODAL_ID}Label`).textContent =
+        `${config.className || "Class"} Spellcasting`;
       document.getElementById("spellcastingInfoBody").innerHTML = `
         ${detail("Class Level", config.level)}
         ${detail("Casting Type", config.castingType)}
@@ -60,8 +66,10 @@
         ${detail("Spell Management", modeLabel(config.mode))}
         ${detail("Maximum Spell Level", config.maxSpellLevel)}
       `;
-      modal = bootstrap.Modal.getOrCreateInstance(document.getElementById(MODAL_ID));
+      modal = bootstrap.Modal.getOrCreateInstance(
+        document.getElementById(MODAL_ID),
+      );
       modal.show();
-    }
+    },
   };
 })();

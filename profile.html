@@ -1,87 +1,141 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>PathFriends Profile</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <head>
+    <meta charset="UTF-8" />
+    <title>PathFriends Profile</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
 
-  <link href="css/profile.css" rel="stylesheet">
-</head>
+    <link href="css/profile.css" rel="stylesheet" />
+  </head>
 
-<body>
-<div id="appNavbar"></div>
+  <body>
+    <div id="appNavbar"></div>
 
-<main class="container mt-3" style="max-width: 720px;">
-  <h3>PathFriends Profile</h3>
-  <div id="profileStatus" class="alert d-none" role="alert"></div>
+    <main class="container mt-3" style="max-width: 720px">
+      <h3>PathFriends Profile</h3>
+      <div id="profileStatus" class="alert d-none" role="alert"></div>
 
-  <form id="profileForm" class="panel vstack gap-3">
-    <div class="d-flex gap-3 align-items-center">
-      <img id="avatarPreview" class="avatar-preview rounded-circle" alt="Avatar preview">
-      <div>
-        <label class="form-label" for="avatarFile">Avatar</label>
-        <input id="avatarFile" class="form-control form-control-sm" type="file" accept="image/png,image/jpeg,image/webp">
-        <div id="avatarHelp" class="small-text mt-1">PNG, JPG, or WebP. Images over 2 MB will be resized before upload.</div>
-      </div>
-    </div>
+      <form id="profileForm" class="panel vstack gap-3">
+        <div class="d-flex gap-3 align-items-center">
+          <img
+            id="avatarPreview"
+            class="avatar-preview rounded-circle"
+            alt="Avatar preview"
+          />
+          <div>
+            <label class="form-label" for="avatarFile">Avatar</label>
+            <input
+              id="avatarFile"
+              class="form-control form-control-sm"
+              type="file"
+              accept="image/png,image/jpeg,image/webp"
+            />
+            <div id="avatarHelp" class="small-text mt-1">
+              PNG, JPG, or WebP. Images over 2 MB will be resized before upload.
+            </div>
+          </div>
+        </div>
 
-    <div>
-      <label class="form-label" for="username">Username</label>
-      <input id="username" class="form-control" type="text" maxlength="32" autocomplete="nickname" required>
-    </div>
+        <div>
+          <label class="form-label" for="username">Username</label>
+          <input
+            id="username"
+            class="form-control"
+            type="text"
+            maxlength="32"
+            autocomplete="nickname"
+            required
+          />
+        </div>
 
-    <div>
-      <label class="form-label" for="email">Email</label>
-      <input id="email" class="form-control" type="email" disabled>
-    </div>
+        <div>
+          <label class="form-label" for="email">Email</label>
+          <input id="email" class="form-control" type="email" disabled />
+        </div>
 
-    <div class="d-flex gap-2">
-      <button id="saveBtn" class="btn btn-primary" type="submit">Save Profile</button>
-      <button class="btn btn-outline-light" type="button" onclick="PFApp.signOut()">Logout</button>
-    </div>
-  </form>
+        <div class="d-flex gap-2">
+          <button id="saveBtn" class="btn btn-primary" type="submit">
+            Save Profile
+          </button>
+          <button
+            class="btn btn-outline-light"
+            type="button"
+            onclick="PFApp.signOut()"
+          >
+            Logout
+          </button>
+        </div>
+      </form>
 
-  <form id="passwordForm" class="panel vstack gap-3 mt-3">
-    <div>
-      <h5 class="mb-1">Password</h5>
-      <div class="small-text">Set a new password for this account.</div>
-    </div>
+      <form id="passwordForm" class="panel vstack gap-3 mt-3">
+        <div>
+          <h5 class="mb-1">Password</h5>
+          <div class="small-text">Set a new password for this account.</div>
+        </div>
 
-    <div>
-      <label class="form-label" for="newPassword">New Password</label>
-      <input id="newPassword" class="form-control" type="password" autocomplete="new-password" minlength="6" required>
-    </div>
+        <div>
+          <label class="form-label" for="newPassword">New Password</label>
+          <input
+            id="newPassword"
+            class="form-control"
+            type="password"
+            autocomplete="new-password"
+            minlength="6"
+            required
+          />
+        </div>
 
-    <div>
-      <label class="form-label" for="confirmPassword">Confirm Password</label>
-      <input id="confirmPassword" class="form-control" type="password" autocomplete="new-password" minlength="6" required>
-    </div>
+        <div>
+          <label class="form-label" for="confirmPassword"
+            >Confirm Password</label
+          >
+          <input
+            id="confirmPassword"
+            class="form-control"
+            type="password"
+            autocomplete="new-password"
+            minlength="6"
+            required
+          />
+        </div>
 
-    <div>
-      <button id="passwordBtn" class="btn btn-outline-info" type="submit">Update Password</button>
-    </div>
-  </form>
+        <div>
+          <button id="passwordBtn" class="btn btn-outline-info" type="submit">
+            Update Password
+          </button>
+        </div>
+      </form>
 
-  <section id="adminSettingsPanel" class="panel vstack gap-2 mt-3 d-none">
-    <div>
-      <h5 class="mb-1">Admin</h5>
-      <div class="small-text">Create users, reset passwords, and maintain local static data.</div>
-    </div>
-    <div class="d-flex gap-2 flex-wrap">
-      <a class="btn btn-outline-info" href="admin.html">Open Admin Panel</a>
-      <a class="btn btn-outline-warning" href="class-editor.html">Edit Classes</a>
-    </div>
-  </section>
-</main>
+      <section id="adminSettingsPanel" class="panel vstack gap-2 mt-3 d-none">
+        <div>
+          <h5 class="mb-1">Admin</h5>
+          <div class="small-text">
+            Create users, reset passwords, and maintain local static data.
+          </div>
+        </div>
+        <div class="d-flex gap-2 flex-wrap">
+          <a class="btn btn-outline-info" href="admin.html">Open Admin Panel</a>
+          <a class="btn btn-outline-warning" href="class-editor.html"
+            >Edit Classes</a
+          >
+        </div>
+      </section>
+    </main>
 
-<script src="scripts/navbar.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="scripts/supabase-config.js"></script>
-<script src="scripts/app-supabase.js"></script>
-<script src="scripts/pages/profile.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+    <script src="scripts/navbar.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="scripts/supabase-config.js"></script>
+    <script src="scripts/app-supabase.js"></script>
+    <script src="scripts/pages/profile.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
 </html>

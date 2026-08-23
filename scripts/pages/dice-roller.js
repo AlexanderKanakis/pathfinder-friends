@@ -115,15 +115,19 @@ function duplicateRow(btn) {
 }
 
 function collectDiceState() {
-  const attacks = [...document.querySelectorAll("#attackContainer .dice-row")].map(row => ({
+  const attacks = [
+    ...document.querySelectorAll("#attackContainer .dice-row"),
+  ].map((row) => ({
     modifier: row.querySelector(".attack-mod").value,
-    crit: row.querySelector(".attack-crit").value
+    crit: row.querySelector(".attack-crit").value,
   }));
 
-  const damages = [...document.querySelectorAll("#damageContainer .dice-row")].map(row => ({
+  const damages = [
+    ...document.querySelectorAll("#damageContainer .dice-row"),
+  ].map((row) => ({
     count: row.querySelector(".dmg-count").value,
     die: row.querySelector(".dmg-type").value,
-    modifier: row.querySelector(".dmg-mod").value
+    modifier: row.querySelector(".dmg-mod").value,
   }));
 
   return { attacks, damages };
@@ -133,14 +137,14 @@ function restoreDiceState(state) {
   document.getElementById("attackContainer").innerHTML = "";
   document.getElementById("damageContainer").innerHTML = "";
 
-  (state.attacks || []).forEach(attack => {
+  (state.attacks || []).forEach((attack) => {
     addAttack(false);
     const row = document.querySelector("#attackContainer .dice-row:last-child");
     row.querySelector(".attack-mod").value = attack.modifier ?? 0;
     row.querySelector(".attack-crit").value = attack.crit ?? 20;
   });
 
-  (state.damages || []).forEach(damage => {
+  (state.damages || []).forEach((damage) => {
     addDamage(false);
     const row = document.querySelector("#damageContainer .dice-row:last-child");
     row.querySelector(".dmg-count").value = damage.count ?? 1;
@@ -178,12 +182,22 @@ async function initDiceRoller() {
 
   diceContextKey = PFApp.getSelectedContextKey();
   await loadDiceContext(diceContextKey);
-  window.addEventListener("pf-context-change", event => loadDiceContext(event.detail.contextKey));
+  window.addEventListener("pf-context-change", (event) =>
+    loadDiceContext(event.detail.contextKey),
+  );
 
-  document.getElementById("attackContainer").addEventListener("input", queueDiceSave);
-  document.getElementById("attackContainer").addEventListener("change", queueDiceSave);
-  document.getElementById("damageContainer").addEventListener("input", queueDiceSave);
-  document.getElementById("damageContainer").addEventListener("change", queueDiceSave);
+  document
+    .getElementById("attackContainer")
+    .addEventListener("input", queueDiceSave);
+  document
+    .getElementById("attackContainer")
+    .addEventListener("change", queueDiceSave);
+  document
+    .getElementById("damageContainer")
+    .addEventListener("input", queueDiceSave);
+  document
+    .getElementById("damageContainer")
+    .addEventListener("change", queueDiceSave);
 }
 
 function isCrit(range, value) {
@@ -233,7 +247,9 @@ function rollSingle(btn) {
     result = rollAttack(row);
     row.querySelector(".result-text").innerHTML =
       `d20 [${result.roll}] + ${result.mod} = ` +
-      (result.crit ? `<span class="crit">${result.total} CRIT</span>` : result.total);
+      (result.crit
+        ? `<span class="crit">${result.total} CRIT</span>`
+        : result.total);
   } else {
     result = rollDamage(row);
     row.querySelector(".result-text").innerHTML =
@@ -248,7 +264,7 @@ function rollAll() {
   results.innerHTML = "";
   let total = 0;
 
-  rows.forEach(row => {
+  rows.forEach((row) => {
     let text = "";
 
     if (row.closest("#attackContainer")) {
@@ -262,8 +278,7 @@ function rollAll() {
       const r = rollDamage(row);
       total += r.total;
 
-      text =
-        `DAMAGE: ${r.count}d${r.type} [${r.rolls.join(", ")}] + ${r.mod} = ${r.total}`;
+      text = `DAMAGE: ${r.count}d${r.type} [${r.rolls.join(", ")}] + ${r.mod} = ${r.total}`;
     }
 
     const div = document.createElement("div");
@@ -275,4 +290,3 @@ function rollAll() {
 }
 
 initDiceRoller();
-

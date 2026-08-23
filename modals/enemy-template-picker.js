@@ -63,9 +63,12 @@
   async function loadMonsters() {
     if (monsters.length) return monsters;
     const response = await fetch("./data/monsters.json", { cache: "no-cache" });
-    if (!response.ok) throw new Error(`Could not load monster templates (${response.status}).`);
+    if (!response.ok)
+      throw new Error(`Could not load monster templates (${response.status}).`);
     const data = await response.json();
-    monsters = Array.isArray(data) ? data.filter(monster => String(monster?.name || "").trim()) : [];
+    monsters = Array.isArray(data)
+      ? data.filter((monster) => String(monster?.name || "").trim())
+      : [];
     return monsters;
   }
 
@@ -91,7 +94,13 @@
   function applyFilters() {
     const term = state.search.trim().toLowerCase();
     filtered = monsters
-      .filter(monster => !term || String(monster.name || "").toLowerCase().includes(term))
+      .filter(
+        (monster) =>
+          !term ||
+          String(monster.name || "")
+            .toLowerCase()
+            .includes(term),
+      )
       .sort(sortRows);
   }
 
@@ -102,20 +111,26 @@
 
   function render() {
     applyFilters();
-    document.querySelectorAll("[data-template-sort-icon]").forEach(node => {
+    document.querySelectorAll("[data-template-sort-icon]").forEach((node) => {
       node.textContent = sortIcon(node.dataset.templateSortIcon);
     });
     document.getElementById("enemyTemplateRows").innerHTML = filtered.length
-      ? filtered.map((monster, index) => `
+      ? filtered
+          .map(
+            (monster, index) => `
         <tr data-template-index="${index}">
           <td class="fw-semibold">${escapeHtml(monster.name || "Unnamed")}</td>
           <td class="text-nowrap">${escapeHtml(monster.cr || "-")}</td>
           <td class="text-secondary text-end enemy-template-type">${escapeHtml([monster.size, monster.creatureType].filter(Boolean).join(" ") || "-")}</td>
         </tr>
-      `).join("")
+      `,
+          )
+          .join("")
       : `<tr><td colspan="3" class="text-secondary">No templates found.</td></tr>`;
-    document.querySelectorAll("[data-template-index]").forEach(row => {
-      row.addEventListener("click", () => chooseTemplate(Number(row.dataset.templateIndex)));
+    document.querySelectorAll("[data-template-index]").forEach((row) => {
+      row.addEventListener("click", () =>
+        chooseTemplate(Number(row.dataset.templateIndex)),
+      );
     });
   }
 
@@ -129,13 +144,16 @@
   async function open(nextConfig = {}) {
     config = nextConfig;
     ensureModal();
-    modal = bootstrap.Modal.getOrCreateInstance(document.getElementById(MODAL_ID));
+    modal = bootstrap.Modal.getOrCreateInstance(
+      document.getElementById(MODAL_ID),
+    );
     const search = document.getElementById("enemyTemplateSearch");
     search.value = "";
     state.search = "";
     state.sortKey = "name";
     state.sortDir = "asc";
-    document.getElementById("enemyTemplateRows").innerHTML = `<tr><td colspan="3" class="text-secondary">Loading templates...</td></tr>`;
+    document.getElementById("enemyTemplateRows").innerHTML =
+      `<tr><td colspan="3" class="text-secondary">Loading templates...</td></tr>`;
     modal.show();
     try {
       await loadMonsters();
@@ -143,21 +161,23 @@
       setTimeout(() => search.focus(), 150);
     } catch (error) {
       console.warn(error);
-      document.getElementById("enemyTemplateRows").innerHTML = `<tr><td colspan="3" class="text-danger">${escapeHtml(error.message || "Could not load templates.")}</td></tr>`;
+      document.getElementById("enemyTemplateRows").innerHTML =
+        `<tr><td colspan="3" class="text-danger">${escapeHtml(error.message || "Could not load templates.")}</td></tr>`;
     }
   }
 
-  document.addEventListener("input", event => {
+  document.addEventListener("input", (event) => {
     if (event.target?.id !== "enemyTemplateSearch") return;
     state.search = event.target.value;
     render();
   });
 
-  document.addEventListener("click", event => {
+  document.addEventListener("click", (event) => {
     const button = event.target.closest("[data-template-sort]");
     if (!button) return;
     const key = button.dataset.templateSort;
-    if (state.sortKey === key) state.sortDir = state.sortDir === "asc" ? "desc" : "asc";
+    if (state.sortKey === key)
+      state.sortDir = state.sortDir === "asc" ? "desc" : "asc";
     else {
       state.sortKey = key;
       state.sortDir = "asc";

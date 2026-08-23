@@ -1,255 +1,705 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>PathFriends Bag of Holding</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-  <link href="css/bag-of-holding.css" rel="stylesheet">
-</head>
-<body>
-<div id="appNavbar"></div>
+  <head>
+    <meta charset="UTF-8" />
+    <title>PathFriends Bag of Holding</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+    <link href="css/bag-of-holding.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div id="appNavbar"></div>
 
-<main class="container-fluid mt-3">
-  <div class="bag-header mb-3">
-    <div>
-      <h3 class="mb-0">Bag of Holding</h3>
-      <div class="bag-subtitle">Campaign's Inventory</div>
-      <div id="contextHint" class="small text-secondary"></div>
-    </div>
-    <div class="bag-search">
-      <label for="lootSearch">Search</label>
-      <input id="lootSearch" class="form-control form-control-sm" placeholder="Name or description">
-    </div>
-    <div class="bag-action">
-      <div class="d-flex flex-wrap justify-content-end gap-2">
-        <button id="openSourceItems" class="btn btn-outline-info btn-sm" type="button">
-          <i class="bi bi-search"></i> Item List
-        </button>
-        <button class="btn btn-primary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#lootModal">
-          <i class="bi bi-plus-lg"></i> Add Item
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <div class="bag-view-tabs mt-3" role="tablist" aria-label="Bag view">
-    <button id="bagFullViewBtn" class="bag-view-tab active" type="button" role="tab" aria-selected="true" onclick="setBagView('full')">Full</button>
-    <button id="bagSimplifiedViewBtn" class="bag-view-tab" type="button" role="tab" aria-selected="false" onclick="setBagView('simplified')">Simplified</button>
-  </div>
-
-  <div id="lootStatus" class="alert d-none py-2"></div>
-
-  <section class="loot-section">
-    <div id="lootGrid" class="loot-grid"></div>
-  </section>
-</main>
-
-<div class="modal fade" id="lootModal" tabindex="-1" aria-labelledby="lootModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-    <form class="modal-content" id="lootForm">
-      <div class="modal-header">
-        <h5 class="modal-title" id="lootModalLabel">Add Item</h5>
-        <button type="button" class="btn-close d-none" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div class="mb-2">
-          <label for="lootName">Name</label>
-          <input id="lootName" class="form-control form-control-sm" required>
-        </div>
-        <div class="mb-2">
-          <label for="lootDescription">Description</label>
-          <textarea id="lootDescription" class="form-control form-control-sm"></textarea>
-        </div>
-        <div class="row g-2">
-          <div class="col-6">
-            <label for="lootCount">Count</label>
-            <input id="lootCount" class="form-control form-control-sm" type="number" min="1" value="1" required>
-          </div>
-          <div class="col-6">
-            <label for="lootType">Type</label>
-            <select id="lootType" class="form-select form-select-sm">
-              <option>Weapon</option>
-              <option>Armor</option>
-              <option>Shield</option>
-              <option selected>Item</option>
-            </select>
-          </div>
-        </div>
-        <div id="lootSlotField" class="slot-field mt-2">
-          <label for="lootSlotInput">Slot</label>
-          <div class="d-flex align-items-center gap-2">
-            <select id="lootSlotInput" class="form-select form-select-sm"></select>
-            <span id="lootSlotValue" class="slot-value"></span>
-          </div>
-        </div>
-        <div class="form-check form-switch mt-2">
-          <input id="lootWondrousItem" class="form-check-input" type="checkbox" role="switch">
-          <label class="form-check-label" for="lootWondrousItem">Wondrous Item</label>
-        </div>
-        <div id="lootSpecialMaterialField" class="mt-2 d-none">
-          <label for="lootSpecialMaterial">Special Material</label>
-          <select id="lootSpecialMaterial" class="form-select form-select-sm"></select>
-        </div>
-        <div id="lootWeaponFields" class="loot-detail-grid mt-2 d-none">
-          <div>
-            <label for="lootWeaponType">Weapon Type</label>
-            <select id="lootWeaponType" class="form-select form-select-sm"></select>
-          </div>
-          <div>
-            <label>Attack Scales With</label>
-            <input id="lootAttackScale" type="hidden" value="STR">
-            <div class="scale-options" id="lootAttackScaleOptions">
-              <button class="btn btn-primary btn-sm" type="button" data-attack-scale-ability="STR">STR</button>
-              <button class="btn btn-outline-light btn-sm" type="button" data-attack-scale-ability="DEX">DEX</button>
-              <button class="btn btn-outline-light btn-sm" type="button" data-attack-scale-ability="CON">CON</button>
-              <button class="btn btn-outline-light btn-sm" type="button" data-attack-scale-ability="INT">INT</button>
-              <button class="btn btn-outline-light btn-sm" type="button" data-attack-scale-ability="WIS">WIS</button>
-              <button class="btn btn-outline-light btn-sm" type="button" data-attack-scale-ability="CHA">CHA</button>
-            </div>
-          </div>
-          <div><label for="lootDamageDice">Damage Dice</label><input id="lootDamageDice" class="form-control form-control-sm" placeholder="1d8"></div>
-          <div><label for="lootWeaponCritical">Critical</label><input id="lootWeaponCritical" class="form-control form-control-sm" placeholder="20/x2"></div>
-          <div class="loot-firearm-field d-none"><label for="lootWeaponCapacity">Capacity</label><input id="lootWeaponCapacity" class="form-control form-control-sm" placeholder="1"></div>
-          <div class="loot-firearm-field d-none"><label for="lootWeaponMisfire">Misfire</label><input id="lootWeaponMisfire" class="form-control form-control-sm" placeholder="1 (5 ft.)"></div>
-          <div>
-            <label>Damage Scales With</label>
-            <input id="lootDamageScale" type="hidden" value="STR">
-            <div class="scale-options" id="lootDamageScaleOptions">
-              <button class="btn btn-primary btn-sm" type="button" data-scale-ability="STR">STR</button>
-              <button class="btn btn-outline-light btn-sm" type="button" data-scale-ability="DEX">DEX</button>
-              <button class="btn btn-outline-light btn-sm" type="button" data-scale-ability="CON">CON</button>
-              <button class="btn btn-outline-light btn-sm" type="button" data-scale-ability="INT">INT</button>
-              <button class="btn btn-outline-light btn-sm" type="button" data-scale-ability="WIS">WIS</button>
-              <button class="btn btn-outline-light btn-sm" type="button" data-scale-ability="CHA">CHA</button>
-            </div>
-          </div>
-          <div><label for="lootWeaponEnhancement">Enhancement</label><input id="lootWeaponEnhancement" class="form-control form-control-sm" type="number" min="0" max="5" value="0"></div>
-          <div>
-            <label for="lootWeaponEnchantment">Enchantment</label>
-            <select id="lootWeaponEnchantment" class="form-select form-select-sm"></select>
-          </div>
-          <div class="grid-column-full"><label for="lootWeaponDetails">Details</label><input id="lootWeaponDetails" class="form-control form-control-sm"></div>
-        </div>
-        <div id="lootArmorFields" class="loot-detail-grid mt-2 d-none">
-          <div><label for="lootArmorBonus">Bonus</label><input id="lootArmorBonus" class="form-control form-control-sm" type="number" value="0"></div>
-          <div><label for="lootArmorEnhancement">Enhancement</label><input id="lootArmorEnhancement" class="form-control form-control-sm" type="number" min="0" max="5" value="0"></div>
-          <div>
-            <label for="lootArmorEnchantment">Enchantment</label>
-            <select id="lootArmorEnchantment" class="form-select form-select-sm"></select>
-          </div>
-        </div>
-        <div class="mt-3">
-          <div class="d-flex justify-content-between align-items-center mb-2">
-            <div class="small text-secondary">Item Effects</div>
-            <button id="addLootEffect" class="btn btn-outline-info btn-sm" type="button">Create Effect</button>
-          </div>
-          <div id="lootEffectRows" class="vstack gap-2"></div>
-        </div>
-        <div class="mt-2">
-          <label for="lootAssignedTo">Give to</label>
-          <select id="lootAssignedTo" class="form-select form-select-sm"></select>
-          <div class="form-text">Leave empty to keep it unassigned.</div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-outline-light btn-sm" data-bs-dismiss="modal">Cancel</button>
-        <button id="lootSubmitButton" type="submit" class="btn btn-primary btn-sm">Add Item</button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<div class="modal fade" id="moveLootModal" tabindex="-1" aria-labelledby="moveLootModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <form class="modal-content" id="moveLootForm">
-      <div class="modal-header">
-        <h5 class="modal-title" id="moveLootModalLabel">Move Item</h5>
-        <button type="button" class="btn-close d-none" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div id="moveLootSummary" class="small text-secondary mb-2"></div>
-        <label for="moveLootCount">How many?</label>
-        <input id="moveLootCount" class="form-control form-control-sm" type="number" min="1" value="1" required>
-        <div id="moveLootMax" class="form-text"></div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-outline-light btn-sm" data-bs-dismiss="modal">Cancel</button>
-        <button type="submit" class="btn btn-primary btn-sm">Move</button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<div class="modal fade" id="deleteLootModal" tabindex="-1" aria-labelledby="deleteLootModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <form class="modal-content" id="deleteLootForm">
-      <div class="modal-header">
-        <h5 class="modal-title" id="deleteLootModalLabel">Delete Item</h5>
-        <button type="button" class="btn-close d-none" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div id="deleteLootSummary" class="small text-secondary mb-2"></div>
-        <label for="deleteLootCount">How many?</label>
-        <input id="deleteLootCount" class="form-control form-control-sm" type="number" min="1" value="1" required>
-        <div id="deleteLootMax" class="form-text"></div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-outline-light btn-sm" data-bs-dismiss="modal">Cancel</button>
-        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<div class="modal fade" id="sourceItemsModal" tabindex="-1" aria-labelledby="sourceItemsModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable search-modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
+    <main class="container-fluid mt-3">
+      <div class="bag-header mb-3">
         <div>
-          <h5 class="modal-title" id="sourceItemsModalLabel">Item List</h5>
-          <div id="sourceItemCount" class="small text-secondary"></div>
+          <h3 class="mb-0">Bag of Holding</h3>
+          <div class="bag-subtitle">Campaign's Inventory</div>
+          <div id="contextHint" class="small text-secondary"></div>
         </div>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="bag-search">
+          <label for="lootSearch">Search</label>
+          <input
+            id="lootSearch"
+            class="form-control form-control-sm"
+            placeholder="Name or description"
+          />
+        </div>
+        <div class="bag-action">
+          <div class="d-flex flex-wrap justify-content-end gap-2">
+            <button
+              id="openSourceItems"
+              class="btn btn-outline-info btn-sm"
+              type="button"
+            >
+              <i class="bi bi-search"></i> Item List
+            </button>
+            <button
+              class="btn btn-primary btn-sm"
+              type="button"
+              data-bs-toggle="modal"
+              data-bs-target="#lootModal"
+            >
+              <i class="bi bi-plus-lg"></i> Add Item
+            </button>
+          </div>
+        </div>
       </div>
-      <div class="modal-body">
-        <input id="sourceItemSearch" class="form-control form-control-sm mb-3" placeholder="Search weapons, armor, shields, wondrous, and alchemical items">
-        <ul class="source-list-tablist mb-3" id="sourceItemTabs" role="tablist">
-          <li class="source-list-tab-item" role="presentation">
-            <button class="source-list-tab active" type="button" data-source-category="all">All</button>
-          </li>
-          <li class="source-list-tab-item" role="presentation">
-            <button class="source-list-tab" type="button" data-source-category="weapons">Weapons</button>
-          </li>
-          <li class="source-list-tab-item" role="presentation">
-            <button class="source-list-tab" type="button" data-source-category="armor">Armor</button>
-          </li>
-          <li class="source-list-tab-item" role="presentation">
-            <button class="source-list-tab" type="button" data-source-category="shields">Shields</button>
-          </li>
-          <li class="source-list-tab-item" role="presentation">
-            <button class="source-list-tab" type="button" data-source-category="mundane">Mundane Items</button>
-          </li>
-          <li class="source-list-tab-item" role="presentation">
-            <button class="source-list-tab" type="button" data-source-category="wondrous">Wondrous Items</button>
-          </li>
-        </ul>
-        <ul class="source-list-tablist source-list-subtabs mb-3 d-none" id="sourceMundaneTabs" role="tablist"></ul>
-        <div id="sourceItemResults" class="source-results-panel search-modal-results"></div>
+
+      <div class="bag-view-tabs mt-3" role="tablist" aria-label="Bag view">
+        <button
+          id="bagFullViewBtn"
+          class="bag-view-tab active"
+          type="button"
+          role="tab"
+          aria-selected="true"
+          onclick="setBagView('full')"
+        >
+          Full
+        </button>
+        <button
+          id="bagSimplifiedViewBtn"
+          class="bag-view-tab"
+          type="button"
+          role="tab"
+          aria-selected="false"
+          onclick="setBagView('simplified')"
+        >
+          Simplified
+        </button>
+      </div>
+
+      <div id="lootStatus" class="alert d-none py-2"></div>
+
+      <section class="loot-section">
+        <div id="lootGrid" class="loot-grid"></div>
+      </section>
+    </main>
+
+    <div
+      class="modal fade"
+      id="lootModal"
+      tabindex="-1"
+      aria-labelledby="lootModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <form class="modal-content" id="lootForm">
+          <div class="modal-header">
+            <h5 class="modal-title" id="lootModalLabel">Add Item</h5>
+            <button
+              type="button"
+              class="btn-close d-none"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-2">
+              <label for="lootName">Name</label>
+              <input
+                id="lootName"
+                class="form-control form-control-sm"
+                required
+              />
+            </div>
+            <div class="mb-2">
+              <label for="lootCount">Count</label>
+              <div class="item-number-stepper" data-item-stepper>
+                <button
+                  class="btn btn-outline-light btn-sm item-stepper-btn"
+                  type="button"
+                  data-item-stepper-delta="-1"
+                  aria-label="Decrease count"
+                >
+                  -
+                </button>
+                <input
+                  id="lootCount"
+                  class="form-control form-control-sm no-spinner"
+                  type="number"
+                  min="1"
+                  value="1"
+                  inputmode="numeric"
+                  required
+                />
+                <button
+                  class="btn btn-outline-light btn-sm item-stepper-btn"
+                  type="button"
+                  data-item-stepper-delta="1"
+                  aria-label="Increase count"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+            <div class="row g-2">
+              <div class="col-12">
+                <label for="lootType">Type</label>
+                <select id="lootType" class="form-select form-select-sm">
+                  <option>Weapon</option>
+                  <option>Armor</option>
+                  <option>Shield</option>
+                  <option selected>Item</option>
+                </select>
+              </div>
+            </div>
+            <div id="lootSlotField" class="slot-field mt-2">
+              <label for="lootSlotInput">Slot</label>
+              <div class="d-flex align-items-center gap-2">
+                <select
+                  id="lootSlotInput"
+                  class="form-select form-select-sm"
+                ></select>
+                <span id="lootSlotValue" class="slot-value"></span>
+              </div>
+            </div>
+            <div class="form-check form-switch mt-2">
+              <input
+                id="lootWondrousItem"
+                class="form-check-input"
+                type="checkbox"
+                role="switch"
+              />
+              <label class="form-check-label" for="lootWondrousItem"
+                >Wondrous Item</label
+              >
+            </div>
+            <div id="lootSpecialMaterialField" class="mt-2 d-none">
+              <label for="lootSpecialMaterial">Special Material</label>
+              <select
+                id="lootSpecialMaterial"
+                class="form-select form-select-sm"
+              ></select>
+            </div>
+            <div id="lootWeaponFields" class="loot-detail-grid mt-2 d-none">
+              <div>
+                <label for="lootWeaponType">Weapon Type</label>
+                <select
+                  id="lootWeaponType"
+                  class="form-select form-select-sm"
+                ></select>
+              </div>
+              <div>
+                <label>Attack Scales With</label>
+                <input id="lootAttackScale" type="hidden" value="STR" />
+                <div class="scale-options" id="lootAttackScaleOptions">
+                  <button
+                    class="btn btn-primary btn-sm"
+                    type="button"
+                    data-attack-scale-ability="STR"
+                  >
+                    STR
+                  </button>
+                  <button
+                    class="btn btn-outline-light btn-sm"
+                    type="button"
+                    data-attack-scale-ability="DEX"
+                  >
+                    DEX
+                  </button>
+                  <button
+                    class="btn btn-outline-light btn-sm"
+                    type="button"
+                    data-attack-scale-ability="CON"
+                  >
+                    CON
+                  </button>
+                  <button
+                    class="btn btn-outline-light btn-sm"
+                    type="button"
+                    data-attack-scale-ability="INT"
+                  >
+                    INT
+                  </button>
+                  <button
+                    class="btn btn-outline-light btn-sm"
+                    type="button"
+                    data-attack-scale-ability="WIS"
+                  >
+                    WIS
+                  </button>
+                  <button
+                    class="btn btn-outline-light btn-sm"
+                    type="button"
+                    data-attack-scale-ability="CHA"
+                  >
+                    CHA
+                  </button>
+                </div>
+              </div>
+              <div>
+                <label for="lootDamageDice">Damage Dice</label
+                ><input
+                  id="lootDamageDice"
+                  class="form-control form-control-sm"
+                  placeholder="1d8"
+                />
+              </div>
+              <div>
+                <label for="lootWeaponCritical">Critical</label
+                ><input
+                  id="lootWeaponCritical"
+                  class="form-control form-control-sm"
+                  placeholder="20/x2"
+                />
+              </div>
+              <div class="loot-firearm-field d-none">
+                <label for="lootWeaponCapacity">Capacity</label>
+                <div class="item-number-stepper" data-item-stepper>
+                  <button
+                    class="btn btn-outline-light btn-sm item-stepper-btn"
+                    type="button"
+                    data-item-stepper-delta="-1"
+                    aria-label="Decrease weapon capacity"
+                  >
+                    -
+                  </button>
+                  <input
+                    id="lootWeaponCapacity"
+                    class="form-control form-control-sm no-spinner"
+                    type="number"
+                    min="0"
+                    value="0"
+                    inputmode="numeric"
+                  />
+                  <button
+                    class="btn btn-outline-light btn-sm item-stepper-btn"
+                    type="button"
+                    data-item-stepper-delta="1"
+                    aria-label="Increase weapon capacity"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+              <div class="loot-firearm-field d-none">
+                <label for="lootWeaponMisfire">Misfire</label
+                ><input
+                  id="lootWeaponMisfire"
+                  class="form-control form-control-sm"
+                  placeholder="1 (5 ft.)"
+                />
+              </div>
+              <div>
+                <label>Damage Scales With</label>
+                <input id="lootDamageScale" type="hidden" value="STR" />
+                <div class="scale-options" id="lootDamageScaleOptions">
+                  <button
+                    class="btn btn-primary btn-sm"
+                    type="button"
+                    data-scale-ability="STR"
+                  >
+                    STR
+                  </button>
+                  <button
+                    class="btn btn-outline-light btn-sm"
+                    type="button"
+                    data-scale-ability="DEX"
+                  >
+                    DEX
+                  </button>
+                  <button
+                    class="btn btn-outline-light btn-sm"
+                    type="button"
+                    data-scale-ability="CON"
+                  >
+                    CON
+                  </button>
+                  <button
+                    class="btn btn-outline-light btn-sm"
+                    type="button"
+                    data-scale-ability="INT"
+                  >
+                    INT
+                  </button>
+                  <button
+                    class="btn btn-outline-light btn-sm"
+                    type="button"
+                    data-scale-ability="WIS"
+                  >
+                    WIS
+                  </button>
+                  <button
+                    class="btn btn-outline-light btn-sm"
+                    type="button"
+                    data-scale-ability="CHA"
+                  >
+                    CHA
+                  </button>
+                </div>
+              </div>
+              <div>
+                <label for="lootWeaponEnhancement">Enhancement</label>
+                <div class="item-number-stepper" data-item-stepper>
+                  <button
+                    class="btn btn-outline-light btn-sm item-stepper-btn"
+                    type="button"
+                    data-item-stepper-delta="-1"
+                    aria-label="Decrease weapon enhancement"
+                  >
+                    -
+                  </button>
+                  <input
+                    id="lootWeaponEnhancement"
+                    class="form-control form-control-sm no-spinner"
+                    type="number"
+                    min="0"
+                    max="5"
+                    value="0"
+                    inputmode="numeric"
+                  />
+                  <button
+                    class="btn btn-outline-light btn-sm item-stepper-btn"
+                    type="button"
+                    data-item-stepper-delta="1"
+                    aria-label="Increase weapon enhancement"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+              <div>
+                <label for="lootWeaponEnchantment">Enchantment</label>
+                <select
+                  id="lootWeaponEnchantment"
+                  class="form-select form-select-sm"
+                ></select>
+              </div>
+              <div class="grid-column-full">
+                <label for="lootWeaponDetails">Details</label
+                ><input
+                  id="lootWeaponDetails"
+                  class="form-control form-control-sm"
+                />
+              </div>
+            </div>
+            <div id="lootArmorFields" class="loot-detail-grid mt-2 d-none">
+              <div>
+                <label for="lootArmorBonus">Bonus</label>
+                <div class="item-number-stepper" data-item-stepper>
+                  <button
+                    class="btn btn-outline-light btn-sm item-stepper-btn"
+                    type="button"
+                    data-item-stepper-delta="-1"
+                    aria-label="Decrease armor bonus"
+                  >
+                    -
+                  </button>
+                  <input
+                    id="lootArmorBonus"
+                    class="form-control form-control-sm no-spinner"
+                    type="number"
+                    value="0"
+                    inputmode="numeric"
+                  />
+                  <button
+                    class="btn btn-outline-light btn-sm item-stepper-btn"
+                    type="button"
+                    data-item-stepper-delta="1"
+                    aria-label="Increase armor bonus"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+              <div>
+                <label for="lootArmorEnhancement">Enhancement</label>
+                <div class="item-number-stepper" data-item-stepper>
+                  <button
+                    class="btn btn-outline-light btn-sm item-stepper-btn"
+                    type="button"
+                    data-item-stepper-delta="-1"
+                    aria-label="Decrease armor enhancement"
+                  >
+                    -
+                  </button>
+                  <input
+                    id="lootArmorEnhancement"
+                    class="form-control form-control-sm no-spinner"
+                    type="number"
+                    min="0"
+                    max="5"
+                    value="0"
+                    inputmode="numeric"
+                  />
+                  <button
+                    class="btn btn-outline-light btn-sm item-stepper-btn"
+                    type="button"
+                    data-item-stepper-delta="1"
+                    aria-label="Increase armor enhancement"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+              <div>
+                <label for="lootArmorEnchantment">Enchantment</label>
+                <select
+                  id="lootArmorEnchantment"
+                  class="form-select form-select-sm"
+                ></select>
+              </div>
+            </div>
+            <div class="mt-3">
+              <div
+                class="d-flex justify-content-between align-items-center mb-2"
+              >
+                <div class="small text-secondary">Item Effects</div>
+                <button
+                  id="addLootEffect"
+                  class="btn btn-outline-info btn-sm"
+                  type="button"
+                >
+                  Create Effect
+                </button>
+              </div>
+              <div id="lootEffectRows" class="vstack gap-2"></div>
+            </div>
+            <div class="mt-2">
+              <label for="lootDescription">Description</label>
+              <textarea
+                id="lootDescription"
+                class="form-control form-control-sm"
+              ></textarea>
+            </div>
+            <div class="mt-2">
+              <label for="lootAssignedTo">Give to</label>
+              <select
+                id="lootAssignedTo"
+                class="form-select form-select-sm"
+              ></select>
+              <div class="form-text">Leave empty to keep it unassigned.</div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-outline-light btn-sm"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
+            <button
+              id="lootSubmitButton"
+              type="submit"
+              class="btn btn-primary btn-sm"
+            >
+              Add Item
+            </button>
+          </div>
+        </form>
       </div>
     </div>
-  </div>
-</div>
 
-<script src="scripts/navbar.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="scripts/supabase-config.js"></script>
-<script src="scripts/app-supabase.js"></script>
-<script src="data/wondrous.js?v=wondrous-refresh-1"></script>
-<script src="scripts/scripts.js"></script>
-<script src="modals/item-editor.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="scripts/pages/bag-of-holding.js"></script>
-</body>
+    <div
+      class="modal fade"
+      id="moveLootModal"
+      tabindex="-1"
+      aria-labelledby="moveLootModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <form class="modal-content" id="moveLootForm">
+          <div class="modal-header">
+            <h5 class="modal-title" id="moveLootModalLabel">Move Item</h5>
+            <button
+              type="button"
+              class="btn-close d-none"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div id="moveLootSummary" class="small text-secondary mb-2"></div>
+            <label for="moveLootCount">How many?</label>
+            <input
+              id="moveLootCount"
+              class="form-control form-control-sm"
+              type="number"
+              min="1"
+              value="1"
+              required
+            />
+            <div id="moveLootMax" class="form-text"></div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-outline-light btn-sm"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary btn-sm">Move</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div
+      class="modal fade"
+      id="deleteLootModal"
+      tabindex="-1"
+      aria-labelledby="deleteLootModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <form class="modal-content" id="deleteLootForm">
+          <div class="modal-header">
+            <h5 class="modal-title" id="deleteLootModalLabel">Delete Item</h5>
+            <button
+              type="button"
+              class="btn-close d-none"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div id="deleteLootSummary" class="small text-secondary mb-2"></div>
+            <label for="deleteLootCount">How many?</label>
+            <input
+              id="deleteLootCount"
+              class="form-control form-control-sm"
+              type="number"
+              min="1"
+              value="1"
+              required
+            />
+            <div id="deleteLootMax" class="form-text"></div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-outline-light btn-sm"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div
+      class="modal fade"
+      id="sourceItemsModal"
+      tabindex="-1"
+      aria-labelledby="sourceItemsModalLabel"
+      aria-hidden="true"
+    >
+      <div
+        class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable search-modal-dialog"
+      >
+        <div class="modal-content">
+          <div class="modal-header">
+            <div>
+              <h5 class="modal-title" id="sourceItemsModalLabel">Item List</h5>
+              <div id="sourceItemCount" class="small text-secondary"></div>
+            </div>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <input
+              id="sourceItemSearch"
+              class="form-control form-control-sm mb-3"
+              placeholder="Search weapons, armor, shields, wondrous, and alchemical items"
+            />
+            <ul
+              class="source-list-tablist mb-3"
+              id="sourceItemTabs"
+              role="tablist"
+            >
+              <li class="source-list-tab-item" role="presentation">
+                <button
+                  class="source-list-tab active"
+                  type="button"
+                  data-source-category="all"
+                >
+                  All
+                </button>
+              </li>
+              <li class="source-list-tab-item" role="presentation">
+                <button
+                  class="source-list-tab"
+                  type="button"
+                  data-source-category="weapons"
+                >
+                  Weapons
+                </button>
+              </li>
+              <li class="source-list-tab-item" role="presentation">
+                <button
+                  class="source-list-tab"
+                  type="button"
+                  data-source-category="armor"
+                >
+                  Armor
+                </button>
+              </li>
+              <li class="source-list-tab-item" role="presentation">
+                <button
+                  class="source-list-tab"
+                  type="button"
+                  data-source-category="shields"
+                >
+                  Shields
+                </button>
+              </li>
+              <li class="source-list-tab-item" role="presentation">
+                <button
+                  class="source-list-tab"
+                  type="button"
+                  data-source-category="mundane"
+                >
+                  Mundane Items
+                </button>
+              </li>
+              <li class="source-list-tab-item" role="presentation">
+                <button
+                  class="source-list-tab"
+                  type="button"
+                  data-source-category="wondrous"
+                >
+                  Wondrous Items
+                </button>
+              </li>
+            </ul>
+            <ul
+              class="source-list-tablist source-list-subtabs mb-3 d-none"
+              id="sourceMundaneTabs"
+              role="tablist"
+            ></ul>
+            <div
+              id="sourceItemResults"
+              class="source-results-panel search-modal-results"
+            ></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="scripts/navbar.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="scripts/supabase-config.js"></script>
+    <script src="scripts/app-supabase.js"></script>
+    <script src="data/wondrous.js?v=wondrous-refresh-1"></script>
+    <script src="scripts/scripts.js"></script>
+    <script src="modals/item-editor.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="scripts/pages/bag-of-holding.js"></script>
+  </body>
 </html>

@@ -4,28 +4,99 @@ let buffSaveTimer;
 let buffContextKey = "general";
 
 const EMPTY_BASELINE = {
-  str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10,
-  bab: 0, hitPoints: 0, hitDice: 0,
-  armor: 0, shield: 0, naturalArmor: 0, deflection: 0, acMisc: 0,
-  fortBase: 0, reflexBase: 0, willBase: 0,
-  initMisc: 0, sizeAc: 0, sizeCombat: 0
+  str: 10,
+  dex: 10,
+  con: 10,
+  int: 10,
+  wis: 10,
+  cha: 10,
+  bab: 0,
+  hitPoints: 0,
+  hitDice: 0,
+  armor: 0,
+  shield: 0,
+  naturalArmor: 0,
+  deflection: 0,
+  acMisc: 0,
+  fortBase: 0,
+  reflexBase: 0,
+  willBase: 0,
+  initMisc: 0,
+  sizeAc: 0,
+  sizeCombat: 0,
 };
 
 const STAT_GROUPS = {
-  abilities: ["strength","dexterity","constitution","intelligence","wisdom","charisma"],
-  armor: ["ac","touch ac","flat-footed ac"],
-  saves: ["fortitude","reflex","will"],
-  combat: ["melee attack","ranged attack","damage","cmb","cmd"],
-  misc: ["initiative","hit points","skill checks","spell resistance"]
+  abilities: [
+    "strength",
+    "dexterity",
+    "constitution",
+    "intelligence",
+    "wisdom",
+    "charisma",
+  ],
+  armor: ["ac", "touch ac", "flat-footed ac"],
+  saves: ["fortitude", "reflex", "will"],
+  combat: ["melee attack", "ranged attack", "damage", "cmb", "cmd"],
+  misc: ["initiative", "hit points", "skill checks", "spell resistance"],
 };
 
 let selectedCharacterId = "";
 let selectedCharacterSheet = null;
-let baseline = {...EMPTY_BASELINE};
+let baseline = { ...EMPTY_BASELINE };
 let customBonusCount = 0;
 
-const BUFF_STATS = ["strength","dexterity","constitution","intelligence","wisdom","charisma","attack","melee attack","ranged attack","extra attack","damage","melee damage","ranged damage","ac","touch ac","flat-footed ac","remove dex bonus to ac","natural armor","deflection","fortitude","reflex","will","initiative","cmb","cmd","hit points","skill checks","spell resistance"];
-const BONUS_TYPES = ["untyped","alchemical","condition","penalty","armor","circumstance","competence","deflection","dodge","enhancement","insight","luck","morale","natural armor","profane","resistance","sacred","shield","size"];
+const BUFF_STATS = [
+  "strength",
+  "dexterity",
+  "constitution",
+  "intelligence",
+  "wisdom",
+  "charisma",
+  "attack",
+  "melee attack",
+  "ranged attack",
+  "extra attack",
+  "damage",
+  "melee damage",
+  "ranged damage",
+  "ac",
+  "touch ac",
+  "flat-footed ac",
+  "remove dex bonus to ac",
+  "natural armor",
+  "deflection",
+  "fortitude",
+  "reflex",
+  "will",
+  "initiative",
+  "cmb",
+  "cmd",
+  "hit points",
+  "skill checks",
+  "spell resistance",
+];
+const BONUS_TYPES = [
+  "untyped",
+  "alchemical",
+  "condition",
+  "penalty",
+  "armor",
+  "circumstance",
+  "competence",
+  "deflection",
+  "dodge",
+  "enhancement",
+  "insight",
+  "luck",
+  "morale",
+  "natural armor",
+  "profane",
+  "resistance",
+  "sacred",
+  "shield",
+  "size",
+];
 const STAT_LABELS = {
   ac: "AC",
   "touch ac": "Touch AC",
@@ -39,36 +110,46 @@ const STAT_LABELS = {
   con: "CON",
   int: "INT",
   wis: "WIS",
-  cha: "CHA"
+  cha: "CHA",
 };
 const ACTIVE_CATEGORY_PRIORITY = ["Spell", "Debuff", "Condition"];
 
 function activeCategoryRank(category) {
-  const index = ACTIVE_CATEGORY_PRIORITY.findIndex(item => item.toLowerCase() === String(category || "").toLowerCase());
+  const index = ACTIVE_CATEGORY_PRIORITY.findIndex(
+    (item) => item.toLowerCase() === String(category || "").toLowerCase(),
+  );
   return index >= 0 ? index : ACTIVE_CATEGORY_PRIORITY.length;
 }
 
 function activeBuffRows() {
   return activeBuffs
     .map((buff, index) => ({ buff, index }))
-    .sort((a, b) =>
-      activeCategoryRank(a.buff.category) - activeCategoryRank(b.buff.category) ||
-      String(a.buff.name || "").localeCompare(String(b.buff.name || "")) ||
-      a.index - b.index
+    .sort(
+      (a, b) =>
+        activeCategoryRank(a.buff.category) -
+          activeCategoryRank(b.buff.category) ||
+        String(a.buff.name || "").localeCompare(String(b.buff.name || "")) ||
+        a.index - b.index,
     );
 }
 
 function titleCaseStat(value) {
-  const key = String(value || "").toLowerCase().trim();
+  const key = String(value || "")
+    .toLowerCase()
+    .trim();
   if (STAT_LABELS[key]) return STAT_LABELS[key];
   return key
     .split(" ")
-    .map(word => STAT_LABELS[word] || word.charAt(0).toUpperCase() + word.slice(1))
+    .map(
+      (word) =>
+        STAT_LABELS[word] || word.charAt(0).toUpperCase() + word.slice(1),
+    )
     .join(" ");
 }
 
 function getRememberedCharacterId(contextKey = buffContextKey) {
-  if (PFApp.getSelectedCharacterId) return PFApp.getSelectedCharacterId(contextKey);
+  if (PFApp.getSelectedCharacterId)
+    return PFApp.getSelectedCharacterId(contextKey);
   return localStorage.getItem(`pf_character_id_${contextKey}`) || "";
 }
 
@@ -93,7 +174,11 @@ function categoryIcon(category) {
 }
 
 function formatBonusText(bonus) {
-  if (String(bonus.stat || "").toLowerCase().trim() === "remove dex bonus to ac") {
+  if (
+    String(bonus.stat || "")
+      .toLowerCase()
+      .trim() === "remove dex bonus to ac"
+  ) {
     const text = "Removes DEX bonus to AC";
     return bonus.appliesWhen ? `${text} (${bonus.appliesWhen})` : text;
   }
@@ -107,31 +192,45 @@ function buffSearchText(buff) {
     buff.name,
     buff.category,
     buff.duration,
-    ...(buff.bonuses || []).map(formatBonusText)
-  ].join(" ").toLowerCase();
+    ...(buff.bonuses || []).map(formatBonusText),
+  ]
+    .join(" ")
+    .toLowerCase();
 }
 
 function renderBuffPickerResults() {
   const container = document.getElementById("buffPickerResults");
   if (!container) return;
-  const term = document.getElementById("buffPickerSearch")?.value.trim().toLowerCase() || "";
-  const matches = buffs
-    .filter(buff => !term || buffSearchText(buff).includes(term));
+  const term =
+    document.getElementById("buffPickerSearch")?.value.trim().toLowerCase() ||
+    "";
+  const matches = buffs.filter(
+    (buff) => !term || buffSearchText(buff).includes(term),
+  );
 
   if (!matches.length) {
     container.innerHTML = `<div class="small-text">No matching effects found.</div>`;
     return;
   }
 
-  container.innerHTML = matches.map(buff => {
-    const index = buffs.indexOf(buff);
-    const bonuses = (buff.bonuses || []).slice(0, 8);
-    const bonusHtml = bonuses.length
-      ? bonuses.map(bonus => `<span class="stat-chip">${escapeHtml(formatBonusText(bonus))}</span>`).join("")
-      : `<span class="small-text">No numerical changes</span>`;
-    const more = (buff.bonuses || []).length > bonuses.length ? `<span class="small-text">+${(buff.bonuses || []).length - bonuses.length} more</span>` : "";
-    const controls = pickerEffectControls(buff, index);
-    return `
+  container.innerHTML = matches
+    .map((buff) => {
+      const index = buffs.indexOf(buff);
+      const bonuses = (buff.bonuses || []).slice(0, 8);
+      const bonusHtml = bonuses.length
+        ? bonuses
+            .map(
+              (bonus) =>
+                `<span class="stat-chip">${escapeHtml(formatBonusText(bonus))}</span>`,
+            )
+            .join("")
+        : `<span class="small-text">No numerical changes</span>`;
+      const more =
+        (buff.bonuses || []).length > bonuses.length
+          ? `<span class="small-text">+${(buff.bonuses || []).length - bonuses.length} more</span>`
+          : "";
+      const controls = pickerEffectControls(buff, index);
+      return `
       <button class="buff-picker-card" type="button" onclick="addBuffFromPicker(${index})">
         <span class="buff-type-icon" title="${escapeHtml(buff.category || "Effect")}"><i class="bi ${categoryIcon(buff.category)}"></i></span>
         <div class="fw-semibold pe-2">${escapeHtml(buff.name)}</div>
@@ -140,7 +239,8 @@ function renderBuffPickerResults() {
         ${controls}
       </button>
     `;
-  }).join("");
+    })
+    .join("");
 }
 
 function pickerEffectControls(buff, index) {
@@ -148,16 +248,24 @@ function pickerEffectControls(buff, index) {
   const isCondition = String(buff.category || "").toLowerCase() === "condition";
   return `
     <div class="effect-controls" onclick="event.stopPropagation()">
-      ${needsCl ? `
+      ${
+        needsCl
+          ? `
         <label class="small effect-inline-field">CL
           <input id="buffCl${index}" class="form-control form-control-sm" type="number" min="1" value="1">
         </label>
-      ` : ""}
-      ${isCondition ? `
+      `
+          : ""
+      }
+      ${
+        isCondition
+          ? `
         <label class="small effect-inline-field">Turns
           <input id="buffTurns${index}" class="form-control form-control-sm" type="number" min="1" value="1">
         </label>
-      ` : ""}
+      `
+          : ""
+      }
       <label class="form-check small">
         <input id="buffPermanent${index}" class="form-check-input" type="checkbox">
         <span class="form-check-label">Permanent</span>
@@ -172,7 +280,9 @@ function openBuffPicker() {
   setTimeout(() => document.getElementById("buffPickerSearch")?.focus(), 150);
 }
 
-document.getElementById("buffPickerSearch")?.addEventListener("input", renderBuffPickerResults);
+document
+  .getElementById("buffPickerSearch")
+  ?.addEventListener("input", renderBuffPickerResults);
 
 function setCustomBuffStatus(message, type = "muted") {
   const status = document.getElementById("customBuffStatus");
@@ -180,16 +290,22 @@ function setCustomBuffStatus(message, type = "muted") {
   status.textContent = message;
 }
 
-document.getElementById("customBuffCategory")?.addEventListener("change", () => applyCustomBuffCategoryDefaults());
+document
+  .getElementById("customBuffCategory")
+  ?.addEventListener("change", () => applyCustomBuffCategoryDefaults());
 
 function prepareCustomBuffModal() {
   updateCustomBuffContextField();
-  if (!document.getElementById("customBonusRows").children.length) addCustomBonusRow();
+  if (!document.getElementById("customBonusRows").children.length)
+    addCustomBonusRow();
 }
 
 function currentContextLabel() {
   const select = document.getElementById("navContextSelect");
-  return select?.selectedOptions?.[0]?.textContent || (buffContextKey === "general" ? "General" : buffContextKey);
+  return (
+    select?.selectedOptions?.[0]?.textContent ||
+    (buffContextKey === "general" ? "General" : buffContextKey)
+  );
 }
 
 function updateCustomBuffContextField() {
@@ -205,7 +321,7 @@ function addCustomBonusRow(data = {}) {
     <div>
       <label class="small">Stat</label>
       <select data-field="stat" class="form-select form-select-sm">
-        ${BUFF_STATS.map(stat => `<option value="${stat}" ${data.stat === stat ? "selected" : ""}>${titleCaseStat(stat)}</option>`).join("")}
+        ${BUFF_STATS.map((stat) => `<option value="${stat}" ${data.stat === stat ? "selected" : ""}>${titleCaseStat(stat)}</option>`).join("")}
       </select>
     </div>
     <div>
@@ -215,7 +331,7 @@ function addCustomBonusRow(data = {}) {
     <div>
       <label class="small">Type</label>
       <select data-field="type" class="form-select form-select-sm">
-        ${BONUS_TYPES.map(type => `<option value="${type}" ${(data.type || "untyped") === type ? "selected" : ""}>${type}</option>`).join("")}
+        ${BONUS_TYPES.map((type) => `<option value="${type}" ${(data.type || "untyped") === type ? "selected" : ""}>${type}</option>`).join("")}
       </select>
     </div>
     <div>
@@ -237,7 +353,7 @@ function applyCustomBuffCategoryDefaults(scope = document) {
   const rows = scope.classList?.contains("custom-bonus-row")
     ? [scope]
     : [...(scope.querySelectorAll?.(".custom-bonus-row") || [])];
-  rows.forEach(row => {
+  rows.forEach((row) => {
     const type = row.querySelector('[data-field="type"]');
     const stacks = row.querySelector('[data-field="stacks"]');
     if (type && type.value === "untyped") type.value = "penalty";
@@ -247,13 +363,17 @@ function applyCustomBuffCategoryDefaults(scope = document) {
 
 function collectCustomBuff() {
   const name = document.getElementById("customBuffName").value.trim();
-  const category = document.getElementById("customBuffCategory").value || "Spell";
-  const duration = document.getElementById("customBuffDuration").value.trim() || "variable";
-  const bonuses = [...document.querySelectorAll("#customBonusRows .custom-bonus-row")].map(row => ({
+  const category =
+    document.getElementById("customBuffCategory").value || "Spell";
+  const duration =
+    document.getElementById("customBuffDuration").value.trim() || "variable";
+  const bonuses = [
+    ...document.querySelectorAll("#customBonusRows .custom-bonus-row"),
+  ].map((row) => ({
     stat: row.querySelector('[data-field="stat"]').value,
     value: Number(row.querySelector('[data-field="value"]').value || 0),
     type: row.querySelector('[data-field="type"]').value || "untyped",
-    stacks: row.querySelector('[data-field="stacks"]').value === "true"
+    stacks: row.querySelector('[data-field="stacks"]').value === "true",
   }));
 
   return { name, category, duration, bonuses, contextKey: buffContextKey };
@@ -272,23 +392,30 @@ async function saveCustomBuff() {
 
   const saved = await PFApp.saveBuffDefinition(buff);
   if (!saved) {
-    setCustomBuffStatus("Could not save buff. Make sure the buff_definitions table exists.", "danger");
+    setCustomBuffStatus(
+      "Could not save buff. Make sure the buff_definitions table exists.",
+      "danger",
+    );
     return;
   }
 
   await loadBuffDefinitions();
   renderBuffPickerResults();
   setCustomBuffStatus("Custom buff saved.", "success");
-  bootstrap.Modal.getInstance(document.getElementById("customBuffModal"))?.hide();
+  bootstrap.Modal.getInstance(
+    document.getElementById("customBuffModal"),
+  )?.hide();
 }
 
 async function loadBuffDefinitions() {
   buffs = await PFApp.loadBuffDefinitions();
   if (!buffs.length) {
     try {
-      const res = await fetch('buffs.json');
+      const res = await fetch("buffs.json");
       buffs = await res.json();
-      console.warn("Loaded buffs from buffs.json fallback. Run supabase-schema.sql to use buff_definitions.");
+      console.warn(
+        "Loaded buffs from buffs.json fallback. Run supabase-schema.sql to use buff_definitions.",
+      );
     } catch (error) {
       console.error(error);
     }
@@ -296,15 +423,15 @@ async function loadBuffDefinitions() {
   renderBuffPickerResults();
 }
 
-function parseDuration(d, casterLevel = 1){
-  if(!d) return null;
+function parseDuration(d, casterLevel = 1) {
+  if (!d) return null;
   const duration = String(d).toLowerCase();
   const cl = Math.max(1, Number.parseInt(casterLevel, 10) || 1);
   const amount = Number((duration.match(/(\d+)/) || [1, 1])[1]) || 1;
   const multiplier = durationUsesCasterLevel(d) ? cl : 1;
-  if(duration.includes("round")) return amount * multiplier;
-  if(duration.includes("minute")) return amount * 10 * multiplier;
-  if(duration.includes("hour")) return amount * 600 * multiplier;
+  if (duration.includes("round")) return amount * multiplier;
+  if (duration.includes("minute")) return amount * 10 * multiplier;
+  if (duration.includes("hour")) return amount * 600 * multiplier;
   return null;
 }
 
@@ -316,26 +443,40 @@ function durationUsesCasterLevel(duration) {
 function formatDurationRounds(rounds) {
   if (rounds === null || rounds === undefined) return "variable";
   if (rounds === 1) return "1 turn";
-  if (rounds % 600 === 0) return `${rounds / 600} hour${rounds === 600 ? "" : "s"}`;
-  if (rounds % 10 === 0) return `${rounds / 10} minute${rounds === 10 ? "" : "s"}`;
+  if (rounds % 600 === 0)
+    return `${rounds / 600} hour${rounds === 600 ? "" : "s"}`;
+  if (rounds % 10 === 0)
+    return `${rounds / 10} minute${rounds === 10 ? "" : "s"}`;
   return `${rounds} round${rounds === 1 ? "" : "s"}`;
 }
 
 function activeBuffDuration(buff) {
   if (buff.permanent) return "Permanent";
   if (buff.durationLabel) return buff.durationLabel;
-  if (buff.computedDuration !== undefined && buff.computedDuration !== null) return `${buff.duration || "duration"} | ${formatDurationRounds(buff.computedDuration)}`;
+  if (buff.computedDuration !== undefined && buff.computedDuration !== null)
+    return `${buff.duration || "duration"} | ${formatDurationRounds(buff.computedDuration)}`;
   return buff.duration || "variable";
 }
 
-function addBuffFromPicker(index){
-  const b=buffs[index];
-  if(!b) return;
-  const casterLevel = Math.max(1, Number.parseInt(document.getElementById(`buffCl${index}`)?.value, 10) || 1);
-  const turns = Math.max(1, Number.parseInt(document.getElementById(`buffTurns${index}`)?.value, 10) || 1);
-  const permanent = Boolean(document.getElementById(`buffPermanent${index}`)?.checked);
+function addBuffFromPicker(index) {
+  const b = buffs[index];
+  if (!b) return;
+  const casterLevel = Math.max(
+    1,
+    Number.parseInt(document.getElementById(`buffCl${index}`)?.value, 10) || 1,
+  );
+  const turns = Math.max(
+    1,
+    Number.parseInt(document.getElementById(`buffTurns${index}`)?.value, 10) ||
+      1,
+  );
+  const permanent = Boolean(
+    document.getElementById(`buffPermanent${index}`)?.checked,
+  );
   const isCondition = String(b.category || "").toLowerCase() === "condition";
-  const calculatedDuration = isCondition ? turns : parseDuration(b.duration, casterLevel);
+  const calculatedDuration = isCondition
+    ? turns
+    : parseDuration(b.duration, casterLevel);
   const remaining = permanent ? null : calculatedDuration;
   const durationLabel = permanent
     ? "Permanent"
@@ -354,30 +495,32 @@ function addBuffFromPicker(index){
     permanent,
     remaining,
     computedDuration: calculatedDuration,
-    durationLabel
+    durationLabel,
   });
   renderActiveBuffs();
   queueBuffSave();
-  bootstrap.Modal.getInstance(document.getElementById("buffPickerModal"))?.hide();
+  bootstrap.Modal.getInstance(
+    document.getElementById("buffPickerModal"),
+  )?.hide();
 }
 
-function removeBuff(i){
-  activeBuffs.splice(i,1);
+function removeBuff(i) {
+  activeBuffs.splice(i, 1);
   renderActiveBuffs();
   queueBuffSave();
 }
 
-function renderActiveBuffsLegacy(){
-  const c=document.getElementById("activeBuffs");
-  c.innerHTML="";
+function renderActiveBuffsLegacy() {
+  const c = document.getElementById("activeBuffs");
+  c.innerHTML = "";
 
-  activeBuffRows().forEach(({ buff: b, index: i })=>{
-    const d=document.createElement("div");
-    d.className="dice-row";
+  activeBuffRows().forEach(({ buff: b, index: i }) => {
+    const d = document.createElement("div");
+    d.className = "dice-row";
     const detailsId = `buffDetails${i}`;
     const bonusText = (b.bonuses || []).map(formatBonusText);
 
-    d.innerHTML=`
+    d.innerHTML = `
       <div>
         <strong>${b.name}</strong>
         <div class="small-text">${b.duration} | Remaining: ${b.remaining ?? "∞"}</div>
@@ -399,7 +542,10 @@ function queueBuffSave() {
     PFApp.saveBuffState(activeBuffs, buffContextKey, selectedCharacterId);
     const stamp = String(Date.now());
     localStorage.setItem(`pf_buffs_updated_${buffContextKey}`, stamp);
-    localStorage.setItem(`pf_buffs_updated_${buffContextKey}_${selectedCharacterId}`, stamp);
+    localStorage.setItem(
+      `pf_buffs_updated_${buffContextKey}_${selectedCharacterId}`,
+      stamp,
+    );
   }, 300);
 }
 
@@ -412,7 +558,7 @@ function numberField(sheet, id, fallback = 0) {
 }
 
 function sheetToBaseline(sheet) {
-  if (!sheet) return {...EMPTY_BASELINE};
+  if (!sheet) return { ...EMPTY_BASELINE };
   const abilities = sheet.abilities || {};
   const saves = sheet.saves || {};
   return {
@@ -435,14 +581,15 @@ function sheetToBaseline(sheet) {
     willBase: Number(saves.will?.base || 0),
     initMisc: numberField(sheet, "initMisc"),
     sizeAc: 0,
-    sizeCombat: 0
+    sizeCombat: 0,
   };
 }
 
 function renderCharacterSummary() {
   const summary = document.getElementById("characterSummary");
   if (!selectedCharacterSheet) {
-    summary.textContent = "No character selected. Create or select a character sheet to calculate buffs.";
+    summary.textContent =
+      "No character selected. Create or select a character sheet to calculate buffs.";
     return;
   }
 
@@ -469,14 +616,23 @@ function escapeHtml(value) {
 }
 
 function formatBreakdownLine(b) {
-  const className = b.applied === false ? "small-text calc-overridden" : "small-text calc-applied";
+  const className =
+    b.applied === false
+      ? "small-text calc-overridden"
+      : "small-text calc-applied";
   const label = b.applied === false ? "overridden" : "applied";
   const detail = b.detail ? ` | ${escapeHtml(b.detail)}` : "";
   return `<div class="${className}">${label}: ${escapeHtml(b.source)} ${fmt(Number(b.value || 0))} (${escapeHtml(b.type)})${detail}</div>`;
 }
 
 function isFormulaBreakdown(b) {
-  return b.source === "Formula" || b.source === "Base" || b.type === "derived" || b.type === "score" || b.source.startsWith("Base +");
+  return (
+    b.source === "Formula" ||
+    b.source === "Base" ||
+    b.type === "derived" ||
+    b.type === "score" ||
+    b.source.startsWith("Base +")
+  );
 }
 
 function formatFormulaLine(b) {
@@ -484,7 +640,9 @@ function formatFormulaLine(b) {
 }
 
 function normalizeStat(stat) {
-  const key = String(stat || "").toLowerCase().trim();
+  const key = String(stat || "")
+    .toLowerCase()
+    .trim();
   const aliases = {
     str: "strength",
     dex: "dexterity",
@@ -493,7 +651,7 @@ function normalizeStat(stat) {
     wis: "wisdom",
     cha: "charisma",
     fort: "fortitude",
-    ac: "ac"
+    ac: "ac",
   };
   return aliases[key] || key;
 }
@@ -508,27 +666,42 @@ function applyBonuses(bonuses) {
   const ignored = [];
   const grouped = {};
 
-  bonuses.filter(bonus => bonus.conditional).forEach(bonus => {
-    ignored.push({ ...bonus, ignoredReason: bonus.appliesWhen ? `when ${bonus.appliesWhen}` : "conditional" });
-  });
+  bonuses
+    .filter((bonus) => bonus.conditional)
+    .forEach((bonus) => {
+      ignored.push({
+        ...bonus,
+        ignoredReason: bonus.appliesWhen
+          ? `when ${bonus.appliesWhen}`
+          : "conditional",
+      });
+    });
 
-  bonuses.filter(bonus => !bonus.conditional).forEach(bonus => {
-    const type = bonus.type || "untyped";
-    if (!grouped[type]) grouped[type] = [];
-    grouped[type].push(bonus);
-  });
+  bonuses
+    .filter((bonus) => !bonus.conditional)
+    .forEach((bonus) => {
+      const type = bonus.type || "untyped";
+      if (!grouped[type]) grouped[type] = [];
+      grouped[type].push(bonus);
+    });
 
   Object.entries(grouped).forEach(([type, typedBonuses]) => {
-    const stacking = typedBonuses.filter(b => stacksByType(type) || b.stacks || b.value < 0);
-    const nonStacking = typedBonuses.filter(b => !stacksByType(type) && !b.stacks && b.value >= 0);
+    const stacking = typedBonuses.filter(
+      (b) => stacksByType(type) || b.stacks || b.value < 0,
+    );
+    const nonStacking = typedBonuses.filter(
+      (b) => !stacksByType(type) && !b.stacks && b.value >= 0,
+    );
 
-    stacking.forEach(b => {
+    stacking.forEach((b) => {
       total += Number(b.value || 0);
       used.push(b);
     });
 
     if (nonStacking.length) {
-      const best = nonStacking.reduce((a, b) => Number(a.value) >= Number(b.value) ? a : b);
+      const best = nonStacking.reduce((a, b) =>
+        Number(a.value) >= Number(b.value) ? a : b,
+      );
       total += Number(best.value || 0);
       used.push(best);
     }
@@ -540,8 +713,8 @@ function applyBonuses(bonuses) {
 function collectBuffModifiers() {
   const map = {};
 
-  activeBuffs.forEach(buff => {
-    (buff.bonuses || []).forEach(rawBonus => {
+  activeBuffs.forEach((buff) => {
+    (buff.bonuses || []).forEach((rawBonus) => {
       const stat = normalizeStat(rawBonus.stat);
       if (!map[stat]) map[stat] = [];
       map[stat].push({
@@ -549,7 +722,7 @@ function collectBuffModifiers() {
         stat,
         value: Number(rawBonus.value || 0),
         type: rawBonus.type || "untyped",
-        source: buff.name
+        source: buff.name,
       });
     });
   });
@@ -557,18 +730,31 @@ function collectBuffModifiers() {
   return map;
 }
 
-function addBreakdown(breakdown, stat, label, value, type = "derived", detail = "") {
+function addBreakdown(
+  breakdown,
+  stat,
+  label,
+  value,
+  type = "derived",
+  detail = "",
+) {
   if (!breakdown[stat]) breakdown[stat] = [];
   breakdown[stat].push({ source: label, value, type, detail });
 }
 
 function describeBonuses(bonuses) {
   if (!bonuses.length) return "no active buff modifiers";
-  return bonuses.map(b => `${b.source} ${fmt(Number(b.value || 0))} ${b.type || "untyped"} to ${titleCaseStat(b.stat)}`).join(", ");
+  return bonuses
+    .map(
+      (b) =>
+        `${b.source} ${fmt(Number(b.value || 0))} ${b.type || "untyped"} to ${titleCaseStat(b.stat)}`,
+    )
+    .join(", ");
 }
 
-function calculateStatsDetailed(){
-  if (window.PFBuffs) return window.PFBuffs.calculateStatsDetailed(activeBuffs, baseline);
+function calculateStatsDetailed() {
+  if (window.PFBuffs)
+    return window.PFBuffs.calculateStatsDetailed(activeBuffs, baseline);
 
   const buffMap = collectBuffModifiers();
   const totals = {};
@@ -580,7 +766,7 @@ function calculateStatsDetailed(){
     constitution: "con",
     intelligence: "int",
     wisdom: "wis",
-    charisma: "cha"
+    charisma: "cha",
   };
 
   const abilityScores = {};
@@ -596,12 +782,14 @@ function calculateStatsDetailed(){
     totals[stat] = `${score} (${fmt(abilityMods[stat])})`;
 
     addBreakdown(breakdown, stat, "Base", Number(baseline[key] || 0), "score");
-    applied.used.forEach(b => addBreakdown(breakdown, stat, b.source, b.value, b.type));
+    applied.used.forEach((b) =>
+      addBreakdown(breakdown, stat, b.source, b.value, b.type),
+    );
   });
 
   const direct = {};
   const directCauses = {};
-  Object.keys(buffMap).forEach(stat => {
+  Object.keys(buffMap).forEach((stat) => {
     if (abilityKeys[stat]) return;
     const applied = applyBonuses(buffMap[stat]);
     direct[stat] = applied.total;
@@ -611,110 +799,284 @@ function calculateStatsDetailed(){
   Object.entries(buffMap).forEach(([stat, bonuses]) => {
     if (abilityKeys[stat]) return;
     const applied = applyBonuses(bonuses);
-    applied.used.forEach(b => addBreakdown(breakdown, stat, b.source, b.value, b.type));
+    applied.used.forEach((b) =>
+      addBreakdown(breakdown, stat, b.source, b.value, b.type),
+    );
   });
 
   const acSizeFromBuffs = (buffMap.ac || [])
-    .filter(b => b.type === "size")
+    .filter((b) => b.type === "size")
     .reduce((sum, b) => sum + Number(b.value || 0), 0);
   const combatSize = Number(baseline.sizeCombat || 0) - acSizeFromBuffs;
   const acSize = Number(baseline.sizeAc || 0) + acSizeFromBuffs;
 
-  const armorFromAcBuffs = applyBonuses((buffMap.ac || []).filter(b => b.type === "armor")).total;
-  const shieldFromAcBuffs = applyBonuses((buffMap.ac || []).filter(b => b.type === "shield")).total;
-  const naturalFromDedicated = applyBonuses(buffMap["natural armor"] || []).total;
+  const armorFromAcBuffs = applyBonuses(
+    (buffMap.ac || []).filter((b) => b.type === "armor"),
+  ).total;
+  const shieldFromAcBuffs = applyBonuses(
+    (buffMap.ac || []).filter((b) => b.type === "shield"),
+  ).total;
+  const naturalFromDedicated = applyBonuses(
+    buffMap["natural armor"] || [],
+  ).total;
   const deflectionFromDedicated = applyBonuses(buffMap.deflection || []).total;
-  const acMiscBuffs = applyBonuses((buffMap.ac || []).filter(b => !["armor","shield","size"].includes(b.type))).total;
+  const acMiscBuffs = applyBonuses(
+    (buffMap.ac || []).filter(
+      (b) => !["armor", "shield", "size"].includes(b.type),
+    ),
+  ).total;
 
   const armor = Math.max(Number(baseline.armor || 0), armorFromAcBuffs);
   const shield = Math.max(Number(baseline.shield || 0), shieldFromAcBuffs);
-  const naturalArmor = Number(baseline.naturalArmor || 0) + naturalFromDedicated;
+  const naturalArmor =
+    Number(baseline.naturalArmor || 0) + naturalFromDedicated;
   const deflection = Number(baseline.deflection || 0) + deflectionFromDedicated;
   const acMisc = Number(baseline.acMisc || 0) + acMiscBuffs;
   const dexMod = abilityMods.dexterity;
   const positiveDex = Math.max(0, dexMod);
-  const cmdAcTypes = ["circumstance", "deflection", "dodge", "insight", "luck", "morale", "profane", "sacred"];
-  const cmdAcApplied = applyBonuses((buffMap.ac || []).filter(b =>
-    cmdAcTypes.includes(b.type) || (b.value < 0 && !["armor", "shield", "natural armor", "size"].includes(b.type))
-  ));
+  const cmdAcTypes = [
+    "circumstance",
+    "deflection",
+    "dodge",
+    "insight",
+    "luck",
+    "morale",
+    "profane",
+    "sacred",
+  ];
+  const cmdAcApplied = applyBonuses(
+    (buffMap.ac || []).filter(
+      (b) =>
+        cmdAcTypes.includes(b.type) ||
+        (b.value < 0 &&
+          !["armor", "shield", "natural armor", "size"].includes(b.type)),
+    ),
+  );
   const cmdAcBonus = cmdAcApplied.total + deflectionFromDedicated;
 
-  totals.ac = 10 + armor + shield + dexMod + acSize + naturalArmor + deflection + acMisc;
+  totals.ac =
+    10 + armor + shield + dexMod + acSize + naturalArmor + deflection + acMisc;
   totals["touch ac"] = 10 + dexMod + acSize + deflection + acMisc;
-  totals["flat-footed ac"] = totals.ac - positiveDex - applyBonuses((buffMap.ac || []).filter(b => b.type === "dodge")).total;
+  totals["flat-footed ac"] =
+    totals.ac -
+    positiveDex -
+    applyBonuses((buffMap.ac || []).filter((b) => b.type === "dodge")).total;
 
-  addBreakdown(breakdown, "ac", "Formula", totals.ac, "10 + armor + shield + Dex + size + natural + deflection + misc", `DEX ${abilityScores.dexterity} (${fmt(dexMod)}): ${abilityCauses.dexterity}`);
-  addBreakdown(breakdown, "touch ac", "Formula", totals["touch ac"], "10 + Dex + size + deflection + misc", `DEX ${abilityScores.dexterity} (${fmt(dexMod)}): ${abilityCauses.dexterity}`);
-  addBreakdown(breakdown, "flat-footed ac", "Formula", totals["flat-footed ac"], "AC without positive Dex/dodge");
+  addBreakdown(
+    breakdown,
+    "ac",
+    "Formula",
+    totals.ac,
+    "10 + armor + shield + Dex + size + natural + deflection + misc",
+    `DEX ${abilityScores.dexterity} (${fmt(dexMod)}): ${abilityCauses.dexterity}`,
+  );
+  addBreakdown(
+    breakdown,
+    "touch ac",
+    "Formula",
+    totals["touch ac"],
+    "10 + Dex + size + deflection + misc",
+    `DEX ${abilityScores.dexterity} (${fmt(dexMod)}): ${abilityCauses.dexterity}`,
+  );
+  addBreakdown(
+    breakdown,
+    "flat-footed ac",
+    "Formula",
+    totals["flat-footed ac"],
+    "AC without positive Dex/dodge",
+  );
 
-  totals.fortitude = Number(baseline.fortBase || 0) + abilityMods.constitution + (direct.fortitude || 0);
-  totals.reflex = Number(baseline.reflexBase || 0) + abilityMods.dexterity + (direct.reflex || 0);
-  totals.will = Number(baseline.willBase || 0) + abilityMods.wisdom + (direct.will || 0);
-  addBreakdown(breakdown, "fortitude", "Base + CON", Number(baseline.fortBase || 0) + abilityMods.constitution, "derived", `CON ${abilityScores.constitution} (${fmt(abilityMods.constitution)}): ${abilityCauses.constitution}`);
-  addBreakdown(breakdown, "reflex", "Base + DEX", Number(baseline.reflexBase || 0) + abilityMods.dexterity, "derived", `DEX ${abilityScores.dexterity} (${fmt(abilityMods.dexterity)}): ${abilityCauses.dexterity}`);
-  addBreakdown(breakdown, "will", "Base + WIS", Number(baseline.willBase || 0) + abilityMods.wisdom, "derived", `WIS ${abilityScores.wisdom} (${fmt(abilityMods.wisdom)}): ${abilityCauses.wisdom}`);
+  totals.fortitude =
+    Number(baseline.fortBase || 0) +
+    abilityMods.constitution +
+    (direct.fortitude || 0);
+  totals.reflex =
+    Number(baseline.reflexBase || 0) +
+    abilityMods.dexterity +
+    (direct.reflex || 0);
+  totals.will =
+    Number(baseline.willBase || 0) + abilityMods.wisdom + (direct.will || 0);
+  addBreakdown(
+    breakdown,
+    "fortitude",
+    "Base + CON",
+    Number(baseline.fortBase || 0) + abilityMods.constitution,
+    "derived",
+    `CON ${abilityScores.constitution} (${fmt(abilityMods.constitution)}): ${abilityCauses.constitution}`,
+  );
+  addBreakdown(
+    breakdown,
+    "reflex",
+    "Base + DEX",
+    Number(baseline.reflexBase || 0) + abilityMods.dexterity,
+    "derived",
+    `DEX ${abilityScores.dexterity} (${fmt(abilityMods.dexterity)}): ${abilityCauses.dexterity}`,
+  );
+  addBreakdown(
+    breakdown,
+    "will",
+    "Base + WIS",
+    Number(baseline.willBase || 0) + abilityMods.wisdom,
+    "derived",
+    `WIS ${abilityScores.wisdom} (${fmt(abilityMods.wisdom)}): ${abilityCauses.wisdom}`,
+  );
 
-  totals.initiative = abilityMods.dexterity + Number(baseline.initMisc || 0) + (direct.initiative || 0);
-  totals["melee attack"] = Number(baseline.bab || 0) + abilityMods.strength + acSize + (direct.attack || 0) + (direct["melee attack"] || 0);
-  totals["ranged attack"] = Number(baseline.bab || 0) + abilityMods.dexterity + acSize + (direct.attack || 0) + (direct["ranged attack"] || 0);
+  totals.initiative =
+    abilityMods.dexterity +
+    Number(baseline.initMisc || 0) +
+    (direct.initiative || 0);
+  totals["melee attack"] =
+    Number(baseline.bab || 0) +
+    abilityMods.strength +
+    acSize +
+    (direct.attack || 0) +
+    (direct["melee attack"] || 0);
+  totals["ranged attack"] =
+    Number(baseline.bab || 0) +
+    abilityMods.dexterity +
+    acSize +
+    (direct.attack || 0) +
+    (direct["ranged attack"] || 0);
   totals.damage = abilityMods.strength + (direct.damage || 0);
-  totals.cmb = Number(baseline.bab || 0) + abilityMods.strength + combatSize + Number(baseline.cmbMisc || 0) + (direct.cmb || 0) + (direct.attack || 0);
-  totals.cmd = 10 + Number(baseline.bab || 0) + abilityMods.strength + abilityMods.dexterity + combatSize + Number(baseline.cmdMisc || 0) + cmdAcBonus + (direct.cmd || 0);
-  totals["hit points"] = Number(baseline.hitDice || 0) * (abilityMods.constitution - abilityMod(baseline.con));
+  totals.cmb =
+    Number(baseline.bab || 0) +
+    abilityMods.strength +
+    combatSize +
+    Number(baseline.cmbMisc || 0) +
+    (direct.cmb || 0) +
+    (direct.attack || 0);
+  totals.cmd =
+    10 +
+    Number(baseline.bab || 0) +
+    abilityMods.strength +
+    abilityMods.dexterity +
+    combatSize +
+    Number(baseline.cmdMisc || 0) +
+    cmdAcBonus +
+    (direct.cmd || 0);
+  totals["hit points"] =
+    Number(baseline.hitDice || 0) *
+    (abilityMods.constitution - abilityMod(baseline.con));
   totals["spell resistance"] = direct["spell resistance"] || 0;
 
-  addBreakdown(breakdown, "initiative", "DEX + misc", abilityMods.dexterity + Number(baseline.initMisc || 0), "derived", `DEX ${abilityScores.dexterity} (${fmt(abilityMods.dexterity)}): ${abilityCauses.dexterity}`);
-  addBreakdown(breakdown, "melee attack", "BAB + STR + size", Number(baseline.bab || 0) + abilityMods.strength + acSize, "derived", `STR ${abilityScores.strength} (${fmt(abilityMods.strength)}): ${abilityCauses.strength}; attack buffs: ${directCauses.attack || "none"}`);
-  addBreakdown(breakdown, "ranged attack", "BAB + DEX + size", Number(baseline.bab || 0) + abilityMods.dexterity + acSize, "derived", `DEX ${abilityScores.dexterity} (${fmt(abilityMods.dexterity)}): ${abilityCauses.dexterity}; attack buffs: ${directCauses.attack || "none"}`);
-  addBreakdown(breakdown, "damage", "STR modifier", abilityMods.strength, "derived", `STR ${abilityScores.strength} (${fmt(abilityMods.strength)}): ${abilityCauses.strength}; damage buffs: ${directCauses.damage || "none"}`);
-  addBreakdown(breakdown, "cmb", "BAB + STR + combat size", Number(baseline.bab || 0) + abilityMods.strength + combatSize, "derived", `STR ${abilityScores.strength} (${fmt(abilityMods.strength)}): ${abilityCauses.strength}; CMB/attack buffs: ${[directCauses.cmb, directCauses.attack].filter(Boolean).join("; ") || "none"}`);
-  cmdAcApplied.used.forEach(b => addBreakdown(breakdown, "cmd", b.source, b.value, b.type, "AC bonus applies to CMD"));
-  addBreakdown(breakdown, "cmd", "10 + BAB + STR + DEX + combat size + CMD-valid AC bonuses", 10 + Number(baseline.bab || 0) + abilityMods.strength + abilityMods.dexterity + combatSize + cmdAcBonus, "derived", `STR ${abilityScores.strength} (${fmt(abilityMods.strength)}): ${abilityCauses.strength}; DEX ${abilityScores.dexterity} (${fmt(abilityMods.dexterity)}): ${abilityCauses.dexterity}; CMD buffs: ${directCauses.cmd || "none"}`);
-  addBreakdown(breakdown, "hit points", "CON change x hit dice", totals["hit points"], "temporary", `CON ${abilityScores.constitution} (${fmt(abilityMods.constitution)}): ${abilityCauses.constitution}`);
+  addBreakdown(
+    breakdown,
+    "initiative",
+    "DEX + misc",
+    abilityMods.dexterity + Number(baseline.initMisc || 0),
+    "derived",
+    `DEX ${abilityScores.dexterity} (${fmt(abilityMods.dexterity)}): ${abilityCauses.dexterity}`,
+  );
+  addBreakdown(
+    breakdown,
+    "melee attack",
+    "BAB + STR + size",
+    Number(baseline.bab || 0) + abilityMods.strength + acSize,
+    "derived",
+    `STR ${abilityScores.strength} (${fmt(abilityMods.strength)}): ${abilityCauses.strength}; attack buffs: ${directCauses.attack || "none"}`,
+  );
+  addBreakdown(
+    breakdown,
+    "ranged attack",
+    "BAB + DEX + size",
+    Number(baseline.bab || 0) + abilityMods.dexterity + acSize,
+    "derived",
+    `DEX ${abilityScores.dexterity} (${fmt(abilityMods.dexterity)}): ${abilityCauses.dexterity}; attack buffs: ${directCauses.attack || "none"}`,
+  );
+  addBreakdown(
+    breakdown,
+    "damage",
+    "STR modifier",
+    abilityMods.strength,
+    "derived",
+    `STR ${abilityScores.strength} (${fmt(abilityMods.strength)}): ${abilityCauses.strength}; damage buffs: ${directCauses.damage || "none"}`,
+  );
+  addBreakdown(
+    breakdown,
+    "cmb",
+    "BAB + STR + combat size",
+    Number(baseline.bab || 0) + abilityMods.strength + combatSize,
+    "derived",
+    `STR ${abilityScores.strength} (${fmt(abilityMods.strength)}): ${abilityCauses.strength}; CMB/attack buffs: ${[directCauses.cmb, directCauses.attack].filter(Boolean).join("; ") || "none"}`,
+  );
+  cmdAcApplied.used.forEach((b) =>
+    addBreakdown(
+      breakdown,
+      "cmd",
+      b.source,
+      b.value,
+      b.type,
+      "AC bonus applies to CMD",
+    ),
+  );
+  addBreakdown(
+    breakdown,
+    "cmd",
+    "10 + BAB + STR + DEX + combat size + CMD-valid AC bonuses",
+    10 +
+      Number(baseline.bab || 0) +
+      abilityMods.strength +
+      abilityMods.dexterity +
+      combatSize +
+      cmdAcBonus,
+    "derived",
+    `STR ${abilityScores.strength} (${fmt(abilityMods.strength)}): ${abilityCauses.strength}; DEX ${abilityScores.dexterity} (${fmt(abilityMods.dexterity)}): ${abilityCauses.dexterity}; CMD buffs: ${directCauses.cmd || "none"}`,
+  );
+  addBreakdown(
+    breakdown,
+    "hit points",
+    "CON change x hit dice",
+    totals["hit points"],
+    "temporary",
+    `CON ${abilityScores.constitution} (${fmt(abilityMods.constitution)}): ${abilityCauses.constitution}`,
+  );
 
-  return {totals, breakdown};
+  return { totals, breakdown };
 }
 
-function renderStats(){
-  const {totals, bonuses = {}, breakdown}=calculateStatsDetailed();
-  const c=document.getElementById("finalStats");
+function renderStats() {
+  const { totals, bonuses = {}, breakdown } = calculateStatsDetailed();
+  const c = document.getElementById("finalStats");
   const showCalculations = document.getElementById("statInfoToggle")?.checked;
-  c.innerHTML="";
+  c.innerHTML = "";
 
-  Object.entries(STAT_GROUPS).forEach(([group,stats])=>{
-    const d=document.createElement("div");
-    d.className="dice-row";
+  Object.entries(STAT_GROUPS).forEach(([group, stats]) => {
+    const d = document.createElement("div");
+    d.className = "dice-row";
 
-    let html=`<strong>${group.toUpperCase()}</strong><br>`;
+    let html = `<strong>${group.toUpperCase()}</strong><br>`;
 
-    stats.forEach(s=>{
-      html+=`<div><strong>${titleCaseStat(s)}: ${totals[s]}</strong> <span class="small-text calc-applied">Buff ${fmt(Number(bonuses[s] || 0))}</span></div>`;
-      (breakdown[s] || []).filter(isFormulaBreakdown).forEach(b=>{
-        html+=formatFormulaLine(b);
+    stats.forEach((s) => {
+      html += `<div><strong>${titleCaseStat(s)}: ${totals[s]}</strong> <span class="small-text calc-applied">Buff ${fmt(Number(bonuses[s] || 0))}</span></div>`;
+      (breakdown[s] || []).filter(isFormulaBreakdown).forEach((b) => {
+        html += formatFormulaLine(b);
       });
 
       if (showCalculations) {
-        const buffLines = (breakdown[s] || []).filter(b => !isFormulaBreakdown(b));
-        if (buffLines.length) html+=`<div class="calc-buffs">${buffLines.map(formatBreakdownLine).join("")}</div>`;
+        const buffLines = (breakdown[s] || []).filter(
+          (b) => !isFormulaBreakdown(b),
+        );
+        if (buffLines.length)
+          html += `<div class="calc-buffs">${buffLines.map(formatBreakdownLine).join("")}</div>`;
       }
     });
 
-    d.innerHTML=html;
+    d.innerHTML = html;
     c.appendChild(d);
   });
 }
 
-function renderActiveBuffs(){
-  const c=document.getElementById("activeBuffs");
-  c.innerHTML="";
+function renderActiveBuffs() {
+  const c = document.getElementById("activeBuffs");
+  c.innerHTML = "";
 
-  activeBuffRows().forEach(({ buff: b, index: i })=>{
-    const d=document.createElement("div");
-    d.className="dice-row";
+  activeBuffRows().forEach(({ buff: b, index: i }) => {
+    const d = document.createElement("div");
+    d.className = "dice-row";
     const detailsId = `buffDetails${i}`;
     const bonusText = (b.bonuses || []).map(formatBonusText);
 
-    d.innerHTML=`
+    d.innerHTML = `
       <div class="d-flex justify-content-between align-items-start gap-2">
         <div>
           <strong>${escapeHtml(b.name)}</strong>
@@ -730,7 +1092,7 @@ function renderActiveBuffs(){
         </div>
       </div>
       <div id="${detailsId}" class="collapse mt-2">
-        ${bonusText.length ? bonusText.map(text => `<div class="small-text">↳ ${escapeHtml(text)}</div>`).join("") : '<div class="small-text">No mechanical bonuses listed.</div>'}
+        ${bonusText.length ? bonusText.map((text) => `<div class="small-text">↳ ${escapeHtml(text)}</div>`).join("") : '<div class="small-text">No mechanical bonuses listed.</div>'}
       </div>
     `;
     c.appendChild(d);
@@ -751,15 +1113,20 @@ async function loadBuffContext(contextKey) {
 
 async function loadCharacterOptions() {
   const sheets = await PFApp.loadCharacterSheets(buffContextKey);
-  await PFApp.setupCharacterSelect("navCharacterSelect", buffContextKey, null, { dispatch: false });
+  await PFApp.setupCharacterSelect("navCharacterSelect", buffContextKey, null, {
+    dispatch: false,
+  });
   selectedCharacterId = PFApp.getSelectedCharacterId(buffContextKey);
 
-  if (selectedCharacterId && sheets.some(sheet => sheet.id === selectedCharacterId)) {
+  if (
+    selectedCharacterId &&
+    sheets.some((sheet) => sheet.id === selectedCharacterId)
+  ) {
     await loadSelectedCharacter(selectedCharacterId);
   } else {
     selectedCharacterId = "";
     selectedCharacterSheet = null;
-    baseline = {...EMPTY_BASELINE};
+    baseline = { ...EMPTY_BASELINE };
     renderCharacterSummary();
   }
 }
@@ -770,23 +1137,33 @@ async function loadSelectedCharacter(characterId) {
   if (!selectedCharacterId) {
     selectedCharacterSheet = null;
     activeBuffs = [];
-    baseline = {...EMPTY_BASELINE};
+    baseline = { ...EMPTY_BASELINE };
     renderCharacterSummary();
     renderActiveBuffs();
     renderStats();
     return;
   }
 
-  const saved = await PFApp.loadCharacterSheet("", buffContextKey, selectedCharacterId);
+  const saved = await PFApp.loadCharacterSheet(
+    "",
+    buffContextKey,
+    selectedCharacterId,
+  );
   selectedCharacterSheet = saved?.sheet || null;
   baseline = sheetToBaseline(selectedCharacterSheet);
   if (!selectedCharacterSheet) {
-    document.getElementById("characterSummary").textContent = "Could not load the selected character sheet.";
+    document.getElementById("characterSummary").textContent =
+      "Could not load the selected character sheet.";
     renderStats();
     return;
   }
-  const savedBuffs = await PFApp.loadBuffState(buffContextKey, selectedCharacterId);
-  activeBuffs = Array.isArray(savedBuffs) ? savedBuffs : savedBuffs?.buffs || [];
+  const savedBuffs = await PFApp.loadBuffState(
+    buffContextKey,
+    selectedCharacterId,
+  );
+  activeBuffs = Array.isArray(savedBuffs)
+    ? savedBuffs
+    : savedBuffs?.buffs || [];
   renderCharacterSummary();
   renderActiveBuffs();
   renderStats();
@@ -801,8 +1178,10 @@ async function initBuffTracker() {
 
   buffContextKey = PFApp.getSelectedContextKey();
   await loadBuffContext(buffContextKey);
-  window.addEventListener("pf-context-change", event => loadBuffContext(event.detail.contextKey));
-  window.addEventListener("pf-character-change", event => {
+  window.addEventListener("pf-context-change", (event) =>
+    loadBuffContext(event.detail.contextKey),
+  );
+  window.addEventListener("pf-character-change", (event) => {
     if (event.detail.contextKey !== buffContextKey) return;
     loadSelectedCharacter(event.detail.characterId);
   });

@@ -1,9 +1,99 @@
 (function () {
-  const EFFECT_STATS = ["strength","dexterity","constitution","intelligence","wisdom","charisma","attack","melee attack","ranged attack","extra attack","damage","melee damage","ranged damage","ac","touch ac","flat-footed ac","remove dex bonus to ac","natural armor","deflection","fortitude","reflex","will","initiative","cmb","cmd","hit points","spell resistance"];
-  const SKILL_STATS = ["skill checks","strength skill checks","dexterity skill checks","constitution skill checks","intelligence skill checks","wisdom skill checks","charisma skill checks"];
-  const PF_SKILLS = ["Acrobatics","Appraise","Bluff","Climb","Diplomacy","Disable Device","Disguise","Escape Artist","Fly","Heal","Intimidate","Knowledge (arcana)","Knowledge (dungeoneering)","Knowledge (engineering)","Knowledge (geography)","Knowledge (history)","Knowledge (local)","Knowledge (nature)","Knowledge (nobility)","Knowledge (planes)","Knowledge (religion)","Linguistics","Perception","Ride","Sense Motive","Sleight of Hand","Spellcraft","Stealth","Survival","Swim","Use Magic Device"];
-  const SPECIFIC_SKILL_STATS = PF_SKILLS.map(skill => `skill:${skill.replace(/[^a-z0-9]/gi, "").toLowerCase()}`);
-  const BONUS_TYPES = ["untyped","alchemical","condition","penalty","armor","circumstance","competence","deflection","dodge","enhancement","insight","luck","morale","natural armor","profane","resistance","sacred","shield","size"];
+  const EFFECT_STATS = [
+    "strength",
+    "dexterity",
+    "constitution",
+    "intelligence",
+    "wisdom",
+    "charisma",
+    "attack",
+    "melee attack",
+    "ranged attack",
+    "extra attack",
+    "damage",
+    "melee damage",
+    "ranged damage",
+    "ac",
+    "touch ac",
+    "flat-footed ac",
+    "remove dex bonus to ac",
+    "natural armor",
+    "deflection",
+    "fortitude",
+    "reflex",
+    "will",
+    "initiative",
+    "cmb",
+    "cmd",
+    "hit points",
+    "spell resistance",
+  ];
+  const SKILL_STATS = [
+    "skill checks",
+    "strength skill checks",
+    "dexterity skill checks",
+    "constitution skill checks",
+    "intelligence skill checks",
+    "wisdom skill checks",
+    "charisma skill checks",
+  ];
+  const PF_SKILLS = [
+    "Acrobatics",
+    "Appraise",
+    "Bluff",
+    "Climb",
+    "Diplomacy",
+    "Disable Device",
+    "Disguise",
+    "Escape Artist",
+    "Fly",
+    "Heal",
+    "Intimidate",
+    "Knowledge (arcana)",
+    "Knowledge (dungeoneering)",
+    "Knowledge (engineering)",
+    "Knowledge (geography)",
+    "Knowledge (history)",
+    "Knowledge (local)",
+    "Knowledge (nature)",
+    "Knowledge (nobility)",
+    "Knowledge (planes)",
+    "Knowledge (religion)",
+    "Linguistics",
+    "Perception",
+    "Ride",
+    "Sense Motive",
+    "Sleight of Hand",
+    "Spellcraft",
+    "Stealth",
+    "Survival",
+    "Swim",
+    "Use Magic Device",
+  ];
+  const SPECIFIC_SKILL_STATS = PF_SKILLS.map(
+    (skill) => `skill:${skill.replace(/[^a-z0-9]/gi, "").toLowerCase()}`,
+  );
+  const BONUS_TYPES = [
+    "untyped",
+    "alchemical",
+    "condition",
+    "penalty",
+    "armor",
+    "circumstance",
+    "competence",
+    "deflection",
+    "dodge",
+    "enhancement",
+    "insight",
+    "luck",
+    "morale",
+    "natural armor",
+    "profane",
+    "resistance",
+    "sacred",
+    "shield",
+    "size",
+  ];
 
   let modal = null;
   let scaleModal = null;
@@ -21,30 +111,41 @@
   }
 
   function titleCaseStat(value) {
-    const key = String(value || "").toLowerCase().trim();
+    const key = String(value || "")
+      .toLowerCase()
+      .trim();
     if (key === "extra attack") return "Extra Attack at Highest BAB";
     if (key.startsWith("skill:")) {
-      const skill = PF_SKILLS.find(entry => `skill:${entry.replace(/[^a-z0-9]/gi, "").toLowerCase()}` === key);
+      const skill = PF_SKILLS.find(
+        (entry) =>
+          `skill:${entry.replace(/[^a-z0-9]/gi, "").toLowerCase()}` === key,
+      );
       return `Skill: ${skill || key.slice(6)}`;
     }
-    return key.split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
+    return key
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
   }
 
   function effectStatOptions(selected = "") {
-    const option = (value, label = titleCaseStat(value)) => `<option value="${escapeHtml(value)}" ${selected === value ? "selected" : ""}>${escapeHtml(label)}</option>`;
+    const option = (value, label = titleCaseStat(value)) =>
+      `<option value="${escapeHtml(value)}" ${selected === value ? "selected" : ""}>${escapeHtml(label)}</option>`;
     return `
-      <optgroup label="Stats">${EFFECT_STATS.map(stat => option(stat)).join("")}</optgroup>
+      <optgroup label="Stats">${EFFECT_STATS.map((stat) => option(stat)).join("")}</optgroup>
       <optgroup label="Skills">
-        ${SKILL_STATS.map(stat => option(stat)).join("")}
+        ${SKILL_STATS.map((stat) => option(stat)).join("")}
         <option value="skill:craft" ${selected === "skill:craft" ? "selected" : ""}>Skill: Craft</option>
         <option value="skill:profession" ${selected === "skill:profession" ? "selected" : ""}>Skill: Profession</option>
-        ${SPECIFIC_SKILL_STATS.map(stat => option(stat)).join("")}
+        ${SPECIFIC_SKILL_STATS.map((stat) => option(stat)).join("")}
       </optgroup>
     `;
   }
 
   function skillKey(name) {
-    return `skill:${String(name || "").replace(/[^a-z0-9]/gi, "").toLowerCase()}`;
+    return `skill:${String(name || "")
+      .replace(/[^a-z0-9]/gi, "")
+      .toLowerCase()}`;
   }
 
   function namedSkill(kind, value) {
@@ -56,7 +157,12 @@
   }
 
   function ensureModal() {
-    if (initialized && document.getElementById("classFeatureEditorModal") && document.getElementById("classFeatureScaleModal")) return;
+    if (
+      initialized &&
+      document.getElementById("classFeatureEditorModal") &&
+      document.getElementById("classFeatureScaleModal")
+    )
+      return;
     document.getElementById("classFeatureEditorModal")?.remove();
     document.getElementById("classFeatureScaleModal")?.remove();
     initialized = true;
@@ -143,30 +249,46 @@
     `;
     document.body.appendChild(scaleWrapper.firstElementChild);
 
-    document.getElementById("addClassFeatureEffect").addEventListener("click", () => addEffectRow());
-    document.getElementById("addClassFeatureScaleMilestone").addEventListener("click", () => addScaleMilestoneRow());
-    document.getElementById("clearClassFeatureScale").addEventListener("click", clearScale);
-    document.getElementById("saveClassFeatureScale").addEventListener("click", saveScale);
-    document.getElementById("classFeatureEditorForm").addEventListener("submit", event => {
-      event.preventDefault();
-      const feature = collectFeature();
-      if (!feature.name) return;
-      resolver?.(feature);
-      modal.hide();
-    });
-    document.getElementById("classFeatureEditorModal").addEventListener("hidden.bs.modal", () => {
-      resolver?.(null);
-      resolver = null;
-    });
+    document
+      .getElementById("addClassFeatureEffect")
+      .addEventListener("click", () => addEffectRow());
+    document
+      .getElementById("addClassFeatureScaleMilestone")
+      .addEventListener("click", () => addScaleMilestoneRow());
+    document
+      .getElementById("clearClassFeatureScale")
+      .addEventListener("click", clearScale);
+    document
+      .getElementById("saveClassFeatureScale")
+      .addEventListener("click", saveScale);
+    document
+      .getElementById("classFeatureEditorForm")
+      .addEventListener("submit", (event) => {
+        event.preventDefault();
+        const feature = collectFeature();
+        if (!feature.name) return;
+        resolver?.(feature);
+        modal.hide();
+      });
+    document
+      .getElementById("classFeatureEditorModal")
+      .addEventListener("hidden.bs.modal", () => {
+        resolver?.(null);
+        resolver = null;
+      });
   }
 
   function addEffectRow(data = {}) {
     const rows = document.getElementById("classFeatureEffectRows");
     const row = document.createElement("div");
     row.className = "class-feature-effect-row";
-    const selectedStat = String(data.skillName || "").toLowerCase().startsWith("profession")
+    const selectedStat = String(data.skillName || "")
+      .toLowerCase()
+      .startsWith("profession")
       ? "skill:profession"
-      : String(data.skillName || "").toLowerCase().startsWith("craft")
+      : String(data.skillName || "")
+            .toLowerCase()
+            .startsWith("craft")
         ? "skill:craft"
         : data.stat || "";
     row.innerHTML = `
@@ -185,7 +307,7 @@
       <div>
         <label>Type</label>
         <select data-effect-field="type" class="form-select form-select-sm">
-          ${BONUS_TYPES.map(type => `<option value="${escapeHtml(type)}" ${(data.type || "untyped") === type ? "selected" : ""}>${escapeHtml(type)}</option>`).join("")}
+          ${BONUS_TYPES.map((type) => `<option value="${escapeHtml(type)}" ${(data.type || "untyped") === type ? "selected" : ""}>${escapeHtml(type)}</option>`).join("")}
         </select>
       </div>
       <div>
@@ -215,21 +337,29 @@
     const namedSkillField = row.querySelector(".named-skill-field");
     const skillNameInput = row.querySelector('[data-effect-field="skillName"]');
     const syncNamedSkill = () => {
-      const named = ["skill:craft", "skill:profession"].includes(statSelect.value);
+      const named = ["skill:craft", "skill:profession"].includes(
+        statSelect.value,
+      );
       namedSkillField.classList.toggle("d-none", !named);
-      skillNameInput.placeholder = statSelect.value === "skill:profession" ? "Sailor" : "Alchemy";
+      skillNameInput.placeholder =
+        statSelect.value === "skill:profession" ? "Sailor" : "Alchemy";
     };
     statSelect.addEventListener("change", syncNamedSkill);
     syncNamedSkill();
-    row.querySelector("[data-scale-bonus]").addEventListener("click", () => openScaleModal(row));
-    row.querySelector('button[aria-label="Delete effect"]').addEventListener("click", () => row.remove());
+    row
+      .querySelector("[data-scale-bonus]")
+      .addEventListener("click", () => openScaleModal(row));
+    row
+      .querySelector('button[aria-label="Delete effect"]')
+      .addEventListener("click", () => row.remove());
     updateScaleSummary(row);
     rows.appendChild(row);
   }
 
   function scaleSourceLabel(source = {}) {
     if (source.type === "character") return "character level";
-    if (source.type === "class") return source.className ? `${source.className} level` : "class level";
+    if (source.type === "class")
+      return source.className ? `${source.className} level` : "class level";
     return "caster level";
   }
 
@@ -239,11 +369,20 @@
     const source = scaleSourceLabel(scale.source || { type: "caster" });
     const milestones = Array.isArray(scale.milestones) ? scale.milestones : [];
     if (milestones.length) {
-      parts.push(milestones.map(milestone => `${source} ${milestone.level}: ${milestone.value >= 0 ? "+" : ""}${milestone.value}`).join(", "));
+      parts.push(
+        milestones
+          .map(
+            (milestone) =>
+              `${source} ${milestone.level}: ${milestone.value >= 0 ? "+" : ""}${milestone.value}`,
+          )
+          .join(", "),
+      );
     }
     const every = scale.every || {};
     if (every.afterLevel && every.everyLevels && every.increase) {
-      parts.push(`after ${source} ${every.afterLevel}, every ${every.everyLevels}: ${every.increase >= 0 ? "+" : ""}${every.increase}`);
+      parts.push(
+        `after ${source} ${every.afterLevel}, every ${every.everyLevels}: ${every.increase >= 0 ? "+" : ""}${every.increase}`,
+      );
     }
     return parts.join("; ");
   }
@@ -286,30 +425,57 @@
     }
     document.getElementById("classFeatureScaleRows").innerHTML = "";
     const milestones = Array.isArray(scale.milestones) ? scale.milestones : [];
-    if (milestones.length) milestones.forEach(milestone => addScaleMilestoneRow(milestone));
+    if (milestones.length)
+      milestones.forEach((milestone) => addScaleMilestoneRow(milestone));
     else addScaleMilestoneRow();
     const every = scale.every || {};
-    document.getElementById("classFeatureScaleAfter").value = every.afterLevel || "";
-    document.getElementById("classFeatureScaleEvery").value = every.everyLevels || "";
-    document.getElementById("classFeatureScaleIncrease").value = every.increase ?? "";
-    scaleModal = bootstrap.Modal.getOrCreateInstance(document.getElementById("classFeatureScaleModal"));
+    document.getElementById("classFeatureScaleAfter").value =
+      every.afterLevel || "";
+    document.getElementById("classFeatureScaleEvery").value =
+      every.everyLevels || "";
+    document.getElementById("classFeatureScaleIncrease").value =
+      every.increase ?? "";
+    scaleModal = bootstrap.Modal.getOrCreateInstance(
+      document.getElementById("classFeatureScaleModal"),
+    );
     scaleModal.show();
   }
 
   function collectScale() {
-    const milestones = [...document.querySelectorAll("#classFeatureScaleRows .class-feature-scale-row")]
-      .map(row => ({
-        level: Number.parseInt(row.querySelector('[data-scale-field="level"]').value, 10),
-        value: Number(row.querySelector('[data-scale-field="value"]').value)
+    const milestones = [
+      ...document.querySelectorAll(
+        "#classFeatureScaleRows .class-feature-scale-row",
+      ),
+    ]
+      .map((row) => ({
+        level: Number.parseInt(
+          row.querySelector('[data-scale-field="level"]').value,
+          10,
+        ),
+        value: Number(row.querySelector('[data-scale-field="value"]').value),
       }))
-      .filter(milestone => milestone.level > 0 && Number.isFinite(milestone.value))
+      .filter(
+        (milestone) => milestone.level > 0 && Number.isFinite(milestone.value),
+      )
       .sort((a, b) => a.level - b.level);
-    const afterLevel = Number.parseInt(document.getElementById("classFeatureScaleAfter").value, 10);
-    const everyLevels = Number.parseInt(document.getElementById("classFeatureScaleEvery").value, 10);
-    const increase = Number(document.getElementById("classFeatureScaleIncrease").value);
-    const every = afterLevel > 0 && everyLevels > 0 && Number.isFinite(increase) && increase !== 0
-      ? { afterLevel, everyLevels, increase }
-      : null;
+    const afterLevel = Number.parseInt(
+      document.getElementById("classFeatureScaleAfter").value,
+      10,
+    );
+    const everyLevels = Number.parseInt(
+      document.getElementById("classFeatureScaleEvery").value,
+      10,
+    );
+    const increase = Number(
+      document.getElementById("classFeatureScaleIncrease").value,
+    );
+    const every =
+      afterLevel > 0 &&
+      everyLevels > 0 &&
+      Number.isFinite(increase) &&
+      increase !== 0
+        ? { afterLevel, everyLevels, increase }
+        : null;
     if (!milestones.length && !every) return null;
     const sourceSelect = document.getElementById("classFeatureScaleSource");
     const source = window.PFEffectMeta?.sourceFromSelect
@@ -322,40 +488,63 @@
     if (!editingScaleRow) return;
     editingScaleRow._bonusScale = null;
     updateScaleSummary(editingScaleRow);
-    bootstrap.Modal.getInstance(document.getElementById("classFeatureScaleModal"))?.hide();
+    bootstrap.Modal.getInstance(
+      document.getElementById("classFeatureScaleModal"),
+    )?.hide();
   }
 
   function saveScale() {
     if (!editingScaleRow) return;
     editingScaleRow._bonusScale = collectScale();
     updateScaleSummary(editingScaleRow);
-    bootstrap.Modal.getInstance(document.getElementById("classFeatureScaleModal"))?.hide();
+    bootstrap.Modal.getInstance(
+      document.getElementById("classFeatureScaleModal"),
+    )?.hide();
   }
 
   function collectEffects() {
-    return [...document.querySelectorAll("#classFeatureEffectRows .class-feature-effect-row")].map(row => {
-      const selectedStat = row.querySelector('[data-effect-field="stat"]').value;
-      const skillName = ["skill:craft", "skill:profession"].includes(selectedStat)
-        ? namedSkill(selectedStat, row.querySelector('[data-effect-field="skillName"]')?.value)
+    return [
+      ...document.querySelectorAll(
+        "#classFeatureEffectRows .class-feature-effect-row",
+      ),
+    ].map((row) => {
+      const selectedStat = row.querySelector(
+        '[data-effect-field="stat"]',
+      ).value;
+      const skillName = ["skill:craft", "skill:profession"].includes(
+        selectedStat,
+      )
+        ? namedSkill(
+            selectedStat,
+            row.querySelector('[data-effect-field="skillName"]')?.value,
+          )
         : "";
       const effect = {
         stat: skillName ? skillKey(skillName) : selectedStat,
-        value: Number(row.querySelector('[data-effect-field="value"]').value || 0),
-        type: row.querySelector('[data-effect-field="type"]').value || "untyped",
+        value: Number(
+          row.querySelector('[data-effect-field="value"]').value || 0,
+        ),
+        type:
+          row.querySelector('[data-effect-field="type"]').value || "untyped",
         stacks: row.querySelector('[data-effect-field="stacks"]').checked,
-      conditional: row.querySelector('[data-effect-field="conditional"]').checked,
-      appliesWhen: row.querySelector('[data-effect-field="appliesWhen"]').value.trim()
-    };
-    if (skillName) effect.skillName = skillName;
-    if (row._bonusScale) effect.bonusScale = row._bonusScale;
-    return effect;
-  });
+        conditional: row.querySelector('[data-effect-field="conditional"]')
+          .checked,
+        appliesWhen: row
+          .querySelector('[data-effect-field="appliesWhen"]')
+          .value.trim(),
+      };
+      if (skillName) effect.skillName = skillName;
+      if (row._bonusScale) effect.bonusScale = row._bonusScale;
+      return effect;
+    });
   }
 
   function collectFeature() {
     const feature = {
       name: document.getElementById("classFeatureName").value.trim(),
-      description: document.getElementById("classFeatureDescription").value.trim()
+      description: document
+        .getElementById("classFeatureDescription")
+        .value.trim(),
     };
     const effects = collectEffects();
     if (effects.length) feature.effects = effects;
@@ -365,13 +554,18 @@
   function open(feature = {}) {
     ensureModal();
     document.getElementById("classFeatureName").value = feature.name || "";
-    document.getElementById("classFeatureDescription").value = feature.description || "";
+    document.getElementById("classFeatureDescription").value =
+      feature.description || "";
     document.getElementById("classFeatureEffectRows").innerHTML = "";
-    (Array.isArray(feature.effects) ? feature.effects : []).forEach(effect => addEffectRow(effect));
-    modal = bootstrap.Modal.getOrCreateInstance(document.getElementById("classFeatureEditorModal"));
+    (Array.isArray(feature.effects) ? feature.effects : []).forEach((effect) =>
+      addEffectRow(effect),
+    );
+    modal = bootstrap.Modal.getOrCreateInstance(
+      document.getElementById("classFeatureEditorModal"),
+    );
     modal.show();
     setTimeout(() => document.getElementById("classFeatureName").focus(), 150);
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       resolver = resolve;
     });
   }

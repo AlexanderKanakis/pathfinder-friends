@@ -1,6 +1,8 @@
 let bagContextKey = "general";
 let bagCharacters = [];
 let bagLoot = [];
+let bagCurrentUserId = "";
+let bagCanManageContext = false;
 let sourceItems = [];
 let lootModal;
 let sourceItemModal;
@@ -22,19 +24,227 @@ const typeIcons = {
   Weapon: "bi bi-crosshair",
   Armor: "bi bi-shield-fill",
   Shield: "bi bi-shield",
-  Item: "bi bi-gem"
+  Item: "bi bi-gem",
 };
-const EFFECT_STATS = ["strength","dexterity","constitution","intelligence","wisdom","charisma","attack","melee attack","ranged attack","extra attack","damage","melee damage","ranged damage","ac","touch ac","flat-footed ac","natural armor","deflection","fortitude","reflex","will","initiative","cmb","cmd","hit points","spell resistance"];
-const SKILL_STATS = ["skill checks","strength skill checks","dexterity skill checks","constitution skill checks","intelligence skill checks","wisdom skill checks","charisma skill checks"];
-const PF_SKILLS = ["Acrobatics","Appraise","Bluff","Climb","Diplomacy","Disable Device","Disguise","Escape Artist","Fly","Heal","Intimidate","Knowledge (arcana)","Knowledge (dungeoneering)","Knowledge (engineering)","Knowledge (geography)","Knowledge (history)","Knowledge (local)","Knowledge (nature)","Knowledge (nobility)","Knowledge (planes)","Knowledge (religion)","Linguistics","Perception","Ride","Sense Motive","Sleight of Hand","Spellcraft","Stealth","Survival","Swim","Use Magic Device"];
-const SPECIFIC_SKILL_STATS = PF_SKILLS.map(skill => `skill:${skill.replace(/[^a-z0-9]/gi, "").toLowerCase()}`);
-const BONUS_TYPES = ["untyped","alchemical","condition","penalty","armor","circumstance","competence","deflection","dodge","enhancement","insight","luck","morale","natural armor","profane","resistance","sacred","shield","size"];
-const WEAPON_TYPES = ["Melee Weapon (Light)", "Melee Weapon (One-Handed)", "Melee Weapon (Two-Handed)", "Ranged Weapon", "Firearm (One-Handed)", "Firearm (Two-Handed)", "Natural"];
+const EFFECT_STATS = [
+  "strength",
+  "dexterity",
+  "constitution",
+  "intelligence",
+  "wisdom",
+  "charisma",
+  "attack",
+  "melee attack",
+  "ranged attack",
+  "extra attack",
+  "damage",
+  "melee damage",
+  "ranged damage",
+  "ac",
+  "touch ac",
+  "flat-footed ac",
+  "natural armor",
+  "deflection",
+  "fortitude",
+  "reflex",
+  "will",
+  "initiative",
+  "cmb",
+  "cmd",
+  "hit points",
+  "spell resistance",
+];
+const SKILL_STATS = [
+  "skill checks",
+  "strength skill checks",
+  "dexterity skill checks",
+  "constitution skill checks",
+  "intelligence skill checks",
+  "wisdom skill checks",
+  "charisma skill checks",
+];
+const PF_SKILLS = [
+  "Acrobatics",
+  "Appraise",
+  "Bluff",
+  "Climb",
+  "Diplomacy",
+  "Disable Device",
+  "Disguise",
+  "Escape Artist",
+  "Fly",
+  "Heal",
+  "Intimidate",
+  "Knowledge (arcana)",
+  "Knowledge (dungeoneering)",
+  "Knowledge (engineering)",
+  "Knowledge (geography)",
+  "Knowledge (history)",
+  "Knowledge (local)",
+  "Knowledge (nature)",
+  "Knowledge (nobility)",
+  "Knowledge (planes)",
+  "Knowledge (religion)",
+  "Linguistics",
+  "Perception",
+  "Ride",
+  "Sense Motive",
+  "Sleight of Hand",
+  "Spellcraft",
+  "Stealth",
+  "Survival",
+  "Swim",
+  "Use Magic Device",
+];
+const SPECIFIC_SKILL_STATS = PF_SKILLS.map(
+  (skill) => `skill:${skill.replace(/[^a-z0-9]/gi, "").toLowerCase()}`,
+);
+const BONUS_TYPES = [
+  "untyped",
+  "alchemical",
+  "condition",
+  "penalty",
+  "armor",
+  "circumstance",
+  "competence",
+  "deflection",
+  "dodge",
+  "enhancement",
+  "insight",
+  "luck",
+  "morale",
+  "natural armor",
+  "profane",
+  "resistance",
+  "sacred",
+  "shield",
+  "size",
+];
+const WEAPON_TYPES = [
+  "Melee Weapon (Light)",
+  "Melee Weapon (One-Handed)",
+  "Melee Weapon (Two-Handed)",
+  "Ranged Weapon",
+  "Firearm (One-Handed)",
+  "Firearm (Two-Handed)",
+  "Natural",
+];
 const ITEM_SLOTS = PFItemEditor.DEFAULT_SLOTS;
-const WEAPON_ENCHANTMENTS = ["", "Adaptive", "Allying", "Anarchic", "Anchoring", "Axiomatic", "Bane", "Brilliant Energy", "Called", "Conductive", "Corrosive", "Corrosive Burst", "Cruel", "Cunning", "Dancing", "Defending", "Disruption", "Distance", "Flaming", "Flaming Burst", "Frost", "Furious", "Ghost Touch", "Holy", "Icy Burst", "Impact", "Keen", "Merciful", "Returning", "Seeking", "Shock", "Shocking Burst", "Speed", "Spell Storing", "Throwing", "Thundering", "Unholy", "Vicious", "Vorpal", "Wounding"];
-const ARMOR_ENCHANTMENTS = ["", "Balanced", "Benevolent", "Bitter", "Bolstering", "Brawling", "Champion", "Dastard", "Deathless", "Defiant", "Determination", "Energy Resistance", "Energy Resistance (Improved)", "Energy Resistance (Greater)", "Etherealness", "Fortification (Light)", "Fortification (Moderate)", "Fortification (Heavy)", "Ghost Touch", "Glamered", "Invulnerability", "Shadow", "Shadow (Improved)", "Shadow (Greater)", "Slick", "Slick (Improved)", "Slick (Greater)", "Spell Resistance (13)", "Spell Resistance (15)", "Spell Resistance (17)", "Spell Resistance (19)", "Wild"];
-const SHIELD_ENCHANTMENTS = ["", "Animated", "Arrow Catching", "Arrow Deflection", "Bashing", "Blinding", "Clangorous", "Defiant", "Determination", "Energy Resistance", "Energy Resistance (Improved)", "Energy Resistance (Greater)", "Fortification (Light)", "Fortification (Moderate)", "Fortification (Heavy)", "Ghost Touch", "Impervious", "Merging", "Mirrored", "Poison-Resistant", "Rallying", "Ramming", "Reflecting", "Spell Resistance (13)", "Spell Resistance (15)", "Spell Resistance (17)", "Spell Resistance (19)", "Wild"];
-const MUNDANE_CATEGORIES = ["Adventuring Gear", "Alchemical Creations", "Books, Paper, & Writing Supplies", "Clothing & Containers", "Locks, Keys, Tools & Kits", "Religious Items", "Toys & Games"];
+const WEAPON_ENCHANTMENTS = [
+  "",
+  "Adaptive",
+  "Allying",
+  "Anarchic",
+  "Anchoring",
+  "Axiomatic",
+  "Bane",
+  "Brilliant Energy",
+  "Called",
+  "Conductive",
+  "Corrosive",
+  "Corrosive Burst",
+  "Cruel",
+  "Cunning",
+  "Dancing",
+  "Defending",
+  "Disruption",
+  "Distance",
+  "Flaming",
+  "Flaming Burst",
+  "Frost",
+  "Furious",
+  "Ghost Touch",
+  "Holy",
+  "Icy Burst",
+  "Impact",
+  "Keen",
+  "Merciful",
+  "Returning",
+  "Seeking",
+  "Shock",
+  "Shocking Burst",
+  "Speed",
+  "Spell Storing",
+  "Throwing",
+  "Thundering",
+  "Unholy",
+  "Vicious",
+  "Vorpal",
+  "Wounding",
+];
+const ARMOR_ENCHANTMENTS = [
+  "",
+  "Balanced",
+  "Benevolent",
+  "Bitter",
+  "Bolstering",
+  "Brawling",
+  "Champion",
+  "Dastard",
+  "Deathless",
+  "Defiant",
+  "Determination",
+  "Energy Resistance",
+  "Energy Resistance (Improved)",
+  "Energy Resistance (Greater)",
+  "Etherealness",
+  "Fortification (Light)",
+  "Fortification (Moderate)",
+  "Fortification (Heavy)",
+  "Ghost Touch",
+  "Glamered",
+  "Invulnerability",
+  "Shadow",
+  "Shadow (Improved)",
+  "Shadow (Greater)",
+  "Slick",
+  "Slick (Improved)",
+  "Slick (Greater)",
+  "Spell Resistance (13)",
+  "Spell Resistance (15)",
+  "Spell Resistance (17)",
+  "Spell Resistance (19)",
+  "Wild",
+];
+const SHIELD_ENCHANTMENTS = [
+  "",
+  "Animated",
+  "Arrow Catching",
+  "Arrow Deflection",
+  "Bashing",
+  "Blinding",
+  "Clangorous",
+  "Defiant",
+  "Determination",
+  "Energy Resistance",
+  "Energy Resistance (Improved)",
+  "Energy Resistance (Greater)",
+  "Fortification (Light)",
+  "Fortification (Moderate)",
+  "Fortification (Heavy)",
+  "Ghost Touch",
+  "Impervious",
+  "Merging",
+  "Mirrored",
+  "Poison-Resistant",
+  "Rallying",
+  "Ramming",
+  "Reflecting",
+  "Spell Resistance (13)",
+  "Spell Resistance (15)",
+  "Spell Resistance (17)",
+  "Spell Resistance (19)",
+  "Wild",
+];
+const MUNDANE_CATEGORIES = [
+  "Adventuring Gear",
+  "Alchemical Creations",
+  "Books, Paper, & Writing Supplies",
+  "Clothing & Containers",
+  "Locks, Keys, Tools & Kits",
+  "Religious Items",
+  "Toys & Games",
+];
 
 function el(id) {
   return document.getElementById(id);
@@ -54,14 +264,25 @@ function setBagView(mode) {
   sessionStorage.setItem("pf_bag_view", bagViewMode);
   const simple = bagViewMode === "simplified";
   el("bagFullViewBtn")?.classList.toggle("active", !simple);
-  el("bagFullViewBtn")?.setAttribute("aria-selected", !simple ? "true" : "false");
+  el("bagFullViewBtn")?.setAttribute(
+    "aria-selected",
+    !simple ? "true" : "false",
+  );
   el("bagSimplifiedViewBtn")?.classList.toggle("active", simple);
-  el("bagSimplifiedViewBtn")?.setAttribute("aria-selected", simple ? "true" : "false");
+  el("bagSimplifiedViewBtn")?.setAttribute(
+    "aria-selected",
+    simple ? "true" : "false",
+  );
   renderLoot();
 }
 
 function optionList(options, selected = "") {
-  return options.map(value => `<option value="${escapeHtml(value)}" ${value === selected ? "selected" : ""}>${value || "None"}</option>`).join("");
+  return options
+    .map(
+      (value) =>
+        `<option value="${escapeHtml(value)}" ${value === selected ? "selected" : ""}>${value || "None"}</option>`,
+    )
+    .join("");
 }
 
 function armorEnchantmentOptions(selected = "") {
@@ -73,30 +294,41 @@ function armorEnchantmentOptions(selected = "") {
 }
 
 function titleCaseStat(value) {
-  const key = String(value || "").toLowerCase().trim();
+  const key = String(value || "")
+    .toLowerCase()
+    .trim();
   if (key === "extra attack") return "Extra Attack at Highest BAB";
   if (key.startsWith("skill:")) {
-    const skill = PF_SKILLS.find(entry => `skill:${entry.replace(/[^a-z0-9]/gi, "").toLowerCase()}` === key);
+    const skill = PF_SKILLS.find(
+      (entry) =>
+        `skill:${entry.replace(/[^a-z0-9]/gi, "").toLowerCase()}` === key,
+    );
     return `Skill: ${skill || key.slice(6)}`;
   }
-  return key.split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
+  return key
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
 }
 
 function effectStatOptions(selected = "") {
-  const option = (value, label = titleCaseStat(value)) => `<option value="${escapeHtml(value)}" ${selected === value ? "selected" : ""}>${escapeHtml(label)}</option>`;
+  const option = (value, label = titleCaseStat(value)) =>
+    `<option value="${escapeHtml(value)}" ${selected === value ? "selected" : ""}>${escapeHtml(label)}</option>`;
   return `
-    <optgroup label="Stats">${EFFECT_STATS.map(stat => option(stat)).join("")}</optgroup>
+    <optgroup label="Stats">${EFFECT_STATS.map((stat) => option(stat)).join("")}</optgroup>
     <optgroup label="Skills">
-      ${SKILL_STATS.map(stat => option(stat)).join("")}
+      ${SKILL_STATS.map((stat) => option(stat)).join("")}
       <option value="skill:craft" ${selected === "skill:craft" ? "selected" : ""}>Skill: Craft</option>
       <option value="skill:profession" ${selected === "skill:profession" ? "selected" : ""}>Skill: Profession</option>
-      ${SPECIFIC_SKILL_STATS.map(stat => option(stat)).join("")}
+      ${SPECIFIC_SKILL_STATS.map((stat) => option(stat)).join("")}
     </optgroup>
   `;
 }
 
 function skillKey(name) {
-  return `skill:${String(name || "").replace(/[^a-z0-9]/gi, "").toLowerCase()}`;
+  return `skill:${String(name || "")
+    .replace(/[^a-z0-9]/gi, "")
+    .toLowerCase()}`;
 }
 
 function namedSkill(kind, value) {
@@ -120,12 +352,27 @@ function clearLootStatus() {
 
 function characterLabel(character) {
   const owner = character?.username || character?.email || "";
-  return owner ? `${character.name} (${owner})` : character?.name || "Unnamed character";
+  return owner
+    ? `${character.name} (${owner})`
+    : character?.name || "Unnamed character";
+}
+
+function isOwnBagCharacter(character) {
+  return Boolean(bagCurrentUserId && character?.userId === bagCurrentUserId);
+}
+
+function orderedBagCharacters() {
+  if (bagCanManageContext) return bagCharacters;
+  const ownCharacters = bagCharacters.filter(isOwnBagCharacter);
+  const otherCharacters = bagCharacters.filter(
+    (character) => !isOwnBagCharacter(character),
+  );
+  return [...ownCharacters, ...otherCharacters];
 }
 
 function renderCharacterOptions(select, selectedCharacterId = "") {
   select.innerHTML = `<option value="">Unassigned</option>`;
-  bagCharacters.forEach(character => {
+  orderedBagCharacters().forEach((character) => {
     const option = document.createElement("option");
     option.value = character.id;
     option.textContent = characterLabel(character);
@@ -144,14 +391,33 @@ function collapsedLootStorageKey() {
 
 function loadCollapsedLootGroups() {
   try {
-    collapsedLootGroups = new Set(JSON.parse(localStorage.getItem(collapsedLootStorageKey()) || "[]"));
+    collapsedLootGroups = new Set(
+      JSON.parse(localStorage.getItem(collapsedLootStorageKey()) || "[]"),
+    );
   } catch {
     collapsedLootGroups = new Set();
   }
 }
 
+function applyRoleBasedCollapseDefaults() {
+  if (bagCanManageContext) return;
+
+  const ownCharacterIds = new Set(
+    bagCharacters.filter(isOwnBagCharacter).map((character) => character.id),
+  );
+  collapsedLootGroups = new Set([
+    "unassigned",
+    ...bagCharacters
+      .filter((character) => !ownCharacterIds.has(character.id))
+      .map((character) => character.id),
+  ]);
+}
+
 function saveCollapsedLootGroups() {
-  localStorage.setItem(collapsedLootStorageKey(), JSON.stringify([...collapsedLootGroups]));
+  localStorage.setItem(
+    collapsedLootStorageKey(),
+    JSON.stringify([...collapsedLootGroups]),
+  );
 }
 
 function toggleLootGroup(groupKey) {
@@ -172,7 +438,9 @@ function stripSourceHtml(value) {
 }
 
 function normalizeWondrousSlot(value = "") {
-  const slot = String(value || "").toLowerCase().trim();
+  const slot = String(value || "")
+    .toLowerCase()
+    .trim();
   if (!slot || slot === "-") return "none";
   if (slot.includes("armor")) return "armor";
   if (slot.includes("shield")) return "shield";
@@ -183,10 +451,26 @@ function normalizeWondrousSlot(value = "") {
   if (slot.includes("headband")) return "headband";
   if (slot.includes("head") || slot.includes("helm")) return "head";
   if (slot.includes("eye") || slot.includes("goggle")) return "eyes";
-  if (slot.includes("neck") || slot.includes("amulet") || slot.includes("necklace")) return "neck";
-  if (slot.includes("shoulder") || slot.includes("cloak") || slot.includes("mantle") || slot.includes("back")) return "shoulders";
+  if (
+    slot.includes("neck") ||
+    slot.includes("amulet") ||
+    slot.includes("necklace")
+  )
+    return "neck";
+  if (
+    slot.includes("shoulder") ||
+    slot.includes("cloak") ||
+    slot.includes("mantle") ||
+    slot.includes("back")
+  )
+    return "shoulders";
   if (slot.includes("wrist")) return "wrists";
-  if (slot.includes("hand") || slot.includes("glove") || slot.includes("gauntlet")) return "hands";
+  if (
+    slot.includes("hand") ||
+    slot.includes("glove") ||
+    slot.includes("gauntlet")
+  )
+    return "hands";
   if (slot.includes("feet") || slot.includes("boot")) return "feet";
   if (slot.includes("belt")) return "belt";
   if (slot.includes("chest") || slot.includes("torso")) return "chest";
@@ -212,7 +496,9 @@ function itemSlotLabel(item) {
 
 function renderSlotValue(item) {
   const slot = itemSlotLabel(item);
-  return slot ? `${wondrousSlotIcon(slot)}<span>${escapeHtml(slot)}</span>` : "";
+  return slot
+    ? `${wondrousSlotIcon(slot)}<span>${escapeHtml(slot)}</span>`
+    : "";
 }
 
 function updateLootSlotPreview() {
@@ -255,7 +541,9 @@ function inferWondrousType(item) {
 function normalizeWondrousSourceItem(item, index) {
   const details = item.details || {};
   const type = inferWondrousType(item);
-  const description = stripSourceHtml(details.description || item.description || "");
+  const description = stripSourceHtml(
+    details.description || item.description || "",
+  );
   return {
     id: `wondrous:${index}`,
     sourceType: "Wondrous Item",
@@ -272,9 +560,9 @@ function normalizeWondrousSourceItem(item, index) {
       weight: details.weight || "",
       requirements: details.requirements || "",
       cost: details.cost || "",
-      link: item.link || ""
+      link: item.link || "",
     },
-    effects: []
+    effects: [],
   };
 }
 
@@ -282,11 +570,17 @@ function normalizeAlchemicalSourceItem(item, index) {
   const description = [
     ...(item.desc || []),
     ...(item.flavor || []),
-    ...(Array.isArray(item.effect) ? item.effect : item.effect ? [item.effect] : []),
+    ...(Array.isArray(item.effect)
+      ? item.effect
+      : item.effect
+        ? [item.effect]
+        : []),
     item.damage || "",
     item.cure ? `Cure: ${item.cure}` : "",
-    item.addiction ? `Addiction: ${item.addiction}` : ""
-  ].filter(Boolean).join(" ");
+    item.addiction ? `Addiction: ${item.addiction}` : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
   return {
     id: `alchemical:${index}`,
     sourceType: "Alchemical Item",
@@ -300,9 +594,9 @@ function normalizeAlchemicalSourceItem(item, index) {
       craftDc: item.dc || "",
       price: `${item.gp || 0} gp${item.sp ? `, ${item.sp} sp` : ""}${item.cp ? `, ${item.cp} cp` : ""}`,
       subtype: item.type || "",
-      link: item.link || ""
+      link: item.link || "",
     },
-    effects: []
+    effects: [],
   };
 }
 
@@ -323,9 +617,9 @@ function normalizeMundaneSourceItem(item, index) {
       weight: details.weight || "",
       sourceBook: details.sourceBook || "",
       link: details.link || "",
-      summary: details.summary || ""
+      summary: details.summary || "",
     },
-    effects: Array.isArray(item.effects) ? item.effects : []
+    effects: Array.isArray(item.effects) ? item.effects : [],
   };
 }
 
@@ -335,12 +629,16 @@ function normalizeWeaponSourceItem(item, index) {
     id: `weapon:${index}`,
     sourceType: "Weapon",
     name: item.name || "Weapon",
-    description: item.description || [
-      details.proficiency,
-      details.weaponGroup,
-      details.damageType ? `Damage type: ${details.damageType}` : "",
-      details.special ? `Special: ${details.special}` : ""
-    ].filter(Boolean).join(". "),
+    description:
+      item.description ||
+      [
+        details.proficiency,
+        details.weaponGroup,
+        details.damageType ? `Damage type: ${details.damageType}` : "",
+        details.special ? `Special: ${details.special}` : "",
+      ]
+        .filter(Boolean)
+        .join(". "),
     type: item.type || "Weapon",
     count: item.count || 1,
     details: {
@@ -361,9 +659,9 @@ function normalizeWeaponSourceItem(item, index) {
       damageType: details.damageType || "",
       special: details.special || "",
       sourceBook: details.sourceBook || "",
-      link: details.link || ""
+      link: details.link || "",
     },
-    effects: Array.isArray(item.effects) ? item.effects : []
+    effects: Array.isArray(item.effects) ? item.effects : [],
   };
 }
 
@@ -376,7 +674,7 @@ function normalizeFirearmSourceItem(item, index) {
     source: item.details?.source || "d20pfsrd firearms",
     firearmEra: item.details?.firearmEra || "",
     misfire: item.details?.misfire || "",
-    capacity: item.details?.capacity || ""
+    capacity: item.details?.capacity || "",
   };
   return normalized;
 }
@@ -406,9 +704,9 @@ function normalizeArmorShieldSourceItem(item, index) {
       weight: details.weight || "",
       sourceBook: details.sourceBook || "",
       link: details.link || "",
-      summary: details.summary || ""
+      summary: details.summary || "",
     },
-    effects: Array.isArray(item.effects) ? item.effects : []
+    effects: Array.isArray(item.effects) ? item.effects : [],
   };
 }
 
@@ -422,7 +720,9 @@ async function loadSourceItems() {
     const response = await fetch("./data/weapons.json", { cache: "no-cache" });
     if (response.ok) {
       const data = await response.json();
-      weapons = (Array.isArray(data) ? data : []).map(normalizeWeaponSourceItem);
+      weapons = (Array.isArray(data) ? data : []).map(
+        normalizeWeaponSourceItem,
+      );
     }
   } catch (error) {
     console.info("No generated weapons.json found yet.", error);
@@ -432,17 +732,23 @@ async function loadSourceItems() {
     const response = await fetch("./data/firearms.json", { cache: "no-cache" });
     if (response.ok) {
       const data = await response.json();
-      firearms = (Array.isArray(data) ? data : []).map(normalizeFirearmSourceItem);
+      firearms = (Array.isArray(data) ? data : []).map(
+        normalizeFirearmSourceItem,
+      );
     }
   } catch (error) {
     console.info("No generated firearms.json found yet.", error);
   }
   let armorShields = [];
   try {
-    const response = await fetch("./data/armor-shields.json", { cache: "no-cache" });
+    const response = await fetch("./data/armor-shields.json", {
+      cache: "no-cache",
+    });
     if (response.ok) {
       const data = await response.json();
-      armorShields = (Array.isArray(data) ? data : []).map(normalizeArmorShieldSourceItem);
+      armorShields = (Array.isArray(data) ? data : []).map(
+        normalizeArmorShieldSourceItem,
+      );
     }
   } catch (error) {
     console.info("No generated armor-shields.json found yet.", error);
@@ -451,22 +757,33 @@ async function loadSourceItems() {
   try {
     const module = await import("./data/alchemical-crafts.js");
     alchemical = (Array.isArray(module.items) ? module.items : [])
-      .filter(item => item.name && item.dc)
+      .filter((item) => item.name && item.dc)
       .map(normalizeAlchemicalSourceItem);
   } catch (error) {
     console.error("Could not load alchemical item source data", error);
   }
   let mundane = [];
   try {
-    const response = await fetch("./data/mundane-items.json", { cache: "no-cache" });
+    const response = await fetch("./data/mundane-items.json", {
+      cache: "no-cache",
+    });
     if (response.ok) {
       const data = await response.json();
-      mundane = (Array.isArray(data) ? data : []).map(normalizeMundaneSourceItem);
+      mundane = (Array.isArray(data) ? data : []).map(
+        normalizeMundaneSourceItem,
+      );
     }
   } catch (error) {
     console.info("No generated mundane-items.json found yet.", error);
   }
-  sourceItems = [...weapons, ...firearms, ...armorShields, ...wondrous, ...mundane, ...alchemical].filter(item => item.name && item.description);
+  sourceItems = [
+    ...weapons,
+    ...firearms,
+    ...armorShields,
+    ...wondrous,
+    ...mundane,
+    ...alchemical,
+  ].filter((item) => item.name && item.description);
 }
 
 function searchableSourceItem(item) {
@@ -475,17 +792,25 @@ function searchableSourceItem(item) {
 
 function sourceItemSearchRank(item, term) {
   if (!term) return 0;
-  return String(item.name || "").toLowerCase().includes(term) ? 0 : 1;
+  return String(item.name || "")
+    .toLowerCase()
+    .includes(term)
+    ? 0
+    : 1;
 }
 
 function sourceItemMatchesCategory(item) {
-  if (sourceItemCategory === "wondrous") return item.sourceType === "Wondrous Item";
-  if (sourceItemCategory === "weapons") return ["Weapon", "Firearm"].includes(item.sourceType);
+  if (sourceItemCategory === "wondrous")
+    return item.sourceType === "Wondrous Item";
+  if (sourceItemCategory === "weapons")
+    return ["Weapon", "Firearm"].includes(item.sourceType);
   if (sourceItemCategory === "armor") return item.type === "Armor";
   if (sourceItemCategory === "shields") return item.type === "Shield";
   if (sourceItemCategory === "mundane") {
-    return ["Mundane Item", "Alchemical Item"].includes(item.sourceType) &&
-      (item.details?.mundaneCategory || "") === sourceItemMundaneCategory;
+    return (
+      ["Mundane Item", "Alchemical Item"].includes(item.sourceType) &&
+      (item.details?.mundaneCategory || "") === sourceItemMundaneCategory
+    );
   }
   return true;
 }
@@ -502,8 +827,12 @@ function renderSourceItemResults() {
   }
   const results = sourceItems
     .filter(sourceItemMatchesCategory)
-    .filter(item => searchableSourceItem(item).includes(term))
-    .sort((a, b) => sourceItemSearchRank(a, term) - sourceItemSearchRank(b, term) || String(a.name || "").localeCompare(String(b.name || "")));
+    .filter((item) => searchableSourceItem(item).includes(term))
+    .sort(
+      (a, b) =>
+        sourceItemSearchRank(a, term) - sourceItemSearchRank(b, term) ||
+        String(a.name || "").localeCompare(String(b.name || "")),
+    );
   count.textContent = `${results.length} item${results.length === 1 ? "" : "s"}`;
   if (!results.length) {
     wrapper.innerHTML = `<div class="small text-secondary">No matching source items found.</div>`;
@@ -511,18 +840,24 @@ function renderSourceItemResults() {
   }
   wrapper.innerHTML = `
     <div class="source-results-grid">
-      ${results.map(item => `
+      ${results
+        .map(
+          (item) => `
         <button class="source-result-card" type="button" data-source-item="${escapeHtml(item.id)}">
           <span class="source-result-icon">${sourceItemIcon(item)}</span>
           <div class="fw-semibold pe-2">${escapeHtml(item.name)}</div>
           <div class="loot-meta">${escapeHtml(item.sourceType)} | ${escapeHtml(item.type)}${itemSlotLabel(item) ? ` | Slot: ${escapeHtml(itemSlotLabel(item))}` : ""}</div>
           <div class="source-result-description mt-1">${escapeHtml(item.description)}</div>
         </button>
-      `).join("")}
+      `,
+        )
+        .join("")}
     </div>
   `;
-  wrapper.querySelectorAll("[data-source-item]").forEach(button => {
-    button.addEventListener("click", () => openSourceItemEditor(button.dataset.sourceItem));
+  wrapper.querySelectorAll("[data-source-item]").forEach((button) => {
+    button.addEventListener("click", () =>
+      openSourceItemEditor(button.dataset.sourceItem),
+    );
   });
 }
 
@@ -532,14 +867,17 @@ function renderSourceMundaneTabs() {
   const show = sourceItemCategory === "mundane";
   tabs.classList.toggle("d-none", !show);
   if (!show) return;
-  tabs.innerHTML = MUNDANE_CATEGORIES.map(category => `
+  tabs.innerHTML = MUNDANE_CATEGORIES.map(
+    (category) => `
     <li class="source-list-tab-item" role="presentation">
       <button class="source-list-tab${sourceItemMundaneCategory === category ? " active" : ""}" type="button" data-source-mundane-category="${escapeHtml(category)}">${escapeHtml(category)}</button>
     </li>
-  `).join("");
-  tabs.querySelectorAll("[data-source-mundane-category]").forEach(button => {
+  `,
+  ).join("");
+  tabs.querySelectorAll("[data-source-mundane-category]").forEach((button) => {
     button.addEventListener("click", () => {
-      sourceItemMundaneCategory = button.dataset.sourceMundaneCategory || MUNDANE_CATEGORIES[0];
+      sourceItemMundaneCategory =
+        button.dataset.sourceMundaneCategory || MUNDANE_CATEGORIES[0];
       renderSourceItemResults();
     });
   });
@@ -558,10 +896,13 @@ function populateLootForm(item, selectedCharacterId = "") {
 
   const details = item.details || {};
   PFItemEditor.setSlot(lootEditorConfig(), details.slot || "");
-  el("lootWondrousItem").checked = String(details.source || item.sourceType || "").toLowerCase() === "wondrous item";
+  el("lootWondrousItem").checked =
+    String(details.source || item.sourceType || "").toLowerCase() ===
+    "wondrous item";
   updateLootSlotPreview();
   PFItemEditor.refreshDescription(lootEditorConfig());
-  el("lootWeaponType").value = details.weaponType || "Melee Weapon (One-Handed)";
+  el("lootWeaponType").value =
+    details.weaponType || "Melee Weapon (One-Handed)";
   setLootAttackScale(details.attackScale || "STR");
   el("lootDamageDice").value = details.damage || "";
   el("lootWeaponCritical").value = details.critical || "";
@@ -570,19 +911,25 @@ function populateLootForm(item, selectedCharacterId = "") {
   setLootDamageScale(details.damageScale || "STR");
   el("lootWeaponEnhancement").value = details.enhancement || "0";
   el("lootWeaponEnchantment").value = details.enchantment || "";
-  el("lootWeaponDetails").value = details.details || details.summary || details.special || "";
+  el("lootWeaponDetails").value =
+    details.details || details.summary || details.special || "";
   el("lootArmorBonus").value = details.bonus || "0";
   el("lootArmorEnhancement").value = details.enhancement || "0";
   el("lootArmorEnchantment").value = details.enchantment || "";
-  PFItemEditor.syncSpecialMaterialForType(lootEditorConfig(), details.specialMaterial || "");
+  PFItemEditor.syncSpecialMaterialForType(
+    lootEditorConfig(),
+    details.specialMaterial || "",
+  );
   el("lootEffectRows").innerHTML = "";
-  (Array.isArray(item.effects) ? item.effects : []).forEach(effect => addLootEffectRow(effect));
+  (Array.isArray(item.effects) ? item.effects : []).forEach((effect) =>
+    addLootEffectRow(effect),
+  );
   toggleLootDetailFields();
   syncLootSlotForType();
 }
 
 function openSourceItemEditor(sourceItemId) {
-  const source = sourceItems.find(item => item.id === sourceItemId);
+  const source = sourceItems.find((item) => item.id === sourceItemId);
   if (!source) return;
   resetLootForm();
   editingLootId = null;
@@ -599,9 +946,11 @@ function openSourceItemsModal() {
   sourceItemMundaneCategory = MUNDANE_CATEGORIES[0];
   sourceItemSearchTerm = "";
   el("sourceItemSearch").value = "";
-  el("sourceItemTabs").querySelectorAll("[data-source-category]").forEach(tab => {
-    tab.classList.toggle("active", tab.dataset.sourceCategory === "all");
-  });
+  el("sourceItemTabs")
+    .querySelectorAll("[data-source-category]")
+    .forEach((tab) => {
+      tab.classList.toggle("active", tab.dataset.sourceCategory === "all");
+    });
   renderSourceItemResults();
   sourceItemModal.show();
   setTimeout(() => el("sourceItemSearch").focus(), 150);
@@ -610,17 +959,23 @@ function openSourceItemsModal() {
 function renderLoot() {
   const grid = el("lootGrid");
   const visibleLoot = lootSearchTerm
-    ? bagLoot.filter(item => searchableLoot(item).includes(lootSearchTerm))
+    ? bagLoot.filter((item) => searchableLoot(item).includes(lootSearchTerm))
     : bagLoot;
   const groups = [
     { key: "unassigned", label: "Unassigned" },
-    ...bagCharacters.map(character => ({ key: character.id, label: characterLabel(character) }))
+    ...orderedBagCharacters().map((character) => ({
+      key: character.id,
+      label: characterLabel(character),
+    })),
   ];
 
-  grid.innerHTML = groups.map(group => {
-    const items = visibleLoot.filter(item => itemGroupKey(item) === group.key);
-    const collapsed = collapsedLootGroups.has(group.key);
-    return `
+  grid.innerHTML = groups
+    .map((group) => {
+      const items = visibleLoot.filter(
+        (item) => itemGroupKey(item) === group.key,
+      );
+      const collapsed = collapsedLootGroups.has(group.key);
+      return `
       <div class="loot-group${collapsed ? " collapsed" : ""}">
         <div class="loot-group-header">
           <strong class="loot-group-title">${escapeHtml(group.label)}</strong>
@@ -636,30 +991,31 @@ function renderLoot() {
         </div>
       </div>
     `;
-  }).join("");
+    })
+    .join("");
 
-  grid.querySelectorAll("[data-toggle-loot-group]").forEach(button => {
-    button.addEventListener("click", event => {
+  grid.querySelectorAll("[data-toggle-loot-group]").forEach((button) => {
+    button.addEventListener("click", (event) => {
       event.stopPropagation();
       toggleLootGroup(button.dataset.toggleLootGroup);
     });
   });
-  grid.querySelectorAll("[data-loot-assign]").forEach(select => {
-    select.addEventListener("click", event => event.stopPropagation());
-    select.addEventListener("change", event => {
+  grid.querySelectorAll("[data-loot-assign]").forEach((select) => {
+    select.addEventListener("click", (event) => event.stopPropagation());
+    select.addEventListener("change", (event) => {
       event.stopPropagation();
       assignLoot(select.dataset.lootAssign, select.value);
     });
   });
-  grid.querySelectorAll("[data-delete-loot]").forEach(button => {
-    button.addEventListener("click", event => {
+  grid.querySelectorAll("[data-delete-loot]").forEach((button) => {
+    button.addEventListener("click", (event) => {
       event.stopPropagation();
       requestLootDelete(button.dataset.deleteLoot);
     });
   });
-  grid.querySelectorAll(".loot-card").forEach(card => {
+  grid.querySelectorAll(".loot-card").forEach((card) => {
     card.addEventListener("click", () => openLootEditor(card.dataset.lootId));
-    card.addEventListener("keydown", event => {
+    card.addEventListener("keydown", (event) => {
       if (event.key === "Enter" || event.key === " ") {
         event.preventDefault();
         openLootEditor(card.dataset.lootId);
@@ -670,15 +1026,23 @@ function renderLoot() {
 
 function toggleLootDetailFields() {
   const type = el("lootType").value;
-  const firearm = type === "Weapon" && isFirearmWeaponType(el("lootWeaponType").value);
+  const firearm =
+    type === "Weapon" && isFirearmWeaponType(el("lootWeaponType").value);
   el("lootWeaponFields").classList.toggle("d-none", type !== "Weapon");
-  document.querySelectorAll(".loot-firearm-field").forEach(field => field.classList.toggle("d-none", !firearm));
+  document
+    .querySelectorAll(".loot-firearm-field")
+    .forEach((field) => field.classList.toggle("d-none", !firearm));
   if (!firearm) {
     el("lootWeaponCapacity").value = "";
     el("lootWeaponMisfire").value = "";
   }
-  el("lootArmorFields").classList.toggle("d-none", !["Armor", "Shield"].includes(type));
-  el("lootArmorEnchantment").innerHTML = armorEnchantmentOptions(el("lootArmorEnchantment").value);
+  el("lootArmorFields").classList.toggle(
+    "d-none",
+    !["Armor", "Shield"].includes(type),
+  );
+  el("lootArmorEnchantment").innerHTML = armorEnchantmentOptions(
+    el("lootArmorEnchantment").value,
+  );
   syncLootSlotForType();
 }
 
@@ -687,52 +1051,78 @@ function isFirearmWeaponType(type) {
 }
 
 function setupLootScalingControls() {
-  el("lootDamageScaleOptions").querySelectorAll("[data-scale-ability]").forEach(button => {
-    button.addEventListener("click", () => {
-      button.classList.toggle("btn-primary");
-      button.classList.toggle("btn-outline-light");
-      const selected = [...el("lootDamageScaleOptions").querySelectorAll(".btn-primary")].map(btn => btn.dataset.scaleAbility);
-      el("lootDamageScale").value = (selected.length ? selected : ["STR"]).join(" + ");
+  el("lootDamageScaleOptions")
+    .querySelectorAll("[data-scale-ability]")
+    .forEach((button) => {
+      button.addEventListener("click", () => {
+        button.classList.toggle("btn-primary");
+        button.classList.toggle("btn-outline-light");
+        const selected = [
+          ...el("lootDamageScaleOptions").querySelectorAll(".btn-primary"),
+        ].map((btn) => btn.dataset.scaleAbility);
+        el("lootDamageScale").value = (
+          selected.length ? selected : ["STR"]
+        ).join(" + ");
+      });
     });
-  });
-  el("lootAttackScaleOptions").querySelectorAll("[data-attack-scale-ability]").forEach(button => {
-    button.addEventListener("click", () => {
-      button.classList.toggle("btn-primary");
-      button.classList.toggle("btn-outline-light");
-      const selected = [...el("lootAttackScaleOptions").querySelectorAll(".btn-primary")].map(btn => btn.dataset.attackScaleAbility);
-      el("lootAttackScale").value = (selected.length ? selected : ["STR"]).join(" + ");
+  el("lootAttackScaleOptions")
+    .querySelectorAll("[data-attack-scale-ability]")
+    .forEach((button) => {
+      button.addEventListener("click", () => {
+        button.classList.toggle("btn-primary");
+        button.classList.toggle("btn-outline-light");
+        const selected = [
+          ...el("lootAttackScaleOptions").querySelectorAll(".btn-primary"),
+        ].map((btn) => btn.dataset.attackScaleAbility);
+        el("lootAttackScale").value = (
+          selected.length ? selected : ["STR"]
+        ).join(" + ");
+      });
     });
-  });
 }
 
 function setLootDamageScale(value = "STR") {
-  const selected = String(value || "STR").split("+").map(part => part.trim().toUpperCase()).filter(Boolean);
+  const selected = String(value || "STR")
+    .split("+")
+    .map((part) => part.trim().toUpperCase())
+    .filter(Boolean);
   const activeSet = new Set(selected.length ? selected : ["STR"]);
   el("lootDamageScale").value = [...activeSet].join(" + ");
-  el("lootDamageScaleOptions").querySelectorAll("[data-scale-ability]").forEach(button => {
-    const active = activeSet.has(button.dataset.scaleAbility);
-    button.classList.toggle("btn-primary", active);
-    button.classList.toggle("btn-outline-light", !active);
-  });
+  el("lootDamageScaleOptions")
+    .querySelectorAll("[data-scale-ability]")
+    .forEach((button) => {
+      const active = activeSet.has(button.dataset.scaleAbility);
+      button.classList.toggle("btn-primary", active);
+      button.classList.toggle("btn-outline-light", !active);
+    });
 }
 
 function setLootAttackScale(value = "STR") {
-  const selected = String(value || "STR").split("+").map(part => part.trim().toUpperCase()).filter(Boolean);
+  const selected = String(value || "STR")
+    .split("+")
+    .map((part) => part.trim().toUpperCase())
+    .filter(Boolean);
   const activeSet = new Set(selected.length ? selected : ["STR"]);
   el("lootAttackScale").value = [...activeSet].join(" + ");
-  el("lootAttackScaleOptions").querySelectorAll("[data-attack-scale-ability]").forEach(button => {
-    const active = activeSet.has(button.dataset.attackScaleAbility);
-    button.classList.toggle("btn-primary", active);
-    button.classList.toggle("btn-outline-light", !active);
-  });
+  el("lootAttackScaleOptions")
+    .querySelectorAll("[data-attack-scale-ability]")
+    .forEach((button) => {
+      const active = activeSet.has(button.dataset.attackScaleAbility);
+      button.classList.toggle("btn-primary", active);
+      button.classList.toggle("btn-outline-light", !active);
+    });
 }
 
 function addLootEffectRow(data = {}) {
   const row = document.createElement("div");
   row.className = "loot-effect-row";
-  const selectedStat = String(data.skillName || "").toLowerCase().startsWith("profession")
+  const selectedStat = String(data.skillName || "")
+    .toLowerCase()
+    .startsWith("profession")
     ? "skill:profession"
-    : String(data.skillName || "").toLowerCase().startsWith("craft")
+    : String(data.skillName || "")
+          .toLowerCase()
+          .startsWith("craft")
       ? "skill:craft"
       : data.stat || "";
   row.innerHTML = `
@@ -743,11 +1133,38 @@ function addLootEffectRow(data = {}) {
       </select>
     </div>
     <div class="loot-named-skill-field d-none"><label>Skill Name</label><input data-effect-field="skillName" class="form-control form-control-sm" value="${escapeHtml(data.skillName || "")}" placeholder="Alchemy"></div>
-    <div><label>Value</label><input data-effect-field="value" class="form-control form-control-sm" type="number" value="${data.value ?? 0}"></div>
+    <div>
+      <label>Value</label>
+      <div class="item-number-stepper" data-item-stepper>
+        <button
+          class="btn btn-outline-light btn-sm item-stepper-btn"
+          type="button"
+          data-item-stepper-delta="-1"
+          aria-label="Decrease effect value"
+        >
+          -
+        </button>
+        <input
+          data-effect-field="value"
+          class="form-control form-control-sm no-spinner"
+          type="number"
+          value="${data.value ?? 0}"
+          inputmode="numeric"
+        >
+        <button
+          class="btn btn-outline-light btn-sm item-stepper-btn"
+          type="button"
+          data-item-stepper-delta="1"
+          aria-label="Increase effect value"
+        >
+          +
+        </button>
+      </div>
+    </div>
     <div>
       <label>Type</label>
       <select data-effect-field="type" class="form-select form-select-sm">
-        ${BONUS_TYPES.map(type => `<option value="${type}" ${(data.type || "untyped") === type ? "selected" : ""}>${escapeHtml(type)}</option>`).join("")}
+        ${BONUS_TYPES.map((type) => `<option value="${type}" ${(data.type || "untyped") === type ? "selected" : ""}>${escapeHtml(type)}</option>`).join("")}
       </select>
     </div>
     <div>
@@ -771,9 +1188,12 @@ function addLootEffectRow(data = {}) {
   const namedSkillField = row.querySelector(".loot-named-skill-field");
   const skillNameInput = row.querySelector('[data-effect-field="skillName"]');
   const syncNamedSkill = () => {
-    const named = ["skill:craft", "skill:profession"].includes(statSelect.value);
+    const named = ["skill:craft", "skill:profession"].includes(
+      statSelect.value,
+    );
     namedSkillField.classList.toggle("d-none", !named);
-    skillNameInput.placeholder = statSelect.value === "skill:profession" ? "Sailor" : "Alchemy";
+    skillNameInput.placeholder =
+      statSelect.value === "skill:profession" ? "Sailor" : "Alchemy";
   };
   statSelect.addEventListener("change", syncNamedSkill);
   syncNamedSkill();
@@ -782,22 +1202,37 @@ function addLootEffectRow(data = {}) {
 }
 
 function collectLootEffects() {
-  return [...el("lootEffectRows").querySelectorAll(".loot-effect-row")].map(row => {
-    const selectedStat = row.querySelector('[data-effect-field="stat"]').value;
-    const skillName = ["skill:craft", "skill:profession"].includes(selectedStat)
-      ? namedSkill(selectedStat, row.querySelector('[data-effect-field="skillName"]')?.value)
-      : "";
-    const effect = {
-      stat: skillName ? skillKey(skillName) : selectedStat,
-      value: Number(row.querySelector('[data-effect-field="value"]').value || 0),
-      type: row.querySelector('[data-effect-field="type"]').value || "untyped",
-      stacks: row.querySelector('[data-effect-field="stacks"]').checked,
-      conditional: row.querySelector('[data-effect-field="conditional"]').checked,
-      appliesWhen: row.querySelector('[data-effect-field="appliesWhen"]').value.trim()
-    };
-    if (skillName) effect.skillName = skillName;
-    return effect;
-  });
+  return [...el("lootEffectRows").querySelectorAll(".loot-effect-row")].map(
+    (row) => {
+      const selectedStat = row.querySelector(
+        '[data-effect-field="stat"]',
+      ).value;
+      const skillName = ["skill:craft", "skill:profession"].includes(
+        selectedStat,
+      )
+        ? namedSkill(
+            selectedStat,
+            row.querySelector('[data-effect-field="skillName"]')?.value,
+          )
+        : "";
+      const effect = {
+        stat: skillName ? skillKey(skillName) : selectedStat,
+        value: Number(
+          row.querySelector('[data-effect-field="value"]').value || 0,
+        ),
+        type:
+          row.querySelector('[data-effect-field="type"]').value || "untyped",
+        stacks: row.querySelector('[data-effect-field="stacks"]').checked,
+        conditional: row.querySelector('[data-effect-field="conditional"]')
+          .checked,
+        appliesWhen: row
+          .querySelector('[data-effect-field="appliesWhen"]')
+          .value.trim(),
+      };
+      if (skillName) effect.skillName = skillName;
+      return effect;
+    },
+  );
 }
 
 function collectLootDetails() {
@@ -805,7 +1240,8 @@ function collectLootDetails() {
   const slot = el("lootSlotInput").value.trim();
   const slotDetails = { slot };
   if (type === "Weapon") {
-    const weaponType = el("lootWeaponType").value || "Melee Weapon (One-Handed)";
+    const weaponType =
+      el("lootWeaponType").value || "Melee Weapon (One-Handed)";
     const details = {
       ...slotDetails,
       weaponType,
@@ -816,7 +1252,7 @@ function collectLootDetails() {
       enhancement: el("lootWeaponEnhancement").value || "0",
       enchantment: el("lootWeaponEnchantment").value.trim(),
       specialMaterial: el("lootSpecialMaterial").value,
-      details: el("lootWeaponDetails").value.trim()
+      details: el("lootWeaponDetails").value.trim(),
     };
     if (isFirearmWeaponType(weaponType)) {
       details.capacity = el("lootWeaponCapacity").value.trim();
@@ -830,7 +1266,7 @@ function collectLootDetails() {
       bonus: el("lootArmorBonus").value || "0",
       enhancement: el("lootArmorEnhancement").value || "0",
       enchantment: el("lootArmorEnchantment").value.trim(),
-      specialMaterial: el("lootSpecialMaterial").value
+      specialMaterial: el("lootSpecialMaterial").value,
     };
   }
   return slotDetails;
@@ -845,20 +1281,27 @@ function renderLootAttributes(item) {
   const details = item.details || {};
   const rows = [];
   if (item.type === "Weapon") {
-    rows.push(["Weapon Type", details.weaponType || "Melee Weapon (One-Handed)"]);
-    if (details.specialMaterial) rows.push(["Material", details.specialMaterial]);
+    rows.push([
+      "Weapon Type",
+      details.weaponType || "Melee Weapon (One-Handed)",
+    ]);
+    if (details.specialMaterial)
+      rows.push(["Material", details.specialMaterial]);
     rows.push(["Attack Scales", details.attackScale || "STR"]);
     if (details.damage) rows.push(["Damage", details.damage]);
     if (details.critical) rows.push(["Critical", details.critical]);
-    if (isFirearmWeaponType(details.weaponType) && details.capacity) rows.push(["Capacity", details.capacity]);
-    if (isFirearmWeaponType(details.weaponType) && details.misfire) rows.push(["Misfire", details.misfire]);
+    if (isFirearmWeaponType(details.weaponType) && details.capacity)
+      rows.push(["Capacity", details.capacity]);
+    if (isFirearmWeaponType(details.weaponType) && details.misfire)
+      rows.push(["Misfire", details.misfire]);
     rows.push(["Damage Scales", details.damageScale || "STR"]);
     rows.push(["Enhancement", signedValue(details.enhancement || 0)]);
     if (details.enchantment) rows.push(["Enchantment", details.enchantment]);
     if (details.details) rows.push(["Details", details.details]);
   } else if (["Armor", "Shield"].includes(item.type)) {
     rows.push(["Bonus", signedValue(details.bonus || 0)]);
-    if (details.specialMaterial) rows.push(["Material", details.specialMaterial]);
+    if (details.specialMaterial)
+      rows.push(["Material", details.specialMaterial]);
     rows.push(["Enhancement", signedValue(details.enhancement || 0)]);
     if (details.enchantment) rows.push(["Enchantment", details.enchantment]);
   }
@@ -877,17 +1320,23 @@ function renderLootEffects(item) {
   return `
     <div class="loot-effects-display">
       <div class="loot-meta">Item effects</div>
-      ${effects.map(effect => `
+      ${effects
+        .map(
+          (effect) => `
         <div class="loot-effect-display">
           ${escapeHtml(titleCaseStat(effect.stat || "effect"))} ${signedValue(effect.value)} (${escapeHtml(effect.type || "untyped")})${effect.conditional ? ` (${escapeHtml(effect.appliesWhen || "conditional")})` : ""}${effect.stacks ? " stacks" : ""}
         </div>
-      `).join("")}
+      `,
+        )
+        .join("")}
     </div>
   `;
 }
 
 function renderLootCard(item) {
-  return bagViewMode === "simplified" ? renderSimplifiedLootCard(item) : renderFullLootCard(item);
+  return bagViewMode === "simplified"
+    ? renderSimplifiedLootCard(item)
+    : renderFullLootCard(item);
 }
 
 function renderSimplifiedLootCard(item) {
@@ -912,7 +1361,10 @@ function renderFullLootCard(item) {
   const icon = sourceItemIcon(item);
   const options = [
     `<option value="">Unassigned</option>`,
-    ...bagCharacters.map(character => `<option value="${escapeHtml(character.id)}"${character.id === item.assigned_character_id ? " selected" : ""}>${escapeHtml(characterLabel(character))}</option>`)
+    ...bagCharacters.map(
+      (character) =>
+        `<option value="${escapeHtml(character.id)}"${character.id === item.assigned_character_id ? " selected" : ""}>${escapeHtml(characterLabel(character))}</option>`,
+    ),
   ].join("");
 
   return `
@@ -943,7 +1395,11 @@ function renderFullLootCard(item) {
 function lootTypeBucket(item) {
   if (item.type === "Weapon") return "weapons";
   if (["Armor", "Shield"].includes(item.type)) return "armor";
-  if (String(item.details?.source || item.sourceType || "").toLowerCase() === "wondrous item") return "wondrous";
+  if (
+    String(item.details?.source || item.sourceType || "").toLowerCase() ===
+    "wondrous item"
+  )
+    return "wondrous";
   return "other";
 }
 
@@ -953,12 +1409,15 @@ function renderLootTypeSections(items) {
     { key: "weapons", label: "Weapons" },
     { key: "armor", label: "Armor / Shields" },
     { key: "wondrous", label: "Wondrous Items" },
-    { key: "other", label: "Other" }
+    { key: "other", label: "Other" },
   ];
-  return sections.map(section => {
-    const sectionItems = items.filter(item => lootTypeBucket(item) === section.key);
-    if (!sectionItems.length) return "";
-    return `
+  return sections
+    .map((section) => {
+      const sectionItems = items.filter(
+        (item) => lootTypeBucket(item) === section.key,
+      );
+      if (!sectionItems.length) return "";
+      return `
       <section class="loot-type-section">
         <div class="loot-type-title">${escapeHtml(section.label)}</div>
         <div class="loot-type-grid">
@@ -966,11 +1425,12 @@ function renderLootTypeSections(items) {
         </div>
       </section>
     `;
-  }).join("");
+    })
+    .join("");
 }
 
 async function assignLoot(itemId, assignedTo) {
-  const item = bagLoot.find(entry => entry.id === itemId);
+  const item = bagLoot.find((entry) => entry.id === itemId);
   if (!item) return;
 
   const previous = item.assigned_character_id || "";
@@ -987,16 +1447,19 @@ async function assignLoot(itemId, assignedTo) {
   item.assigned_character_id = target;
   renderLoot();
 
-  const saved = await PFApp.saveLootItem({
-    id: item.id,
-    name: item.name,
-    description: item.description,
-    count: item.count,
-    type: item.type,
-    assignedCharacterId: item.assigned_character_id,
-    details: item.details,
-    effects: item.effects
-  }, bagContextKey);
+  const saved = await PFApp.saveLootItem(
+    {
+      id: item.id,
+      name: item.name,
+      description: item.description,
+      count: item.count,
+      type: item.type,
+      assignedCharacterId: item.assigned_character_id,
+      details: item.details,
+      effects: item.effects,
+    },
+    bagContextKey,
+  );
 
   if (!saved) {
     item.assigned_character_id = previous || null;
@@ -1012,8 +1475,11 @@ async function assignLoot(itemId, assignedTo) {
 }
 
 function openMoveLootModal(item, targetCharacterId) {
-  const target = bagCharacters.find(character => character.id === targetCharacterId);
-  el("moveLootSummary").textContent = `${item.name} -> ${target ? characterLabel(target) : "Unassigned"}`;
+  const target = bagCharacters.find(
+    (character) => character.id === targetCharacterId,
+  );
+  el("moveLootSummary").textContent =
+    `${item.name} -> ${target ? characterLabel(target) : "Unassigned"}`;
   el("moveLootCount").max = String(item.count || 1);
   el("moveLootCount").value = String(item.count || 1);
   el("moveLootMax").textContent = `Max: ${item.count || 1}`;
@@ -1024,49 +1490,64 @@ async function submitLootMove(event) {
   event.preventDefault();
   if (!pendingLootMove) return;
 
-  const item = bagLoot.find(entry => entry.id === pendingLootMove.itemId);
+  const item = bagLoot.find((entry) => entry.id === pendingLootMove.itemId);
   if (!item) return;
 
   const total = Number(item.count || 1);
-  const amount = Math.max(1, Math.min(total, Number.parseInt(el("moveLootCount").value, 10) || 1));
+  const amount = Math.max(
+    1,
+    Math.min(total, Number.parseInt(el("moveLootCount").value, 10) || 1),
+  );
   const target = pendingLootMove.target || null;
 
   if (amount >= total) {
     item.assigned_character_id = target;
-    const saved = await PFApp.saveLootItem({
-      id: item.id,
-      name: item.name,
-      description: item.description,
-      count: item.count,
-      type: item.type,
-      assignedCharacterId: target,
-      details: item.details,
-      effects: item.effects
-    }, bagContextKey);
+    const saved = await PFApp.saveLootItem(
+      {
+        id: item.id,
+        name: item.name,
+        description: item.description,
+        count: item.count,
+        type: item.type,
+        assignedCharacterId: target,
+        details: item.details,
+        effects: item.effects,
+      },
+      bagContextKey,
+    );
     if (saved) {
-      notifyLootUpdated({ ...item, assigned_character_id: pendingLootMove.previous || null });
+      notifyLootUpdated({
+        ...item,
+        assigned_character_id: pendingLootMove.previous || null,
+      });
       notifyLootUpdated(saved);
     }
   } else {
-    const remaining = await PFApp.saveLootItem({
-      id: item.id,
-      name: item.name,
-      description: item.description,
-      count: total - amount,
-      type: item.type,
-      assignedCharacterId: pendingLootMove.previous || null,
-      details: item.details,
-      effects: item.effects
-    }, bagContextKey);
-    const moved = await PFApp.saveLootItem({
-      name: item.name,
-      description: item.description,
-      count: amount,
-      type: item.type,
-      assignedCharacterId: target,
-      details: item.details,
-      effects: item.effects
-    }, bagContextKey);
+    const remaining = await PFApp.saveLootItem(
+      {
+        id: item.id,
+        name: item.name,
+        description: item.description,
+        count: total - amount,
+        type: item.type,
+        assignedCharacterId: pendingLootMove.previous || null,
+        details: item.details,
+        effects: item.effects,
+      },
+      bagContextKey,
+    );
+    const moved = await PFApp.saveLootItem(
+      {
+        name: item.name,
+        description: item.description,
+        count: amount,
+        type: item.type,
+        assignedCharacterId: target,
+        details: item.details,
+        effects: item.effects,
+      },
+      bagContextKey,
+    );
     if (remaining) notifyLootUpdated(remaining);
     if (moved) notifyLootUpdated(moved);
   }
@@ -1098,7 +1579,7 @@ function resetLootForm() {
 }
 
 function openLootEditor(itemId) {
-  const item = bagLoot.find(entry => entry.id === itemId);
+  const item = bagLoot.find((entry) => entry.id === itemId);
   if (!item) return;
 
   editingLootId = item.id;
@@ -1111,9 +1592,12 @@ function openLootEditor(itemId) {
 
 async function syncEditedLootBuff(item) {
   if (!item?.assigned_character_id) return;
-  const buffs = await PFApp.loadBuffState(bagContextKey, item.assigned_character_id);
+  const buffs = await PFApp.loadBuffState(
+    bagContextKey,
+    item.assigned_character_id,
+  );
   if (!Array.isArray(buffs)) return;
-  const index = buffs.findIndex(buff => buff.sourceLootId === item.id);
+  const index = buffs.findIndex((buff) => buff.sourceLootId === item.id);
   if (index < 0) return;
   if (Array.isArray(item.effects) && item.effects.length) {
     buffs[index] = { ...buffs[index], name: item.name, bonuses: item.effects };
@@ -1121,27 +1605,42 @@ async function syncEditedLootBuff(item) {
     buffs.splice(index, 1);
   }
   await PFApp.saveBuffState(buffs, bagContextKey, item.assigned_character_id);
-  localStorage.setItem(`pf_buffs_updated_${bagContextKey}_${item.assigned_character_id}`, String(Date.now()));
-  localStorage.setItem(`pf_loot_updated_${bagContextKey}_${item.assigned_character_id}`, JSON.stringify({ itemId: item.id, at: Date.now() }));
+  localStorage.setItem(
+    `pf_buffs_updated_${bagContextKey}_${item.assigned_character_id}`,
+    String(Date.now()),
+  );
+  localStorage.setItem(
+    `pf_loot_updated_${bagContextKey}_${item.assigned_character_id}`,
+    JSON.stringify({ itemId: item.id, at: Date.now() }),
+  );
 }
 
 function notifyLootUpdated(item) {
   if (!item?.assigned_character_id) return;
-  localStorage.setItem(`pf_loot_updated_${bagContextKey}_${item.assigned_character_id}`, JSON.stringify({ itemId: item.id, at: Date.now() }));
+  localStorage.setItem(
+    `pf_loot_updated_${bagContextKey}_${item.assigned_character_id}`,
+    JSON.stringify({ itemId: item.id, at: Date.now() }),
+  );
 }
 
 async function removeLootBuff(item) {
   if (!item?.assigned_character_id) return;
-  const buffs = await PFApp.loadBuffState(bagContextKey, item.assigned_character_id);
+  const buffs = await PFApp.loadBuffState(
+    bagContextKey,
+    item.assigned_character_id,
+  );
   if (!Array.isArray(buffs)) return;
-  const next = buffs.filter(buff => buff.sourceLootId !== item.id);
+  const next = buffs.filter((buff) => buff.sourceLootId !== item.id);
   if (next.length === buffs.length) return;
   await PFApp.saveBuffState(next, bagContextKey, item.assigned_character_id);
-  localStorage.setItem(`pf_buffs_updated_${bagContextKey}_${item.assigned_character_id}`, String(Date.now()));
+  localStorage.setItem(
+    `pf_buffs_updated_${bagContextKey}_${item.assigned_character_id}`,
+    String(Date.now()),
+  );
 }
 
 async function deleteLootAmount(itemId, amountOverride = null) {
-  const item = bagLoot.find(entry => entry.id === itemId);
+  const item = bagLoot.find((entry) => entry.id === itemId);
   if (!item) return;
 
   const total = Number(item.count || 1);
@@ -1153,16 +1652,21 @@ async function deleteLootAmount(itemId, amountOverride = null) {
     await removeLootBuff(item);
     ok = await PFApp.deleteLootItem(item.id);
   } else {
-    ok = Boolean(await PFApp.saveLootItem({
-      id: item.id,
-      name: item.name,
-      description: item.description,
-      count: total - amount,
-      type: item.type,
-      assignedCharacterId: item.assigned_character_id,
-      details: item.details,
-      effects: item.effects
-    }, bagContextKey));
+    ok = Boolean(
+      await PFApp.saveLootItem(
+        {
+          id: item.id,
+          name: item.name,
+          description: item.description,
+          count: total - amount,
+          type: item.type,
+          assignedCharacterId: item.assigned_character_id,
+          details: item.details,
+          effects: item.effects,
+        },
+        bagContextKey,
+      ),
+    );
   }
 
   if (!ok) {
@@ -1178,7 +1682,7 @@ async function deleteLootAmount(itemId, amountOverride = null) {
 }
 
 function requestLootDelete(itemId) {
-  const item = bagLoot.find(entry => entry.id === itemId);
+  const item = bagLoot.find((entry) => entry.id === itemId);
   if (!item) return;
   const total = Number(item.count || 1);
   if (total <= 1) {
@@ -1186,7 +1690,8 @@ function requestLootDelete(itemId) {
     return;
   }
   pendingLootDelete = { itemId };
-  el("deleteLootSummary").textContent = `${item.name}${item.assigned_character_id ? " is assigned. If fully deleted, equipped copies and item effects will be removed." : ""}`;
+  el("deleteLootSummary").textContent =
+    `${item.name}${item.assigned_character_id ? " is assigned. If fully deleted, equipped copies and item effects will be removed." : ""}`;
   el("deleteLootCount").max = String(total);
   el("deleteLootCount").value = String(total);
   el("deleteLootMax").textContent = `Max: ${total}`;
@@ -1204,28 +1709,37 @@ async function submitLootForm(event) {
   const name = el("lootName").value.trim();
   if (!name) return;
   const isCreating = !editingLootId;
-  const createdFromSourceList = isCreating && Boolean(sourceLootTemplateDetails);
-  const existingItem = editingLootId ? bagLoot.find(item => item.id === editingLootId) : null;
+  const createdFromSourceList =
+    isCreating && Boolean(sourceLootTemplateDetails);
+  const existingItem = editingLootId
+    ? bagLoot.find((item) => item.id === editingLootId)
+    : null;
   const selectedType = el("lootType").value;
   const baseDetails = sourceLootTemplateDetails || existingItem?.details || {};
   const details = applyWondrousSource(
     { ...cloneJson(baseDetails), ...collectLootDetails() },
-    el("lootWondrousItem").checked
+    el("lootWondrousItem").checked,
   );
 
-  const saved = await PFApp.saveLootItem({
-    id: editingLootId,
-    name,
-    description: el("lootDescription").value.trim(),
-    count: el("lootCount").value,
-    type: selectedType,
-    assignedCharacterId: el("lootAssignedTo").value,
-    details,
-    effects: collectLootEffects()
-  }, bagContextKey);
+  const saved = await PFApp.saveLootItem(
+    {
+      id: editingLootId,
+      name,
+      description: el("lootDescription").value.trim(),
+      count: el("lootCount").value,
+      type: selectedType,
+      assignedCharacterId: el("lootAssignedTo").value,
+      details,
+      effects: collectLootEffects(),
+    },
+    bagContextKey,
+  );
 
   if (!saved) {
-    setLootStatus(editingLootId ? "Could not update item." : "Could not add item.", "danger");
+    setLootStatus(
+      editingLootId ? "Could not update item." : "Could not add item.",
+      "danger",
+    );
     return;
   }
 
@@ -1244,13 +1758,19 @@ async function loadBagContext(contextKey, showLoading = true) {
   loadCollapsedLootGroups();
   if (showLoading) setLootStatus("Loading bag...", "secondary");
 
+  const [isAdmin, isManager] = await Promise.all([
+    PFApp.isAppAdmin(),
+    PFApp.isGameManager(bagContextKey),
+  ]);
+  bagCanManageContext = Boolean(isAdmin || isManager);
   bagCharacters = await PFApp.loadContextCharacters(bagContextKey);
+  applyRoleBasedCollapseDefaults();
   bagLoot = await PFApp.loadLootItems(bagContextKey);
   renderCharacterOptions(el("lootAssignedTo"));
   renderLoot();
 
   const contexts = await PFApp.loadContexts();
-  const current = contexts.find(context => context.key === bagContextKey);
+  const current = contexts.find((context) => context.key === bagContextKey);
   el("contextHint").textContent = current ? `Context: ${current.label}` : "";
   clearLootStatus();
 }
@@ -1270,25 +1790,31 @@ function lootEditorConfig() {
     materialFieldId: "lootSpecialMaterialField",
     materialInputId: "lootSpecialMaterial",
     slots: ITEM_SLOTS,
-    onSlotChange: updateLootSlotPreview
+    onSlotChange: updateLootSlotPreview,
   };
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
   const user = await PFApp.requireAuth();
   if (!user) return;
+  bagCurrentUserId = user.id;
 
   lootModal = new bootstrap.Modal(el("lootModal"));
   sourceItemModal = new bootstrap.Modal(el("sourceItemsModal"));
   moveLootModal = new bootstrap.Modal(el("moveLootModal"));
   deleteLootModal = new bootstrap.Modal(el("deleteLootModal"));
   PFItemEditor.init(lootEditorConfig());
-  el("lootWeaponType").innerHTML = optionList(WEAPON_TYPES, "Melee Weapon (One-Handed)");
+  el("lootWeaponType").innerHTML = optionList(
+    WEAPON_TYPES,
+    "Melee Weapon (One-Handed)",
+  );
   el("lootWeaponEnchantment").innerHTML = optionList(WEAPON_ENCHANTMENTS);
   el("lootArmorEnchantment").innerHTML = armorEnchantmentOptions();
   el("lootForm").addEventListener("submit", submitLootForm);
   el("lootModal").addEventListener("hidden.bs.modal", resetLootForm);
-  el("lootModal").addEventListener("hidden.bs.modal", () => PFItemEditor.resetTabs(lootEditorConfig()));
+  el("lootModal").addEventListener("hidden.bs.modal", () =>
+    PFItemEditor.resetTabs(lootEditorConfig()),
+  );
   el("lootModal").addEventListener("hidden.bs.modal", () => {
     if (!returnToSourceItemsAfterClose) return;
     returnToSourceItemsAfterClose = false;
@@ -1298,40 +1824,50 @@ document.addEventListener("DOMContentLoaded", async () => {
       window.setTimeout(() => el("sourceItemSearch").focus(), 150);
     }, 160);
   });
-  el("lootModal").addEventListener("shown.bs.modal", () => PFItemEditor.refreshDescription(lootEditorConfig()));
+  el("lootModal").addEventListener("shown.bs.modal", () =>
+    PFItemEditor.refreshDescription(lootEditorConfig()),
+  );
   el("lootType").addEventListener("change", toggleLootDetailFields);
   el("lootWeaponType").addEventListener("change", toggleLootDetailFields);
   setupLootScalingControls();
   el("addLootEffect").addEventListener("click", () => addLootEffectRow());
   el("moveLootForm").addEventListener("submit", submitLootMove);
   el("deleteLootForm").addEventListener("submit", submitLootDelete);
-  el("lootSearch").addEventListener("input", event => {
+  el("lootSearch").addEventListener("input", (event) => {
     lootSearchTerm = event.target.value.trim().toLowerCase();
     renderLoot();
   });
   el("openSourceItems").addEventListener("click", openSourceItemsModal);
-  el("sourceItemSearch").addEventListener("input", event => {
+  el("sourceItemSearch").addEventListener("input", (event) => {
     sourceItemSearchTerm = event.target.value.trim();
     renderSourceItemResults();
   });
-  el("sourceItemTabs").querySelectorAll("[data-source-category]").forEach(button => {
-    button.addEventListener("click", () => {
-      sourceItemCategory = button.dataset.sourceCategory || "all";
-      if (sourceItemCategory === "mundane" && !MUNDANE_CATEGORIES.includes(sourceItemMundaneCategory)) {
-        sourceItemMundaneCategory = MUNDANE_CATEGORIES[0];
-      }
-      el("sourceItemTabs").querySelectorAll("[data-source-category]").forEach(tab => {
-        tab.classList.toggle("active", tab === button);
+  el("sourceItemTabs")
+    .querySelectorAll("[data-source-category]")
+    .forEach((button) => {
+      button.addEventListener("click", () => {
+        sourceItemCategory = button.dataset.sourceCategory || "all";
+        if (
+          sourceItemCategory === "mundane" &&
+          !MUNDANE_CATEGORIES.includes(sourceItemMundaneCategory)
+        ) {
+          sourceItemMundaneCategory = MUNDANE_CATEGORIES[0];
+        }
+        el("sourceItemTabs")
+          .querySelectorAll("[data-source-category]")
+          .forEach((tab) => {
+            tab.classList.toggle("active", tab === button);
+          });
+        renderSourceItemResults();
       });
-      renderSourceItemResults();
     });
-  });
   bagContextKey = await PFApp.requireGameContext();
   if (!bagContextKey) return;
   await loadSourceItems();
   await loadBagContext(bagContextKey);
   setBagView(bagViewMode);
-  window.addEventListener("pf-context-change", event => {
-    if (event.detail.contextKey && event.detail.contextKey !== "general") loadBagContext(event.detail.contextKey);
+  window.addEventListener("pf-context-change", (event) => {
+    if (event.detail.contextKey && event.detail.contextKey !== "general")
+      loadBagContext(event.detail.contextKey);
   });
 });

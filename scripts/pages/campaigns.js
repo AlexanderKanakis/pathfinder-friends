@@ -2,7 +2,9 @@ let currentUser = null;
 let campaigns = [];
 let selectedCampaignId = "";
 
-function el(id) { return document.getElementById(id); }
+function el(id) {
+  return document.getElementById(id);
+}
 function escapeHtml(value) {
   return String(value ?? "")
     .replaceAll("&", "&amp;")
@@ -47,7 +49,8 @@ async function findCampaignById() {
   if (!id) return;
   const result = await PFApp.findCampaign(id);
   if (result?.error || !result?.data) {
-    el("foundCampaign").innerHTML = `<div class="small-text">No campaign found.</div>`;
+    el("foundCampaign").innerHTML =
+      `<div class="small-text">No campaign found.</div>`;
     return;
   }
 
@@ -72,11 +75,14 @@ async function requestJoin(gameId) {
 
 function renderCampaignList() {
   if (!campaigns.length) {
-    el("campaignList").innerHTML = `<div class="small-text">No campaigns yet.</div>`;
+    el("campaignList").innerHTML =
+      `<div class="small-text">No campaigns yet.</div>`;
     return;
   }
 
-  el("campaignList").innerHTML = campaigns.map(campaign => `
+  el("campaignList").innerHTML = campaigns
+    .map(
+      (campaign) => `
     <article class="campaign-card ${campaign.id === selectedCampaignId ? "active" : ""}" onclick="selectCampaign('${escapeHtml(campaign.id)}')">
       <div class="campaign-card-main d-flex justify-content-between gap-2">
         <div>
@@ -91,22 +97,30 @@ function renderCampaignList() {
         </div>
       </div>
     </article>
-  `).join("");
+  `,
+    )
+    .join("");
 }
 
 async function selectCampaign(gameId) {
   selectedCampaignId = gameId;
   renderCampaignList();
-  const campaign = campaigns.find(item => item.id === gameId);
+  const campaign = campaigns.find((item) => item.id === gameId);
   if (!campaign) return;
 
   const [members, characters] = await Promise.all([
     PFApp.loadContextMembers(`game:${gameId}`),
-    PFApp.loadContextCharacters(`game:${gameId}`)
+    PFApp.loadContextCharacters(`game:${gameId}`),
   ]);
 
   const isGm = campaign.owner_id === currentUser.id;
-  const sortedMembers = [...members].sort((a, b) => (a.userId === campaign.owner_id ? -1 : b.userId === campaign.owner_id ? 1 : 0));
+  const sortedMembers = [...members].sort((a, b) =>
+    a.userId === campaign.owner_id
+      ? -1
+      : b.userId === campaign.owner_id
+        ? 1
+        : 0,
+  );
 
   const detailsHtml = `
     <div class="d-flex flex-wrap justify-content-between gap-2 mb-3">
@@ -121,16 +135,22 @@ async function selectCampaign(gameId) {
         </div>
       </div>
       <div class="d-flex gap-2 align-items-start">
-        ${isGm ? `
+        ${
+          isGm
+            ? `
           <button class="btn btn-outline-info btn-sm" type="button" onclick="openEditCampaign('${escapeHtml(campaign.id)}')">Edit</button>
           <button class="btn btn-danger btn-sm" type="button" onclick="deleteCampaign('${escapeHtml(campaign.id)}')">Delete</button>
-        ` : `<button class="btn btn-outline-warning btn-sm" type="button" onclick="leaveCampaign('${escapeHtml(campaign.id)}')">Leave</button>`}
+        `
+            : `<button class="btn btn-outline-warning btn-sm" type="button" onclick="leaveCampaign('${escapeHtml(campaign.id)}')">Leave</button>`
+        }
       </div>
     </div>
 
     <h5>Players</h5>
     <div class="detail-list mb-3">
-      ${sortedMembers.map(member => `
+      ${sortedMembers
+        .map(
+          (member) => `
         <div class="detail-row d-flex justify-content-between align-items-center gap-2">
           <div>
             <span class="fw-semibold">${escapeHtml(displayName(member))}</span>
@@ -138,17 +158,27 @@ async function selectCampaign(gameId) {
           </div>
           ${isGm && member.userId !== campaign.owner_id ? `<button class="btn btn-outline-danger btn-sm" type="button" onclick="kickMember('${escapeHtml(campaign.id)}','${escapeHtml(member.userId)}')">Remove</button>` : ""}
         </div>
-      `).join("")}
+      `,
+        )
+        .join("")}
     </div>
 
     <h5>Characters</h5>
     <div class="detail-list">
-      ${characters.length ? characters.map(character => `
+      ${
+        characters.length
+          ? characters
+              .map(
+                (character) => `
         <div class="detail-row">
           <div class="fw-semibold">${escapeHtml(character.name)}</div>
           <div class="small-text">${escapeHtml(character.username || character.email || "Unknown owner")}</div>
         </div>
-      `).join("") : `<div class="small-text">No characters in this campaign yet.</div>`}
+      `,
+              )
+              .join("")
+          : `<div class="small-text">No characters in this campaign yet.</div>`
+      }
     </div>
   `;
 
@@ -156,7 +186,8 @@ async function selectCampaign(gameId) {
     el("campaignDetailsModalLabel").textContent = campaign.name || "Campaign";
     el("campaignDetailsModalBody").innerHTML = detailsHtml;
     new bootstrap.Modal(el("campaignDetailsModal")).show();
-    el("campaignDetails").innerHTML = `<div class="small-text">Selected: ${escapeHtml(campaign.name)}</div>`;
+    el("campaignDetails").innerHTML =
+      `<div class="small-text">Selected: ${escapeHtml(campaign.name)}</div>`;
   } else {
     el("campaignDetails").innerHTML = detailsHtml;
   }
@@ -166,7 +197,10 @@ async function refreshCampaigns() {
   campaigns = await PFApp.loadCampaigns();
   renderCampaignList();
   await renderRequests();
-  if (selectedCampaignId && campaigns.some(campaign => campaign.id === selectedCampaignId)) {
+  if (
+    selectedCampaignId &&
+    campaigns.some((campaign) => campaign.id === selectedCampaignId)
+  ) {
     await selectCampaign(selectedCampaignId);
   } else {
     selectedCampaignId = "";
@@ -177,11 +211,14 @@ async function refreshCampaigns() {
 async function renderRequests() {
   const requests = await PFApp.loadCampaignRequests();
   if (!requests.length) {
-    el("requestList").innerHTML = `<div class="small-text">No pending requests.</div>`;
+    el("requestList").innerHTML =
+      `<div class="small-text">No pending requests.</div>`;
     return;
   }
 
-  el("requestList").innerHTML = requests.map(request => `
+  el("requestList").innerHTML = requests
+    .map(
+      (request) => `
     <div class="detail-row">
       <div><span class="fw-semibold">${escapeHtml(request.username || request.email || request.user_id)}</span> has requested access to <span class="fw-semibold">${escapeHtml(request.campaign_name)}</span></div>
       <div class="d-flex gap-2 mt-2">
@@ -189,7 +226,9 @@ async function renderRequests() {
         <button class="btn btn-outline-danger btn-sm" type="button" onclick="respondRequest('${escapeHtml(request.id)}', false)">Deny</button>
       </div>
     </div>
-  `).join("");
+  `,
+    )
+    .join("");
 }
 
 async function respondRequest(requestId, accepted) {
@@ -203,7 +242,12 @@ async function respondRequest(requestId, accepted) {
 }
 
 async function leaveCampaign(gameId) {
-  if (!confirm("Leave this campaign? Your assigned loot will be moved to unassigned.")) return;
+  if (
+    !confirm(
+      "Leave this campaign? Your assigned loot will be moved to unassigned.",
+    )
+  )
+    return;
   const result = await PFApp.leaveCampaign(gameId);
   if (result.error) {
     setStatus(result.error.message || "Could not leave campaign.", "danger");
@@ -215,7 +259,12 @@ async function leaveCampaign(gameId) {
 }
 
 async function kickMember(gameId, userId) {
-  if (!confirm("Remove this player? Their assigned loot will be moved to unassigned.")) return;
+  if (
+    !confirm(
+      "Remove this player? Their assigned loot will be moved to unassigned.",
+    )
+  )
+    return;
   const result = await PFApp.kickCampaignMember(gameId, userId);
   if (result.error) {
     setStatus(result.error.message || "Could not remove player.", "danger");
@@ -226,7 +275,8 @@ async function kickMember(gameId, userId) {
 }
 
 async function deleteCampaign(gameId) {
-  if (!confirm("Delete this campaign and all associated campaign data?")) return;
+  if (!confirm("Delete this campaign and all associated campaign data?"))
+    return;
   const result = await PFApp.deleteCampaign(gameId);
   if (result.error) {
     setStatus(result.error.message || "Could not delete campaign.", "danger");
@@ -238,7 +288,7 @@ async function deleteCampaign(gameId) {
 }
 
 function openEditCampaign(gameId) {
-  const campaign = campaigns.find(item => item.id === gameId);
+  const campaign = campaigns.find((item) => item.id === gameId);
   if (!campaign) return;
   el("editCampaignId").value = campaign.id;
   el("editCampaignName").value = campaign.name || "";
@@ -256,7 +306,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   currentUser = await PFApp.requireAuth();
   if (!currentUser) return;
 
-  el("createCampaignForm").addEventListener("submit", async event => {
+  el("createCampaignForm").addEventListener("submit", async (event) => {
     event.preventDefault();
     const name = el("campaignName").value.trim();
     const description = el("campaignDescription").value.trim();
@@ -266,14 +316,16 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    bootstrap.Modal.getInstance(document.getElementById("createCampaignModal"))?.hide();
+    bootstrap.Modal.getInstance(
+      document.getElementById("createCampaignModal"),
+    )?.hide();
     event.target.reset();
     setStatus("Campaign created.", "success");
     await PFApp.renderAuthNav(currentUser);
     await refreshCampaigns();
   });
 
-  el("editCampaignForm").addEventListener("submit", async event => {
+  el("editCampaignForm").addEventListener("submit", async (event) => {
     event.preventDefault();
     const id = el("editCampaignId").value;
     const name = el("editCampaignName").value.trim();

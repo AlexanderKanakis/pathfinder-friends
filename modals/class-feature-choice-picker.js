@@ -62,7 +62,9 @@
   function ensureModal() {
     ensureStyle();
     if (document.getElementById(MODAL_ID)) return;
-    document.body.insertAdjacentHTML("beforeend", `
+    document.body.insertAdjacentHTML(
+      "beforeend",
+      `
       <div class="modal fade" id="${MODAL_ID}" tabindex="-1" aria-labelledby="${MODAL_ID}Label" aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable search-modal-dialog">
           <div class="modal-content bg-dark text-white border-secondary">
@@ -89,23 +91,32 @@
           </div>
         </div>
       </div>
-    `);
+    `,
+    );
 
-    document.getElementById("classFeatureChoicePickerSearch").addEventListener("input", event => {
-      state.search = event.target.value.trim().toLowerCase();
-      renderResults();
-    });
-    document.getElementById("classFeatureChoicePickerSelect").addEventListener("click", () => {
-      if (!state.expanded) return;
-      resolveChoice(state.expanded);
-    });
-    document.getElementById("classFeatureChoicePickerClear").addEventListener("click", () => resolveChoice(""));
-    document.getElementById(MODAL_ID).addEventListener("hidden.bs.modal", () => {
-      if (resolver) {
-        resolver(null);
-        resolver = null;
-      }
-    });
+    document
+      .getElementById("classFeatureChoicePickerSearch")
+      .addEventListener("input", (event) => {
+        state.search = event.target.value.trim().toLowerCase();
+        renderResults();
+      });
+    document
+      .getElementById("classFeatureChoicePickerSelect")
+      .addEventListener("click", () => {
+        if (!state.expanded) return;
+        resolveChoice(state.expanded);
+      });
+    document
+      .getElementById("classFeatureChoicePickerClear")
+      .addEventListener("click", () => resolveChoice(""));
+    document
+      .getElementById(MODAL_ID)
+      .addEventListener("hidden.bs.modal", () => {
+        if (resolver) {
+          resolver(null);
+          resolver = null;
+        }
+      });
   }
 
   function searchableOption(option) {
@@ -114,8 +125,10 @@
       option.description || "",
       option.source || "",
       option.publisher || "",
-      ...(option.warnings || [])
-    ].join(" ").toLowerCase();
+      ...(option.warnings || []),
+    ]
+      .join(" ")
+      .toLowerCase();
   }
 
   function renderResults() {
@@ -124,7 +137,7 @@
     const count = document.getElementById("classFeatureChoicePickerCount");
     const term = state.search || "";
     const results = state.options
-      .filter(option => !term || searchableOption(option).includes(term))
+      .filter((option) => !term || searchableOption(option).includes(term))
       .sort((a, b) => {
         const aName = String(a.name || "").toLowerCase();
         const bName = String(b.name || "").toLowerCase();
@@ -142,35 +155,43 @@
 
     wrapper.innerHTML = `
       <div class="source-results-grid">
-        ${results.map((option, index) => {
-          const unmet = Boolean(option.unmet);
-          const selected = String(option.name || "") === state.selected;
-          const expanded = String(option.name || "") === state.expanded;
-          return `
+        ${results
+          .map((option, index) => {
+            const unmet = Boolean(option.unmet);
+            const selected = String(option.name || "") === state.selected;
+            const expanded = String(option.name || "") === state.expanded;
+            return `
             <article class="source-result-card class-choice-picker-card${unmet ? " is-unmet" : ""}${selected ? " is-selected" : ""}" role="button" tabindex="0" data-choice-expand="${index}">
               <span class="class-choice-picker-badge"><i class="bi ${selected ? "bi-check2" : unmet ? "bi-exclamation-triangle" : expanded ? "bi-chevron-up" : "bi-stars"}"></i></span>
               <div class="fw-semibold pe-2">${escapeHtml(option.name || "Unnamed choice")}</div>
               ${unmet ? `<div class="class-choice-picker-warning"><i class="bi bi-exclamation-triangle"></i> ${escapeHtml(option.warnings.join("; "))}</div>` : ""}
-              ${expanded ? `
+              ${
+                expanded
+                  ? `
                 <div class="class-choice-picker-description">${escapeHtml(option.description || option.summary || "No description available.")}</div>
-              ` : ""}
+              `
+                  : ""
+              }
             </article>
           `;
-        }).join("")}
+          })
+          .join("")}
       </div>
     `;
     updateSelectButton();
-    wrapper.querySelectorAll("[data-choice-expand]").forEach(card => {
+    wrapper.querySelectorAll("[data-choice-expand]").forEach((card) => {
       card.addEventListener("click", () => {
         const option = results[Number(card.dataset.choiceExpand)];
-        state.expanded = state.expanded === option?.name ? "" : option?.name || "";
+        state.expanded =
+          state.expanded === option?.name ? "" : option?.name || "";
         renderResults();
       });
-      card.addEventListener("keydown", event => {
+      card.addEventListener("keydown", (event) => {
         if (event.key !== "Enter" && event.key !== " ") return;
         event.preventDefault();
         const option = results[Number(card.dataset.choiceExpand)];
-        state.expanded = state.expanded === option?.name ? "" : option?.name || "";
+        state.expanded =
+          state.expanded === option?.name ? "" : option?.name || "";
         renderResults();
       });
     });
@@ -196,27 +217,39 @@
         title: config.title || "Choose Feature",
         poolName: config.poolName || config.title || "Class Feature",
         description: config.description || "",
-        poolWarnings: Array.isArray(config.poolWarnings) ? config.poolWarnings : [],
+        poolWarnings: Array.isArray(config.poolWarnings)
+          ? config.poolWarnings
+          : [],
         options: Array.isArray(config.options) ? config.options : [],
         selected: config.selected || "",
         search: "",
-        expanded: config.initialChoiceName || config.selected || ""
+        expanded: config.initialChoiceName || config.selected || "",
       };
 
       document.getElementById(`${MODAL_ID}Label`).textContent = state.title;
-      document.getElementById("classFeatureChoicePickerDescription").textContent = state.description;
-      document.getElementById("classFeatureChoicePickerPoolWarnings").innerHTML = state.poolWarnings.length
+      document.getElementById(
+        "classFeatureChoicePickerDescription",
+      ).textContent = state.description;
+      document.getElementById(
+        "classFeatureChoicePickerPoolWarnings",
+      ).innerHTML = state.poolWarnings.length
         ? `<i class="bi bi-exclamation-triangle"></i> ${escapeHtml(state.poolWarnings.join("; "))}`
         : "";
       document.getElementById("classFeatureChoicePickerSearch").value = "";
       renderResults();
-      modal = bootstrap.Modal.getOrCreateInstance(document.getElementById(MODAL_ID));
+      modal = bootstrap.Modal.getOrCreateInstance(
+        document.getElementById(MODAL_ID),
+      );
       modal.show();
-      setTimeout(() => document.getElementById("classFeatureChoicePickerSearch")?.focus(), 150);
+      setTimeout(
+        () =>
+          document.getElementById("classFeatureChoicePickerSearch")?.focus(),
+        150,
+      );
 
-      return new Promise(resolve => {
+      return new Promise((resolve) => {
         resolver = resolve;
       });
-    }
+    },
   };
 })();

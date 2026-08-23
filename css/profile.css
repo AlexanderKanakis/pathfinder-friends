@@ -1,10 +1,22 @@
-    body { background-color: #121212; color: white; }
-    .panel { background: #1e1e1e; padding: 16px; border-radius: 10px; }
-    .avatar-preview {
-      width: 112px;
-      height: 112px;
-      object-fit: cover;
-      background: #2b2b2b;
-    }
-    .small-text { font-size: 12px; color: #aaa; }
+body {
+  background-color: #121212;
+  color: white;
+}
 
+.panel {
+  background: #1e1e1e;
+  padding: 16px;
+  border-radius: 10px;
+}
+
+.avatar-preview {
+  width: 112px;
+  height: 112px;
+  object-fit: cover;
+  background: #2b2b2b;
+}
+
+.small-text {
+  font-size: 12px;
+  color: #aaa;
+}

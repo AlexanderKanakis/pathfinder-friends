@@ -1,339 +1,712 @@
-<!DOCTYPE html>
-<html><head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <meta name="description" content="A free online calculator for using the Craft skill in Pathfinder RPG.">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+<!doctype html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta
+      name="description"
+      content="A free online calculator for using the Craft skill in Pathfinder RPG."
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <!-- TensorFlow.js -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.17.0/dist/tf.min.js"></script>
 
     <!-- Universal Sentence Encoder -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/universal-sentence-encoder"></script>
 
-
     <script src="data/spells.js" defer></script>
     <script src="data/wondrous.js" defer></script>
     <script src="scripts/scripts.js" defer></script>
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
+    />
     <title>PathFriends Magic Crafting Calculator</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
     <div id="appNavbar"></div>
 
-    <div class="w-100 my-3 px-4" style="text-align: left;">
-        <h3>Magic Crafting Calculator</h3>
+    <div class="w-100 my-3 px-4" style="text-align: left">
+      <h3>Magic Crafting Calculator</h3>
     </div>
-    
+
     <!-- ============================================================== -->
     <!-- -------------------------- NEW ITEM -------------------------- -->
     <!-- ============================================================== -->
 
     <div class="d-flex flex-wrap gap-5 m-4">
-        <label class="text-wrap" title="Create New Item"><h5><b>Create New Item:</h5></b></label>
-        <i class="bi bi-caret-down-fill" id="new-toggle-down" onclick="toggleNew()" style="cursor: pointer;"></i>
-        <i class="bi bi-caret-up-fill" id="new-toggle-up" onclick="toggleNew()" style="cursor: pointer; display: none;"></i>
+      <label class="text-wrap" title="Create New Item"
+        ><h5><b>Create New Item:</b></h5></label
+      >
+      <i
+        class="bi bi-caret-down-fill"
+        id="new-toggle-down"
+        onclick="toggleNew()"
+        style="cursor: pointer"
+      ></i>
+      <i
+        class="bi bi-caret-up-fill"
+        id="new-toggle-up"
+        onclick="toggleNew()"
+        style="cursor: pointer; display: none"
+      ></i>
     </div>
-    <div class="d-flex row gap-2 justify-content-between m-3"  >
+    <div class="d-flex row gap-2 justify-content-between m-3">
+      <!-- -------------------------- DISPLAY --------------------------- -->
 
-        <!-- -------------------------- DISPLAY --------------------------- -->
-
-        <div class="itemdesc col-md-5" id="new-wrapper-1" style="display: none;">
-            <div class="itemname d-flex justify-content-between">
-                <div class="d-flex gap-1">
-                    <input class="w-100 form-control" placeholder="Item Name">
-                </div>
-            </div>
-            <div id="w-item-id-${index}">
-                <div class="d-flex flex-wrap gap-2 mt-2">
-                    <div class="text-wrap d-flex" id="new-aura"><b>Aura:</b>&nbsp;-</div>
-                    <div class="text-wrap d-flex" id="caster-level-label"><b>CL:</b>&nbsp;-</div>
-                </div>
-                <div class="d-flex flex-wrap gap-2 mt-2">
-                    <div class="text-wrap d-flex"><b>Slot:</b>&nbsp;<select class="form-select form-select-sm" name="slot" id="new-slot">
-                        <option value="none">none</option>
-                        <option value="belt">belt</option>
-                        <option value="body">body</option>
-                        <option value="chest">chest</option>
-                        <option value="eyes">eyes</option>
-                        <option value="feet">feet</option>
-                        <option value="hands">hands</option>
-                        <option value="head">head</option>
-                        <option value="headband">headband</option>
-                        <option value="neck">neck</option>
-                        <option value="shoulders">shoulders</option>
-                        <option value="wrist">wrist</option>
-                    </select></div>
-                    <div class="text-wrap d-flex" id="new-price"><b>Price:</b>&nbsp;-</div>
-                    <div class="text-wrap d-flex"><b>Weight:</b>&nbsp;<input>&nbsp;lbs</div>
-                </div>
-                <div class="catlabel">
-                    <b>DESCRIPTION</b>
-                </div>
-                <div class="description">
-                    <textarea type="text" class="w-100 form-control" id="new-description" style="min-height: 400px;"></textarea>
-                </div>
-                <div class="catlabel">
-                    <b>CONSTRUCTION</b>
-                </div>
-                <div class="d-flex flex-wrap gap-2">
-                    <div class="text-wrap"><b>Requirements:</b></div>
-                    <div class="ms-3">
-                        <div class="d-flex flex-wrap gap-2">
-                            <select class="form-select form-select-sm w-auto" name="craft-slot" id="craft-feet-slot">
-                                <option value="Craft Wondrous Item">Craft Wondrous Item</option>
-                                <option value="Craft Magic Arms and Armor">Craft Magic Arms and Armor</option>
-                                <option value="Forge Ring">Forge Ring</option>
-                                <option value="Brew Potion">Brew Potion</option>
-                                <option value="Craft Rod">Craft Rod</option>
-                                <option value="Craft Wand">Craft Wand</option>
-                                <option value="Craft Staff">Craft Staff</option>
-                                <option value="Scribe Scroll">Scribe Scroll</option>
-                                <option value="Brew Fleshcrafting Poison">Brew Fleshcrafting Poison</option>
-                                <option value="Craft Construct">Craft Construct</option>
-                                <option value="Craft Ooze">Craft Ooze</option>
-                                <option value="Craft Poppet">Craft Poppet</option>
-                                <option value="Craft Shadow Piercing">Craft Shadow Piercing</option>
-                                <option value="Cultivate Magic Plants">Cultivate Magic Plants</option>
-                                <option value="Fleshwarper">Fleshwarper</option>
-                                <option value="Grisly Ornament">Grisly Ornament</option>
-                                <option value="Grow Plant Creature">Grow Plant Creature</option>
-                                <option value="Infuse Poison">Infuse Poison</option>
-                                <option value="Inscribe Magical Tattoo">Inscribe Magical Tattoo</option>
-                                <option value="Haunt Scavenger">Haunt Scavenger</option>
-                                <option value="Inscribe Rune">Inscribe Rune</option>
-                                <option value="Monstrous Crafter">Monstrous Crafter</option>
-                            </select>
-                        </div>
-                        <div id="new-item-spells-wrapper"></div>
-                    </div> 
-                </div>
-                <div class="text-wrap" id="new-cost"><b>Cost:</b>&nbsp;-</div>
-            </div>
+      <div class="itemdesc col-md-5" id="new-wrapper-1" style="display: none">
+        <div class="itemname d-flex justify-content-between">
+          <div class="d-flex gap-1">
+            <input class="w-100 form-control" placeholder="Item Name" />
+          </div>
         </div>
-
-        <!-- -------------------------- CALCULATOR ------------------------ -->
-
-        <div class="flex-column col-md-6 col-12" id="new-wrapper-2" style="display: none;">
-            <div class="flex-column p-3">
-                <div class="d-flex row">
-                    <label class="col-5" title="Restrictions">Crafter Class:</label>
-                    <select class="form-select form-select-sm w-auto" onchange="handleChangeClass(this)" name="craft-class" id="craft-class">
-                        <option value=""></option>
-                        <!-- FILLED BY LOAD FILTERS -->
-                    </select>
-                </div>
-                <div class="d-flex row">
-                    <label class="col-5" title="Restrictions">Restrictions:</label>
-                    <div class="col-7 d-flex flex-wrap gap-3">
-                        <button class="btn btn-primary">Add Spell</button>
-                        <button class="btn btn-primary" type="button" onclick="toggleRestrictions()">Restrictions</button>
-                        <button class="btn btn-primary" onclick="addNewBonus()">Add Bonus</button>
-                    </div>
-                </div>
-                <div class="itemdesc-light" id="restriction-details" style="display: none;">
-                    <h5><b>Restrictions & Crafting Modifiers</b></h5>
-                    <div class="d-grid gap-2">
-                        <label class="form-check">
-                            <input id="RestrictSkill" class="form-check-input" type="checkbox" onchange="calculateCost()">
-                            <span class="form-check-label">Item requires a specific skill to use (-10% base price)</span>
-                        </label>
-                        <label class="form-check">
-                            <input id="RestrictClassAlignment" class="form-check-input" type="checkbox" onchange="calculateCost()">
-                            <span class="form-check-label">Item requires a specific class or alignment to use (-30% base price)</span>
-                        </label>
-                        <label class="form-check">
-                            <input id="AcceleratedCrafting" class="form-check-input" type="checkbox" onchange="calculateCost()">
-                            <span class="form-check-label">Accelerated crafting (+5 DC, craft in half the time)</span>
-                        </label>
-                        <label class="form-check">
-                            <input id="CooperativeCrafting" class="form-check-input" type="checkbox" onchange="calculateCost()">
-                            <span class="form-check-label">Cooperative Crafting (+2 check, doubles daily progress)</span>
-                        </label>
-                        <label class="form-check">
-                            <input id="ArcaneBuilder" class="form-check-input" type="checkbox" onchange="calculateCost()">
-                            <span class="form-check-label">Arcane Builder (+4 check, 25% faster for one item type)</span>
-                        </label>
-                        <label class="form-check">
-                            <input id="FathersForgehammer" class="form-check-input" type="checkbox" onchange="calculateCost()">
-                            <span class="form-check-label">Father's Forgehammer / similar 25% faster effect</span>
-                        </label>
-                        <label class="form-check">
-                            <input id="HedgeMagician" class="form-check-input" type="checkbox" onchange="calculateCost()">
-                            <span class="form-check-label">Hedge Magician / Spark of Creation (-5% crafting cost)</span>
-                        </label>
-                    </div>
-                </div>
-                <div class="itemdesc-light" id="spell-req-details" style="display: none;">
-                    <h5><b>Spells</b></h5>
-                    <br>
-                    <div id="spell-req-details-items"></div>
-                    
-                </div>
-                <div class="itemdesc-light" id="bonus-req-details" style="display: none;">
-                    <h5><b>Bonuses</b></h5>
-                    <br>
-                    <div id="bonus-req-details-items"></div>
-                    
-                </div>
-                <div class="costrow d-flex row gap-1 mt-3">
-                    <span class="col-5" title="Market price before construction-cost reductions">Base Price:</span>
-                    <div class="flex-column row col-7" style="padding-left: 0;">
-                        <div class="d-flex gap-2">
-                            <input class="col-5" id="GP" title="Base market price, GP part" value="120" type="text">
-                            <label class="col-7" for="GP" title="Base market price, GP part">GP</label>
-                        </div>
-                        <div class="d-flex gap-2">
-                            <input class="col-5" id="SP" title="Market cost of the item being crafted, SP part" value="0" type="text">
-                            <label class="col-7" for="SP" title="Market cost of the item being crafted, SP part">SP</label>
-                        </div>
-                        <div class="d-flex gap-2">
-                            <input class="col-5" id="CP" title="Market cost of the item being crafted, CP part" value="0" type="text">
-                            <label class="col-7" for="CP" title="Market cost of the item being crafted, CP part">CP</label>
-                        </div>       
-                    </div>
-                </div>
-                <div class="d-flex row gap-1 mt-4">
-                    <label class="col-5" for="DC" title="Caster level of the item">Caster Level:</label>
-                    <input class="col-3" id="DC" value="5" title="Caster level of the item" type="text">
-                </div>
-                <div class="d-flex row gap-1 mt-4">
-                    <label class="col-5" for="PriorWork" title="GP of crafting progress already completed">Prior Progress:</label>
-                    <input class="col-3" id="PriorWork" value="0" title="GP of crafting progress already completed" type="text">
-                </div>
-                <div class="d-flex row gap-1 mt-4">
-                    <label class="col-5" for="Check" title="Spellcraft or relevant Craft check result">Check Result:</label>
-                    <input class="col-3" id="Check" value="15" title="Spellcraft or relevant Craft check result" type="text">
-                </div>
-                <div class="d-flex row gap-1 mt-4">
-                    <label class="col-5" for="MissingPrereqs" title="Each missing prerequisite increases DC by 5">Missing Prereqs:</label>
-                    <input class="col-3" id="MissingPrereqs" value="0" title="Each missing prerequisite increases DC by 5" type="text">
-                </div>
-                <div class="d-flex row gap-1 mt-4">
-                    <label class="col-5" for="ItemCostGP" title="Cost of the mundane item being enchanted">Mundane Item Cost:</label>
-                    <input class="col-3" id="ItemCostGP" value="0" title="Cost of the mundane item being enchanted" type="text">
-                </div>
-                <div class="d-flex row gap-1 mt-4">
-                    <label class="col-5" for="ComponentCostGP" title="Extra material component costs">Component Cost:</label>
-                    <input class="col-3" id="ComponentCostGP" value="0" title="Extra material component costs" type="text">
-                </div>
-                <div class="d-flex row gap-1 mt-4">
-                    <input id="ItemMultiple" value="1" type="hidden">
-                    <input id="IsByDay" type="hidden">
-                    <input id="IsSwift" type="hidden">
-                    <input id="IsMaster" type="hidden">
-                </div>
-                <div class="d-flex row gap-1 mt-4">
-                    <div class="col-5"></div>
-                    <input class="col-4" value="Recompute" onclick="recompute()" type="button">
-                </div>
+        <div id="w-item-id-${index}">
+          <div class="d-flex flex-wrap gap-2 mt-2">
+            <div class="text-wrap d-flex" id="new-aura">
+              <b>Aura:</b>&nbsp;-
             </div>
-            <div class="result-wrapper p-3 mt-3">
-                <div class="resultsrow d-flex row gap-3">
-                    <label class="col-4 text-wrap" for="Progress" title="Progress made toward item completion on this check">Progress:</label>
-                    <input class="col-7" value="" title="Progress made toward item completion on this check" id="Progress" disabled="true" type="text">
-                </div>
-                <div class="resultsrow d-flex row gap-3 mt-4">
-                    <label class="col-4 text-wrap" for="MagicCraftDc" title="Magic item creation DC">Craft DC:</label>
-                    <input class="col-7" value="" title="Magic item creation DC" id="MagicCraftDc" disabled="true" type="text">
-                </div>
-                <div class="resultsrow d-flex row gap-3 mt-4">
-                    <label class="col-4 text-wrap" for="MagicFinalPrice" title="Final market price after allowed restrictions">Final Price:</label>
-                    <input class="col-7" value="" title="Final market price after allowed restrictions" id="MagicFinalPrice" disabled="true" type="text">
-                </div>
-                <div class="resultsrow d-flex row gap-3 mt-4">
-                    <label class="col-4 text-wrap" for="TotalProgress" title="Total progress made toward item completion">Overall Progress:</label>
-                    <input class="col-7" value="" title="Total progress made toward item completion" id="TotalProgress" disabled="true" type="text">
-                </div>
-                <div class="resultsrow d-flex row gap-3 mt-4">
-                    <label class="col-4 text-wrap" for="TimeTaken" title="Total amount of time taken to make this progress">Time Taken:</label>
-                    <input class="col-7" value="" title="Total amount of time taken to make this progress" id="TimeTaken" disabled="true" type="text">
-                </div>
-                <div class="resultsrow d-flex row gap-3 mt-4">
-                    <label class="col-4 text-wrap" for="AmountToPay" title="Amount to pay for this check (base materials only paid on first check)">Amount To Pay:</label>
-                    <input class="col-7" title="Amount to pay for this check (base materials only paid on first check)" id="AmountToPay" disabled="true" type="text">
-                </div>
+            <div class="text-wrap d-flex" id="caster-level-label">
+              <b>CL:</b>&nbsp;-
             </div>
-            
+          </div>
+          <div class="d-flex flex-wrap gap-2 mt-2">
+            <div class="text-wrap d-flex">
+              <b>Slot:</b>&nbsp;<select
+                class="form-select form-select-sm"
+                name="slot"
+                id="new-slot"
+              >
+                <option value="none">none</option>
+                <option value="belt">belt</option>
+                <option value="body">body</option>
+                <option value="chest">chest</option>
+                <option value="eyes">eyes</option>
+                <option value="feet">feet</option>
+                <option value="hands">hands</option>
+                <option value="head">head</option>
+                <option value="headband">headband</option>
+                <option value="neck">neck</option>
+                <option value="shoulders">shoulders</option>
+                <option value="wrist">wrist</option>
+              </select>
+            </div>
+            <div class="text-wrap d-flex" id="new-price">
+              <b>Price:</b>&nbsp;-
+            </div>
+            <div class="text-wrap d-flex">
+              <b>Weight:</b>&nbsp;<input />&nbsp;lbs
+            </div>
+          </div>
+          <div class="catlabel">
+            <b>DESCRIPTION</b>
+          </div>
+          <div class="description">
+            <textarea
+              type="text"
+              class="w-100 form-control"
+              id="new-description"
+              style="min-height: 400px"
+            ></textarea>
+          </div>
+          <div class="catlabel">
+            <b>CONSTRUCTION</b>
+          </div>
+          <div class="d-flex flex-wrap gap-2">
+            <div class="text-wrap"><b>Requirements:</b></div>
+            <div class="ms-3">
+              <div class="d-flex flex-wrap gap-2">
+                <select
+                  class="form-select form-select-sm w-auto"
+                  name="craft-slot"
+                  id="craft-feet-slot"
+                >
+                  <option value="Craft Wondrous Item">
+                    Craft Wondrous Item
+                  </option>
+                  <option value="Craft Magic Arms and Armor">
+                    Craft Magic Arms and Armor
+                  </option>
+                  <option value="Forge Ring">Forge Ring</option>
+                  <option value="Brew Potion">Brew Potion</option>
+                  <option value="Craft Rod">Craft Rod</option>
+                  <option value="Craft Wand">Craft Wand</option>
+                  <option value="Craft Staff">Craft Staff</option>
+                  <option value="Scribe Scroll">Scribe Scroll</option>
+                  <option value="Brew Fleshcrafting Poison">
+                    Brew Fleshcrafting Poison
+                  </option>
+                  <option value="Craft Construct">Craft Construct</option>
+                  <option value="Craft Ooze">Craft Ooze</option>
+                  <option value="Craft Poppet">Craft Poppet</option>
+                  <option value="Craft Shadow Piercing">
+                    Craft Shadow Piercing
+                  </option>
+                  <option value="Cultivate Magic Plants">
+                    Cultivate Magic Plants
+                  </option>
+                  <option value="Fleshwarper">Fleshwarper</option>
+                  <option value="Grisly Ornament">Grisly Ornament</option>
+                  <option value="Grow Plant Creature">
+                    Grow Plant Creature
+                  </option>
+                  <option value="Infuse Poison">Infuse Poison</option>
+                  <option value="Inscribe Magical Tattoo">
+                    Inscribe Magical Tattoo
+                  </option>
+                  <option value="Haunt Scavenger">Haunt Scavenger</option>
+                  <option value="Inscribe Rune">Inscribe Rune</option>
+                  <option value="Monstrous Crafter">Monstrous Crafter</option>
+                </select>
+              </div>
+              <div id="new-item-spells-wrapper"></div>
+            </div>
+          </div>
+          <div class="text-wrap" id="new-cost"><b>Cost:</b>&nbsp;-</div>
         </div>
+      </div>
+
+      <!-- -------------------------- CALCULATOR ------------------------ -->
+
+      <div
+        class="flex-column col-md-6 col-12"
+        id="new-wrapper-2"
+        style="display: none"
+      >
+        <div class="flex-column p-3">
+          <div class="d-flex row">
+            <label class="col-5" title="Restrictions">Crafter Class:</label>
+            <select
+              class="form-select form-select-sm w-auto"
+              onchange="handleChangeClass(this)"
+              name="craft-class"
+              id="craft-class"
+            >
+              <option value=""></option>
+              <!-- FILLED BY LOAD FILTERS -->
+            </select>
+          </div>
+          <div class="d-flex row">
+            <label class="col-5" title="Restrictions">Restrictions:</label>
+            <div class="col-7 d-flex flex-wrap gap-3">
+              <button class="btn btn-primary">Add Spell</button>
+              <button
+                class="btn btn-primary"
+                type="button"
+                onclick="toggleRestrictions()"
+              >
+                Restrictions
+              </button>
+              <button class="btn btn-primary" onclick="addNewBonus()">
+                Add Bonus
+              </button>
+            </div>
+          </div>
+          <div
+            class="itemdesc-light"
+            id="restriction-details"
+            style="display: none"
+          >
+            <h5><b>Restrictions & Crafting Modifiers</b></h5>
+            <div class="d-grid gap-2">
+              <label class="form-check">
+                <input
+                  id="RestrictSkill"
+                  class="form-check-input"
+                  type="checkbox"
+                  onchange="calculateCost()"
+                />
+                <span class="form-check-label"
+                  >Item requires a specific skill to use (-10% base price)</span
+                >
+              </label>
+              <label class="form-check">
+                <input
+                  id="RestrictClassAlignment"
+                  class="form-check-input"
+                  type="checkbox"
+                  onchange="calculateCost()"
+                />
+                <span class="form-check-label"
+                  >Item requires a specific class or alignment to use (-30% base
+                  price)</span
+                >
+              </label>
+              <label class="form-check">
+                <input
+                  id="AcceleratedCrafting"
+                  class="form-check-input"
+                  type="checkbox"
+                  onchange="calculateCost()"
+                />
+                <span class="form-check-label"
+                  >Accelerated crafting (+5 DC, craft in half the time)</span
+                >
+              </label>
+              <label class="form-check">
+                <input
+                  id="CooperativeCrafting"
+                  class="form-check-input"
+                  type="checkbox"
+                  onchange="calculateCost()"
+                />
+                <span class="form-check-label"
+                  >Cooperative Crafting (+2 check, doubles daily progress)</span
+                >
+              </label>
+              <label class="form-check">
+                <input
+                  id="ArcaneBuilder"
+                  class="form-check-input"
+                  type="checkbox"
+                  onchange="calculateCost()"
+                />
+                <span class="form-check-label"
+                  >Arcane Builder (+4 check, 25% faster for one item type)</span
+                >
+              </label>
+              <label class="form-check">
+                <input
+                  id="FathersForgehammer"
+                  class="form-check-input"
+                  type="checkbox"
+                  onchange="calculateCost()"
+                />
+                <span class="form-check-label"
+                  >Father's Forgehammer / similar 25% faster effect</span
+                >
+              </label>
+              <label class="form-check">
+                <input
+                  id="HedgeMagician"
+                  class="form-check-input"
+                  type="checkbox"
+                  onchange="calculateCost()"
+                />
+                <span class="form-check-label"
+                  >Hedge Magician / Spark of Creation (-5% crafting cost)</span
+                >
+              </label>
+            </div>
+          </div>
+          <div
+            class="itemdesc-light"
+            id="spell-req-details"
+            style="display: none"
+          >
+            <h5><b>Spells</b></h5>
+            <br />
+            <div id="spell-req-details-items"></div>
+          </div>
+          <div
+            class="itemdesc-light"
+            id="bonus-req-details"
+            style="display: none"
+          >
+            <h5><b>Bonuses</b></h5>
+            <br />
+            <div id="bonus-req-details-items"></div>
+          </div>
+          <div class="costrow d-flex row gap-1 mt-3">
+            <span
+              class="col-5"
+              title="Market price before construction-cost reductions"
+              >Base Price:</span
+            >
+            <div class="flex-column row col-7" style="padding-left: 0">
+              <div class="d-flex gap-2">
+                <input
+                  class="col-5"
+                  id="GP"
+                  title="Base market price, GP part"
+                  value="120"
+                  type="text"
+                />
+                <label class="col-7" for="GP" title="Base market price, GP part"
+                  >GP</label
+                >
+              </div>
+              <div class="d-flex gap-2">
+                <input
+                  class="col-5"
+                  id="SP"
+                  title="Market cost of the item being crafted, SP part"
+                  value="0"
+                  type="text"
+                />
+                <label
+                  class="col-7"
+                  for="SP"
+                  title="Market cost of the item being crafted, SP part"
+                  >SP</label
+                >
+              </div>
+              <div class="d-flex gap-2">
+                <input
+                  class="col-5"
+                  id="CP"
+                  title="Market cost of the item being crafted, CP part"
+                  value="0"
+                  type="text"
+                />
+                <label
+                  class="col-7"
+                  for="CP"
+                  title="Market cost of the item being crafted, CP part"
+                  >CP</label
+                >
+              </div>
+            </div>
+          </div>
+          <div class="d-flex row gap-1 mt-4">
+            <label class="col-5" for="DC" title="Caster level of the item"
+              >Caster Level:</label
+            >
+            <input
+              class="col-3"
+              id="DC"
+              value="5"
+              title="Caster level of the item"
+              type="text"
+            />
+          </div>
+          <div class="d-flex row gap-1 mt-4">
+            <label
+              class="col-5"
+              for="PriorWork"
+              title="GP of crafting progress already completed"
+              >Prior Progress:</label
+            >
+            <input
+              class="col-3"
+              id="PriorWork"
+              value="0"
+              title="GP of crafting progress already completed"
+              type="text"
+            />
+          </div>
+          <div class="d-flex row gap-1 mt-4">
+            <label
+              class="col-5"
+              for="Check"
+              title="Spellcraft or relevant Craft check result"
+              >Check Result:</label
+            >
+            <input
+              class="col-3"
+              id="Check"
+              value="15"
+              title="Spellcraft or relevant Craft check result"
+              type="text"
+            />
+          </div>
+          <div class="d-flex row gap-1 mt-4">
+            <label
+              class="col-5"
+              for="MissingPrereqs"
+              title="Each missing prerequisite increases DC by 5"
+              >Missing Prereqs:</label
+            >
+            <input
+              class="col-3"
+              id="MissingPrereqs"
+              value="0"
+              title="Each missing prerequisite increases DC by 5"
+              type="text"
+            />
+          </div>
+          <div class="d-flex row gap-1 mt-4">
+            <label
+              class="col-5"
+              for="ItemCostGP"
+              title="Cost of the mundane item being enchanted"
+              >Mundane Item Cost:</label
+            >
+            <input
+              class="col-3"
+              id="ItemCostGP"
+              value="0"
+              title="Cost of the mundane item being enchanted"
+              type="text"
+            />
+          </div>
+          <div class="d-flex row gap-1 mt-4">
+            <label
+              class="col-5"
+              for="ComponentCostGP"
+              title="Extra material component costs"
+              >Component Cost:</label
+            >
+            <input
+              class="col-3"
+              id="ComponentCostGP"
+              value="0"
+              title="Extra material component costs"
+              type="text"
+            />
+          </div>
+          <div class="d-flex row gap-1 mt-4">
+            <input id="ItemMultiple" value="1" type="hidden" />
+            <input id="IsByDay" type="hidden" />
+            <input id="IsSwift" type="hidden" />
+            <input id="IsMaster" type="hidden" />
+          </div>
+          <div class="d-flex row gap-1 mt-4">
+            <div class="col-5"></div>
+            <input
+              class="col-4"
+              value="Recompute"
+              onclick="recompute()"
+              type="button"
+            />
+          </div>
+        </div>
+        <div class="result-wrapper p-3 mt-3">
+          <div class="resultsrow d-flex row gap-3">
+            <label
+              class="col-4 text-wrap"
+              for="Progress"
+              title="Progress made toward item completion on this check"
+              >Progress:</label
+            >
+            <input
+              class="col-7"
+              value=""
+              title="Progress made toward item completion on this check"
+              id="Progress"
+              disabled="true"
+              type="text"
+            />
+          </div>
+          <div class="resultsrow d-flex row gap-3 mt-4">
+            <label
+              class="col-4 text-wrap"
+              for="MagicCraftDc"
+              title="Magic item creation DC"
+              >Craft DC:</label
+            >
+            <input
+              class="col-7"
+              value=""
+              title="Magic item creation DC"
+              id="MagicCraftDc"
+              disabled="true"
+              type="text"
+            />
+          </div>
+          <div class="resultsrow d-flex row gap-3 mt-4">
+            <label
+              class="col-4 text-wrap"
+              for="MagicFinalPrice"
+              title="Final market price after allowed restrictions"
+              >Final Price:</label
+            >
+            <input
+              class="col-7"
+              value=""
+              title="Final market price after allowed restrictions"
+              id="MagicFinalPrice"
+              disabled="true"
+              type="text"
+            />
+          </div>
+          <div class="resultsrow d-flex row gap-3 mt-4">
+            <label
+              class="col-4 text-wrap"
+              for="TotalProgress"
+              title="Total progress made toward item completion"
+              >Overall Progress:</label
+            >
+            <input
+              class="col-7"
+              value=""
+              title="Total progress made toward item completion"
+              id="TotalProgress"
+              disabled="true"
+              type="text"
+            />
+          </div>
+          <div class="resultsrow d-flex row gap-3 mt-4">
+            <label
+              class="col-4 text-wrap"
+              for="TimeTaken"
+              title="Total amount of time taken to make this progress"
+              >Time Taken:</label
+            >
+            <input
+              class="col-7"
+              value=""
+              title="Total amount of time taken to make this progress"
+              id="TimeTaken"
+              disabled="true"
+              type="text"
+            />
+          </div>
+          <div class="resultsrow d-flex row gap-3 mt-4">
+            <label
+              class="col-4 text-wrap"
+              for="AmountToPay"
+              title="Amount to pay for this check (base materials only paid on first check)"
+              >Amount To Pay:</label
+            >
+            <input
+              class="col-7"
+              title="Amount to pay for this check (base materials only paid on first check)"
+              id="AmountToPay"
+              disabled="true"
+              type="text"
+            />
+          </div>
+        </div>
+      </div>
     </div>
 
-    <hr class="mt-3">
+    <hr class="mt-3" />
 
     <!-- ============================================================== -->
     <!-- -------------------------- SEARCH ITEM ----------------------- -->
     <!-- ============================================================== -->
-    
+
     <div class="d-flex row gap-1 m-4 justify-content-between">
-        <label class="text-wrap col-3" for="Search_W_Item" title="Search Item"><h5><b>Search Wondrous Item:</h5></b></label>
-        <input class="col-5"class="col-3"id="Search_W_Item" title="Search Item"></select>
-        
-        <div class="col-3 d-flex justify-content-end gap-2">
-            <button class="btn btn-primary" onclick="searchWItemFilters()" style="max-width: 250px;">Filters</button>
-            <button class="btn btn-primary" onclick="searchWItem()" style="max-width: 250px;">Search</button>
-        </div>
+      <label class="text-wrap col-3" for="Search_W_Item" title="Search Item"
+        ><h5><b>Search Wondrous Item:</b></h5></label
+      >
+      <input class="col-5" id="Search_W_Item" title="Search Item" />
+
+      <div class="col-3 d-flex justify-content-end gap-2">
+        <button
+          class="btn btn-primary"
+          onclick="searchWItemFilters()"
+          style="max-width: 250px"
+        >
+          Filters
+        </button>
+        <button
+          class="btn btn-primary"
+          onclick="searchWItem()"
+          style="max-width: 250px"
+        >
+          Search
+        </button>
+      </div>
     </div>
-    <div  class="m-4" id="item-filters-wrapper" style="display: none;">
-        <div class="d-flex flex-column gap-3">
-            <div class="d-flex flex-wrap gap-3 justify-content-center" id="item-slots-wrapper">
-                <b>Slots:</b>
-                <!-- FILLED BY LOAD FILTERS -->
-            </div>
-            <div class="d-flex flex-wrap gap-3 justify-content-center" id="item-types-wrapper">
-                <b>Types:</b>
-                <!-- FILLED BY LOAD FILTERS -->
-            </div>
+    <div class="m-4" id="item-filters-wrapper" style="display: none">
+      <div class="d-flex flex-column gap-3">
+        <div
+          class="d-flex flex-wrap gap-3 justify-content-center"
+          id="item-slots-wrapper"
+        >
+          <b>Slots:</b>
+          <!-- FILLED BY LOAD FILTERS -->
         </div>
+        <div
+          class="d-flex flex-wrap gap-3 justify-content-center"
+          id="item-types-wrapper"
+        >
+          <b>Types:</b>
+          <!-- FILLED BY LOAD FILTERS -->
+        </div>
+      </div>
     </div>
 
-    <div id="search_w_item_wrapper" class="d-flex row justify-content-center"></div>
+    <div
+      id="search_w_item_wrapper"
+      class="d-flex row justify-content-center"
+    ></div>
 
-    <hr>
+    <hr />
 
     <!-- ============================================================== -->
     <!-- -------------------------- SEARCH SPELL ---------------------- -->
     <!-- ============================================================== -->
 
     <div class="d-flex row gap-1 m-4 justify-content-between">
-        <label class="text-wrap col-3" for="Search_Item" title="Search Spell"><h5><b>Search Spell:</h5></b></label>
-        <input class="col-5"class="col-3"id="Search_Item" title="Search Spell"></select>
-        
-        <div class="col-3 d-flex justify-content-end gap-2">
-            <button class="btn btn-primary" onclick="searchSpellFilters()" style="max-width: 250px;">Filters</button>
-            <button class="btn btn-primary" onclick="searchItem()" style="max-width: 250px;">Search</button>
+      <label class="text-wrap col-3" for="Search_Item" title="Search Spell"
+        ><h5><b>Search Spell:</b></h5></label
+      >
+      <input class="col-5" id="Search_Item" title="Search Spell" />
+
+      <div class="col-3 d-flex justify-content-end gap-2">
+        <button
+          class="btn btn-primary"
+          onclick="searchSpellFilters()"
+          style="max-width: 250px"
+        >
+          Filters
+        </button>
+        <button
+          class="btn btn-primary"
+          onclick="searchItem()"
+          style="max-width: 250px"
+        >
+          Search
+        </button>
+      </div>
+    </div>
+    <div class="m-4" id="spell-filters-wrapper" style="display: none">
+      <div class="d-flex flex-column gap-3">
+        <div
+          class="d-flex flex-wrap gap-3 justify-content-center"
+          id="spell-schools-wrapper"
+        >
+          <b>Schools:</b>
+          <!-- FILLED BY LOAD FILTERS -->
         </div>
-    </div>
-    <div  class=" m-4" id="spell-filters-wrapper" style="display: none;">
-        <div class="d-flex flex-column gap-3">
-            <div class="d-flex flex-wrap gap-3 justify-content-center" id="spell-schools-wrapper">
-                <b>Schools:</b>
-                <!-- FILLED BY LOAD FILTERS -->
-            </div>
-            <div class="d-flex flex-wrap gap-3 justify-content-center" id="spell-class-wrapper">
-                <b>Classes:</b>
-                <!-- FILLED BY LOAD FILTERS -->
-            </div>
+        <div
+          class="d-flex flex-wrap gap-3 justify-content-center"
+          id="spell-class-wrapper"
+        >
+          <b>Classes:</b>
+          <!-- FILLED BY LOAD FILTERS -->
         </div>
+      </div>
     </div>
-    <div id="search_spell_wrapper" class="d-flex row justify-content-center"></div>
+    <div
+      id="search_spell_wrapper"
+      class="d-flex row justify-content-center"
+    ></div>
 
-    <hr class="my-3">
-  
-    <div class='justify-content-center w-100 p-2' id="footer" style="display: none; position: fixed; bottom: 0px; height: 50px; background-color: #1e1e1e;" onclick="resetSearch()">
-        <button class="btn btn-primary">Reset</button>
+    <hr class="my-3" />
+
+    <div
+      class="justify-content-center w-100 p-2"
+      id="footer"
+      style="
+        display: none;
+        position: fixed;
+        bottom: 0px;
+        height: 50px;
+        background-color: #1e1e1e;
+      "
+      onclick="resetSearch()"
+    >
+      <button class="btn btn-primary">Reset</button>
     </div>
 
-    <button class="btn btn-primary" onclick="exportFiltered()" style="max-width: 250px;">run</button>
-
+    <button
+      class="btn btn-primary"
+      onclick="exportFiltered()"
+      style="max-width: 250px"
+    >
+      run
+    </button>
 
     <script src="scripts/navbar.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="scripts/supabase-config.js"></script>
     <script src="scripts/app-supabase.js"></script>
     <script src="scripts/pages/magic-craft-calculator.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-    <script type="text/javascript" src="scripts/pages/magic-craft-calculator-2.js"></script>
-
-</body></html>
+    <script
+      type="text/javascript"
+      src="scripts/pages/magic-craft-calculator-2.js"
+    ></script>
+  </body>
+</html>

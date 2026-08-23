@@ -1,4 +1,4 @@
-import { items } from '../data/alchemical-crafts.js';
+import { items } from "../data/alchemical-crafts.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   window.items = items;

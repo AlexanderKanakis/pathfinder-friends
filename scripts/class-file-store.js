@@ -14,9 +14,9 @@ function writeJson(filePath, value) {
 
 function loadClasses() {
   const index = readJson(INDEX_PATH);
-  return index.map(entry => ({
+  return index.map((entry) => ({
     ...readJson(path.join(CLASS_DIR, entry.file)),
-    __classFile: entry.file
+    __classFile: entry.file,
   }));
 }
 
@@ -27,14 +27,17 @@ function classIndexEntry(entry) {
     category: entry.category || entry.type || "base",
     sourceUrl: entry.sourceUrl || "",
     spellcastingClass: Boolean(entry.spellcastingClass),
-    file: entry.__classFile
+    file: entry.__classFile,
   };
 }
 
 function saveClasses(classes) {
   writeJson(INDEX_PATH, classes.map(classIndexEntry));
   for (const cls of classes) {
-    if (!cls.__classFile) throw new Error(`Class ${cls.name || "Unnamed Class"} is missing __classFile.`);
+    if (!cls.__classFile)
+      throw new Error(
+        `Class ${cls.name || "Unnamed Class"} is missing __classFile.`,
+      );
     const payload = { ...cls };
     delete payload.__classFile;
     writeJson(path.join(CLASS_DIR, cls.__classFile), payload);
@@ -45,5 +48,5 @@ module.exports = {
   CLASS_DIR,
   INDEX_PATH,
   loadClasses,
-  saveClasses
+  saveClasses,
 };

@@ -84,11 +84,11 @@
   }
 
   async function getRequiredGameContextKey() {
-    const contexts = (await loadContexts()).filter(context => context.gameId);
+    const contexts = (await loadContexts()).filter((context) => context.gameId);
     if (!contexts.length) return "";
 
     const selected = getSelectedContextKey();
-    if (contexts.some(context => context.key === selected)) return selected;
+    if (contexts.some((context) => context.key === selected)) return selected;
 
     const fallback = contexts[0].key;
     setSelectedContextKey(fallback);
@@ -121,7 +121,10 @@
     return localStorage.getItem(`pf_character_id_${contextKey}`) || "";
   }
 
-  function setSelectedCharacterId(characterId, contextKey = getSelectedContextKey()) {
+  function setSelectedCharacterId(
+    characterId,
+    contextKey = getSelectedContextKey(),
+  ) {
     const key = `pf_character_id_${contextKey}`;
     if (characterId) localStorage.setItem(key, characterId);
     else localStorage.removeItem(key);
@@ -138,7 +141,9 @@
 
   async function requireAuth() {
     if (missingConfig) {
-      showLockedMessage("Add your Supabase URL and anon key in supabase-config.js.");
+      showLockedMessage(
+        "Add your Supabase URL and anon key in supabase-config.js.",
+      );
       return null;
     }
 
@@ -160,7 +165,7 @@
     const admin = currentUser ? await isAppAdmin() : false;
     slot.innerHTML = authLinkHtml(currentUser, profile, admin);
     if (currentUser) {
-      await setupContextSelect("navContextSelect", async contextKey => {
+      await setupContextSelect("navContextSelect", async (contextKey) => {
         await updateNavbarAccess(contextKey, admin);
       });
       await updateNavbarAccess(getSelectedContextKey(), admin);
@@ -169,11 +174,18 @@
     }
   }
 
-  async function updateNavbarAccess(contextKey = getSelectedContextKey(), admin = false) {
-    const enemiesItem = document.querySelector('[data-nav-item="enemies.html"]');
-    const enemiesOption = document.querySelector('#navPageSelect option[value="enemies.html"]');
+  async function updateNavbarAccess(
+    contextKey = getSelectedContextKey(),
+    admin = false,
+  ) {
+    const enemiesItem = document.querySelector(
+      '[data-nav-item="enemies.html"]',
+    );
+    const enemiesOption = document.querySelector(
+      '#navPageSelect option[value="enemies.html"]',
+    );
 
-    const canManageEnemies = admin || await isGameManager(contextKey);
+    const canManageEnemies = admin || (await isGameManager(contextKey));
     enemiesItem?.classList.toggle("d-none", !canManageEnemies);
     if (enemiesOption) {
       enemiesOption.hidden = !canManageEnemies;
@@ -195,11 +207,12 @@
   }
 
   function characterLevelFromSheet(sheet = {}) {
-    const raw = sheet?.fields?.characterLevel
-      ?? sheet?.characterLevel
-      ?? sheet?.fields?.level
-      ?? sheet?.level
-      ?? null;
+    const raw =
+      sheet?.fields?.characterLevel ??
+      sheet?.characterLevel ??
+      sheet?.fields?.level ??
+      sheet?.level ??
+      null;
     const value = Number.parseInt(String(raw ?? "").trim(), 10);
     return Number.isFinite(value) ? value : null;
   }
@@ -225,49 +238,61 @@
     await renderAuthNav(await getUser());
 
     if (missingConfig) {
-      setStatus("Add your Supabase URL and anon key in supabase-config.js first.", "warning");
+      setStatus(
+        "Add your Supabase URL and anon key in supabase-config.js first.",
+        "warning",
+      );
       return;
     }
 
-    const redirect = new URLSearchParams(window.location.search).get("redirect") || "dice-roller.html";
+    const redirect =
+      new URLSearchParams(window.location.search).get("redirect") ||
+      "dice-roller.html";
     const currentUser = await getUser();
     if (currentUser) {
       window.location.href = redirect;
       return;
     }
 
-    document.getElementById("loginForm").addEventListener("submit", async event => {
-      event.preventDefault();
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value;
-      const { data, error } = await client.auth.signInWithPassword({ email, password });
+    document
+      .getElementById("loginForm")
+      .addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value;
+        const { data, error } = await client.auth.signInWithPassword({
+          email,
+          password,
+        });
 
-      if (error) {
-        setStatus(error.message, "danger");
-        return;
-      }
+        if (error) {
+          setStatus(error.message, "danger");
+          return;
+        }
 
-      if (!data.session) {
-        setStatus("Login succeeded, but no session was returned. Check email confirmation settings.", "warning");
-        return;
-      }
+        if (!data.session) {
+          setStatus(
+            "Login succeeded, but no session was returned. Check email confirmation settings.",
+            "warning",
+          );
+          return;
+        }
 
-      window.location.href = redirect;
-    });
-
+        window.location.href = redirect;
+      });
   }
 
   async function createUserAsAdmin(email, password) {
     if (!client) return { error: new Error("Supabase is not configured") };
     return client.functions.invoke("admin-create-user", {
-      body: { email, password }
+      body: { email, password },
     });
   }
 
   async function resetUserPasswordAsAdmin(email, password) {
     if (!client) return { error: new Error("Supabase is not configured") };
     return client.functions.invoke("admin-create-user", {
-      body: { action: "reset-password", email, password }
+      body: { action: "reset-password", email, password },
     });
   }
 
@@ -285,7 +310,7 @@
     const form = document.getElementById("adminCreateUserForm");
     if (!form) return;
 
-    form.addEventListener("submit", async event => {
+    form.addEventListener("submit", async (event) => {
       event.preventDefault();
       const email = document.getElementById("adminUserEmail").value.trim();
       const password = document.getElementById("adminUserPassword").value;
@@ -301,7 +326,8 @@
 
       if (error || data?.error) {
         status.className = "alert alert-danger py-2";
-        status.textContent = data?.error || error?.message || "Could not create user.";
+        status.textContent =
+          data?.error || error?.message || "Could not create user.";
         return;
       }
 
@@ -311,7 +337,7 @@
     });
 
     const resetForm = document.getElementById("adminResetPasswordForm");
-    resetForm?.addEventListener("submit", async event => {
+    resetForm?.addEventListener("submit", async (event) => {
       event.preventDefault();
       const email = document.getElementById("adminResetEmail").value.trim();
       const password = document.getElementById("adminResetPassword").value;
@@ -327,7 +353,8 @@
 
       if (error || data?.error) {
         status.className = "alert alert-danger py-2";
-        status.textContent = data?.error || error?.message || "Could not reset password.";
+        status.textContent =
+          data?.error || error?.message || "Could not reset password.";
         return;
       }
 
@@ -339,9 +366,11 @@
 
   async function loadContexts() {
     const user = await getUser();
-    if (!client || !user) return [{ key: "general", label: "General", gameId: null }];
+    if (!client || !user)
+      return [{ key: "general", label: "General", gameId: null }];
     if (contextsCache && contextsCacheUserId === user.id) return contextsCache;
-    if (contextsPromise && contextsCacheUserId === user.id) return contextsPromise;
+    if (contextsPromise && contextsCacheUserId === user.id)
+      return contextsPromise;
 
     contextsCacheUserId = user.id;
     contextsPromise = (async () => {
@@ -357,11 +386,11 @@
 
       return [
         { key: "general", label: "General", gameId: null },
-        ...(data || []).map(game => ({
+        ...(data || []).map((game) => ({
           key: `game:${game.id}`,
           label: game.name,
-          gameId: game.id
-        }))
+          gameId: game.id,
+        })),
       ];
     })();
 
@@ -375,7 +404,7 @@
     if (!client || !user) return null;
     const { data, error } = await client.rpc("create_campaign", {
       game_name: name,
-      game_description: description || ""
+      game_description: description || "",
     });
     if (error) {
       console.error(error);
@@ -388,7 +417,9 @@
   async function findCampaign(gameId) {
     const user = await getUser();
     if (!client || !user) return null;
-    const { data, error } = await client.rpc("find_campaign", { target_game_id: gameId });
+    const { data, error } = await client.rpc("find_campaign", {
+      target_game_id: gameId,
+    });
     if (error) {
       console.error(error);
       return { error };
@@ -399,7 +430,9 @@
   async function requestCampaignAccess(gameId) {
     const user = await getUser();
     if (!client || !user) return null;
-    const { data, error } = await client.rpc("request_campaign_access", { target_game_id: gameId });
+    const { data, error } = await client.rpc("request_campaign_access", {
+      target_game_id: gameId,
+    });
     if (error) {
       console.error(error);
       return { error };
@@ -410,8 +443,10 @@
   async function loadCampaigns() {
     const user = await getUser();
     if (!user) return [];
-    if (campaignsCache && campaignsCacheUserId === user.id) return campaignsCache;
-    if (campaignsPromise && campaignsCacheUserId === user.id) return campaignsPromise;
+    if (campaignsCache && campaignsCacheUserId === user.id)
+      return campaignsCache;
+    if (campaignsPromise && campaignsCacheUserId === user.id)
+      return campaignsPromise;
 
     campaignsCacheUserId = user.id;
     campaignsPromise = (async () => {
@@ -434,7 +469,7 @@
     const context = normalizeContext(contextKey);
     if (!context.gameId) return false;
     const campaigns = await loadCampaigns();
-    const campaign = campaigns.find(item => item.id === context.gameId);
+    const campaign = campaigns.find((item) => item.id === context.gameId);
     return ["owner", "gm", "admin"].includes(campaign?.role);
   }
 
@@ -452,7 +487,7 @@
   async function respondCampaignRequest(requestId, accepted) {
     const { error } = await client.rpc("respond_campaign_request", {
       request_id: requestId,
-      accept_request: Boolean(accepted)
+      accept_request: Boolean(accepted),
     });
     if (error) console.error(error);
     if (!error) invalidateContextCaches();
@@ -460,7 +495,9 @@
   }
 
   async function leaveCampaign(gameId) {
-    const { error } = await client.rpc("leave_campaign", { target_game_id: gameId });
+    const { error } = await client.rpc("leave_campaign", {
+      target_game_id: gameId,
+    });
     if (error) console.error(error);
     if (!error) invalidateContextCaches();
     return { error };
@@ -469,7 +506,7 @@
   async function kickCampaignMember(gameId, userId) {
     const { error } = await client.rpc("kick_campaign_member", {
       target_game_id: gameId,
-      target_user_id: userId
+      target_user_id: userId,
     });
     if (error) console.error(error);
     if (!error) invalidateContextCaches();
@@ -488,7 +525,7 @@
       .from("games")
       .update({
         name,
-        description: description || ""
+        description: description || "",
       })
       .eq("id", gameId)
       .select("id,name,description,owner_id,created_at")
@@ -504,11 +541,19 @@
     if (!select) return "general";
 
     const contexts = await loadContexts();
-    const keys = contexts.map(context => context.key);
+    const keys = contexts.map((context) => context.key);
     let selectedKey = getSelectedContextKey();
     const page = window.location.pathname.split("/").pop() || "";
-    const requiresGame = ["map.html", "characters.html", "character-sheet.html", "bag-of-holding.html", "enemies.html"].includes(page);
-    const availableContexts = requiresGame ? contexts.filter(context => context.gameId) : contexts;
+    const requiresGame = [
+      "map.html",
+      "characters.html",
+      "character-sheet.html",
+      "bag-of-holding.html",
+      "enemies.html",
+    ].includes(page);
+    const availableContexts = requiresGame
+      ? contexts.filter((context) => context.gameId)
+      : contexts;
 
     if (!availableContexts.length) {
       select.innerHTML = `<option value="">No campaigns</option>`;
@@ -516,13 +561,13 @@
       return "";
     }
 
-    if (!availableContexts.some(context => context.key === selectedKey)) {
+    if (!availableContexts.some((context) => context.key === selectedKey)) {
       selectedKey = requiresGame ? availableContexts[0].key : "general";
       setSelectedContextKey(selectedKey);
     }
 
     select.innerHTML = "";
-    availableContexts.forEach(context => {
+    availableContexts.forEach((context) => {
       const option = document.createElement("option");
       option.value = context.key;
       option.textContent = context.label;
@@ -532,25 +577,35 @@
     select.value = selectedKey;
     select.addEventListener("change", () => {
       setSelectedContextKey(select.value);
-      window.dispatchEvent(new CustomEvent("pf-context-change", { detail: { contextKey: select.value } }));
+      window.dispatchEvent(
+        new CustomEvent("pf-context-change", {
+          detail: { contextKey: select.value },
+        }),
+      );
       onChange?.(select.value);
     });
 
     return selectedKey;
   }
 
-  async function setupCharacterSelect(selectId, contextKey = getSelectedContextKey(), onChange, options = {}) {
+  async function setupCharacterSelect(
+    selectId,
+    contextKey = getSelectedContextKey(),
+    onChange,
+    options = {},
+  ) {
     const select = document.getElementById(selectId);
     if (!select) return "";
 
     const sheets = await loadCharacterSheets(contextKey);
     const remembered = getSelectedCharacterId(contextKey);
-    const selectedId = remembered && sheets.some(sheet => sheet.id === remembered)
-      ? remembered
-      : "";
+    const selectedId =
+      remembered && sheets.some((sheet) => sheet.id === remembered)
+        ? remembered
+        : "";
 
     select.innerHTML = `<option value="">No character</option>`;
-    sheets.forEach(sheet => {
+    sheets.forEach((sheet) => {
       const option = document.createElement("option");
       option.value = sheet.id;
       option.textContent = sheet.character_name || "Unnamed";
@@ -560,16 +615,20 @@
     select.value = selectedId;
     select.onchange = () => {
       setSelectedCharacterId(select.value, contextKey);
-      window.dispatchEvent(new CustomEvent("pf-character-change", {
-        detail: { contextKey, characterId: select.value }
-      }));
+      window.dispatchEvent(
+        new CustomEvent("pf-character-change", {
+          detail: { contextKey, characterId: select.value },
+        }),
+      );
       onChange?.(select.value);
     };
 
     if (options.dispatch !== false) {
-      window.dispatchEvent(new CustomEvent("pf-character-change", {
-        detail: { contextKey, characterId: selectedId }
-      }));
+      window.dispatchEvent(
+        new CustomEvent("pf-character-change", {
+          detail: { contextKey, characterId: selectedId },
+        }),
+      );
     }
 
     return selectedId;
@@ -603,7 +662,7 @@
         id: user.id,
         email: user.email,
         ...profile,
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
       })
       .select("id,email,username,avatar_path,avatar_url")
       .single();
@@ -651,18 +710,16 @@
     if (!client || !user) return;
     const context = normalizeContext(contextKey);
 
-    const { error } = await client
-      .from("user_dice_state")
-      .upsert(
-        {
-          user_id: user.id,
-          context_key: context.contextKey,
-          game_id: context.gameId,
-          state,
-          updated_at: new Date().toISOString()
-        },
-        { onConflict: "user_id,context_key" }
-      );
+    const { error } = await client.from("user_dice_state").upsert(
+      {
+        user_id: user.id,
+        context_key: context.contextKey,
+        game_id: context.gameId,
+        state,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "user_id,context_key" },
+    );
 
     if (error) console.error(error);
   }
@@ -673,7 +730,10 @@
     return [];
   }
 
-  async function loadBuffState(contextKey = getSelectedContextKey(), characterId = "") {
+  async function loadBuffState(
+    contextKey = getSelectedContextKey(),
+    characterId = "",
+  ) {
     const user = await getUser();
     if (!user) return null;
     const context = normalizeContext(contextKey);
@@ -714,15 +774,21 @@
       }
 
       const legacyState = legacy?.[0]?.active_buffs;
-      if (legacyState?.characterId === characterId) return normalizeActiveBuffState(legacyState);
+      if (legacyState?.characterId === characterId)
+        return normalizeActiveBuffState(legacyState);
     }
 
     return [];
   }
 
-  async function saveBuffState(activeBuffs, contextKey = getSelectedContextKey(), characterId = "") {
+  async function saveBuffState(
+    activeBuffs,
+    contextKey = getSelectedContextKey(),
+    characterId = "",
+  ) {
     const user = await getUser();
-    if (!client || !user) return { ok: false, error: new Error("Not signed in") };
+    if (!client || !user)
+      return { ok: false, error: new Error("Not signed in") };
     const context = normalizeContext(contextKey);
 
     const payload = {
@@ -731,7 +797,7 @@
       game_id: context.gameId,
       character_id: characterId || null,
       active_buffs: activeBuffs,
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     };
 
     let existingQuery = client
@@ -751,7 +817,10 @@
     }
 
     const { error } = existing?.[0]?.id
-      ? await client.from("user_buff_state").update(payload).eq("id", existing[0].id)
+      ? await client
+          .from("user_buff_state")
+          .update(payload)
+          .eq("id", existing[0].id)
       : await client.from("user_buff_state").insert(payload);
 
     if (error) {
@@ -762,14 +831,20 @@
     return { ok: true };
   }
 
-  async function loadCharacterBuffStateForRecalculation(characterId, contextKey = getSelectedContextKey()) {
+  async function loadCharacterBuffStateForRecalculation(
+    characterId,
+    contextKey = getSelectedContextKey(),
+  ) {
     const context = normalizeContext(contextKey);
     if (!client || !characterId) return [];
 
-    const { data, error } = await client.rpc("get_character_buff_state_for_recalculation", {
-      target_sheet_id: characterId,
-      target_context_key: context.contextKey
-    });
+    const { data, error } = await client.rpc(
+      "get_character_buff_state_for_recalculation",
+      {
+        target_sheet_id: characterId,
+        target_context_key: context.contextKey,
+      },
+    );
 
     if (error) {
       console.error(error);
@@ -780,14 +855,19 @@
     return normalizeActiveBuffState(row?.active_buffs);
   }
 
-  async function applyCharacterMapEffect(characterId, effect, contextKey = getSelectedContextKey()) {
+  async function applyCharacterMapEffect(
+    characterId,
+    effect,
+    contextKey = getSelectedContextKey(),
+  ) {
     const context = normalizeContext(contextKey);
-    if (!client || !characterId || !effect) return { ok: false, error: new Error("Missing character or effect") };
+    if (!client || !characterId || !effect)
+      return { ok: false, error: new Error("Missing character or effect") };
 
     const { data, error } = await client.rpc("apply_character_map_effect", {
       target_sheet_id: characterId,
       target_context_key: context.contextKey,
-      effect
+      effect,
     });
 
     if (error) {
@@ -796,17 +876,25 @@
     }
 
     const row = Array.isArray(data) ? data[0] : data;
-    return { ok: true, activeBuffs: normalizeActiveBuffState(row?.active_buffs) };
+    return {
+      ok: true,
+      activeBuffs: normalizeActiveBuffState(row?.active_buffs),
+    };
   }
 
-  async function updateCharacterEffectState(characterId, activeBuffs, contextKey = getSelectedContextKey()) {
+  async function updateCharacterEffectState(
+    characterId,
+    activeBuffs,
+    contextKey = getSelectedContextKey(),
+  ) {
     const context = normalizeContext(contextKey);
-    if (!client || !characterId) return { ok: false, error: new Error("Missing character") };
+    if (!client || !characterId)
+      return { ok: false, error: new Error("Missing character") };
 
     const { data, error } = await client.rpc("update_character_effect_state", {
       target_sheet_id: characterId,
       target_context_key: context.contextKey,
-      next_active_buffs: activeBuffs || []
+      next_active_buffs: activeBuffs || [],
     });
 
     if (error) {
@@ -815,23 +903,36 @@
     }
 
     const row = Array.isArray(data) ? data[0] : data;
-    return { ok: true, activeBuffs: normalizeActiveBuffState(row?.active_buffs) };
+    return {
+      ok: true,
+      activeBuffs: normalizeActiveBuffState(row?.active_buffs),
+    };
   }
 
-  async function advanceMapEffectTurn(endingTokenId, turnEventId, contextKey = getSelectedContextKey()) {
+  async function advanceMapEffectTurn(
+    endingTokenId,
+    turnEventId,
+    contextKey = getSelectedContextKey(),
+  ) {
     const context = normalizeContext(contextKey);
     if (!client || !endingTokenId || !turnEventId) {
-      return { ok: false, unavailable: false, error: new Error("Missing turn information") };
+      return {
+        ok: false,
+        unavailable: false,
+        error: new Error("Missing turn information"),
+      };
     }
 
     const { data, error } = await client.rpc("advance_map_effect_turn", {
       target_context_key: context.contextKey,
       ending_token_id: endingTokenId,
-      turn_event_id: turnEventId
+      turn_event_id: turnEventId,
     });
 
     if (error) {
-      const unavailable = error.code === "PGRST202" || String(error.message || "").includes("advance_map_effect_turn");
+      const unavailable =
+        error.code === "PGRST202" ||
+        String(error.message || "").includes("advance_map_effect_turn");
       if (!unavailable) console.error(error);
       return { ok: false, unavailable, error };
     }
@@ -841,19 +942,30 @@
 
   function normalizeBuffDefinition(row) {
     const legacyDuration = parseDurationLabel(row.duration);
-    const durationCount = row.duration_count === undefined ? legacyDuration.count : row.duration_count;
-    const durationUnit = row.duration_unit === undefined ? legacyDuration.unit : row.duration_unit;
-    const durationPerLevel = row.duration_per_level === undefined ? legacyDuration.perLevel : row.duration_per_level;
+    const durationCount =
+      row.duration_count === undefined
+        ? legacyDuration.count
+        : row.duration_count;
+    const durationUnit =
+      row.duration_unit === undefined ? legacyDuration.unit : row.duration_unit;
+    const durationPerLevel =
+      row.duration_per_level === undefined
+        ? legacyDuration.perLevel
+        : row.duration_per_level;
     const durationConfig = row.duration_config || {
       count: durationCount,
       unit: durationUnit || "variable",
-      factors: durationPerLevel ? [{ type: "caster" }] : []
+      factors: durationPerLevel ? [{ type: "caster" }] : [],
     };
     return {
       id: row.id,
       name: row.name,
       category: row.category || "Custom",
-      duration: formatDurationLabel(durationCount, durationUnit, durationPerLevel),
+      duration: formatDurationLabel(
+        durationCount,
+        durationUnit,
+        durationPerLevel,
+      ),
       durationCount,
       durationUnit: durationUnit || "variable",
       durationPerLevel: Boolean(durationPerLevel),
@@ -861,21 +973,27 @@
       bonuses: Array.isArray(row.bonuses) ? row.bonuses : [],
       source: row.source || "custom",
       contextKey: row.context_key || "general",
-      gameId: row.game_id || null
+      gameId: row.game_id || null,
     };
   }
 
   function parseDurationLabel(duration) {
-    const text = String(duration || "").toLowerCase().trim();
+    const text = String(duration || "")
+      .toLowerCase()
+      .trim();
     if (!text || text === "variable" || text === "permanent") {
       return { count: null, unit: "variable", perLevel: false };
     }
 
     const count = Number((text.match(/(\d+)/) || [null, 1])[1]) || 1;
     const units = ["turn", "round", "minute", "hour", "day"];
-    const unit = units.find(value => text.includes(value)) || "variable";
+    const unit = units.find((value) => text.includes(value)) || "variable";
     const perLevel = text.includes("/level") || text.includes("per level");
-    return { count: unit === "variable" ? null : count, unit, perLevel: unit !== "variable" && perLevel };
+    return {
+      count: unit === "variable" ? null : count,
+      unit,
+      perLevel: unit !== "variable" && perLevel,
+    };
   }
 
   function formatDurationLabel(count, unit, perLevel) {
@@ -890,7 +1008,9 @@
 
     let { data, error } = await client
       .from("buff_definitions")
-      .select("id,name,category,duration,duration_count,duration_unit,duration_per_level,duration_config,bonuses,source,context_key,game_id")
+      .select(
+        "id,name,category,duration,duration_count,duration_unit,duration_per_level,duration_config,bonuses,source,context_key,game_id",
+      )
       .order("name", { ascending: true });
 
     if (error?.code === "42703") {
@@ -913,13 +1033,21 @@
   async function saveBuffDefinition(buff) {
     const user = await getUser();
     if (!client || !user) return null;
-    const context = normalizeContext(buff.contextKey || getSelectedContextKey());
+    const context = normalizeContext(
+      buff.contextKey || getSelectedContextKey(),
+    );
 
     const payload = {
       user_id: user.id,
       name: buff.name,
       category: buff.category || "Custom",
-      duration: buff.duration || formatDurationLabel(buff.durationCount, buff.durationUnit, buff.durationPerLevel),
+      duration:
+        buff.duration ||
+        formatDurationLabel(
+          buff.durationCount,
+          buff.durationUnit,
+          buff.durationPerLevel,
+        ),
       duration_count: buff.durationCount || null,
       duration_unit: buff.durationUnit || "variable",
       duration_per_level: Boolean(buff.durationPerLevel),
@@ -928,7 +1056,7 @@
       source: "custom",
       context_key: context.contextKey,
       game_id: context.gameId,
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     };
 
     const { data: existing, error: existingError } = await client
@@ -949,7 +1077,9 @@
       : client.from("buff_definitions").insert(payload);
 
     let { data, error } = await query
-      .select("id,name,category,duration,duration_count,duration_unit,duration_per_level,duration_config,bonuses,source,context_key,game_id")
+      .select(
+        "id,name,category,duration,duration_count,duration_unit,duration_per_level,duration_config,bonuses,source,context_key,game_id",
+      )
       .single();
 
     if (error?.code === "42703") {
@@ -959,7 +1089,10 @@
       delete legacyPayload.duration_per_level;
       delete legacyPayload.duration_config;
       query = existing?.id
-        ? client.from("buff_definitions").update(legacyPayload).eq("id", existing.id)
+        ? client
+            .from("buff_definitions")
+            .update(legacyPayload)
+            .eq("id", existing.id)
         : client.from("buff_definitions").insert(legacyPayload);
       const fallback = await query
         .select("id,name,category,duration,bonuses,source,context_key,game_id")
@@ -984,24 +1117,39 @@
       target_buff_id: buffId,
       new_name: buff.name,
       new_category: buff.category || "Custom",
-      new_duration: buff.duration || formatDurationLabel(buff.durationCount, buff.durationUnit, buff.durationPerLevel),
+      new_duration:
+        buff.duration ||
+        formatDurationLabel(
+          buff.durationCount,
+          buff.durationUnit,
+          buff.durationPerLevel,
+        ),
       new_duration_count: buff.durationCount || null,
       new_duration_unit: buff.durationUnit || "variable",
       new_duration_per_level: Boolean(buff.durationPerLevel),
       new_duration_config: buff.durationConfig || null,
-      new_bonuses: Array.isArray(buff.bonuses) ? buff.bonuses : []
+      new_bonuses: Array.isArray(buff.bonuses) ? buff.bonuses : [],
     });
 
-    if (error?.code === "PGRST202" || String(error?.message || "").includes("new_duration_config")) {
+    if (
+      error?.code === "PGRST202" ||
+      String(error?.message || "").includes("new_duration_config")
+    ) {
       const fallback = await client.rpc("admin_update_buff_definition", {
         target_buff_id: buffId,
         new_name: buff.name,
         new_category: buff.category || "Custom",
-        new_duration: buff.duration || formatDurationLabel(buff.durationCount, buff.durationUnit, buff.durationPerLevel),
+        new_duration:
+          buff.duration ||
+          formatDurationLabel(
+            buff.durationCount,
+            buff.durationUnit,
+            buff.durationPerLevel,
+          ),
         new_duration_count: buff.durationCount || null,
         new_duration_unit: buff.durationUnit || "variable",
         new_duration_per_level: Boolean(buff.durationPerLevel),
-        new_bonuses: Array.isArray(buff.bonuses) ? buff.bonuses : []
+        new_bonuses: Array.isArray(buff.bonuses) ? buff.bonuses : [],
       });
       data = fallback.data;
       error = fallback.error;
@@ -1018,11 +1166,14 @@
   async function deleteBuffDefinition(buffId) {
     const user = await getUser();
     if (!client || !user || !buffId) {
-      return { ok: false, error: new Error("Not signed in or missing effect id") };
+      return {
+        ok: false,
+        error: new Error("Not signed in or missing effect id"),
+      };
     }
 
     const { error } = await client.rpc("admin_delete_buff_definition", {
-      target_buff_id: buffId
+      target_buff_id: buffId,
     });
 
     if (error) {
@@ -1033,7 +1184,10 @@
     return { ok: true };
   }
 
-  async function loadCharacterSheets(contextKey = getSelectedContextKey(), options = {}) {
+  async function loadCharacterSheets(
+    contextKey = getSelectedContextKey(),
+    options = {},
+  ) {
     const user = await getUser();
     if (!user) return [];
 
@@ -1044,21 +1198,28 @@
         ? "id,character_name,user_id,updated_at,sheet"
         : "id,character_name,user_id,updated_at";
 
-    const runQuery = async fields => {
+    const runQuery = async (fields) => {
       let query = client
         .from("character_sheets")
         .select(fields)
         .eq("context_key", context.contextKey)
         .order("updated_at", { ascending: false });
 
-      if (!context.gameId || options.ownOnly) query = query.eq("user_id", user.id);
+      if (!context.gameId || options.ownOnly)
+        query = query.eq("user_id", user.id);
       return query;
     };
 
     let { data, error } = await runQuery(selectFields);
 
-    if (error && options.summaryOnly && String(error.message || "").includes("character_level")) {
-      ({ data, error } = await runQuery("id,character_name,user_id,updated_at,sheet"));
+    if (
+      error &&
+      options.summaryOnly &&
+      String(error.message || "").includes("character_level")
+    ) {
+      ({ data, error } = await runQuery(
+        "id,character_name,user_id,updated_at,sheet",
+      ));
     }
 
     if (error) {
@@ -1069,7 +1230,11 @@
     return data || [];
   }
 
-  async function loadCharacterSheet(characterName, contextKey = getSelectedContextKey(), sheetId = null) {
+  async function loadCharacterSheet(
+    characterName,
+    contextKey = getSelectedContextKey(),
+    sheetId = null,
+  ) {
     const user = await getUser();
     if (!user || (!characterName && !sheetId)) return null;
 
@@ -1107,14 +1272,20 @@
     return Array.isArray(data) ? data[0] || null : data;
   }
 
-  async function loadCharacterSheetForRecalculation(sheetId, contextKey = getSelectedContextKey()) {
+  async function loadCharacterSheetForRecalculation(
+    sheetId,
+    contextKey = getSelectedContextKey(),
+  ) {
     const context = normalizeContext(contextKey);
     if (!client || !sheetId) return null;
 
-    const { data, error } = await client.rpc("get_character_sheet_for_recalculation", {
-      target_sheet_id: sheetId,
-      target_context_key: context.contextKey
-    });
+    const { data, error } = await client.rpc(
+      "get_character_sheet_for_recalculation",
+      {
+        target_sheet_id: sheetId,
+        target_context_key: context.contextKey,
+      },
+    );
 
     if (error) {
       console.error(error);
@@ -1124,19 +1295,27 @@
     return Array.isArray(data) ? data[0] || null : data;
   }
 
-  async function updateCharacterCurrentHp(sheetId, currentHp, contextKey = getSelectedContextKey()) {
+  async function updateCharacterCurrentHp(
+    sheetId,
+    currentHp,
+    contextKey = getSelectedContextKey(),
+  ) {
     const current = await loadCharacterSheet("", contextKey, sheetId);
     if (!current?.sheet) return null;
 
     const sheet = structuredClone(current.sheet || {});
-    sheet.fields = { ...(sheet.fields || {}), currentHitPoints: String(currentHp ?? "") };
-    if (sheet.calculated?.hp) sheet.calculated.hp.current = String(currentHp ?? "");
+    sheet.fields = {
+      ...(sheet.fields || {}),
+      currentHitPoints: String(currentHp ?? ""),
+    };
+    if (sheet.calculated?.hp)
+      sheet.calculated.hp.current = String(currentHp ?? "");
 
     const { data, error } = await client
       .from("character_sheets")
       .update({
         sheet,
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
       })
       .eq("id", sheetId)
       .select("id,character_name,user_id,sheet")
@@ -1150,7 +1329,11 @@
     return data;
   }
 
-  async function updateCharacterSheetRaw(sheetId, sheet, contextKey = getSelectedContextKey()) {
+  async function updateCharacterSheetRaw(
+    sheetId,
+    sheet,
+    contextKey = getSelectedContextKey(),
+  ) {
     const context = normalizeContext(contextKey);
     if (!client || !sheetId || !sheet) return null;
 
@@ -1159,7 +1342,7 @@
       .update({
         sheet,
         character_level: characterLevelFromSheet(sheet),
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
       })
       .eq("id", sheetId)
       .eq("context_key", context.contextKey);
@@ -1175,12 +1358,13 @@
         .from("character_sheets")
         .update({
           sheet,
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
         })
         .eq("id", sheetId)
         .eq("context_key", context.contextKey);
 
-      if (context.gameId) fallbackQuery = fallbackQuery.eq("game_id", context.gameId);
+      if (context.gameId)
+        fallbackQuery = fallbackQuery.eq("game_id", context.gameId);
 
       ({ data, error } = await fallbackQuery
         .select("id,character_name,user_id,sheet")
@@ -1195,15 +1379,22 @@
     return data;
   }
 
-  async function updateCharacterCalculatedSummary(sheetId, calculated, contextKey = getSelectedContextKey()) {
+  async function updateCharacterCalculatedSummary(
+    sheetId,
+    calculated,
+    contextKey = getSelectedContextKey(),
+  ) {
     const context = normalizeContext(contextKey);
     if (!client || !sheetId) return null;
 
-    const { data, error } = await client.rpc("update_character_calculated_summary", {
-      target_sheet_id: sheetId,
-      target_context_key: context.contextKey,
-      calculated
-    });
+    const { data, error } = await client.rpc(
+      "update_character_calculated_summary",
+      {
+        target_sheet_id: sheetId,
+        target_context_key: context.contextKey,
+        calculated,
+      },
+    );
 
     if (error) {
       console.error(error);
@@ -1213,7 +1404,12 @@
     return Array.isArray(data) ? data[0] || null : data;
   }
 
-  async function saveCharacterSheet(characterName, sheet, contextKey = getSelectedContextKey(), sheetId = null) {
+  async function saveCharacterSheet(
+    characterName,
+    sheet,
+    contextKey = getSelectedContextKey(),
+    sheetId = null,
+  ) {
     const user = await getUser();
     if (!client || !user || !characterName) return null;
     const context = normalizeContext(contextKey);
@@ -1223,7 +1419,7 @@
       character_name: characterName,
       character_level: characterLevelFromSheet(sheet),
       sheet,
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     };
 
     if (sheetId) {
@@ -1272,9 +1468,13 @@
     return data;
   }
 
-  async function deleteCharacterSheet(sheetId, contextKey = getSelectedContextKey()) {
+  async function deleteCharacterSheet(
+    sheetId,
+    contextKey = getSelectedContextKey(),
+  ) {
     const user = await getUser();
-    if (!client || !user || !sheetId) return { error: new Error("Missing character") };
+    if (!client || !user || !sheetId)
+      return { error: new Error("Missing character") };
     const context = normalizeContext(contextKey);
 
     let query = client
@@ -1297,31 +1497,37 @@
     const context = normalizeContext(contextKey);
     if (!context.gameId) {
       const profile = await loadProfile(user.id);
-      return [{
-        userId: user.id,
-        email: user.email || "",
-        username: profile?.username || "",
-        avatarUrl: profile?.avatar_url || ""
-      }];
+      return [
+        {
+          userId: user.id,
+          email: user.email || "",
+          username: profile?.username || "",
+          avatarUrl: profile?.avatar_url || "",
+        },
+      ];
     }
 
-    const { data, error } = await client.rpc("get_game_members", { target_game_id: context.gameId });
+    const { data, error } = await client.rpc("get_game_members", {
+      target_game_id: context.gameId,
+    });
     if (error) {
       console.error(error);
       const profile = await loadProfile(user.id);
-      return [{
-        userId: user.id,
-        email: user.email || "",
-        username: profile?.username || "",
-        avatarUrl: profile?.avatar_url || ""
-      }];
+      return [
+        {
+          userId: user.id,
+          email: user.email || "",
+          username: profile?.username || "",
+          avatarUrl: profile?.avatar_url || "",
+        },
+      ];
     }
 
-    return (data || []).map(member => ({
+    return (data || []).map((member) => ({
       userId: member.user_id,
       email: member.email || "",
       username: member.username || "",
-      avatarUrl: member.avatar_url || ""
+      avatarUrl: member.avatar_url || "",
     }));
   }
 
@@ -1330,19 +1536,21 @@
     if (!user) return [];
 
     const context = normalizeContext(contextKey);
-    const { data, error } = await client.rpc("get_context_characters", { target_context_key: context.contextKey });
+    const { data, error } = await client.rpc("get_context_characters", {
+      target_context_key: context.contextKey,
+    });
     if (error) {
       console.error(error);
       return [];
     }
 
-    return (data || []).map(character => ({
+    return (data || []).map((character) => ({
       id: character.id,
       name: character.character_name || "Unnamed character",
       userId: character.user_id,
       sheet: character.sheet || {},
       username: character.username || "",
-      email: character.email || ""
+      email: character.email || "",
     }));
   }
 
@@ -1355,7 +1563,7 @@
       contextKey: row.context_key || "",
       gameId: row.game_id || "",
       createdBy: row.created_by || "",
-      updatedAt: row.updated_at || ""
+      updatedAt: row.updated_at || "",
     };
   }
 
@@ -1401,14 +1609,20 @@
     return data ? normalizeEnemy(data) : null;
   }
 
-  async function loadEnemyForEffectApplication(enemyId, contextKey = getSelectedContextKey()) {
+  async function loadEnemyForEffectApplication(
+    enemyId,
+    contextKey = getSelectedContextKey(),
+  ) {
     const context = normalizeContext(contextKey);
     if (!client || !enemyId) return null;
 
-    const { data, error } = await client.rpc("get_enemy_for_effect_application", {
-      target_enemy_id: enemyId,
-      target_context_key: context.contextKey
-    });
+    const { data, error } = await client.rpc(
+      "get_enemy_for_effect_application",
+      {
+        target_enemy_id: enemyId,
+        target_context_key: context.contextKey,
+      },
+    );
 
     if (error) {
       console.error(error);
@@ -1419,14 +1633,18 @@
     return row ? normalizeEnemy(row) : null;
   }
 
-  async function applyEnemyMapEffect(enemyId, effect, contextKey = getSelectedContextKey()) {
+  async function applyEnemyMapEffect(
+    enemyId,
+    effect,
+    contextKey = getSelectedContextKey(),
+  ) {
     const context = normalizeContext(contextKey);
     if (!client || !enemyId || !effect) return null;
 
     const { data, error } = await client.rpc("apply_enemy_map_effect", {
       target_enemy_id: enemyId,
       target_context_key: context.contextKey,
-      effect
+      effect,
     });
 
     if (error) {
@@ -1438,7 +1656,12 @@
     return row ? normalizeEnemy(row) : null;
   }
 
-  async function updateEnemyEffectSummary(enemyId, activeBuffs, calculated, contextKey = getSelectedContextKey()) {
+  async function updateEnemyEffectSummary(
+    enemyId,
+    activeBuffs,
+    calculated,
+    contextKey = getSelectedContextKey(),
+  ) {
     const context = normalizeContext(contextKey);
     if (!client || !enemyId) return null;
 
@@ -1446,7 +1669,7 @@
       target_enemy_id: enemyId,
       target_context_key: context.contextKey,
       active_buffs: activeBuffs || [],
-      calculated: calculated || {}
+      calculated: calculated || {},
     });
 
     if (error) {
@@ -1471,7 +1694,7 @@
       sheet: enemy.sheet || {},
       context_key: context.contextKey,
       game_id: context.gameId,
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     };
 
     const query = enemy.id
@@ -1490,30 +1713,42 @@
     return normalizeEnemy(data);
   }
 
-  async function updateEnemyCurrentHp(enemyId, currentHp, contextKey = getSelectedContextKey()) {
+  async function updateEnemyCurrentHp(
+    enemyId,
+    currentHp,
+    contextKey = getSelectedContextKey(),
+  ) {
     const enemy = await loadEnemy(enemyId, contextKey);
     if (!enemy) return null;
 
     const sheet = structuredClone(enemy.sheet || {});
-    sheet.fields = { ...(sheet.fields || {}), currentHitPoints: String(currentHp ?? "") };
-    if (sheet.calculated?.hp) sheet.calculated.hp.current = String(currentHp ?? "");
+    sheet.fields = {
+      ...(sheet.fields || {}),
+      currentHitPoints: String(currentHp ?? ""),
+    };
+    if (sheet.calculated?.hp)
+      sheet.calculated.hp.current = String(currentHp ?? "");
     return saveEnemy({ ...enemy, sheet }, contextKey);
   }
 
   async function duplicateEnemy(enemyId, contextKey = getSelectedContextKey()) {
     const enemies = await loadEnemies(contextKey);
-    const source = enemies.find(enemy => enemy.id === enemyId);
+    const source = enemies.find((enemy) => enemy.id === enemyId);
     if (!source) return null;
-    return saveEnemy({
-      name: `${source.name} Copy`,
-      visible: source.visible,
-      sheet: structuredClone(source.sheet || {})
-    }, contextKey);
+    return saveEnemy(
+      {
+        name: `${source.name} Copy`,
+        visible: source.visible,
+        sheet: structuredClone(source.sheet || {}),
+      },
+      contextKey,
+    );
   }
 
   async function deleteEnemy(enemyId, contextKey = getSelectedContextKey()) {
     const user = await getUser();
-    if (!client || !user || !enemyId) return { error: new Error("Missing enemy") };
+    if (!client || !user || !enemyId)
+      return { error: new Error("Missing enemy") };
 
     const context = normalizeContext(contextKey);
     if (!context.gameId) return { error: new Error("Missing campaign") };
@@ -1530,26 +1765,37 @@
     return { error };
   }
 
-  async function removeEnemyFromMapState(enemyId, contextKey = getSelectedContextKey()) {
+  async function removeEnemyFromMapState(
+    enemyId,
+    contextKey = getSelectedContextKey(),
+  ) {
     const state = await loadMapState(contextKey);
     if (!state || !Array.isArray(state.tokens)) return state;
 
     const removedTokenIds = new Set(
       state.tokens
-        .filter(token => token.kind === "enemy" && token.enemyId === enemyId)
-        .map(token => token.id)
+        .filter((token) => token.kind === "enemy" && token.enemyId === enemyId)
+        .map((token) => token.id),
     );
     if (!removedTokenIds.size) return state;
 
     const nextState = {
       ...state,
-      tokens: state.tokens.filter(token => !removedTokenIds.has(token.id)),
+      tokens: state.tokens.filter((token) => !removedTokenIds.has(token.id)),
       initiative: Array.isArray(state.initiative)
-        ? state.initiative.filter(entry => !removedTokenIds.has(entry.tokenId))
-        : state.initiative
+        ? state.initiative.filter(
+            (entry) => !removedTokenIds.has(entry.tokenId),
+          )
+        : state.initiative,
     };
     if (Array.isArray(nextState.initiative)) {
-      nextState.activeTurn = Math.max(0, Math.min(Number(nextState.activeTurn || 0), Math.max(0, nextState.initiative.length - 1)));
+      nextState.activeTurn = Math.max(
+        0,
+        Math.min(
+          Number(nextState.activeTurn || 0),
+          Math.max(0, nextState.initiative.length - 1),
+        ),
+      );
     }
     return saveMapState(nextState, contextKey);
   }
@@ -1561,7 +1807,9 @@
     const context = normalizeContext(contextKey);
     const { data, error } = await client
       .from("game_loot")
-      .select("id,name,description,count,type,assigned_to,assigned_character_id,details,effects,created_by,updated_at")
+      .select(
+        "id,name,description,count,type,assigned_to,assigned_character_id,details,effects,created_by,updated_at",
+      )
       .eq("context_key", context.contextKey)
       .order("updated_at", { ascending: false });
 
@@ -1589,7 +1837,7 @@
       effects: Array.isArray(item.effects) ? item.effects : [],
       context_key: context.contextKey,
       game_id: context.gameId,
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     };
 
     const query = item.id
@@ -1597,7 +1845,9 @@
       : client.from("game_loot").insert({ ...payload, created_by: user.id });
 
     const { data, error } = await query
-      .select("id,name,description,count,type,assigned_to,assigned_character_id,details,effects,created_by,updated_at")
+      .select(
+        "id,name,description,count,type,assigned_to,assigned_character_id,details,effects,created_by,updated_at",
+      )
       .single();
 
     if (error) {
@@ -1656,7 +1906,7 @@
       game_id: context.gameId,
       state: state || {},
       updated_by: user.id,
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     };
 
     const { data, error } = await client
@@ -1741,6 +1991,6 @@
     saveLootItem,
     deleteLootItem,
     loadMapState,
-    saveMapState
+    saveMapState,
   };
 })();

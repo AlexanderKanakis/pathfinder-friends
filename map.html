@@ -1,435 +1,1035 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>PathFriends Map</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-  <link href="css/map.css" rel="stylesheet">
-</head>
-<body>
-<div id="appNavbar"></div>
+  <head>
+    <meta charset="UTF-8" />
+    <title>PathFriends Map</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+    <link href="css/map.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div id="appNavbar"></div>
 
-<main class="map-shell">
-  <section class="map-main">
-    <div class="map-toolbar">
-      <button id="addCharacterToken" class="btn btn-primary btn-sm" type="button"><i class="bi bi-person-plus"></i> Character</button>
-      <button id="addEnemyToken" class="btn btn-danger btn-sm" type="button"><i class="bi bi-bug"></i> Enemy</button>
-      <button id="addGenericToken" class="btn btn-outline-info btn-sm" type="button"><i class="bi bi-circle-fill"></i> Token</button>
-      <button id="addRectShape" class="btn btn-outline-light btn-sm" type="button"><i class="bi bi-square"></i> Rect</button>
-      <button id="addCircleShape" class="btn btn-outline-light btn-sm" type="button"><i class="bi bi-circle"></i> Circle</button>
-      <button id="openBackgroundOptions" class="btn btn-outline-light btn-sm btn-icon map-settings-button" type="button" title="Map settings" aria-label="Map settings">
-        <i class="bi bi-gear"></i>
+    <main class="map-shell">
+      <section class="map-main">
+        <div class="map-toolbar">
+          <button
+            id="addCharacterToken"
+            class="btn btn-primary btn-sm"
+            type="button"
+          >
+            <i class="bi bi-person-plus"></i> Character
+          </button>
+          <button
+            id="addEnemyToken"
+            class="btn btn-danger btn-sm"
+            type="button"
+          >
+            <i class="bi bi-bug"></i> Enemy
+          </button>
+          <button
+            id="addGenericToken"
+            class="btn btn-outline-info btn-sm"
+            type="button"
+          >
+            <i class="bi bi-circle-fill"></i> Token
+          </button>
+          <button
+            id="addRectShape"
+            class="btn btn-outline-light btn-sm"
+            type="button"
+          >
+            <i class="bi bi-square"></i> Rect
+          </button>
+          <button
+            id="addCircleShape"
+            class="btn btn-outline-light btn-sm"
+            type="button"
+          >
+            <i class="bi bi-circle"></i> Circle
+          </button>
+          <button
+            id="openBackgroundOptions"
+            class="btn btn-outline-light btn-sm btn-icon map-settings-button"
+            type="button"
+            title="Map settings"
+            aria-label="Map settings"
+          >
+            <i class="bi bi-gear"></i>
+          </button>
+        </div>
+
+        <div class="map-stage-wrap">
+          <div
+            id="auraEffectToasts"
+            class="aura-effect-toasts"
+            aria-live="polite"
+          ></div>
+          <div
+            id="turnEffectNotices"
+            class="turn-effect-notices"
+            aria-live="polite"
+          ></div>
+          <div id="mapStage" class="map-stage" aria-label="Battle map"></div>
+        </div>
+      </section>
+
+      <aside class="map-side">
+        <div class="side-tabs">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h5 class="mb-0">Map</h5>
+              <div id="gmHint" class="small text-secondary"></div>
+            </div>
+            <button id="nextTurn" class="btn btn-success btn-sm" type="button">
+              Next
+            </button>
+          </div>
+          <nav
+            class="nav nav-pills map-side-nav"
+            role="tablist"
+            aria-label="Map sidebar"
+          >
+            <button
+              id="mapCharacterTab"
+              class="nav-link active"
+              data-bs-toggle="tab"
+              data-bs-target="#mapCharacterPane"
+              type="button"
+              role="tab"
+              aria-controls="mapCharacterPane"
+              aria-selected="true"
+            >
+              Character
+            </button>
+            <button
+              id="mapInitiativeTab"
+              class="nav-link"
+              data-bs-toggle="tab"
+              data-bs-target="#mapInitiativePane"
+              type="button"
+              role="tab"
+              aria-controls="mapInitiativePane"
+              aria-selected="false"
+            >
+              Initiative
+            </button>
+            <button
+              id="mapTimelineTab"
+              class="nav-link"
+              data-bs-toggle="tab"
+              data-bs-target="#mapTimelinePane"
+              type="button"
+              role="tab"
+              aria-controls="mapTimelinePane"
+              aria-selected="false"
+            >
+              Timeline
+            </button>
+          </nav>
+        </div>
+        <div class="side-scroll tab-content">
+          <section
+            id="mapCharacterPane"
+            class="tab-pane fade show active side-section"
+            role="tabpanel"
+            aria-labelledby="mapCharacterTab"
+            tabindex="0"
+          >
+            <div class="side-title">Characters</div>
+            <div id="selectedPanel" class="small text-secondary">
+              Select a token or shape.
+            </div>
+          </section>
+
+          <section
+            id="mapInitiativePane"
+            class="tab-pane fade side-section"
+            role="tabpanel"
+            aria-labelledby="mapInitiativeTab"
+            tabindex="0"
+          >
+            <div class="side-title">Initiative</div>
+            <div class="initiative-meta">
+              <strong id="roundCounter">Round 0</strong>
+              <button
+                id="resetRounds"
+                class="btn btn-outline-light btn-sm"
+                type="button"
+              >
+                <i class="bi bi-arrow-counterclockwise me-1"></i>Reset
+              </button>
+            </div>
+            <div id="initiativeNotice" class="small text-warning mb-2"></div>
+            <div id="initiativeList"></div>
+            <div
+              class="accordion initiative-custom mt-2"
+              id="customInitiativeAccordion"
+            >
+              <div class="accordion-item bg-transparent border-0">
+                <h2 class="accordion-header">
+                  <button
+                    class="accordion-button collapsed"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#customInitiativeBody"
+                    aria-expanded="false"
+                    aria-controls="customInitiativeBody"
+                  >
+                    Custom entry
+                  </button>
+                </h2>
+                <div
+                  id="customInitiativeBody"
+                  class="accordion-collapse collapse"
+                  data-bs-parent="#customInitiativeAccordion"
+                >
+                  <div class="accordion-body">
+                    <form id="initiativeForm" class="d-grid gap-2">
+                      <input
+                        id="initiativeName"
+                        class="form-control form-control-sm"
+                        placeholder="Name"
+                        autocomplete="off"
+                      />
+                      <div class="d-flex gap-2">
+                        <input
+                          id="initiativeScore"
+                          class="form-control form-control-sm"
+                          type="number"
+                          value="0"
+                          aria-label="Initiative"
+                        />
+                        <button class="btn btn-primary btn-sm" type="submit">
+                          Add
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section
+            id="mapTimelinePane"
+            class="tab-pane fade side-section"
+            role="tabpanel"
+            aria-labelledby="mapTimelineTab"
+            tabindex="0"
+          >
+            <div class="side-title">Timeline</div>
+            <form id="timelineForm" class="d-flex gap-2 mb-2">
+              <input
+                id="timelineText"
+                class="form-control form-control-sm"
+                placeholder="Event"
+              />
+              <button class="btn btn-primary btn-sm" type="submit">Add</button>
+            </form>
+            <div id="timelineList" class="timeline-list"></div>
+          </section>
+        </div>
+      </aside>
+    </main>
+
+    <div id="mapContextMenu" class="map-context-menu d-none" role="menu">
+      <div id="mapContextMenuTitle" class="map-context-menu-title"></div>
+      <button
+        id="openAuraOptions"
+        class="btn btn-outline-info btn-sm mb-1"
+        type="button"
+        role="menuitem"
+      >
+        <i class="bi bi-broadcast-pin me-1"></i> Aura options
+      </button>
+      <button
+        id="openApplyEffect"
+        class="btn btn-outline-success btn-sm mb-1 d-none"
+        type="button"
+        role="menuitem"
+      >
+        <i class="bi bi-magic me-1"></i> Apply effect
+      </button>
+      <button
+        id="openRollMenu"
+        class="btn btn-outline-primary btn-sm mb-1 d-none"
+        type="button"
+        role="menuitem"
+      >
+        <i class="bi bi-dice-5 me-1"></i> Roll
+      </button>
+      <button
+        id="toggleTokenVisibility"
+        class="btn btn-outline-secondary btn-sm mb-1 d-none"
+        type="button"
+        role="menuitem"
+      >
+        <i class="bi bi-eye-slash me-1"></i> Hide
+      </button>
+      <button
+        id="toggleEnemyVisibility"
+        class="btn btn-outline-warning btn-sm mb-1 d-none"
+        type="button"
+        role="menuitem"
+      >
+        <i class="bi bi-eye-slash me-1"></i> Hide enemy
+      </button>
+      <button
+        id="toggleTokenNameVisibility"
+        class="btn btn-outline-warning btn-sm mb-1 d-none"
+        type="button"
+        role="menuitem"
+      >
+        <i class="bi bi-incognito me-1"></i> Hide name
+      </button>
+      <button
+        id="toggleZIndexMenu"
+        class="btn btn-outline-light btn-sm mb-1"
+        type="button"
+        role="menuitem"
+        aria-expanded="false"
+      >
+        <i class="bi bi-layers me-1"></i> Z-index
+      </button>
+      <div
+        id="zIndexMenu"
+        class="map-context-submenu d-none"
+        role="group"
+        aria-label="Z index"
+      >
+        <button
+          class="btn btn-outline-light btn-sm mb-1"
+          type="button"
+          data-z-action="top"
+          role="menuitem"
+        >
+          <i class="bi bi-front me-1"></i> Move to top
+        </button>
+        <button
+          class="btn btn-outline-light btn-sm mb-1"
+          type="button"
+          data-z-action="bottom"
+          role="menuitem"
+        >
+          <i class="bi bi-back me-1"></i> Move to bottom
+        </button>
+        <button
+          class="btn btn-outline-light btn-sm mb-1"
+          type="button"
+          data-z-action="up"
+          role="menuitem"
+        >
+          <i class="bi bi-arrow-up me-1"></i> Move up
+        </button>
+        <button
+          class="btn btn-outline-light btn-sm"
+          type="button"
+          data-z-action="down"
+          role="menuitem"
+        >
+          <i class="bi bi-arrow-down me-1"></i> Move down
+        </button>
+      </div>
+      <button
+        id="removeTokenFromMap"
+        class="btn btn-outline-danger btn-sm"
+        type="button"
+        role="menuitem"
+      >
+        <i class="bi bi-box-arrow-right me-1"></i> Remove from map
       </button>
     </div>
 
-    <div class="map-stage-wrap">
-      <div id="auraEffectToasts" class="aura-effect-toasts" aria-live="polite"></div>
-      <div id="turnEffectNotices" class="turn-effect-notices" aria-live="polite"></div>
-      <div id="mapStage" class="map-stage" aria-label="Battle map"></div>
-    </div>
-  </section>
-
-  <aside class="map-side">
-    <div class="side-tabs">
-      <div class="d-flex justify-content-between align-items-center">
-        <div>
-          <h5 class="mb-0">Map</h5>
-          <div id="gmHint" class="small text-secondary"></div>
-        </div>
-        <button id="nextTurn" class="btn btn-success btn-sm" type="button">Next</button>
-      </div>
-      <nav class="nav nav-pills map-side-nav" role="tablist" aria-label="Map sidebar">
-        <button id="mapCharacterTab" class="nav-link active" data-bs-toggle="tab" data-bs-target="#mapCharacterPane" type="button" role="tab" aria-controls="mapCharacterPane" aria-selected="true">Character</button>
-        <button id="mapInitiativeTab" class="nav-link" data-bs-toggle="tab" data-bs-target="#mapInitiativePane" type="button" role="tab" aria-controls="mapInitiativePane" aria-selected="false">Initiative</button>
-        <button id="mapTimelineTab" class="nav-link" data-bs-toggle="tab" data-bs-target="#mapTimelinePane" type="button" role="tab" aria-controls="mapTimelinePane" aria-selected="false">Timeline</button>
-      </nav>
-    </div>
-    <div class="side-scroll tab-content">
-      <section id="mapCharacterPane" class="tab-pane fade show active side-section" role="tabpanel" aria-labelledby="mapCharacterTab" tabindex="0">
-        <div class="side-title">Character</div>
-        <div id="selectedPanel" class="small text-secondary">Select a token or shape.</div>
-      </section>
-
-      <section id="mapInitiativePane" class="tab-pane fade side-section" role="tabpanel" aria-labelledby="mapInitiativeTab" tabindex="0">
-        <div class="side-title">Initiative</div>
-        <div class="initiative-meta">
-          <strong id="roundCounter">Round 0</strong>
-          <button id="resetRounds" class="btn btn-outline-light btn-sm" type="button"><i class="bi bi-arrow-counterclockwise me-1"></i>Reset</button>
-        </div>
-        <div id="initiativeNotice" class="small text-warning mb-2"></div>
-        <div id="initiativeList"></div>
-        <div class="accordion initiative-custom mt-2" id="customInitiativeAccordion">
-          <div class="accordion-item bg-transparent border-0">
-            <h2 class="accordion-header">
-              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#customInitiativeBody" aria-expanded="false" aria-controls="customInitiativeBody">
-                Custom entry
+    <div
+      class="modal fade"
+      id="rollModal"
+      tabindex="-1"
+      aria-labelledby="rollModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark text-white border-secondary">
+          <div class="modal-header border-secondary">
+            <h5 id="rollModalLabel" class="modal-title">Roll</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div id="rollWeaponWrap" class="mb-3 d-none">
+              <label for="rollWeaponSelect">Weapon</label>
+              <select
+                id="rollWeaponSelect"
+                class="form-select form-select-sm"
+              ></select>
+            </div>
+            <div class="d-grid gap-2">
+              <button
+                class="btn btn-outline-light btn-sm text-start"
+                type="button"
+                data-roll-action="attack"
+              >
+                <i class="bi bi-crosshair me-1"></i> Attack
               </button>
-            </h2>
-            <div id="customInitiativeBody" class="accordion-collapse collapse" data-bs-parent="#customInitiativeAccordion">
-              <div class="accordion-body">
-                <form id="initiativeForm" class="d-grid gap-2">
-                  <input id="initiativeName" class="form-control form-control-sm" placeholder="Name" autocomplete="off">
-                  <div class="d-flex gap-2">
-                    <input id="initiativeScore" class="form-control form-control-sm" type="number" value="0" aria-label="Initiative">
-                    <button class="btn btn-primary btn-sm" type="submit">Add</button>
-                  </div>
-                </form>
+              <button
+                class="btn btn-outline-light btn-sm text-start"
+                type="button"
+                data-roll-action="fullAttack"
+              >
+                <i class="bi bi-crosshair2 me-1"></i> Full Attack
+              </button>
+              <button
+                class="btn btn-outline-light btn-sm text-start"
+                type="button"
+                data-roll-panel="save"
+              >
+                <i class="bi bi-shield-check me-1"></i> Saving Throw
+              </button>
+              <button
+                class="btn btn-outline-light btn-sm text-start"
+                type="button"
+                data-roll-panel="skill"
+              >
+                <i class="bi bi-list-check me-1"></i> Skill Check
+              </button>
+              <button
+                class="btn btn-outline-light btn-sm text-start"
+                type="button"
+                data-roll-panel="ability"
+              >
+                <i class="bi bi-person-arms-up me-1"></i> Attribute Check
+              </button>
+            </div>
+            <div
+              id="rollDetailPanel"
+              class="border-top border-secondary mt-3 pt-3 d-none"
+            >
+              <label id="rollDetailLabel" for="rollDetailSelect">Choose</label>
+              <div class="d-flex gap-2">
+                <select
+                  id="rollDetailSelect"
+                  class="form-select form-select-sm"
+                ></select>
+                <button
+                  id="confirmRollDetail"
+                  class="btn btn-primary btn-sm"
+                  type="button"
+                >
+                  Roll
+                </button>
+              </div>
+            </div>
+            <div id="rollModalStatus" class="small text-secondary mt-3"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="modal fade"
+      id="rollResultModal"
+      tabindex="-1"
+      aria-labelledby="rollResultModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark text-white border-secondary">
+          <div class="modal-header border-secondary">
+            <h5 id="rollResultModalLabel" class="modal-title">Roll Result</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div id="rollResultList" class="roll-result-list"></div>
+          </div>
+          <div class="modal-footer border-secondary">
+            <button
+              id="rerollResult"
+              class="btn btn-outline-warning btn-sm"
+              type="button"
+            >
+              <i class="bi bi-arrow-repeat me-1"></i> Reroll
+            </button>
+            <button
+              type="button"
+              class="btn btn-outline-light btn-sm"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="modal fade"
+      id="quickEffectModal"
+      tabindex="-1"
+      aria-labelledby="quickEffectModalLabel"
+      aria-hidden="true"
+    >
+      <div
+        class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable search-modal-dialog"
+      >
+        <div class="modal-content bg-dark text-white border-secondary">
+          <div class="modal-header border-secondary">
+            <h5 class="modal-title" id="quickEffectModalLabel">Apply Effect</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <input
+              id="quickEffectSearch"
+              class="form-control form-control-sm mb-3"
+              placeholder="Search effects"
+            />
+            <section id="quickEffectMostUsedWrap" class="mb-4">
+              <div class="side-title">Most Used</div>
+              <div id="quickEffectMostUsed" class="quick-effect-grid"></div>
+            </section>
+            <div class="side-title">All Effects</div>
+            <div
+              id="quickEffectResults"
+              class="quick-effect-grid search-modal-results"
+            ></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="modal fade"
+      id="quickEffectTargetsModal"
+      tabindex="-1"
+      aria-labelledby="quickEffectTargetsModalLabel"
+      aria-hidden="true"
+    >
+      <div
+        class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable"
+      >
+        <div class="modal-content bg-dark text-white border-secondary">
+          <div class="modal-header border-secondary">
+            <h5 class="modal-title" id="quickEffectTargetsModalLabel">
+              Choose Targets
+            </h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white d-none"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div
+              id="quickEffectTargetHint"
+              class="small text-secondary mb-3"
+            ></div>
+            <div id="quickEffectTargetList" class="quick-target-list"></div>
+          </div>
+          <div class="modal-footer border-secondary">
+            <span
+              id="quickEffectApplyStatus"
+              class="small text-secondary me-auto"
+            ></span>
+            <button
+              type="button"
+              class="btn btn-outline-light btn-sm"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
+            <button
+              id="confirmQuickEffectTargets"
+              class="btn btn-success btn-sm"
+              type="button"
+            >
+              Apply Effect
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="modal fade"
+      id="backgroundOptionsModal"
+      tabindex="-1"
+      aria-hidden="true"
+    >
+      <div
+        class="modal-dialog modal-dialog-centered search-modal-dialog modal-lg"
+      >
+        <form
+          id="backgroundOptionsForm"
+          class="modal-content bg-dark text-white border-secondary"
+        >
+          <div class="modal-header border-secondary">
+            <h5 class="modal-title">Map Settings</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white d-none"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div class="map-settings-grid mb-3">
+              <div>
+                <label for="gridSize">Map Size</label>
+                <input
+                  id="gridSize"
+                  class="form-control form-control-sm"
+                  type="number"
+                  min="24"
+                  max="96"
+                  value="48"
+                />
+              </div>
+              <div>
+                <label for="mapCols">Width</label>
+                <input
+                  id="mapCols"
+                  class="form-control form-control-sm"
+                  type="number"
+                  min="8"
+                  max="80"
+                  value="30"
+                />
+              </div>
+              <div>
+                <label for="mapRows">Height</label>
+                <input
+                  id="mapRows"
+                  class="form-control form-control-sm"
+                  type="number"
+                  min="8"
+                  max="80"
+                  value="20"
+                />
+              </div>
+            </div>
+            <hr class="border-secondary" />
+            <div class="mb-3">
+              <label for="backgroundUrl">Background URL</label>
+              <input
+                id="backgroundUrl"
+                class="form-control form-control-sm"
+                placeholder="https://..."
+              />
+            </div>
+            <div class="mb-3">
+              <label for="backgroundFit">Fit</label>
+              <select id="backgroundFit" class="form-select form-select-sm">
+                <option value="cover">Cover</option>
+                <option value="contain">Contain</option>
+                <option value="100% 100%">Stretch</option>
+                <option value="auto">Original</option>
+              </select>
+            </div>
+          </div>
+          <div class="modal-footer border-secondary">
+            <button
+              id="openMapDocumentation"
+              type="button"
+              class="btn btn-outline-info btn-sm me-auto"
+            >
+              <i class="bi bi-book me-1"></i>Documentation
+            </button>
+            <button
+              type="button"
+              class="btn btn-outline-light btn-sm"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
+            <button class="btn btn-primary btn-sm" type="submit">
+              Save Settings
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div
+      class="modal fade"
+      id="mapDocumentationModal"
+      tabindex="-1"
+      aria-labelledby="mapDocumentationModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div
+          class="modal-content map-docs-modal-content bg-dark text-white border-secondary"
+        >
+          <div class="modal-header border-secondary">
+            <h5 class="modal-title" id="mapDocumentationModalLabel">
+              Map Documentation
+            </h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body map-docs-modal-body p-0">
+            <div id="mapDocsLayout" class="map-docs-layout">
+              <nav
+                id="mapDocsList"
+                class="map-docs-list"
+                aria-label="Map function documentation"
+              ></nav>
+              <article id="mapDocsDetail" class="map-docs-detail">
+                <button
+                  id="mapDocsBack"
+                  class="btn btn-outline-light btn-sm map-docs-back"
+                  type="button"
+                >
+                  <i class="bi bi-arrow-left me-1"></i>Back
+                </button>
+                <div id="mapDocsContent"></div>
+              </article>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="modal fade"
+      id="genericTokenModal"
+      tabindex="-1"
+      aria-labelledby="genericTokenModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <form
+          id="genericTokenForm"
+          class="modal-content bg-dark text-white border-secondary"
+        >
+          <div class="modal-header border-secondary">
+            <h5 class="modal-title" id="genericTokenModalLabel">Add Token</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white d-none"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <label for="genericTokenName">Name</label>
+            <input
+              id="genericTokenName"
+              class="form-control form-control-sm"
+              required
+              maxlength="80"
+              placeholder="Token name"
+            />
+            <div class="form-check form-switch mt-3">
+              <input
+                id="genericTokenHideName"
+                class="form-check-input"
+                type="checkbox"
+                role="switch"
+              />
+              <label class="form-check-label" for="genericTokenHideName"
+                >Hide name from players</label
+              >
+            </div>
+          </div>
+          <div class="modal-footer border-secondary">
+            <button
+              type="button"
+              class="btn btn-outline-light btn-sm"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary btn-sm">
+              Add Token
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div
+      class="modal fade"
+      id="enemyPickerModal"
+      tabindex="-1"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark text-white border-secondary">
+          <div class="modal-header border-secondary">
+            <h5 class="modal-title">Add Enemy</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white d-none"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <input
+              id="enemyPickerSearch"
+              class="form-control form-control-sm mb-3"
+              placeholder="Search enemies"
+            />
+            <div class="form-check form-switch mb-3">
+              <input
+                id="enemyTokenVisible"
+                class="form-check-input"
+                type="checkbox"
+                role="switch"
+                checked
+              />
+              <label class="form-check-label" for="enemyTokenVisible"
+                >Visible to players</label
+              >
+            </div>
+            <div class="form-check form-switch mb-3">
+              <input
+                id="enemyTokenHideName"
+                class="form-check-input"
+                type="checkbox"
+                role="switch"
+              />
+              <label class="form-check-label" for="enemyTokenHideName"
+                >Hide name from players</label
+              >
+            </div>
+            <div
+              id="enemyPickerList"
+              class="enemy-picker-list search-modal-results"
+            ></div>
+          </div>
+          <div class="modal-footer border-secondary">
+            <a class="btn btn-outline-info btn-sm" href="enemies.html"
+              >Manage Enemies</a
+            >
+            <button
+              type="button"
+              class="btn btn-outline-light btn-sm"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="modal fade"
+      id="characterPickerModal"
+      tabindex="-1"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark text-white border-secondary">
+          <div class="modal-header border-secondary">
+            <h5 class="modal-title">Add Character</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white d-none"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <input
+              id="characterPickerSearch"
+              class="form-control form-control-sm mb-3"
+              placeholder="Search characters"
+            />
+            <div
+              id="characterPickerList"
+              class="enemy-picker-list search-modal-results"
+            ></div>
+          </div>
+          <div class="modal-footer border-secondary">
+            <a class="btn btn-outline-info btn-sm" href="characters.html"
+              >Manage Characters</a
+            >
+            <button
+              type="button"
+              class="btn btn-outline-light btn-sm"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="modal fade"
+      id="auraOptionsModal"
+      tabindex="-1"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <form
+          id="auraOptionsForm"
+          class="modal-content bg-dark text-white border-secondary"
+        >
+          <div class="modal-header border-secondary">
+            <h5 class="modal-title">Aura Options</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white d-none"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div class="form-check form-switch mb-3">
+              <input
+                id="auraVisible"
+                class="form-check-input"
+                type="checkbox"
+                role="switch"
+              />
+              <label class="form-check-label" for="auraVisible">Visible</label>
+            </div>
+            <div class="mb-3">
+              <label for="auraRadiusCells">Radius</label>
+              <div class="d-flex align-items-center gap-2">
+                <input
+                  id="auraRadiusCells"
+                  class="form-control form-control-sm"
+                  type="number"
+                  min="1"
+                  max="60"
+                  value="1"
+                />
+                <span
+                  id="auraRadiusText"
+                  class="small text-secondary text-nowrap"
+                  >1 cell / 5 ft</span
+                >
+              </div>
+            </div>
+            <div>
+              <label for="auraColor">Color</label>
+              <input
+                id="auraColor"
+                class="form-control form-control-sm"
+                type="color"
+                value="#8fd19e"
+              />
+            </div>
+            <div class="border-top border-secondary mt-3 pt-3">
+              <div
+                class="d-flex justify-content-between align-items-center gap-2 mb-2"
+              >
+                <div>
+                  <div class="small text-secondary">Aura Effect</div>
+                  <div id="auraEffectSummary" class="fw-semibold">None</div>
+                </div>
+                <div class="d-flex gap-2">
+                  <button
+                    id="chooseAuraEffect"
+                    class="btn btn-outline-success btn-sm"
+                    type="button"
+                  >
+                    Apply effect
+                  </button>
+                  <button
+                    id="clearAuraEffect"
+                    class="btn btn-outline-danger btn-sm btn-icon"
+                    type="button"
+                    title="Clear aura effect"
+                  >
+                    <i class="bi bi-x-lg"></i>
+                  </button>
+                </div>
+              </div>
+              <div id="auraRemoveOutWrap" class="form-check form-switch d-none">
+                <input
+                  id="auraRemoveOutOfRange"
+                  class="form-check-input"
+                  type="checkbox"
+                  role="switch"
+                />
+                <label class="form-check-label" for="auraRemoveOutOfRange"
+                  >Remove when out of range</label
+                >
               </div>
             </div>
           </div>
-        </div>
-      </section>
-
-      <section id="mapTimelinePane" class="tab-pane fade side-section" role="tabpanel" aria-labelledby="mapTimelineTab" tabindex="0">
-        <div class="side-title">Timeline</div>
-        <form id="timelineForm" class="d-flex gap-2 mb-2">
-          <input id="timelineText" class="form-control form-control-sm" placeholder="Event">
-          <button class="btn btn-primary btn-sm" type="submit">Add</button>
+          <div class="modal-footer border-secondary">
+            <button
+              type="button"
+              class="btn btn-outline-light btn-sm"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
+            <button class="btn btn-primary btn-sm" type="submit">
+              Save Aura
+            </button>
+          </div>
         </form>
-        <div id="timelineList" class="timeline-list"></div>
-      </section>
-    </div>
-  </aside>
-</main>
-
-<div id="mapContextMenu" class="map-context-menu d-none" role="menu">
-  <div id="mapContextMenuTitle" class="map-context-menu-title"></div>
-  <button id="openAuraOptions" class="btn btn-outline-info btn-sm mb-1" type="button" role="menuitem">
-    <i class="bi bi-broadcast-pin me-1"></i> Aura options
-  </button>
-  <button id="openApplyEffect" class="btn btn-outline-success btn-sm mb-1 d-none" type="button" role="menuitem">
-    <i class="bi bi-magic me-1"></i> Apply effect
-  </button>
-  <button id="openRollMenu" class="btn btn-outline-primary btn-sm mb-1 d-none" type="button" role="menuitem">
-    <i class="bi bi-dice-5 me-1"></i> Roll
-  </button>
-  <button id="toggleTokenVisibility" class="btn btn-outline-secondary btn-sm mb-1 d-none" type="button" role="menuitem">
-    <i class="bi bi-eye-slash me-1"></i> Hide
-  </button>
-  <button id="toggleEnemyVisibility" class="btn btn-outline-warning btn-sm mb-1 d-none" type="button" role="menuitem">
-    <i class="bi bi-eye-slash me-1"></i> Hide enemy
-  </button>
-  <button id="toggleTokenNameVisibility" class="btn btn-outline-warning btn-sm mb-1 d-none" type="button" role="menuitem">
-    <i class="bi bi-incognito me-1"></i> Hide name
-  </button>
-  <button id="toggleZIndexMenu" class="btn btn-outline-light btn-sm mb-1" type="button" role="menuitem" aria-expanded="false">
-    <i class="bi bi-layers me-1"></i> Z-index
-  </button>
-  <div id="zIndexMenu" class="map-context-submenu d-none" role="group" aria-label="Z index">
-    <button class="btn btn-outline-light btn-sm mb-1" type="button" data-z-action="top" role="menuitem">
-      <i class="bi bi-front me-1"></i> Move to top
-    </button>
-    <button class="btn btn-outline-light btn-sm mb-1" type="button" data-z-action="bottom" role="menuitem">
-      <i class="bi bi-back me-1"></i> Move to bottom
-    </button>
-    <button class="btn btn-outline-light btn-sm mb-1" type="button" data-z-action="up" role="menuitem">
-      <i class="bi bi-arrow-up me-1"></i> Move up
-    </button>
-    <button class="btn btn-outline-light btn-sm" type="button" data-z-action="down" role="menuitem">
-      <i class="bi bi-arrow-down me-1"></i> Move down
-    </button>
-  </div>
-  <button id="removeTokenFromMap" class="btn btn-outline-danger btn-sm" type="button" role="menuitem">
-    <i class="bi bi-box-arrow-right me-1"></i> Remove from map
-  </button>
-</div>
-
-<div class="modal fade" id="rollModal" tabindex="-1" aria-labelledby="rollModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content bg-dark text-white border-secondary">
-      <div class="modal-header border-secondary">
-        <h5 id="rollModalLabel" class="modal-title">Roll</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body">
-        <div id="rollWeaponWrap" class="mb-3 d-none">
-          <label for="rollWeaponSelect">Weapon</label>
-          <select id="rollWeaponSelect" class="form-select form-select-sm"></select>
-        </div>
-        <div class="d-grid gap-2">
-          <button class="btn btn-outline-light btn-sm text-start" type="button" data-roll-action="attack"><i class="bi bi-crosshair me-1"></i> Attack</button>
-          <button class="btn btn-outline-light btn-sm text-start" type="button" data-roll-action="fullAttack"><i class="bi bi-crosshair2 me-1"></i> Full Attack</button>
-          <button class="btn btn-outline-light btn-sm text-start" type="button" data-roll-panel="save"><i class="bi bi-shield-check me-1"></i> Saving Throw</button>
-          <button class="btn btn-outline-light btn-sm text-start" type="button" data-roll-panel="skill"><i class="bi bi-list-check me-1"></i> Skill Check</button>
-          <button class="btn btn-outline-light btn-sm text-start" type="button" data-roll-panel="ability"><i class="bi bi-person-arms-up me-1"></i> Attribute Check</button>
-        </div>
-        <div id="rollDetailPanel" class="border-top border-secondary mt-3 pt-3 d-none">
-          <label id="rollDetailLabel" for="rollDetailSelect">Choose</label>
-          <div class="d-flex gap-2">
-            <select id="rollDetailSelect" class="form-select form-select-sm"></select>
-            <button id="confirmRollDetail" class="btn btn-primary btn-sm" type="button">Roll</button>
+    </div>
+
+    <div
+      class="modal fade"
+      id="mapEffectsModal"
+      tabindex="-1"
+      aria-labelledby="mapEffectsModalLabel"
+      aria-hidden="true"
+    >
+      <div
+        class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable"
+      >
+        <div class="modal-content bg-dark text-white border-secondary">
+          <div class="modal-header border-secondary">
+            <h5 class="modal-title" id="mapEffectsModalLabel">Effects</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
           </div>
-        </div>
-        <div id="rollModalStatus" class="small text-secondary mt-3"></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="modal fade" id="rollResultModal" tabindex="-1" aria-labelledby="rollResultModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content bg-dark text-white border-secondary">
-      <div class="modal-header border-secondary">
-        <h5 id="rollResultModalLabel" class="modal-title">Roll Result</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div id="rollResultList" class="roll-result-list"></div>
-      </div>
-      <div class="modal-footer border-secondary">
-        <button id="rerollResult" class="btn btn-outline-warning btn-sm" type="button"><i class="bi bi-arrow-repeat me-1"></i> Reroll</button>
-        <button type="button" class="btn btn-outline-light btn-sm" data-bs-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="modal fade" id="quickEffectModal" tabindex="-1" aria-labelledby="quickEffectModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable search-modal-dialog">
-    <div class="modal-content bg-dark text-white border-secondary">
-      <div class="modal-header border-secondary">
-        <h5 class="modal-title" id="quickEffectModalLabel">Apply Effect</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <input id="quickEffectSearch" class="form-control form-control-sm mb-3" placeholder="Search effects">
-        <section id="quickEffectMostUsedWrap" class="mb-4">
-          <div class="side-title">Most Used</div>
-          <div id="quickEffectMostUsed" class="quick-effect-grid"></div>
-        </section>
-        <div class="side-title">All Effects</div>
-        <div id="quickEffectResults" class="quick-effect-grid search-modal-results"></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="modal fade" id="quickEffectTargetsModal" tabindex="-1" aria-labelledby="quickEffectTargetsModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-    <div class="modal-content bg-dark text-white border-secondary">
-      <div class="modal-header border-secondary">
-        <h5 class="modal-title" id="quickEffectTargetsModalLabel">Choose Targets</h5>
-        <button type="button" class="btn-close btn-close-white d-none" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div id="quickEffectTargetHint" class="small text-secondary mb-3"></div>
-        <div id="quickEffectTargetList" class="quick-target-list"></div>
-      </div>
-      <div class="modal-footer border-secondary">
-        <span id="quickEffectApplyStatus" class="small text-secondary me-auto"></span>
-        <button type="button" class="btn btn-outline-light btn-sm" data-bs-dismiss="modal">Cancel</button>
-        <button id="confirmQuickEffectTargets" class="btn btn-success btn-sm" type="button">Apply Effect</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="modal fade" id="backgroundOptionsModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered search-modal-dialog modal-lg">
-    <form id="backgroundOptionsForm" class="modal-content bg-dark text-white border-secondary">
-      <div class="modal-header border-secondary">
-        <h5 class="modal-title">Map Settings</h5>
-        <button type="button" class="btn-close btn-close-white d-none" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div class="map-settings-grid mb-3">
-          <div>
-            <label for="gridSize">Map Size</label>
-            <input id="gridSize" class="form-control form-control-sm" type="number" min="24" max="96" value="48">
-          </div>
-          <div>
-            <label for="mapCols">Width</label>
-            <input id="mapCols" class="form-control form-control-sm" type="number" min="8" max="80" value="30">
-          </div>
-          <div>
-            <label for="mapRows">Height</label>
-            <input id="mapRows" class="form-control form-control-sm" type="number" min="8" max="80" value="20">
-          </div>
-        </div>
-        <hr class="border-secondary">
-        <div class="mb-3">
-          <label for="backgroundUrl">Background URL</label>
-          <input id="backgroundUrl" class="form-control form-control-sm" placeholder="https://...">
-        </div>
-        <div class="mb-3">
-          <label for="backgroundFit">Fit</label>
-          <select id="backgroundFit" class="form-select form-select-sm">
-            <option value="cover">Cover</option>
-            <option value="contain">Contain</option>
-            <option value="100% 100%">Stretch</option>
-            <option value="auto">Original</option>
-          </select>
-        </div>
-      </div>
-      <div class="modal-footer border-secondary">
-        <button id="openMapDocumentation" type="button" class="btn btn-outline-info btn-sm me-auto"><i class="bi bi-book me-1"></i>Documentation</button>
-        <button type="button" class="btn btn-outline-light btn-sm" data-bs-dismiss="modal">Cancel</button>
-        <button class="btn btn-primary btn-sm" type="submit">Save Settings</button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<div class="modal fade" id="mapDocumentationModal" tabindex="-1" aria-labelledby="mapDocumentationModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-centered">
-    <div class="modal-content map-docs-modal-content bg-dark text-white border-secondary">
-      <div class="modal-header border-secondary">
-        <h5 class="modal-title" id="mapDocumentationModalLabel">Map Documentation</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body map-docs-modal-body p-0">
-        <div id="mapDocsLayout" class="map-docs-layout">
-          <nav id="mapDocsList" class="map-docs-list" aria-label="Map function documentation"></nav>
-          <article id="mapDocsDetail" class="map-docs-detail">
-            <button id="mapDocsBack" class="btn btn-outline-light btn-sm map-docs-back" type="button"><i class="bi bi-arrow-left me-1"></i>Back</button>
-            <div id="mapDocsContent"></div>
-          </article>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="modal fade" id="genericTokenModal" tabindex="-1" aria-labelledby="genericTokenModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <form id="genericTokenForm" class="modal-content bg-dark text-white border-secondary">
-      <div class="modal-header border-secondary">
-        <h5 class="modal-title" id="genericTokenModalLabel">Add Token</h5>
-        <button type="button" class="btn-close btn-close-white d-none" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <label for="genericTokenName">Name</label>
-        <input id="genericTokenName" class="form-control form-control-sm" required maxlength="80" placeholder="Token name">
-        <div class="form-check form-switch mt-3">
-          <input id="genericTokenHideName" class="form-check-input" type="checkbox" role="switch">
-          <label class="form-check-label" for="genericTokenHideName">Hide name from players</label>
-        </div>
-      </div>
-      <div class="modal-footer border-secondary">
-        <button type="button" class="btn btn-outline-light btn-sm" data-bs-dismiss="modal">Cancel</button>
-        <button type="submit" class="btn btn-primary btn-sm">Add Token</button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<div class="modal fade" id="enemyPickerModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content bg-dark text-white border-secondary">
-      <div class="modal-header border-secondary">
-        <h5 class="modal-title">Add Enemy</h5>
-        <button type="button" class="btn-close btn-close-white d-none" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <input id="enemyPickerSearch" class="form-control form-control-sm mb-3" placeholder="Search enemies">
-        <div class="form-check form-switch mb-3">
-          <input id="enemyTokenVisible" class="form-check-input" type="checkbox" role="switch" checked>
-          <label class="form-check-label" for="enemyTokenVisible">Visible to players</label>
-        </div>
-        <div class="form-check form-switch mb-3">
-          <input id="enemyTokenHideName" class="form-check-input" type="checkbox" role="switch">
-          <label class="form-check-label" for="enemyTokenHideName">Hide name from players</label>
-        </div>
-        <div id="enemyPickerList" class="enemy-picker-list search-modal-results"></div>
-      </div>
-      <div class="modal-footer border-secondary">
-        <a class="btn btn-outline-info btn-sm" href="enemies.html">Manage Enemies</a>
-        <button type="button" class="btn btn-outline-light btn-sm" data-bs-dismiss="modal">Cancel</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="modal fade" id="characterPickerModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content bg-dark text-white border-secondary">
-      <div class="modal-header border-secondary">
-        <h5 class="modal-title">Add Character</h5>
-        <button type="button" class="btn-close btn-close-white d-none" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <input id="characterPickerSearch" class="form-control form-control-sm mb-3" placeholder="Search characters">
-        <div id="characterPickerList" class="enemy-picker-list search-modal-results"></div>
-      </div>
-      <div class="modal-footer border-secondary">
-        <a class="btn btn-outline-info btn-sm" href="characters.html">Manage Characters</a>
-        <button type="button" class="btn btn-outline-light btn-sm" data-bs-dismiss="modal">Cancel</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="modal fade" id="auraOptionsModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <form id="auraOptionsForm" class="modal-content bg-dark text-white border-secondary">
-      <div class="modal-header border-secondary">
-        <h5 class="modal-title">Aura Options</h5>
-        <button type="button" class="btn-close btn-close-white d-none" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div class="form-check form-switch mb-3">
-          <input id="auraVisible" class="form-check-input" type="checkbox" role="switch">
-          <label class="form-check-label" for="auraVisible">Visible</label>
-        </div>
-        <div class="mb-3">
-          <label for="auraRadiusCells">Radius</label>
-          <div class="d-flex align-items-center gap-2">
-            <input id="auraRadiusCells" class="form-control form-control-sm" type="number" min="1" max="60" value="1">
-            <span id="auraRadiusText" class="small text-secondary text-nowrap">1 cell / 5 ft</span>
-          </div>
-        </div>
-        <div>
-          <label for="auraColor">Color</label>
-          <input id="auraColor" class="form-control form-control-sm" type="color" value="#8fd19e">
-        </div>
-        <div class="border-top border-secondary mt-3 pt-3">
-          <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
-            <div>
-              <div class="small text-secondary">Aura Effect</div>
-              <div id="auraEffectSummary" class="fw-semibold">None</div>
-            </div>
-            <div class="d-flex gap-2">
-              <button id="chooseAuraEffect" class="btn btn-outline-success btn-sm" type="button">Apply effect</button>
-              <button id="clearAuraEffect" class="btn btn-outline-danger btn-sm btn-icon" type="button" title="Clear aura effect"><i class="bi bi-x-lg"></i></button>
-            </div>
-          </div>
-          <div id="auraRemoveOutWrap" class="form-check form-switch d-none">
-            <input id="auraRemoveOutOfRange" class="form-check-input" type="checkbox" role="switch">
-            <label class="form-check-label" for="auraRemoveOutOfRange">Remove when out of range</label>
+          <div class="modal-body">
+            <div id="mapEffectTracker"></div>
           </div>
         </div>
       </div>
-      <div class="modal-footer border-secondary">
-        <button type="button" class="btn btn-outline-light btn-sm" data-bs-dismiss="modal">Cancel</button>
-        <button class="btn btn-primary btn-sm" type="submit">Save Aura</button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<div class="modal fade" id="mapEffectsModal" tabindex="-1" aria-labelledby="mapEffectsModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
-    <div class="modal-content bg-dark text-white border-secondary">
-      <div class="modal-header border-secondary">
-        <h5 class="modal-title" id="mapEffectsModalLabel">Effects</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div id="mapEffectTracker"></div>
-      </div>
     </div>
-  </div>
-</div>
 
-<script src="scripts/navbar.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="scripts/supabase-config.js"></script>
-<script src="scripts/app-supabase.js"></script>
-<script src="modals/effect-duration-editor.js"></script>
-<script src="scripts/buff-tracker-widget.js?v=extra-attack-widget-2"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="scripts/pages/map.js"></script>
-</body>
+    <script src="scripts/navbar.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="scripts/supabase-config.js"></script>
+    <script src="scripts/app-supabase.js"></script>
+    <script src="modals/effect-duration-editor.js"></script>
+    <script src="scripts/buff-tracker-widget.js?v=extra-attack-widget-2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="scripts/pages/map.js"></script>
+  </body>
 </html>

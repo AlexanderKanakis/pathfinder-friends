@@ -49,7 +49,7 @@ function loadImage(file) {
 }
 
 function canvasToBlob(canvas, quality) {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     canvas.toBlob(resolve, "image/jpeg", quality);
   });
 }
@@ -88,21 +88,27 @@ async function shrinkAvatar(file) {
     maxSide = Math.floor(maxSide * 0.75);
   }
 
-  throw new Error("That image could not be reduced below 2 MB. Try a smaller source image.");
+  throw new Error(
+    "That image could not be reduced below 2 MB. Try a smaller source image.",
+  );
 }
 
 async function uploadAvatar(file) {
   const avatar = await shrinkAvatar(file);
-  const extension = avatar.type === "image/png" ? "png" : avatar.type === "image/webp" ? "webp" : "jpg";
+  const extension =
+    avatar.type === "image/png"
+      ? "png"
+      : avatar.type === "image/webp"
+        ? "webp"
+        : "jpg";
   const path = `${currentUser.id}/avatar.${extension}`;
 
-  const { error } = await PFApp.client
-    .storage
+  const { error } = await PFApp.client.storage
     .from("avatars")
     .upload(path, avatar, {
       cacheControl: "3600",
       contentType: avatar.type,
-      upsert: true
+      upsert: true,
     });
 
   if (error) throw error;
@@ -119,13 +125,16 @@ async function initProfile() {
   document.getElementById("email").value = currentUser.email || "";
   document.getElementById("username").value = currentProfile?.username || "";
   document.getElementById("avatarPreview").src =
-    currentProfile?.avatar_url || fallbackAvatar(currentProfile?.username || currentUser.email);
+    currentProfile?.avatar_url ||
+    fallbackAvatar(currentProfile?.username || currentUser.email);
 
   const isAdmin = await PFApp.isAppAdmin();
-  document.getElementById("adminSettingsPanel").classList.toggle("d-none", !isAdmin);
+  document
+    .getElementById("adminSettingsPanel")
+    .classList.toggle("d-none", !isAdmin);
 }
 
-document.getElementById("avatarFile").addEventListener("change", event => {
+document.getElementById("avatarFile").addEventListener("change", (event) => {
   const file = event.target.files[0];
   if (!file) return;
 
@@ -136,58 +145,63 @@ document.getElementById("avatarFile").addEventListener("change", event => {
       : "This image is under 2 MB and ready to upload.";
 });
 
-document.getElementById("profileForm").addEventListener("submit", async event => {
-  event.preventDefault();
-  setSaving(true);
+document
+  .getElementById("profileForm")
+  .addEventListener("submit", async (event) => {
+    event.preventDefault();
+    setSaving(true);
 
-  try {
-    const username = document.getElementById("username").value.trim();
-    const avatarFile = document.getElementById("avatarFile").files[0];
-    const update = { username };
+    try {
+      const username = document.getElementById("username").value.trim();
+      const avatarFile = document.getElementById("avatarFile").files[0];
+      const update = { username };
 
-    if (avatarFile) {
-      setProfileStatus("Preparing avatar...", "info");
-      const avatar = await uploadAvatar(avatarFile);
-      update.avatar_path = avatar.path;
-      update.avatar_url = avatar.url;
+      if (avatarFile) {
+        setProfileStatus("Preparing avatar...", "info");
+        const avatar = await uploadAvatar(avatarFile);
+        update.avatar_path = avatar.path;
+        update.avatar_url = avatar.url;
+      }
+
+      const { data, error } = await PFApp.saveProfile(update);
+      if (error) throw error;
+
+      currentProfile = data;
+      document.getElementById("avatarPreview").src =
+        currentProfile.avatar_url ||
+        fallbackAvatar(currentProfile.username || currentUser.email);
+      await PFApp.renderAuthNav(currentUser);
+      setProfileStatus("Profile saved.", "success");
+    } catch (error) {
+      setProfileStatus(error.message || "Could not save profile.", "danger");
+    } finally {
+      setSaving(false);
+    }
+  });
+
+document
+  .getElementById("passwordForm")
+  .addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const password = document.getElementById("newPassword").value;
+    const confirm = document.getElementById("confirmPassword").value;
+
+    if (password !== confirm) {
+      setProfileStatus("Passwords do not match.", "warning");
+      return;
     }
 
-    const { data, error } = await PFApp.saveProfile(update);
-    if (error) throw error;
-
-    currentProfile = data;
-    document.getElementById("avatarPreview").src =
-      currentProfile.avatar_url || fallbackAvatar(currentProfile.username || currentUser.email);
-    await PFApp.renderAuthNav(currentUser);
-    setProfileStatus("Profile saved.", "success");
-  } catch (error) {
-    setProfileStatus(error.message || "Could not save profile.", "danger");
-  } finally {
-    setSaving(false);
-  }
-});
-
-document.getElementById("passwordForm").addEventListener("submit", async event => {
-  event.preventDefault();
-  const password = document.getElementById("newPassword").value;
-  const confirm = document.getElementById("confirmPassword").value;
-
-  if (password !== confirm) {
-    setProfileStatus("Passwords do not match.", "warning");
-    return;
-  }
-
-  setPasswordSaving(true);
-  try {
-    const { error } = await PFApp.updatePassword(password);
-    if (error) throw error;
-    event.target.reset();
-    setProfileStatus("Password updated.", "success");
-  } catch (error) {
-    setProfileStatus(error.message || "Could not update password.", "danger");
-  } finally {
-    setPasswordSaving(false);
-  }
-});
+    setPasswordSaving(true);
+    try {
+      const { error } = await PFApp.updatePassword(password);
+      if (error) throw error;
+      event.target.reset();
+      setProfileStatus("Password updated.", "success");
+    } catch (error) {
+      setProfileStatus(error.message || "Could not update password.", "danger");
+    } finally {
+      setPasswordSaving(false);
+    }
+  });
 
 initProfile();

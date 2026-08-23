@@ -1,16 +1,74 @@
-    body { background-color: #121212; color: white; }
-    .panel { background: #1e1e1e; border: 1px solid #333; border-radius: 8px; padding: 12px; }
-    .campaign-card { background: #242424; border: 1px solid #444; border-radius: 8px; padding: 10px; cursor: pointer; min-width: 0; }
-    .campaign-card.active { border-color: #0d6efd; }
-    .campaign-card code, .campaign-id { overflow-wrap: anywhere; word-break: break-word; }
-    .small-text { font-size: 12px; color: #aaa; }
-    input, textarea { background-color: #2b2b2b !important; color: white !important; border-color: #555 !important; }
-    .modal-content { background: #1e1e1e; color: white; border: 1px solid #444; }
-    .btn-close { filter: invert(1); }
-    .detail-list { display: grid; gap: 8px; }
-    .detail-row { background: #242424; border: 1px solid #444; border-radius: 8px; padding: 8px; }
-    @media (max-width: 767px) {
-      .campaign-card .campaign-card-main { flex-direction: column; }
-      .campaign-card .campaign-id-wrap { align-items: flex-start !important; }
-    }
+body {
+  background-color: #121212;
+  color: white;
+}
 
+.panel {
+  background: #1e1e1e;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.campaign-card {
+  background: #242424;
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 10px;
+  cursor: pointer;
+  min-width: 0;
+}
+
+.campaign-card.active {
+  border-color: #0d6efd;
+}
+
+.campaign-card code,
+.campaign-id {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.small-text {
+  font-size: 12px;
+  color: #aaa;
+}
+
+input,
+textarea {
+  background-color: #2b2b2b !important;
+  color: white !important;
+  border-color: #555 !important;
+}
+
+.modal-content {
+  background: #1e1e1e;
+  color: white;
+  border: 1px solid #444;
+}
+
+.btn-close {
+  filter: invert(1);
+}
+
+.detail-list {
+  display: grid;
+  gap: 8px;
+}
+
+.detail-row {
+  background: #242424;
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 8px;
+}
+
+@media (max-width: 767px) {
+  .campaign-card .campaign-card-main {
+    flex-direction: column;
+  }
+
+  .campaign-card .campaign-id-wrap {
+    align-items: flex-start !important;
+  }
+}

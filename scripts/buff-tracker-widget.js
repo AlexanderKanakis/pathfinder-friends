@@ -77,12 +77,82 @@
     con: "CON",
     int: "INT",
     wis: "WIS",
-    cha: "CHA"
+    cha: "CHA",
   };
-  const EFFECT_STATS = ["strength","dexterity","constitution","intelligence","wisdom","charisma","attack","melee attack","ranged attack","extra attack","damage","melee damage","ranged damage","ac","touch ac","flat-footed ac","remove dex bonus to ac","natural armor","deflection","fortitude","reflex","will","initiative","cmb","cmd","hit points","spell resistance"];
-  const SKILL_STATS = ["skill checks","strength skill checks","dexterity skill checks","constitution skill checks","intelligence skill checks","wisdom skill checks","charisma skill checks"];
-  const PF_SKILLS = ["Acrobatics","Appraise","Bluff","Climb","Diplomacy","Disable Device","Disguise","Escape Artist","Fly","Heal","Intimidate","Knowledge (arcana)","Knowledge (dungeoneering)","Knowledge (engineering)","Knowledge (geography)","Knowledge (history)","Knowledge (local)","Knowledge (nature)","Knowledge (nobility)","Knowledge (planes)","Knowledge (religion)","Linguistics","Perception","Ride","Sense Motive","Sleight of Hand","Spellcraft","Stealth","Survival","Swim","Use Magic Device"];
-  const SPECIFIC_SKILL_STATS = PF_SKILLS.map(skill => `skill:${skill.replace(/[^a-z0-9]/gi, "").toLowerCase()}`);
+  const EFFECT_STATS = [
+    "strength",
+    "dexterity",
+    "constitution",
+    "intelligence",
+    "wisdom",
+    "charisma",
+    "attack",
+    "melee attack",
+    "ranged attack",
+    "extra attack",
+    "damage",
+    "melee damage",
+    "ranged damage",
+    "ac",
+    "touch ac",
+    "flat-footed ac",
+    "remove dex bonus to ac",
+    "natural armor",
+    "deflection",
+    "fortitude",
+    "reflex",
+    "will",
+    "initiative",
+    "cmb",
+    "cmd",
+    "hit points",
+    "spell resistance",
+  ];
+  const SKILL_STATS = [
+    "skill checks",
+    "strength skill checks",
+    "dexterity skill checks",
+    "constitution skill checks",
+    "intelligence skill checks",
+    "wisdom skill checks",
+    "charisma skill checks",
+  ];
+  const PF_SKILLS = [
+    "Acrobatics",
+    "Appraise",
+    "Bluff",
+    "Climb",
+    "Diplomacy",
+    "Disable Device",
+    "Disguise",
+    "Escape Artist",
+    "Fly",
+    "Heal",
+    "Intimidate",
+    "Knowledge (arcana)",
+    "Knowledge (dungeoneering)",
+    "Knowledge (engineering)",
+    "Knowledge (geography)",
+    "Knowledge (history)",
+    "Knowledge (local)",
+    "Knowledge (nature)",
+    "Knowledge (nobility)",
+    "Knowledge (planes)",
+    "Knowledge (religion)",
+    "Linguistics",
+    "Perception",
+    "Ride",
+    "Sense Motive",
+    "Sleight of Hand",
+    "Spellcraft",
+    "Stealth",
+    "Survival",
+    "Swim",
+    "Use Magic Device",
+  ];
+  const SPECIFIC_SKILL_STATS = PF_SKILLS.map(
+    (skill) => `skill:${skill.replace(/[^a-z0-9]/gi, "").toLowerCase()}`,
+  );
   const SKILL_STAT_LABELS = {
     "skill checks": "Skill: All Checks",
     "strength skill checks": "Skill: STR Checks",
@@ -91,36 +161,85 @@
     "intelligence skill checks": "Skill: INT Checks",
     "wisdom skill checks": "Skill: WIS Checks",
     "charisma skill checks": "Skill: CHA Checks",
-    ...Object.fromEntries(PF_SKILLS.map(skill => [`skill:${skill.replace(/[^a-z0-9]/gi, "").toLowerCase()}`, `Skill: ${skill}`]))
+    ...Object.fromEntries(
+      PF_SKILLS.map((skill) => [
+        `skill:${skill.replace(/[^a-z0-9]/gi, "").toLowerCase()}`,
+        `Skill: ${skill}`,
+      ]),
+    ),
   };
   const CRAFT_SKILL_STAT = "skill:craft";
   const PROFESSION_SKILL_STAT = "skill:profession";
   const SPECIAL_SKILL_STATS = [CRAFT_SKILL_STAT, PROFESSION_SKILL_STAT];
-  const BONUS_TYPES = ["untyped","alchemical","condition","penalty","armor","circumstance","competence","deflection","dodge","enhancement","insight","luck","morale","natural armor","profane","resistance","sacred","shield","size"];
+  const BONUS_TYPES = [
+    "untyped",
+    "alchemical",
+    "condition",
+    "penalty",
+    "armor",
+    "circumstance",
+    "competence",
+    "deflection",
+    "dodge",
+    "enhancement",
+    "insight",
+    "luck",
+    "morale",
+    "natural armor",
+    "profane",
+    "resistance",
+    "sacred",
+    "shield",
+    "size",
+  ];
   const DURATION_UNITS = ["variable", "turn", "round", "minute", "hour", "day"];
-  const EFFECT_CATEGORIES = ["Spell", "Special Ability", "Feat", "Debuff", "Condition"];
-  const ACTIVE_CATEGORY_PRIORITY = ["Spell", "Special Ability", "Feat", "Debuff", "Condition", "Item"];
+  const EFFECT_CATEGORIES = [
+    "Spell",
+    "Special Ability",
+    "Feat",
+    "Debuff",
+    "Condition",
+  ];
+  const ACTIVE_CATEGORY_PRIORITY = [
+    "Spell",
+    "Special Ability",
+    "Feat",
+    "Debuff",
+    "Condition",
+    "Item",
+  ];
 
   function titleCaseStat(value) {
-    const key = String(value || "").toLowerCase().trim();
+    const key = String(value || "")
+      .toLowerCase()
+      .trim();
     if (STAT_LABELS[key]) return STAT_LABELS[key];
     if (SKILL_STAT_LABELS[key]) return SKILL_STAT_LABELS[key];
     return key
       .split(" ")
-      .map(word => STAT_LABELS[word] || word.charAt(0).toUpperCase() + word.slice(1))
+      .map(
+        (word) =>
+          STAT_LABELS[word] || word.charAt(0).toUpperCase() + word.slice(1),
+      )
       .join(" ");
   }
 
   function activeCategoryRank(category) {
-    const index = ACTIVE_CATEGORY_PRIORITY.findIndex(item => item.toLowerCase() === String(category || "").toLowerCase());
+    const index = ACTIVE_CATEGORY_PRIORITY.findIndex(
+      (item) => item.toLowerCase() === String(category || "").toLowerCase(),
+    );
     return index >= 0 ? index : ACTIVE_CATEGORY_PRIORITY.length;
   }
 
   function sortActiveRows(rows) {
-    return rows.sort((a, b) =>
-      activeCategoryRank(a.effect.category) - activeCategoryRank(b.effect.category) ||
-      String(a.effect.name || "").localeCompare(String(b.effect.name || "")) ||
-      a.index - b.index
+    return rows.sort(
+      (a, b) =>
+        activeCategoryRank(a.effect.category) -
+          activeCategoryRank(b.effect.category) ||
+        String(a.effect.name || "").localeCompare(
+          String(b.effect.name || ""),
+        ) ||
+        a.index - b.index,
     );
   }
 
@@ -131,7 +250,7 @@
   function groupedActiveRows(rows) {
     return rows.reduce((groups, row) => {
       const category = row.effect.category || "Effect";
-      const group = groups.find(entry => entry.category === category);
+      const group = groups.find((entry) => entry.category === category);
       if (group) group.rows.push(row);
       else groups.push({ category, rows: [row] });
       return groups;
@@ -151,19 +270,21 @@
       `<option value="${stat}" ${selected === stat ? "selected" : ""}>${escapeHtml(label)}</option>`;
     return `
       <optgroup label="Stats">
-        ${effectStats.map(stat => option(stat)).join("")}
+        ${effectStats.map((stat) => option(stat)).join("")}
       </optgroup>
       <optgroup label="Skills">
-        ${SKILL_STATS.map(stat => option(stat)).join("")}
+        ${SKILL_STATS.map((stat) => option(stat)).join("")}
         ${option(CRAFT_SKILL_STAT, "Skill: Craft")}
         ${option(PROFESSION_SKILL_STAT, "Skill: Profession")}
-        ${SPECIFIC_SKILL_STATS.map(stat => option(stat)).join("")}
+        ${SPECIFIC_SKILL_STATS.map((stat) => option(stat)).join("")}
       </optgroup>
     `;
   }
 
   function skillKey(name) {
-    return `skill:${String(name || "").replace(/[^a-z0-9]/gi, "").toLowerCase()}`;
+    return `skill:${String(name || "")
+      .replace(/[^a-z0-9]/gi, "")
+      .toLowerCase()}`;
   }
 
   function namedSkill(kind, value) {
@@ -184,12 +305,17 @@
   }
 
   function legacyDurationParts(duration) {
-    const text = String(duration || "").toLowerCase().trim();
+    const text = String(duration || "")
+      .toLowerCase()
+      .trim();
     if (!text || text === "variable" || text === "permanent") {
       return { count: null, unit: "variable", perLevel: false };
     }
     const count = Number((text.match(/(\d+)/) || [null, 1])[1]) || 1;
-    const unit = DURATION_UNITS.find(value => value !== "variable" && text.includes(value)) || "variable";
+    const unit =
+      DURATION_UNITS.find(
+        (value) => value !== "variable" && text.includes(value),
+      ) || "variable";
     const perLevel = text.includes("/level") || text.includes("per level");
     return { count, unit, perLevel };
   }
@@ -197,14 +323,28 @@
   function durationParts(effect) {
     if (window.PFEffectMeta?.normalizeDurationConfig) {
       const config = window.PFEffectMeta.normalizeDurationConfig(effect);
-      return { count: config.count, unit: config.unit, perLevel: config.factors.some(factor => factor.type === "caster"), config };
+      return {
+        count: config.count,
+        unit: config.unit,
+        perLevel: config.factors.some((factor) => factor.type === "caster"),
+        config,
+      };
     }
-    const hasStructured = effect && (effect.durationCount !== undefined || effect.durationUnit || effect.durationPerLevel !== undefined);
+    const hasStructured =
+      effect &&
+      (effect.durationCount !== undefined ||
+        effect.durationUnit ||
+        effect.durationPerLevel !== undefined);
     if (hasStructured) {
       return {
-        count: effect.durationCount === null || effect.durationCount === undefined || effect.durationCount === "" ? null : Number(effect.durationCount),
+        count:
+          effect.durationCount === null ||
+          effect.durationCount === undefined ||
+          effect.durationCount === ""
+            ? null
+            : Number(effect.durationCount),
         unit: effect.durationUnit || "variable",
-        perLevel: Boolean(effect.durationPerLevel)
+        perLevel: Boolean(effect.durationPerLevel),
       };
     }
     return legacyDurationParts(effect?.duration);
@@ -212,11 +352,14 @@
 
   function durationUsesCasterLevel(effect) {
     const config = durationParts(effect).config;
-    return config ? config.factors.some(factor => factor.type === "caster") : durationParts(effect).perLevel;
+    return config
+      ? config.factors.some((factor) => factor.type === "caster")
+      : durationParts(effect).perLevel;
   }
 
   function durationLabel(effect) {
-    if (window.PFEffectMeta?.durationLabel) return window.PFEffectMeta.durationLabel(effect);
+    if (window.PFEffectMeta?.durationLabel)
+      return window.PFEffectMeta.durationLabel(effect);
     const parts = durationParts(effect);
     if (!parts.count || parts.unit === "variable") return "variable";
     const unit = `${parts.unit}${Number(parts.count) === 1 ? "" : "s"}`;
@@ -234,8 +377,11 @@
     const parts = durationParts(effect);
     if (!parts.count || parts.unit === "variable") return null;
     const amount = Number(parts.count) || 1;
-    const multiplier = parts.perLevel ? Math.max(1, Number(casterLevel) || 1) : 1;
-    if (parts.unit === "turn" || parts.unit === "round") return amount * multiplier;
+    const multiplier = parts.perLevel
+      ? Math.max(1, Number(casterLevel) || 1)
+      : 1;
+    if (parts.unit === "turn" || parts.unit === "round")
+      return amount * multiplier;
     if (parts.unit === "minute") return amount * 10 * multiplier;
     if (parts.unit === "hour") return amount * 600 * multiplier;
     if (parts.unit === "day") return amount * 14400 * multiplier;
@@ -245,15 +391,21 @@
   function formatDurationRounds(rounds) {
     if (rounds === null || rounds === undefined) return "variable";
     if (rounds === 1) return "1 turn";
-    if (rounds % 600 === 0) return `${rounds / 600} hour${rounds === 600 ? "" : "s"}`;
-    if (rounds % 10 === 0) return `${rounds / 10} minute${rounds === 10 ? "" : "s"}`;
+    if (rounds % 600 === 0)
+      return `${rounds / 600} hour${rounds === 600 ? "" : "s"}`;
+    if (rounds % 10 === 0)
+      return `${rounds / 10} minute${rounds === 10 ? "" : "s"}`;
     return `${rounds} round${rounds === 1 ? "" : "s"}`;
   }
 
   function activeDuration(effect) {
     if (effect.permanent) return "Permanent";
     if (effect.durationLabel) return effect.durationLabel;
-    if (effect.computedDuration !== undefined && effect.computedDuration !== null) return formatDurationRounds(effect.computedDuration);
+    if (
+      effect.computedDuration !== undefined &&
+      effect.computedDuration !== null
+    )
+      return formatDurationRounds(effect.computedDuration);
     return durationLabel(effect);
   }
 
@@ -272,7 +424,11 @@
   }
 
   function bonusText(bonus) {
-    if (String(bonus.stat || "").toLowerCase().trim() === "remove dex bonus to ac") {
+    if (
+      String(bonus.stat || "")
+        .toLowerCase()
+        .trim() === "remove dex bonus to ac"
+    ) {
       const text = "Removes DEX bonus to AC";
       return bonus.appliesWhen ? `${text} (${bonus.appliesWhen})` : text;
     }
@@ -286,15 +442,28 @@
   function scaleText(scale) {
     if (!scale) return "";
     const parts = [];
-    const sourceLabel = scale.source ? `${window.PFEffectMeta?.factorLabel?.(scale.source) || "level"}` : "CL";
+    const sourceLabel = scale.source
+      ? `${window.PFEffectMeta?.factorLabel?.(scale.source) || "level"}`
+      : "CL";
     const milestones = Array.isArray(scale.milestones) ? scale.milestones : [];
     const milestoneText = milestones
-      .filter(milestone => milestone.level && milestone.value !== "" && milestone.value !== null && milestone.value !== undefined)
-      .map(milestone => `${sourceLabel} ${milestone.level}: ${fmt(Number(milestone.value || 0))}`);
+      .filter(
+        (milestone) =>
+          milestone.level &&
+          milestone.value !== "" &&
+          milestone.value !== null &&
+          milestone.value !== undefined,
+      )
+      .map(
+        (milestone) =>
+          `${sourceLabel} ${milestone.level}: ${fmt(Number(milestone.value || 0))}`,
+      );
     if (milestoneText.length) parts.push(milestoneText.join(", "));
     const every = scale.every || {};
     if (every.afterLevel && every.everyLevels && every.increase) {
-      parts.push(`after ${sourceLabel} ${every.afterLevel}, every ${every.everyLevels}: ${fmt(Number(every.increase || 0))}`);
+      parts.push(
+        `after ${sourceLabel} ${every.afterLevel}, every ${every.everyLevels}: ${fmt(Number(every.increase || 0))}`,
+      );
     }
     return parts.length ? `scales ${parts.join("; ")}` : "";
   }
@@ -304,14 +473,20 @@
       effect.name,
       effect.category,
       durationLabel(effect),
-      ...(effect.bonuses || []).map(bonusText)
-    ].join(" ").toLowerCase();
+      ...(effect.bonuses || []).map(bonusText),
+    ]
+      .join(" ")
+      .toLowerCase();
   }
 
   function stamp(contextKey, characterId) {
     const value = String(Date.now());
     localStorage.setItem(`pf_buffs_updated_${contextKey}`, value);
-    if (characterId) localStorage.setItem(`pf_buffs_updated_${contextKey}_${characterId}`, value);
+    if (characterId)
+      localStorage.setItem(
+        `pf_buffs_updated_${contextKey}_${characterId}`,
+        value,
+      );
   }
 
   class EffectTracker {
@@ -376,7 +551,7 @@
                   <div class="col-md-4">
                     <label class="small" for="${this.prefix}CustomCategory">Type</label>
                     <select id="${this.prefix}CustomCategory" class="form-select form-select-sm">
-                      ${EFFECT_CATEGORIES.map(category => `<option value="${category}" ${category === "Spell" ? "selected" : ""}>${category}</option>`).join("")}
+                      ${EFFECT_CATEGORIES.map((category) => `<option value="${category}" ${category === "Spell" ? "selected" : ""}>${category}</option>`).join("")}
                     </select>
                   </div>
                   <div class="col-md-4">
@@ -462,18 +637,28 @@
       this.addShellEl = document.getElementById(`${this.prefix}AddShell`);
       this.openSearchEl = document.getElementById(`${this.prefix}OpenSearch`);
       this.openButtonEl = document.getElementById(`${this.prefix}OpenButton`);
-      this.createButtonEl = document.getElementById(`${this.prefix}CreateButton`);
+      this.createButtonEl = document.getElementById(
+        `${this.prefix}CreateButton`,
+      );
       this.pickerModalEl = document.getElementById(`${this.prefix}PickerModal`);
       this.customModalEl = document.getElementById(`${this.prefix}CustomModal`);
       this.scaleModalEl = document.getElementById(`${this.prefix}ScaleModal`);
       this.deleteModalEl = document.getElementById(`${this.prefix}DeleteModal`);
       this.customNameEl = document.getElementById(`${this.prefix}CustomName`);
-      this.editDurationEl = document.getElementById(`${this.prefix}EditDuration`);
-      this.durationSummaryEl = document.getElementById(`${this.prefix}DurationSummary`);
+      this.editDurationEl = document.getElementById(
+        `${this.prefix}EditDuration`,
+      );
+      this.durationSummaryEl = document.getElementById(
+        `${this.prefix}DurationSummary`,
+      );
       this.customLabelEl = document.getElementById(`${this.prefix}CustomLabel`);
       this.customRowsEl = document.getElementById(`${this.prefix}CustomRows`);
-      this.customCategoryEl = document.getElementById(`${this.prefix}CustomCategory`);
-      this.customStatusEl = document.getElementById(`${this.prefix}CustomStatus`);
+      this.customCategoryEl = document.getElementById(
+        `${this.prefix}CustomCategory`,
+      );
+      this.customStatusEl = document.getElementById(
+        `${this.prefix}CustomStatus`,
+      );
       this.saveCustomEl = document.getElementById(`${this.prefix}SaveCustom`);
       this.searchEl = document.getElementById(`${this.prefix}Search`);
       this.resultsEl = document.getElementById(`${this.prefix}Results`);
@@ -481,32 +666,60 @@
       this.scaleRowsEl = document.getElementById(`${this.prefix}ScaleRows`);
       this.scaleAfterEl = document.getElementById(`${this.prefix}ScaleAfter`);
       this.scaleEveryEl = document.getElementById(`${this.prefix}ScaleEvery`);
-      this.scaleIncreaseEl = document.getElementById(`${this.prefix}ScaleIncrease`);
+      this.scaleIncreaseEl = document.getElementById(
+        `${this.prefix}ScaleIncrease`,
+      );
       this.scaleStatusEl = document.getElementById(`${this.prefix}ScaleStatus`);
       this.deleteNameEl = document.getElementById(`${this.prefix}DeleteName`);
-      this.deleteStatusEl = document.getElementById(`${this.prefix}DeleteStatus`);
-      this.durationEditor = window.PFEffectDurationEditor ? new window.PFEffectDurationEditor(this.prefix) : null;
-      [this.pickerModalEl, this.customModalEl, this.scaleModalEl, this.deleteModalEl].forEach(modal => {
-        if (modal && modal.parentElement !== document.body) document.body.appendChild(modal);
+      this.deleteStatusEl = document.getElementById(
+        `${this.prefix}DeleteStatus`,
+      );
+      this.durationEditor = window.PFEffectDurationEditor
+        ? new window.PFEffectDurationEditor(this.prefix)
+        : null;
+      [
+        this.pickerModalEl,
+        this.customModalEl,
+        this.scaleModalEl,
+        this.deleteModalEl,
+      ].forEach((modal) => {
+        if (modal && modal.parentElement !== document.body)
+          document.body.appendChild(modal);
       });
       this.searchEl.addEventListener("input", () => this.renderResults());
       this.openSearchEl.addEventListener("click", () => this.openPicker());
       this.openButtonEl.addEventListener("click", () => this.openPicker());
       this.createButtonEl.addEventListener("click", () => this.openCustom());
-      document.getElementById(`${this.prefix}AddCustomBonus`).addEventListener("click", () => this.addCustomBonusRow());
-      document.getElementById(`${this.prefix}SaveCustom`).addEventListener("click", () => this.saveCustomEffect());
-      document.getElementById(`${this.prefix}AddScaleMilestone`).addEventListener("click", () => this.addScaleMilestoneRow());
-      document.getElementById(`${this.prefix}ClearScale`).addEventListener("click", () => this.clearScale());
-      document.getElementById(`${this.prefix}SaveScale`).addEventListener("click", () => this.saveScale());
-      document.getElementById(`${this.prefix}ConfirmDelete`).addEventListener("click", () => this.deleteEffect());
-      this.customCategoryEl.addEventListener("change", () => this.applyCustomDefaults());
-      this.editDurationEl.addEventListener("click", () => this.openDurationEditor());
+      document
+        .getElementById(`${this.prefix}AddCustomBonus`)
+        .addEventListener("click", () => this.addCustomBonusRow());
+      document
+        .getElementById(`${this.prefix}SaveCustom`)
+        .addEventListener("click", () => this.saveCustomEffect());
+      document
+        .getElementById(`${this.prefix}AddScaleMilestone`)
+        .addEventListener("click", () => this.addScaleMilestoneRow());
+      document
+        .getElementById(`${this.prefix}ClearScale`)
+        .addEventListener("click", () => this.clearScale());
+      document
+        .getElementById(`${this.prefix}SaveScale`)
+        .addEventListener("click", () => this.saveScale());
+      document
+        .getElementById(`${this.prefix}ConfirmDelete`)
+        .addEventListener("click", () => this.deleteEffect());
+      this.customCategoryEl.addEventListener("change", () =>
+        this.applyCustomDefaults(),
+      );
+      this.editDurationEl.addEventListener("click", () =>
+        this.openDurationEditor(),
+      );
       await this.refresh(this.options);
     }
 
     async refresh(options = this.options) {
       this.options = { ...this.options, ...options };
-      this.isAdmin = await PFApp.isAppAdmin?.() || false;
+      this.isAdmin = (await PFApp.isAppAdmin?.()) || false;
       if (!this.options.characterId) {
         this.effects = [];
         this.active = [];
@@ -518,7 +731,10 @@
       this.effects = await PFApp.loadBuffDefinitions();
       const saved = this.options.loadActiveEffects
         ? await this.options.loadActiveEffects()
-        : await PFApp.loadBuffState(this.options.contextKey, this.options.characterId);
+        : await PFApp.loadBuffState(
+            this.options.contextKey,
+            this.options.characterId,
+          );
       this.active = Array.isArray(saved) ? saved : saved?.buffs || [];
       this.updateSearchVisibility();
       this.renderResults();
@@ -538,7 +754,10 @@
       this.customNameEl.disabled = false;
       this.customCategoryEl.value = "Spell";
       this.customCategoryEl.disabled = false;
-      this.setDurationFields({ count: null, unit: "variable", factors: [] }, false);
+      this.setDurationFields(
+        { count: null, unit: "variable", factors: [] },
+        false,
+      );
       this.customRowsEl.innerHTML = "";
       this.saveCustomEl.textContent = "Save Effect";
       this.customStatus("");
@@ -556,13 +775,17 @@
       this.customNameEl.disabled = false;
       this.customCategoryEl.value = effect.category || "Spell";
       this.customCategoryEl.disabled = false;
-      this.setDurationFields(effect.durationConfig || durationParts(effect), false);
+      this.setDurationFields(
+        effect.durationConfig || durationParts(effect),
+        false,
+      );
       this.customRowsEl.innerHTML = "";
       this.saveCustomEl.textContent = "Save Effect";
       this.customStatus("");
 
       const bonuses = Array.isArray(effect.bonuses) ? effect.bonuses : [];
-      if (bonuses.length) bonuses.forEach(bonus => this.addCustomBonusRow(bonus));
+      if (bonuses.length)
+        bonuses.forEach((bonus) => this.addCustomBonusRow(bonus));
       else this.addCustomBonusRow();
 
       bootstrap.Modal.getOrCreateInstance(this.customModalEl).show();
@@ -571,14 +794,21 @@
     setDurationFields(parts, disabled) {
       this.durationConfig = window.PFEffectMeta?.normalizeDurationConfig
         ? window.PFEffectMeta.normalizeDurationConfig(parts)
-        : { count: parts?.count || null, unit: parts?.unit || "variable", factors: parts?.perLevel ? [{ type: "caster" }] : [] };
-      if (this.durationSummaryEl) this.durationSummaryEl.textContent = durationLabel({ durationConfig: this.durationConfig });
+        : {
+            count: parts?.count || null,
+            unit: parts?.unit || "variable",
+            factors: parts?.perLevel ? [{ type: "caster" }] : [],
+          };
+      if (this.durationSummaryEl)
+        this.durationSummaryEl.textContent = durationLabel({
+          durationConfig: this.durationConfig,
+        });
       if (this.editDurationEl) this.editDurationEl.disabled = disabled;
     }
 
     openDurationEditor() {
       if (!this.durationEditor) return;
-      this.durationEditor.open(this.durationConfig, config => {
+      this.durationEditor.open(this.durationConfig, (config) => {
         this.setDurationFields(config, false);
       });
     }
@@ -606,7 +836,7 @@
         <div>
           <label class="small">Type</label>
           <select data-field="type" class="form-select form-select-sm">
-            ${BONUS_TYPES.map(type => `<option value="${type}" ${(data.type || "untyped") === type ? "selected" : ""}>${type}</option>`).join("")}
+            ${BONUS_TYPES.map((type) => `<option value="${type}" ${(data.type || "untyped") === type ? "selected" : ""}>${type}</option>`).join("")}
           </select>
         </div>
         <div>
@@ -635,14 +865,21 @@
       const namedSkillField = row.querySelector(".effect-named-skill-field");
       const skillNameInput = row.querySelector('[data-field="skillName"]');
       const syncNamedSkill = () => {
-        const named = [CRAFT_SKILL_STAT, PROFESSION_SKILL_STAT].includes(statSelect.value);
+        const named = [CRAFT_SKILL_STAT, PROFESSION_SKILL_STAT].includes(
+          statSelect.value,
+        );
         namedSkillField.classList.toggle("d-none", !named);
-        skillNameInput.placeholder = statSelect.value === PROFESSION_SKILL_STAT ? "Sailor" : "Alchemy";
+        skillNameInput.placeholder =
+          statSelect.value === PROFESSION_SKILL_STAT ? "Sailor" : "Alchemy";
       };
       statSelect.addEventListener("change", syncNamedSkill);
       syncNamedSkill();
-      row.querySelector("[data-scale-bonus]").addEventListener("click", () => this.openScaleModal(row));
-      row.querySelector('button[aria-label="Delete bonus"]').addEventListener("click", () => row.remove());
+      row
+        .querySelector("[data-scale-bonus]")
+        .addEventListener("click", () => this.openScaleModal(row));
+      row
+        .querySelector('button[aria-label="Delete bonus"]')
+        .addEventListener("click", () => row.remove());
       this.customRowsEl.appendChild(row);
       if (!this.editingEffectId) this.applyCustomDefaults(row);
     }
@@ -657,8 +894,11 @@
       if (sourceSelect && window.PFEffectMeta?.levelSourceOptions) {
         sourceSelect.innerHTML = window.PFEffectMeta.levelSourceOptions(source);
       }
-      const milestones = Array.isArray(scale.milestones) ? scale.milestones : [];
-      if (milestones.length) milestones.forEach(milestone => this.addScaleMilestoneRow(milestone));
+      const milestones = Array.isArray(scale.milestones)
+        ? scale.milestones
+        : [];
+      if (milestones.length)
+        milestones.forEach((milestone) => this.addScaleMilestoneRow(milestone));
       else this.addScaleMilestoneRow();
       const every = scale.every || {};
       this.scaleAfterEl.value = every.afterLevel || "";
@@ -686,19 +926,31 @@
     }
 
     collectScale() {
-      const milestones = [...this.scaleRowsEl.querySelectorAll(".effect-scale-row")]
-        .map(row => ({
-          level: Number.parseInt(row.querySelector('[data-scale-field="level"]').value, 10),
-          value: Number(row.querySelector('[data-scale-field="value"]').value)
+      const milestones = [
+        ...this.scaleRowsEl.querySelectorAll(".effect-scale-row"),
+      ]
+        .map((row) => ({
+          level: Number.parseInt(
+            row.querySelector('[data-scale-field="level"]').value,
+            10,
+          ),
+          value: Number(row.querySelector('[data-scale-field="value"]').value),
         }))
-        .filter(milestone => milestone.level > 0 && Number.isFinite(milestone.value))
+        .filter(
+          (milestone) =>
+            milestone.level > 0 && Number.isFinite(milestone.value),
+        )
         .sort((a, b) => a.level - b.level);
       const afterLevel = Number.parseInt(this.scaleAfterEl.value, 10);
       const everyLevels = Number.parseInt(this.scaleEveryEl.value, 10);
       const increase = Number(this.scaleIncreaseEl.value);
-      const every = afterLevel > 0 && everyLevels > 0 && Number.isFinite(increase) && increase !== 0
-        ? { afterLevel, everyLevels, increase }
-        : null;
+      const every =
+        afterLevel > 0 &&
+        everyLevels > 0 &&
+        Number.isFinite(increase) &&
+        increase !== 0
+          ? { afterLevel, everyLevels, increase }
+          : null;
       if (!milestones.length && !every) return null;
       const sourceSelect = document.getElementById(`${this.prefix}ScaleSource`);
       const source = window.PFEffectMeta?.sourceFromSelect
@@ -732,7 +984,7 @@
       const rows = scope.classList?.contains("effect-custom-row")
         ? [scope]
         : [...(scope.querySelectorAll?.(".effect-custom-row") || [])];
-      rows.forEach(row => {
+      rows.forEach((row) => {
         const type = row.querySelector('[data-field="type"]');
         const stacks = row.querySelector('[data-field="stacks"]');
         if (type && type.value === "untyped") type.value = "penalty";
@@ -743,11 +995,17 @@
     collectCustomEffect() {
       const durationConfig = window.PFEffectMeta?.normalizeDurationConfig
         ? window.PFEffectMeta.normalizeDurationConfig(this.durationConfig)
-        : (this.durationConfig || { count: null, unit: "variable", factors: [] });
+        : this.durationConfig || { count: null, unit: "variable", factors: [] };
       const durationUnit = durationConfig.unit || "variable";
       const durationCount = durationConfig.count || null;
-      const durationPerLevel = durationConfig.factors?.some(factor => factor.type === "caster") || false;
-      const duration = durationLabel({ durationCount, durationUnit, durationPerLevel });
+      const durationPerLevel =
+        durationConfig.factors?.some((factor) => factor.type === "caster") ||
+        false;
+      const duration = durationLabel({
+        durationCount,
+        durationUnit,
+        durationPerLevel,
+      });
       return {
         name: this.customNameEl.value.trim(),
         category: this.customCategoryEl.value || "Spell",
@@ -757,23 +1015,33 @@
         durationPerLevel,
         durationConfig,
         contextKey: this.options.contextKey,
-        bonuses: [...this.customRowsEl.querySelectorAll(".effect-custom-row")].map(row => {
+        bonuses: [
+          ...this.customRowsEl.querySelectorAll(".effect-custom-row"),
+        ].map((row) => {
           const selectedStat = row.querySelector('[data-field="stat"]').value;
-          const skillName = [CRAFT_SKILL_STAT, PROFESSION_SKILL_STAT].includes(selectedStat)
-            ? namedSkill(selectedStat, row.querySelector('[data-field="skillName"]')?.value)
+          const skillName = [CRAFT_SKILL_STAT, PROFESSION_SKILL_STAT].includes(
+            selectedStat,
+          )
+            ? namedSkill(
+                selectedStat,
+                row.querySelector('[data-field="skillName"]')?.value,
+              )
             : "";
           const bonus = {
             stat: skillName ? skillKey(skillName) : selectedStat,
             value: Number(row.querySelector('[data-field="value"]').value || 0),
             type: row.querySelector('[data-field="type"]').value || "untyped",
             stacks: row.querySelector('[data-field="stacks"]').checked,
-            conditional: row.querySelector('[data-field="conditional"]').checked,
-            appliesWhen: row.querySelector('[data-field="appliesWhen"]').value.trim()
+            conditional: row.querySelector('[data-field="conditional"]')
+              .checked,
+            appliesWhen: row
+              .querySelector('[data-field="appliesWhen"]')
+              .value.trim(),
           };
           if (skillName) bonus.skillName = skillName;
           if (row._bonusScale) bonus.bonusScale = row._bonusScale;
           return bonus;
-        })
+        }),
       };
     }
 
@@ -802,7 +1070,12 @@
         ? await PFApp.updateBuffDefinition?.(this.editingEffectId, effect)
         : await PFApp.saveBuffDefinition(effect);
       if (!saved) {
-        this.customStatus(this.editingEffectId ? "Could not update effect." : "Could not save effect.", "danger");
+        this.customStatus(
+          this.editingEffectId
+            ? "Could not update effect."
+            : "Could not save effect.",
+          "danger",
+        );
         return;
       }
       this.effects = await PFApp.loadBuffDefinitions();
@@ -831,8 +1104,17 @@
       if (!this.isAdmin || !this.deletingEffectId) return;
       const result = await PFApp.deleteBuffDefinition?.(this.deletingEffectId);
       if (result !== true && !result?.ok) {
-        const message = result?.error?.message || result?.error?.details || result?.error?.hint || JSON.stringify(result?.error || {});
-        this.deleteStatus(message && message !== "{}" ? message : "Could not delete effect. Refresh the page and try again.", "danger");
+        const message =
+          result?.error?.message ||
+          result?.error?.details ||
+          result?.error?.hint ||
+          JSON.stringify(result?.error || {});
+        this.deleteStatus(
+          message && message !== "{}"
+            ? message
+            : "Could not delete effect. Refresh the page and try again.",
+          "danger",
+        );
         return;
       }
       this.effects = await PFApp.loadBuffDefinitions();
@@ -845,10 +1127,14 @@
       if (!this.options.characterId) return;
       this.searchEl.value = "";
       this.renderResults();
-      this.pickerModalEl.addEventListener("shown.bs.modal", () => {
-        this.searchEl?.focus();
-        this.searchEl?.select();
-      }, { once: true });
+      this.pickerModalEl.addEventListener(
+        "shown.bs.modal",
+        () => {
+          this.searchEl?.focus();
+          this.searchEl?.select();
+        },
+        { once: true },
+      );
       bootstrap.Modal.getOrCreateInstance(this.pickerModalEl).show();
       setTimeout(() => {
         if (document.activeElement !== this.searchEl) this.searchEl?.focus();
@@ -858,64 +1144,91 @@
     renderResults() {
       if (!this.resultsEl) return;
       const term = this.searchEl?.value.trim().toLowerCase() || "";
-      const matches = this.effects
-        .filter(effect => !term || searchText(effect).includes(term));
+      const matches = this.effects.filter(
+        (effect) => !term || searchText(effect).includes(term),
+      );
 
       if (!matches.length) {
         this.resultsEl.innerHTML = `<div class="small-text">No matching effects found.</div>`;
         return;
       }
 
-      this.resultsEl.innerHTML = matches.map(effect => {
-        const index = this.effects.indexOf(effect);
-        const bonuses = (effect.bonuses || []).slice(0, 8);
-        const bonusHtml = bonuses.length
-          ? bonuses.map(bonus => `<span class="effect-tracker-chip">${escapeHtml(bonusText(bonus))}</span>`).join("")
-          : `<span class="small-text">No numerical changes</span>`;
-        const more = (effect.bonuses || []).length > bonuses.length
-          ? `<span class="small-text">+${(effect.bonuses || []).length - bonuses.length} more</span>`
-          : "";
-        return `
+      this.resultsEl.innerHTML = matches
+        .map((effect) => {
+          const index = this.effects.indexOf(effect);
+          const bonuses = (effect.bonuses || []).slice(0, 8);
+          const bonusHtml = bonuses.length
+            ? bonuses
+                .map(
+                  (bonus) =>
+                    `<span class="effect-tracker-chip">${escapeHtml(bonusText(bonus))}</span>`,
+                )
+                .join("")
+            : `<span class="small-text">No numerical changes</span>`;
+          const more =
+            (effect.bonuses || []).length > bonuses.length
+              ? `<span class="small-text">+${(effect.bonuses || []).length - bonuses.length} more</span>`
+              : "";
+          return `
           <article class="effect-tracker-card" role="button" tabindex="0" data-effect-index="${index}">
             <span class="effect-tracker-icon" title="${escapeHtml(effect.category || "Effect")}"><i class="bi ${categoryIcon(effect.category)}"></i></span>
             <div class="fw-semibold pe-2">${escapeHtml(effect.name)}</div>
             <div class="small-text mb-2">${escapeHtml(effect.category || "Effect")} | ${escapeHtml(durationLabel(effect))}</div>
             <div>${bonusHtml}${more}</div>
-            ${this.isAdmin ? `
+            ${
+              this.isAdmin
+                ? `
               <div class="effect-card-admin-actions">
                 <button class="btn btn-outline-warning btn-sm" type="button" data-edit-bonuses="${index}" aria-label="Edit effect" title="Edit effect"><i class="bi bi-pencil-square"></i></button>
                 <button class="btn btn-outline-danger btn-sm" type="button" data-delete-effect="${index}" aria-label="Delete effect" title="Delete effect"><i class="bi bi-trash"></i></button>
               </div>
-            ` : ""}
+            `
+                : ""
+            }
             ${this.controls(effect, index)}
           </article>
         `;
-      }).join("");
+        })
+        .join("");
 
-      this.resultsEl.querySelectorAll("[data-effect-index]").forEach(card => {
-        card.addEventListener("click", event => {
-          if (event.target.closest(".effect-tracker-controls, .effect-card-admin-actions")) return;
+      this.resultsEl.querySelectorAll("[data-effect-index]").forEach((card) => {
+        card.addEventListener("click", (event) => {
+          if (
+            event.target.closest(
+              ".effect-tracker-controls, .effect-card-admin-actions",
+            )
+          )
+            return;
           this.addEffect(Number(card.dataset.effectIndex));
         });
-        card.addEventListener("keydown", event => {
-          if (event.target.closest(".effect-tracker-controls, .effect-card-admin-actions")) return;
+        card.addEventListener("keydown", (event) => {
+          if (
+            event.target.closest(
+              ".effect-tracker-controls, .effect-card-admin-actions",
+            )
+          )
+            return;
           if (event.key !== "Enter" && event.key !== " ") return;
           event.preventDefault();
           this.addEffect(Number(card.dataset.effectIndex));
         });
       });
-      this.resultsEl.querySelectorAll("[data-edit-bonuses]").forEach(button => {
-        button.addEventListener("click", event => {
-          event.stopPropagation();
-          this.openBonusEditor(Number(button.dataset.editBonuses));
+      this.resultsEl
+        .querySelectorAll("[data-edit-bonuses]")
+        .forEach((button) => {
+          button.addEventListener("click", (event) => {
+            event.stopPropagation();
+            this.openBonusEditor(Number(button.dataset.editBonuses));
+          });
         });
-      });
-      this.resultsEl.querySelectorAll("[data-delete-effect]").forEach(button => {
-        button.addEventListener("click", event => {
-          event.stopPropagation();
-          this.openDeleteModal(Number(button.dataset.deleteEffect));
+      this.resultsEl
+        .querySelectorAll("[data-delete-effect]")
+        .forEach((button) => {
+          button.addEventListener("click", (event) => {
+            event.stopPropagation();
+            this.openDeleteModal(Number(button.dataset.deleteEffect));
+          });
         });
-      });
     }
 
     controls(effect, index) {
@@ -923,16 +1236,24 @@
       const condition = isCondition(effect);
       return `
         <div class="effect-tracker-controls">
-          ${needsCl ? `
+          ${
+            needsCl
+              ? `
             <label class="small effect-tracker-inline">CL
               <input id="${this.prefix}Cl${index}" class="form-control form-control-sm" type="number" min="1" value="1">
             </label>
-          ` : ""}
-          ${condition ? `
+          `
+              : ""
+          }
+          ${
+            condition
+              ? `
             <label class="small effect-tracker-inline">Turns
               <input id="${this.prefix}Turns${index}" class="form-control form-control-sm" type="number" min="1" value="1">
             </label>
-          ` : ""}
+          `
+              : ""
+          }
           <label class="form-check small">
             <input id="${this.prefix}Permanent${index}" class="form-check-input" type="checkbox">
             <span class="form-check-label">Permanent</span>
@@ -944,12 +1265,28 @@
     addEffect(index) {
       const effect = this.effects[index];
       if (!effect || !this.options.characterId) return;
-      const casterLevel = Math.max(1, Number.parseInt(document.getElementById(`${this.prefix}Cl${index}`)?.value, 10) || 1);
-      const turns = Math.max(1, Number.parseInt(document.getElementById(`${this.prefix}Turns${index}`)?.value, 10) || 1);
-      const permanent = Boolean(document.getElementById(`${this.prefix}Permanent${index}`)?.checked);
+      const casterLevel = Math.max(
+        1,
+        Number.parseInt(
+          document.getElementById(`${this.prefix}Cl${index}`)?.value,
+          10,
+        ) || 1,
+      );
+      const turns = Math.max(
+        1,
+        Number.parseInt(
+          document.getElementById(`${this.prefix}Turns${index}`)?.value,
+          10,
+        ) || 1,
+      );
+      const permanent = Boolean(
+        document.getElementById(`${this.prefix}Permanent${index}`)?.checked,
+      );
       const condition = isCondition(effect);
       const baseDurationLabel = durationLabel(effect);
-      const calculatedDuration = condition ? turns : parseDuration(effect, casterLevel);
+      const calculatedDuration = condition
+        ? turns
+        : parseDuration(effect, casterLevel);
       const appliedDurationLabel = permanent
         ? "Permanent"
         : condition
@@ -967,7 +1304,7 @@
         permanent,
         remaining: permanent ? null : calculatedDuration,
         computedDuration: calculatedDuration,
-        durationLabel: appliedDurationLabel
+        durationLabel: appliedDurationLabel,
       });
       this.renderActive();
       this.notifyChange();
@@ -1012,16 +1349,24 @@
       if (!needsCl && !condition) return "";
       return `
         <div class="effect-active-adjustments">
-          ${needsCl ? `
+          ${
+            needsCl
+              ? `
             <label class="small effect-tracker-inline">CL
               <input class="form-control form-control-sm" type="number" min="1" value="${escapeHtml(effect.casterLevel || 1)}" data-active-cl="${index}">
             </label>
-          ` : ""}
-          ${condition ? `
+          `
+              : ""
+          }
+          ${
+            condition
+              ? `
             <label class="small effect-tracker-inline">Turns
               <input class="form-control form-control-sm" type="number" min="1" value="${escapeHtml(effect.turns || effect.remaining || 1)}" data-active-turns="${index}">
             </label>
-          ` : ""}
+          `
+              : ""
+          }
         </div>
       `;
     }
@@ -1033,13 +1378,23 @@
         return;
       }
 
-      const activeCategories = [...new Set(this.active.map(effect => effect.category || "Effect"))]
-        .sort((a, b) => activeCategoryRank(a) - activeCategoryRank(b) || String(a).localeCompare(String(b)));
+      const activeCategories = [
+        ...new Set(this.active.map((effect) => effect.category || "Effect")),
+      ].sort(
+        (a, b) =>
+          activeCategoryRank(a) - activeCategoryRank(b) ||
+          String(a).localeCompare(String(b)),
+      );
       const filterOptions = ["all", ...activeCategories];
-      if (!filterOptions.includes(this.activeTypeFilter)) this.activeTypeFilter = "all";
+      if (!filterOptions.includes(this.activeTypeFilter))
+        this.activeTypeFilter = "all";
       const filteredActive = this.active
         .map((effect, index) => ({ effect, index }))
-        .filter(row => this.activeTypeFilter === "all" || row.effect.category === this.activeTypeFilter);
+        .filter(
+          (row) =>
+            this.activeTypeFilter === "all" ||
+            row.effect.category === this.activeTypeFilter,
+        );
       sortActiveRows(filteredActive);
 
       const toolbar = `
@@ -1048,7 +1403,7 @@
           <div>
             <label class="small" for="${this.prefix}ActiveTypeFilter">Type</label>
             <select id="${this.prefix}ActiveTypeFilter" class="form-select form-select-sm">
-              ${filterOptions.map(type => `<option value="${escapeHtml(type)}" ${this.activeTypeFilter === type ? "selected" : ""}>${escapeHtml(type === "all" ? "All" : type)}</option>`).join("")}
+              ${filterOptions.map((type) => `<option value="${escapeHtml(type)}" ${this.activeTypeFilter === type ? "selected" : ""}>${escapeHtml(type === "all" ? "All" : type)}</option>`).join("")}
             </select>
           </div>
         </div>
@@ -1067,7 +1422,12 @@
 
       const renderRow = ({ effect, index }) => {
         const detailsId = `${this.prefix}Details${index}`;
-        const bonuses = (effect.bonuses || []).map(bonus => `<div class="small-text">${escapeHtml(bonusText(bonus))}</div>`).join("");
+        const bonuses = (effect.bonuses || [])
+          .map(
+            (bonus) =>
+              `<div class="small-text">${escapeHtml(bonusText(bonus))}</div>`,
+          )
+          .join("");
         const lockedToItem = isItemSourcedEffect(effect);
         return `
           <article class="effect-tracker-active">
@@ -1086,27 +1446,37 @@
           </article>
         `;
       };
-      this.activeEl.innerHTML = toolbar + groupedActiveRows(filteredActive).map(group => `
+      this.activeEl.innerHTML =
+        toolbar +
+        groupedActiveRows(filteredActive)
+          .map(
+            (group) => `
         <section class="effect-active-group">
           <div class="effect-active-group-title">${escapeHtml(group.category)}</div>
           ${group.rows.map(renderRow).join("")}
         </section>
-      `).join("");
+      `,
+          )
+          .join("");
 
-      this.activeEl.querySelectorAll("[data-remove-effect]").forEach(button => {
-        button.addEventListener("click", () => this.removeEffect(Number(button.dataset.removeEffect)));
-      });
-      this.activeEl.querySelectorAll("[data-active-cl]").forEach(input => {
+      this.activeEl
+        .querySelectorAll("[data-remove-effect]")
+        .forEach((button) => {
+          button.addEventListener("click", () =>
+            this.removeEffect(Number(button.dataset.removeEffect)),
+          );
+        });
+      this.activeEl.querySelectorAll("[data-active-cl]").forEach((input) => {
         input.addEventListener("change", () => {
           this.updateActiveDuration(Number(input.dataset.activeCl), {
-            casterLevel: Math.max(1, Number.parseInt(input.value, 10) || 1)
+            casterLevel: Math.max(1, Number.parseInt(input.value, 10) || 1),
           });
         });
       });
-      this.activeEl.querySelectorAll("[data-active-turns]").forEach(input => {
+      this.activeEl.querySelectorAll("[data-active-turns]").forEach((input) => {
         input.addEventListener("change", () => {
           this.updateActiveDuration(Number(input.dataset.activeTurns), {
-            turns: Math.max(1, Number.parseInt(input.value, 10) || 1)
+            turns: Math.max(1, Number.parseInt(input.value, 10) || 1),
           });
         });
       });
@@ -1127,7 +1497,11 @@
         if (this.options.saveActiveEffects) {
           await this.options.saveActiveEffects([...this.active]);
         } else {
-          await PFApp.saveBuffState(this.active, this.options.contextKey, this.options.characterId);
+          await PFApp.saveBuffState(
+            this.active,
+            this.options.contextKey,
+            this.options.characterId,
+          );
           stamp(this.options.contextKey, this.options.characterId);
         }
         this.notifyChange();
@@ -1144,6 +1518,6 @@
       const tracker = new EffectTracker(container, options);
       tracker.ready = tracker.mount();
       return tracker;
-    }
+    },
   };
 })();

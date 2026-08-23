@@ -13,38 +13,82 @@ const CLASS_GROUPS = [
   ["hybrid", "Hybrid"],
   ["unchained", "Unchained"],
   ["prestige", "Prestige"],
-  ["npc", "NPC"]
+  ["npc", "NPC"],
 ];
 const CASTING_TYPES = ["", "prepared", "spontaneous"];
 const CASTING_PROGRESSIONS = ["", "full", "2/3", "1/2"];
 const CASTING_ABILITIES = ["", "int", "wis", "cha"];
 const PREPARATION_TYPES = ["", "spellbook", "daily-list", "spontaneous"];
 const FULL_PREPARED_SLOTS = [
-  [3, 1], [4, 2], [4, 2, 1], [4, 3, 2], [4, 3, 2, 1],
-  [4, 3, 3, 2], [4, 4, 3, 2, 1], [4, 4, 3, 3, 2], [4, 4, 4, 3, 2, 1],
-  [4, 4, 4, 3, 3, 2], [4, 4, 4, 4, 3, 2, 1], [4, 4, 4, 4, 3, 3, 2],
-  [4, 4, 4, 4, 4, 3, 2, 1], [4, 4, 4, 4, 4, 3, 3, 2],
-  [4, 4, 4, 4, 4, 4, 3, 2, 1], [4, 4, 4, 4, 4, 4, 3, 3, 2],
-  [4, 4, 4, 4, 4, 4, 4, 3, 2, 1], [4, 4, 4, 4, 4, 4, 4, 3, 3, 2],
-  [4, 4, 4, 4, 4, 4, 4, 4, 3, 3], [4, 4, 4, 4, 4, 4, 4, 4, 4, 4]
+  [3, 1],
+  [4, 2],
+  [4, 2, 1],
+  [4, 3, 2],
+  [4, 3, 2, 1],
+  [4, 3, 3, 2],
+  [4, 4, 3, 2, 1],
+  [4, 4, 3, 3, 2],
+  [4, 4, 4, 3, 2, 1],
+  [4, 4, 4, 3, 3, 2],
+  [4, 4, 4, 4, 3, 2, 1],
+  [4, 4, 4, 4, 3, 3, 2],
+  [4, 4, 4, 4, 4, 3, 2, 1],
+  [4, 4, 4, 4, 4, 3, 3, 2],
+  [4, 4, 4, 4, 4, 4, 3, 2, 1],
+  [4, 4, 4, 4, 4, 4, 3, 3, 2],
+  [4, 4, 4, 4, 4, 4, 4, 3, 2, 1],
+  [4, 4, 4, 4, 4, 4, 4, 3, 3, 2],
+  [4, 4, 4, 4, 4, 4, 4, 4, 3, 3],
+  [4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
 ];
 const TWO_THIRDS_SLOTS = [
-  [0, 1], [0, 2], [0, 3], [0, 3, 1], [0, 4, 2],
-  [0, 4, 3], [0, 4, 3, 1], [0, 4, 4, 2], [0, 5, 4, 3],
-  [0, 5, 4, 3, 1], [0, 5, 4, 4, 2], [0, 5, 5, 4, 3],
-  [0, 5, 5, 4, 3, 1], [0, 5, 5, 4, 4, 2], [0, 5, 5, 5, 4, 3],
-  [0, 5, 5, 5, 4, 3, 1], [0, 5, 5, 5, 4, 4, 2], [0, 5, 5, 5, 5, 4, 3],
-  [0, 5, 5, 5, 5, 5, 4], [0, 5, 5, 5, 5, 5, 5]
+  [0, 1],
+  [0, 2],
+  [0, 3],
+  [0, 3, 1],
+  [0, 4, 2],
+  [0, 4, 3],
+  [0, 4, 3, 1],
+  [0, 4, 4, 2],
+  [0, 5, 4, 3],
+  [0, 5, 4, 3, 1],
+  [0, 5, 4, 4, 2],
+  [0, 5, 5, 4, 3],
+  [0, 5, 5, 4, 3, 1],
+  [0, 5, 5, 4, 4, 2],
+  [0, 5, 5, 5, 4, 3],
+  [0, 5, 5, 5, 4, 3, 1],
+  [0, 5, 5, 5, 4, 4, 2],
+  [0, 5, 5, 5, 5, 4, 3],
+  [0, 5, 5, 5, 5, 5, 4],
+  [0, 5, 5, 5, 5, 5, 5],
 ];
 const HALF_SLOTS = [
-  [0], [0], [0], [0, 1], [0, 1], [0, 1],
-  [0, 1, 0], [0, 1, 1], [0, 2, 1], [0, 2, 1, 0],
-  [0, 2, 1, 1], [0, 2, 2, 1], [0, 3, 2, 1, 0], [0, 3, 2, 1, 1],
-  [0, 3, 2, 2, 1], [0, 3, 3, 2, 1], [0, 4, 3, 2, 1], [0, 4, 3, 2, 2],
-  [0, 4, 3, 3, 2], [0, 4, 4, 3, 3]
+  [0],
+  [0],
+  [0],
+  [0, 1],
+  [0, 1],
+  [0, 1],
+  [0, 1, 0],
+  [0, 1, 1],
+  [0, 2, 1],
+  [0, 2, 1, 0],
+  [0, 2, 1, 1],
+  [0, 2, 2, 1],
+  [0, 3, 2, 1, 0],
+  [0, 3, 2, 1, 1],
+  [0, 3, 2, 2, 1],
+  [0, 3, 3, 2, 1],
+  [0, 4, 3, 2, 1],
+  [0, 4, 3, 2, 2],
+  [0, 4, 3, 3, 2],
+  [0, 4, 4, 3, 3],
 ];
 
-function el(id) { return document.getElementById(id); }
+function el(id) {
+  return document.getElementById(id);
+}
 
 function escapeHtml(value) {
   return String(value ?? "")
@@ -79,8 +123,13 @@ function normalizeLevel(level, index) {
     fort: Number(level?.fort || 0),
     ref: Number(level?.ref || level?.reflex || 0),
     will: Number(level?.will || 0),
-    classFeatures: Array.isArray(level?.classFeatures) ? level.classFeatures : [],
-    spellcasting: level?.spellcasting && typeof level.spellcasting === "object" ? level.spellcasting : {}
+    classFeatures: Array.isArray(level?.classFeatures)
+      ? level.classFeatures
+      : [],
+    spellcasting:
+      level?.spellcasting && typeof level.spellcasting === "object"
+        ? level.spellcasting
+        : {},
   };
 }
 
@@ -95,19 +144,33 @@ function classGroupRank(entry) {
 
 function normalizeClass(entry) {
   const next = { ...entry };
-  next.levelProgression = Array.from({ length: 20 }, (_, index) => normalizeLevel(next.levelProgression?.[index], index));
-  next.spellcastingClass = Boolean(next.spellcastingClass || next.spellcasting || next.levelProgression.some(level => Object.keys(level.spellcasting || {}).length));
-  if (next.spellcastingClass && (!next.spellcasting || typeof next.spellcasting !== "object")) next.spellcasting = {};
+  next.levelProgression = Array.from({ length: 20 }, (_, index) =>
+    normalizeLevel(next.levelProgression?.[index], index),
+  );
+  next.spellcastingClass = Boolean(
+    next.spellcastingClass ||
+      next.spellcasting ||
+      next.levelProgression.some(
+        (level) => Object.keys(level.spellcasting || {}).length,
+      ),
+  );
+  if (
+    next.spellcastingClass &&
+    (!next.spellcasting || typeof next.spellcasting !== "object")
+  )
+    next.spellcasting = {};
   return next;
 }
 
 function slugifyClassName(name, index = 0) {
-  return String(name || `class-${index + 1}`)
-    .normalize("NFKD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "") || `class-${index + 1}`;
+  return (
+    String(name || `class-${index + 1}`)
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "") || `class-${index + 1}`
+  );
 }
 
 function ensureClassFiles(list) {
@@ -133,7 +196,7 @@ function classIndexEntry(entry) {
     category: entry.category || entry.type || "base",
     sourceUrl: entry.sourceUrl || "",
     spellcastingClass: Boolean(entry.spellcastingClass),
-    file: entry.__classFile || `${slugifyClassName(entry.name)}.json`
+    file: entry.__classFile || `${slugifyClassName(entry.name)}.json`,
   };
 }
 
@@ -144,7 +207,12 @@ function classFilePayload(entry) {
 }
 
 function selectOptions(values, selected = "") {
-  return values.map(value => `<option value="${escapeHtml(value)}" ${String(selected || "") === value ? "selected" : ""}>${escapeHtml(value || "None")}</option>`).join("");
+  return values
+    .map(
+      (value) =>
+        `<option value="${escapeHtml(value)}" ${String(selected || "") === value ? "selected" : ""}>${escapeHtml(value || "None")}</option>`,
+    )
+    .join("");
 }
 
 function prettyJson(value) {
@@ -162,7 +230,10 @@ function parseJsonTextarea(id, fallback = null) {
   try {
     return JSON.parse(raw);
   } catch {
-    setStatus(`${id} must contain valid JSON. Keeping previous value.`, "warning");
+    setStatus(
+      `${id} must contain valid JSON. Keeping previous value.`,
+      "warning",
+    );
     return fallback;
   }
 }
@@ -180,7 +251,9 @@ function normalizedSpellTableRows(rows, maxSpellLevel = 9) {
   const max = Math.max(0, Math.min(9, Number(maxSpellLevel || 0)));
   return Array.from({ length: 20 }, (_, levelIndex) => {
     const source = Array.isArray(rows?.[levelIndex]) ? rows[levelIndex] : [];
-    return Array.from({ length: max + 1 }, (_, spellLevel) => Number(source[spellLevel] || 0));
+    return Array.from({ length: max + 1 }, (_, spellLevel) =>
+      Number(source[spellLevel] || 0),
+    );
   });
 }
 
@@ -191,25 +264,42 @@ function baseSlotRowsForProgression(progression, castingType, maxSpellLevel) {
   if (progression === "1/2") source = HALF_SLOTS;
   const rows = normalizedSpellTableRows(source, max);
   if (castingType !== "spontaneous") return rows;
-  return rows.map(row => row.map((value, spellLevel) => spellLevel === 0 ? value : value + (value > 0 ? 2 : 0)));
+  return rows.map((row) =>
+    row.map((value, spellLevel) =>
+      spellLevel === 0 ? value : value + (value > 0 ? 2 : 0),
+    ),
+  );
 }
 
 function spontaneousKnownRows(slotRows, maxSpellLevel) {
   const rows = normalizedSpellTableRows(slotRows, maxSpellLevel);
-  return rows.map((row, classLevelIndex) => row.map((slots, spellLevel) => {
-    if (spellLevel === 0) return Math.min(9, Math.max(4, 4 + Math.floor(classLevelIndex / 2)));
-    if (!slots) return 0;
-    return Math.max(1, Math.min(6, slots - 1));
-  }));
+  return rows.map((row, classLevelIndex) =>
+    row.map((slots, spellLevel) => {
+      if (spellLevel === 0)
+        return Math.min(9, Math.max(4, 4 + Math.floor(classLevelIndex / 2)));
+      if (!slots) return 0;
+      return Math.max(1, Math.min(6, slots - 1));
+    }),
+  );
 }
 
 function spellTableHasZeroLevel(rows) {
-  return normalizedSpellTableRows(rows, 0).some(row => Number(row[0] || 0) > 0);
+  return normalizedSpellTableRows(rows, 0).some(
+    (row) => Number(row[0] || 0) > 0,
+  );
 }
 
-function renderSpellcastingTable(id, label, rows, maxSpellLevel = 9, { includeZero = true } = {}) {
+function renderSpellcastingTable(
+  id,
+  label,
+  rows,
+  maxSpellLevel = 9,
+  { includeZero = true } = {},
+) {
   const max = Math.max(0, Math.min(9, Number(maxSpellLevel || 0)));
-  const levels = Array.from({ length: max + 1 }, (_, level) => level).filter(level => includeZero || level > 0);
+  const levels = Array.from({ length: max + 1 }, (_, level) => level).filter(
+    (level) => includeZero || level > 0,
+  );
   const normalized = normalizedSpellTableRows(rows, max);
   return `
     <div>
@@ -219,20 +309,28 @@ function renderSpellcastingTable(id, label, rows, maxSpellLevel = 9, { includeZe
           <thead>
             <tr>
               <th>Level</th>
-              ${levels.map(level => `<th>${escapeHtml(ordinalSpellLevel(level))}</th>`).join("")}
+              ${levels.map((level) => `<th>${escapeHtml(ordinalSpellLevel(level))}</th>`).join("")}
             </tr>
           </thead>
           <tbody>
-            ${normalized.map((row, levelIndex) => `
+            ${normalized
+              .map(
+                (row, levelIndex) => `
               <tr>
                 <td class="spell-level-cell">${levelIndex + 1}</td>
-                ${levels.map(spellLevel => `
+                ${levels
+                  .map(
+                    (spellLevel) => `
                   <td>
                     <input class="form-control form-control-sm" inputmode="numeric" data-spell-row="${levelIndex}" data-spell-col="${spellLevel}" value="${Number(row[spellLevel] || 0) || ""}" aria-label="${escapeHtml(label)} level ${levelIndex + 1} spell ${ordinalSpellLevel(spellLevel)}">
                   </td>
-                `).join("")}
+                `,
+                  )
+                  .join("")}
               </tr>
-            `).join("")}
+            `,
+              )
+              .join("")}
           </tbody>
         </table>
       </div>
@@ -241,31 +339,48 @@ function renderSpellcastingTable(id, label, rows, maxSpellLevel = 9, { includeZe
 }
 
 function collectSpellcastingTable(id, maxSpellLevel = 9) {
-  const table = [...document.querySelectorAll("[data-spell-table]")].find(candidate => candidate.dataset.spellTable === id);
+  const table = [...document.querySelectorAll("[data-spell-table]")].find(
+    (candidate) => candidate.dataset.spellTable === id,
+  );
   if (!table) return null;
   const max = Math.max(0, Math.min(9, Number(maxSpellLevel || 0)));
   const rows = normalizedSpellTableRows([], max);
-  table.querySelectorAll("[data-spell-row][data-spell-col]").forEach(input => {
-    const row = Number(input.dataset.spellRow || 0);
-    const col = Number(input.dataset.spellCol || 0);
-    rows[row][col] = Number(input.value || 0);
-  });
+  table
+    .querySelectorAll("[data-spell-row][data-spell-col]")
+    .forEach((input) => {
+      const row = Number(input.dataset.spellRow || 0);
+      const col = Number(input.dataset.spellCol || 0);
+      rows[row][col] = Number(input.value || 0);
+    });
   return rows;
 }
 
 function spellcastingTableIsEmpty(rows) {
-  return !Array.isArray(rows) || rows.every(row => !Array.isArray(row) || row.every(value => !Number(value || 0)));
+  return (
+    !Array.isArray(rows) ||
+    rows.every(
+      (row) => !Array.isArray(row) || row.every((value) => !Number(value || 0)),
+    )
+  );
 }
 
 function regenerateSpellcastingTablesFromControls() {
   const cls = classes[selectedIndex];
   if (!cls || !el("castingProgression")) return;
   commitSelectedClass();
-  if (!cls.spellcasting || typeof cls.spellcasting !== "object") cls.spellcasting = {};
+  if (!cls.spellcasting || typeof cls.spellcasting !== "object")
+    cls.spellcasting = {};
   const maxSpellLevel = Number(cls.spellcasting.maxSpellLevel || 0);
-  cls.spellcasting.slotsByLevel = baseSlotRowsForProgression(cls.spellcasting.progression || "full", cls.spellcasting.castingType || "prepared", maxSpellLevel);
+  cls.spellcasting.slotsByLevel = baseSlotRowsForProgression(
+    cls.spellcasting.progression || "full",
+    cls.spellcasting.castingType || "prepared",
+    maxSpellLevel,
+  );
   if (cls.spellcasting.castingType === "spontaneous") {
-    cls.spellcasting.knownByLevel = spontaneousKnownRows(cls.spellcasting.slotsByLevel, maxSpellLevel);
+    cls.spellcasting.knownByLevel = spontaneousKnownRows(
+      cls.spellcasting.slotsByLevel,
+      maxSpellLevel,
+    );
   } else {
     delete cls.spellcasting.knownByLevel;
   }
@@ -280,7 +395,10 @@ async function loadDefaultClasses() {
   setDirty(false);
   renderClassList();
   renderSelectedClass();
-  setStatus("Loaded split class data from data/classes. Use Open Project Folder to save directly into this project.", "info");
+  setStatus(
+    "Loaded split class data from data/classes. Use Open Project Folder to save directly into this project.",
+    "info",
+  );
 }
 
 async function readClassesFromProjectDirectory(handle) {
@@ -288,25 +406,35 @@ async function readClassesFromProjectDirectory(handle) {
   classDirectoryHandle = await dataDirectory.getDirectoryHandle("classes");
   const indexHandle = await classDirectoryHandle.getFileHandle("index.json");
   const index = JSON.parse(await (await indexHandle.getFile()).text());
-  classes = await Promise.all((Array.isArray(index) ? index : []).map(async entry => {
-    const classHandle = await classDirectoryHandle.getFileHandle(entry.file);
-    const cls = JSON.parse(await (await classHandle.getFile()).text());
-    return normalizeClass({ ...cls, __classFile: entry.file });
-  }));
+  classes = await Promise.all(
+    (Array.isArray(index) ? index : []).map(async (entry) => {
+      const classHandle = await classDirectoryHandle.getFileHandle(entry.file);
+      const cls = JSON.parse(await (await classHandle.getFile()).text());
+      return normalizeClass({ ...cls, __classFile: entry.file });
+    }),
+  );
   ensureClassFiles(classes);
   selectedIndex = classes.length ? 0 : -1;
   setDirty(false);
   renderClassList();
   renderSelectedClass();
-  setStatus("Opened split class data from the selected project folder.", "success");
+  setStatus(
+    "Opened split class data from the selected project folder.",
+    "success",
+  );
 }
 
 async function openProjectFolder() {
   if (!window.showDirectoryPicker) {
-    setStatus("This browser cannot write directly to project folders.", "warning");
+    setStatus(
+      "This browser cannot write directly to project folders.",
+      "warning",
+    );
     return;
   }
-  projectDirectoryHandle = await window.showDirectoryPicker({ mode: "readwrite" });
+  projectDirectoryHandle = await window.showDirectoryPicker({
+    mode: "readwrite",
+  });
   await readClassesFromProjectDirectory(projectDirectoryHandle);
 }
 
@@ -314,24 +442,41 @@ async function saveClassesFile() {
   commitSelectedClass();
   ensureClassFiles(classes);
   if (!classDirectoryHandle && projectDirectoryHandle) {
-    const dataDirectory = await projectDirectoryHandle.getDirectoryHandle("data");
-    classDirectoryHandle = await dataDirectory.getDirectoryHandle("classes", { create: true });
+    const dataDirectory =
+      await projectDirectoryHandle.getDirectoryHandle("data");
+    classDirectoryHandle = await dataDirectory.getDirectoryHandle("classes", {
+      create: true,
+    });
   }
   if (!classDirectoryHandle && window.showDirectoryPicker) {
-    projectDirectoryHandle = await window.showDirectoryPicker({ mode: "readwrite" });
-    const dataDirectory = await projectDirectoryHandle.getDirectoryHandle("data");
-    classDirectoryHandle = await dataDirectory.getDirectoryHandle("classes", { create: true });
+    projectDirectoryHandle = await window.showDirectoryPicker({
+      mode: "readwrite",
+    });
+    const dataDirectory =
+      await projectDirectoryHandle.getDirectoryHandle("data");
+    classDirectoryHandle = await dataDirectory.getDirectoryHandle("classes", {
+      create: true,
+    });
   }
   if (classDirectoryHandle) {
-    const indexHandle = await classDirectoryHandle.getFileHandle("index.json", { create: true });
+    const indexHandle = await classDirectoryHandle.getFileHandle("index.json", {
+      create: true,
+    });
     const indexWritable = await indexHandle.createWritable();
-    await indexWritable.write(`${JSON.stringify(classes.map(classIndexEntry), null, 2)}\n`);
+    await indexWritable.write(
+      `${JSON.stringify(classes.map(classIndexEntry), null, 2)}\n`,
+    );
     await indexWritable.close();
 
     for (const cls of classes) {
-      const classHandle = await classDirectoryHandle.getFileHandle(cls.__classFile, { create: true });
+      const classHandle = await classDirectoryHandle.getFileHandle(
+        cls.__classFile,
+        { create: true },
+      );
       const writable = await classHandle.createWritable();
-      await writable.write(`${JSON.stringify(classFilePayload(cls), null, 2)}\n`);
+      await writable.write(
+        `${JSON.stringify(classFilePayload(cls), null, 2)}\n`,
+      );
       await writable.close();
     }
     setDirty(false);
@@ -340,9 +485,11 @@ async function saveClassesFile() {
   }
   const exportData = {
     index: classes.map(classIndexEntry),
-    classes: classes.map(classFilePayload)
+    classes: classes.map(classFilePayload),
   };
-  const blob = new Blob([`${JSON.stringify(exportData, null, 2)}\n`], { type: "application/json" });
+  const blob = new Blob([`${JSON.stringify(exportData, null, 2)}\n`], {
+    type: "application/json",
+  });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
@@ -350,58 +497,88 @@ async function saveClassesFile() {
   link.click();
   URL.revokeObjectURL(url);
   setDirty(false);
-  setStatus("Downloaded a split-class export because direct project saving is unavailable.", "warning");
+  setStatus(
+    "Downloaded a split-class export because direct project saving is unavailable.",
+    "warning",
+  );
 }
 
 function filteredClassIndexes() {
   const term = searchTerm.trim().toLowerCase();
   return classes
     .map((entry, index) => ({ entry, index }))
-    .filter(({ entry }) => !term || String(entry.name || "").toLowerCase().includes(term))
-    .sort((a, b) => classGroupRank(a.entry) - classGroupRank(b.entry) || String(a.entry.name || "").localeCompare(String(b.entry.name || "")))
-    .map(item => item.index);
+    .filter(
+      ({ entry }) =>
+        !term ||
+        String(entry.name || "")
+          .toLowerCase()
+          .includes(term),
+    )
+    .sort(
+      (a, b) =>
+        classGroupRank(a.entry) - classGroupRank(b.entry) ||
+        String(a.entry.name || "").localeCompare(String(b.entry.name || "")),
+    )
+    .map((item) => item.index);
 }
 
 function renderClassList() {
   const indexes = filteredClassIndexes();
-  el("classCount").innerHTML = `${classes.length} classes${dirty ? ' <span class="dirty-dot" title="Unsaved changes"></span>' : ""}`;
-  el("classList").innerHTML = indexes.map(index => {
-    const entry = classes[index];
-    const group = CLASS_GROUPS.find(([type]) => type === classTypeOf(entry))?.[1] || entry.type || "class";
-    return `
+  el("classCount").innerHTML =
+    `${classes.length} classes${dirty ? ' <span class="dirty-dot" title="Unsaved changes"></span>' : ""}`;
+  el("classList").innerHTML =
+    indexes
+      .map((index) => {
+        const entry = classes[index];
+        const group =
+          CLASS_GROUPS.find(([type]) => type === classTypeOf(entry))?.[1] ||
+          entry.type ||
+          "class";
+        return `
       <button class="btn ${index === selectedIndex ? "btn-primary" : "btn-outline-light"} btn-sm" type="button" data-class-index="${index}">
         <span>${escapeHtml(entry.name || "Unnamed Class")}</span>
         <span class="class-type">${escapeHtml(group)}</span>
       </button>
     `;
-  }).join("") || `<div class="small-text">No matching classes.</div>`;
-  el("classList").querySelectorAll("[data-class-index]").forEach(button => {
-    button.addEventListener("click", () => {
-      commitSelectedClass();
-      selectedIndex = Number(button.dataset.classIndex);
-      renderClassList();
-      renderSelectedClass();
+      })
+      .join("") || `<div class="small-text">No matching classes.</div>`;
+  el("classList")
+    .querySelectorAll("[data-class-index]")
+    .forEach((button) => {
+      button.addEventListener("click", () => {
+        commitSelectedClass();
+        selectedIndex = Number(button.dataset.classIndex);
+        renderClassList();
+        renderSelectedClass();
+      });
     });
-  });
 }
 
 function levelFeatureSummary(feature) {
   const effects = Array.isArray(feature.effects) ? feature.effects : [];
   return effects.length
-    ? `<div class="feature-effects">${effects.map(effect => `<span>${escapeHtml(effect.stat || "effect")} ${Number(effect.value || 0) >= 0 ? "+" : ""}${escapeHtml(effect.value ?? 0)} ${escapeHtml(effect.type || "untyped")}</span>`).join("")}</div>`
+    ? `<div class="feature-effects">${effects.map((effect) => `<span>${escapeHtml(effect.stat || "effect")} ${Number(effect.value || 0) >= 0 ? "+" : ""}${escapeHtml(effect.value ?? 0)} ${escapeHtml(effect.type || "untyped")}</span>`).join("")}</div>`
     : "";
 }
 
 function levelFeaturePools(feature, levelIndex, featureIndex) {
-  const pools = Array.isArray(feature.pools) ? feature.pools : Array.isArray(feature.choicePools) ? feature.choicePools : [];
+  const pools = Array.isArray(feature.pools)
+    ? feature.pools
+    : Array.isArray(feature.choicePools)
+      ? feature.choicePools
+      : [];
   if (!pools.length) return "";
   return `
     <div class="feature-pools">
-      ${pools.map((pool, poolIndex) => `
+      ${pools
+        .map(
+          (pool, poolIndex) => `
         <button class="btn btn-link p-0 text-decoration-none feature-pool-pill" type="button" data-level-index="${levelIndex}" data-feature-index="${featureIndex}" data-pool-index="${poolIndex}" data-edit-pool>
           <i class="bi bi-list-stars"></i> ${escapeHtml(pool.name || "Pool")} choices (${Array.isArray(pool.options) ? pool.options.length : 0})
         </button>
-      `).join("")}
+      `,
+        )
+        .join("")}
     </div>
   `;
 }
@@ -409,7 +586,8 @@ function levelFeaturePools(feature, levelIndex, featureIndex) {
 function renderSelectedClass() {
   const cls = classes[selectedIndex];
   if (!cls) {
-    el("classEditorPanel").innerHTML = `<div class="small-text">Choose a class to edit.</div>`;
+    el("classEditorPanel").innerHTML =
+      `<div class="small-text">Choose a class to edit.</div>`;
     return;
   }
 
@@ -476,7 +654,11 @@ function renderSelectedClass() {
             "Spells Per Day",
             cls.spellcasting?.slotsByLevel,
             cls.spellcasting?.maxSpellLevel ?? 9,
-            { includeZero: spellTableHasZeroLevel(cls.spellcasting?.slotsByLevel) }
+            {
+              includeZero: spellTableHasZeroLevel(
+                cls.spellcasting?.slotsByLevel,
+              ),
+            },
           )}
         </div>
         <div class="col-xl-4">
@@ -485,7 +667,7 @@ function renderSelectedClass() {
             "Spells Prepared",
             cls.spellcasting?.preparedByLevel,
             cls.spellcasting?.maxSpellLevel ?? 9,
-            { includeZero: true }
+            { includeZero: true },
           )}
         </div>
         <div class="col-xl-4">
@@ -494,7 +676,7 @@ function renderSelectedClass() {
             "Spells Known",
             cls.spellcasting?.knownByLevel,
             cls.spellcasting?.maxSpellLevel ?? 9,
-            { includeZero: true }
+            { includeZero: true },
           )}
         </div>
       </div>
@@ -505,32 +687,72 @@ function renderSelectedClass() {
     </div>
   `;
 
-  el("classEditorPanel").querySelectorAll("input, textarea, select").forEach(input => {
-    input.addEventListener("input", () => setDirty(true));
-    input.addEventListener("change", () => setDirty(true));
+  el("classEditorPanel")
+    .querySelectorAll("input, textarea, select")
+    .forEach((input) => {
+      input.addEventListener("input", () => setDirty(true));
+      input.addEventListener("change", () => setDirty(true));
+    });
+  ["castingProgression", "castingType", "maxSpellLevel"].forEach((id) => {
+    el(id)?.addEventListener(
+      "change",
+      regenerateSpellcastingTablesFromControls,
+    );
   });
-  ["castingProgression", "castingType", "maxSpellLevel"].forEach(id => {
-    el(id)?.addEventListener("change", regenerateSpellcastingTablesFromControls);
-  });
-  el("classEditorPanel").querySelectorAll("[data-add-feature]").forEach(button => {
-    button.addEventListener("click", () => addClassFeature(Number(button.dataset.addFeature)));
-  });
-  el("classEditorPanel").querySelectorAll("[data-edit-feature]").forEach(button => {
-    button.addEventListener("click", () => editClassFeature(Number(button.dataset.levelIndex), Number(button.dataset.featureIndex)));
-  });
-  el("classEditorPanel").querySelectorAll("[data-delete-feature]").forEach(button => {
-    button.addEventListener("click", () => deleteClassFeature(Number(button.dataset.levelIndex), Number(button.dataset.featureIndex)));
-  });
-  el("classEditorPanel").querySelectorAll("[data-add-pool]").forEach(button => {
-    button.addEventListener("click", () => addFeaturePool(Number(button.dataset.levelIndex), Number(button.dataset.featureIndex)));
-  });
-  el("classEditorPanel").querySelectorAll("[data-edit-pool]").forEach(button => {
-    button.addEventListener("click", () => editFeaturePool(Number(button.dataset.levelIndex), Number(button.dataset.featureIndex), Number(button.dataset.poolIndex)));
-  });
+  el("classEditorPanel")
+    .querySelectorAll("[data-add-feature]")
+    .forEach((button) => {
+      button.addEventListener("click", () =>
+        addClassFeature(Number(button.dataset.addFeature)),
+      );
+    });
+  el("classEditorPanel")
+    .querySelectorAll("[data-edit-feature]")
+    .forEach((button) => {
+      button.addEventListener("click", () =>
+        editClassFeature(
+          Number(button.dataset.levelIndex),
+          Number(button.dataset.featureIndex),
+        ),
+      );
+    });
+  el("classEditorPanel")
+    .querySelectorAll("[data-delete-feature]")
+    .forEach((button) => {
+      button.addEventListener("click", () =>
+        deleteClassFeature(
+          Number(button.dataset.levelIndex),
+          Number(button.dataset.featureIndex),
+        ),
+      );
+    });
+  el("classEditorPanel")
+    .querySelectorAll("[data-add-pool]")
+    .forEach((button) => {
+      button.addEventListener("click", () =>
+        addFeaturePool(
+          Number(button.dataset.levelIndex),
+          Number(button.dataset.featureIndex),
+        ),
+      );
+    });
+  el("classEditorPanel")
+    .querySelectorAll("[data-edit-pool]")
+    .forEach((button) => {
+      button.addEventListener("click", () =>
+        editFeaturePool(
+          Number(button.dataset.levelIndex),
+          Number(button.dataset.featureIndex),
+          Number(button.dataset.poolIndex),
+        ),
+      );
+    });
 }
 
 function renderLevelCard(level, index) {
-  const features = Array.isArray(level.classFeatures) ? level.classFeatures : [];
+  const features = Array.isArray(level.classFeatures)
+    ? level.classFeatures
+    : [];
   return `
     <article class="level-card" data-level-index="${index}">
       <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
@@ -546,7 +768,10 @@ function renderLevelCard(level, index) {
         <div><label>Will</label><input data-level-field="will" class="form-control form-control-sm" type="number" value="${escapeHtml(level.will)}"></div>
       </div>
       <div class="vstack gap-2">
-        ${features.map((feature, featureIndex) => `
+        ${
+          features
+            .map(
+              (feature, featureIndex) => `
           <div class="feature-row">
             <div>
               <strong>${escapeHtml(feature.name || "Class Feature")}</strong>
@@ -560,7 +785,11 @@ function renderLevelCard(level, index) {
               <button class="btn btn-outline-danger btn-sm btn-icon" type="button" data-level-index="${index}" data-feature-index="${featureIndex}" data-delete-feature aria-label="Delete feature"><i class="bi bi-trash"></i></button>
             </div>
           </div>
-        `).join("") || `<div class="small-text">No class features at this level.</div>`}
+        `,
+            )
+            .join("") ||
+          `<div class="small-text">No class features at this level.</div>`
+        }
       </div>
     </article>
   `;
@@ -573,55 +802,89 @@ function commitSelectedClass() {
   cls.type = el("classType").value || cls.type || "base";
   cls.sourceUrl = el("classSourceUrl").value.trim();
   cls.spellcastingClass = el("spellcastingClass").checked;
-  const existingSpellcasting = cls.spellcasting && typeof cls.spellcasting === "object" ? cls.spellcasting : {};
+  const existingSpellcasting =
+    cls.spellcasting && typeof cls.spellcasting === "object"
+      ? cls.spellcasting
+      : {};
   if (cls.spellcastingClass) {
     cls.spellcasting = {
       ...existingSpellcasting,
-      summary: existingSpellcasting.summary || "Structured spellcasting data available.",
+      summary:
+        existingSpellcasting.summary ||
+        "Structured spellcasting data available.",
       castingType: el("castingType").value,
       progression: el("castingProgression").value,
       ability: el("castingAbility").value,
       preparation: el("preparationType").value,
-      maxSpellLevel: Number(el("maxSpellLevel").value || existingSpellcasting.maxSpellLevel || 0),
-      slotsByLevel: collectSpellcastingTable("slotsByLevel", el("maxSpellLevel").value || existingSpellcasting.maxSpellLevel || 0),
-      preparedByLevel: collectSpellcastingTable("preparedByLevel", el("maxSpellLevel").value || existingSpellcasting.maxSpellLevel || 0),
-      knownByLevel: collectSpellcastingTable("knownByLevel", el("maxSpellLevel").value || existingSpellcasting.maxSpellLevel || 0)
+      maxSpellLevel: Number(
+        el("maxSpellLevel").value || existingSpellcasting.maxSpellLevel || 0,
+      ),
+      slotsByLevel: collectSpellcastingTable(
+        "slotsByLevel",
+        el("maxSpellLevel").value || existingSpellcasting.maxSpellLevel || 0,
+      ),
+      preparedByLevel: collectSpellcastingTable(
+        "preparedByLevel",
+        el("maxSpellLevel").value || existingSpellcasting.maxSpellLevel || 0,
+      ),
+      knownByLevel: collectSpellcastingTable(
+        "knownByLevel",
+        el("maxSpellLevel").value || existingSpellcasting.maxSpellLevel || 0,
+      ),
     };
-    Object.keys(cls.spellcasting).forEach(key => {
+    Object.keys(cls.spellcasting).forEach((key) => {
       if (
         cls.spellcasting[key] === "" ||
         cls.spellcasting[key] === null ||
-        (Array.isArray(cls.spellcasting[key]) && (!cls.spellcasting[key].length || spellcastingTableIsEmpty(cls.spellcasting[key])))
-      ) delete cls.spellcasting[key];
+        (Array.isArray(cls.spellcasting[key]) &&
+          (!cls.spellcasting[key].length ||
+            spellcastingTableIsEmpty(cls.spellcasting[key])))
+      )
+        delete cls.spellcasting[key];
     });
   } else {
     cls.spellcasting = null;
   }
-  el("classEditorPanel").querySelectorAll(".level-card[data-level-index]").forEach(card => {
-    const index = Number(card.dataset.levelIndex);
-    const level = cls.levelProgression[index];
-    level.level = index + 1;
-    level.bab = Number(card.querySelector('[data-level-field="bab"]').value || 0);
-    level.fort = Number(card.querySelector('[data-level-field="fort"]').value || 0);
-    level.ref = Number(card.querySelector('[data-level-field="ref"]').value || 0);
-    level.will = Number(card.querySelector('[data-level-field="will"]').value || 0);
-    delete level.spellcasting;
-  });
+  el("classEditorPanel")
+    .querySelectorAll(".level-card[data-level-index]")
+    .forEach((card) => {
+      const index = Number(card.dataset.levelIndex);
+      const level = cls.levelProgression[index];
+      level.level = index + 1;
+      level.bab = Number(
+        card.querySelector('[data-level-field="bab"]').value || 0,
+      );
+      level.fort = Number(
+        card.querySelector('[data-level-field="fort"]').value || 0,
+      );
+      level.ref = Number(
+        card.querySelector('[data-level-field="ref"]').value || 0,
+      );
+      level.will = Number(
+        card.querySelector('[data-level-field="will"]').value || 0,
+      );
+      delete level.spellcasting;
+    });
 }
 
 async function addClassFeature(levelIndex) {
   commitSelectedClass();
   const feature = await PFClassFeatureEditor.open({});
   if (!feature) return;
-  classes[selectedIndex].levelProgression[levelIndex].classFeatures.push(feature);
+  classes[selectedIndex].levelProgression[levelIndex].classFeatures.push(
+    feature,
+  );
   setDirty(true);
   renderSelectedClass();
 }
 
 async function editClassFeature(levelIndex, featureIndex) {
   commitSelectedClass();
-  const features = classes[selectedIndex].levelProgression[levelIndex].classFeatures;
-  const feature = await PFClassFeatureEditor.open(cloneJson(features[featureIndex]));
+  const features =
+    classes[selectedIndex].levelProgression[levelIndex].classFeatures;
+  const feature = await PFClassFeatureEditor.open(
+    cloneJson(features[featureIndex]),
+  );
   if (!feature) return;
   features[featureIndex] = feature;
   setDirty(true);
@@ -631,20 +894,29 @@ async function editClassFeature(levelIndex, featureIndex) {
 function deleteClassFeature(levelIndex, featureIndex) {
   if (!confirm("Delete this class feature?")) return;
   commitSelectedClass();
-  classes[selectedIndex].levelProgression[levelIndex].classFeatures.splice(featureIndex, 1);
+  classes[selectedIndex].levelProgression[levelIndex].classFeatures.splice(
+    featureIndex,
+    1,
+  );
   setDirty(true);
   renderSelectedClass();
 }
 
 function featurePools(feature) {
-  if (!Array.isArray(feature.pools)) feature.pools = Array.isArray(feature.choicePools) ? feature.choicePools : [];
+  if (!Array.isArray(feature.pools))
+    feature.pools = Array.isArray(feature.choicePools)
+      ? feature.choicePools
+      : [];
   delete feature.choicePools;
   return feature.pools;
 }
 
 async function addFeaturePool(levelIndex, featureIndex) {
   commitSelectedClass();
-  const feature = classes[selectedIndex].levelProgression[levelIndex].classFeatures[featureIndex];
+  const feature =
+    classes[selectedIndex].levelProgression[levelIndex].classFeatures[
+      featureIndex
+    ];
   const pool = await PFClassFeaturePoolEditor.open({});
   if (!pool) return;
   featurePools(feature).push(pool);
@@ -654,9 +926,14 @@ async function addFeaturePool(levelIndex, featureIndex) {
 
 async function editFeaturePool(levelIndex, featureIndex, poolIndex) {
   commitSelectedClass();
-  const feature = classes[selectedIndex].levelProgression[levelIndex].classFeatures[featureIndex];
+  const feature =
+    classes[selectedIndex].levelProgression[levelIndex].classFeatures[
+      featureIndex
+    ];
   const pools = featurePools(feature);
-  const pool = await PFClassFeaturePoolEditor.open(cloneJson(pools[poolIndex] || {}));
+  const pool = await PFClassFeaturePoolEditor.open(
+    cloneJson(pools[poolIndex] || {}),
+  );
   if (!pool) return;
   pools[poolIndex] = pool;
   setDirty(true);
@@ -668,13 +945,14 @@ async function initClassEditor() {
   if (!user) return;
   const admin = await PFApp.isAppAdmin();
   if (!admin) {
-    document.querySelector("main").innerHTML = `<div class="alert alert-warning">Only app admins can access this tool.</div>`;
+    document.querySelector("main").innerHTML =
+      `<div class="alert alert-warning">Only app admins can access this tool.</div>`;
     return;
   }
   await loadDefaultClasses();
 }
 
-el("classSearch").addEventListener("input", event => {
+el("classSearch").addEventListener("input", (event) => {
   searchTerm = event.target.value;
   renderClassList();
 });
@@ -692,7 +970,7 @@ el("saveClassesFileBtn").addEventListener("click", async () => {
     setStatus(error.message || "Could not save split class data.", "danger");
   }
 });
-window.addEventListener("beforeunload", event => {
+window.addEventListener("beforeunload", (event) => {
   if (!dirty) return;
   event.preventDefault();
   event.returnValue = "";

@@ -1,42 +1,93 @@
 const { loadClasses, saveClasses } = require("./class-file-store");
 
 const FULL_PREPARED = [
-  [3, 1], [4, 2], [4, 2, 1], [4, 3, 2], [4, 3, 2, 1],
-  [4, 3, 3, 2], [4, 4, 3, 2, 1], [4, 4, 3, 3, 2], [4, 4, 4, 3, 2, 1],
-  [4, 4, 4, 3, 3, 2], [4, 4, 4, 4, 3, 2, 1], [4, 4, 4, 4, 3, 3, 2],
-  [4, 4, 4, 4, 4, 3, 2, 1], [4, 4, 4, 4, 4, 3, 3, 2],
-  [4, 4, 4, 4, 4, 4, 3, 2, 1], [4, 4, 4, 4, 4, 4, 3, 3, 2],
-  [4, 4, 4, 4, 4, 4, 4, 3, 2, 1], [4, 4, 4, 4, 4, 4, 4, 3, 3, 2],
-  [4, 4, 4, 4, 4, 4, 4, 4, 3, 3], [4, 4, 4, 4, 4, 4, 4, 4, 4, 4]
+  [3, 1],
+  [4, 2],
+  [4, 2, 1],
+  [4, 3, 2],
+  [4, 3, 2, 1],
+  [4, 3, 3, 2],
+  [4, 4, 3, 2, 1],
+  [4, 4, 3, 3, 2],
+  [4, 4, 4, 3, 2, 1],
+  [4, 4, 4, 3, 3, 2],
+  [4, 4, 4, 4, 3, 2, 1],
+  [4, 4, 4, 4, 3, 3, 2],
+  [4, 4, 4, 4, 4, 3, 2, 1],
+  [4, 4, 4, 4, 4, 3, 3, 2],
+  [4, 4, 4, 4, 4, 4, 3, 2, 1],
+  [4, 4, 4, 4, 4, 4, 3, 3, 2],
+  [4, 4, 4, 4, 4, 4, 4, 3, 2, 1],
+  [4, 4, 4, 4, 4, 4, 4, 3, 3, 2],
+  [4, 4, 4, 4, 4, 4, 4, 4, 3, 3],
+  [4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
 ];
 
 const TWO_THIRDS = [
-  [0, 1], [0, 2], [0, 3], [0, 3, 1], [0, 4, 2],
-  [0, 4, 3], [0, 4, 3, 1], [0, 4, 4, 2], [0, 5, 4, 3],
-  [0, 5, 4, 3, 1], [0, 5, 4, 4, 2], [0, 5, 5, 4, 3],
-  [0, 5, 5, 4, 3, 1], [0, 5, 5, 4, 4, 2], [0, 5, 5, 5, 4, 3],
-  [0, 5, 5, 5, 4, 3, 1], [0, 5, 5, 5, 4, 4, 2], [0, 5, 5, 5, 5, 4, 3],
-  [0, 5, 5, 5, 5, 5, 4], [0, 5, 5, 5, 5, 5, 5]
+  [0, 1],
+  [0, 2],
+  [0, 3],
+  [0, 3, 1],
+  [0, 4, 2],
+  [0, 4, 3],
+  [0, 4, 3, 1],
+  [0, 4, 4, 2],
+  [0, 5, 4, 3],
+  [0, 5, 4, 3, 1],
+  [0, 5, 4, 4, 2],
+  [0, 5, 5, 4, 3],
+  [0, 5, 5, 4, 3, 1],
+  [0, 5, 5, 4, 4, 2],
+  [0, 5, 5, 5, 4, 3],
+  [0, 5, 5, 5, 4, 3, 1],
+  [0, 5, 5, 5, 4, 4, 2],
+  [0, 5, 5, 5, 5, 4, 3],
+  [0, 5, 5, 5, 5, 5, 4],
+  [0, 5, 5, 5, 5, 5, 5],
 ];
 
 const HALF = [
-  [0], [0], [0], [0, 1], [0, 1], [0, 1],
-  [0, 1, 0], [0, 1, 1], [0, 2, 1], [0, 2, 1, 0],
-  [0, 2, 1, 1], [0, 2, 2, 1], [0, 3, 2, 1, 0], [0, 3, 2, 1, 1],
-  [0, 3, 2, 2, 1], [0, 3, 3, 2, 1], [0, 4, 3, 2, 1], [0, 4, 3, 2, 2],
-  [0, 4, 3, 3, 2], [0, 4, 4, 3, 3]
+  [0],
+  [0],
+  [0],
+  [0, 1],
+  [0, 1],
+  [0, 1],
+  [0, 1, 0],
+  [0, 1, 1],
+  [0, 2, 1],
+  [0, 2, 1, 0],
+  [0, 2, 1, 1],
+  [0, 2, 2, 1],
+  [0, 3, 2, 1, 0],
+  [0, 3, 2, 1, 1],
+  [0, 3, 2, 2, 1],
+  [0, 3, 3, 2, 1],
+  [0, 4, 3, 2, 1],
+  [0, 4, 3, 2, 2],
+  [0, 4, 3, 3, 2],
+  [0, 4, 4, 3, 3],
 ];
 
 function trimRows(rows, maxSpellLevel) {
-  return rows.map(row => Array.from({ length: maxSpellLevel + 1 }, (_, index) => Number(row[index] || 0)));
+  return rows.map((row) =>
+    Array.from({ length: maxSpellLevel + 1 }, (_, index) =>
+      Number(row[index] || 0),
+    ),
+  );
 }
 
 function spontaneousKnown(rows, maxSpellLevel) {
-  return rows.map((row, classLevelIndex) => row.map((slots, spellLevel) => {
-    if (spellLevel === 0) return Math.min(9, Math.max(4, 4 + Math.floor(classLevelIndex / 2)));
-    if (!slots) return 0;
-    return Math.max(1, Math.min(6, slots - 1));
-  }).slice(0, maxSpellLevel + 1));
+  return rows.map((row, classLevelIndex) =>
+    row
+      .map((slots, spellLevel) => {
+        if (spellLevel === 0)
+          return Math.min(9, Math.max(4, 4 + Math.floor(classLevelIndex / 2)));
+        if (!slots) return 0;
+        return Math.max(1, Math.min(6, slots - 1));
+      })
+      .slice(0, maxSpellLevel + 1),
+  );
 }
 
 function baseSlots(progression, castingType, maxSpellLevel) {
@@ -45,7 +96,11 @@ function baseSlots(progression, castingType, maxSpellLevel) {
   if (progression === "1/2") rows = HALF;
   const trimmed = trimRows(rows, maxSpellLevel);
   if (castingType !== "spontaneous") return trimmed;
-  return trimmed.map(row => row.map((value, index) => index === 0 ? value : value + (value > 0 ? 2 : 0)));
+  return trimmed.map((row) =>
+    row.map((value, index) =>
+      index === 0 ? value : value + (value > 0 ? 2 : 0),
+    ),
+  );
 }
 
 const DEFAULTS = {
@@ -78,7 +133,7 @@ const DEFAULTS = {
   "Vampire Hunter": ["prepared", "1/2", "wis", "daily-list", 4],
   Warpriest: ["prepared", "2/3", "wis", "daily-list", 6],
   Witch: ["prepared", "full", "int", "spellbook", 9],
-  Wizard: ["prepared", "full", "int", "spellbook", 9]
+  Wizard: ["prepared", "full", "int", "spellbook", 9],
 };
 
 const classes = loadClasses();
@@ -86,11 +141,14 @@ let updated = 0;
 for (const cls of classes) {
   const config = DEFAULTS[cls.name];
   if (!config) continue;
-  const [castingType, progression, ability, preparation, maxSpellLevel] = config;
+  const [castingType, progression, ability, preparation, maxSpellLevel] =
+    config;
   const slotsByLevel = baseSlots(progression, castingType, maxSpellLevel);
   cls.spellcastingClass = true;
   cls.spellcasting = {
-    ...(cls.spellcasting && typeof cls.spellcasting === "object" ? cls.spellcasting : {}),
+    ...(cls.spellcasting && typeof cls.spellcasting === "object"
+      ? cls.spellcasting
+      : {}),
     summary: `${castingType} ${progression} caster using ${ability.toUpperCase()}`,
     castingType,
     progression,
@@ -98,7 +156,9 @@ for (const cls of classes) {
     preparation,
     maxSpellLevel,
     slotsByLevel,
-    ...(castingType === "spontaneous" ? { knownByLevel: spontaneousKnown(slotsByLevel, maxSpellLevel) } : {})
+    ...(castingType === "spontaneous"
+      ? { knownByLevel: spontaneousKnown(slotsByLevel, maxSpellLevel) }
+      : {}),
   };
   updated += 1;
 }

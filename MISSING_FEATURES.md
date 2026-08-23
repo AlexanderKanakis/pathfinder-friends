@@ -15,3 +15,4 @@ This file tracks larger Pathfinder 1e systems that still need design and impleme
 - Correct animal companion, familiar, and similar companion handling.
 - Multiple maps per campaign.
 - Fog of war for maps.
+- Figure out the most useful permissions for group resources handling and stat visibility.

@@ -1,7 +1,95 @@
 (function () {
-  const DEFAULT_SLOTS = ["", "Armor", "Shield", "Weapon", "Ring", "Rod", "Staff", "Headband", "Head", "Eyes", "Neck", "Shoulders", "Wrists", "Hands", "Feet", "Belt", "Chest", "Body", "Held", "None", "Special", "Other"];
-  const WEAPON_SPECIAL_MATERIALS = ["", "Abysium", "Adamantine", "Bone", "Bronze", "Cryptstone", "Blood Crystal", "Darkwood", "Druchite", "Dragonskin", "Elysian Bronze", "Gold", "Greenwood", "Horacalcum", "Inubrix", "Cold Iron", "Mindglass", "Mithral", "Noqual", "Obsidian", "Siccatite", "Alchemical Silver", "Silversheen", "Fire-Forged Steel", "Frost-Forged Steel", "Living Steel", "Singing Steel", "Stainless Steel", "Stone", "Sunsilver", "Spiresteel", "Viridium", "Voidglass", "Whipwood", "Wyroot"];
-  const ARMOR_SPECIAL_MATERIALS = ["", "Abysium", "Adamantine", "Angelskin", "Aszite", "Bone", "Bronze", "Darkleaf Cloth", "Darkwood", "Druchite", "Dragonhide", "Eel Hide", "Elysian Bronze", "Gold", "Griffon Mane", "Horacalcum", "Mithral", "Noqual", "Siccatite", "Fire-Forged Steel", "Frost-Forged Steel", "Living Steel", "Singing Steel", "Stainless Steel", "Sunsilk", "Sunsilver", "Spiresteel", "Voidglass"];
+  const DEFAULT_SLOTS = [
+    "",
+    "Armor",
+    "Shield",
+    "Weapon",
+    "Ring",
+    "Rod",
+    "Staff",
+    "Headband",
+    "Head",
+    "Eyes",
+    "Neck",
+    "Shoulders",
+    "Wrists",
+    "Hands",
+    "Feet",
+    "Belt",
+    "Chest",
+    "Body",
+    "Held",
+    "None",
+    "Special",
+    "Other",
+  ];
+  const WEAPON_SPECIAL_MATERIALS = [
+    "",
+    "Abysium",
+    "Adamantine",
+    "Bone",
+    "Bronze",
+    "Cryptstone",
+    "Blood Crystal",
+    "Darkwood",
+    "Druchite",
+    "Dragonskin",
+    "Elysian Bronze",
+    "Gold",
+    "Greenwood",
+    "Horacalcum",
+    "Inubrix",
+    "Cold Iron",
+    "Mindglass",
+    "Mithral",
+    "Noqual",
+    "Obsidian",
+    "Siccatite",
+    "Alchemical Silver",
+    "Silversheen",
+    "Fire-Forged Steel",
+    "Frost-Forged Steel",
+    "Living Steel",
+    "Singing Steel",
+    "Stainless Steel",
+    "Stone",
+    "Sunsilver",
+    "Spiresteel",
+    "Viridium",
+    "Voidglass",
+    "Whipwood",
+    "Wyroot",
+  ];
+  const ARMOR_SPECIAL_MATERIALS = [
+    "",
+    "Abysium",
+    "Adamantine",
+    "Angelskin",
+    "Aszite",
+    "Bone",
+    "Bronze",
+    "Darkleaf Cloth",
+    "Darkwood",
+    "Druchite",
+    "Dragonhide",
+    "Eel Hide",
+    "Elysian Bronze",
+    "Gold",
+    "Griffon Mane",
+    "Horacalcum",
+    "Mithral",
+    "Noqual",
+    "Siccatite",
+    "Fire-Forged Steel",
+    "Frost-Forged Steel",
+    "Living Steel",
+    "Singing Steel",
+    "Stainless Steel",
+    "Sunsilk",
+    "Sunsilver",
+    "Spiresteel",
+    "Voidglass",
+  ];
 
   function escapeHtml(value) {
     return String(value ?? "")
@@ -13,8 +101,15 @@
   }
 
   function optionList(options, selected = "", emptyLabel = "No slot") {
-    const entries = options.includes(selected) ? options : [...options, selected];
-    return entries.map(value => `<option value="${escapeHtml(value)}" ${value === selected ? "selected" : ""}>${value || emptyLabel}</option>`).join("");
+    const entries = options.includes(selected)
+      ? options
+      : [...options, selected];
+    return entries
+      .map(
+        (value) =>
+          `<option value="${escapeHtml(value)}" ${value === selected ? "selected" : ""}>${value || emptyLabel}</option>`,
+      )
+      .join("");
   }
 
   function autosize(textarea) {
@@ -24,10 +119,35 @@
     textarea.style.height = `${Math.max(textarea.scrollHeight, 120)}px`;
   }
 
+  function adjustNumberInput(input, delta) {
+    if (!input) return;
+    const current = Number(input.value || 0);
+    const min = input.min === "" ? -Infinity : Number(input.min);
+    const max = input.max === "" ? Infinity : Number(input.max);
+    const next = Math.min(max, Math.max(min, current + delta));
+    input.value = String(next);
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    input.dispatchEvent(new Event("change", { bubbles: true }));
+  }
+
+  function initSteppers() {
+    if (document.body.dataset.itemEditorSteppersBound === "true") return;
+    document.body.dataset.itemEditorSteppersBound = "true";
+    document.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-item-stepper-delta]");
+      if (!button) return;
+      const wrapper = button.closest("[data-item-stepper]");
+      const input = wrapper?.querySelector("input");
+      adjustNumberInput(input, Number(button.dataset.itemStepperDelta || 0));
+    });
+  }
+
   function syncSlotForType(config) {
     const type = document.getElementById(config.typeInputId)?.value || "Item";
     const slotField = document.getElementById(config.slotFieldId);
-    const automaticSlot = ["Weapon", "Armor", "Shield"].includes(type) ? type : "";
+    const automaticSlot = ["Weapon", "Armor", "Shield"].includes(type)
+      ? type
+      : "";
     slotField?.classList.toggle("d-none", type !== "Item");
     if (automaticSlot) setSlot(config, automaticSlot);
     else config.onSlotChange?.();
@@ -54,11 +174,17 @@
   }
 
   function initTabs(config) {
-    if (config.formId && config.effectsRootId && !document.getElementById(config.generalPanelId)) {
+    if (
+      config.formId &&
+      config.effectsRootId &&
+      !document.getElementById(config.generalPanelId)
+    ) {
       const form = document.getElementById(config.formId);
       const body = form?.querySelector(".modal-body");
       const effectsRoot = document.getElementById(config.effectsRootId);
-      const effectsSection = effectsRoot?.closest(config.effectsSectionSelector || ".mt-3");
+      const effectsSection = effectsRoot?.closest(
+        config.effectsSectionSelector || ".mt-3",
+      );
       if (body && effectsSection) {
         const tabs = document.createElement("div");
         tabs.className = "item-editor-tabs item-editor-view-tabs";
@@ -74,7 +200,7 @@
         const effectsPanel = document.createElement("div");
         effectsPanel.id = config.effectsPanelId;
         effectsPanel.className = "item-editor-panel";
-        [...body.children].forEach(child => generalPanel.appendChild(child));
+        [...body.children].forEach((child) => generalPanel.appendChild(child));
         effectsPanel.appendChild(effectsSection);
         body.appendChild(tabs);
         body.appendChild(generalPanel);
@@ -88,7 +214,7 @@
     const effectsPanel = document.getElementById(config.effectsPanelId);
     if (!generalTab || !effectsTab || !generalPanel || !effectsPanel) return;
 
-    const show = tab => {
+    const show = (tab) => {
       const effects = tab === "effects";
       syncTabHeights(config);
       generalTab.classList.toggle("active", !effects);
@@ -112,7 +238,7 @@
       position: panel.style.position,
       visibility: panel.style.visibility,
       pointerEvents: panel.style.pointerEvents,
-      width: panel.style.width
+      width: panel.style.width,
     };
     if (wasHidden) {
       panel.classList.remove("d-none");
@@ -138,12 +264,17 @@
     if (!generalPanel || !effectsPanel) return;
     generalPanel.style.minHeight = "";
     effectsPanel.style.minHeight = "";
-    const height = Math.max(260, measurePanel(generalPanel), measurePanel(effectsPanel));
+    const height = Math.max(
+      260,
+      measurePanel(generalPanel),
+      measurePanel(effectsPanel),
+    );
     generalPanel.style.minHeight = `${height}px`;
     effectsPanel.style.minHeight = `${height}px`;
   }
 
   function init(config) {
+    initSteppers();
     const slotSelect = document.getElementById(config.slotInputId);
     const description = document.getElementById(config.descriptionId);
     if (slotSelect) {
@@ -200,6 +331,6 @@
     refreshDescription,
     syncSlotForType,
     syncSpecialMaterialForType,
-    slotOptionList: optionList
+    slotOptionList: optionList,
   };
 })();

@@ -5,18 +5,19 @@
       label: "Crafting",
       children: [
         { href: "craft-calculator.html", label: "Alchemical Crafting" },
-        { href: "magic-craft-calculator.html", label: "Magic Crafting" }
-      ]
+        { href: "magic-craft-calculator.html", label: "Magic Crafting" },
+      ],
     },
     { href: "characters.html", label: "Characters" },
     { href: "enemies.html", label: "Enemies" },
     { href: "bag-of-holding.html", label: "Bag of Holding" },
     { href: "map.html", label: "Map" },
-    { href: "campaigns.html", label: "Campaigns" }
+    { href: "campaigns.html", label: "Campaigns" },
   ];
 
   function currentPage() {
-    const page = window.location.pathname.split("/").pop() || "dice-roller.html";
+    const page =
+      window.location.pathname.split("/").pop() || "dice-roller.html";
     if (page === "character-sheet.html") {
       const params = new URLSearchParams(window.location.search);
       return params.get("enemyId") ? "enemies.html" : "characters.html";
@@ -44,29 +45,37 @@
 
           <div class="collapse navbar-collapse" id="navbarMain">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-              ${links.map(link => {
-                if (link.children) {
-                  const isActive = link.children.some(child => child.href === page);
-                  return `
+              ${links
+                .map((link) => {
+                  if (link.children) {
+                    const isActive = link.children.some(
+                      (child) => child.href === page,
+                    );
+                    return `
                     <li class="nav-item dropdown">
                       <a class="nav-link dropdown-toggle ${isActive ? "active" : ""}" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         ${link.label}
                       </a>
                       <ul class="dropdown-menu dropdown-menu-dark">
-                        ${link.children.map(child => `
+                        ${link.children
+                          .map(
+                            (child) => `
                           <li><a class="dropdown-item ${child.href === page ? "active" : ""}" href="${child.href}">${child.label}</a></li>
-                        `).join("")}
+                        `,
+                          )
+                          .join("")}
                       </ul>
                     </li>
                   `;
-                }
+                  }
 
-                return `
+                  return `
                   <li class="nav-item ${link.href === "enemies.html" ? "d-none" : ""}" data-nav-item="${link.href}">
                     <a class="nav-link ${link.href === page ? "active" : ""}" href="${link.href}">${link.label}</a>
                   </li>
                 `;
-              }).join("")}
+                })
+                .join("")}
             </ul>
             <div id="authNav" class="d-flex gap-2 align-items-center"></div>
           </div>
