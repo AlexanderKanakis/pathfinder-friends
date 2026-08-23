@@ -19,7 +19,7 @@
 
 <main id="sheetLoading" class="container-fluid sheet-loading-shell mt-3" aria-busy="true">
   <div class="sheet-title-row mb-3">
-    <div class="sheet-skeleton-line" style="width: 32px; height: 30px; border-radius: 6px;"></div>
+    <div class="sheet-skeleton-line sheet-skeleton-back"></div>
     <div class="sheet-skeleton-line sheet-skeleton-title"></div>
   </div>
   <div class="sheet-skeleton-grid">
@@ -113,7 +113,7 @@
       <div class="sheet-grid-wide">
         <div><label for="characterName">Character Name</label><input id="characterName" class="form-control form-control-sm sheet-input" required></div>
         <div><label for="classLevel">Class / Level</label><input id="classLevel" class="form-control form-control-sm sheet-input"></div>
-        <div><label for="characterLevel">Character Level</label><input id="characterLevel" class="form-control form-control-sm sheet-input" type="number" min="1" value="1"></div>
+        <div class="sheet-number-field"><label for="characterLevel" class="number-stepper-label">Character Level</label><div class="ability-score-stepper sheet-number-stepper"><button class="btn btn-outline-light btn-sm ability-stepper-btn" type="button" onclick="adjustSkillNumber('characterLevel', -1)" aria-label="Decrease character level">-</button><input id="characterLevel" class="form-control form-control-sm sheet-input no-spinner" type="number" min="1" value="1" inputmode="numeric"><button class="btn btn-outline-light btn-sm ability-stepper-btn" type="button" onclick="adjustSkillNumber('characterLevel', 1)" aria-label="Increase character level">+</button></div></div>
         <div><label for="race">Race</label><select id="race" class="form-select form-select-sm sheet-input"></select></div>
         <div class="enemy-only enemy-double-field"><label for="subtype">Subtype</label><textarea id="subtype" class="form-control form-control-sm sheet-input enemy-auto-textarea enemy-header-control" rows="1" readonly></textarea></div>
         <div><label for="alignment">Alignment</label><select id="alignment" class="form-select form-select-sm sheet-input"></select></div>
@@ -145,9 +145,9 @@
     </div>
   </section>
 
-  <div class="row">
+  <div class="row full-sheet-layout">
     <div class="col-xl-4">
-      <section class="sheet-section">
+      <section class="sheet-section full-order-attributes">
         <div class="sheet-title">Attributes</div>
         <div class="table-responsive">
           <table class="table table-dark table-sm align-middle compact-table ability-table">
@@ -157,11 +157,11 @@
         </div>
       </section>
 
-      <section class="sheet-section">
+      <section class="sheet-section full-order-hp">
         <div class="sheet-title">HP</div>
         <div class="sheet-grid">
-          <div><label for="currentHitPoints">Current HP</label><input id="currentHitPoints" class="form-control form-control-sm sheet-input" type="number" value="0"></div>
-          <div><label for="hitPoints">Base HP</label><input id="hitPoints" class="form-control form-control-sm sheet-input" type="number" value="0"></div>
+          <div class="sheet-number-field"><label for="currentHitPoints" class="number-stepper-label">Current HP</label><div class="ability-score-stepper sheet-number-stepper"><button class="btn btn-outline-light btn-sm ability-stepper-btn" type="button" onclick="adjustSkillNumber('currentHitPoints', -1)" aria-label="Decrease current HP">-</button><input id="currentHitPoints" class="form-control form-control-sm sheet-input no-spinner" type="number" value="0" inputmode="numeric"><button class="btn btn-outline-light btn-sm ability-stepper-btn" type="button" onclick="adjustSkillNumber('currentHitPoints', 1)" aria-label="Increase current HP">+</button></div></div>
+          <div class="sheet-number-field"><label for="hitPoints" class="number-stepper-label">Base HP</label><div class="ability-score-stepper sheet-number-stepper"><button class="btn btn-outline-light btn-sm ability-stepper-btn" type="button" onclick="adjustSkillNumber('hitPoints', -1)" aria-label="Decrease base HP">-</button><input id="hitPoints" class="form-control form-control-sm sheet-input no-spinner" type="number" value="0" inputmode="numeric"><button class="btn btn-outline-light btn-sm ability-stepper-btn" type="button" onclick="adjustSkillNumber('hitPoints', 1)" aria-label="Increase base HP">+</button></div></div>
           <div><label for="hitPointsBuff">Buff</label><input id="hitPointsBuff" class="form-control form-control-sm buff-field" readonly></div>
           <div><label for="hitPointsTotal">Total HP</label><input id="hitPointsTotal" class="form-control form-control-sm" readonly></div>
           <div><label for="regeneration">Regeneration</label><textarea id="regeneration" class="form-control form-control-sm sheet-input enemy-auto-textarea enemy-header-control" rows="1"></textarea></div>
@@ -174,18 +174,18 @@
         <div class="small-text calc-line" data-calc-for="hitPointsTotal"></div>
       </section>
 
-      <section class="sheet-section">
+      <section class="sheet-section full-order-initiative">
         <div class="sheet-title">Initiative</div>
         <div class="sheet-grid">
           <div><label for="initTotal">Total</label><input id="initTotal" class="form-control form-control-sm" readonly></div>
           <div><label for="initDexMod">Dex</label><input id="initDexMod" class="form-control form-control-sm" readonly></div>
           <div><label for="initBuff">Buff</label><input id="initBuff" class="form-control form-control-sm buff-field" readonly></div>
-          <div><label for="initMisc">Misc</label><input id="initMisc" class="form-control form-control-sm sheet-input" type="number" value="0"></div>
+          <div class="sheet-number-field"><label for="initMisc" class="number-stepper-label">Misc</label><div class="ability-score-stepper sheet-number-stepper"><button class="btn btn-outline-light btn-sm ability-stepper-btn" type="button" onclick="adjustSkillNumber('initMisc', -1)" aria-label="Decrease initiative misc">-</button><input id="initMisc" class="form-control form-control-sm sheet-input no-spinner" type="number" value="0" inputmode="numeric"><button class="btn btn-outline-light btn-sm ability-stepper-btn" type="button" onclick="adjustSkillNumber('initMisc', 1)" aria-label="Increase initiative misc">+</button></div></div>
         </div>
         <div class="small-text calc-line" data-calc-for="initTotal"></div>
       </section>
 
-      <section class="sheet-section">
+      <section class="sheet-section full-order-movement">
         <div class="sheet-title">Movement</div>
         <div class="sheet-grid">
           <div><label for="speedBase">Base Speed</label><input id="speedBase" class="form-control form-control-sm sheet-input"></div>
@@ -194,7 +194,7 @@
         </div>
       </section>
 
-      <section class="sheet-section">
+      <section class="sheet-section full-order-weapons">
         <div class="d-flex justify-content-between align-items-center mb-2">
           <div class="sheet-title mb-0">Weapons</div>
           <button class="btn btn-primary btn-sm" type="button" onclick="addWeapon()">Add Weapon</button>
@@ -202,7 +202,7 @@
         <div id="weaponRows" class="vstack gap-2"></div>
       </section>
 
-      <section class="sheet-section">
+      <section class="sheet-section full-order-armor">
         <div class="d-flex justify-content-between align-items-center mb-2">
           <div class="sheet-title mb-0">Armor & Shields</div>
           <button class="btn btn-primary btn-sm" type="button" onclick="addArmor()">Add Armor/Shield</button>
@@ -210,7 +210,7 @@
         <div id="armorRows" class="vstack gap-2"></div>
       </section>
 
-      <section class="sheet-section">
+      <section class="sheet-section full-order-equipment">
         <div class="d-flex justify-content-between align-items-center mb-2">
           <div class="sheet-title mb-0">Other Equipment</div>
           <button class="btn btn-primary btn-sm" type="button" onclick="addGear()">Add Equipment</button>
@@ -220,7 +220,7 @@
     </div>
 
     <div class="col-xl-4">
-      <section class="sheet-section">
+      <section class="sheet-section full-order-ac">
         <div class="sheet-title">Armor Class</div>
         <div class="ac-primary-grid">
           <div><label for="acTotal">AC</label><input id="acTotal" class="form-control form-control-sm" readonly></div>
@@ -236,31 +236,31 @@
           <div><label for="acDex">Dex</label><input id="acDex" class="form-control form-control-sm" readonly></div>
           <div><label for="acNatural">Natural</label><input id="acNatural" class="form-control form-control-sm no-spinner" value="0" readonly></div>
           <div><label for="acDeflection">Deflection</label><input id="acDeflection" class="form-control form-control-sm no-spinner" value="0" readonly></div>
-          <div><label for="acMisc">Misc</label><input id="acMisc" class="form-control form-control-sm sheet-input" type="number" value="0"></div>
+          <div class="sheet-number-field"><label for="acMisc" class="number-stepper-label">Misc</label><div class="ability-score-stepper sheet-number-stepper"><button class="btn btn-outline-light btn-sm ability-stepper-btn" type="button" onclick="adjustSkillNumber('acMisc', -1)" aria-label="Decrease AC misc">-</button><input id="acMisc" class="form-control form-control-sm sheet-input no-spinner" type="number" value="0" inputmode="numeric"><button class="btn btn-outline-light btn-sm ability-stepper-btn" type="button" onclick="adjustSkillNumber('acMisc', 1)" aria-label="Increase AC misc">+</button></div></div>
         </div>
         <div class="small-text calc-line" data-calc-for="acTotal"></div>
       </section>
 
-      <section class="sheet-section">
+      <section class="sheet-section full-order-saves">
         <div class="sheet-title">Saving Throws</div>
         <div class="table-responsive">
           <table class="table table-dark table-sm align-middle compact-table save-table">
-            <thead><tr><th>Save</th><th>Total</th><th>Base</th><th>Misc</th><th>Ability</th><th>Buff</th></tr></thead>
+            <thead><tr><th>Save</th><th>Total</th><th>Base</th><th class="number-stepper-heading"><span>Misc</span></th><th>Ability</th><th>Buff</th></tr></thead>
             <tbody id="saveRows"></tbody>
           </table>
         </div>
       </section>
 
-      <section class="sheet-section">
+      <section class="sheet-section full-order-bab">
         <div class="sheet-title">Base Attack Bonus</div>
         <div class="bab-grid">
           <div><label for="bab">BAB</label><input id="bab" class="form-control form-control-sm no-spinner" inputmode="numeric" value="0" readonly></div>
           <div><label for="babBase">Base</label><input id="babBase" class="form-control form-control-sm no-spinner" inputmode="numeric" value="0" readonly></div>
-          <div><label for="babMisc">Misc</label><input id="babMisc" class="form-control form-control-sm sheet-input" type="number" value="0"></div>
+          <div class="sheet-number-field"><label for="babMisc" class="number-stepper-label">Misc</label><div class="ability-score-stepper sheet-number-stepper"><button class="btn btn-outline-light btn-sm ability-stepper-btn" type="button" onclick="adjustSkillNumber('babMisc', -1)" aria-label="Decrease BAB misc">-</button><input id="babMisc" class="form-control form-control-sm sheet-input no-spinner" type="number" value="0" inputmode="numeric"><button class="btn btn-outline-light btn-sm ability-stepper-btn" type="button" onclick="adjustSkillNumber('babMisc', 1)" aria-label="Increase BAB misc">+</button></div></div>
         </div>
       </section>
 
-      <section class="sheet-section">
+      <section class="sheet-section full-order-maneuvers">
         <div class="sheet-title">Combat Maneuvers</div>
         <div class="maneuver-grid">
           <div class="maneuver-block">
@@ -268,7 +268,7 @@
             <div class="maneuver-fields">
               <div><label for="cmbTotal">Total</label><input id="cmbTotal" class="form-control form-control-sm" readonly></div>
               <div><label for="cmbBuff">Buff</label><input id="cmbBuff" class="form-control form-control-sm buff-field" readonly></div>
-              <div><label for="cmbMisc">Misc</label><input id="cmbMisc" class="form-control form-control-sm sheet-input" type="number" value="0"></div>
+              <div class="sheet-number-field"><label for="cmbMisc" class="number-stepper-label">Misc</label><div class="ability-score-stepper sheet-number-stepper"><button class="btn btn-outline-light btn-sm ability-stepper-btn" type="button" onclick="adjustSkillNumber('cmbMisc', -1)" aria-label="Decrease CMB misc">-</button><input id="cmbMisc" class="form-control form-control-sm sheet-input no-spinner" type="number" value="0" inputmode="numeric"><button class="btn btn-outline-light btn-sm ability-stepper-btn" type="button" onclick="adjustSkillNumber('cmbMisc', 1)" aria-label="Increase CMB misc">+</button></div></div>
             </div>
             <div class="small-text calc-line" data-calc-for="cmbTotal"></div>
           </div>
@@ -277,7 +277,7 @@
             <div class="maneuver-fields">
               <div><label for="cmdTotal">Total</label><input id="cmdTotal" class="form-control form-control-sm" readonly></div>
               <div><label for="cmdBuff">Buff</label><input id="cmdBuff" class="form-control form-control-sm buff-field" readonly></div>
-              <div><label for="cmdMisc">Misc</label><input id="cmdMisc" class="form-control form-control-sm sheet-input" type="number" value="0"></div>
+              <div class="sheet-number-field"><label for="cmdMisc" class="number-stepper-label">Misc</label><div class="ability-score-stepper sheet-number-stepper"><button class="btn btn-outline-light btn-sm ability-stepper-btn" type="button" onclick="adjustSkillNumber('cmdMisc', -1)" aria-label="Decrease CMD misc">-</button><input id="cmdMisc" class="form-control form-control-sm sheet-input no-spinner" type="number" value="0" inputmode="numeric"><button class="btn btn-outline-light btn-sm ability-stepper-btn" type="button" onclick="adjustSkillNumber('cmdMisc', 1)" aria-label="Increase CMD misc">+</button></div></div>
             </div>
             <div class="small-text calc-line" data-calc-for="cmdTotal"></div>
           </div>
@@ -555,15 +555,15 @@
       </div>
       <div class="modal-body">
         <input id="enemySourceItemSearch" class="form-control form-control-sm mb-3" placeholder="Search weapons, armor, shields, wondrous, and alchemical items">
-        <ul class="nav nav-tabs mb-3" id="enemySourceItemTabs" role="tablist">
-          <li class="nav-item" role="presentation"><button class="nav-link active" type="button" data-source-category="all">All</button></li>
-          <li class="nav-item" role="presentation"><button class="nav-link" type="button" data-source-category="weapons">Weapons</button></li>
-          <li class="nav-item" role="presentation"><button class="nav-link" type="button" data-source-category="armor">Armor</button></li>
-          <li class="nav-item" role="presentation"><button class="nav-link" type="button" data-source-category="shields">Shields</button></li>
-          <li class="nav-item" role="presentation"><button class="nav-link" type="button" data-source-category="mundane">Mundane Items</button></li>
-          <li class="nav-item" role="presentation"><button class="nav-link" type="button" data-source-category="wondrous">Wondrous Items</button></li>
+        <ul class="source-list-tablist mb-3" id="enemySourceItemTabs" role="tablist">
+          <li class="source-list-tab-item" role="presentation"><button class="source-list-tab active" type="button" data-source-category="all">All</button></li>
+          <li class="source-list-tab-item" role="presentation"><button class="source-list-tab" type="button" data-source-category="weapons">Weapons</button></li>
+          <li class="source-list-tab-item" role="presentation"><button class="source-list-tab" type="button" data-source-category="armor">Armor</button></li>
+          <li class="source-list-tab-item" role="presentation"><button class="source-list-tab" type="button" data-source-category="shields">Shields</button></li>
+          <li class="source-list-tab-item" role="presentation"><button class="source-list-tab" type="button" data-source-category="mundane">Mundane Items</button></li>
+          <li class="source-list-tab-item" role="presentation"><button class="source-list-tab" type="button" data-source-category="wondrous">Wondrous Items</button></li>
         </ul>
-        <ul class="nav nav-pills mb-3 d-none" id="enemySourceMundaneTabs" role="tablist"></ul>
+        <ul class="source-list-tablist source-list-subtabs mb-3 d-none" id="enemySourceMundaneTabs" role="tablist"></ul>
         <div id="enemySourceItemResults" class="source-results-panel search-modal-results"></div>
       </div>
     </div>

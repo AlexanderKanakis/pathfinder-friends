@@ -29,7 +29,22 @@
     .loot-effect-display { background: rgba(143, 209, 158, .08); border-left: 3px solid #8fd19e; border-radius: 4px; padding: 4px 7px; font-size: 12px; overflow-wrap: anywhere; }
     .bag-subtitle { color: #aaa; font-size: 14px; }
     .bag-header { display: grid; grid-template-columns: minmax(180px, 1fr) minmax(240px, 420px) minmax(120px, 1fr); gap: 12px; align-items: end; }
-    .bag-view-tabs .btn { min-width: 92px; }
+    .bag-view-tabs { display: flex; justify-content: flex-end; gap: 2px; border-bottom: 1px solid #333; background: #121212; }
+    .bag-view-tab { border: 0; border-bottom: 2px solid transparent; border-radius: 0; background: transparent; color: #bbb; min-width: 92px; padding: 8px 14px 9px; line-height: 1.1; text-align: center; }
+    .bag-view-tab:hover, .bag-view-tab:focus { color: #fff; background: #1b1b1b; outline: none; }
+    .bag-view-tab.active { color: #fff; border-bottom-color: #0dcaf0; background: #202020; }
+    .item-editor-view-tabs { margin-bottom: 12px; border-bottom: 1px solid #333; background: #1e1e1e; }
+    .item-editor-tablist { display: flex; gap: 2px; width: 100%; }
+    .item-editor-view-tab { flex: 1 1 0; min-width: 0; border: 0; border-bottom: 2px solid transparent; border-radius: 0; background: transparent; color: #bbb; padding: 8px 14px 9px; line-height: 1.1; text-align: center; }
+    .item-editor-view-tab:hover, .item-editor-view-tab:focus { color: #fff; background: #1b1b1b; outline: none; }
+    .item-editor-view-tab.active { color: #fff; border-bottom-color: #0dcaf0; background: #202020; }
+    .item-editor-panel { min-height: 260px; }
+    .source-list-tablist { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); gap: 2px; width: 100%; border-bottom: 1px solid #333; background: #1e1e1e; }
+    .source-list-subtabs { grid-template-columns: repeat(auto-fit, minmax(138px, 1fr)); background: #181818; }
+    .source-list-tab-item { min-width: 0; }
+    .source-list-tab { width: 100%; height: 100%; min-height: 34px; border: 0; border-bottom: 2px solid transparent; border-radius: 0; background: transparent; color: #bbb; padding: 8px 10px 9px; line-height: 1.15; text-align: center; }
+    .source-list-tab:hover, .source-list-tab:focus { color: #fff; background: #1b1b1b; outline: none; }
+    .source-list-tab.active { color: #fff; border-bottom-color: #0dcaf0; background: #202020; }
     .bag-search { width: 100%; }
     .bag-action { justify-self: end; }
     .search-modal-dialog { width: min(1140px, calc(100vw - 2rem)); max-width: min(1140px, calc(100vw - 2rem)); }
@@ -44,6 +59,9 @@
       .bag-header { grid-template-columns: 1fr; align-items: stretch; }
       .bag-action { justify-self: stretch; }
       .bag-action .btn { width: 100%; }
+      .bag-view-tabs { width: 100%; }
+      .bag-view-tab { flex: 1 1 0; min-width: 0; padding: 10px 8px 11px; }
+      .item-editor-view-tab { padding: 10px 8px 11px; }
       .source-results-grid { grid-template-columns: 1fr; }
       .loot-group-body { grid-template-columns: 1fr; }
       .loot-type-grid { grid-template-columns: 1fr; }
@@ -70,4 +88,3 @@
       .loot-detail-grid, .loot-effect-row, .loot-condition-inline { grid-template-columns: 1fr; }
       .loot-condition-inline { grid-column: auto; }
     }
-

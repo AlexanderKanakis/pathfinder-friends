@@ -34,9 +34,9 @@
     </div>
   </div>
 
-  <div class="btn-group btn-group-sm bag-view-tabs mt-3" role="group" aria-label="Bag view">
-    <button id="bagFullViewBtn" class="btn btn-primary" type="button" onclick="setBagView('full')">Full</button>
-    <button id="bagSimplifiedViewBtn" class="btn btn-outline-primary" type="button" onclick="setBagView('simplified')">Simplified</button>
+  <div class="bag-view-tabs mt-3" role="tablist" aria-label="Bag view">
+    <button id="bagFullViewBtn" class="bag-view-tab active" type="button" role="tab" aria-selected="true" onclick="setBagView('full')">Full</button>
+    <button id="bagSimplifiedViewBtn" class="bag-view-tab" type="button" role="tab" aria-selected="false" onclick="setBagView('simplified')">Simplified</button>
   </div>
 
   <div id="lootStatus" class="alert d-none py-2"></div>
@@ -215,27 +215,27 @@
       </div>
       <div class="modal-body">
         <input id="sourceItemSearch" class="form-control form-control-sm mb-3" placeholder="Search weapons, armor, shields, wondrous, and alchemical items">
-        <ul class="nav nav-tabs mb-3" id="sourceItemTabs" role="tablist">
-          <li class="nav-item" role="presentation">
-            <button class="nav-link active" type="button" data-source-category="all">All</button>
+        <ul class="source-list-tablist mb-3" id="sourceItemTabs" role="tablist">
+          <li class="source-list-tab-item" role="presentation">
+            <button class="source-list-tab active" type="button" data-source-category="all">All</button>
           </li>
-          <li class="nav-item" role="presentation">
-            <button class="nav-link" type="button" data-source-category="weapons">Weapons</button>
+          <li class="source-list-tab-item" role="presentation">
+            <button class="source-list-tab" type="button" data-source-category="weapons">Weapons</button>
           </li>
-          <li class="nav-item" role="presentation">
-            <button class="nav-link" type="button" data-source-category="armor">Armor</button>
+          <li class="source-list-tab-item" role="presentation">
+            <button class="source-list-tab" type="button" data-source-category="armor">Armor</button>
           </li>
-          <li class="nav-item" role="presentation">
-            <button class="nav-link" type="button" data-source-category="shields">Shields</button>
+          <li class="source-list-tab-item" role="presentation">
+            <button class="source-list-tab" type="button" data-source-category="shields">Shields</button>
           </li>
-          <li class="nav-item" role="presentation">
-            <button class="nav-link" type="button" data-source-category="mundane">Mundane Items</button>
+          <li class="source-list-tab-item" role="presentation">
+            <button class="source-list-tab" type="button" data-source-category="mundane">Mundane Items</button>
           </li>
-          <li class="nav-item" role="presentation">
-            <button class="nav-link" type="button" data-source-category="wondrous">Wondrous Items</button>
+          <li class="source-list-tab-item" role="presentation">
+            <button class="source-list-tab" type="button" data-source-category="wondrous">Wondrous Items</button>
           </li>
         </ul>
-        <ul class="nav nav-pills mb-3 d-none" id="sourceMundaneTabs" role="tablist"></ul>
+        <ul class="source-list-tablist source-list-subtabs mb-3 d-none" id="sourceMundaneTabs" role="tablist"></ul>
         <div id="sourceItemResults" class="source-results-panel search-modal-results"></div>
       </div>
     </div>

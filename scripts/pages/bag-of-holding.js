@@ -53,10 +53,10 @@ function setBagView(mode) {
   bagViewMode = mode === "simplified" ? "simplified" : "full";
   sessionStorage.setItem("pf_bag_view", bagViewMode);
   const simple = bagViewMode === "simplified";
-  el("bagFullViewBtn")?.classList.toggle("btn-primary", !simple);
-  el("bagFullViewBtn")?.classList.toggle("btn-outline-primary", simple);
-  el("bagSimplifiedViewBtn")?.classList.toggle("btn-primary", simple);
-  el("bagSimplifiedViewBtn")?.classList.toggle("btn-outline-primary", !simple);
+  el("bagFullViewBtn")?.classList.toggle("active", !simple);
+  el("bagFullViewBtn")?.setAttribute("aria-selected", !simple ? "true" : "false");
+  el("bagSimplifiedViewBtn")?.classList.toggle("active", simple);
+  el("bagSimplifiedViewBtn")?.setAttribute("aria-selected", simple ? "true" : "false");
   renderLoot();
 }
 
@@ -533,8 +533,8 @@ function renderSourceMundaneTabs() {
   tabs.classList.toggle("d-none", !show);
   if (!show) return;
   tabs.innerHTML = MUNDANE_CATEGORIES.map(category => `
-    <li class="nav-item" role="presentation">
-      <button class="nav-link${sourceItemMundaneCategory === category ? " active" : ""}" type="button" data-source-mundane-category="${escapeHtml(category)}">${escapeHtml(category)}</button>
+    <li class="source-list-tab-item" role="presentation">
+      <button class="source-list-tab${sourceItemMundaneCategory === category ? " active" : ""}" type="button" data-source-mundane-category="${escapeHtml(category)}">${escapeHtml(category)}</button>
     </li>
   `).join("");
   tabs.querySelectorAll("[data-source-mundane-category]").forEach(button => {
@@ -599,7 +599,7 @@ function openSourceItemsModal() {
   sourceItemMundaneCategory = MUNDANE_CATEGORIES[0];
   sourceItemSearchTerm = "";
   el("sourceItemSearch").value = "";
-  el("sourceItemTabs").querySelectorAll(".nav-link").forEach(tab => {
+  el("sourceItemTabs").querySelectorAll("[data-source-category]").forEach(tab => {
     tab.classList.toggle("active", tab.dataset.sourceCategory === "all");
   });
   renderSourceItemResults();
@@ -930,7 +930,6 @@ function renderFullLootCard(item) {
           </button>
         </span>
       </div>
-      ${item.description ? `<div class="loot-description mt-2">${escapeHtml(item.description)}</div>` : ""}
       <div class="mt-2">
         <label for="assign-${escapeHtml(item.id)}">Give to</label>
         <select id="assign-${escapeHtml(item.id)}" class="form-select form-select-sm w-100" data-loot-assign="${escapeHtml(item.id)}">
@@ -1321,7 +1320,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (sourceItemCategory === "mundane" && !MUNDANE_CATEGORIES.includes(sourceItemMundaneCategory)) {
         sourceItemMundaneCategory = MUNDANE_CATEGORIES[0];
       }
-      el("sourceItemTabs").querySelectorAll(".nav-link").forEach(tab => {
+      el("sourceItemTabs").querySelectorAll("[data-source-category]").forEach(tab => {
         tab.classList.toggle("active", tab === button);
       });
       renderSourceItemResults();

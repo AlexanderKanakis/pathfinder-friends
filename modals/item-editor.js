@@ -32,6 +32,7 @@
     if (automaticSlot) setSlot(config, automaticSlot);
     else config.onSlotChange?.();
     syncSpecialMaterialForType(config);
+    requestAnimationFrame(() => syncTabHeights(config));
   }
 
   function materialOptionsForType(type) {
@@ -60,17 +61,19 @@
       const effectsSection = effectsRoot?.closest(config.effectsSectionSelector || ".mt-3");
       if (body && effectsSection) {
         const tabs = document.createElement("div");
-        tabs.className = "item-editor-tabs";
+        tabs.className = "item-editor-tabs item-editor-view-tabs";
         tabs.innerHTML = `
-          <div class="btn-group btn-group-sm mb-3" role="group" aria-label="Item editor tabs">
-            <button id="${escapeHtml(config.generalTabId)}" class="btn btn-primary active" type="button">General</button>
-            <button id="${escapeHtml(config.effectsTabId)}" class="btn btn-outline-primary" type="button">Item Effects</button>
+          <div class="item-editor-tablist" role="tablist" aria-label="Item editor tabs">
+            <button id="${escapeHtml(config.generalTabId)}" class="item-editor-view-tab active" type="button" role="tab" aria-selected="true">General</button>
+            <button id="${escapeHtml(config.effectsTabId)}" class="item-editor-view-tab" type="button" role="tab" aria-selected="false">Item Effects</button>
           </div>
         `;
         const generalPanel = document.createElement("div");
         generalPanel.id = config.generalPanelId;
+        generalPanel.className = "item-editor-panel";
         const effectsPanel = document.createElement("div");
         effectsPanel.id = config.effectsPanelId;
+        effectsPanel.className = "item-editor-panel";
         [...body.children].forEach(child => generalPanel.appendChild(child));
         effectsPanel.appendChild(effectsSection);
         body.appendChild(tabs);
@@ -87,19 +90,57 @@
 
     const show = tab => {
       const effects = tab === "effects";
+      syncTabHeights(config);
       generalTab.classList.toggle("active", !effects);
-      generalTab.classList.toggle("btn-primary", !effects);
-      generalTab.classList.toggle("btn-outline-primary", effects);
+      generalTab.setAttribute("aria-selected", !effects ? "true" : "false");
       effectsTab.classList.toggle("active", effects);
-      effectsTab.classList.toggle("btn-primary", effects);
-      effectsTab.classList.toggle("btn-outline-primary", !effects);
+      effectsTab.setAttribute("aria-selected", effects ? "true" : "false");
       generalPanel.classList.toggle("d-none", effects);
       effectsPanel.classList.toggle("d-none", !effects);
+      requestAnimationFrame(() => syncTabHeights(config));
     };
 
     generalTab.addEventListener("click", () => show("general"));
     effectsTab.addEventListener("click", () => show("effects"));
     show("general");
+    requestAnimationFrame(() => syncTabHeights(config));
+  }
+
+  function measurePanel(panel) {
+    const wasHidden = panel.classList.contains("d-none");
+    const previous = {
+      position: panel.style.position,
+      visibility: panel.style.visibility,
+      pointerEvents: panel.style.pointerEvents,
+      width: panel.style.width
+    };
+    if (wasHidden) {
+      panel.classList.remove("d-none");
+      panel.style.position = "absolute";
+      panel.style.visibility = "hidden";
+      panel.style.pointerEvents = "none";
+      panel.style.width = "100%";
+    }
+    const height = panel.scrollHeight;
+    if (wasHidden) {
+      panel.classList.add("d-none");
+      panel.style.position = previous.position;
+      panel.style.visibility = previous.visibility;
+      panel.style.pointerEvents = previous.pointerEvents;
+      panel.style.width = previous.width;
+    }
+    return height;
+  }
+
+  function syncTabHeights(config) {
+    const generalPanel = document.getElementById(config.generalPanelId);
+    const effectsPanel = document.getElementById(config.effectsPanelId);
+    if (!generalPanel || !effectsPanel) return;
+    generalPanel.style.minHeight = "";
+    effectsPanel.style.minHeight = "";
+    const height = Math.max(260, measurePanel(generalPanel), measurePanel(effectsPanel));
+    generalPanel.style.minHeight = `${height}px`;
+    effectsPanel.style.minHeight = `${height}px`;
   }
 
   function init(config) {
@@ -144,6 +185,8 @@
     autosize(description);
     requestAnimationFrame(() => autosize(description));
     setTimeout(() => autosize(description), 50);
+    requestAnimationFrame(() => syncTabHeights(config));
+    setTimeout(() => syncTabHeights(config), 80);
   }
 
   window.PFItemEditor = {

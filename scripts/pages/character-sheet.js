@@ -847,6 +847,35 @@ function initSheetStickyControls() {
   requestAnimationFrame(syncSheetStickyControls);
 }
 
+const mobileCombatSectionSelectors = [".full-order-ac", ".full-order-saves", ".full-order-bab", ".full-order-maneuvers"];
+let combatSectionsDesktopColumn = null;
+let combatSectionsDesktopBefore = null;
+let combatSectionsAreMobile = false;
+
+function syncFullViewMobileOrder() {
+  const sections = mobileCombatSectionSelectors
+    .map(selector => document.querySelector(selector))
+    .filter(Boolean);
+  const weapons = document.querySelector(".full-order-weapons");
+  if (!sections.length || !weapons) return;
+
+  if (!combatSectionsDesktopColumn) {
+    combatSectionsDesktopColumn = sections[0].parentElement;
+    combatSectionsDesktopBefore = combatSectionsDesktopColumn?.querySelector(".enemy-section-stack") || null;
+  }
+
+  const shouldUseMobileOrder = window.matchMedia("(max-width: 1199.98px)").matches;
+  if (shouldUseMobileOrder === combatSectionsAreMobile) return;
+  combatSectionsAreMobile = shouldUseMobileOrder;
+
+  if (shouldUseMobileOrder) {
+    sections.forEach(section => weapons.parentElement.insertBefore(section, weapons));
+  } else if (combatSectionsDesktopColumn) {
+    sections.forEach(section => combatSectionsDesktopColumn.insertBefore(section, combatSectionsDesktopBefore));
+  }
+  requestAnimationFrame(syncSheetStickyControls);
+}
+
 function setSheetView(mode) {
   sheetViewMode = mode === "simplified" ? "simplified" : "full";
   sessionStorage.setItem("pf_character_sheet_view", sheetViewMode);
@@ -858,6 +887,7 @@ function setSheetView(mode) {
   el("simplifiedViewBtn")?.classList.toggle("active", isSimple);
   el("simplifiedViewBtn")?.setAttribute("aria-selected", isSimple ? "true" : "false");
   if (isSimple) renderSimplifiedSheet();
+  syncFullViewMobileOrder();
   requestAnimationFrame(syncSheetStickyControls);
 }
 
@@ -1439,8 +1469,8 @@ function renderEnemySourceMundaneTabs() {
   tabs.classList.toggle("d-none", !show);
   if (!show) return;
   tabs.innerHTML = MUNDANE_CATEGORIES.map(category => `
-    <li class="nav-item" role="presentation">
-      <button class="nav-link${enemySourceItemMundaneCategory === category ? " active" : ""}" type="button" data-enemy-source-mundane-category="${escapeHtml(category)}">${escapeHtml(category)}</button>
+    <li class="source-list-tab-item" role="presentation">
+      <button class="source-list-tab${enemySourceItemMundaneCategory === category ? " active" : ""}" type="button" data-enemy-source-mundane-category="${escapeHtml(category)}">${escapeHtml(category)}</button>
     </li>
   `).join("");
   tabs.querySelectorAll("[data-enemy-source-mundane-category]").forEach(button => {
@@ -1457,7 +1487,7 @@ function openEnemySourceItemsModal() {
   enemySourceItemMundaneCategory = MUNDANE_CATEGORIES[0];
   enemySourceItemSearchTerm = "";
   el("enemySourceItemSearch").value = "";
-  el("enemySourceItemTabs").querySelectorAll(".nav-link").forEach(tab => {
+  el("enemySourceItemTabs").querySelectorAll("[data-source-category]").forEach(tab => {
     tab.classList.toggle("active", tab.dataset.sourceCategory === "all");
   });
   renderEnemySourceItemResults();
@@ -2415,7 +2445,13 @@ function buildSheet() {
       <th>${label}</th>
       <td><input id="${key}Total" class="form-control form-control-sm total-first-input" readonly></td>
       <td><input id="${key}Base" class="form-control form-control-sm no-spinner" inputmode="numeric" value="0" readonly></td>
-      <td><input id="${key}Misc" class="form-control form-control-sm sheet-input" type="number" value="0"></td>
+      <td>
+        <div class="number-stepper">
+          <button class="btn btn-outline-light btn-sm ability-stepper-btn" type="button" onclick="adjustSkillNumber('${key}Misc', -1)" aria-label="Decrease ${label} misc">-</button>
+          <input id="${key}Misc" class="form-control form-control-sm sheet-input no-spinner" type="number" value="0" inputmode="numeric">
+          <button class="btn btn-outline-light btn-sm ability-stepper-btn" type="button" onclick="adjustSkillNumber('${key}Misc', 1)" aria-label="Increase ${label} misc">+</button>
+        </div>
+      </td>
       <td><input id="${key}Ability" class="form-control form-control-sm" readonly></td>
       <td><input id="${key}Buff" class="form-control form-control-sm buff-field" readonly></td>
     </tr>
@@ -2470,7 +2506,21 @@ function renderSkillRows(saved = {}) {
 function adjustSkillNumber(id, delta) {
   const input = el(id);
   if (!input) return;
-  input.value = String(Number(input.value || 0) + delta);
+  adjustNumberInput(input, delta);
+}
+
+function adjustSiblingNumber(button, delta) {
+  const input = button?.parentElement?.querySelector("input");
+  if (!input) return;
+  adjustNumberInput(input, delta);
+}
+
+function adjustNumberInput(input, delta) {
+  const current = Number(input.value || 0);
+  const min = input.min === "" ? -Infinity : Number(input.min);
+  const max = input.max === "" ? Infinity : Number(input.max);
+  const next = Math.min(max, Math.max(min, current + delta));
+  input.value = String(next);
   input.dispatchEvent(new Event("input", { bubbles: true }));
 }
 
@@ -2541,7 +2591,6 @@ function addWeapon(data = {}) {
   card.className = "sheet-card";
   card.dataset.weaponIndex = i;
   const sourceLootId = data.sourceLootId || data.source_loot_id || "";
-  const inventoryBacked = Boolean(sourceLootId);
   const name = data.name || `Weapon ${i + 1}`;
   const attackScale = data.attackScale || data.attack_scale || "STR";
   const damageScale = data.damageScale || data.damage_scale || "STR";
@@ -2559,14 +2608,16 @@ function addWeapon(data = {}) {
   const enhancement = data.enhancement || "0";
   const enchantment = data.enchantment || "";
   const specialMaterial = data.specialMaterial || data.special_material || "";
+  const detailsText = data.details || data.type || "";
+  const sourceLocked = Boolean(sourceLootId);
   card.innerHTML = `
     <div class="equipment-card-header">
-      ${inventoryBacked
-        ? `<div class="fw-semibold equipment-name-input">${escapeHtml(name)}</div><input data-field="name" class="sheet-input" type="hidden" value="${escapeHtml(name)}">`
-        : `<input data-field="name" class="form-control form-control-sm sheet-input fw-semibold equipment-name-input" value="${escapeHtml(name)}">`}
+      <input data-field="name" class="form-control form-control-sm sheet-input fw-semibold equipment-name-input" value="${escapeHtml(name)}" ${sourceLocked ? "readonly" : ""}>
       <div class="equipment-actions">
-        <button class="btn btn-outline-light btn-sm" type="button" onclick="toggleCardDetails(this)">More</button>
-        <button class="btn btn-danger btn-sm" type="button" onclick="removeCard(this)">Remove</button>
+        <button class="btn btn-outline-light btn-sm" type="button" onclick="openEquipmentItemEditor(this)">More</button>
+        <button class="btn btn-outline-danger btn-sm equipment-icon-btn" type="button" onclick="removeCard(this)" aria-label="Remove ${escapeHtml(name)}" title="Remove">
+          <i class="bi bi-trash"></i>
+        </button>
       </div>
     </div>
     <input data-field="sourceLootId" class="sheet-input" type="hidden" value="${sourceLootId}">
@@ -2574,134 +2625,33 @@ function addWeapon(data = {}) {
     <div class="weapon-summary">
       <div class="weapon-attack-summary"><label>Attack Bonus</label><input data-attack-total class="form-control form-control-sm" readonly></div>
       <div><label>Damage</label><input data-damage-total class="form-control form-control-sm" readonly></div>
-      <div><label>Critical</label><input data-field="critical" class="form-control form-control-sm ${inventoryBacked ? "" : "sheet-input"}" value="${data.critical || ""}" ${inventoryBacked ? "readonly" : ""}></div>
+      <div><label>Critical</label><input data-field="critical" class="form-control form-control-sm sheet-input" value="${data.critical || ""}" ${sourceLocked ? "readonly" : ""}></div>
     </div>
     <div class="small-text calc-line" data-weapon-attack-calc></div>
     <div class="small-text calc-line" data-weapon-damage-calc></div>
-    <div class="card-details d-none" data-card-details>
-    <div class="enhancement-summary${inventoryBacked ? " d-none" : ""}">
-      <div><label>Enhancement</label><input data-field="enhancement" class="form-control form-control-sm sheet-input" type="number" min="0" max="5" value="${enhancement}"></div>
-      <div>
-        <label>Enchantment</label>
-        <select data-field="enchantment" class="form-select form-select-sm sheet-input">
-          ${optionList(WEAPON_ENCHANTMENTS, enchantment)}
-        </select>
-      </div>
-      <div>
-        <label>Special Material</label>
-        <select data-field="specialMaterial" class="form-select form-select-sm sheet-input">
-          ${optionList(PFItemEditor.WEAPON_SPECIAL_MATERIALS, specialMaterial)}
-        </select>
-      </div>
-    </div>
-    <div class="weapon-group${inventoryBacked ? " d-none" : ""}">
-      <div class="weapon-group-title">Weapon Type</div>
-      <div class="sheet-grid-wide">
-        <div>
-          <label>Weapon Type</label>
-          <select data-field="weaponType" class="form-select form-select-sm sheet-input">
-            ${optionList(WEAPON_TYPES, weaponType)}
-          </select>
-        </div>
-      </div>
-    </div>
-    <div class="weapon-group">
-      <div class="weapon-group-title">Attack</div>
-      <div class="sheet-grid-wide">
-      <div><label>Attack Buff</label><input data-attack-buff class="form-control form-control-sm buff-field" readonly></div>
-      <div><label>Attack Misc</label><input data-field="attackMisc" class="form-control form-control-sm sheet-input" type="number" value="${data.attackMisc || data.attack_misc || "0"}"></div>
-      <div class="${inventoryBacked ? "d-none" : ""}"><label>Attack Scales With</label>${scalingOptionButtons("attackScale", attackScale)}</div>
-      </div>
-    </div>
-    <div class="weapon-group">
-      <div class="weapon-group-title">Damage</div>
-      <div class="sheet-grid-wide">
-      <div class="${inventoryBacked ? "d-none" : ""}"><label>Damage Dice</label><input data-field="damage" class="form-control form-control-sm sheet-input" value="${data.damage || ""}"></div>
-      <div class="${inventoryBacked ? "d-none" : ""}"><label>Damage Scales With</label>${scalingOptionButtons("damageScale", damageScale)}</div>
-      <div><label>Damage Buff</label><input data-damage-buff class="form-control form-control-sm buff-field" readonly></div>
-      <div><label>Damage Misc</label><input data-field="damageMisc" class="form-control form-control-sm sheet-input" type="number" value="${data.damageMisc || data.damage_misc || "0"}"></div>
-      <div><label>Scaling Bonus</label><input data-damage-scaling class="form-control form-control-sm" readonly></div>
-      <div><label>Damage Bonus</label><input data-damage-bonus class="form-control form-control-sm buff-field" readonly></div>
-      </div>
-    </div>
-    <div class="weapon-group">
-      <div class="weapon-group-title">Attack Options</div>
-      <div class="weapon-toggle-grid">
-        <div data-melee-weapon-option>
-          <label class="d-block" for="weaponTwoHanded${i}">Two-Handed</label>
-          <div class="form-check form-switch mt-1">
-            <input id="weaponTwoHanded${i}" data-field="twoHanded" class="form-check-input sheet-input" type="checkbox" value="yes" ${twoHanded === "yes" ? "checked" : ""}>
-          </div>
-        </div>
-        <div data-melee-weapon-option>
-          <label class="d-block" for="weaponPowerAttack${i}">Power Attack</label>
-          <div class="form-check form-switch mt-1">
-            <input id="weaponPowerAttack${i}" data-field="powerAttack" class="form-check-input sheet-input" type="checkbox" value="yes" ${powerAttack === "yes" ? "checked" : ""}>
-          </div>
-        </div>
-        <div data-ranged-weapon-option>
-          <label class="d-block" for="weaponDeadlyAim${i}">Deadly Aim</label>
-          <div class="form-check form-switch mt-1">
-            <input id="weaponDeadlyAim${i}" data-field="deadlyAim" class="form-check-input sheet-input" type="checkbox" value="yes" ${deadlyAim === "yes" ? "checked" : ""}>
-          </div>
-        </div>
-        <div data-ranged-weapon-option>
-          <label class="d-block" for="weaponRapidShot${i}">Rapid Shot</label>
-          <div class="form-check form-switch mt-1">
-            <input id="weaponRapidShot${i}" data-field="rapidShot" class="form-check-input sheet-input" type="checkbox" value="yes" ${rapidShot === "yes" ? "checked" : ""}>
-          </div>
-        </div>
-      </div>
-      <div class="weapon-group-title mt-2">Two-Weapon Fighting</div>
-      <div class="weapon-toggle-grid">
-        <div>
-          <label class="d-block" for="weaponTwfNoFeatPrimary${i}">No Feat Primary</label>
-          <div class="form-check form-switch mt-1">
-            <input id="weaponTwfNoFeatPrimary${i}" data-field="twfNoFeatPrimary" data-twf-option class="form-check-input sheet-input" type="checkbox" value="yes" ${twfNoFeatPrimary === "yes" ? "checked" : ""}>
-          </div>
-        </div>
-        <div>
-          <label class="d-block" for="weaponTwfNoFeatOff${i}">No Feat Off</label>
-          <div class="form-check form-switch mt-1">
-            <input id="weaponTwfNoFeatOff${i}" data-field="twfNoFeatOff" data-twf-option class="form-check-input sheet-input" type="checkbox" value="yes" ${twfNoFeatOff === "yes" ? "checked" : ""}>
-          </div>
-        </div>
-        <div>
-          <label class="d-block" for="weaponTwfFeatPrimary${i}">Feat Primary</label>
-          <div class="form-check form-switch mt-1">
-            <input id="weaponTwfFeatPrimary${i}" data-field="twfFeatPrimary" data-twf-option class="form-check-input sheet-input" type="checkbox" value="yes" ${twfFeatPrimary === "yes" ? "checked" : ""}>
-          </div>
-        </div>
-        <div>
-          <label class="d-block" for="weaponTwfFeatOff${i}">Feat Off</label>
-          <div class="form-check form-switch mt-1">
-            <input id="weaponTwfFeatOff${i}" data-field="twfFeatOff" data-twf-option class="form-check-input sheet-input" type="checkbox" value="yes" ${twfFeatOff === "yes" ? "checked" : ""}>
-          </div>
-        </div>
-        <div data-twf-offhand-feat-option>
-          <label class="d-block" for="weaponImprovedTwf${i}">Improved TWF</label>
-          <div class="form-check form-switch mt-1">
-            <input id="weaponImprovedTwf${i}" data-field="improvedTwf" data-twf-option class="form-check-input sheet-input" type="checkbox" value="yes" ${improvedTwf === "yes" ? "checked" : ""}>
-          </div>
-        </div>
-        <div data-twf-offhand-feat-option>
-          <label class="d-block" for="weaponGreaterTwf${i}">Greater TWF</label>
-          <div class="form-check form-switch mt-1">
-            <input id="weaponGreaterTwf${i}" data-field="greaterTwf" data-twf-option class="form-check-input sheet-input" type="checkbox" value="yes" ${greaterTwf === "yes" ? "checked" : ""}>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="weapon-group${inventoryBacked ? " d-none" : ""}">
-      <div class="weapon-group-title">Details</div>
-      <div class="sheet-grid-wide">
-      <div><label>Type</label><input data-field="type" class="form-control form-control-sm sheet-input" value="${data.type || ""}"></div>
-      <div><label>Range / Ammo</label><input data-field="range" class="form-control form-control-sm sheet-input" value="${data.range || ""}"></div>
-      <div data-firearm-weapon-option><label>Capacity</label><input data-field="capacity" class="form-control form-control-sm sheet-input" value="${data.capacity || ""}"></div>
-      <div data-firearm-weapon-option><label>Misfire</label><input data-field="misfire" class="form-control form-control-sm sheet-input" value="${data.misfire || ""}"></div>
-      </div>
-    </div>
-    </div>
+    <input data-field="enhancement" class="sheet-input" type="hidden" value="${enhancement}">
+    <input data-field="enchantment" class="sheet-input" type="hidden" value="${escapeHtml(enchantment)}">
+    <input data-field="specialMaterial" class="sheet-input" type="hidden" value="${escapeHtml(specialMaterial)}">
+    <input data-field="weaponType" class="sheet-input" type="hidden" value="${escapeHtml(weaponType)}">
+    <input data-field="attackScale" class="sheet-input" type="hidden" value="${escapeHtml(attackScale)}">
+    <input data-field="attackMisc" class="sheet-input" type="hidden" value="${data.attackMisc || data.attack_misc || "0"}">
+    <input data-field="damage" class="sheet-input" type="hidden" value="${escapeHtml(data.damage || "")}">
+    <input data-field="damageScale" class="sheet-input" type="hidden" value="${escapeHtml(damageScale)}">
+    <input data-field="damageMisc" class="sheet-input" type="hidden" value="${data.damageMisc || data.damage_misc || "0"}">
+    <input data-field="details" class="sheet-input" type="hidden" value="${escapeHtml(detailsText)}">
+    <input data-field="range" class="sheet-input" type="hidden" value="${escapeHtml(data.range || "")}">
+    <input data-field="capacity" class="sheet-input" type="hidden" value="${escapeHtml(data.capacity || "")}">
+    <input data-field="misfire" class="sheet-input" type="hidden" value="${escapeHtml(data.misfire || "")}">
+    <input data-field="twoHanded" data-twf-compatible class="sheet-input d-none" type="checkbox" value="yes" ${twoHanded === "yes" ? "checked" : ""}>
+    <input data-field="powerAttack" class="sheet-input d-none" type="checkbox" value="yes" ${powerAttack === "yes" ? "checked" : ""}>
+    <input data-field="deadlyAim" class="sheet-input d-none" type="checkbox" value="yes" ${deadlyAim === "yes" ? "checked" : ""}>
+    <input data-field="rapidShot" class="sheet-input d-none" type="checkbox" value="yes" ${rapidShot === "yes" ? "checked" : ""}>
+    <input data-field="twfNoFeatPrimary" data-twf-option class="sheet-input d-none" type="checkbox" value="yes" ${twfNoFeatPrimary === "yes" ? "checked" : ""}>
+    <input data-field="twfNoFeatOff" data-twf-option class="sheet-input d-none" type="checkbox" value="yes" ${twfNoFeatOff === "yes" ? "checked" : ""}>
+    <input data-field="twfFeatPrimary" data-twf-option class="sheet-input d-none" type="checkbox" value="yes" ${twfFeatPrimary === "yes" ? "checked" : ""}>
+    <input data-field="twfFeatOff" data-twf-option class="sheet-input d-none" type="checkbox" value="yes" ${twfFeatOff === "yes" ? "checked" : ""}>
+    <input data-field="improvedTwf" data-twf-option class="sheet-input d-none" type="checkbox" value="yes" ${improvedTwf === "yes" ? "checked" : ""}>
+    <input data-field="greaterTwf" data-twf-option class="sheet-input d-none" type="checkbox" value="yes" ${greaterTwf === "yes" ? "checked" : ""}>
   `;
   el("weaponRows").appendChild(card);
   attachInputListeners(card);
@@ -2721,48 +2671,30 @@ function addArmor(data = {}) {
   const enhancement = data.enhancement || "0";
   const enchantment = data.enchantment || "";
   const specialMaterial = data.specialMaterial || data.special_material || "";
+  const sourceLootId = data.sourceLootId || data.source_loot_id || "";
+  const sourceLocked = Boolean(sourceLootId);
   card.innerHTML = `
     <div class="equipment-card-header">
-      <input data-field="item" class="form-control form-control-sm sheet-input fw-semibold equipment-name-input" value="${escapeHtml(itemName)}">
+      <input data-field="item" class="form-control form-control-sm sheet-input fw-semibold equipment-name-input" value="${escapeHtml(itemName)}" ${sourceLocked ? "readonly" : ""}>
       <div class="equipment-actions">
-        <button class="btn btn-outline-light btn-sm" type="button" onclick="toggleCardDetails(this)">More</button>
-        <button class="btn btn-danger btn-sm" type="button" onclick="removeCard(this)">Remove</button>
+        <button class="btn btn-outline-light btn-sm" type="button" onclick="openEquipmentItemEditor(this)">More</button>
+        <button class="btn btn-outline-danger btn-sm equipment-icon-btn" type="button" onclick="removeCard(this)" aria-label="Remove ${escapeHtml(itemName)}" title="Remove">
+          <i class="bi bi-trash"></i>
+        </button>
       </div>
     </div>
     <div class="card-summary">
       <div><label>Total</label><input data-armor-total class="form-control form-control-sm" readonly></div>
-      <input data-field="sourceLootId" class="sheet-input" type="hidden" value="${data.sourceLootId || data.source_loot_id || ""}">
     </div>
-    <div class="card-details d-none" data-card-details>
-    <div class="enhancement-summary">
-      <div><label>Enhancement</label><input data-field="enhancement" class="form-control form-control-sm sheet-input" type="number" min="0" max="5" value="${enhancement}"></div>
-      <div>
-        <label>Enchantment</label>
-        <select data-field="enchantment" class="form-select form-select-sm sheet-input">
-          ${armorEnchantmentOptions(enchantment)}
-        </select>
-      </div>
-      <div>
-        <label>Special Material</label>
-        <select data-field="specialMaterial" class="form-select form-select-sm sheet-input">
-          ${optionList(PFItemEditor.ARMOR_SPECIAL_MATERIALS, specialMaterial)}
-        </select>
-      </div>
-    </div>
-    <div class="sheet-grid-wide mt-2">
-      <div>
-        <label>Type</label>
-        <select data-field="type" class="form-select form-select-sm sheet-input">
-          <option value="Armor" ${type === "Armor" ? "selected" : ""}>Armor</option>
-          <option value="Shield" ${type === "Shield" ? "selected" : ""}>Shield</option>
-        </select>
-      </div>
-      <div><label data-armor-bonus-label>${type === "Shield" ? "Shield Bonus" : "Armor Bonus"}</label><input data-field="bonus" class="form-control form-control-sm sheet-input" value="${data.bonus || ""}"></div>
-      <div><label>Penalty</label><input data-field="penalty" class="form-control form-control-sm sheet-input" value="${data.penalty || ""}"></div>
-      <div><label>Failure</label><input data-field="failure" class="form-control form-control-sm sheet-input" value="${data.failure || ""}"></div>
-      <div><label>Weight</label><input data-field="weight" class="form-control form-control-sm sheet-input" value="${data.weight || ""}"></div>
-    </div>
-    </div>
+    <input data-field="sourceLootId" class="sheet-input" type="hidden" value="${sourceLootId}">
+    <input data-field="type" class="sheet-input" type="hidden" value="${type}">
+    <input data-field="bonus" class="sheet-input" type="hidden" value="${data.bonus || ""}">
+    <input data-field="enhancement" class="sheet-input" type="hidden" value="${enhancement}">
+    <input data-field="enchantment" class="sheet-input" type="hidden" value="${escapeHtml(enchantment)}">
+    <input data-field="specialMaterial" class="sheet-input" type="hidden" value="${escapeHtml(specialMaterial)}">
+    <input data-field="penalty" class="sheet-input" type="hidden" value="${data.penalty || ""}">
+    <input data-field="failure" class="sheet-input" type="hidden" value="${data.failure || ""}">
+    <input data-field="weight" class="sheet-input" type="hidden" value="${data.weight || ""}">
   `;
   el("armorRows").appendChild(card);
   attachInputListeners(card);
@@ -2775,20 +2707,22 @@ function addGear(data = {}) {
   card.className = "sheet-card";
   card.dataset.gearIndex = i;
   const itemName = data.item || data.name || `Gear ${i + 1}`;
+  const slot = data.slot || "";
+  const sourceLootId = data.sourceLootId || data.source_loot_id || "";
+  const sourceLocked = Boolean(sourceLootId);
   card.innerHTML = `
     <div class="equipment-card-header">
-      <input data-field="item" class="form-control form-control-sm sheet-input fw-semibold equipment-name-input" value="${escapeHtml(itemName)}">
+      <input data-field="item" class="form-control form-control-sm sheet-input fw-semibold equipment-name-input" value="${escapeHtml(itemName)}" ${sourceLocked ? "readonly" : ""}>
       <div class="equipment-actions">
-        <button class="btn btn-outline-light btn-sm" type="button" onclick="toggleCardDetails(this)">More</button>
-        <button class="btn btn-danger btn-sm" type="button" onclick="removeCard(this)">Remove</button>
+        <button class="btn btn-outline-light btn-sm" type="button" onclick="openEquipmentItemEditor(this)">More</button>
+        <button class="btn btn-outline-danger btn-sm equipment-icon-btn" type="button" onclick="removeCard(this)" aria-label="Remove ${escapeHtml(itemName)}" title="Remove">
+          <i class="bi bi-trash"></i>
+        </button>
       </div>
     </div>
-    <input data-field="sourceLootId" class="sheet-input" type="hidden" value="${data.sourceLootId || data.source_loot_id || ""}">
-    <div class="card-details d-none" data-card-details>
-      <div class="sheet-grid-wide mt-2">
-        <div><label>Details</label><input data-field="details" class="form-control form-control-sm sheet-input" value="${data.details || ""}"></div>
-      </div>
-    </div>
+    <input data-field="sourceLootId" class="sheet-input" type="hidden" value="${sourceLootId}">
+    <input data-field="slot" class="sheet-input" type="hidden" value="${escapeHtml(slot)}">
+    <input data-field="details" class="sheet-input" type="hidden" value="${escapeHtml(data.details || "")}">
   `;
   el("gearRows").appendChild(card);
   attachInputListeners(card);
@@ -2850,13 +2784,14 @@ function updateWornCardFromLoot(item) {
     weaponCard.querySelector('[data-field="critical"]').value = details.critical || "";
     weaponCard.querySelector('[data-field="capacity"]').value = details.capacity || "";
     weaponCard.querySelector('[data-field="misfire"]').value = details.misfire || "";
+    weaponCard.querySelector('[data-field="range"]').value = details.range || "";
     weaponCard.querySelector('[data-field="enhancement"]').value = details.enhancement || "0";
     weaponCard.querySelector('[data-field="enchantment"]').value = details.enchantment || "";
     weaponCard.querySelector('[data-field="specialMaterial"]').value = details.specialMaterial || "";
+    weaponCard.querySelector('[data-field="details"]').value = details.details || "";
     const previousType = weaponCard.querySelector('[data-field="weaponType"]').value || "";
     const nextType = details.weaponType || "Melee Weapon (One-Handed)";
     weaponCard.querySelector('[data-field="weaponType"]').value = nextType;
-    weaponCard.querySelector('[data-field="type"]').value = details.details || "";
     syncWeaponTypeControls(weaponCard, previousType !== nextType);
     setCardScaling(weaponCard, "attackScale", details.attackScale || "STR");
     setCardScaling(weaponCard, "damageScale", details.damageScale || "STR");
@@ -2869,10 +2804,12 @@ function updateWornCardFromLoot(item) {
     armorCard.querySelector('[data-field="enhancement"]').value = details.enhancement || "0";
     armorCard.querySelector('[data-field="enchantment"]').value = details.enchantment || "";
     armorCard.querySelector('[data-field="specialMaterial"]').value = details.specialMaterial || "";
+    syncArmorCardDisplay(armorCard);
   }
 
   if (gearCard && !["Weapon", "Armor", "Shield"].includes(item.type)) {
     gearCard.querySelector('[data-field="item"]').value = item.name || "";
+    gearCard.querySelector('[data-field="slot"]').value = details.slot || "";
     gearCard.querySelector('[data-field="details"]').value = details.details || item.description || "";
   }
 
@@ -2891,7 +2828,8 @@ function updateWornCardFromLoot(item) {
       enhancement: details.enhancement || "0",
       enchantment: details.enchantment || "",
       specialMaterial: details.specialMaterial || "",
-      type: details.details || "",
+      details: details.details || "",
+      range: details.range || "",
       critical: details.critical || "",
       capacity: details.capacity || "",
       misfire: details.misfire || ""
@@ -2914,6 +2852,7 @@ function updateWornCardFromLoot(item) {
     addGear({
       item: item.name,
       sourceLootId: item.id,
+      slot: details.slot || "",
       details: details.details || item.description || ""
     });
   }
@@ -2952,13 +2891,14 @@ function isLootEquipped(sourceLootId) {
   );
 }
 
-function toggleCardDetails(btn) {
+function openEquipmentItemEditor(btn) {
   const card = btn.closest(".sheet-card");
-  const details = card?.querySelector("[data-card-details]");
-  if (!details) return;
-
-  const isHidden = details.classList.toggle("d-none");
-  btn.textContent = isHidden ? "More" : "Less";
+  const sourceLootId = card?.querySelector('[data-field="sourceLootId"]')?.value || "";
+  if (!sourceLootId) {
+    setStatus("This equipped item is not linked to inventory. Add it through inventory to edit full details.", "warning");
+    return;
+  }
+  openInventoryItemEditor(sourceLootId);
 }
 
 function calculateGearAc() {
@@ -3974,7 +3914,9 @@ async function wearLootItem(item) {
       damageScale: details.damageScale || "STR",
       enhancement: details.enhancement || "0",
       enchantment: details.enchantment || "",
-      type: details.details || "",
+      specialMaterial: details.specialMaterial || "",
+      details: details.details || "",
+      range: details.range || "",
       critical: details.critical || "",
       capacity: details.capacity || "",
       misfire: details.misfire || ""
@@ -3986,12 +3928,14 @@ async function wearLootItem(item) {
       type: item.type === "Shield" ? "Shield" : item.type === "Armor" ? "Armor" : "Gear",
       bonus: details.bonus || "0",
       enhancement: details.enhancement || "0",
-      enchantment: details.enchantment || ""
+      enchantment: details.enchantment || "",
+      specialMaterial: details.specialMaterial || ""
     });
   } else {
     addGear({
       item: item.name,
       sourceLootId: item.id,
+      slot: details.slot || "",
       details: details.details || item.description || ""
     });
   }
@@ -4360,6 +4304,9 @@ function restoreSheet(sheet) {
       if (el(`${key}Misc`) && value?.misc === undefined) el(`${key}Misc`).value = value.base || 0;
     });
   }
+  ["babMisc", "initMisc", "acMisc", "cmbMisc", "cmdMisc"].forEach(id => {
+    if (el(id) && el(id).value === "") el(id).value = "0";
+  });
   characterInventoryItems = isEnemySheetMode && Array.isArray(data.enemyInventory)
     ? data.enemyInventory.map(item => ({ ...item, assigned_character_id: currentSheetId }))
     : [];
@@ -4704,9 +4651,16 @@ async function initCharacterSheet() {
   });
   initSheetStickyControls();
   window.addEventListener("scroll", updateSheetStickyControls, { passive: true });
-  window.addEventListener("resize", () => requestAnimationFrame(syncSheetStickyControls));
+  window.addEventListener("resize", () => {
+    syncFullViewMobileOrder();
+    requestAnimationFrame(syncSheetStickyControls);
+  });
   window.visualViewport?.addEventListener("scroll", updateSheetStickyControls, { passive: true });
-  window.visualViewport?.addEventListener("resize", () => requestAnimationFrame(syncSheetStickyControls));
+  window.visualViewport?.addEventListener("resize", () => {
+    syncFullViewMobileOrder();
+    requestAnimationFrame(syncSheetStickyControls);
+  });
+  syncFullViewMobileOrder();
   requestAnimationFrame(syncSheetStickyControls);
   setTimeout(syncSheetStickyControls, 250);
   el("skillSearch")?.addEventListener("input", event => {
@@ -4752,7 +4706,7 @@ async function initCharacterSheet() {
       if (enemySourceItemCategory === "mundane" && !MUNDANE_CATEGORIES.includes(enemySourceItemMundaneCategory)) {
         enemySourceItemMundaneCategory = MUNDANE_CATEGORIES[0];
       }
-      el("enemySourceItemTabs").querySelectorAll(".nav-link").forEach(tab => {
+      el("enemySourceItemTabs").querySelectorAll("[data-source-category]").forEach(tab => {
         tab.classList.toggle("active", tab === button);
       });
       renderEnemySourceItemResults();
