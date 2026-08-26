@@ -44,10 +44,107 @@ body {
   margin-left: auto;
 }
 
-.map-settings-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+/* Cell X / Cell Y as a linked pair, with a toggle button between them. */
+.map-cell-size-row {
+  display: flex;
+  align-items: flex-end;
   gap: 8px;
+}
+
+.map-cell-size-field {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.map-cell-link-btn {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 31px;
+  height: 31px;
+  padding: 0;
+  font-size: 1rem;
+}
+
+/* Compact +/- stepper for number fields, matching the character sheet. */
+.item-number-stepper {
+  display: grid;
+  grid-template-columns: 28px minmax(54px, 1fr) 28px;
+  gap: 4px;
+  align-items: stretch;
+}
+
+.item-number-stepper input {
+  min-width: 0;
+  text-align: center;
+}
+
+.item-stepper-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 31px;
+  padding: 0;
+  line-height: 1;
+  font-weight: 800;
+}
+
+.no-spinner::-webkit-outer-spin-button,
+.no-spinner::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.no-spinner {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+/* Small square swatch instead of the browser's full-width color bar. */
+.map-color-swatch {
+  flex: 0 0 auto;
+  width: 40px;
+  min-width: 40px;
+  height: 31px;
+  padding: 2px;
+  border: 1px solid #444;
+  border-radius: 4px;
+  background: transparent;
+}
+
+/* Map switcher navbar: every user (GM and players) picks their own map
+   slot independently, so there's no shared "live" map to broadcast. */
+.map-slot-bar {
+  flex-basis: 100%;
+  order: -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Compound selector so this wins over .map-side-nav's 3-column layout
+   regardless of source order (equal single-class specificity otherwise). */
+.map-side-nav.map-slot-nav {
+  grid-template-columns: repeat(6, minmax(32px, 1fr));
+  flex: 1 1 220px;
+  min-width: 0;
+  margin-top: 0;
+}
+
+.map-side-nav.map-slot-nav .nav-link {
+  padding: 6px 2px;
+  font-weight: 700;
+}
+
+.map-slot-label {
+  font-size: 12px;
+  color: #aaa;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 220px;
 }
 
 .map-docs-modal-content {
@@ -165,10 +262,13 @@ body {
     ),
     linear-gradient(to bottom, rgba(255, 255, 255, 0.18) 1px, transparent 1px),
     var(--map-bg);
+  /* The background image always fills the whole cols x rows grid, so
+     resizing Cell X/Y (linked to the image's ratio) scales the picture with
+     it -- fewer, bigger cells or more, smaller ones -- without cropping. */
   background-size:
     var(--cell) var(--cell),
     var(--cell) var(--cell),
-    var(--bg-size);
+    100% 100%;
   background-position:
     0 0,
     0 0,
@@ -200,10 +300,56 @@ body {
   height: calc(var(--aura-size) * var(--cell));
   border: 2px solid var(--aura-color);
   border-radius: 50%;
-  background: color-mix(in srgb, var(--aura-color) 18%, transparent);
+  /* Fallback for browsers without color-mix(): an unsupported color-mix()
+     makes the *whole* declaration invalid (not just that value), so
+     without this the fill/glow silently disappears and only the border
+     shows. Not as pretty (fully opaque instead of translucent) but visible. */
+  background-color: var(--aura-color);
   pointer-events: none;
   z-index: 1;
-  box-shadow: 0 0 10px color-mix(in srgb, var(--aura-color) 30%, transparent);
+  box-shadow: 0 0 10px var(--aura-color);
+}
+
+@supports (background: color-mix(in srgb, red 50%, transparent)) {
+  .map-aura {
+    background: color-mix(in srgb, var(--aura-color) 18%, transparent);
+    box-shadow: 0 0 10px color-mix(in srgb, var(--aura-color) 30%, transparent);
+  }
+}
+
+.map-aura.map-reveal-light {
+  border-style: dashed;
+}
+
+.map-aura.map-reveal-limited {
+  border-style: dotted;
+}
+
+.map-fog-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 25;
+}
+
+.map-limited-view-grayscale {
+  position: absolute;
+  left: calc(var(--aura-x) * var(--cell));
+  top: calc(var(--aura-y) * var(--cell));
+  width: calc(var(--aura-size) * var(--cell));
+  height: calc(var(--aura-size) * var(--cell));
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 26;
+  backdrop-filter: grayscale(1) contrast(1.75);
+  -webkit-backdrop-filter: grayscale(1) contrast(1.75);
+}
+
+.map-token.map-token-fog-reveal {
+  pointer-events: none;
+  z-index: 30;
 }
 
 .map-token {
@@ -355,7 +501,16 @@ body {
 
 .map-shape {
   border: 2px solid var(--color);
-  background: color-mix(in srgb, var(--color) 28%, transparent);
+  /* Fallback for browsers without color-mix() -- see .map-aura above for
+     why this matters: without it, unsupported browsers show only the
+     border and no fill at all. */
+  background-color: var(--color);
+}
+
+@supports (background: color-mix(in srgb, red 50%, transparent)) {
+  .map-shape {
+    background: color-mix(in srgb, var(--color) 28%, transparent);
+  }
 }
 
 .map-shape.shape-grid {
@@ -368,14 +523,22 @@ body {
 }
 
 .shape-cell {
-  background: color-mix(in srgb, var(--color) 28%, transparent);
+  background-color: var(--color);
   border: 1px solid var(--color);
 }
 
+@supports (background: color-mix(in srgb, red 50%, transparent)) {
+  .shape-cell {
+    background: color-mix(in srgb, var(--color) 28%, transparent);
+  }
+}
+
 .shape-cell.texture-cell {
+  /* background-image is set inline per-cell (see renderShape in map.js) --
+     a url() inside a --custom-property resolves relative to whichever
+     stylesheet reads it via var(), not the page, which broke these icons. */
   border: 0;
   background-color: transparent;
-  background-image: var(--texture-url);
   background-repeat: no-repeat;
   background-size: 600% 400%;
   background-position: var(--tile-x) var(--tile-y);
@@ -495,6 +658,15 @@ body {
   color: #fff;
   background: #1b1b1b;
   outline: none;
+}
+
+.map-mobile-tab {
+  display: none;
+}
+
+.map-toolbar-mobile-slot .map-toolbar {
+  border-bottom: 0;
+  padding: 0;
 }
 
 .map-side-nav .nav-link.active {
@@ -806,6 +978,7 @@ body {
   position: fixed;
   z-index: 1080;
   min-width: 190px;
+  max-width: 240px;
   padding: 6px;
   background: #1e1e1e;
   border: 1px solid #555;
@@ -832,6 +1005,8 @@ body {
   width: 100%;
   justify-content: flex-start;
   text-align: left;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .map-context-submenu {
@@ -1179,16 +1354,26 @@ textarea {
 
 @media (max-width: 980px) {
   .map-shell {
-    grid-template-columns: 1fr;
+    display: block;
     height: auto;
   }
 
   .map-main {
-    min-height: 70vh;
+    display: none;
   }
 
   .map-side {
-    min-height: 420px;
+    max-width: 640px;
+    min-height: calc(100vh - 110px);
+    margin: 0 auto;
+  }
+
+  .map-mobile-tab {
+    display: block;
+  }
+
+  .map-side-nav {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 
@@ -1197,8 +1382,14 @@ textarea {
     margin-left: 0;
   }
 
-  .map-settings-grid {
-    grid-template-columns: 1fr;
+  .map-side-nav.map-slot-nav {
+    flex-basis: 100%;
+    order: 1;
+  }
+
+  .map-slot-label {
+    order: 2;
+    max-width: none;
   }
 
   .map-docs-layout {
@@ -1242,4 +1433,82 @@ textarea {
     grid-column: 1 / -1;
     justify-content: flex-end;
   }
+}
+
+.quick-controls-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  margin-top: 6px;
+}
+
+.quick-controls-toggle.active {
+  background: #0dcaf0;
+  border-color: #0dcaf0;
+  color: #111;
+}
+
+.quick-controls-panel {
+  display: grid;
+  gap: 8px;
+}
+
+.quick-controls-panel .mini-sheet-card {
+  text-align: center;
+}
+
+.quick-controls-panel .mini-sheet-label {
+  font-size: 13px;
+}
+
+.quick-controls-panel .mini-sheet-value {
+  justify-content: center;
+  font-size: 24px;
+}
+
+.quick-controls-panel .mini-sheet-value .hp-number-input {
+  width: 90px;
+  font-size: 24px;
+  text-align: center;
+}
+
+.dpad-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 40px);
+  grid-template-rows: repeat(3, 40px);
+  gap: 4px;
+  justify-content: center;
+  margin: 16px 0;
+}
+
+.dpad-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.dpad-center {
+  background: #242424;
+  border: 1px solid #444;
+  border-radius: 6px;
+}
+
+.quick-actions-list {
+  display: grid;
+  gap: 4px;
+}
+
+/* Matches .map-context-submenu's nested-group look, for the "Emit" group
+   in the mobile quick-controls panel. */
+.quick-actions-submenu {
+  display: grid;
+  gap: 4px;
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 5px;
+  background: #181818;
 }

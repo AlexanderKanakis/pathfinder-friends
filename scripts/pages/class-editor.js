@@ -503,6 +503,37 @@ async function saveClassesFile() {
   );
 }
 
+// Downloads just the selected class, in the exact shape (and under the
+// exact filename) it would have inside data/classes/ -- for browsers
+// without directory-write support, or when you only want to hand off one
+// changed class instead of the whole set.
+function exportSelectedClass() {
+  const cls = classes[selectedIndex];
+  if (!cls) {
+    setStatus("Select a class first.", "warning");
+    return;
+  }
+  commitSelectedClass();
+  ensureClassFiles(classes);
+  const filename = cls.__classFile;
+  const blob = new Blob(
+    [`${JSON.stringify(classFilePayload(cls), null, 2)}\n`],
+    { type: "application/json" },
+  );
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(url);
+  // Only this one class was exported -- other unsaved edits (if any) are
+  // still pending, so the dirty flag is intentionally left alone.
+  setStatus(
+    `Downloaded ${filename}. Replace data/classes/${filename} with it -- same format as the other split files, so index.json doesn't need to change unless you edited the name, type, category, or spellcasting flag.`,
+    "success",
+  );
+}
+
 function filteredClassIndexes() {
   const term = searchTerm.trim().toLowerCase();
   return classes
@@ -561,6 +592,24 @@ function levelFeatureSummary(feature) {
     : "";
 }
 
+// How many pools in the whole class currently share this name -- classes
+// with a choice that repeats at every N levels (rage powers, discoveries,
+// talents, ...) end up with one separate pool object per level. Only shown
+// when there's actually something else to sync to.
+function poolNameCount(name) {
+  const cls = classes[selectedIndex];
+  if (!cls || !name) return 0;
+  let count = 0;
+  cls.levelProgression.forEach((level) => {
+    (level.classFeatures || []).forEach((feature) => {
+      featurePools(feature).forEach((pool) => {
+        if (pool.name === name) count += 1;
+      });
+    });
+  });
+  return count;
+}
+
 function levelFeaturePools(feature, levelIndex, featureIndex) {
   const pools = Array.isArray(feature.pools)
     ? feature.pools
@@ -571,13 +620,25 @@ function levelFeaturePools(feature, levelIndex, featureIndex) {
   return `
     <div class="feature-pools">
       ${pools
-        .map(
-          (pool, poolIndex) => `
-        <button class="btn btn-link p-0 text-decoration-none feature-pool-pill" type="button" data-level-index="${levelIndex}" data-feature-index="${featureIndex}" data-pool-index="${poolIndex}" data-edit-pool>
-          <i class="bi bi-list-stars"></i> ${escapeHtml(pool.name || "Pool")} choices (${Array.isArray(pool.options) ? pool.options.length : 0})
-        </button>
-      `,
-        )
+        .map((pool, poolIndex) => {
+          const duplicateCount = poolNameCount(pool.name);
+          return `
+        <div class="feature-pool-pill-row">
+          <button class="btn btn-link p-0 text-decoration-none feature-pool-pill" type="button" data-level-index="${levelIndex}" data-feature-index="${featureIndex}" data-pool-index="${poolIndex}" data-edit-pool>
+            <i class="bi bi-list-stars"></i> ${escapeHtml(pool.name || "Pool")} choices (${Array.isArray(pool.options) ? pool.options.length : 0})
+          </button>
+          ${
+            duplicateCount > 1
+              ? `
+            <button class="btn btn-outline-info btn-sm feature-pool-sync-btn" type="button" data-level-index="${levelIndex}" data-feature-index="${featureIndex}" data-pool-index="${poolIndex}" data-sync-pool title="Copy this pool's settings and choice effects to the other ${duplicateCount - 1} &quot;${escapeHtml(pool.name || "")}&quot; pool(s) in this class" aria-label="Sync pool to other levels">
+              <i class="bi bi-arrow-repeat"></i>
+            </button>
+          `
+              : ""
+          }
+        </div>
+      `;
+        })
         .join("")}
     </div>
   `;
@@ -622,8 +683,25 @@ function renderSelectedClass() {
 
     <section class="level-card mb-3">
       <div class="d-flex justify-content-between align-items-center gap-2 flex-wrap mb-2">
+        <strong>Class Skills</strong>
+      </div>
+      <div class="class-skills-grid" id="classSkillsGrid">
+        ${(window.PFEffectStats?.PF_SKILLS_WITH_ABILITY || [])
+          .map(
+            ([skill]) => `
+          <label class="form-check">
+            <input class="form-check-input" type="checkbox" data-class-skill="${escapeHtml(skill)}" ${(cls.classSkills || []).includes(skill) ? "checked" : ""}>
+            <span class="form-check-label">${escapeHtml(skill)}</span>
+          </label>
+        `,
+          )
+          .join("")}
+      </div>
+    </section>
+
+    <section class="level-card mb-3">
+      <div class="d-flex justify-content-between align-items-center gap-2 flex-wrap mb-2">
         <strong>Spellcasting</strong>
-        <div class="small-text">Structured spell data used by the character sheet Spells tab.</div>
       </div>
       <div class="spellcasting-grid mb-2">
         <div>
@@ -747,6 +825,17 @@ function renderSelectedClass() {
         ),
       );
     });
+  el("classEditorPanel")
+    .querySelectorAll("[data-sync-pool]")
+    .forEach((button) => {
+      button.addEventListener("click", () =>
+        syncPoolAcrossLevels(
+          Number(button.dataset.levelIndex),
+          Number(button.dataset.featureIndex),
+          Number(button.dataset.poolIndex),
+        ),
+      );
+    });
 }
 
 function renderLevelCard(level, index) {
@@ -801,6 +890,9 @@ function commitSelectedClass() {
   cls.name = el("className").value.trim() || cls.name;
   cls.type = el("classType").value || cls.type || "base";
   cls.sourceUrl = el("classSourceUrl").value.trim();
+  cls.classSkills = [
+    ...document.querySelectorAll("#classSkillsGrid [data-class-skill]:checked"),
+  ].map((input) => input.dataset.classSkill);
   cls.spellcastingClass = el("spellcastingClass").checked;
   const existingSpellcasting =
     cls.spellcasting && typeof cls.spellcasting === "object"
@@ -940,6 +1032,108 @@ async function editFeaturePool(levelIndex, featureIndex, poolIndex) {
   renderSelectedClass();
 }
 
+// Copies contributesToAbility, plus each choice's effects/DR/activatable/
+// duration (matched by choice name), from this pool onto every other pool
+// in the class sharing its name -- so linking "Rage Power" to Rage, or
+// giving Superstition an effect, doesn't have to be repeated once per
+// level it's re-offered at.
+function syncPoolAcrossLevels(levelIndex, featureIndex, poolIndex) {
+  commitSelectedClass();
+  const cls = classes[selectedIndex];
+  const sourceFeature = cls.levelProgression[levelIndex]?.classFeatures?.[featureIndex];
+  const sourcePool = featurePools(sourceFeature || {})[poolIndex];
+  if (!sourcePool?.name) return;
+
+  let syncedPools = 0;
+  let syncedChoices = 0;
+  cls.levelProgression.forEach((level, lvlIdx) => {
+    (level.classFeatures || []).forEach((feature, featIdx) => {
+      featurePools(feature).forEach((pool, poolIdx) => {
+        if (
+          lvlIdx === levelIndex &&
+          featIdx === featureIndex &&
+          poolIdx === poolIndex
+        )
+          return;
+        if (pool.name !== sourcePool.name) return;
+        syncedPools += 1;
+        if (sourcePool.contributesToAbility)
+          pool.contributesToAbility = sourcePool.contributesToAbility;
+        else delete pool.contributesToAbility;
+        (pool.options || []).forEach((option) => {
+          const match = (sourcePool.options || []).find(
+            (candidate) => candidate.name === option.name,
+          );
+          if (!match) return;
+          let changed = false;
+          ["effects", "damageReduction", "spellResistance"].forEach((key) => {
+            if (Array.isArray(match[key]) && match[key].length) {
+              option[key] = cloneJson(match[key]);
+              changed = true;
+            } else if (option[key]) {
+              delete option[key];
+              changed = true;
+            }
+          });
+          if (match.activatable) {
+            if (!option.activatable) changed = true;
+            option.activatable = true;
+            option.durationConfig = match.durationConfig
+              ? cloneJson(match.durationConfig)
+              : option.durationConfig;
+          } else if (option.activatable) {
+            delete option.activatable;
+            delete option.durationConfig;
+            changed = true;
+          }
+          // A prerequisite (min level, race, required prior choices,
+          // the notes text, the exclusive-group tag) is a property of
+          // the OPTION itself -- "Celestial Totem requires Barbarian 8
+          // and Lesser Celestial Totem" is true everywhere that option
+          // appears, not just at the one level slot someone happened to
+          // fill it in on. Sync the whole requirements object so a gap
+          // at one level (like a missing requiredChoices link) can't
+          // silently make that option look unearned everywhere else.
+          ["minClassLevel", "race", "requiredChoices", "text", "excludesGroup"].forEach(
+            (reqKey) => {
+              const matchVal = match.requirements?.[reqKey];
+              const optionVal = option.requirements?.[reqKey];
+              const matchHas = Array.isArray(matchVal)
+                ? matchVal.length
+                : matchVal !== undefined && matchVal !== null && matchVal !== "";
+              if (matchHas) {
+                if (JSON.stringify(optionVal) !== JSON.stringify(matchVal)) {
+                  option.requirements = option.requirements || {};
+                  option.requirements[reqKey] = cloneJson(matchVal);
+                  changed = true;
+                }
+              } else if (optionVal !== undefined) {
+                delete option.requirements[reqKey];
+                changed = true;
+              }
+            },
+          );
+          if (
+            option.requirements &&
+            !Object.keys(option.requirements).length
+          )
+            delete option.requirements;
+          if (changed) syncedChoices += 1;
+        });
+      });
+    });
+  });
+
+  setDirty(true);
+  renderSelectedClass();
+  setStatus(
+    syncedPools
+      ? `Synced "${sourcePool.name}" to ${syncedPools} other pool${syncedPools === 1 ? "" : "s"} (${syncedChoices} matching choice${syncedChoices === 1 ? "" : "s"} updated).`
+      : `No other "${sourcePool.name}" pools found to sync.`,
+    syncedPools ? "success" : "warning",
+  );
+}
+
 async function initClassEditor() {
   const user = await PFApp.requireAuth();
   if (!user) return;
@@ -968,6 +1162,13 @@ el("saveClassesFileBtn").addEventListener("click", async () => {
     await saveClassesFile();
   } catch (error) {
     setStatus(error.message || "Could not save split class data.", "danger");
+  }
+});
+el("exportSelectedClassBtn").addEventListener("click", () => {
+  try {
+    exportSelectedClass();
+  } catch (error) {
+    setStatus(error.message || "Could not export the selected class.", "danger");
   }
 });
 window.addEventListener("beforeunload", (event) => {

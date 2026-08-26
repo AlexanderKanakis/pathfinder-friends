@@ -19,7 +19,16 @@
 
     <main class="map-shell">
       <section class="map-main">
-        <div class="map-toolbar">
+        <div class="map-toolbar" id="mapToolbar">
+          <div id="mapSlotBar" class="map-slot-bar d-none">
+            <nav
+              id="mapSlotNav"
+              class="nav nav-pills map-side-nav map-slot-nav"
+              role="tablist"
+              aria-label="Map slots"
+            ></nav>
+            <div id="mapSlotLabel" class="map-slot-label"></div>
+          </div>
           <button
             id="addCharacterToken"
             class="btn btn-primary btn-sm"
@@ -66,31 +75,16 @@
           </button>
         </div>
 
-        <div class="map-stage-wrap">
-          <div
-            id="auraEffectToasts"
-            class="aura-effect-toasts"
-            aria-live="polite"
-          ></div>
-          <div
-            id="turnEffectNotices"
-            class="turn-effect-notices"
-            aria-live="polite"
-          ></div>
+        <div class="map-stage-wrap" id="mapStageWrap">
           <div id="mapStage" class="map-stage" aria-label="Battle map"></div>
         </div>
       </section>
 
       <aside class="map-side">
         <div class="side-tabs">
-          <div class="d-flex justify-content-between align-items-center">
-            <div>
-              <h5 class="mb-0">Map</h5>
-              <div id="gmHint" class="small text-secondary"></div>
-            </div>
-            <button id="nextTurn" class="btn btn-success btn-sm" type="button">
-              Next
-            </button>
+          <div>
+            <h5 class="mb-0">Map</h5>
+            <div id="gmHint" class="small text-secondary"></div>
           </div>
           <nav
             class="nav nav-pills map-side-nav"
@@ -133,6 +127,18 @@
             >
               Timeline
             </button>
+            <button
+              id="mapToolbarTab"
+              class="nav-link map-mobile-tab"
+              data-bs-toggle="tab"
+              data-bs-target="#mapToolbarPane"
+              type="button"
+              role="tab"
+              aria-controls="mapToolbarPane"
+              aria-selected="false"
+            >
+              Map
+            </button>
           </nav>
         </div>
         <div class="side-scroll tab-content">
@@ -158,14 +164,19 @@
           >
             <div class="side-title">Initiative</div>
             <div class="initiative-meta">
-              <strong id="roundCounter">Round 0</strong>
-              <button
-                id="resetRounds"
-                class="btn btn-outline-light btn-sm"
-                type="button"
-              >
-                <i class="bi bi-arrow-counterclockwise me-1"></i>Reset
-              </button>
+              <strong id="roundCounter">Round 1</strong>
+              <div class="d-flex gap-2">
+                <button id="nextTurn" class="btn btn-success btn-sm" type="button">
+                  Next
+                </button>
+                <button
+                  id="resetRounds"
+                  class="btn btn-outline-light btn-sm"
+                  type="button"
+                >
+                  <i class="bi bi-arrow-counterclockwise me-1"></i>Reset
+                </button>
+              </div>
             </div>
             <div id="initiativeNotice" class="small text-warning mb-2"></div>
             <div id="initiativeList"></div>
@@ -236,20 +247,66 @@
             </form>
             <div id="timelineList" class="timeline-list"></div>
           </section>
+
+          <section
+            id="mapToolbarPane"
+            class="tab-pane fade side-section"
+            role="tabpanel"
+            aria-labelledby="mapToolbarTab"
+            tabindex="0"
+          >
+            <div class="side-title">Map</div>
+            <div id="mapToolbarMobileSlot" class="map-toolbar-mobile-slot"></div>
+          </section>
         </div>
       </aside>
     </main>
 
+    <div id="auraEffectToasts" class="aura-effect-toasts" aria-live="polite"></div>
+    <div id="turnEffectNotices" class="turn-effect-notices" aria-live="polite"></div>
+
     <div id="mapContextMenu" class="map-context-menu d-none" role="menu">
       <div id="mapContextMenuTitle" class="map-context-menu-title"></div>
       <button
-        id="openAuraOptions"
+        id="toggleEmitMenu"
         class="btn btn-outline-info btn-sm mb-1"
         type="button"
         role="menuitem"
+        aria-expanded="false"
       >
-        <i class="bi bi-broadcast-pin me-1"></i> Aura options
+        <i class="bi bi-broadcast-pin me-1"></i> Emit
       </button>
+      <div
+        id="emitMenu"
+        class="map-context-submenu d-none"
+        role="group"
+        aria-label="Emit"
+      >
+        <button
+          id="openAuraOptions"
+          class="btn btn-outline-info btn-sm mb-1"
+          type="button"
+          role="menuitem"
+        >
+          <i class="bi bi-broadcast-pin me-1"></i> Aura options
+        </button>
+        <button
+          id="openLightOptions"
+          class="btn btn-outline-warning btn-sm mb-1"
+          type="button"
+          role="menuitem"
+        >
+          <i class="bi bi-brightness-high me-1"></i> Apply light
+        </button>
+        <button
+          id="openLimitedViewOptions"
+          class="btn btn-outline-info btn-sm"
+          type="button"
+          role="menuitem"
+        >
+          <i class="bi bi-eye me-1"></i> Apply Special Vision
+        </button>
+      </div>
       <button
         id="openApplyEffect"
         class="btn btn-outline-success btn-sm mb-1 d-none"
@@ -584,7 +641,9 @@
           class="modal-content bg-dark text-white border-secondary"
         >
           <div class="modal-header border-secondary">
-            <h5 class="modal-title">Map Settings</h5>
+            <h5 id="backgroundOptionsTitle" class="modal-title">
+              Map Settings
+            </h5>
             <button
               type="button"
               class="btn-close btn-close-white d-none"
@@ -593,42 +652,15 @@
             ></button>
           </div>
           <div class="modal-body">
-            <div class="map-settings-grid mb-3">
-              <div>
-                <label for="gridSize">Map Size</label>
-                <input
-                  id="gridSize"
-                  class="form-control form-control-sm"
-                  type="number"
-                  min="24"
-                  max="96"
-                  value="48"
-                />
-              </div>
-              <div>
-                <label for="mapCols">Width</label>
-                <input
-                  id="mapCols"
-                  class="form-control form-control-sm"
-                  type="number"
-                  min="8"
-                  max="80"
-                  value="30"
-                />
-              </div>
-              <div>
-                <label for="mapRows">Height</label>
-                <input
-                  id="mapRows"
-                  class="form-control form-control-sm"
-                  type="number"
-                  min="8"
-                  max="80"
-                  value="20"
-                />
-              </div>
+            <div id="mapNameWrap" class="mb-3 d-none">
+              <label for="mapName">Map Name</label>
+              <input
+                id="mapName"
+                class="form-control form-control-sm"
+                placeholder="Map 1"
+                maxlength="60"
+              />
             </div>
-            <hr class="border-secondary" />
             <div class="mb-3">
               <label for="backgroundUrl">Background URL</label>
               <input
@@ -636,15 +668,130 @@
                 class="form-control form-control-sm"
                 placeholder="https://..."
               />
+              <div id="mapSizeHint" class="small text-secondary mt-1">
+                Loading an image sets Cell X/Y to match its shape. Resize
+                freely from there — linked keeps it undistorted, fewer
+                cells just means each one is bigger.
+              </div>
+            </div>
+            <hr class="border-secondary" />
+            <div class="mb-3">
+              <label for="gridSize">Map Size</label>
+              <div class="item-number-stepper" data-item-stepper>
+                <button
+                  type="button"
+                  class="btn btn-outline-light btn-sm item-stepper-btn"
+                  data-item-stepper-delta="-1"
+                  aria-label="Decrease map size"
+                >
+                  -</button
+                ><input
+                  id="gridSize"
+                  class="form-control form-control-sm no-spinner"
+                  type="number"
+                  min="24"
+                  max="96"
+                  value="48"
+                  inputmode="numeric"
+                /><button
+                  type="button"
+                  class="btn btn-outline-light btn-sm item-stepper-btn"
+                  data-item-stepper-delta="1"
+                  aria-label="Increase map size"
+                >
+                  +
+                </button>
+              </div>
             </div>
             <div class="mb-3">
-              <label for="backgroundFit">Fit</label>
-              <select id="backgroundFit" class="form-select form-select-sm">
-                <option value="cover">Cover</option>
-                <option value="contain">Contain</option>
-                <option value="100% 100%">Stretch</option>
-                <option value="auto">Original</option>
-              </select>
+              <div class="map-cell-size-row">
+                <div class="map-cell-size-field">
+                  <label for="cellX">Cell X</label>
+                  <div class="item-number-stepper" data-item-stepper>
+                    <button
+                      type="button"
+                      class="btn btn-outline-light btn-sm item-stepper-btn"
+                      data-item-stepper-delta="-1"
+                      aria-label="Decrease cell X"
+                    >
+                      -</button
+                    ><input
+                      id="cellX"
+                      class="form-control form-control-sm no-spinner"
+                      type="number"
+                      min="8"
+                      max="300"
+                      value="30"
+                      inputmode="numeric"
+                    /><button
+                      type="button"
+                      class="btn btn-outline-light btn-sm item-stepper-btn"
+                      data-item-stepper-delta="1"
+                      aria-label="Increase cell X"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+                <button
+                  id="cellLinkToggle"
+                  type="button"
+                  class="btn btn-sm map-cell-link-btn"
+                  aria-pressed="true"
+                  aria-label="Keep Cell X and Cell Y locked to the image's aspect ratio"
+                  title="Locked to the image's aspect ratio"
+                >
+                  <i class="bi bi-link-45deg"></i>
+                </button>
+                <div class="map-cell-size-field">
+                  <label for="cellY">Cell Y</label>
+                  <div class="item-number-stepper" data-item-stepper>
+                    <button
+                      type="button"
+                      class="btn btn-outline-light btn-sm item-stepper-btn"
+                      data-item-stepper-delta="-1"
+                      aria-label="Decrease cell Y"
+                    >
+                      -</button
+                    ><input
+                      id="cellY"
+                      class="form-control form-control-sm no-spinner"
+                      type="number"
+                      min="8"
+                      max="300"
+                      value="20"
+                      inputmode="numeric"
+                    /><button
+                      type="button"
+                      class="btn btn-outline-light btn-sm item-stepper-btn"
+                      data-item-stepper-delta="1"
+                      aria-label="Increase cell Y"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div id="fogSettingsWrap" class="d-none">
+              <hr class="border-secondary" />
+              <div class="d-flex align-items-center gap-2">
+                <button
+                  id="applyFogButton"
+                  type="button"
+                  class="btn btn-outline-light btn-sm flex-grow-1"
+                >
+                  Apply Fog
+                </button>
+                <input
+                  id="fogColor"
+                  class="map-color-swatch"
+                  type="color"
+                  value="#000000"
+                  title="Fog color"
+                  aria-label="Fog color"
+                />
+              </div>
             </div>
           </div>
           <div class="modal-footer border-secondary">
@@ -896,7 +1043,9 @@
           class="modal-content bg-dark text-white border-secondary"
         >
           <div class="modal-header border-secondary">
-            <h5 class="modal-title">Aura Options</h5>
+            <h5 id="auraOptionsModalTitle" class="modal-title">
+              Aura Options
+            </h5>
             <button
               type="button"
               class="btn-close btn-close-white d-none"
@@ -912,7 +1061,12 @@
                 type="checkbox"
                 role="switch"
               />
-              <label class="form-check-label" for="auraVisible">Visible</label>
+              <label
+                id="auraVisibleLabel"
+                class="form-check-label"
+                for="auraVisible"
+                >Visible</label
+              >
             </div>
             <div class="mb-3">
               <label for="auraRadiusCells">Radius</label>
@@ -932,16 +1086,16 @@
                 >
               </div>
             </div>
-            <div>
+            <div id="auraColorField">
               <label for="auraColor">Color</label>
               <input
                 id="auraColor"
-                class="form-control form-control-sm"
+                class="map-color-swatch"
                 type="color"
                 value="#8fd19e"
               />
             </div>
-            <div class="border-top border-secondary mt-3 pt-3">
+            <div id="auraEffectSection" class="border-top border-secondary mt-3 pt-3">
               <div
                 class="d-flex justify-content-between align-items-center gap-2 mb-2"
               >
@@ -988,7 +1142,7 @@
             >
               Cancel
             </button>
-            <button class="btn btn-primary btn-sm" type="submit">
+            <button id="auraSaveButton" class="btn btn-primary btn-sm" type="submit">
               Save Aura
             </button>
           </div>
@@ -1027,8 +1181,13 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="scripts/supabase-config.js"></script>
     <script src="scripts/app-supabase.js"></script>
+    <script src="scripts/class-data.js"></script>
+    <script src="scripts/class-feature-abilities.js?v=1"></script>
     <script src="modals/effect-duration-editor.js"></script>
-    <script src="scripts/buff-tracker-widget.js?v=extra-attack-widget-2"></script>
+    <script src="scripts/effect-stat-options.js?v=2"></script>
+    <script src="modals/effect-choice-picker.js?v=1"></script>
+    <script src="modals/pending-effect-choices.js?v=1"></script>
+    <script src="scripts/buff-tracker-widget.js?v=min-scale-1"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="scripts/pages/map.js"></script>
   </body>

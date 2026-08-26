@@ -295,6 +295,7 @@ const LOOT_EFFECT_STATS = [
   "fortitude",
   "reflex",
   "will",
+  "all saves",
   "initiative",
   "cmb",
   "cmd",
@@ -1298,6 +1299,8 @@ function titleCaseStat(value) {
   const key = String(value || "")
     .toLowerCase()
     .trim();
+  const choiceLabel = window.PFEffectStats?.choiceStatLabel?.(key);
+  if (choiceLabel) return choiceLabel;
   if (key.startsWith("skill:")) {
     const skill = allSkills()
       .map(([name]) => name)
@@ -1324,6 +1327,7 @@ function lootEffectStatOptions(selected = "") {
       <option value="skill:profession" ${selected === "skill:profession" ? "selected" : ""}>Skill: Profession</option>
       ${skillStats.map((stat) => option(stat)).join("")}
     </optgroup>
+    ${window.PFEffectStats?.choiceOptgroupHtml?.(selected, escapeHtml) || ""}
   `;
 }
 
@@ -2448,7 +2452,13 @@ function collectClassFeatureBuffs() {
         casterLevel: classLevel,
         permanent: true,
       };
-      if (Array.isArray(feature.effects) && feature.effects.length) {
+      // Activatable features (Rage, Smite Evil, ...) aren't always-on --
+      // their effects only apply once cast, via collectActivatableAbilities.
+      if (
+        !feature.activatable &&
+        Array.isArray(feature.effects) &&
+        feature.effects.length
+      ) {
         buffs.push({
           ...context,
           name: feature.name || "Class Feature",
@@ -2456,6 +2466,10 @@ function collectClassFeatureBuffs() {
         });
       }
       featurePools(feature).forEach((pool) => {
+        // Choices whose pool contributes to an activatable ability (e.g.
+        // rage powers into Rage) get bundled in at cast time instead of
+        // applying as their own always-on buff.
+        if (pool.contributesToAbility) return;
         const key = classFeatureChoiceKey(
           {
             ...feature,
@@ -2483,8 +2497,290 @@ function collectClassFeatureBuffs() {
   return buffs;
 }
 
+// Resolves every class feature's damage reduction (scaled to the current
+// level via the same milestone/every-N-levels math as regular stat
+// bonuses) into "amount/type" entries, e.g. { amount: 3, overcomeType:
+// "magic", source: "Damage Reduction" }.
+function collectClassFeatureDamageReduction() {
+  const limit = Math.max(1, num("characterLevel") || 1);
+  const counts = {};
+  const classLevels = progressionClassCounts(limit);
+  const entries = [];
+  const addEntries = (drList, context, sourceName, active = false) => {
+    (Array.isArray(drList) ? drList : []).forEach((dr) => {
+      const amount = window.PFBuffs?.scaledBonusValue
+        ? window.PFBuffs.scaledBonusValue(
+            { value: dr.amount, bonusScale: dr.bonusScale || dr.scale },
+            context,
+          )
+        : Number(dr.amount || 0);
+      if (amount <= 0) return;
+      entries.push({
+        amount,
+        overcomeType: dr.overcomeType || "",
+        source: sourceName,
+        active,
+      });
+    });
+  };
+  classProgression.slice(0, limit).forEach((row) => {
+    const className = row.className;
+    if (!className) return;
+    counts[className] = (counts[className] || 0) + 1;
+    const classLevel = counts[className];
+    const definition = classDefinitionByName(className);
+    const levelData = classLevelAt(definition, classLevel);
+    const features = levelData?.classFeatures || levelData?.special || [];
+    features.forEach((feature) => {
+      if (typeof feature === "string") return;
+      const context = {
+        characterLevel: limit,
+        classLevel,
+        classLevels,
+        casterLevel: classLevel,
+      };
+      if (!feature.activatable) {
+        addEntries(
+          feature.damageReduction,
+          context,
+          feature.name || "Class Feature",
+        );
+      }
+      featurePools(feature).forEach((pool) => {
+        if (pool.contributesToAbility) return;
+        const key = classFeatureChoiceKey(
+          { ...feature, className, classLevel, characterLevel: row.level },
+          pool,
+          { className, classLevel, characterLevel: row.level },
+        );
+        const selected = classFeatureChoices[key];
+        const option = (pool.options || []).find(
+          (item) => item.name === selected,
+        );
+        if (option) {
+          addEntries(
+            option.damageReduction,
+            context,
+            option.name || pool.name || "Class Feature Choice",
+          );
+        }
+      });
+    });
+  });
+  // Abilities that are currently active (Rage, etc.) can carry their
+  // own bundled DR -- e.g. Celestial Totem, Greater's SR only applies
+  // while raging, so it's on the active buff entry rather than an
+  // always-on class feature. Scaled against that buff's own
+  // casterLevel/characterLevel (locked in when it was activated), not
+  // the character's current class-level walk.
+  (activeBuffs || []).forEach((buff) => {
+    addEntries(buff.damageReduction, buff, buff.name || "Active Effect", true);
+  });
+  return entries;
+}
+
+function updateClassFeatureDamageReductionSummary() {
+  const summary = el("damageReductionFromClasses");
+  if (!summary) return;
+  const entries = collectClassFeatureDamageReduction();
+  if (!entries.length) {
+    summary.textContent = "";
+    summary.classList.add("d-none");
+    return;
+  }
+  const always = entries.filter((entry) => !entry.active);
+  const active = entries.filter((entry) => entry.active);
+  const parts = [];
+  if (always.length)
+    parts.push(`From class features: ${always.map(drEntryText).join(", ")}`);
+  if (active.length)
+    parts.push(
+      `While active: ${active.map((entry) => `${drEntryText(entry)} (${entry.source})`).join(", ")}`,
+    );
+  summary.textContent = parts.join(" | ");
+  summary.classList.remove("d-none");
+}
+
+// Same idea as collectClassFeatureDamageReduction, but for Spell
+// Resistance -- fewer class features grant it, but the ones that do
+// (protective auras, some archetypes) scale the same way DR does.
+function collectClassFeatureSpellResistance() {
+  const limit = Math.max(1, num("characterLevel") || 1);
+  const counts = {};
+  const classLevels = progressionClassCounts(limit);
+  const entries = [];
+  const addEntries = (srList, context, sourceName, active = false) => {
+    (Array.isArray(srList) ? srList : []).forEach((sr) => {
+      const amount = window.PFBuffs?.scaledBonusValue
+        ? window.PFBuffs.scaledBonusValue(
+            { value: sr.amount, bonusScale: sr.bonusScale || sr.scale },
+            context,
+          )
+        : Number(sr.amount || 0);
+      if (amount <= 0) return;
+      entries.push({
+        amount,
+        conditional: sr.conditional,
+        appliesWhen: sr.appliesWhen,
+        condition: sr.condition,
+        source: sourceName,
+        active,
+      });
+    });
+  };
+  classProgression.slice(0, limit).forEach((row) => {
+    const className = row.className;
+    if (!className) return;
+    counts[className] = (counts[className] || 0) + 1;
+    const classLevel = counts[className];
+    const definition = classDefinitionByName(className);
+    const levelData = classLevelAt(definition, classLevel);
+    const features = levelData?.classFeatures || levelData?.special || [];
+    features.forEach((feature) => {
+      if (typeof feature === "string") return;
+      const context = {
+        characterLevel: limit,
+        classLevel,
+        classLevels,
+        casterLevel: classLevel,
+      };
+      if (!feature.activatable) {
+        addEntries(
+          feature.spellResistance,
+          context,
+          feature.name || "Class Feature",
+        );
+      }
+      featurePools(feature).forEach((pool) => {
+        if (pool.contributesToAbility) return;
+        const key = classFeatureChoiceKey(
+          { ...feature, className, classLevel, characterLevel: row.level },
+          pool,
+          { className, classLevel, characterLevel: row.level },
+        );
+        const selected = classFeatureChoices[key];
+        const option = (pool.options || []).find(
+          (item) => item.name === selected,
+        );
+        if (option) {
+          addEntries(
+            option.spellResistance,
+            context,
+            option.name || pool.name || "Class Feature Choice",
+          );
+        }
+      });
+    });
+  });
+  // Same reasoning as collectClassFeatureDamageReduction: an ability
+  // that's currently active can carry its own bundled SR (e.g.
+  // Celestial Totem, Greater's SR only while raging).
+  (activeBuffs || []).forEach((buff) => {
+    addEntries(buff.spellResistance, buff, buff.name || "Active Effect", true);
+  });
+  return entries;
+}
+
+function updateClassFeatureSpellResistanceSummary() {
+  const summary = el("spellResistanceFromClasses");
+  if (!summary) return;
+  const entries = collectClassFeatureSpellResistance();
+  if (!entries.length) {
+    summary.textContent = "";
+    summary.classList.add("d-none");
+    return;
+  }
+  const always = entries.filter((entry) => !entry.active);
+  const active = entries.filter((entry) => entry.active);
+  const parts = [];
+  if (always.length)
+    parts.push(`From class features: ${always.map(srEntryText).join(", ")}`);
+  if (active.length)
+    parts.push(
+      `While active: ${active.map((entry) => `${srEntryText(entry)} (${entry.source})`).join(", ")}`,
+    );
+  summary.textContent = parts.join(" | ");
+  summary.classList.remove("d-none");
+}
+
+// Class features (or pool choices) flagged "activatable" aren't part of
+// the always-on bonus total -- they're things a player triggers (Rage,
+// Smite Evil, ...), so they're surfaced here as ready-to-cast abilities
+// instead, for the Effects tab / map effect pickers to offer directly.
+// Any selected pool choice whose pool declares contributesToAbility gets
+// folded into the matching ability's bonuses (e.g. rage powers into Rage)
+// rather than applying on its own.
+function collectActivatableAbilities() {
+  return (
+    window.PFClassFeatureAbilities?.collectActivatableAbilities({
+      classDefinitions,
+      classProgression,
+      classFeatureChoices,
+      characterLevel: num("characterLevel"),
+      abilityScores: {
+        str: num("strScore"),
+        dex: num("dexScore"),
+        con: num("conScore"),
+        int: num("intScore"),
+        wis: num("wisScore"),
+        cha: num("chaScore"),
+      },
+    }) || []
+  );
+}
+
 function calculationBuffs() {
   return [...activeBuffs, ...collectClassFeatureBuffs()];
+}
+
+// Every class skill from every class this character has levels in --
+// which class actually granted it doesn't matter for the +3 bonus (PF1e:
+// classes sharing a class skill don't stack it), so a Set of resolved
+// skill keys already gives the right "does this count at all" answer.
+function characterClassSkillKeys() {
+  const limit = Math.max(1, num("characterLevel") || 1);
+  const keys = new Set();
+  const seenClasses = new Set();
+  classProgression.slice(0, limit).forEach((row) => {
+    if (!row.className || seenClasses.has(row.className)) return;
+    seenClasses.add(row.className);
+    const definition = classDefinitionByName(row.className);
+    (definition?.classSkills || []).forEach((skill) => {
+      keys.add(skillStatKey(skill));
+    });
+  });
+  return keys;
+}
+
+// Skills granted class-skill status by an effect (a feat/trait/racial
+// ability/class feature saying "X becomes a class skill for you") --
+// scans the same buffs (always-on class features + active effects)
+// recalculateSheet() already reads for numeric bonuses. Traits, feats,
+// and any other buff added through the tracker (activatable abilities
+// included) already have their "choice:<poolId>" stats resolved to a
+// concrete skill via PFEffectChoicePicker at add/cast time (see
+// resolveChoiceBonuses in buff-tracker-widget.js), so those work here
+// with no extra plumbing. The one gap: a class feature that is (a) not
+// activatable -- i.e. baked straight into calculationBuffs() every
+// recalc with no "add" step -- and (b) itself carries a raw
+// "choice:<poolId>" stat (either directly on feature.effects, or on a
+// selected pool option's effects) never passes through that picker, so
+// its stat stays unresolved and is skipped here rather than applied
+// nonsensically.
+function grantedClassSkillKeys() {
+  const keys = new Set();
+  calculationBuffs().forEach((buff) => {
+    (buff.bonuses || []).forEach((bonus) => {
+      if (!bonus.classSkillGrant) return;
+      const stat = String(bonus.stat || "");
+      if (stat.startsWith("skill:")) keys.add(stat);
+    });
+  });
+  return keys;
+}
+
+function characterClassSkillSet() {
+  return new Set([...characterClassSkillKeys(), ...grantedClassSkillKeys()]);
 }
 
 function computeClassProgressionTotals() {
@@ -2627,6 +2923,11 @@ function classFeatureScaleText(scale) {
         ? `${source.className || "class"} level`
         : "caster level";
   const parts = [];
+  if (scale.levelMultiplier) {
+    const { numerator, denominator } = scale.levelMultiplier;
+    const frac = denominator === 1 ? `${numerator}x` : `${numerator}/${denominator}`;
+    parts.push(`${frac} ${sourceLabel} (round down)`);
+  }
   const milestones = Array.isArray(scale.milestones) ? scale.milestones : [];
   if (milestones.length) {
     parts.push(
@@ -2644,7 +2945,62 @@ function classFeatureScaleText(scale) {
       `after ${sourceLabel} ${every.afterLevel}, every ${every.everyLevels}: ${signed(Number(every.increase || 0))}`,
     );
   }
+  if (scale.minimumOne) parts.push("minimum 1");
   return parts.length ? `; scales ${parts.join("; ")}` : "";
+}
+
+// DR is written "amount/type" -- an empty type or a bare "-" means it
+// applies to any attack that doesn't ignore DR outright (PF core rules).
+function drOvercomeTypeText(overcomeType) {
+  const text = String(overcomeType || "").trim();
+  return text && text !== "-" ? text : "-";
+}
+
+function drEntryText(dr) {
+  return `DR ${Number(dr.amount || 0)}/${drOvercomeTypeText(dr.overcomeType)}`;
+}
+
+function renderClassFeatureDamageReduction(feature) {
+  const entries = Array.isArray(feature.damageReduction)
+    ? feature.damageReduction
+    : [];
+  if (!entries.length) return "";
+  return `
+    <div class="class-feature-effects">
+      ${entries
+        .map((dr) => {
+          const scale = classFeatureScaleText(dr.bonusScale || dr.scale);
+          return `<span class="class-feature-dr-pill">${escapeHtml(`${drEntryText(dr)}${scale}`)}</span>`;
+        })
+        .join("")}
+    </div>
+  `;
+}
+
+function srEntryText(sr) {
+  // conditional/appliesWhen matches how every other effect authors a
+  // condition; sr.condition is a fallback for entries saved before this
+  // switched over from its own one-off free-text field.
+  const isConditional = sr.conditional ?? Boolean(sr.condition);
+  const appliesWhen = sr.appliesWhen || sr.condition || "";
+  return `SR ${Number(sr.amount || 0)}${isConditional ? ` (${appliesWhen || "conditional"})` : ""}`;
+}
+
+function renderClassFeatureSpellResistance(feature) {
+  const entries = Array.isArray(feature.spellResistance)
+    ? feature.spellResistance
+    : [];
+  if (!entries.length) return "";
+  return `
+    <div class="class-feature-effects">
+      ${entries
+        .map((sr) => {
+          const scale = classFeatureScaleText(sr.bonusScale || sr.scale);
+          return `<span class="class-feature-sr-pill">${escapeHtml(`${srEntryText(sr)}${scale}`)}</span>`;
+        })
+        .join("")}
+    </div>
+  `;
 }
 
 function renderClassFeatureEffects(feature) {
@@ -2657,17 +3013,19 @@ function renderClassFeatureEffects(feature) {
           const stat = titleCaseStat(
             effect.skillName || effect.stat || "effect",
           );
-          const value =
-            String(effect.stat || "").toLowerCase() === "remove dex bonus to ac"
+          const value = effect.classSkillGrant
+            ? "becomes a class skill"
+            : String(effect.stat || "").toLowerCase() ===
+                "remove dex bonus to ac"
               ? "removes DEX bonus"
               : `${signed(Number(effect.value || 0))} ${effect.type || "untyped"}`;
           const conditional = effect.conditional
             ? ` (${effect.appliesWhen || "conditional"})`
             : "";
           const stacks = effect.stacks ? "; stacks" : "";
-          const scale = classFeatureScaleText(
-            effect.bonusScale || effect.scale,
-          );
+          const scale = effect.classSkillGrant
+            ? ""
+            : classFeatureScaleText(effect.bonusScale || effect.scale);
           return `<span class="class-feature-effect-pill">${escapeHtml(`${stat}: ${value}${conditional}${stacks}${scale}`)}</span>`;
         })
         .join("")}
@@ -2683,7 +3041,73 @@ function featurePools(feature) {
       : [];
 }
 
-function requirementWarnings(requirements = {}, context = {}) {
+// Every option currently chosen across every instance of a pool sharing
+// this name (e.g. every level's separate "Rage Power" slot), except the
+// slot identified by excludeKey -- used to check exclusive-group
+// conflicts (totem lines, etc.) against choices made at *other* levels.
+function chosenOptionsForPoolName(poolName, excludeKey) {
+  if (!poolName) return [];
+  const limit = Math.max(1, num("characterLevel") || 1);
+  const counts = {};
+  const results = [];
+  classProgression.slice(0, limit).forEach((row) => {
+    const className = row.className;
+    if (!className) return;
+    counts[className] = (counts[className] || 0) + 1;
+    const classLevel = counts[className];
+    const definition = classDefinitionByName(className);
+    const levelData = classLevelAt(definition, classLevel);
+    const features = levelData?.classFeatures || levelData?.special || [];
+    features.forEach((feature) => {
+      if (typeof feature === "string") return;
+      const context = { className, classLevel, characterLevel: row.level };
+      featurePools(feature).forEach((pool) => {
+        if (pool.name !== poolName) return;
+        const key = classFeatureChoiceKey(
+          { ...feature, ...context },
+          pool,
+          context,
+        );
+        if (key === excludeKey) return;
+        const selected = classFeatureChoices[key];
+        if (!selected) return;
+        const option = (pool.options || []).find(
+          (item) => item.name === selected,
+        );
+        if (option) results.push(option);
+      });
+    });
+  });
+  return results;
+}
+
+// Two options with the same requirements.excludesGroup tag block each
+// other -- unless one is a prerequisite of the other via
+// requiredChoices (e.g. a totem line's later tiers), in which case
+// they're the same chain, not competing chains.
+function exclusiveGroupConflict(option = {}, requirements = {}, extra = {}) {
+  const group = String(requirements.excludesGroup || "").trim();
+  if (!group || !extra.poolName) return "";
+  const others = chosenOptionsForPoolName(extra.poolName, extra.excludeKey);
+  const conflict = others.find((other) => {
+    if (other.name === option.name) return false;
+    if (String(other.requirements?.excludesGroup || "").trim() !== group)
+      return false;
+    const linkedForward = (requirements.requiredChoices || []).some((req) =>
+      classFeatureChoiceMatchesRequirement(req, other.name),
+    );
+    const linkedBackward = (
+      other.requirements?.requiredChoices || []
+    ).some((req) => classFeatureChoiceMatchesRequirement(req, option.name));
+    return !linkedForward && !linkedBackward;
+  });
+  return conflict ? `exclusive with ${conflict.name}` : "";
+}
+
+// extra: optional { option, poolName, excludeKey } to also check the
+// requirements.excludesGroup tag against choices made in every other
+// instance of the same-named pool (see chosenOptionsForPoolName).
+function requirementWarnings(requirements = {}, context = {}, extra = {}) {
   const warnings = [];
   const minClassLevel = Number(
     requirements.minClassLevel || requirements.minLevel || 0,
@@ -2714,6 +3138,20 @@ function requirementWarnings(requirements = {}, context = {}) {
     )
       warnings.push(`requires choice: ${choice}`);
   });
+  const exclusiveWarning = exclusiveGroupConflict(
+    extra.option || {},
+    requirements,
+    extra,
+  );
+  if (exclusiveWarning) warnings.push(exclusiveWarning);
+  // requirements.text is a descriptive note (e.g. "Barbarian 6, lesser
+  // ancestor totem"), not itself a failed check -- it must not count
+  // toward "unmet", or every option with prerequisite flavor text would
+  // show as permanently blocked even when its actual requirements are
+  // satisfied. blockingCount freezes the real failure count before text
+  // is appended, without changing this into anything but a plain array
+  // (still safe to .join()/spread/Array.isArray() as before).
+  warnings.blockingCount = warnings.length;
   if (requirements.text) warnings.push(requirements.text);
   return warnings;
 }
@@ -2739,40 +3177,6 @@ function classFeatureChoiceMatchesRequirement(required = "", selected = "") {
     requiredWords.length > 0 &&
     requiredWords.every((word) => selectedWords.has(word))
   );
-}
-
-function requirementUnmetWarnings(requirements = {}, context = {}) {
-  const warnings = [];
-  const minClassLevel = Number(
-    requirements.minClassLevel || requirements.minLevel || 0,
-  );
-  if (minClassLevel > 0 && Number(context.classLevel || 0) < minClassLevel) {
-    warnings.push(
-      `requires ${context.className || "class"} level ${minClassLevel}`,
-    );
-  }
-  const race = String(requirements.race || "").trim();
-  if (
-    race &&
-    String(el("race")?.value || "")
-      .trim()
-      .toLowerCase() !== race.toLowerCase()
-  ) {
-    warnings.push(`requires race: ${race}`);
-  }
-  const requiredChoices = Array.isArray(requirements.requiredChoices)
-    ? requirements.requiredChoices
-    : [];
-  const chosen = Object.values(classFeatureChoices || {}).map(String);
-  requiredChoices.forEach((choice) => {
-    if (
-      !chosen.some((value) =>
-        classFeatureChoiceMatchesRequirement(choice, value),
-      )
-    )
-      warnings.push(`requires choice: ${choice}`);
-  });
-  return warnings;
 }
 
 function classFeatureChoiceKey(feature, pool, context = {}) {
@@ -2849,6 +3253,12 @@ function renderClassFeatures() {
                 name: capitalizedFeatureName(feature.name || "Class Feature"),
                 description: feature.description || feature.desc || "",
                 effects: Array.isArray(feature.effects) ? feature.effects : [],
+                damageReduction: Array.isArray(feature.damageReduction)
+                  ? feature.damageReduction
+                  : [],
+                spellResistance: Array.isArray(feature.spellResistance)
+                  ? feature.spellResistance
+                  : [],
                 pools: featurePools(feature),
               };
         groups.get(row.level).push(nextFeature);
@@ -2874,6 +3284,8 @@ function renderClassFeatures() {
               </button>
               <div class="small-text">${escapeHtml(feature.className)} ${escapeHtml(feature.classLevel)}</div>
               ${renderClassFeatureEffects(feature)}
+              ${renderClassFeatureDamageReduction(feature)}
+              ${renderClassFeatureSpellResistance(feature)}
               ${renderClassFeaturePools(feature)}
               <div id="${collapseId}" class="collapse small mt-2">${feature.description ? escapeHtml(feature.description) : "No description scraped."}</div>
             </article>
@@ -2901,13 +3313,14 @@ function renderClassFeatures() {
           description: pool.description || "",
           selected,
           poolWarnings: requirementWarnings(pool.requirements || {}, feature),
-          options: (pool.options || []).map((option) => ({
-            ...option,
-            warnings: requirementWarnings(option.requirements || {}, feature),
-            unmet:
-              requirementUnmetWarnings(option.requirements || {}, feature)
-                .length > 0,
-          })),
+          options: (pool.options || []).map((option) => {
+            const warnings = requirementWarnings(
+              option.requirements || {},
+              feature,
+              { option, poolName: pool.name, excludeKey: key },
+            );
+            return { ...option, warnings, unmet: warnings.blockingCount > 0 };
+          }),
         });
         if (choice === null) return;
         if (choice) classFeatureChoices[key] = choice;
@@ -3463,6 +3876,8 @@ function updateClassDerivedViews() {
   updateClassLevelText();
   renderClassFeatures();
   renderSpellProgression();
+  updateClassFeatureDamageReductionSummary();
+  updateClassFeatureSpellResistanceSummary();
 }
 
 function setSheetInfoTab(tab) {
@@ -3595,6 +4010,7 @@ function renderSkillRows(saved = {}) {
       const searchName = escapeHtml(skill.toLowerCase());
       return `
       <tr data-skill-row="${searchName}">
+        <td class="class-skill-cell"><span id="${id}ClassSkill" class="class-skill-dot" title="Not a class skill"></span></td>
         <th class="skill-name-cell">
           ${escapeHtml(skill)}
           ${custom ? `<button class="btn btn-outline-danger btn-sm ms-2 py-0 px-1" type="button" onclick="removeNamedSkillByKey('${normalizeSkillName(skill)}')" aria-label="Remove ${escapeHtml(skill)}"><i class="bi bi-trash"></i></button>` : ""}
@@ -3618,7 +4034,7 @@ function renderSkillRows(saved = {}) {
         <td><input id="${id}Buff" class="form-control form-control-sm buff-field" readonly></td>
       </tr>
       <tr data-skill-row="${searchName}">
-        <td colspan="6"><div class="small-text calc-line" data-calc-for="${id}Total"></div></td>
+        <td colspan="7"><div class="small-text calc-line" data-calc-for="${id}Total"></div></td>
       </tr>
     `;
     })
@@ -4918,6 +5334,7 @@ function recalculateSheet() {
   );
   recalculateWeapons(buffed, buffBonuses);
 
+  const classSkillSet = characterClassSkillSet();
   allSkills().forEach(([skill]) => {
     const id = skillId(skill);
     const abilityKey = el(`${id}Ability`)?.dataset.ability;
@@ -4928,28 +5345,46 @@ function recalculateSheet() {
       Number(buffBonuses["skill checks"] || 0) +
       Number(buffBonuses[skillAbilityBuffKey] || 0) +
       Number(buffBonuses[specificSkillKey] || 0);
+    // +3 for ranking a class skill (from any of your classes, or a "X
+    // becomes a class skill" grant) -- only once it actually has ranks
+    // in it, and never stacking no matter how many sources call it a
+    // class skill (a Set already collapses that).
+    const ranks = num(`${id}Ranks`);
+    const isClassSkill = classSkillSet.has(specificSkillKey);
+    const classSkillBonus = isClassSkill && ranks > 0 ? 3 : 0;
     el(`${id}Ability`).value = String(abilityValue);
-    el(`${id}Buff`).value = String(skillBuff);
+    el(`${id}Buff`).value = String(skillBuff + classSkillBonus);
     el(`${id}Total`).value = String(
-      abilityValue + num(`${id}Ranks`) + num(`${id}Misc`) + skillBuff,
+      abilityValue + ranks + num(`${id}Misc`) + skillBuff + classSkillBonus,
     );
-    setCalc(
-      `${id}Total`,
-      "",
-      combinedBreakdowns(buffed, [
-        {
-          stat: ABILITY_STAT_NAMES[abilityKey],
-          target: `${skill} via ${abilityKey.toUpperCase()}`,
-          detail: `affects ${skill} through ${abilityKey.toUpperCase()}`,
-        },
-        { stat: "skill checks", target: "All skills" },
-        {
-          stat: skillAbilityBuffKey,
-          target: `${abilityKey.toUpperCase()} skills`,
-        },
-        { stat: specificSkillKey, target: skill },
-      ]),
-    );
+    const classSkillEl = el(`${id}ClassSkill`);
+    if (classSkillEl) {
+      classSkillEl.classList.toggle("is-class-skill", isClassSkill);
+      classSkillEl.title = isClassSkill
+        ? "Class skill -- +3 once ranked"
+        : "Not a class skill";
+    }
+    const skillBreakdownItems = combinedBreakdowns(buffed, [
+      {
+        stat: ABILITY_STAT_NAMES[abilityKey],
+        target: `${skill} via ${abilityKey.toUpperCase()}`,
+        detail: `affects ${skill} through ${abilityKey.toUpperCase()}`,
+      },
+      { stat: "skill checks", target: "All skills" },
+      {
+        stat: skillAbilityBuffKey,
+        target: `${abilityKey.toUpperCase()} skills`,
+      },
+      { stat: specificSkillKey, target: skill },
+    ]);
+    if (classSkillBonus)
+      skillBreakdownItems.push({
+        source: "Class Skill",
+        value: classSkillBonus,
+        type: "untyped",
+        stat: specificSkillKey,
+      });
+    setCalc(`${id}Total`, "", skillBreakdownItems);
   });
   renderSkillSummaryRows();
   if (sheetViewMode === "simplified") renderSimplifiedSheet();
@@ -5014,6 +5449,15 @@ async function openEffectTrackerModal() {
     contextKey: sheetContextKey,
     characterId: currentSheetId,
     effectStats: LOOT_EFFECT_STATS,
+    activatableAbilities: collectActivatableAbilities(),
+    choicePoolSkills: allSkills(),
+    // Enemies aren't "controlled" by a separate real person the way a
+    // PC is -- only route PC effects-with-a-choice through the request
+    // flow when someone other than that character's own owner is the
+    // one applying it.
+    isOwnCharacter: isEnemySheetMode
+      ? true
+      : !currentSheetOwnerId || currentSheetOwnerId === currentUserId,
     loadActiveEffects: isEnemySheetMode ? async () => activeBuffs : undefined,
     saveActiveEffects: enemySaveActiveEffects || undefined,
     onChange: async (buffs) => {
@@ -5094,6 +5538,9 @@ function renderInventoryEffects(item) {
         .trim() === "remove dex bonus to ac"
     ) {
       return `Removes DEX bonus to AC${effect.conditional ? ` (${escapeHtml(effect.appliesWhen || "conditional")})` : ""}${effect.stacks ? " stacks" : ""}`;
+    }
+    if (effect.classSkillGrant) {
+      return `${escapeHtml(titleCaseStat(effect.stat || "effect"))} becomes a class skill${effect.conditional ? ` (${escapeHtml(effect.appliesWhen || "conditional")})` : ""}`;
     }
     return `${escapeHtml(titleCaseStat(effect.stat || "effect"))} ${signed(Number(effect.value || 0))} (${escapeHtml(effect.type || "untyped")})${effect.conditional ? ` (${escapeHtml(effect.appliesWhen || "conditional")})` : ""}${effect.stacks ? " stacks" : ""}`;
   };
@@ -5262,7 +5709,7 @@ function addInventoryEffectRow(data = {}) {
       </select>
     </div>
     <div class="inventory-named-skill-field d-none"><label>Skill Name</label><input data-inventory-effect-field="skillName" class="form-control form-control-sm" value="${escapeHtml(data.skillName || "")}" placeholder="Alchemy"></div>
-    <div>
+    <div class="effect-value-field">
       <label>Value</label>
       <div class="item-number-stepper" data-item-stepper>
         <button
@@ -5290,7 +5737,7 @@ function addInventoryEffectRow(data = {}) {
         </button>
       </div>
     </div>
-    <div>
+    <div class="effect-type-field">
       <label>Type</label>
       <select data-inventory-effect-field="type" class="form-select form-select-sm">
         ${LOOT_BONUS_TYPES.map((type) => `<option value="${type}" ${(data.type || "untyped") === type ? "selected" : ""}>${escapeHtml(type)}</option>`).join("")}
@@ -5300,6 +5747,12 @@ function addInventoryEffectRow(data = {}) {
       <label>Stacks</label>
       <div class="form-check form-switch">
         <input data-inventory-effect-field="stacks" class="form-check-input" type="checkbox" ${data.stacks ? "checked" : ""}>
+      </div>
+    </div>
+    <div>
+      <label>Class Skill</label>
+      <div class="form-check form-switch">
+        <input data-inventory-effect-field="classSkillGrant" class="form-check-input" type="checkbox" ${data.classSkillGrant ? "checked" : ""}>
       </div>
     </div>
     <div class="inventory-condition-inline">
@@ -5328,6 +5781,16 @@ function addInventoryEffectRow(data = {}) {
   };
   statSelect.addEventListener("change", syncNamedSkill);
   syncNamedSkill();
+  const classSkillCheckbox = row.querySelector(
+    '[data-inventory-effect-field="classSkillGrant"]',
+  );
+  const syncClassSkillGrant = () => {
+    const granting = classSkillCheckbox.checked;
+    row.querySelector(".effect-value-field").classList.toggle("d-none", granting);
+    row.querySelector(".effect-type-field").classList.toggle("d-none", granting);
+  };
+  classSkillCheckbox.addEventListener("change", syncClassSkillGrant);
+  syncClassSkillGrant();
   row.querySelector("button").addEventListener("click", () => row.remove());
   el("inventoryEffectRows").appendChild(row);
 }
@@ -5363,6 +5826,11 @@ function collectInventoryEffects() {
         .value.trim(),
     };
     if (skillName) effect.skillName = skillName;
+    if (
+      row.querySelector('[data-inventory-effect-field="classSkillGrant"]')
+        .checked
+    )
+      effect.classSkillGrant = true;
     return effect;
   });
 }
@@ -6594,6 +7062,41 @@ function inventoryEditorConfig() {
   };
 }
 
+// Cache of the current user's own characters in this context, refreshed
+// periodically -- used to scope the pending-choice poller. A user
+// controlling more than one character (a main PC plus a companion
+// sheet, say) just means more ids in this list; the poller and its
+// panel already handle any number of pending requests across any
+// number of characters the same way.
+let myCharacterOptionsCache = [];
+async function refreshMyCharacterOptions() {
+  myCharacterOptionsCache = await PFApp.loadCharacterSheets(sheetContextKey, {
+    ownOnly: true,
+    summaryOnly: true,
+  });
+}
+
+async function startPendingEffectChoicePolling() {
+  if (!window.PFPendingEffectChoices) return;
+  await refreshMyCharacterOptions();
+  window.PFPendingEffectChoices.start({
+    contextKey: sheetContextKey,
+    characterIds: () => myCharacterOptionsCache.map((row) => row.id),
+    characterNameFor: (id) =>
+      myCharacterOptionsCache.find((row) => row.id === id)?.character_name ||
+      "",
+    choicePoolSkillsFor: (id) =>
+      !isEnemySheetMode && id === currentSheetId ? allSkills() : undefined,
+    onResolved: async (characterId) => {
+      if (isEnemySheetMode || characterId !== currentSheetId) return;
+      await loadActiveBuffs(currentSheetId);
+      await effectTrackerInstance?.refresh?.();
+      recalculateSheet();
+    },
+  });
+  setInterval(refreshMyCharacterOptions, 60000);
+}
+
 async function initCharacterSheet() {
   showSheetLoading();
   const user = await PFApp.requireAuth();
@@ -6603,6 +7106,7 @@ async function initCharacterSheet() {
   currentUserId = user.id;
   currentUserIsAdmin = (await PFApp.isAppAdmin?.()) || false;
   currentSheetOwnerId = user.id;
+  startPendingEffectChoicePolling();
   await loadClassDefinitions();
   await loadRaceDefinitions();
   const params = new URLSearchParams(window.location.search);

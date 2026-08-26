@@ -25,8 +25,14 @@
         .class-feature-pool-option.is-filtered {
           display: none;
         }
-        .class-feature-pool-option textarea {
-          min-height: 120px;
+        .class-feature-pool-option-summary {
+          display: flex;
+          justify-content: space-between;
+          align-items: start;
+          gap: 8px;
+        }
+        .class-feature-pool-option-info {
+          min-width: 0;
         }
         .class-feature-pool-option-meta {
           color: #9aa0a6;
@@ -63,6 +69,11 @@
                 <label for="classFeaturePoolRequiredChoices">Required Previous Choices</label>
                 <input id="classFeaturePoolRequiredChoices" class="form-control form-control-sm" placeholder="Mutagen, Greater Mutagen">
               </div>
+              <div class="mb-2">
+                <label for="classFeaturePoolContributesTo">Contributes To Activatable Feature</label>
+                <input id="classFeaturePoolContributesTo" class="form-control form-control-sm" placeholder="Rage">
+                <div class="small-text">If set, a selected choice's effects are bundled into that activatable feature when it's cast (e.g. rage powers into Rage) instead of applying on their own.</div>
+              </div>
               <div class="mb-3">
                 <label for="classFeaturePoolRequirementText">Requirement Notes</label>
                 <textarea id="classFeaturePoolRequirementText" class="form-control form-control-sm" rows="2" placeholder="Any requirement text that the scraper could not structure."></textarea>
@@ -92,7 +103,14 @@
     document.body.appendChild(wrapper.firstElementChild);
     document
       .getElementById("addClassFeaturePoolOption")
-      .addEventListener("click", () => addOptionRow());
+      .addEventListener("click", async () => {
+        const created = await window.PFClassFeatureEditor.open(
+          {},
+          { mode: "option" },
+        );
+        if (!created || !created.name) return;
+        addOptionRow(created);
+      });
     document
       .getElementById("classFeaturePoolOptionSearch")
       .addEventListener("input", filterOptionRows);
@@ -161,114 +179,97 @@
       count.textContent = `${shown} of ${rows.length} choice${rows.length === 1 ? "" : "s"}`;
   }
 
-  function addOptionRow(option = {}) {
-    const rows = document.getElementById("classFeaturePoolOptions");
+  // Choices are edited full-screen in PFClassFeatureEditor (same Effects/
+  // DR/Activatable UI a class feature gets, plus prerequisites) rather than
+  // inline -- there just isn't room for that here, and rage powers etc.
+  // need the same expressiveness as a top-level feature.
+  function summarizeOption(option = {}) {
     const req = normalizeRequirements(option.requirements || {});
-    const row = document.createElement("div");
-    row.className = "class-feature-pool-option";
-    row.__poolOptionOriginal = JSON.parse(JSON.stringify(option || {}));
+    const parts = [];
+    if (req.minClassLevel) parts.push(`Level ${req.minClassLevel}+`);
+    if (req.race) parts.push(req.race);
+    if (req.requiredChoices.length)
+      parts.push(`requires ${req.requiredChoices.join(", ")}`);
+    if (option.activatable) parts.push("Activatable");
+    const effectCount = Array.isArray(option.effects)
+      ? option.effects.length
+      : 0;
+    if (effectCount)
+      parts.push(`${effectCount} effect${effectCount === 1 ? "" : "s"}`);
+    if (Array.isArray(option.damageReduction) && option.damageReduction.length)
+      parts.push("DR");
+    if (Array.isArray(option.spellResistance) && option.spellResistance.length)
+      parts.push("SR");
+    return parts.join(" | ") || "No effects set yet";
+  }
+
+  function renderOptionRowContent(row) {
+    const option = row.__poolOption;
     row.dataset.searchText = searchableOption(option);
     row.innerHTML = `
-      <div class="row g-2">
-        <div class="col-md-4">
-          <label>Choice Name</label>
-          <input data-pool-option-field="name" class="form-control form-control-sm" value="${escapeHtml(option.name || "")}" required>
+      <div class="class-feature-pool-option-summary">
+        <div class="class-feature-pool-option-info">
+          <strong>${escapeHtml(option.name || "Unnamed choice")}</strong>
+          <div class="small-text">${escapeHtml(summarizeOption(option))}</div>
+          ${
+            option.source || option.publisher || option.sourceUrl
+              ? `
+            <div class="class-feature-pool-option-meta">
+              ${escapeHtml([option.source, option.publisher].filter(Boolean).join(" | "))}${option.sourceUrl ? ` | ${escapeHtml(option.sourceUrl)}` : ""}
+            </div>
+          `
+              : ""
+          }
         </div>
-        <div class="col-md-2">
-          <label>Min Level</label>
-          <input data-pool-option-field="minClassLevel" class="form-control form-control-sm" type="number" min="1" max="20" value="${escapeHtml(req.minClassLevel)}">
-        </div>
-        <div class="col-md-3">
-          <label>Race</label>
-          <input data-pool-option-field="race" class="form-control form-control-sm" value="${escapeHtml(req.race)}">
-        </div>
-        <div class="col-md-3 d-flex align-items-end justify-content-end">
-          <button class="btn btn-outline-danger btn-sm" type="button" data-delete-pool-option><i class="bi bi-trash"></i></button>
-        </div>
-        ${
-          option.source || option.publisher || option.sourceUrl
-            ? `
-          <div class="col-12 class-feature-pool-option-meta">
-            ${escapeHtml([option.source, option.publisher].filter(Boolean).join(" | "))}${option.sourceUrl ? ` | ${escapeHtml(option.sourceUrl)}` : ""}
-          </div>
-        `
-            : ""
-        }
-        <div class="col-md-6">
-          <label>Required Previous Choices</label>
-          <input data-pool-option-field="requiredChoices" class="form-control form-control-sm" value="${escapeHtml(req.requiredChoices.join(", "))}">
-        </div>
-        <div class="col-md-6">
-          <label>Requirement Notes</label>
-          <input data-pool-option-field="requirementText" class="form-control form-control-sm" value="${escapeHtml(req.text)}">
-        </div>
-        <div class="col-12">
-          <label>Description</label>
-          <textarea data-pool-option-field="description" class="form-control form-control-sm" rows="2">${escapeHtml(option.description || "")}</textarea>
+        <div class="d-flex gap-1">
+          <button class="btn btn-outline-warning btn-sm btn-icon" type="button" data-edit-pool-option aria-label="Edit choice"><i class="bi bi-pencil-square"></i></button>
+          <button class="btn btn-outline-danger btn-sm btn-icon" type="button" data-delete-pool-option aria-label="Delete choice"><i class="bi bi-trash"></i></button>
         </div>
       </div>
     `;
-    row.querySelectorAll("input, textarea").forEach((input) => {
-      input.addEventListener("input", () => {
-        row.dataset.searchText = searchableOption({
-          ...row.__poolOptionOriginal,
-          name: row.querySelector('[data-pool-option-field="name"]').value,
-          description: row.querySelector(
-            '[data-pool-option-field="description"]',
-          ).value,
-          requirements: {
-            text: row.querySelector(
-              '[data-pool-option-field="requirementText"]',
-            ).value,
-          },
-        });
+    row
+      .querySelector("[data-edit-pool-option]")
+      .addEventListener("click", async () => {
+        const edited = await window.PFClassFeatureEditor.open(
+          row.__poolOption,
+          { mode: "option" },
+        );
+        if (!edited || !edited.name) return;
+        // Keep scraped metadata (source/sourceUrl/publisher/summary/...)
+        // that the editor doesn't know about; everything it does edit
+        // (name, description, effects, DR, activatable, requirements)
+        // is fully replaced so clearing a field in the editor actually
+        // clears it here too.
+        const {
+          name,
+          description,
+          effects,
+          damageReduction,
+          activatable,
+          durationConfig,
+          requirements,
+          ...preserved
+        } = row.__poolOption;
+        row.__poolOption = { ...preserved, ...edited };
+        renderOptionRowContent(row);
         filterOptionRows();
       });
-    });
     row
       .querySelector("[data-delete-pool-option]")
       .addEventListener("click", () => {
         row.remove();
         filterOptionRows();
       });
-    rows.appendChild(row);
-    filterOptionRows();
   }
 
-  function collectRequirements(scope, prefix = "") {
-    const minClassLevel = Number.parseInt(
-      scope.querySelector(`[data-pool-option-field="${prefix}minClassLevel"]`)
-        ?.value || "",
-      10,
-    );
-    const requiredChoices = String(
-      scope.querySelector(`[data-pool-option-field="${prefix}requiredChoices"]`)
-        ?.value || "",
-    )
-      .split(",")
-      .map((choice) => choice.trim())
-      .filter(Boolean);
-    const requirements = {
-      minClassLevel: minClassLevel > 0 ? minClassLevel : null,
-      race:
-        scope
-          .querySelector(`[data-pool-option-field="${prefix}race"]`)
-          ?.value.trim() || "",
-      requiredChoices,
-      text:
-        scope
-          .querySelector(`[data-pool-option-field="${prefix}requirementText"]`)
-          ?.value.trim() || "",
-    };
-    Object.keys(requirements).forEach((key) => {
-      if (
-        requirements[key] === "" ||
-        requirements[key] === null ||
-        (Array.isArray(requirements[key]) && !requirements[key].length)
-      )
-        delete requirements[key];
-    });
-    return requirements;
+  function addOptionRow(option = {}) {
+    const rows = document.getElementById("classFeaturePoolOptions");
+    const row = document.createElement("div");
+    row.className = "class-feature-pool-option";
+    row.__poolOption = option || {};
+    renderOptionRowContent(row);
+    rows.appendChild(row);
+    filterOptionRows();
   }
 
   function collectPool() {
@@ -302,28 +303,18 @@
         "#classFeaturePoolOptions .class-feature-pool-option",
       ),
     ]
-      .map((row) => {
-        const option = {
-          ...(row.__poolOptionOriginal || {}),
-          name: row
-            .querySelector('[data-pool-option-field="name"]')
-            .value.trim(),
-          description: row
-            .querySelector('[data-pool-option-field="description"]')
-            .value.trim(),
-          requirements: collectRequirements(row),
-        };
-        if (!Object.keys(option.requirements || {}).length)
-          delete option.requirements;
-        return option;
-      })
-      .filter((option) => option.name);
+      .map((row) => row.__poolOption)
+      .filter((option) => option?.name);
+    const contributesToAbility = document
+      .getElementById("classFeaturePoolContributesTo")
+      .value.trim();
     return {
       name: document.getElementById("classFeaturePoolName").value.trim(),
       description: document
         .getElementById("classFeaturePoolDescription")
         .value.trim(),
       requirements,
+      ...(contributesToAbility ? { contributesToAbility } : {}),
       options,
     };
   }
@@ -341,6 +332,8 @@
       req.requiredChoices.join(", ");
     document.getElementById("classFeaturePoolRequirementText").value =
       req.text || "";
+    document.getElementById("classFeaturePoolContributesTo").value =
+      pool.contributesToAbility || "";
     document.getElementById("classFeaturePoolOptionSearch").value = "";
     document.getElementById("classFeaturePoolOptions").innerHTML = "";
     (Array.isArray(pool.options) ? pool.options : []).forEach((option) =>

@@ -423,6 +423,24 @@ body {
   font-size: 12px;
 }
 
+.class-feature-dr-pill {
+  background: rgba(240, 213, 140, 0.08);
+  border: 1px solid rgba(240, 213, 140, 0.35);
+  color: #f5e9c8;
+  border-radius: 999px;
+  padding: 1px 7px;
+  font-size: 12px;
+}
+
+.class-feature-sr-pill {
+  background: rgba(140, 197, 240, 0.08);
+  border: 1px solid rgba(140, 197, 240, 0.35);
+  color: #cfe9fa;
+  border-radius: 999px;
+  padding: 1px 7px;
+  font-size: 12px;
+}
+
 .class-feature-pools {
   display: grid;
   gap: 4px;
@@ -1448,6 +1466,25 @@ body.enemy-sheet-mode .enemy-field-pair {
   min-width: 180px;
   max-width: 320px;
   white-space: normal;
+}
+
+.class-skill-cell {
+  text-align: center;
+  width: 28px;
+}
+
+.class-skill-dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  border: 1px solid #555;
+  background: transparent;
+}
+
+.class-skill-dot.is-class-skill {
+  background: #8fd19e;
+  border-color: #8fd19e;
 }
 
 .skill-table-wrap {

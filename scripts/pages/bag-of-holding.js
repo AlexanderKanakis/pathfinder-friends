@@ -48,6 +48,7 @@ const EFFECT_STATS = [
   "fortitude",
   "reflex",
   "will",
+  "all saves",
   "initiative",
   "cmb",
   "cmd",
@@ -297,6 +298,8 @@ function titleCaseStat(value) {
   const key = String(value || "")
     .toLowerCase()
     .trim();
+  const choiceLabel = window.PFEffectStats?.choiceStatLabel?.(key);
+  if (choiceLabel) return choiceLabel;
   if (key === "extra attack") return "Extra Attack at Highest BAB";
   if (key.startsWith("skill:")) {
     const skill = PF_SKILLS.find(
@@ -322,6 +325,7 @@ function effectStatOptions(selected = "") {
       <option value="skill:profession" ${selected === "skill:profession" ? "selected" : ""}>Skill: Profession</option>
       ${SPECIFIC_SKILL_STATS.map((stat) => option(stat)).join("")}
     </optgroup>
+    ${window.PFEffectStats?.choiceOptgroupHtml?.(selected, escapeHtml) || ""}
   `;
 }
 
@@ -1133,7 +1137,7 @@ function addLootEffectRow(data = {}) {
       </select>
     </div>
     <div class="loot-named-skill-field d-none"><label>Skill Name</label><input data-effect-field="skillName" class="form-control form-control-sm" value="${escapeHtml(data.skillName || "")}" placeholder="Alchemy"></div>
-    <div>
+    <div class="effect-value-field">
       <label>Value</label>
       <div class="item-number-stepper" data-item-stepper>
         <button
@@ -1161,7 +1165,7 @@ function addLootEffectRow(data = {}) {
         </button>
       </div>
     </div>
-    <div>
+    <div class="effect-type-field">
       <label>Type</label>
       <select data-effect-field="type" class="form-select form-select-sm">
         ${BONUS_TYPES.map((type) => `<option value="${type}" ${(data.type || "untyped") === type ? "selected" : ""}>${escapeHtml(type)}</option>`).join("")}
@@ -1171,6 +1175,12 @@ function addLootEffectRow(data = {}) {
       <label>Stacks</label>
       <div class="form-check form-switch">
         <input data-effect-field="stacks" class="form-check-input" type="checkbox" ${data.stacks ? "checked" : ""}>
+      </div>
+    </div>
+    <div>
+      <label>Class Skill</label>
+      <div class="form-check form-switch">
+        <input data-effect-field="classSkillGrant" class="form-check-input" type="checkbox" ${data.classSkillGrant ? "checked" : ""}>
       </div>
     </div>
     <div class="loot-condition-inline">
@@ -1197,6 +1207,16 @@ function addLootEffectRow(data = {}) {
   };
   statSelect.addEventListener("change", syncNamedSkill);
   syncNamedSkill();
+  const classSkillCheckbox = row.querySelector(
+    '[data-effect-field="classSkillGrant"]',
+  );
+  const syncClassSkillGrant = () => {
+    const granting = classSkillCheckbox.checked;
+    row.querySelector(".effect-value-field").classList.toggle("d-none", granting);
+    row.querySelector(".effect-type-field").classList.toggle("d-none", granting);
+  };
+  classSkillCheckbox.addEventListener("change", syncClassSkillGrant);
+  syncClassSkillGrant();
   row.querySelector("button").addEventListener("click", () => row.remove());
   el("lootEffectRows").appendChild(row);
 }
@@ -1230,6 +1250,8 @@ function collectLootEffects() {
           .value.trim(),
       };
       if (skillName) effect.skillName = skillName;
+      if (row.querySelector('[data-effect-field="classSkillGrant"]').checked)
+        effect.classSkillGrant = true;
       return effect;
     },
   );
@@ -1324,7 +1346,11 @@ function renderLootEffects(item) {
         .map(
           (effect) => `
         <div class="loot-effect-display">
-          ${escapeHtml(titleCaseStat(effect.stat || "effect"))} ${signedValue(effect.value)} (${escapeHtml(effect.type || "untyped")})${effect.conditional ? ` (${escapeHtml(effect.appliesWhen || "conditional")})` : ""}${effect.stacks ? " stacks" : ""}
+          ${
+            effect.classSkillGrant
+              ? `${escapeHtml(titleCaseStat(effect.stat || "effect"))} becomes a class skill`
+              : `${escapeHtml(titleCaseStat(effect.stat || "effect"))} ${signedValue(effect.value)} (${escapeHtml(effect.type || "untyped")})`
+          }${effect.conditional ? ` (${escapeHtml(effect.appliesWhen || "conditional")})` : ""}${effect.stacks ? " stacks" : ""}
         </div>
       `,
         )

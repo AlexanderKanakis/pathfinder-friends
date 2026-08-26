@@ -6,6 +6,11 @@
     config.url.includes("YOUR_PROJECT_REF") ||
     config.anonKey.includes("YOUR_SUPABASE_ANON_KEY");
 
+  const MAP_SLOT_COUNT = 6;
+  function clampMapSlot(mapSlot) {
+    return Math.min(MAP_SLOT_COUNT, Math.max(1, Number(mapSlot) || 1));
+  }
+
   let client = null;
   let contextsCache = null;
   let contextsCacheUserId = "";
@@ -828,6 +833,114 @@
       return { ok: false, error };
     }
 
+    return { ok: true };
+  }
+
+  // Queues a "choose a skill/target" request instead of applying an
+  // effect straight to a character's buffs -- used when the effect has
+  // an unresolved choice: stat and the caller isn't that character's
+  // owner (e.g. a GM casting something at a player's token from the
+  // map). ability should already have duration/casterLevel/etc fully
+  // resolved (see buff-tracker-widget.js's addEffect) -- only its
+  // "choice:" bonus stats are still unresolved.
+  async function createEffectChoiceRequest({
+    contextKey = getSelectedContextKey(),
+    characterId,
+    ability,
+  } = {}) {
+    const user = await getUser();
+    if (!client || !user)
+      return { ok: false, error: new Error("Not signed in") };
+    if (!characterId || !ability)
+      return { ok: false, error: new Error("Missing characterId/ability") };
+    const context = normalizeContext(contextKey);
+    const { data, error } = await client
+      .from("effect_choice_requests")
+      .insert({
+        context_key: context.contextKey,
+        game_id: context.gameId,
+        character_id: characterId,
+        requested_by: user.id,
+        effect_name: ability.name || "Effect",
+        ability,
+      })
+      .select("id")
+      .single();
+    if (error) {
+      console.error(error);
+      return { ok: false, error };
+    }
+    return { ok: true, id: data.id };
+  }
+
+  // Every pending request for any of the given character ids -- a
+  // player's own poller passes every character they control at once so
+  // one player answering for two characters in the same sitting works
+  // the same as answering for one.
+  async function loadPendingEffectChoiceRequests(characterIds = []) {
+    const ids = (Array.isArray(characterIds) ? characterIds : []).filter(
+      Boolean,
+    );
+    if (!client || !ids.length) return [];
+    const { data, error } = await client
+      .from("effect_choice_requests")
+      .select("id,character_id,effect_name,ability,created_at")
+      .in("character_id", ids)
+      .eq("status", "pending")
+      .order("created_at", { ascending: true });
+    if (error) {
+      console.error(error);
+      return [];
+    }
+    return data || [];
+  }
+
+  // The requester's own side polls this by id to notice when their
+  // queued request has been answered, so "waiting for player" can
+  // update without the requester having to refresh anything.
+  async function loadEffectChoiceRequestStatus(requestId) {
+    if (!client || !requestId) return null;
+    const { data, error } = await client
+      .from("effect_choice_requests")
+      .select("status,resolved_bonuses")
+      .eq("id", requestId)
+      .maybeSingle();
+    if (error) {
+      console.error(error);
+      return null;
+    }
+    return data;
+  }
+
+  async function resolveEffectChoiceRequest(requestId, resolvedBonuses) {
+    if (!client || !requestId)
+      return { ok: false, error: new Error("Missing requestId") };
+    const { error } = await client
+      .from("effect_choice_requests")
+      .update({
+        status: "resolved",
+        resolved_bonuses: resolvedBonuses,
+        resolved_at: new Date().toISOString(),
+      })
+      .eq("id", requestId);
+    if (error) {
+      console.error(error);
+      return { ok: false, error };
+    }
+    return { ok: true };
+  }
+
+  async function cancelEffectChoiceRequest(requestId) {
+    if (!client || !requestId)
+      return { ok: false, error: new Error("Missing requestId") };
+    const { error } = await client
+      .from("effect_choice_requests")
+      .delete()
+      .eq("id", requestId);
+    if (error) {
+      console.error(error);
+      return { ok: false, error };
+    }
     return { ok: true };
   }
 
@@ -1769,35 +1882,44 @@
     enemyId,
     contextKey = getSelectedContextKey(),
   ) {
-    const state = await loadMapState(contextKey);
-    if (!state || !Array.isArray(state.tokens)) return state;
+    // Enemies are shared across all 6 map slots of a campaign, so their
+    // token has to be scrubbed from every slot, not just the one currently
+    // being viewed.
+    const results = [];
+    for (let slot = 1; slot <= MAP_SLOT_COUNT; slot += 1) {
+      const state = await loadMapState(contextKey, slot);
+      if (!state || !Array.isArray(state.tokens)) continue;
 
-    const removedTokenIds = new Set(
-      state.tokens
-        .filter((token) => token.kind === "enemy" && token.enemyId === enemyId)
-        .map((token) => token.id),
-    );
-    if (!removedTokenIds.size) return state;
-
-    const nextState = {
-      ...state,
-      tokens: state.tokens.filter((token) => !removedTokenIds.has(token.id)),
-      initiative: Array.isArray(state.initiative)
-        ? state.initiative.filter(
-            (entry) => !removedTokenIds.has(entry.tokenId),
+      const removedTokenIds = new Set(
+        state.tokens
+          .filter(
+            (token) => token.kind === "enemy" && token.enemyId === enemyId,
           )
-        : state.initiative,
-    };
-    if (Array.isArray(nextState.initiative)) {
-      nextState.activeTurn = Math.max(
-        0,
-        Math.min(
-          Number(nextState.activeTurn || 0),
-          Math.max(0, nextState.initiative.length - 1),
-        ),
+          .map((token) => token.id),
       );
+      if (!removedTokenIds.size) continue;
+
+      const nextState = {
+        ...state,
+        tokens: state.tokens.filter((token) => !removedTokenIds.has(token.id)),
+        initiative: Array.isArray(state.initiative)
+          ? state.initiative.filter(
+              (entry) => !removedTokenIds.has(entry.tokenId),
+            )
+          : state.initiative,
+      };
+      if (Array.isArray(nextState.initiative)) {
+        nextState.activeTurn = Math.max(
+          0,
+          Math.min(
+            Number(nextState.activeTurn || 0),
+            Math.max(0, nextState.initiative.length - 1),
+          ),
+        );
+      }
+      results.push(await saveMapState(nextState, contextKey, slot));
     }
-    return saveMapState(nextState, contextKey);
+    return results;
   }
 
   async function loadLootItems(contextKey = getSelectedContextKey()) {
@@ -1877,7 +1999,10 @@
     return Boolean(data?.id);
   }
 
-  async function loadMapState(contextKey = getSelectedContextKey()) {
+  async function loadMapState(
+    contextKey = getSelectedContextKey(),
+    mapSlot = 1,
+  ) {
     const user = await getUser();
     if (!user) return null;
 
@@ -1886,6 +2011,7 @@
       .from("map_state")
       .select("state,updated_at,updated_by")
       .eq("context_key", context.contextKey)
+      .eq("map_slot", clampMapSlot(mapSlot))
       .maybeSingle();
 
     if (error) {
@@ -1896,7 +2022,11 @@
     return data?.state || null;
   }
 
-  async function saveMapState(state, contextKey = getSelectedContextKey()) {
+  async function saveMapState(
+    state,
+    contextKey = getSelectedContextKey(),
+    mapSlot = 1,
+  ) {
     const user = await getUser();
     if (!client || !user) return null;
 
@@ -1904,6 +2034,7 @@
     const payload = {
       context_key: context.contextKey,
       game_id: context.gameId,
+      map_slot: clampMapSlot(mapSlot),
       state: state || {},
       updated_by: user.id,
       updated_at: new Date().toISOString(),
@@ -1911,7 +2042,7 @@
 
     const { data, error } = await client
       .from("map_state")
-      .upsert(payload, { onConflict: "context_key" })
+      .upsert(payload, { onConflict: "context_key,map_slot" })
       .select("state")
       .single();
 
@@ -1921,6 +2052,29 @@
     }
 
     return data?.state || state;
+  }
+
+  // Lightweight per-slot summary (just the name) for populating the map
+  // switcher navbar without pulling every slot's full tokens/shapes payload.
+  async function loadMapSlotSummaries(contextKey = getSelectedContextKey()) {
+    const user = await getUser();
+    if (!user) return [];
+
+    const context = normalizeContext(contextKey);
+    const { data, error } = await client
+      .from("map_state")
+      .select("map_slot,name:state->settings->>name")
+      .eq("context_key", context.contextKey);
+
+    if (error) {
+      console.error(error);
+      return [];
+    }
+
+    return (data || []).map((row) => ({
+      slot: clampMapSlot(row.map_slot),
+      name: row.name || "",
+    }));
   }
 
   window.PFApp = {
@@ -1960,6 +2114,11 @@
     saveDiceState,
     loadBuffState,
     saveBuffState,
+    createEffectChoiceRequest,
+    loadPendingEffectChoiceRequests,
+    loadEffectChoiceRequestStatus,
+    resolveEffectChoiceRequest,
+    cancelEffectChoiceRequest,
     loadCharacterBuffStateForRecalculation,
     applyCharacterMapEffect,
     updateCharacterEffectState,
@@ -1992,5 +2151,7 @@
     deleteLootItem,
     loadMapState,
     saveMapState,
+    loadMapSlotSummaries,
+    MAP_SLOT_COUNT,
   };
 })();

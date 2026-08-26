@@ -1,5 +1,6 @@
 let mapContextKey = "";
 let mapCharacters = [];
+let mapClassDefinitions = null;
 let currentUserId = "";
 let currentUserEmail = "";
 let isGm = false;
@@ -9,13 +10,20 @@ let saveTimer = null;
 let dragState = null;
 let mapRealtimeChannel = null;
 let pendingRemoteState = null;
+let mapViewSlot = 1;
+let mapSlotMeta = [];
+let pendingBackgroundFootprint = null;
+let cellRatioLinked = true;
 let localGridSize = Number(sessionStorage.getItem("pf_map_grid_size") || 48);
 let suppressStageClick = false;
 let contextMenuTokenId = "";
+let quickControlsOpenId = "";
+let dpadMovingIds = new Set();
 let movementMeasure = null;
 let suppressNextContextMenu = false;
 let auraModal = null;
 let auraEditingTokenId = "";
+let auraEditingMode = "aura";
 let backgroundModal = null;
 let mapDocumentationModal = null;
 let enemyPickerModal = null;
@@ -49,16 +57,31 @@ let auraEffectInside = new Set();
 let turnAdvanceBusy = false;
 let seenTurnEffectNotices = new Set();
 
+const MAP_SLOT_COUNT = 6;
+// Pixels-per-cell assumed when converting a newly loaded background image's
+// natural size into a cell count. Fixed and independent of anyone's local
+// zoom ("Map Size") so the resulting grid is identical for every viewer.
+const MAP_IMAGE_REFERENCE_CELL_PX = 48;
+const MAP_SIZE_MIN = 8;
+const MAP_SIZE_MAX = 300;
 const defaultState = {
-  settings: { cols: 30, rows: 20, backgroundUrl: "", backgroundFit: "cover" },
+  settings: {
+    cols: 30,
+    rows: 20,
+    backgroundUrl: "",
+    backgroundCols: 0,
+    backgroundRows: 0,
+    name: "",
+  },
   tokens: [],
   shapes: [],
   initiative: [],
   activeTurn: 0,
-  roundsPassed: 0,
+  roundsPassed: 1,
   turnSequence: 0,
   effectNotices: [],
   timeline: [],
+  fog: { visible: false, color: "#000000" },
 };
 let state = structuredClone(defaultState);
 const MAP_SKILLS = [
@@ -315,6 +338,27 @@ function activateSideTab(tabId) {
   if (!tabButton) return;
   bootstrap.Tab.getOrCreateInstance(tabButton).show();
 }
+
+const mapMobileQuery = window.matchMedia("(max-width: 980px)");
+
+function relocateMapToolbar(isMobile) {
+  const toolbar = el("mapToolbar");
+  const mobileSlot = el("mapToolbarMobileSlot");
+  const stageWrap = el("mapStageWrap");
+  if (!toolbar || !mobileSlot || !stageWrap) return;
+  if (isMobile) {
+    mobileSlot.appendChild(toolbar);
+  } else {
+    stageWrap.parentElement.insertBefore(toolbar, stageWrap);
+  }
+}
+
+function setupMobileToolbar() {
+  relocateMapToolbar(mapMobileQuery.matches);
+  mapMobileQuery.addEventListener("change", (event) =>
+    relocateMapToolbar(event.matches),
+  );
+}
 function showSelectedPanel() {
   const sideScroll = document.querySelector(".side-scroll");
   if (sideScroll && el("mapCharacterPane")?.classList.contains("active")) {
@@ -388,9 +432,14 @@ function durationLabel(effect) {
   if (!parts.count || parts.unit === "variable") return "variable";
   return `${parts.count} ${parts.unit}${Number(parts.count) === 1 ? "" : "s"}${parts.perLevel ? " / level" : ""}`;
 }
-function parseEffectDuration(effect, casterLevel = 1) {
+function parseEffectDuration(effect, casterLevelOrContext = 1) {
+  const context =
+    casterLevelOrContext && typeof casterLevelOrContext === "object"
+      ? casterLevelOrContext
+      : { casterLevel: casterLevelOrContext };
   if (window.PFEffectMeta?.parseDuration)
-    return window.PFEffectMeta.parseDuration(effect, { casterLevel });
+    return window.PFEffectMeta.parseDuration(effect, context);
+  const casterLevel = context.casterLevel ?? 1;
   const parts = durationParts(effect);
   if (!parts.count || parts.unit === "variable") return null;
   const amount = Number(parts.count) || 1;
@@ -415,6 +464,10 @@ function isConditionEffect(effect) {
   return String(effect?.category || "").toLowerCase() === "condition";
 }
 function titleCaseStat(value) {
+  const choiceLabel = window.PFEffectStats?.choiceStatLabel?.(
+    String(value || "").toLowerCase().trim(),
+  );
+  if (choiceLabel) return choiceLabel;
   if (
     String(value || "")
       .toLowerCase()
@@ -1455,8 +1508,25 @@ function normalizeState(raw) {
     tokens,
     raw?.initiative,
   );
+  const settings = { ...defaultState.settings, ...(raw?.settings || {}) };
+  // backgroundCols/backgroundRows record the image's own aspect ratio (used
+  // to seed Cell X/Y when it first loads, and as the link button's target
+  // ratio) -- they are not a floor. Cell X/Y are freely adjustable in
+  // either direction; the image always scales to fill them.
+  settings.backgroundCols = Math.max(0, Number(settings.backgroundCols) || 0);
+  settings.backgroundRows = Math.max(0, Number(settings.backgroundRows) || 0);
+  settings.cols = clamp(
+    Number(settings.cols) || MAP_SIZE_MIN,
+    MAP_SIZE_MIN,
+    MAP_SIZE_MAX,
+  );
+  settings.rows = clamp(
+    Number(settings.rows) || MAP_SIZE_MIN,
+    MAP_SIZE_MIN,
+    MAP_SIZE_MAX,
+  );
   const nextState = {
-    settings: { ...defaultState.settings, ...(raw?.settings || {}) },
+    settings,
     tokens,
     shapes: Array.isArray(raw?.shapes) ? raw.shapes : [],
     initiative: normalizedInitiative,
@@ -1465,24 +1535,253 @@ function normalizeState(raw) {
       0,
       Math.max(0, normalizedInitiative.length - 1),
     ),
-    roundsPassed: Math.max(0, Number(raw?.roundsPassed || 0)),
+    roundsPassed: Math.max(1, Number(raw?.roundsPassed || 1)),
     turnSequence: Math.max(0, Number(raw?.turnSequence || 0)),
     effectNotices: Array.isArray(raw?.effectNotices)
       ? raw.effectNotices.slice(-10)
       : [],
     timeline: Array.isArray(raw?.timeline) ? raw.timeline.slice(-20) : [],
+    fog: {
+      visible: Boolean(raw?.fog?.visible),
+      color:
+        typeof raw?.fog?.color === "string" && raw.fog.color
+          ? raw.fog.color
+          : "#000000",
+    },
   };
   state = nextState;
   normalizeZIndexes();
   return nextState;
 }
 
+function currentMapSlotName() {
+  return state.settings?.name?.trim() || `Map ${mapViewSlot}`;
+}
+
+function measureImageNaturalSize(url) {
+  return new Promise((resolve) => {
+    if (!url) {
+      resolve(null);
+      return;
+    }
+    const img = new Image();
+    img.onload = () => resolve({ width: img.naturalWidth, height: img.naturalHeight });
+    img.onerror = () => resolve(null);
+    img.src = url;
+  });
+}
+
+function backgroundFootprintFromNaturalSize(width, height) {
+  return {
+    cols: clamp(
+      Math.round(width / MAP_IMAGE_REFERENCE_CELL_PX) || 1,
+      1,
+      MAP_SIZE_MAX,
+    ),
+    rows: clamp(
+      Math.round(height / MAP_IMAGE_REFERENCE_CELL_PX) || 1,
+      1,
+      MAP_SIZE_MAX,
+    ),
+  };
+}
+
+// Cell X/Y always range over the same [MAP_SIZE_MIN, MAP_SIZE_MAX] bounds --
+// a loaded background image only affects their *default*, never a floor,
+// so the grid can be made coarser (bigger cells) or finer (smaller cells)
+// freely in either direction.
+function applyCellSizeBounds() {
+  const colsInput = el("cellX");
+  const rowsInput = el("cellY");
+  colsInput.min = String(MAP_SIZE_MIN);
+  rowsInput.min = String(MAP_SIZE_MIN);
+  colsInput.max = String(MAP_SIZE_MAX);
+  rowsInput.max = String(MAP_SIZE_MAX);
+}
+
+// When linked, editing Cell X or Cell Y keeps the other one proportional so
+// a resize never distorts the background image. The target ratio comes
+// from the loaded image itself when there is one; otherwise it's whatever
+// ratio the two fields already show, so a fresh resize can't warp that.
+// The ratio a link-driven resize should hold. When an image is loaded --
+// including one just measured but not saved yet -- its own ratio always
+// wins. Otherwise this returns a ratio captured at a well-defined moment
+// (modal open, or the link being re-enabled) rather than re-deriving it
+// from the field a live edit just changed, which would be self-referential.
+let noImageCellRatio = 1;
+
+function targetCellRatio() {
+  const url = el("backgroundUrl").value.trim();
+  const pending =
+    pendingBackgroundFootprint?.url === url ? pendingBackgroundFootprint : null;
+  const bgCols = pending?.cols || state.settings.backgroundCols || 0;
+  const bgRows = pending?.rows || state.settings.backgroundRows || 0;
+  if (bgCols > 0 && bgRows > 0) return bgRows / bgCols;
+  return noImageCellRatio || 1;
+}
+
+function captureNoImageCellRatio() {
+  const x = Number(el("cellX").value) || 1;
+  const y = Number(el("cellY").value) || 1;
+  noImageCellRatio = y / x;
+}
+
+function setCellLinkEnabled(enabled) {
+  cellRatioLinked = enabled;
+  // Re-locking (e.g. after free, unlinked edits) should hold whatever
+  // ratio is showing right now, not a stale one from when the modal opened.
+  if (enabled) captureNoImageCellRatio();
+  const btn = el("cellLinkToggle");
+  if (!btn) return;
+  btn.setAttribute("aria-pressed", String(enabled));
+  btn.classList.toggle("btn-primary", enabled);
+  btn.classList.toggle("btn-outline-secondary", !enabled);
+  const label = enabled
+    ? "Locked to the image's aspect ratio"
+    : "Unlocked -- Cell X and Cell Y resize independently";
+  btn.title = label;
+  btn.setAttribute("aria-label", label);
+}
+
+// Reads whichever of Cell X / Cell Y just changed, clamps it, and -- when
+// linked -- recomputes the other one to hold the target ratio. Commits both
+// to state.settings and re-renders.
+function handleCellSizeChange(sourceId) {
+  const xInput = el("cellX");
+  const yInput = el("cellY");
+  const minCols = Number(xInput.min) || MAP_SIZE_MIN;
+  const minRows = Number(yInput.min) || MAP_SIZE_MIN;
+
+  if (cellRatioLinked) {
+    const ratio = targetCellRatio(); // rows per column
+    if (sourceId === "cellY") {
+      const y = clamp(Number(yInput.value) || minRows, minRows, MAP_SIZE_MAX);
+      const x = clamp(Math.round(y / ratio) || minCols, minCols, MAP_SIZE_MAX);
+      yInput.value = String(y);
+      xInput.value = String(x);
+    } else {
+      const x = clamp(Number(xInput.value) || minCols, minCols, MAP_SIZE_MAX);
+      const y = clamp(Math.round(x * ratio) || minRows, minRows, MAP_SIZE_MAX);
+      xInput.value = String(x);
+      yInput.value = String(y);
+    }
+  } else {
+    xInput.value = String(
+      clamp(Number(xInput.value) || minCols, minCols, MAP_SIZE_MAX),
+    );
+    yInput.value = String(
+      clamp(Number(yInput.value) || minRows, minRows, MAP_SIZE_MAX),
+    );
+  }
+
+  state.settings.cols = Number(xInput.value);
+  state.settings.rows = Number(yInput.value);
+  renderAll();
+}
+
 function applySettingsToInputs() {
   el("gridSize").value = localGridSize;
-  el("mapCols").value = state.settings.cols;
-  el("mapRows").value = state.settings.rows;
+  el("cellX").value = state.settings.cols;
+  el("cellY").value = state.settings.rows;
   el("backgroundUrl").value = state.settings.backgroundUrl || "";
-  el("backgroundFit").value = state.settings.backgroundFit || "cover";
+  applyCellSizeBounds();
+  el("fogSettingsWrap").classList.toggle("d-none", !isGm);
+  el("fogColor").value = state.fog?.color || "#000000";
+  updateFogButtonLabel();
+  el("mapNameWrap").classList.toggle("d-none", !isGm);
+  el("mapName").value = state.settings.name || "";
+  el("mapName").placeholder = `Map ${mapViewSlot}`;
+  el("backgroundOptionsTitle").textContent = isGm
+    ? `Map Settings — ${currentMapSlotName()}`
+    : "Map Settings";
+  captureNoImageCellRatio();
+}
+
+// Fires while editing the Background URL field in the modal: measures the
+// new image (if any) and, if it's genuinely a different image, defaults
+// Cell X/Y to match its aspect ratio -- purely a starting point, the GM can
+// still resize freely (bigger, coarser cells or smaller, finer ones) from
+// there, using the link button to stay proportional or not as they choose.
+async function handleBackgroundUrlChange() {
+  const url = el("backgroundUrl").value.trim();
+  if (!url) {
+    pendingBackgroundFootprint = { url: "", cols: 0, rows: 0 };
+    return;
+  }
+  const size = await measureImageNaturalSize(url);
+  if (el("backgroundUrl").value.trim() !== url) return; // field changed again meanwhile
+  if (!size) {
+    pendingBackgroundFootprint = { url, cols: 0, rows: 0 };
+    return;
+  }
+  const footprint = backgroundFootprintFromNaturalSize(size.width, size.height);
+  pendingBackgroundFootprint = { url, ...footprint };
+  if (url !== state.settings.backgroundUrl) {
+    el("cellX").value = String(footprint.cols);
+    el("cellY").value = String(footprint.rows);
+  }
+}
+
+function adjustNumberInput(input, delta) {
+  if (!input) return;
+  const current = Number(input.value || 0);
+  const min = input.min === "" ? -Infinity : Number(input.min);
+  const max = input.max === "" ? Infinity : Number(input.max);
+  const next = Math.min(max, Math.max(min, current + delta));
+  input.value = String(next);
+  input.dispatchEvent(new Event("input", { bubbles: true }));
+  input.dispatchEvent(new Event("change", { bubbles: true }));
+}
+
+function bindNumberSteppers() {
+  document.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-item-stepper-delta]");
+    if (!button) return;
+    const wrapper = button.closest("[data-item-stepper]");
+    const input = wrapper?.querySelector("input");
+    adjustNumberInput(input, Number(button.dataset.itemStepperDelta || 0));
+  });
+}
+
+// Every user (GM and players alike) picks their own map slot independently
+// -- there's no shared "live" map, so different people can be looking at
+// different maps at the same time. The choice is remembered per browser.
+function renderMapSlotNav() {
+  const bar = el("mapSlotBar");
+  if (!bar) return;
+  bar.classList.remove("d-none");
+
+  const nav = el("mapSlotNav");
+  nav.innerHTML = Array.from({ length: MAP_SLOT_COUNT }, (_, index) => {
+    const slot = index + 1;
+    const meta = mapSlotMeta.find((entry) => entry.slot === slot);
+    const name = meta?.name?.trim() || `Map ${slot}`;
+    const isViewing = slot === mapViewSlot;
+    const classes = ["nav-link"];
+    if (isViewing) classes.push("active");
+    return `<button type="button" class="${classes.join(" ")}" data-map-slot="${slot}" title="${escapeHtml(name)}">${slot}</button>`;
+  }).join("");
+
+  const label = el("mapSlotLabel");
+  if (label) label.textContent = currentMapSlotName();
+}
+
+function updateFogButtonLabel() {
+  const button = el("applyFogButton");
+  if (!button) return;
+  const active = Boolean(state.fog?.visible);
+  button.textContent = active ? "Remove Fog" : "Apply Fog";
+  button.classList.toggle("btn-outline-light", !active);
+  button.classList.toggle("btn-danger", active);
+}
+
+function toggleFog() {
+  if (!isGm) return;
+  state.fog = state.fog || { visible: false, color: "#000000" };
+  state.fog.visible = !state.fog.visible;
+  if (state.fog.visible) state.fog.color = el("fogColor").value || "#000000";
+  updateFogButtonLabel();
+  renderAll();
 }
 
 function hideContextMenu() {
@@ -1504,7 +1803,9 @@ function showMapContextMenu(event, item) {
       : item.kind
         ? displayTokenName(item)
         : item.name || "Shape";
-  el("openAuraOptions").classList.toggle("d-none", !canManageAura(item));
+  el("toggleEmitMenu").classList.toggle("d-none", !canManageAura(item));
+  el("emitMenu").classList.add("d-none");
+  el("toggleEmitMenu").setAttribute("aria-expanded", "false");
   el("openApplyEffect").classList.toggle("d-none", !canManageEffects(item));
   el("openRollMenu").classList.toggle("d-none", !canRollToken(item));
   const tokenVisibilityButton = el("toggleTokenVisibility");
@@ -1654,7 +1955,7 @@ function endMovementMeasure() {
 
 function renderMap() {
   const stage = el("mapStage");
-  const { cols, rows, backgroundUrl, backgroundFit } = state.settings;
+  const { cols, rows, backgroundUrl } = state.settings;
   stage.style.setProperty("--cell", `${localGridSize}px`);
   stage.style.setProperty("--cols", cols);
   stage.style.setProperty("--rows", rows);
@@ -1662,12 +1963,32 @@ function renderMap() {
     "--map-bg",
     backgroundUrl ? `url("${backgroundUrl.replaceAll('"', "%22")}")` : "none",
   );
-  stage.style.setProperty("--bg-size", backgroundFit || "cover");
+  // The background always fills the whole cols x rows grid, so resizing
+  // Cell X/Y (linked) scales the picture with it instead of cropping it.
 
+  const visibleTokens = state.tokens.filter(canSeeToken);
   stage.innerHTML = [
-    ...state.tokens.filter(canSeeToken).map(renderAura),
+    ...visibleTokens.map(renderAura),
+    ...(isGm
+      ? visibleTokens.map((token) =>
+          renderRevealIndicator(token, "light", "map-reveal-light", "#f0d58c"),
+        )
+      : []),
+    ...(isGm
+      ? visibleTokens.map((token) =>
+          renderRevealIndicator(
+            token,
+            "limitedView",
+            "map-reveal-limited",
+            "#61dafb",
+          ),
+        )
+      : []),
     ...state.shapes.map(renderShape),
-    ...state.tokens.filter(canSeeToken).map(renderToken),
+    ...visibleTokens.map(renderToken),
+    renderFogLayer(),
+    renderLimitedViewGrayscale(),
+    renderOwnTokenFogReveal(visibleTokens),
     `<div id="tokenHoverLayer" class="token-hover-layer"></div>`,
   ].join("");
 
@@ -1737,6 +2058,84 @@ function tokenCenter(token) {
   };
 }
 
+function renderRevealIndicator(token, field, className, color) {
+  const data = token[field];
+  if (!data?.visible) return "";
+  const radius = Math.max(1, Number(data.radius || 1));
+  const size = radius * 2;
+  const center = tokenCenter(token);
+  return `<div class="map-aura ${className}" style="--aura-x:${center.x - radius};--aura-y:${center.y - radius};--aura-size:${size};--aura-color:${color};"></div>`;
+}
+
+function lightRevealCircles() {
+  const circles = [];
+  state.tokens.forEach((token) => {
+    if (!token.light?.visible) return;
+    const center = tokenCenter(token);
+    circles.push({
+      x: center.x,
+      y: center.y,
+      radius: Math.max(1, Number(token.light.radius || 1)),
+    });
+  });
+  return circles;
+}
+
+function limitedViewRevealCircles() {
+  const circles = [];
+  state.tokens.forEach((token) => {
+    if (
+      !token.limitedView?.visible ||
+      !(isGm || token.ownerId === currentUserId)
+    )
+      return;
+    const center = tokenCenter(token);
+    circles.push({
+      x: center.x,
+      y: center.y,
+      radius: Math.max(1, Number(token.limitedView.radius || 1)),
+    });
+  });
+  return circles;
+}
+
+function fogRevealCircles() {
+  return [...lightRevealCircles(), ...limitedViewRevealCircles()];
+}
+
+function renderFogLayer() {
+  if (!state.fog?.visible) return "";
+  const { cols, rows } = state.settings;
+  const holes = fogRevealCircles()
+    .map(
+      (circle) =>
+        `<circle cx="${circle.x}" cy="${circle.y}" r="${circle.radius}" fill="black"></circle>`,
+    )
+    .join("");
+  const opacity = isGm ? 0.45 : 1;
+  return `
+    <svg class="map-fog-layer" viewBox="0 0 ${cols} ${rows}" preserveAspectRatio="none">
+      <defs>
+        <mask id="mapFogMask">
+          <rect x="0" y="0" width="${cols}" height="${rows}" fill="white"></rect>
+          ${holes}
+        </mask>
+      </defs>
+      <rect x="0" y="0" width="${cols}" height="${rows}" fill="${escapeHtml(state.fog.color || "#000000")}" fill-opacity="${opacity}" mask="url(#mapFogMask)"></rect>
+    </svg>
+  `;
+}
+
+function renderLimitedViewGrayscale() {
+  if (!state.fog?.visible) return "";
+  return limitedViewRevealCircles()
+    .map((circle) => {
+      const size = circle.radius * 2;
+      return `<div class="map-limited-view-grayscale" style="--aura-x:${circle.x - circle.radius};--aura-y:${circle.y - circle.radius};--aura-size:${size};"></div>`;
+    })
+    .join("");
+}
+
 function tokenInAura(token, auraToken) {
   const aura = auraToken?.aura || {};
   if (!aura.visible || !aura.effect || token.id === auraToken.id) return false;
@@ -1789,6 +2188,13 @@ function updateAuraToastPosition() {
   const container = el("auraEffectToasts");
   const wrap = document.querySelector(".map-stage-wrap");
   if (!container || !wrap) return;
+  if (wrap.offsetParent === null) {
+    container.style.removeProperty("--aura-toast-top");
+    container.style.removeProperty("--aura-toast-right");
+    container.style.removeProperty("--aura-toast-width");
+    container.style.removeProperty("--aura-toast-max-height");
+    return;
+  }
   const rect = wrap.getBoundingClientRect();
   const top = clamp(rect.top + 8, 8, window.innerHeight - 80);
   const right = clamp(
@@ -1842,7 +2248,7 @@ function renderAuraEffectToasts() {
   });
 }
 
-function renderToken(token) {
+function renderToken(token, { ghost = false } = {}) {
   const enemyClass = token.kind === "enemy" ? " enemy" : "";
   const genericClass = token.kind === "token" ? " generic-token" : "";
   const identityHidden = tokenNameIsHidden(token);
@@ -1858,19 +2264,29 @@ function renderToken(token) {
       : "";
   const tokenHiddenClass =
     token.hidden === true && canManageMapItem(token) ? " token-hidden" : "";
-  const selectedClass = token.id === selectedId ? " selected" : "";
+  const selectedClass = !ghost && token.id === selectedId ? " selected" : "";
   const activeEntry = state.initiative[state.activeTurn];
   const activeClass =
-    activeEntry?.tokenId === token.id && !activeEntry.disabled
+    !ghost && activeEntry?.tokenId === token.id && !activeEntry.disabled
       ? " turn-active"
       : "";
+  const ghostClass = ghost ? " map-token-fog-reveal" : "";
+  const idAttr = ghost ? "" : ` data-map-id="${escapeHtml(token.id)}"`;
   return `
-    <div class="map-token${enemyClass}${genericClass}${imageClass}${identityHiddenClass}${hiddenClass}${tokenHiddenClass}${selectedClass}${activeClass}" data-map-id="${escapeHtml(token.id)}" style="--x:${token.x};--y:${token.y};--w:${token.w || 1};--h:${token.h || 1};--z:${Number(token.zIndex || 2)};--color:${escapeHtml(token.color || "#8fd19e")};--token-image:${tokenImage};">
+    <div class="map-token${enemyClass}${genericClass}${imageClass}${identityHiddenClass}${hiddenClass}${tokenHiddenClass}${selectedClass}${activeClass}${ghostClass}"${idAttr} style="--x:${token.x};--y:${token.y};--w:${token.w || 1};--h:${token.h || 1};--z:${Number(token.zIndex || 2)};--color:${escapeHtml(token.color || "#8fd19e")};--token-image:${tokenImage};">
       <div class="text-center">
         <div class="token-label">${escapeHtml(tokenNameIsHidden(token) ? (isGm ? `? ${tokenInitials(tokenActualName(token))}` : "?") : tokenInitials(tokenActualName(token)))}</div>
       </div>
     </div>
   `;
+}
+
+function renderOwnTokenFogReveal(visibleTokens) {
+  if (isGm || !state.fog?.visible) return "";
+  return visibleTokens
+    .filter((token) => token.ownerId === currentUserId)
+    .map((token) => renderToken(token, { ghost: true }))
+    .join("");
 }
 
 function hideTokenHover() {
@@ -2018,8 +2434,13 @@ function renderShape(shape) {
         }
         if (texture) {
           const tile = tilePosition(shapeTileIndex(shape, mask, x, y));
+          // background-image is set directly here (not via a --custom-
+          // property referenced from css/map.css) because a url() inside a
+          // custom property resolves relative to the stylesheet that reads
+          // it, not the page -- which pointed this at css/assets/... and
+          // 404'd. An inline style resolves relative to the document.
           cells.push(
-            `<span class="shape-cell texture-cell" style="--texture-url:url('${texture.url}');--tile-x:${tile.x};--tile-y:${tile.y};"></span>`,
+            `<span class="shape-cell texture-cell" style="background-image:url('${cssUrl(texture.url)}');--tile-x:${tile.x};--tile-y:${tile.y};"></span>`,
           );
         } else {
           cells.push(`<span class="shape-cell"></span>`);
@@ -2033,6 +2454,202 @@ function renderShape(shape) {
     `;
   }
   return `<div class="map-shape ${shape.shape || "rect"}${selectedClass}" data-map-id="${escapeHtml(shape.id)}" style="--x:${shape.x};--y:${shape.y};--w:${shape.w || 2};--h:${shape.h || 2};--z:${Number(shape.zIndex || 2)};--color:${escapeHtml(shape.color || "#f0d58c")};"></div>`;
+}
+
+const DPAD_MOVE_COOLDOWN_MS = 200;
+
+function canUseQuickControls(item) {
+  return Boolean(item?.kind) && canManageMapItem(item);
+}
+
+function moveTokenByDpad(item, dx, dy) {
+  if (dpadMovingIds.has(item.id) || !canManageMapItem(item)) return;
+  const maxX = state.settings.cols - (item.w || 1);
+  const maxY = state.settings.rows - (item.h || 1);
+  const nextX = clamp((item.x || 0) + dx, 0, maxX);
+  const nextY = clamp((item.y || 0) + dy, 0, maxY);
+  if (nextX === (item.x || 0) && nextY === (item.y || 0)) return;
+  item.x = nextX;
+  item.y = nextY;
+  dpadMovingIds.add(item.id);
+  renderAll();
+  removeOutOfRangeAuraEffects();
+  setTimeout(() => {
+    dpadMovingIds.delete(item.id);
+    if (selectedObject()?.id === item.id) renderSelectedPanel();
+  }, DPAD_MOVE_COOLDOWN_MS);
+}
+
+function renderMovementDpad(item) {
+  const moving = dpadMovingIds.has(item.id);
+  const dpadButton = (direction, icon, dx, dy) => `
+    <button type="button" class="btn btn-outline-light btn-sm dpad-btn dpad-${direction}" data-dpad-move="${dx},${dy}" ${moving ? "disabled" : ""} aria-label="Move ${direction}">
+      <i class="bi ${icon}"></i>
+    </button>
+  `;
+  return `
+    <div class="dpad-grid">
+      <div></div>${dpadButton("up", "bi-caret-up-fill", 0, -1)}<div></div>
+      ${dpadButton("left", "bi-caret-left-fill", -1, 0)}<div class="dpad-center"></div>${dpadButton("right", "bi-caret-right-fill", 1, 0)}
+      <div></div>${dpadButton("down", "bi-caret-down-fill", 0, 1)}<div></div>
+    </div>
+  `;
+}
+
+// Some quick actions are grouped under one expandable entry, same as the
+// right-click context menu's submenus (Emit, Z-index).
+const QUICK_ACTION_GROUPS = {
+  "emit-toggle": {
+    label: "Emit",
+    icon: "bi-broadcast-pin",
+    cls: "btn-outline-info",
+    rows: [
+      ["aura", "bi-broadcast-pin", "btn-outline-info", "Aura options"],
+      ["light", "bi-brightness-high", "btn-outline-warning", "Apply light"],
+      ["limitedView", "bi-eye", "btn-outline-info", "Apply Special Vision"],
+    ],
+  },
+  "zindex-toggle": {
+    label: "Z-index",
+    icon: "bi-layers",
+    cls: "btn-outline-light",
+    rows: [
+      ["z-top", "bi-front", "btn-outline-light", "Move to top"],
+      ["z-bottom", "bi-back", "btn-outline-light", "Move to bottom"],
+      ["z-up", "bi-arrow-up", "btn-outline-light", "Move up"],
+      ["z-down", "bi-arrow-down", "btn-outline-light", "Move down"],
+    ],
+  },
+};
+let quickExpandedGroups = new Set();
+
+function quickActionRows(item) {
+  const rows = [];
+  if (canManageAura(item))
+    rows.push(["emit-toggle", "bi-broadcast-pin", "btn-outline-info", "Emit"]);
+  if (canManageEffects(item))
+    rows.push(["effect", "bi-magic", "btn-outline-success", "Apply effect"]);
+  if (canRollToken(item)) rows.push(["roll", "bi-dice-5", "btn-outline-primary", "Roll"]);
+  rows.push([
+    "toggle-visibility",
+    item.hidden === true ? "bi-eye" : "bi-eye-slash",
+    "btn-outline-secondary",
+    item.hidden === true ? "Unhide" : "Hide",
+  ]);
+  if (item.kind === "enemy" && isGm) {
+    rows.push([
+      "toggle-enemy-visibility",
+      item.visible === false ? "bi-eye" : "bi-eye-slash",
+      "btn-outline-warning",
+      item.visible === false ? "Show enemy" : "Hide enemy",
+    ]);
+  }
+  if (isGm) {
+    rows.push([
+      "toggle-name-visibility",
+      item.hideName ? "bi-eye" : "bi-incognito",
+      "btn-outline-warning",
+      item.hideName ? "Unhide name" : "Hide name",
+    ]);
+  }
+  rows.push(["zindex-toggle", "bi-layers", "btn-outline-light", "Z-index"]);
+  rows.push(["remove", "bi-box-arrow-right", "btn-outline-danger", "Remove from map"]);
+  return rows;
+}
+
+function renderQuickActionsList(item) {
+  const rows = quickActionRows(item)
+    .map(([action, icon, cls, label]) => {
+      const group = QUICK_ACTION_GROUPS[action];
+      if (group) {
+        const expanded = quickExpandedGroups.has(action);
+        const subRows = group.rows
+          .map(
+            ([subAction, subIcon, subCls, subLabel]) => `
+      <button class="btn ${subCls} btn-sm w-100 text-start" type="button" data-quick-action="${subAction}">
+        <i class="bi ${subIcon} me-1"></i> ${escapeHtml(subLabel)}
+      </button>
+    `,
+          )
+          .join("");
+        return `
+    <button class="btn ${cls} btn-sm w-100 text-start" type="button" data-quick-group-toggle="${action}" aria-expanded="${expanded}">
+      <i class="bi ${expanded ? "bi-chevron-down" : icon} me-1"></i> ${escapeHtml(label)}
+    </button>
+    ${expanded ? `<div class="quick-actions-submenu">${subRows}</div>` : ""}
+  `;
+      }
+      return `
+    <button class="btn ${cls} btn-sm w-100 text-start" type="button" data-quick-action="${action}">
+      <i class="bi ${icon} me-1"></i> ${escapeHtml(label)}
+    </button>
+  `;
+    })
+    .join("");
+  return `<div class="quick-actions-list">${rows}</div>`;
+}
+
+function renderQuickControlsPanel(item) {
+  return `
+    <div class="quick-controls-panel mt-2">
+      ${compactHpStat(item)}
+      ${renderMovementDpad(item)}
+      ${renderQuickActionsList(item)}
+    </div>
+  `;
+}
+
+const QUICK_ACTION_HANDLERS = {
+  aura: openAuraOptions,
+  light: openLightOptions,
+  limitedView: openLimitedViewOptions,
+  effect: openQuickApplyEffect,
+  roll: openRollModal,
+  "toggle-visibility": toggleContextTokenVisibility,
+  "toggle-enemy-visibility": toggleContextEnemyVisibility,
+  "toggle-name-visibility": toggleContextTokenNameVisibility,
+  "z-top": () => moveContextItemZ("top"),
+  "z-bottom": () => moveContextItemZ("bottom"),
+  "z-up": () => moveContextItemZ("up"),
+  "z-down": () => moveContextItemZ("down"),
+  remove: removeContextMenuToken,
+};
+
+function runQuickAction(item, action) {
+  contextMenuTokenId = item.id;
+  selectedId = item.id;
+  QUICK_ACTION_HANDLERS[action]?.();
+}
+
+function bindQuickControlsPanel(item) {
+  const panel = el("selectedPanel");
+  panel
+    .querySelector("[data-quick-controls-toggle]")
+    ?.addEventListener("click", () => {
+      quickControlsOpenId = quickControlsOpenId === item.id ? "" : item.id;
+      quickExpandedGroups.clear();
+      renderSelectedPanel();
+    });
+  if (quickControlsOpenId !== item.id) return;
+  panel.querySelectorAll("[data-dpad-move]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const [dx, dy] = button.dataset.dpadMove.split(",").map(Number);
+      moveTokenByDpad(item, dx, dy);
+    });
+  });
+  panel.querySelectorAll("[data-quick-group-toggle]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const group = button.dataset.quickGroupToggle;
+      if (quickExpandedGroups.has(group)) quickExpandedGroups.delete(group);
+      else quickExpandedGroups.add(group);
+      renderSelectedPanel();
+    });
+  });
+  panel.querySelectorAll("[data-quick-action]").forEach((button) => {
+    button.addEventListener("click", () =>
+      runQuickAction(item, button.dataset.quickAction),
+    );
+  });
 }
 
 function renderSelectedPanel() {
@@ -2102,9 +2719,21 @@ function renderSelectedPanel() {
   const sizeLinked = item.sizeLinked !== false;
   const sizeLinkIcon = sizeLinked ? "bi-link-45deg" : "bi-unlink";
   const concealedName = item.kind && tokenNameIsHidden(item) && !isGm;
-  const detailHtml = `
-    <label>Name</label>
-    <input data-selected-field="name" class="form-control form-control-sm" value="${escapeHtml(concealedName ? "?" : item.name || "")}" ${concealedName ? "readonly" : ""}>
+  const nameField =
+    item.kind === "character"
+      ? ""
+      : `<label>Name</label>
+    <input data-selected-field="name" class="form-control form-control-sm" value="${escapeHtml(concealedName ? "?" : item.name || "")}" ${concealedName ? "readonly" : ""}>`;
+  const quickControlsAvailable = canUseQuickControls(item);
+  const quickControlsOpen = quickControlsAvailable && quickControlsOpenId === item.id;
+  const quickControlsToggle = quickControlsAvailable
+    ? `<button type="button" class="btn btn-outline-info btn-sm quick-controls-toggle${quickControlsOpen ? " active" : ""}" data-quick-controls-toggle title="Quick controls" aria-label="Quick controls" aria-pressed="${quickControlsOpen}">
+        <i class="bi bi-controller"></i>
+      </button>`
+    : "";
+  const belowFoldHtml = quickControlsOpen
+    ? renderQuickControlsPanel(item)
+    : `
     ${compactSheet}
     ${effectsSection}
     <div class="accordion selected-collapse mt-2" id="selectedDetailsAccordion">
@@ -2136,6 +2765,11 @@ function renderSelectedPanel() {
       </div>
     </div>
     ${textureFields}
+  `;
+  const detailHtml = `
+    ${nameField}
+    ${quickControlsToggle}
+    ${belowFoldHtml}
   `;
   const selectedCharacterName =
     item.kind === "character" && characterPanelCharacterId
@@ -2267,11 +2901,12 @@ function bindSelectedPanelInteractions(item) {
         renderAll();
       });
     });
+  bindQuickControlsPanel(item);
 }
 
 function renderInitiative() {
   const list = el("initiativeList");
-  el("roundCounter").textContent = `Round ${state.roundsPassed || 0}`;
+  el("roundCounter").textContent = `Round ${state.roundsPassed || 1}`;
   if (!state.initiative.length) {
     list.innerHTML = `<div class="small text-secondary">No initiative entries.</div>`;
     return;
@@ -2457,8 +3092,9 @@ function flushPendingRemoteState() {
 
 function queueSave() {
   clearTimeout(saveTimer);
+  const slot = mapViewSlot;
   saveTimer = setTimeout(async () => {
-    await PFApp.saveMapState(state, mapContextKey);
+    await PFApp.saveMapState(state, mapContextKey, slot);
   }, 500);
 }
 
@@ -2912,6 +3548,62 @@ async function updateTokenCurrentHp(
   );
 }
 
+async function ensureMapClassDefinitions() {
+  if (!mapClassDefinitions) {
+    mapClassDefinitions = window.PFClassData
+      ? await window.PFClassData.loadAllClasses()
+      : [];
+  }
+  return mapClassDefinitions;
+}
+
+// Every base-30 PF skill plus this character's own homebrew ones --
+// matches character-sheet.js's allSkills() so a "choose a skill" pick
+// offers the same options wherever it's answered.
+function characterSkillOptions(character) {
+  const base = window.PFEffectStats?.PF_SKILLS_WITH_ABILITY || [];
+  const custom = Array.isArray(character?.sheet?.customSkills)
+    ? character.sheet.customSkills.map((skill) => [
+        skill.name,
+        skill.ability || "int",
+      ])
+    : [];
+  return [...base, ...custom];
+}
+
+// The class features (Rage, its bundled rage powers/totems, ...) a
+// character could activate, computed from their own saved sheet data --
+// used both for self-cast (character sheet) and for casting one
+// character's abilities onto another token from the map (Share Rage /
+// Skald's Inspired Rage).
+async function characterActivatableAbilities(character) {
+  if (!character?.sheet) return [];
+  await ensureMapClassDefinitions();
+  const abilities = character.sheet.abilities || {};
+  return (
+    window.PFClassFeatureAbilities?.collectActivatableAbilities({
+      classDefinitions: mapClassDefinitions || [],
+      classProgression: character.sheet.classProgression || [],
+      classFeatureChoices: character.sheet.classFeatureChoices || {},
+      characterLevel: character.sheet.fields?.characterLevel,
+      abilityScores: {
+        str: abilities.str?.score,
+        dex: abilities.dex?.score,
+        con: abilities.con?.score,
+        int: abilities.int?.score,
+        wis: abilities.wis?.score,
+        cha: abilities.cha?.score,
+      },
+    }) || []
+  );
+}
+
+// This modal is for directly managing a token's own active effects
+// (self-application, or a GM tidying up an NPC) -- casting one
+// character's class features onto ANOTHER token belongs in "Apply
+// Effect" and Aura Options instead, where the caster and target are
+// already unambiguous from the right-click context, so this doesn't
+// need its own "cast as" picker.
 async function openMapEffects(tokenId) {
   const token = tokenById(tokenId);
   const mount = el("mapEffectTracker");
@@ -2926,9 +3618,16 @@ async function openMapEffects(tokenId) {
   }
 
   el("mapEffectsModalLabel").textContent = `${displayTokenName(token)} Effects`;
+  // Enemies aren't "controlled" by a separate real person -- only route
+  // a choice-needing effect through the pending-request flow when
+  // whoever's applying it isn't that character's own owner.
+  const isOwnCharacter =
+    token.kind === "enemy" ||
+    tokenCharacter(token)?.userId === currentUserId;
   const options = {
     contextKey: mapContextKey,
     characterId: effectTargetId,
+    isOwnCharacter,
     loadActiveEffects:
       token.kind === "enemy"
         ? async () => {
@@ -3193,6 +3892,24 @@ function renderQuickEffects() {
   bindQuickEffectCards(el("quickEffectResults"), matches);
 }
 
+// The source token's own class features (Rage, its bundled totems/rage
+// powers, ...) come first, ahead of the general library -- both "Apply
+// Effect" and Aura Options already know their caster unambiguously (the
+// token the menu was opened from), so this is where Share Rage /
+// Inspired Rage style sharing actually belongs, not a separate "cast
+// as" picker.
+async function sourceEffectDefinitions(sourceToken) {
+  const sourceCharacter =
+    sourceToken?.kind === "character" ? tokenCharacter(sourceToken) : null;
+  const [library, abilities] = await Promise.all([
+    PFApp.loadBuffDefinitions(),
+    sourceCharacter
+      ? characterActivatableAbilities(sourceCharacter)
+      : Promise.resolve([]),
+  ]);
+  return [...abilities, ...library];
+}
+
 async function openQuickApplyEffect() {
   const token = tokenById(contextMenuTokenId);
   if (!token || !canManageEffects(token)) return;
@@ -3207,7 +3924,7 @@ async function openQuickApplyEffect() {
   el("quickEffectMostUsedWrap").classList.add("d-none");
   quickEffectModal.show();
   setTimeout(() => el("quickEffectSearch").focus(), 150);
-  quickEffectDefinitions = await PFApp.loadBuffDefinitions();
+  quickEffectDefinitions = await sourceEffectDefinitions(token);
   renderQuickEffects();
 }
 
@@ -3225,7 +3942,7 @@ async function openAuraEffectPicker() {
   auraModal.hide();
   quickEffectModal.show();
   setTimeout(() => el("quickEffectSearch").focus(), 150);
-  quickEffectDefinitions = await PFApp.loadBuffDefinitions();
+  quickEffectDefinitions = await sourceEffectDefinitions(token);
   renderQuickEffects();
 }
 
@@ -3283,10 +4000,17 @@ function appliedEffectFromQuickSelection(effect, options) {
   const turns = Math.max(1, Number(options?.turns || 1) || 1);
   const permanent = Boolean(options?.permanent);
   const condition = isConditionEffect(effect);
+  // A class-feature ability's duration (e.g. Rage's "4 rounds + CON
+  // modifier") needs the caster's full stat block, not just a typed-in
+  // caster level -- same distinction buff-tracker-widget.js's addEffect
+  // makes.
+  const durationArg = effect.fromAbility
+    ? effect.abilityContext || { casterLevel }
+    : casterLevel;
   const baseDurationLabel = durationLabel(effect);
   const calculatedDuration = condition
     ? turns
-    : parseEffectDuration(effect, casterLevel);
+    : parseEffectDuration(effect, durationArg);
   const appliedDurationLabel = permanent
     ? "Permanent"
     : condition
@@ -3297,9 +4021,15 @@ function appliedEffectFromQuickSelection(effect, options) {
           ? `${baseDurationLabel} | CL ${casterLevel}: ${formatDurationRounds(calculatedDuration)}`
           : `${baseDurationLabel} | ${formatDurationRounds(calculatedDuration)}`;
 
+  // fromAbility/abilityContext only exist to drive this pick -- strip
+  // them so the saved active-effect entry matches the normal buff shape
+  // instead of carrying the caster's whole stat block.
+  const { fromAbility, abilityContext, ...persistedEffect } = effect;
   return {
-    ...effect,
-    casterLevel,
+    ...persistedEffect,
+    casterLevel: fromAbility
+      ? abilityContext?.characterLevel || casterLevel
+      : casterLevel,
     turns: condition ? turns : undefined,
     permanent,
     remaining: permanent ? null : calculatedDuration,
@@ -3468,6 +4198,61 @@ async function removeOutOfRangeAuraEffects() {
   }
 }
 
+// Resolves any "choice:" bonuses on an effect before it lands on a
+// token -- locally, via a picker, if whoever's applying it already owns
+// that character; otherwise by queuing a cross-device request (see
+// modals/pending-effect-choices.js) so the choice lands with whoever
+// actually controls the target, not whoever cast the effect.
+// Returns { effect, queued }: effect is null if nothing should be
+// applied right now (cancelled, or queued for later).
+async function resolveEffectChoicesForToken(token, effect) {
+  const bonuses = Array.isArray(effect.bonuses) ? effect.bonuses : [];
+  if (
+    !bonuses.some((bonus) => window.PFEffectStats?.isChoiceStat(bonus.stat))
+  )
+    return { effect, queued: false };
+
+  const isOwn =
+    token.kind === "enemy" ||
+    tokenCharacter(token)?.userId === currentUserId;
+
+  if (!isOwn) {
+    if (token.kind !== "character" || !token.characterId)
+      return { effect: null, queued: false };
+    const result = await PFApp.createEffectChoiceRequest?.({
+      contextKey: mapContextKey,
+      characterId: token.characterId,
+      ability: effect,
+    });
+    return { effect: null, queued: Boolean(result?.ok) };
+  }
+
+  const character = token.kind === "character" ? tokenCharacter(token) : null;
+  const skills = character ? characterSkillOptions(character) : undefined;
+  const resolved = [];
+  for (const bonus of bonuses) {
+    if (!window.PFEffectStats?.isChoiceStat(bonus.stat)) {
+      resolved.push(bonus);
+      continue;
+    }
+    const poolId = window.PFEffectStats.choicePoolIdFromStat(bonus.stat);
+    const pool = window.PFEffectStats.poolById(poolId);
+    const options = await window.PFEffectStats.resolveChoicePoolOptions(
+      poolId,
+      { skills },
+    );
+    const picked = window.PFEffectChoicePicker
+      ? await window.PFEffectChoicePicker.open({
+          title: `${effect.name || "Effect"}${character ? ` (${character.name})` : ""}: Choose ${pool?.label || "a Target"}`,
+          options,
+        })
+      : null;
+    if (!picked) return { effect: null, queued: false };
+    resolved.push({ ...bonus, stat: picked });
+  }
+  return { effect: { ...effect, bonuses: resolved }, queued: false };
+}
+
 async function applyAuraEffectToToken(tokenId, auraId) {
   const token = tokenById(tokenId);
   const auraToken = tokenById(auraId);
@@ -3488,7 +4273,17 @@ async function applyAuraEffectToToken(tokenId, auraId) {
     sourceTokenId: auraId,
     durationAnchorTokenId: auraId,
   };
-  if (await applyQuickEffectToToken(token, applied)) {
+  const { effect: resolvedEffect, queued } = await resolveEffectChoicesForToken(
+    token,
+    applied,
+  );
+  if (queued) {
+    auraEffectDismissed.add(promptKey);
+    renderAuraEffectToasts();
+    return;
+  }
+  if (!resolvedEffect) return;
+  if (await applyQuickEffectToToken(token, resolvedEffect)) {
     auraEffectDismissed.add(promptKey);
     await refetchMapSheetState();
     renderAll();
@@ -3522,19 +4317,27 @@ async function confirmQuickEffectTargets() {
   const sourceTokenId =
     quickEffectSelection.sourceTokenId || quickEffectSourceTokenId || "";
   const appliedTargets = [];
+  const queuedTargets = [];
   for (const token of targets) {
     const targetEffect = {
       ...structuredClone(appliedEffect),
       sourceTokenId: sourceTokenId || token.id,
       durationAnchorTokenId: sourceTokenId || token.id,
     };
-    if (await applyQuickEffectToToken(token, targetEffect)) {
+    const { effect: resolvedEffect, queued } =
+      await resolveEffectChoicesForToken(token, targetEffect);
+    if (queued) {
+      queuedTargets.push(tokenActualName(token));
+      continue;
+    }
+    if (!resolvedEffect) continue;
+    if (await applyQuickEffectToToken(token, resolvedEffect)) {
       appliedTargets.push(tokenActualName(token));
     }
   }
 
   el("confirmQuickEffectTargets").disabled = false;
-  if (!appliedTargets.length) {
+  if (!appliedTargets.length && !queuedTargets.length) {
     el("quickEffectApplyStatus").textContent = "Could not apply effect.";
     return;
   }
@@ -3542,15 +4345,31 @@ async function confirmQuickEffectTargets() {
   incrementQuickEffectUsage(quickEffectSelection.effect);
   const actor = await currentActorName();
   const effectName = quickEffectSelection.effect.name || "Effect";
-  const targetsText = appliedTargets.join(", ");
-  addTimeline(`${actor} applied ${effectName} on ${targetsText}.`, [
-    { text: actor, emphasis: true },
-    { text: " applied " },
-    { text: effectName, emphasis: true },
-    { text: " on " },
-    { text: targetsText, emphasis: true },
-    { text: "." },
-  ]);
+  if (appliedTargets.length) {
+    const targetsText = appliedTargets.join(", ");
+    addTimeline(`${actor} applied ${effectName} on ${targetsText}.`, [
+      { text: actor, emphasis: true },
+      { text: " applied " },
+      { text: effectName, emphasis: true },
+      { text: " on " },
+      { text: targetsText, emphasis: true },
+      { text: "." },
+    ]);
+  }
+  if (queuedTargets.length) {
+    const targetsText = queuedTargets.join(", ");
+    addTimeline(
+      `${actor} sent ${effectName} to ${targetsText} to choose a target.`,
+      [
+        { text: actor, emphasis: true },
+        { text: " sent " },
+        { text: effectName, emphasis: true },
+        { text: " to " },
+        { text: targetsText, emphasis: true },
+        { text: " to choose a target." },
+      ],
+    );
+  }
   quickEffectTargetsModal.hide();
   quickEffectSelection = null;
   await refetchMapSheetState();
@@ -4515,43 +5334,82 @@ function updateAuraEffectSummary() {
   el("auraRemoveOutWrap").classList.toggle("d-none", !hasEffect);
 }
 
-function openAuraOptions() {
+const CIRCLE_MODE_FIELD = {
+  aura: "aura",
+  light: "light",
+  limitedView: "limitedView",
+};
+const CIRCLE_MODE_LABEL = {
+  aura: "Aura Options",
+  light: "Apply Light",
+  limitedView: "Apply Special Vision",
+};
+const CIRCLE_MODE_SAVE_LABEL = {
+  aura: "Save Aura",
+  light: "Save Light",
+  limitedView: "Save Special Vision",
+};
+
+function openCircleOptions(mode) {
   const token = tokenById(contextMenuTokenId);
   if (!token || !canManageAura(token)) return;
   hideContextMenu();
   auraEditingTokenId = token.id;
-  const aura = token.aura || {};
-  auraEffectDraft = aura.effect ? structuredClone(aura.effect) : null;
-  el("auraVisible").checked = Boolean(aura.visible);
-  el("auraRadiusCells").value = Math.max(1, Number(aura.radius || 1));
+  auraEditingMode = mode;
+  const field = token[CIRCLE_MODE_FIELD[mode]] || {};
+  auraEffectDraft =
+    mode === "aura" && field.effect ? structuredClone(field.effect) : null;
+  el("auraVisible").checked = Boolean(field.visible);
+  el("auraRadiusCells").value = Math.max(1, Number(field.radius || 1));
   el("auraColor").value =
-    aura.color || (token.kind === "enemy" ? "#b02a37" : "#8fd19e");
-  el("auraRemoveOutOfRange").checked = Boolean(aura.removeWhenOutOfRange);
+    field.color || (token.kind === "enemy" ? "#b02a37" : "#8fd19e");
+  el("auraRemoveOutOfRange").checked = Boolean(field.removeWhenOutOfRange);
+  el("auraOptionsModalTitle").textContent = CIRCLE_MODE_LABEL[mode];
+  el("auraVisibleLabel").textContent = mode === "aura" ? "Visible" : "Active";
+  el("auraColorField").classList.toggle("d-none", mode !== "aura");
+  el("auraEffectSection").classList.toggle("d-none", mode !== "aura");
+  el("auraSaveButton").textContent = CIRCLE_MODE_SAVE_LABEL[mode];
   updateAuraRadiusText();
   updateAuraEffectSummary();
   auraModal.show();
+}
+
+function openAuraOptions() {
+  openCircleOptions("aura");
+}
+function openLightOptions() {
+  openCircleOptions("light");
+}
+function openLimitedViewOptions() {
+  openCircleOptions("limitedView");
 }
 
 function saveAuraOptions(event) {
   event.preventDefault();
   const token = tokenById(auraEditingTokenId);
   if (!token || !canManageAura(token)) return;
-  token.aura = {
+  const mode = auraEditingMode;
+  const payload = {
     visible: el("auraVisible").checked,
     radius: Math.max(1, Number(el("auraRadiusCells").value || 1)),
-    color: el("auraColor").value || "#8fd19e",
-    effect: auraEffectDraft ? structuredClone(auraEffectDraft) : null,
-    removeWhenOutOfRange: Boolean(
-      auraEffectDraft && el("auraRemoveOutOfRange").checked,
-    ),
   };
+  if (mode === "aura") {
+    payload.color = el("auraColor").value || "#8fd19e";
+    payload.effect = auraEffectDraft ? structuredClone(auraEffectDraft) : null;
+    payload.removeWhenOutOfRange = Boolean(
+      auraEffectDraft && el("auraRemoveOutOfRange").checked,
+    );
+  }
+  token[CIRCLE_MODE_FIELD[mode]] = payload;
   auraModal.hide();
   auraEditingTokenId = "";
+  auraEditingMode = "aura";
   auraEffectDraft = null;
   renderAll();
 }
 
 function openBackgroundOptions() {
+  pendingBackgroundFootprint = null;
   applySettingsToInputs();
   backgroundModal.show();
 }
@@ -4603,17 +5461,72 @@ function openMapDocumentation() {
   window.setTimeout(() => mapDocumentationModal.show(), 160);
 }
 
-function saveBackgroundOptions(event) {
+async function saveBackgroundOptions(event) {
   event.preventDefault();
   localGridSize = clamp(Number(el("gridSize").value || 48), 24, 96);
   sessionStorage.setItem("pf_map_grid_size", String(localGridSize));
-  state.settings.cols = clamp(Number(el("mapCols").value || 30), 8, 80);
-  state.settings.rows = clamp(Number(el("mapRows").value || 20), 8, 80);
-  state.settings.backgroundUrl = el("backgroundUrl").value.trim();
-  state.settings.backgroundFit = el("backgroundFit").value;
+
+  const newBackgroundUrl = el("backgroundUrl").value.trim();
+  let footprint = { cols: 0, rows: 0 };
+  if (newBackgroundUrl) {
+    if (pendingBackgroundFootprint?.url === newBackgroundUrl) {
+      footprint = pendingBackgroundFootprint;
+    } else if (newBackgroundUrl === state.settings.backgroundUrl) {
+      // URL wasn't touched this time around -- keep the footprint already
+      // stored for it.
+      footprint = {
+        cols: state.settings.backgroundCols || 0,
+        rows: state.settings.backgroundRows || 0,
+      };
+    } else {
+      // Save was clicked before the field's change/blur handler ran
+      // (e.g. paste-then-immediately-submit) -- measure it now.
+      const size = await measureImageNaturalSize(newBackgroundUrl);
+      if (size) footprint = backgroundFootprintFromNaturalSize(size.width, size.height);
+    }
+  }
+
+  state.settings.backgroundUrl = newBackgroundUrl;
+  state.settings.backgroundCols = newBackgroundUrl ? footprint.cols || 0 : 0;
+  state.settings.backgroundRows = newBackgroundUrl ? footprint.rows || 0 : 0;
+
+  state.settings.cols = clamp(
+    Number(el("cellX").value) || MAP_SIZE_MIN,
+    MAP_SIZE_MIN,
+    MAP_SIZE_MAX,
+  );
+  state.settings.rows = clamp(
+    Number(el("cellY").value) || MAP_SIZE_MIN,
+    MAP_SIZE_MIN,
+    MAP_SIZE_MAX,
+  );
+
+  if (isGm) {
+    state.settings.name = el("mapName").value.trim();
+    const meta = mapSlotMeta.find((entry) => entry.slot === mapViewSlot);
+    if (meta) meta.name = state.settings.name;
+    else mapSlotMeta.push({ slot: mapViewSlot, name: state.settings.name });
+  }
   applySettingsToInputs();
+  renderMapSlotNav();
   backgroundModal.hide();
   renderAll();
+}
+
+// Which map slot a user is looking at is a purely local, per-browser
+// choice -- different people can be on different maps at once, so it is
+// never synced or broadcast to anyone else.
+function mapSlotStorageKey(contextKey) {
+  return `pf_map_slot_${contextKey}`;
+}
+
+function loadRememberedMapSlot(contextKey) {
+  const stored = Number(localStorage.getItem(mapSlotStorageKey(contextKey)));
+  return clamp(stored || 1, 1, MAP_SLOT_COUNT);
+}
+
+function rememberMapSlot(contextKey, slot) {
+  localStorage.setItem(mapSlotStorageKey(contextKey), String(slot));
 }
 
 async function loadMap(contextKey) {
@@ -4622,22 +5535,68 @@ async function loadMap(contextKey) {
   mapContextKey = contextKey;
   mapCharacters = await PFApp.loadContextCharacters(mapContextKey);
   await hydrateMapCharacterSheets();
+  startPendingEffectChoicePolling();
   isGm = await determineGm(mapContextKey);
   el("addEnemyToken").classList.toggle("d-none", !isGm);
   el("gmHint").textContent = isGm ? "GM tools enabled" : "Player view";
-  state = normalizeState(await PFApp.loadMapState(mapContextKey));
   if (isGm) mapEnemies = await PFApp.loadEnemies(mapContextKey);
+  mapSlotMeta = await PFApp.loadMapSlotSummaries(mapContextKey);
+  await loadMapSlot(loadRememberedMapSlot(mapContextKey));
+}
+
+// Same idea as character-sheet.js's poller: whoever's viewing the map
+// gets prompted for any of THEIR OWN characters' pending choice
+// requests (e.g. the GM cast something at them from a token), covering
+// however many characters they control the same way -- every one of
+// mapCharacters they own is in scope, not just whichever token is
+// currently selected.
+function startPendingEffectChoicePolling() {
+  if (!window.PFPendingEffectChoices) return;
+  window.PFPendingEffectChoices.start({
+    contextKey: mapContextKey,
+    characterIds: () =>
+      mapCharacters
+        .filter((character) => character.userId === currentUserId)
+        .map((character) => character.id),
+    characterNameFor: (id) =>
+      mapCharacters.find((character) => character.id === id)?.name || "",
+    choicePoolSkillsFor: (id) => {
+      const character = mapCharacters.find((item) => item.id === id);
+      return character ? characterSkillOptions(character) : undefined;
+    },
+    onResolved: async () => {
+      await hydrateMapCharacterSheets();
+      renderAll(false);
+    },
+  });
+}
+
+// Loads one of the 6 map slots into the current view. Every user picks
+// their own slot independently -- this never affects what anyone else sees.
+async function loadMapSlot(slot) {
+  unsubscribeMapRealtime();
+  mapViewSlot = clamp(Number(slot) || 1, 1, MAP_SLOT_COUNT);
+  state = normalizeState(await PFApp.loadMapState(mapContextKey, mapViewSlot));
   await refreshMapTokenSheets({ save: false });
   applySettingsToInputs();
+  renderMapSlotNav();
   selectedId = "";
   renderAll(false);
   subscribeMapRealtime();
 }
 
+async function switchMapSlot(slot) {
+  const nextSlot = clamp(Number(slot) || 1, 1, MAP_SLOT_COUNT);
+  if (nextSlot === mapViewSlot) return;
+  rememberMapSlot(mapContextKey, nextSlot);
+  await loadMapSlot(nextSlot);
+}
+
 function subscribeMapRealtime() {
   if (!PFApp.client || !mapContextKey) return;
+  const subscribedSlot = mapViewSlot;
   mapRealtimeChannel = PFApp.client
-    .channel(`map_state:${mapContextKey}`)
+    .channel(`map_state:${mapContextKey}:${subscribedSlot}`)
     .on(
       "postgres_changes",
       {
@@ -4649,6 +5608,7 @@ function subscribeMapRealtime() {
       (payload) => {
         const row = payload.new;
         if (!row?.state) return;
+        if (Number(row.map_slot || 1) !== subscribedSlot) return;
         applyRemoteMapState(row.state);
       },
     )
@@ -4688,6 +5648,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   currentUserId = user.id;
   currentUserEmail = user.email || "";
 
+  setupMobileToolbar();
+  bindNumberSteppers();
+
+  el("mapSlotNav").addEventListener("click", (event) => {
+    const button = event.target.closest("[data-map-slot]");
+    if (!button) return;
+    switchMapSlot(button.dataset.mapSlot);
+  });
+
   el("gridSize").addEventListener("change", () => {
     localGridSize = clamp(Number(el("gridSize").value || 48), 24, 96);
     sessionStorage.setItem("pf_map_grid_size", String(localGridSize));
@@ -4695,13 +5664,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     renderAll(false);
   });
 
-  ["mapCols", "mapRows"].forEach((id) => {
-    el(id).addEventListener("change", () => {
-      state.settings.cols = clamp(Number(el("mapCols").value || 30), 8, 80);
-      state.settings.rows = clamp(Number(el("mapRows").value || 20), 8, 80);
-      renderAll();
-    });
+  ["cellX", "cellY"].forEach((id) => {
+    el(id).addEventListener("change", () => handleCellSizeChange(id));
   });
+  setCellLinkEnabled(cellRatioLinked);
+  el("cellLinkToggle").addEventListener("click", () => {
+    setCellLinkEnabled(!cellRatioLinked);
+  });
+
+  el("backgroundUrl").addEventListener("change", handleBackgroundUrlChange);
 
   window.addEventListener("focus", () => {
     if (mapContextKey) refreshMapTokenSheets({ save: false });
@@ -4752,7 +5723,26 @@ document.addEventListener("DOMContentLoaded", async () => {
   el("addGenericToken").addEventListener("click", () => addToken("token"));
   el("addRectShape").addEventListener("click", () => addShape("rect"));
   el("addCircleShape").addEventListener("click", () => addShape("circle"));
+  el("toggleEmitMenu").addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const menu = el("emitMenu");
+    const isHidden = menu.classList.toggle("d-none");
+    el("toggleEmitMenu").setAttribute("aria-expanded", String(!isHidden));
+  });
   el("openAuraOptions").addEventListener("click", openAuraOptions);
+  el("openLightOptions").addEventListener("click", openLightOptions);
+  el("openLimitedViewOptions").addEventListener(
+    "click",
+    openLimitedViewOptions,
+  );
+  el("applyFogButton").addEventListener("click", toggleFog);
+  el("fogColor").addEventListener("input", () => {
+    if (!isGm || !state.fog?.visible) return;
+    state.fog.color = el("fogColor").value;
+    renderMap();
+    queueSave();
+  });
   el("openApplyEffect").addEventListener("click", openQuickApplyEffect);
   el("openRollMenu").addEventListener("click", openRollModal);
   el("rollModal")
@@ -4812,7 +5802,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   el("initiativeForm").addEventListener("submit", addInitiativeEntry);
   el("nextTurn").addEventListener("click", nextTurn);
   el("resetRounds").addEventListener("click", () => {
-    state.roundsPassed = 0;
+    state.roundsPassed = 1;
     renderAll();
   });
   el("timelineForm").addEventListener("submit", (event) => {

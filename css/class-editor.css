@@ -17,6 +17,16 @@ body {
   padding: 12px;
 }
 
+.class-skills-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 4px 12px;
+}
+
+.class-skills-grid .form-check {
+  margin-bottom: 0;
+}
+
 .class-list {
   display: grid;
   gap: 6px;
@@ -155,6 +165,24 @@ body {
   margin-top: 5px;
 }
 
+.feature-pool-pill-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.feature-pool-sync-btn {
+  width: 20px;
+  height: 20px;
+  min-width: 0;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  border-radius: 50%;
+}
+
 .feature-pool-pill {
   background: rgba(13, 202, 240, 0.08);
   border: 1px solid rgba(13, 202, 240, 0.35);
@@ -173,7 +201,7 @@ body {
 
 .class-feature-effect-row {
   display: grid;
-  grid-template-columns: 1.25fr 0.85fr 0.6fr 0.85fr 0.45fr auto;
+  grid-template-columns: 1.25fr 0.85fr 0.6fr 0.85fr 0.45fr 0.6fr auto;
   gap: 8px;
   align-items: end;
   background: #242424;
@@ -188,6 +216,62 @@ body {
   gap: 8px;
   align-items: end;
   grid-column: 1 / -2;
+}
+
+.class-feature-dr-row {
+  display: grid;
+  grid-template-columns: 0.7fr 1.3fr auto auto;
+  gap: 8px;
+  align-items: end;
+  background: #242424;
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.class-feature-sr-row {
+  display: grid;
+  grid-template-columns: 0.5fr auto 0.9fr auto auto;
+  gap: 8px;
+  align-items: end;
+  background: #242424;
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.class-feature-dr-row [data-scale-summary],
+.class-feature-sr-row [data-scale-summary] {
+  grid-column: 1 / -1;
+}
+
+.class-feature-stat-accordion .accordion-item {
+  background: transparent;
+  border: 0;
+}
+
+.class-feature-stat-accordion .accordion-button {
+  background: #242424;
+  color: #ddd;
+  padding: 8px 10px;
+  font-size: 13px;
+}
+
+.class-feature-stat-accordion .accordion-button:not(.collapsed) {
+  background: #2b2b2b;
+  color: #fff;
+  box-shadow: none;
+}
+
+.class-feature-stat-accordion .accordion-button::after {
+  filter: invert(1) grayscale(1) brightness(1.6);
+}
+
+.class-feature-stat-accordion .accordion-body {
+  background: #1e1e1e;
+  border: 1px solid #333;
+  border-top: 0;
+  padding: 10px;
 }
 
 .class-feature-scale-row {
@@ -253,6 +337,8 @@ textarea {
   .level-main-grid,
   .spellcasting-grid,
   .class-feature-effect-row,
+  .class-feature-dr-row,
+  .class-feature-sr-row,
   .class-feature-condition-inline {
     grid-template-columns: 1fr;
   }

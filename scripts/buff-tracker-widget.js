@@ -14,6 +14,9 @@
       .effect-tracker-search-trigger { cursor: pointer; }
       .effect-tracker-card { position: relative; min-height: 116px; background: #242424; border: 1px solid #444; border-radius: 8px; padding: 12px 52px 12px 12px; text-align: left; color: #f4f4f4; cursor: pointer; }
       .effect-tracker-card:hover, .effect-tracker-card:focus { border-color: #0d6efd; outline: none; box-shadow: 0 0 0 2px rgba(13, 110, 253, .25); }
+      .effect-tracker-card-ability { border-color: rgba(143, 209, 158, .45); background: rgba(143, 209, 158, .06); }
+      .effect-tracker-card-ability:hover, .effect-tracker-card-ability:focus { border-color: #8fd19e; box-shadow: 0 0 0 2px rgba(143, 209, 158, .25); }
+      .effect-tracker-ability-badge { display: inline-block; background: rgba(143, 209, 158, .16); border: 1px solid rgba(143, 209, 158, .4); color: #d9f5df; border-radius: 999px; padding: 1px 7px; font-size: 11px; margin-bottom: 4px; }
       .effect-tracker-icon { position: absolute; top: 10px; right: 10px; width: 28px; height: 28px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; background: #151515; border: 1px solid #555; color: #9ec5fe; }
       .effect-card-admin-actions { position: absolute; top: 44px; right: 10px; display: grid; gap: 4px; }
       .effect-card-admin-actions .btn { width: 28px; height: 28px; min-width: 0; display: inline-flex; align-items: center; justify-content: center; padding: 0; }
@@ -34,7 +37,7 @@
       .effect-duration-grid { display: grid; grid-template-columns: .75fr 1fr .7fr; gap: 8px; align-items: end; }
       .effect-toggle-field { min-height: 31px; display: flex; align-items: center; margin: 0; padding-left: 0; }
       .effect-toggle-field .form-check-input { width: 2.75rem; height: 1.4rem; margin-left: 0; cursor: pointer; }
-      .effect-custom-row { position: relative; display: grid; grid-template-columns: 1.5fr .7fr 1fr .7fr auto; gap: 6px; align-items: end; padding: 10px 48px 10px 10px; background: #242424; border: 1px solid #444; border-radius: 8px; }
+      .effect-custom-row { position: relative; display: grid; grid-template-columns: 1.5fr .7fr 1fr .7fr .7fr auto; gap: 6px; align-items: end; padding: 10px 48px 10px 10px; background: #242424; border: 1px solid #444; border-radius: 8px; }
       .effect-named-skill-field { grid-column: 1 / -1; max-width: 280px; }
       .effect-row-delete { position: absolute; top: 8px; right: 8px; width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center; padding: 0; }
       .effect-condition-fields { grid-column: 1 / -1; display: grid; grid-template-columns: auto minmax(160px, 260px); gap: 8px; align-items: end; }
@@ -102,6 +105,7 @@
     "fortitude",
     "reflex",
     "will",
+    "all saves",
     "initiative",
     "cmb",
     "cmd",
@@ -213,6 +217,8 @@
     const key = String(value || "")
       .toLowerCase()
       .trim();
+    const choiceLabel = window.PFEffectStats?.choiceStatLabel?.(key);
+    if (choiceLabel) return choiceLabel;
     if (STAT_LABELS[key]) return STAT_LABELS[key];
     if (SKILL_STAT_LABELS[key]) return SKILL_STAT_LABELS[key];
     return key
@@ -278,6 +284,7 @@
         ${option(PROFESSION_SKILL_STAT, "Skill: Profession")}
         ${SPECIFIC_SKILL_STATS.map((stat) => option(stat)).join("")}
       </optgroup>
+      ${window.PFEffectStats?.choiceOptgroupHtml?.(selected, escapeHtml) || ""}
     `;
   }
 
@@ -370,9 +377,19 @@
     return String(effect?.category || "").toLowerCase() === "condition";
   }
 
-  function parseDuration(effect, casterLevel = 1) {
+  // casterLevelOrContext is normally just a caster level number (the
+  // common case: "1 min/level" spells with a CL input). Activatable
+  // abilities pass their full resolved context instead (character level,
+  // class levels, ability mods), since their duration is computed from the
+  // character rather than typed in by hand.
+  function parseDuration(effect, casterLevelOrContext = 1) {
+    const context =
+      casterLevelOrContext && typeof casterLevelOrContext === "object"
+        ? casterLevelOrContext
+        : { casterLevel: casterLevelOrContext };
+    const casterLevel = context.casterLevel ?? 1;
     if (window.PFEffectMeta?.parseDuration) {
-      return window.PFEffectMeta.parseDuration(effect, { casterLevel });
+      return window.PFEffectMeta.parseDuration(effect, context);
     }
     const parts = durationParts(effect);
     if (!parts.count || parts.unit === "variable") return null;
@@ -432,6 +449,11 @@
       const text = "Removes DEX bonus to AC";
       return bonus.appliesWhen ? `${text} (${bonus.appliesWhen})` : text;
     }
+    if (bonus.classSkillGrant) {
+      const statLabel = bonus.skillName || titleCaseStat(bonus.stat);
+      const text = `${statLabel} becomes a class skill`;
+      return bonus.appliesWhen ? `${text} (${bonus.appliesWhen})` : text;
+    }
     const value = Number(bonus.value || 0);
     const scale = scaleText(bonus.bonusScale || bonus.scale);
     const statLabel = bonus.skillName || titleCaseStat(bonus.stat);
@@ -465,6 +487,7 @@
         `after ${sourceLabel} ${every.afterLevel}, every ${every.everyLevels}: ${fmt(Number(every.increase || 0))}`,
       );
     }
+    if (scale.minimumOne) parts.push("minimum 1");
     return parts.length ? `scales ${parts.join("; ")}` : "";
   }
 
@@ -516,6 +539,7 @@
             <button id="${this.prefix}CreateButton" class="btn btn-outline-info btn-sm" type="button">Create</button>
           </div>
         </div>
+        <div id="${this.prefix}RequestStatus" class="small-text mb-2 d-none"></div>
         <h6>Active Effects</h6>
         <div id="${this.prefix}Active"></div>
         <div class="modal fade" id="${this.prefix}PickerModal" tabindex="-1" aria-labelledby="${this.prefix}PickerLabel" aria-hidden="true">
@@ -586,6 +610,10 @@
                   <select id="${this.prefix}ScaleSource" class="form-select form-select-sm">
                     ${window.PFEffectMeta?.levelSourceOptions?.({ type: "caster" }) || '<option value="caster">Caster level</option>'}
                   </select>
+                </div>
+                <div class="form-check form-switch mb-3">
+                  <input id="${this.prefix}ScaleMinOne" class="form-check-input" type="checkbox">
+                  <label class="form-check-label" for="${this.prefix}ScaleMinOne">Minimum 1 (never rounds down to 0)</label>
                 </div>
                 <div class="small-text mb-2">Milestones</div>
                 <div id="${this.prefix}ScaleRows" class="vstack gap-2 mb-3"></div>
@@ -669,6 +697,7 @@
       this.scaleIncreaseEl = document.getElementById(
         `${this.prefix}ScaleIncrease`,
       );
+      this.scaleMinOneEl = document.getElementById(`${this.prefix}ScaleMinOne`);
       this.scaleStatusEl = document.getElementById(`${this.prefix}ScaleStatus`);
       this.deleteNameEl = document.getElementById(`${this.prefix}DeleteName`);
       this.deleteStatusEl = document.getElementById(
@@ -728,7 +757,14 @@
         this.renderActive();
         return;
       }
-      this.effects = await PFApp.loadBuffDefinitions();
+      // Abilities from the character's own build (activatable class
+      // features, with any linked pool choices already bundled in) are
+      // listed ahead of the general library, since they're what this
+      // character actually has rather than everything anyone's authored.
+      const abilities = Array.isArray(this.options.activatableAbilities)
+        ? this.options.activatableAbilities
+        : [];
+      this.effects = [...abilities, ...(await PFApp.loadBuffDefinitions())];
       const saved = this.options.loadActiveEffects
         ? await this.options.loadActiveEffects()
         : await PFApp.loadBuffState(
@@ -829,11 +865,11 @@
           <label class="small">Skill Name</label>
           <input data-field="skillName" class="form-control form-control-sm" value="${escapeHtml(data.skillName || "")}" placeholder="Alchemy">
         </div>
-        <div>
+        <div class="effect-value-field">
           <label class="small">Value</label>
           <input data-field="value" class="form-control form-control-sm" type="number" value="${data.value ?? 0}">
         </div>
-        <div>
+        <div class="effect-type-field">
           <label class="small">Type</label>
           <select data-field="type" class="form-select form-select-sm">
             ${BONUS_TYPES.map((type) => `<option value="${type}" ${(data.type || "untyped") === type ? "selected" : ""}>${type}</option>`).join("")}
@@ -845,7 +881,13 @@
             <input data-field="stacks" class="form-check-input" type="checkbox" ${data.stacks ? "checked" : ""}>
           </label>
         </div>
-        <button class="btn btn-outline-info btn-sm" type="button" data-scale-bonus>Bonus Scale</button>
+        <div>
+          <label class="small">Class Skill</label>
+          <label class="form-check form-switch effect-toggle-field">
+            <input data-field="classSkillGrant" class="form-check-input" type="checkbox" ${data.classSkillGrant ? "checked" : ""}>
+          </label>
+        </div>
+        <button class="btn btn-outline-info btn-sm effect-scale-button" type="button" data-scale-bonus>Bonus Scale</button>
         <button class="btn btn-danger btn-sm effect-row-delete" type="button" aria-label="Delete bonus"><i class="bi bi-trash"></i></button>
         <div class="effect-condition-fields">
           <div>
@@ -874,6 +916,17 @@
       };
       statSelect.addEventListener("change", syncNamedSkill);
       syncNamedSkill();
+      const classSkillCheckbox = row.querySelector(
+        '[data-field="classSkillGrant"]',
+      );
+      const syncClassSkillGrant = () => {
+        const granting = classSkillCheckbox.checked;
+        row.querySelector(".effect-value-field").classList.toggle("d-none", granting);
+        row.querySelector(".effect-type-field").classList.toggle("d-none", granting);
+        row.querySelector(".effect-scale-button").classList.toggle("d-none", granting);
+      };
+      classSkillCheckbox.addEventListener("change", syncClassSkillGrant);
+      syncClassSkillGrant();
       row
         .querySelector("[data-scale-bonus]")
         .addEventListener("click", () => this.openScaleModal(row));
@@ -904,6 +957,7 @@
       this.scaleAfterEl.value = every.afterLevel || "";
       this.scaleEveryEl.value = every.everyLevels || "";
       this.scaleIncreaseEl.value = every.increase ?? "";
+      this.scaleMinOneEl.checked = Boolean(scale.minimumOne);
       bootstrap.Modal.getOrCreateInstance(this.scaleModalEl).show();
     }
 
@@ -951,12 +1005,18 @@
         increase !== 0
           ? { afterLevel, everyLevels, increase }
           : null;
-      if (!milestones.length && !every) return null;
+      const minimumOne = this.scaleMinOneEl.checked;
+      if (!milestones.length && !every && !minimumOne) return null;
       const sourceSelect = document.getElementById(`${this.prefix}ScaleSource`);
       const source = window.PFEffectMeta?.sourceFromSelect
         ? window.PFEffectMeta.sourceFromSelect(sourceSelect?.value || "caster")
         : { type: "caster" };
-      return { source, milestones, every };
+      return {
+        source,
+        milestones,
+        every,
+        ...(minimumOne ? { minimumOne: true } : {}),
+      };
     }
 
     scaleStatus(message, type = "muted") {
@@ -1040,6 +1100,8 @@
           };
           if (skillName) bonus.skillName = skillName;
           if (row._bonusScale) bonus.bonusScale = row._bonusScale;
+          if (row.querySelector('[data-field="classSkillGrant"]').checked)
+            bonus.classSkillGrant = true;
           return bonus;
         }),
       };
@@ -1169,14 +1231,20 @@
             (effect.bonuses || []).length > bonuses.length
               ? `<span class="small-text">+${(effect.bonuses || []).length - bonuses.length} more</span>`
               : "";
+          const abilitySource =
+            effect.fromAbility && effect.source
+              ? `<div class="small-text mb-2">${escapeHtml(effect.source)}</div>`
+              : "";
           return `
-          <article class="effect-tracker-card" role="button" tabindex="0" data-effect-index="${index}">
+          <article class="effect-tracker-card${effect.fromAbility ? " effect-tracker-card-ability" : ""}" role="button" tabindex="0" data-effect-index="${index}">
+            ${effect.fromAbility ? `<span class="effect-tracker-ability-badge">Your Feature</span>` : ""}
             <span class="effect-tracker-icon" title="${escapeHtml(effect.category || "Effect")}"><i class="bi ${categoryIcon(effect.category)}"></i></span>
             <div class="fw-semibold pe-2">${escapeHtml(effect.name)}</div>
             <div class="small-text mb-2">${escapeHtml(effect.category || "Effect")} | ${escapeHtml(durationLabel(effect))}</div>
+            ${abilitySource}
             <div>${bonusHtml}${more}</div>
             ${
-              this.isAdmin
+              this.isAdmin && !effect.fromAbility
                 ? `
               <div class="effect-card-admin-actions">
                 <button class="btn btn-outline-warning btn-sm" type="button" data-edit-bonuses="${index}" aria-label="Edit effect" title="Edit effect"><i class="bi bi-pencil-square"></i></button>
@@ -1232,7 +1300,10 @@
     }
 
     controls(effect, index) {
-      const needsCl = durationUsesCasterLevel(effect);
+      // Abilities carry their own resolved duration context (the
+      // character's actual level/ability mods), so there's nothing to ask
+      // the player to type in -- just activate it.
+      const needsCl = durationUsesCasterLevel(effect) && !effect.fromAbility;
       const condition = isCondition(effect);
       return `
         <div class="effect-tracker-controls">
@@ -1262,7 +1333,39 @@
       `;
     }
 
-    addEffect(index) {
+    // Resolves any "choice:<poolId>" bonuses on an effect definition into
+    // concrete stats by prompting the player (e.g. Ancestor Totem, Lesser
+    // bundled into Rage: "+2 insight to a skill of your choice"). Returns
+    // the resolved bonuses array, or null if the player cancelled a pick.
+    async resolveChoiceBonuses(effect) {
+      const bonuses = Array.isArray(effect.bonuses) ? effect.bonuses : [];
+      if (!bonuses.some((bonus) => window.PFEffectStats?.isChoiceStat(bonus.stat)))
+        return bonuses;
+      const resolved = [];
+      for (const bonus of bonuses) {
+        if (!window.PFEffectStats?.isChoiceStat(bonus.stat)) {
+          resolved.push(bonus);
+          continue;
+        }
+        const poolId = window.PFEffectStats.choicePoolIdFromStat(bonus.stat);
+        const pool = window.PFEffectStats.poolById(poolId);
+        const options = await window.PFEffectStats.resolveChoicePoolOptions(
+          poolId,
+          { skills: this.options.choicePoolSkills },
+        );
+        const picked = window.PFEffectChoicePicker
+          ? await window.PFEffectChoicePicker.open({
+              title: `${effect.name || "Effect"}: Choose ${pool?.label || "a Target"}`,
+              options,
+            })
+          : null;
+        if (!picked) return null;
+        resolved.push({ ...bonus, stat: picked });
+      }
+      return resolved;
+    }
+
+    async addEffect(index) {
       const effect = this.effects[index];
       if (!effect || !this.options.characterId) return;
       const casterLevel = Math.max(
@@ -1283,33 +1386,135 @@
         document.getElementById(`${this.prefix}Permanent${index}`)?.checked,
       );
       const condition = isCondition(effect);
+      const durationArg = effect.fromAbility
+        ? effect.abilityContext || { casterLevel }
+        : casterLevel;
       const baseDurationLabel = durationLabel(effect);
       const calculatedDuration = condition
         ? turns
-        : parseDuration(effect, casterLevel);
+        : parseDuration(effect, durationArg);
       const appliedDurationLabel = permanent
         ? "Permanent"
         : condition
           ? `${turns} turn${turns === 1 ? "" : "s"}`
           : calculatedDuration === null
             ? baseDurationLabel
-            : durationUsesCasterLevel(effect)
-              ? `${baseDurationLabel} | CL ${casterLevel}: ${formatDurationRounds(calculatedDuration)}`
-              : `${baseDurationLabel} | ${formatDurationRounds(calculatedDuration)}`;
+            : effect.fromAbility
+              ? `${baseDurationLabel} | ${formatDurationRounds(calculatedDuration)}`
+              : durationUsesCasterLevel(effect)
+                ? `${baseDurationLabel} | CL ${casterLevel}: ${formatDurationRounds(calculatedDuration)}`
+                : `${baseDurationLabel} | ${formatDurationRounds(calculatedDuration)}`;
 
-      this.active.push({
-        ...effect,
-        casterLevel,
+      // fromAbility/abilityContext are only there to drive duration/choice
+      // resolution -- strip them so the saved active-effect entry matches
+      // the normal buff shape instead of carrying the character's whole
+      // stat block. Every duration/CL/turns/permanent decision is baked
+      // in here, BEFORE the choice is resolved, so a request sent to
+      // another player (see requestEffectChoice) only ever needs them to
+      // answer "which skill/target", never redo any of this.
+      const { fromAbility, abilityContext, ...persistedEffect } = effect;
+      const finalizedEffect = {
+        ...persistedEffect,
+        casterLevel: fromAbility
+          ? abilityContext?.characterLevel || casterLevel
+          : casterLevel,
         turns: condition ? turns : undefined,
         permanent,
         remaining: permanent ? null : calculatedDuration,
         computedDuration: calculatedDuration,
         durationLabel: appliedDurationLabel,
-      });
+      };
+
+      const needsChoice = (finalizedEffect.bonuses || []).some((bonus) =>
+        window.PFEffectStats?.isChoiceStat(bonus.stat),
+      );
+      if (needsChoice && this.options.isOwnCharacter === false) {
+        await this.requestEffectChoice(finalizedEffect);
+        return;
+      }
+
+      const resolvedBonuses = await this.resolveChoiceBonuses(finalizedEffect);
+      if (resolvedBonuses === null) return;
+      this.active.push({ ...finalizedEffect, bonuses: resolvedBonuses });
       this.renderActive();
       this.notifyChange();
       this.queueSave();
       bootstrap.Modal.getInstance(this.pickerModalEl)?.hide();
+    }
+
+    // Applying a choice-needing effect to a character someone else
+    // controls doesn't pick for them -- it queues a request that
+    // player's own session picks up (see modals/pending-effect-choices.js)
+    // and resolves on their end, so they're the one choosing which skill
+    // an insight bonus lands on, not whoever cast it.
+    async requestEffectChoice(finalizedEffect) {
+      const status = document.getElementById(`${this.prefix}RequestStatus`);
+      if (status) {
+        status.textContent = "Sending choice to the player...";
+        status.classList.remove("d-none", "text-danger");
+      }
+      const result = await window.PFApp?.createEffectChoiceRequest?.({
+        contextKey: this.options.contextKey,
+        characterId: this.options.characterId,
+        ability: finalizedEffect,
+      });
+      if (!result?.ok) {
+        if (status) {
+          status.textContent =
+            "Couldn't send this to the player -- try again.";
+          status.classList.add("text-danger");
+        }
+        return;
+      }
+      if (status) {
+        status.textContent = `Sent "${finalizedEffect.name || "effect"}" to the player -- waiting for them to choose.`;
+      }
+      bootstrap.Modal.getInstance(this.pickerModalEl)?.hide();
+      this.watchEffectChoiceRequest(result.id, finalizedEffect);
+    }
+
+    // Polls the request this widget just sent so "waiting for player"
+    // resolves into an actual active effect without the requester having
+    // to do anything else -- caps out after ~30 minutes so a forgotten
+    // request doesn't poll forever.
+    watchEffectChoiceRequest(requestId, finalizedEffect, attempt = 0) {
+      this._watchedRequests = this._watchedRequests || new Set();
+      if (this._watchedRequests.has(requestId) || attempt > 300) return;
+      const poll = async () => {
+        if (this._watchedRequests.has(requestId)) return;
+        const result = await window.PFApp?.loadEffectChoiceRequestStatus?.(
+          requestId,
+        );
+        if (!result || result.status === "pending") {
+          this._pollTimer = setTimeout(
+            () =>
+              this.watchEffectChoiceRequest(
+                requestId,
+                finalizedEffect,
+                attempt + 1,
+              ),
+            6000,
+          );
+          return;
+        }
+        this._watchedRequests.add(requestId);
+        const status = document.getElementById(`${this.prefix}RequestStatus`);
+        if (result.status === "resolved" && Array.isArray(result.resolved_bonuses)) {
+          this.active.push({
+            ...finalizedEffect,
+            bonuses: result.resolved_bonuses,
+          });
+          this.renderActive();
+          this.notifyChange();
+          this.queueSave();
+          if (status)
+            status.textContent = `"${finalizedEffect.name || "Effect"}" applied -- the player chose their target.`;
+        } else if (status) {
+          status.textContent = `"${finalizedEffect.name || "Effect"}" request was cancelled.`;
+        }
+        if (status) setTimeout(() => status.classList.add("d-none"), 8000);
+      };
+      poll();
     }
 
     removeEffect(index) {

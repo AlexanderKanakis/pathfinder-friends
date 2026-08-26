@@ -153,6 +153,12 @@
       unit,
       factors:
         unit === "variable" ? [] : factors.map(normalizeFactor).filter(Boolean),
+      // "multiply" (default) is the existing behavior: count * sum(factors),
+      // e.g. "1 round per level". "add" is count + sum(factors), e.g. Rage's
+      // "4 rounds + CON modifier" -- a flat base plus a modifier, not a
+      // per-level scale. Defaulting to "multiply" keeps every duration
+      // already configured the old way behaving identically.
+      factorMode: raw?.factorMode === "add" ? "add" : "multiply",
     };
   }
 
@@ -175,7 +181,10 @@
     if (!config.count || config.unit === "variable") return "variable";
     const unit = `${config.unit}${config.count === 1 ? "" : "s"}`;
     const factors = config.factors.map(factorLabel).filter(Boolean);
-    return `${config.count} ${unit}${factors.length ? ` / ${factors.join(" + ")}` : ""}`;
+    if (!factors.length) return `${config.count} ${unit}`;
+    return config.factorMode === "add"
+      ? `${config.count} ${unit} + ${factors.join(" + ")}`
+      : `${config.count} ${unit} / ${factors.join(" + ")}`;
   }
 
   function factorLabel(factor) {
@@ -220,19 +229,26 @@
     return 1;
   }
 
+  function factorsSum(config, context = {}) {
+    const factors = normalizeDurationConfig(config).factors;
+    return factors.reduce((sum, factor) => sum + factorValue(factor, context), 0);
+  }
+
+  // Kept for compatibility with existing callers/exports -- this is the
+  // "multiply" path's scale factor (e.g. "1 round per level" -> the level).
   function durationMultiplier(config, context = {}) {
     const factors = normalizeDurationConfig(config).factors;
     if (!factors.length) return 1;
-    return Math.max(
-      1,
-      factors.reduce((sum, factor) => sum + factorValue(factor, context), 0),
-    );
+    return Math.max(1, factorsSum(config, context));
   }
 
   function parseDuration(effect, context = {}) {
     const config = normalizeDurationConfig(effect);
     if (!config.count || config.unit === "variable") return null;
-    const amount = config.count * durationMultiplier(config, context);
+    const amount =
+      config.factorMode === "add"
+        ? config.count + factorsSum(config, context)
+        : config.count * durationMultiplier(config, context);
     if (config.unit === "turn" || config.unit === "round") return amount;
     if (config.unit === "minute") return amount * 10;
     if (config.unit === "hour") return amount * 600;
@@ -305,10 +321,17 @@
                     <button class="btn btn-outline-light btn-sm w-100" type="button" data-duration-add-level>Add Level Factor</button>
                   </div>
                 </div>
-                <div class="d-flex gap-2 mb-2">
+                <div class="d-flex gap-2 mb-2 align-items-end">
                   <button class="btn btn-outline-light btn-sm" type="button" data-duration-add-ability>Add Attribute Bonus</button>
+                  <div class="flex-grow-1">
+                    <label class="small">Factors</label>
+                    <select class="form-select form-select-sm" data-duration-factor-mode>
+                      <option value="multiply">Multiply count (e.g. 1 round per level)</option>
+                      <option value="add">Add to count (e.g. 4 rounds + CON modifier)</option>
+                    </select>
+                  </div>
                 </div>
-                <div class="small-text mb-2">Factors are added together, then multiplied by the duration count.</div>
+                <div class="small-text mb-2" data-duration-factor-hint></div>
                 <div class="vstack gap-2" data-duration-factors></div>
               </div>
               <div class="modal-footer">
@@ -324,6 +347,12 @@
       this.countEl = this.modal.querySelector("[data-duration-count]");
       this.unitEl = this.modal.querySelector("[data-duration-unit]");
       this.factorsEl = this.modal.querySelector("[data-duration-factors]");
+      this.factorModeEl = this.modal.querySelector(
+        "[data-duration-factor-mode]",
+      );
+      this.factorHintEl = this.modal.querySelector(
+        "[data-duration-factor-hint]",
+      );
       this.modal
         .querySelector("[data-duration-add-level]")
         .addEventListener("click", () => this.addFactor({ type: "caster" }));
@@ -336,6 +365,7 @@
         .querySelector("[data-duration-save]")
         .addEventListener("click", () => this.save());
       this.unitEl.addEventListener("change", () => this.sync());
+      this.factorModeEl.addEventListener("change", () => this.syncFactorHint());
       this.modal.addEventListener("shown.bs.modal", () => {
         const backdrops = [...document.querySelectorAll(".modal-backdrop")];
         backdrops.at(-1)?.classList.add("effect-duration-editor-backdrop");
@@ -347,9 +377,11 @@
       this.onSave = onSave;
       this.countEl.value = this.config.count || "";
       this.unitEl.value = this.config.unit || "variable";
+      this.factorModeEl.value = this.config.factorMode || "multiply";
       this.factorsEl.innerHTML = "";
       this.config.factors.forEach((factor) => this.addFactor(factor));
       this.sync();
+      this.syncFactorHint();
       bootstrap.Modal.getOrCreateInstance(this.modal).show();
     }
 
@@ -361,8 +393,16 @@
           "[data-duration-add-level], [data-duration-add-ability]",
         )
         .forEach((button) => (button.disabled = variable));
+      this.factorModeEl.disabled = variable;
       this.factorsEl.classList.toggle("d-none", variable);
       if (variable) this.countEl.value = "";
+    }
+
+    syncFactorHint() {
+      this.factorHintEl.textContent =
+        this.factorModeEl.value === "add"
+          ? "Factors are added together, then added to the duration count -- for a flat base plus a modifier, like Rage's 4 rounds + CON modifier."
+          : "Factors are added together, then multiplied by the duration count -- for scaling with level, like 1 minute per caster level.";
     }
 
     addFactor(factor) {
@@ -394,7 +434,7 @@
     collect() {
       const unit = this.unitEl.value || "variable";
       if (unit === "variable")
-        return { count: null, unit: "variable", factors: [] };
+        return { count: null, unit: "variable", factors: [], factorMode: "multiply" };
       const factors = [...this.factorsEl.children]
         .map((row) => {
           const level = row.querySelector("[data-factor-level]");
@@ -409,6 +449,7 @@
         count: Math.max(1, Number.parseInt(this.countEl.value, 10) || 1),
         unit,
         factors,
+        factorMode: this.factorModeEl.value === "add" ? "add" : "multiply",
       };
     }
 

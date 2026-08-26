@@ -39,9 +39,18 @@
       "extra attacks": "extra attack",
       "extra attack at highest bab": "extra attack",
       "extra attacks at highest bab": "extra attack",
+      "all saving throws": "all saves",
     };
     return aliases[key] || key;
   }
+
+  // "All Saves" isn't its own running total -- it's shorthand so one
+  // effect (e.g. a paladin aura, resistance spell) can add the same
+  // bonus to Fortitude, Reflex, and Will at once instead of being
+  // authored three times. Expanded to those three stats below, at the
+  // point bonuses get bucketed, so the rest of the calc never needs to
+  // know "all saves" exists.
+  const ALL_SAVES_STATS = ["fortitude", "reflex", "will"];
 
   function stacksByType(type) {
     return type === "untyped" || type === "dodge" || type === "circumstance";
@@ -132,7 +141,20 @@
     const level = scaleLevelValue(scale, buff || {});
     if (!scale) return baseValue;
 
-    let value = baseValue;
+    // "DR /lawful equal to 1/2 barbarian level," "+1 per 3 caster
+    // levels," etc. -- a straight fraction of the level, not a flat
+    // value with milestone bumps. PF1e always rounds this down, so
+    // this stays integer division throughout (never a float
+    // multiplier) to avoid the classic 9 * (1/3) = 2.999... trap.
+    const multiplier = scale.levelMultiplier;
+    let value =
+      multiplier && Number(multiplier.denominator) > 0
+        ? Math.floor(
+            (level * Number(multiplier.numerator || 0)) /
+              Number(multiplier.denominator),
+          )
+        : baseValue;
+
     const milestones = Array.isArray(scale.milestones) ? scale.milestones : [];
     milestones
       .map((milestone) => ({
@@ -154,6 +176,12 @@
         Math.floor(Math.max(0, level - afterLevel) / everyLevels) * increase;
     }
 
+    // "... minimum +1" is common PF1e phrasing on fractional scaling (DR
+    // 1/2 level, minimum 1, etc.) -- round-down math above can floor a
+    // low level's share to 0, so this floor is applied last, after
+    // milestones/every have already had their say.
+    if (scale.minimumOne && value < 1) value = 1;
+
     return value;
   }
 
@@ -172,15 +200,24 @@
 
     activeBuffs.forEach((buff) => {
       (buff.bonuses || []).forEach((rawBonus) => {
+        // "X becomes a class skill" isn't a numeric bonus -- it's read
+        // separately (character-sheet.js's grantedClassSkillKeys) to
+        // drive the +3 class skill bonus, so it shouldn't also show up
+        // here as a stray "+0 untyped" entry.
+        if (rawBonus.classSkillGrant) return;
         const stat = normalizeStat(rawBonus.stat);
-        if (!map[stat]) map[stat] = [];
-        map[stat].push({
-          ...rawBonus,
-          stat,
-          value: scaledBonusValue(rawBonus, buff),
-          type: rawBonus.type || "untyped",
-          source: buff.name,
-          casterLevel: buff.casterLevel,
+        const targets = stat === "all saves" ? ALL_SAVES_STATS : [stat];
+        const value = scaledBonusValue(rawBonus, buff);
+        targets.forEach((targetStat) => {
+          if (!map[targetStat]) map[targetStat] = [];
+          map[targetStat].push({
+            ...rawBonus,
+            stat: targetStat,
+            value,
+            type: rawBonus.type || "untyped",
+            source: buff.name,
+            casterLevel: buff.casterLevel,
+          });
         });
       });
     });
@@ -720,5 +757,11 @@
     return { totals, bonuses, breakdown, abilityScores, abilityMods, buffMap };
   }
 
-  window.PFBuffs = { abilityMod, fmt, calculateStatsDetailed };
+  window.PFBuffs = {
+    abilityMod,
+    fmt,
+    calculateStatsDetailed,
+    scaledBonusValue,
+    scaleLevelValue,
+  };
 })();

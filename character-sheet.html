@@ -244,6 +244,7 @@
                 >
                   <thead>
                     <tr>
+                      <th title="Class Skill">CS</th>
                       <th>Skill</th>
                       <th>Total</th>
                       <th>Ability</th>
@@ -564,7 +565,10 @@
                     ><input
                       id="damageReduction"
                       class="form-control form-control-sm sheet-input"
-                    />
+                    /><div
+                      id="damageReductionFromClasses"
+                      class="small-text d-none"
+                    ></div>
                   </div>
                   <div>
                     <label for="resistances">Resistances</label
@@ -587,7 +591,10 @@
                     ><input
                       id="spellResistance"
                       class="form-control form-control-sm sheet-input"
-                    />
+                    /><div
+                      id="spellResistanceFromClasses"
+                      class="small-text d-none"
+                    ></div>
                   </div>
                   <div>
                     <label for="weaknesses">Weakness</label
@@ -1930,13 +1937,17 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="scripts/supabase-config.js"></script>
     <script src="scripts/app-supabase.js"></script>
-    <script src="scripts/buff-calculator.js"></script>
+    <script src="scripts/buff-calculator.js?v=min-scale-1"></script>
     <script src="scripts/class-data.js"></script>
+    <script src="scripts/class-feature-abilities.js?v=1"></script>
     <script src="modals/effect-duration-editor.js"></script>
+    <script src="scripts/effect-stat-options.js?v=2"></script>
+    <script src="modals/effect-choice-picker.js?v=1"></script>
+    <script src="modals/pending-effect-choices.js?v=1"></script>
     <script src="modals/class-feature-choice-picker.js"></script>
     <script src="modals/spell-picker.js"></script>
     <script src="modals/spellcasting-info.js"></script>
-    <script src="scripts/buff-tracker-widget.js?v=extra-attack-widget-2"></script>
+    <script src="scripts/buff-tracker-widget.js?v=min-scale-1"></script>
     <script src="data/wondrous.js?v=wondrous-refresh-1"></script>
     <script src="scripts/scripts.js"></script>
     <script src="modals/item-editor.js"></script>
