@@ -2696,6 +2696,10 @@ function render3DPreview() {
     "--map-3d-angle",
     `${el("map3DAngle").value || 55}deg`,
   );
+  scene.style.setProperty(
+    "--map-3d-rotate",
+    `${el("map3DRotate").value || 0}deg`,
+  );
 
   if (!backgroundUrl) {
     scene.innerHTML = `<div class="map-3d-empty-hint">Set a map background first (Map Settings) to preview it in 3D.</div>`;
@@ -6471,6 +6475,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   el("map3DAngle").addEventListener("input", (event) => {
     el("map3DScene").style.setProperty(
       "--map-3d-angle",
+      `${event.target.value}deg`,
+    );
+  });
+  el("map3DRotate").addEventListener("input", (event) => {
+    el("map3DScene").style.setProperty(
+      "--map-3d-rotate",
       `${event.target.value}deg`,
     );
   });

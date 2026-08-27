@@ -1759,8 +1759,15 @@ textarea {
 .map-3d-scene {
   position: relative;
   transform-style: preserve-3d;
-  /* --map-3d-angle is set from the camera-angle slider in map.js. */
-  transform: rotateX(var(--map-3d-angle, 55deg));
+  /* --map-3d-angle (tilt) and --map-3d-rotate (turntable spin) are set
+     from the two sliders in map.js. Order matters: rotateZ applies
+     first (rightmost), spinning the still-flat map around its own
+     vertical axis like a board on a table, THEN rotateX tilts the
+     already-spun scene to the viewing angle -- reversed, the spin
+     would happen around an axis that's already tilted and wobble
+     instead of turning cleanly. */
+  transform: rotateX(var(--map-3d-angle, 55deg))
+    rotateZ(var(--map-3d-rotate, 0deg));
 }
 
 .map-3d-base {
