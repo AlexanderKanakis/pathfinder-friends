@@ -1884,3 +1884,46 @@ textarea {
 .map-3d-token-label {
   pointer-events: none;
 }
+
+/* A token whose elevationFeet isn't 0 (see render3DToken()) is
+   "flying" -- this pole runs from the token's own height straight
+   down (or up, for a negative offset) to the surface directly beneath
+   it, ending in a small ring marking exactly where that is. Same
+   hinge-and-fold trick blockHtmlAt's walls use (rotateX from a fixed
+   top edge), just aimed at an arbitrary surface Z instead of always
+   ground level. */
+.map-3d-flight-anchor {
+  position: absolute;
+  transform-style: preserve-3d;
+  pointer-events: none;
+}
+
+.map-3d-flight-pole {
+  position: absolute;
+  left: calc(50% - 1px);
+  top: calc(50% - 1px);
+  width: 2px;
+  transform-origin: top;
+  transform: rotateX(-90deg);
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.85) 0 4px,
+    transparent 4px 8px
+  );
+}
+
+.map-3d-flight-pole.fold-up {
+  transform: rotateX(90deg);
+}
+
+.map-3d-flight-anchor-mark {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.85);
+  background: rgba(0, 0, 0, 0.25);
+}

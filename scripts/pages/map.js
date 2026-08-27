@@ -2634,21 +2634,53 @@ function tallestHeightFeetUnder(x, y, w, h) {
   return tallest;
 }
 
+// A token's stored `elevationFeet` is relative to whatever's beneath
+// it, not an absolute world height -- 0 (the default) always means
+// "resting on the surface below," whatever that surface happens to
+// be, so an ordinary token never needs to be re-set every time it
+// walks from open ground onto a platform. Only a nonzero value (set
+// deliberately, e.g. for a flying enemy) offsets it above/below that
+// surface -- see render3DToken().
 function render3DToken(token) {
   const x = Number(token.x || 0);
   const y = Number(token.y || 0);
   const w = Number(token.w || 1);
   const h = Number(token.h || 1);
-  const z = feetToPreviewPx(tallestHeightFeetUnder(x, y, w, h));
+  const surfaceFeet = tallestHeightFeetUnder(x, y, w, h);
+  const elevationFeet = Number(token.elevationFeet || 0);
+  const z = feetToPreviewPx(surfaceFeet + elevationFeet);
   const identityHidden = tokenNameIsHidden(token);
   const imageUrl = identityHidden ? "" : String(token.imageUrl || "").trim();
   const tokenImage = imageUrl ? `url('${cssUrl(imageUrl)}')` : "none";
   const label = escapeHtml(
     identityHidden ? "?" : tokenInitials(tokenActualName(token)),
   );
-  return `
+  const tokenHtml = `
     <div class="map-3d-token" style="left:${x * MAP_3D_CELL_PX}px;top:${y * MAP_3D_CELL_PX}px;width:${w * MAP_3D_CELL_PX}px;height:${h * MAP_3D_CELL_PX}px;transform:translateZ(${z}px);--token-color:${escapeHtml(token.color || "#8fd19e")};--token-image:${tokenImage};">
       <div class="map-3d-token-label">${label}</div>
+    </div>
+  `;
+  return tokenHtml + render3DFlightConnector(x, y, w, h, surfaceFeet, elevationFeet);
+}
+
+// The "is this token flying" line: a token whose actual Z isn't the
+// same as the surface directly beneath it gets a pole running from
+// its own height straight down (or up) to that surface, so it's
+// obvious at a glance that it's off the ground/platform rather than
+// just badly aligned with it.
+function render3DFlightConnector(x, y, w, h, surfaceFeet, elevationFeet) {
+  if (elevationFeet === 0) return "";
+  const tokenZ = feetToPreviewPx(surfaceFeet + elevationFeet);
+  const surfaceZ = feetToPreviewPx(surfaceFeet);
+  const poleLenPx = Math.abs(tokenZ - surfaceZ);
+  // Hinged at the token's own height (tokenZ) and folded toward the
+  // surface -- same "fold down to reach a lower Z" trick blockHtmlAt's
+  // walls use, just pointed whichever way the surface actually is.
+  const foldClass = tokenZ < surfaceZ ? " fold-up" : "";
+  return `
+    <div class="map-3d-flight-anchor" style="left:${x * MAP_3D_CELL_PX}px;top:${y * MAP_3D_CELL_PX}px;width:${w * MAP_3D_CELL_PX}px;height:${h * MAP_3D_CELL_PX}px;transform:translateZ(${tokenZ}px);">
+      <div class="map-3d-flight-pole${foldClass}" style="height:${poleLenPx}px;"></div>
+      <div class="map-3d-flight-anchor-mark" style="transform:translateZ(${surfaceZ - tokenZ}px);"></div>
     </div>
   `;
 }
@@ -2748,39 +2780,22 @@ function render3DPreview() {
   // see the .pit override in css/map.css for the reversed
   // rotateX/rotateY signs (worked out by hand, then confirmed by
   // screenshotting both a raised block and a pit side by side).
-  // A region's top face is cropped straight from the map art, so a
-  // shallow pit (or a raised block whose color happens to be close to
-  // the surrounding terrain -- water is the classic case) can end up
-  // nearly indistinguishable from ground level: the geometry is
-  // correct but there's nothing high-contrast to actually see. Every
-  // region already carries its own accent `color` (used for the 2D
-  // hazard-stripe/label styling) -- reuse it here as a rim around the
-  // top face so a region is identifiable by its own color regardless
-  // of how dark/similar the underlying art is. `sides` controls which
-  // of the 4 edges actually get a wall + rim -- for a freeform region
-  // made of many 1x1 cells, an edge shared with another cell of the
-  // SAME region isn't a real boundary and drawing it anyway chops the
-  // whole platform up into a distracting grid that reads as "flat
-  // textured ground," not "one recessed/raised area." Only the true
-  // outer perimeter gets one.
-  function blockHtmlAt(gx, gy, gw, gh, z, color, sides) {
+  // `sides` controls which of the 4 edges actually get a wall -- for
+  // a freeform region made of many 1x1 cells, an edge shared with
+  // another cell of the SAME region isn't a real boundary and drawing
+  // a wall there anyway chops the whole platform up into a
+  // distracting grid that reads as "flat textured ground," not "one
+  // recessed/raised area." Only the true outer perimeter gets one.
+  function blockHtmlAt(gx, gy, gw, gh, z, sides) {
     const x = gx * MAP_3D_CELL_PX;
     const y = gy * MAP_3D_CELL_PX;
     const w = gw * MAP_3D_CELL_PX;
     const h = gh * MAP_3D_CELL_PX;
     const wallPx = Math.abs(z);
     const pitClass = z < 0 ? " pit" : "";
-    const rawColor = escapeHtml(color || "#61dafb");
-    // Faded to ~60% alpha (an 8-digit hex works wherever this app
-    // already assumes a hex color, i.e. everywhere shape.color comes
-    // from) -- a full-strength saturated rim on every region read as
-    // "glowing" even without the earlier box-shadow blur.
-    const rimColor = /^#[0-9a-f]{6}$/i.test(rawColor) ? `${rawColor}99` : rawColor;
-    const rim = `1px solid ${rimColor}`;
-    const borderCss = `border-top:${sides.north ? rim : "none"};border-bottom:${sides.south ? rim : "none"};border-left:${sides.west ? rim : "none"};border-right:${sides.east ? rim : "none"};`;
     return `
       <div class="map-3d-block${pitClass}" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;">
-        <div class="map-3d-block-top" style="transform:translateZ(${z}px);background-image:${GRID_LINES_CSS},${bgCss};background-size:${MAP_3D_CELL_PX}px ${MAP_3D_CELL_PX}px,${MAP_3D_CELL_PX}px ${MAP_3D_CELL_PX}px,${mapW}px ${mapH}px;background-position:0 0,0 0,-${x}px -${y}px;background-repeat:repeat,repeat,no-repeat;${borderCss}">
+        <div class="map-3d-block-top" style="transform:translateZ(${z}px);background-image:${GRID_LINES_CSS},${bgCss};background-size:${MAP_3D_CELL_PX}px ${MAP_3D_CELL_PX}px,${MAP_3D_CELL_PX}px ${MAP_3D_CELL_PX}px,${mapW}px ${mapH}px;background-position:0 0,0 0,-${x}px -${y}px;background-repeat:repeat,repeat,no-repeat;">
           ${sides.south ? `<div class="map-3d-wall map-3d-wall-south" style="height:${wallPx}px;"></div>` : ""}
           ${sides.north ? `<div class="map-3d-wall map-3d-wall-north" style="height:${wallPx}px;"></div>` : ""}
           ${sides.east ? `<div class="map-3d-wall map-3d-wall-east" style="width:${wallPx}px;"></div>` : ""}
@@ -2795,13 +2810,12 @@ function render3DPreview() {
   const blockHtml = blocks
     .map((shape) => {
       const z = feetToPreviewPx(shape.heightFeet);
-      const color = shape.color;
       if (Array.isArray(shape.cells)) {
         // No single rectangle formula covers an arbitrary painted
         // outline, so a freeform region becomes one 1x1 block per
         // occupied cell instead -- same top-face crop math, just run
-        // per cell. An edge is only "exposed" (gets a wall + rim) if
-        // the neighboring cell isn't part of this same shape -- see
+        // per cell. An edge is only "exposed" (gets a wall) if the
+        // neighboring cell isn't part of this same shape -- see
         // blockHtmlAt's comment.
         const cellSet = new Set(shape.cells);
         return shape.cells
@@ -2819,7 +2833,6 @@ function render3DPreview() {
               1,
               1,
               z,
-              color,
               sides,
             );
           })
@@ -2831,7 +2844,6 @@ function render3DPreview() {
         Number(shape.w || 1),
         Number(shape.h || 1),
         z,
-        color,
         ALL_SIDES,
       );
     })
@@ -3199,6 +3211,14 @@ function renderSelectedPanel() {
   const tokenImageField = item.kind
     ? `<div class="col-12"><label>Image URL</label><input data-selected-field="imageUrl" class="form-control form-control-sm" value="${escapeHtml(item.imageUrl || "")}" placeholder="https://..."></div>`
     : "";
+  // Relative to whatever's underneath, not an absolute world height --
+  // 0 always means "resting on the ground/platform below it," so this
+  // never needs touching for an ordinary token walking around the
+  // map. Only used by the 3D preview (see render3DToken()): a nonzero
+  // value there draws a "flying" line down to the surface below.
+  const elevationField = item.kind
+    ? `<div class="col-4"><label>Z <span class="small-text">(ft)</span></label><input data-selected-field="elevationFeet" class="form-control form-control-sm" type="number" step="5" value="${Number(item.elevationFeet || 0)}"></div>`
+    : "";
   const sizeLinked = item.sizeLinked !== false;
   const sizeLinkIcon = sizeLinked ? "bi-link-45deg" : "bi-unlink";
   const concealedName = item.kind && tokenNameIsHidden(item) && !isGm;
@@ -3229,8 +3249,9 @@ function renderSelectedPanel() {
         <div id="selectedDetailsCollapse" class="accordion-collapse collapse${wasDetailsOpen ? " show" : ""}" data-bs-parent="#selectedDetailsAccordion">
           <div class="accordion-body">
             <div class="row g-2">
-              <div class="col-6"><label>X</label><input data-selected-field="x" class="form-control form-control-sm" type="number" value="${item.x || 0}"></div>
-              <div class="col-6"><label>Y</label><input data-selected-field="y" class="form-control form-control-sm" type="number" value="${item.y || 0}"></div>
+              <div class="col-4"><label>X</label><input data-selected-field="x" class="form-control form-control-sm" type="number" value="${item.x || 0}"></div>
+              <div class="col-4"><label>Y</label><input data-selected-field="y" class="form-control form-control-sm" type="number" value="${item.y || 0}"></div>
+              ${elevationField}
               <div class="col-12">
                 <div class="size-link-row">
                   <div><label>W</label><input data-selected-field="w" class="form-control form-control-sm" type="number" min="1" value="${item.w || 1}"></div>
@@ -3294,7 +3315,13 @@ function bindSelectedPanelInteractions(item) {
     .querySelectorAll("[data-selected-field]")
     .forEach((input) => {
       input.addEventListener("input", () => {
-        const value = ["x", "y", "w", "h"].includes(input.dataset.selectedField)
+        const value = [
+          "x",
+          "y",
+          "w",
+          "h",
+          "elevationFeet",
+        ].includes(input.dataset.selectedField)
           ? Number(input.value || 0)
           : input.value;
         item[input.dataset.selectedField] = value;
