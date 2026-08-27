@@ -2028,37 +2028,47 @@ function renderMap() {
   stage.onpointerdown = heightEditMode
     ? startPaintHeightShape
     : startMovementMeasure;
-  stage.querySelectorAll("[data-resize-handle]").forEach((handle) => {
-    handle.addEventListener("pointerdown", startResize);
-  });
-  stage.querySelectorAll("[data-map-id]:not([data-resize-handle])").forEach((node) => {
-    node.addEventListener("pointerdown", startDrag);
-    node.addEventListener("mouseenter", () =>
-      showTokenHover(node.dataset.mapId),
-    );
-    node.addEventListener("mouseleave", hideTokenHover);
-    node.addEventListener("click", (event) => {
-      event.stopPropagation();
-      suppressStageClick = true;
-      hideContextMenu();
-      selectedId = node.dataset.mapId;
-      renderAll(false);
-      showSelectedPanel();
+  // While the Draw tool is active, existing Height Layer regions need
+  // to be completely non-interactive -- no drag, no resize, no
+  // click-to-select -- so painting over/near one starts a paint stroke
+  // instead of grabbing it. Simplest way to guarantee that: don't wire
+  // any of those listeners onto the shape elements at all while
+  // heightDrawMode is on, so a pointerdown that starts on top of one
+  // has nothing local to catch it and just bubbles up to
+  // stage.onpointerdown above.
+  if (!heightDrawMode) {
+    stage.querySelectorAll("[data-resize-handle]").forEach((handle) => {
+      handle.addEventListener("pointerdown", startResize);
     });
-    node.addEventListener("contextmenu", (event) => {
-      if (suppressNextContextMenu) {
-        event.preventDefault();
-        suppressNextContextMenu = false;
-        return;
-      }
-      event.preventDefault();
-      hideContextMenu();
-      const item = [...state.tokens, ...state.shapes].find(
-        (entry) => entry.id === node.dataset.mapId,
+    stage.querySelectorAll("[data-map-id]:not([data-resize-handle])").forEach((node) => {
+      node.addEventListener("pointerdown", startDrag);
+      node.addEventListener("mouseenter", () =>
+        showTokenHover(node.dataset.mapId),
       );
-      if (item) showMapContextMenu(event, item);
+      node.addEventListener("mouseleave", hideTokenHover);
+      node.addEventListener("click", (event) => {
+        event.stopPropagation();
+        suppressStageClick = true;
+        hideContextMenu();
+        selectedId = node.dataset.mapId;
+        renderAll(false);
+        showSelectedPanel();
+      });
+      node.addEventListener("contextmenu", (event) => {
+        if (suppressNextContextMenu) {
+          event.preventDefault();
+          suppressNextContextMenu = false;
+          return;
+        }
+        event.preventDefault();
+        hideContextMenu();
+        const item = [...state.tokens, ...state.shapes].find(
+          (entry) => entry.id === node.dataset.mapId,
+        );
+        if (item) showMapContextMenu(event, item);
+      });
     });
-  });
+  }
   stage.oncontextmenu = (event) => {
     if (suppressNextContextMenu) {
       event.preventDefault();
@@ -2915,7 +2925,11 @@ function renderHeightShapePanel() {
       ${sizeFieldsHtml}
       <div class="col-12">
         <label>Height (ft) <span class="small-text">1 unit = 5ft, negative = pit</span></label>
-        <input data-height-field="heightFeet" class="form-control form-control-sm" type="number" step="5" value="${Number(item.heightFeet || 0)}">
+        <div class="height-feet-stepper">
+          <button class="btn btn-outline-light btn-sm" type="button" data-height-step="-5" aria-label="Decrease height by 5 feet">-5</button>
+          <input data-height-field="heightFeet" class="form-control form-control-sm" type="number" step="5" value="${Number(item.heightFeet || 0)}">
+          <button class="btn btn-outline-light btn-sm" type="button" data-height-step="5" aria-label="Increase height by 5 feet">+5</button>
+        </div>
       </div>
       <div class="col-12"><label>Color</label><input data-height-field="color" class="form-control form-control-sm" type="color" value="${escapeHtml(item.color || "#61dafb")}"></div>
     </div>
@@ -2939,6 +2953,26 @@ function bindHeightShapePanelInteractions(item) {
         } else {
           item[field] = Number(input.value || 0);
         }
+        renderMap();
+        queueSave();
+      });
+    });
+  // Explicit +5/-5 buttons alongside the number input -- not relying
+  // solely on typing "-" (native number inputs report .value as ""
+  // for that split second, since a bare "-" isn't a complete number
+  // yet -- harmless once a digit follows, but easy to misread as "it
+  // won't go negative") or the browser's own tiny spinner arrows,
+  // which are easy to miss/mis-click depending on OS/theme.
+  el("selectedPanel")
+    .querySelectorAll("[data-height-step]")
+    .forEach((button) => {
+      button.addEventListener("click", () => {
+        const input = el("selectedPanel").querySelector(
+          '[data-height-field="heightFeet"]',
+        );
+        const delta = Number(button.dataset.heightStep);
+        item.heightFeet = Number(item.heightFeet || 0) + delta;
+        input.value = item.heightFeet;
         renderMap();
         queueSave();
       });
@@ -3442,10 +3476,6 @@ function startDrag(event) {
   event.stopPropagation();
   hideContextMenu();
   suppressStageClick = true;
-  // Grabbing an existing shape means the user wants to move/select it,
-  // not paint -- drop out of the Draw tool so the next click on empty
-  // stage doesn't unexpectedly start a new stroke.
-  if (heightDrawMode) toggleHeightDrawMode(false);
   const id = event.currentTarget.dataset.mapId;
   const item = [...state.tokens, ...state.shapes, ...state.heightShapes].find(
     (entry) => entry.id === id,
@@ -3889,7 +3919,16 @@ function toggleHeightDrawMode(next = !heightDrawMode) {
   heightDrawMode = next;
   el("drawHeightShapeBtn")?.classList.toggle("active", heightDrawMode);
   el("mapStage")?.classList.toggle("height-draw-active", heightDrawMode);
-  if (!heightDrawMode) paintState = null;
+  if (heightDrawMode) selectedId = ""; // no panel/handles make sense mid-draw
+  else paintState = null;
+  // renderMap() is what actually (un)wires drag/resize/click listeners
+  // on existing shape elements based on heightDrawMode (see its
+  // wiring loop) -- without re-running it here, shapes already on the
+  // stage from before this toggle would keep whichever listeners they
+  // were built with, regardless of the mode just switched to.
+  // renderAll(false) (not just renderMap()) so clearing selectedId
+  // above also clears a stale selected-item panel.
+  renderAll(false);
 }
 
 function startPaintHeightShape(event) {

@@ -425,6 +425,14 @@ body {
   display: block;
 }
 
+/* Handles are unwired (not just hidden) while the Draw tool is active
+   -- see renderMap()'s wiring loop -- but a stale-selected shape's
+   handles would otherwise still be visible and inert, implying a
+   resize that a click there won't actually do. */
+#mapStage.height-draw-active .map-resize-handle {
+  display: none;
+}
+
 .map-resize-n,
 .map-resize-s {
   left: 50%;
@@ -696,6 +704,13 @@ body {
   padding: 1px 8px;
   pointer-events: none;
   white-space: nowrap;
+}
+
+.height-feet-stepper {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 6px;
+  align-items: center;
 }
 
 /* Freeform painted regions (see "Draw Height Region" -- endPaintHeightShape()
