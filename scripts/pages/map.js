@@ -2746,10 +2746,16 @@ function render3DPreview() {
   // nearly indistinguishable from ground level: the geometry is
   // correct but there's nothing high-contrast to actually see. Every
   // region already carries its own accent `color` (used for the 2D
-  // hazard-stripe/label styling) -- reuse it here as a bright rim
-  // around the top face so a region is always identifiable by its own
-  // color regardless of how dark/similar the underlying art is.
-  function blockHtmlAt(gx, gy, gw, gh, z, color) {
+  // hazard-stripe/label styling) -- reuse it here as a rim around the
+  // top face so a region is identifiable by its own color regardless
+  // of how dark/similar the underlying art is. `sides` controls which
+  // of the 4 edges actually get a wall + rim -- for a freeform region
+  // made of many 1x1 cells, an edge shared with another cell of the
+  // SAME region isn't a real boundary and drawing it anyway chops the
+  // whole platform up into a distracting grid that reads as "flat
+  // textured ground," not "one recessed/raised area." Only the true
+  // outer perimeter gets one.
+  function blockHtmlAt(gx, gy, gw, gh, z, color, sides) {
     const x = gx * MAP_3D_CELL_PX;
     const y = gy * MAP_3D_CELL_PX;
     const w = gw * MAP_3D_CELL_PX;
@@ -2757,17 +2763,21 @@ function render3DPreview() {
     const wallPx = Math.abs(z);
     const pitClass = z < 0 ? " pit" : "";
     const rimColor = escapeHtml(color || "#61dafb");
+    const rim = `1.5px solid ${rimColor}`;
+    const borderCss = `border-top:${sides.north ? rim : "none"};border-bottom:${sides.south ? rim : "none"};border-left:${sides.west ? rim : "none"};border-right:${sides.east ? rim : "none"};`;
     return `
-      <div class="map-3d-block${pitClass}" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;--block-rim:${rimColor};">
-        <div class="map-3d-block-top" style="transform:translateZ(${z}px);background-image:${bgCss};background-size:${mapW}px ${mapH}px;background-position:-${x}px -${y}px;">
-          <div class="map-3d-wall map-3d-wall-south" style="height:${wallPx}px;"></div>
-          <div class="map-3d-wall map-3d-wall-north" style="height:${wallPx}px;"></div>
-          <div class="map-3d-wall map-3d-wall-east" style="width:${wallPx}px;"></div>
-          <div class="map-3d-wall map-3d-wall-west" style="width:${wallPx}px;"></div>
+      <div class="map-3d-block${pitClass}" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;">
+        <div class="map-3d-block-top" style="transform:translateZ(${z}px);background-image:${bgCss};background-size:${mapW}px ${mapH}px;background-position:-${x}px -${y}px;${borderCss}">
+          ${sides.south ? `<div class="map-3d-wall map-3d-wall-south" style="height:${wallPx}px;"></div>` : ""}
+          ${sides.north ? `<div class="map-3d-wall map-3d-wall-north" style="height:${wallPx}px;"></div>` : ""}
+          ${sides.east ? `<div class="map-3d-wall map-3d-wall-east" style="width:${wallPx}px;"></div>` : ""}
+          ${sides.west ? `<div class="map-3d-wall map-3d-wall-west" style="width:${wallPx}px;"></div>` : ""}
         </div>
       </div>
     `;
   }
+
+  const ALL_SIDES = { north: true, south: true, east: true, west: true };
 
   const blockHtml = blocks
     .map((shape) => {
@@ -2777,13 +2787,19 @@ function render3DPreview() {
         // No single rectangle formula covers an arbitrary painted
         // outline, so a freeform region becomes one 1x1 block per
         // occupied cell instead -- same top-face crop math, just run
-        // per cell. Same-height neighbors will show a thin seam where
-        // their walls meet rather than blending into one smooth
-        // platform; an acceptable v1 tradeoff for actually respecting
-        // the shape that got painted instead of squaring it off.
+        // per cell. An edge is only "exposed" (gets a wall + rim) if
+        // the neighboring cell isn't part of this same shape -- see
+        // blockHtmlAt's comment.
+        const cellSet = new Set(shape.cells);
         return shape.cells
           .map((key) => {
             const [dx, dy] = key.split(",").map(Number);
+            const sides = {
+              north: !cellSet.has(`${dx},${dy - 1}`),
+              south: !cellSet.has(`${dx},${dy + 1}`),
+              west: !cellSet.has(`${dx - 1},${dy}`),
+              east: !cellSet.has(`${dx + 1},${dy}`),
+            };
             return blockHtmlAt(
               Number(shape.x || 0) + dx,
               Number(shape.y || 0) + dy,
@@ -2791,6 +2807,7 @@ function render3DPreview() {
               1,
               z,
               color,
+              sides,
             );
           })
           .join("");
@@ -2802,6 +2819,7 @@ function render3DPreview() {
         Number(shape.h || 1),
         z,
         color,
+        ALL_SIDES,
       );
     })
     .join("");
