@@ -7,6 +7,20 @@
   let modal = null;
   let resolver = null;
 
+  // Resolves once the modal has fully finished hiding and is safe to
+  // show() again. An effect can carry more than one "choice:" bonus (a
+  // mutagen: "+ physical attribute of your choice" AND "- mental
+  // attribute of your choice"), which resolveChoiceBonuses() in
+  // buff-tracker-widget.js resolves by awaiting open() twice in a row.
+  // Bootstrap's Modal.show() silently no-ops if called while the same
+  // instance is still mid fade-out from the previous hide() -- and the
+  // fade-out is still running right after the first pick, since the
+  // click handler resolves the pick promise immediately but the CSS
+  // transition (and "hidden.bs.modal") only finish later. So the next
+  // open() has to wait for that transition to actually complete before
+  // it dares call show() again, or the second picker never appears.
+  let hideSignal = Promise.resolve();
+
   function escapeHtml(value) {
     return String(value ?? "")
       .replaceAll("&", "&amp;")
@@ -43,10 +57,6 @@
     document
       .getElementById(`${MODAL_ID}Search`)
       .addEventListener("input", renderList);
-    document.getElementById(MODAL_ID).addEventListener("hidden.bs.modal", () => {
-      resolver?.(null);
-      resolver = null;
-    });
   }
 
   let currentOptions = [];
@@ -75,8 +85,11 @@
       .join("");
     list.querySelectorAll("[data-choice-value]").forEach((button) => {
       button.addEventListener("click", () => {
+        // resolver is this session's settle() (see open() below) -- it
+        // resolves the *pick* promise right away, but the modal itself
+        // isn't done closing until "hidden.bs.modal" fires below, which
+        // is what actually unblocks the next open() call.
         resolver?.(button.dataset.choiceValue);
-        resolver = null;
         modal.hide();
       });
     });
@@ -85,20 +98,50 @@
   // options: [{ value, label }]. Resolves to the chosen value, or null if
   // cancelled/closed without a pick.
   function open({ title = "Choose a Target", options = [] } = {}) {
-    ensureModal();
-    document.getElementById(`${MODAL_ID}Title`).textContent = title;
-    document.getElementById(`${MODAL_ID}Search`).value = "";
-    currentOptions = Array.isArray(options) ? options : [];
-    renderList();
-    modal = bootstrap.Modal.getOrCreateInstance(document.getElementById(MODAL_ID));
-    modal.show();
-    setTimeout(
-      () => document.getElementById(`${MODAL_ID}Search`).focus(),
-      150,
+    // Wait for any still-closing previous session before touching the
+    // (singleton) modal element again -- see hideSignal above.
+    return hideSignal.then(
+      () =>
+        new Promise((resolve) => {
+          ensureModal();
+          document.getElementById(`${MODAL_ID}Title`).textContent = title;
+          document.getElementById(`${MODAL_ID}Search`).value = "";
+          currentOptions = Array.isArray(options) ? options : [];
+          renderList();
+          const modalEl = document.getElementById(MODAL_ID);
+          modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+
+          let settled = false;
+          let resolveHideSignal;
+          hideSignal = new Promise((res) => {
+            resolveHideSignal = res;
+          });
+
+          const settle = (value) => {
+            if (settled) return;
+            settled = true;
+            resolver = null;
+            resolve(value);
+          };
+          const onHidden = () => {
+            // Covers both paths: Cancel/close-button/backdrop (nothing
+            // has settled yet, so this is the real "no pick" answer) and
+            // a normal pick (already settled by the click handler above,
+            // so this is just a no-op confirmation the fade-out is done).
+            settle(null);
+            modalEl.removeEventListener("hidden.bs.modal", onHidden);
+            resolveHideSignal();
+          };
+          modalEl.addEventListener("hidden.bs.modal", onHidden);
+
+          resolver = settle;
+          modal.show();
+          setTimeout(
+            () => document.getElementById(`${MODAL_ID}Search`).focus(),
+            150,
+          );
+        }),
     );
-    return new Promise((resolve) => {
-      resolver = resolve;
-    });
   }
 
   window.PFEffectChoicePicker = { open };

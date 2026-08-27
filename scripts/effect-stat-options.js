@@ -80,6 +80,19 @@
     "Sonic",
   ].map((label) => ({ value: slugify(label), label }));
 
+  // Same 5 energy types, but as fixed stats an author picks directly --
+  // "gain 5 fire resistance" (Draconic bloodline, energy resistance
+  // traits, etc.) doesn't leave the type up to the player, unlike the
+  // "Energy Resistance" choice pool above. Reuses the exact same
+  // "resistance:<type>" stat id the choice pool resolves into, so both
+  // paths render/calculate identically (see choiceStatLabel below).
+  const ENERGY_RESISTANCE_STAT_OPTIONS = ENERGY_RESISTANCE_OPTIONS.map(
+    (option) => ({
+      value: `resistance:${option.value}`,
+      label: `${option.label} Resistance`,
+    }),
+  );
+
   function slugify(text) {
     return String(text || "")
       .toLowerCase()
@@ -275,6 +288,18 @@
     }));
   }
 
+  function energyResistanceOptgroupHtml(selected, escapeHtml) {
+    const esc = escapeHtml || ((value) => String(value ?? ""));
+    return `
+      <optgroup label="Energy Resistance">
+        ${ENERGY_RESISTANCE_STAT_OPTIONS.map(
+          (option) =>
+            `<option value="${esc(option.value)}" ${selected === option.value ? "selected" : ""}>${esc(option.label)}</option>`,
+        ).join("")}
+      </optgroup>
+    `;
+  }
+
   function choiceOptgroupHtml(selected, escapeHtml) {
     const esc = escapeHtml || ((value) => String(value ?? ""));
     return `
@@ -313,11 +338,13 @@
   window.PFEffectStats = {
     ALL_POOLS,
     PF_SKILLS_WITH_ABILITY,
+    ENERGY_RESISTANCE_STAT_OPTIONS,
     poolById,
     isChoiceStat,
     choicePoolIdFromStat,
     resolveChoicePoolOptions,
     choiceOptgroupHtml,
+    energyResistanceOptgroupHtml,
     choiceStatLabel,
     slugify,
     unslugify,

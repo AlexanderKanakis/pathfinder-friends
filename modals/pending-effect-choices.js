@@ -125,40 +125,60 @@
     });
   }
 
-  // Walks every "choice:" bonus on the queued ability the same way
-  // buff-tracker-widget.js's resolveChoiceBonuses does, then saves the
-  // finished effect straight into that character's own buff state and
-  // marks the request resolved. Cancelling a pick leaves the request
-  // pending (nothing saved) so it just reappears next poll.
+  // Walks every "choice:" stat in a list of stat-bearing items (an
+  // ability's bonuses, or its classSkillGrants -- both carry the same
+  // { stat, skillName? } shape) the same way buff-tracker-widget.js's
+  // resolveChoiceStats does. Returns the resolved list, or null if a
+  // pick was cancelled.
+  async function resolveChoiceStats(items, request) {
+    const list = Array.isArray(items) ? items : [];
+    const resolved = [];
+    for (const item of list) {
+      if (!window.PFEffectStats?.isChoiceStat(item.stat)) {
+        resolved.push(item);
+        continue;
+      }
+      const poolId = window.PFEffectStats.choicePoolIdFromStat(item.stat);
+      const pool = window.PFEffectStats.poolById(poolId);
+      const options = await window.PFEffectStats.resolveChoicePoolOptions(
+        poolId,
+        { skills: pollOptions?.choicePoolSkillsFor?.(request.character_id) },
+      );
+      const picked = window.PFEffectChoicePicker
+        ? await window.PFEffectChoicePicker.open({
+            title: `${request.effect_name || "Effect"}${request.characterName ? ` (${request.characterName})` : ""}: Choose ${pool?.label || "a Target"}`,
+            options,
+          })
+        : null;
+      if (!picked) return null;
+      resolved.push({ ...item, stat: picked });
+    }
+    return resolved;
+  }
+
+  // Then saves the finished effect straight into that character's own
+  // buff state and marks the request resolved. Cancelling a pick leaves
+  // the request pending (nothing saved) so it just reappears next poll.
   async function resolveRequest(request) {
     if (resolving.has(request.id)) return;
     resolving.add(request.id);
     try {
       const ability = request.ability || {};
-      const bonuses = Array.isArray(ability.bonuses) ? ability.bonuses : [];
-      const resolved = [];
-      for (const bonus of bonuses) {
-        if (!window.PFEffectStats?.isChoiceStat(bonus.stat)) {
-          resolved.push(bonus);
-          continue;
-        }
-        const poolId = window.PFEffectStats.choicePoolIdFromStat(bonus.stat);
-        const pool = window.PFEffectStats.poolById(poolId);
-        const options = await window.PFEffectStats.resolveChoicePoolOptions(
-          poolId,
-          { skills: pollOptions?.choicePoolSkillsFor?.(request.character_id) },
-        );
-        const picked = window.PFEffectChoicePicker
-          ? await window.PFEffectChoicePicker.open({
-              title: `${request.effect_name || "Effect"}${request.characterName ? ` (${request.characterName})` : ""}: Choose ${pool?.label || "a Target"}`,
-              options,
-            })
-          : null;
-        if (!picked) return;
-        resolved.push({ ...bonus, stat: picked });
-      }
+      const resolved = await resolveChoiceStats(ability.bonuses, request);
+      if (resolved === null) return;
+      const resolvedClassSkillGrants = await resolveChoiceStats(
+        ability.classSkillGrants,
+        request,
+      );
+      if (resolvedClassSkillGrants === null) return;
 
-      const finalized = { ...ability, bonuses: resolved };
+      const finalized = {
+        ...ability,
+        bonuses: resolved,
+        ...(resolvedClassSkillGrants.length
+          ? { classSkillGrants: resolvedClassSkillGrants }
+          : {}),
+      };
       const existing = await window.PFApp.loadBuffState(
         pollOptions.contextKey,
         request.character_id,

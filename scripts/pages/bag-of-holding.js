@@ -19,6 +19,9 @@ let bagViewMode = sessionStorage.getItem("pf_bag_view") || "full";
 let editingLootId = null;
 let sourceLootTemplateDetails = null;
 let collapsedLootGroups = new Set();
+// Effects + DR/SR/Class Skill grants -- mounted once (see DOMContentLoaded
+// below) via the shared scripts/effect-editor.js accordion.
+let lootEffectsAccordion = null;
 
 const typeIcons = {
   Weapon: "bi bi-crosshair",
@@ -26,101 +29,6 @@ const typeIcons = {
   Shield: "bi bi-shield",
   Item: "bi bi-gem",
 };
-const EFFECT_STATS = [
-  "strength",
-  "dexterity",
-  "constitution",
-  "intelligence",
-  "wisdom",
-  "charisma",
-  "attack",
-  "melee attack",
-  "ranged attack",
-  "extra attack",
-  "damage",
-  "melee damage",
-  "ranged damage",
-  "ac",
-  "touch ac",
-  "flat-footed ac",
-  "natural armor",
-  "deflection",
-  "fortitude",
-  "reflex",
-  "will",
-  "all saves",
-  "initiative",
-  "cmb",
-  "cmd",
-  "hit points",
-  "spell resistance",
-];
-const SKILL_STATS = [
-  "skill checks",
-  "strength skill checks",
-  "dexterity skill checks",
-  "constitution skill checks",
-  "intelligence skill checks",
-  "wisdom skill checks",
-  "charisma skill checks",
-];
-const PF_SKILLS = [
-  "Acrobatics",
-  "Appraise",
-  "Bluff",
-  "Climb",
-  "Diplomacy",
-  "Disable Device",
-  "Disguise",
-  "Escape Artist",
-  "Fly",
-  "Heal",
-  "Intimidate",
-  "Knowledge (arcana)",
-  "Knowledge (dungeoneering)",
-  "Knowledge (engineering)",
-  "Knowledge (geography)",
-  "Knowledge (history)",
-  "Knowledge (local)",
-  "Knowledge (nature)",
-  "Knowledge (nobility)",
-  "Knowledge (planes)",
-  "Knowledge (religion)",
-  "Linguistics",
-  "Perception",
-  "Ride",
-  "Sense Motive",
-  "Sleight of Hand",
-  "Spellcraft",
-  "Stealth",
-  "Survival",
-  "Swim",
-  "Use Magic Device",
-];
-const SPECIFIC_SKILL_STATS = PF_SKILLS.map(
-  (skill) => `skill:${skill.replace(/[^a-z0-9]/gi, "").toLowerCase()}`,
-);
-const BONUS_TYPES = [
-  "untyped",
-  "alchemical",
-  "condition",
-  "penalty",
-  "armor",
-  "circumstance",
-  "competence",
-  "deflection",
-  "dodge",
-  "enhancement",
-  "insight",
-  "luck",
-  "morale",
-  "natural armor",
-  "profane",
-  "resistance",
-  "sacred",
-  "shield",
-  "size",
-];
 const WEAPON_TYPES = [
   "Melee Weapon (Light)",
   "Melee Weapon (One-Handed)",
@@ -292,55 +200,6 @@ function armorEnchantmentOptions(selected = "") {
     <optgroup label="Armor">${optionList(ARMOR_ENCHANTMENTS.slice(1), selected)}</optgroup>
     <optgroup label="Shield">${optionList(SHIELD_ENCHANTMENTS.slice(1), selected)}</optgroup>
   `;
-}
-
-function titleCaseStat(value) {
-  const key = String(value || "")
-    .toLowerCase()
-    .trim();
-  const choiceLabel = window.PFEffectStats?.choiceStatLabel?.(key);
-  if (choiceLabel) return choiceLabel;
-  if (key === "extra attack") return "Extra Attack at Highest BAB";
-  if (key.startsWith("skill:")) {
-    const skill = PF_SKILLS.find(
-      (entry) =>
-        `skill:${entry.replace(/[^a-z0-9]/gi, "").toLowerCase()}` === key,
-    );
-    return `Skill: ${skill || key.slice(6)}`;
-  }
-  return key
-    .split(" ")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
-}
-
-function effectStatOptions(selected = "") {
-  const option = (value, label = titleCaseStat(value)) =>
-    `<option value="${escapeHtml(value)}" ${selected === value ? "selected" : ""}>${escapeHtml(label)}</option>`;
-  return `
-    <optgroup label="Stats">${EFFECT_STATS.map((stat) => option(stat)).join("")}</optgroup>
-    <optgroup label="Skills">
-      ${SKILL_STATS.map((stat) => option(stat)).join("")}
-      <option value="skill:craft" ${selected === "skill:craft" ? "selected" : ""}>Skill: Craft</option>
-      <option value="skill:profession" ${selected === "skill:profession" ? "selected" : ""}>Skill: Profession</option>
-      ${SPECIFIC_SKILL_STATS.map((stat) => option(stat)).join("")}
-    </optgroup>
-    ${window.PFEffectStats?.choiceOptgroupHtml?.(selected, escapeHtml) || ""}
-  `;
-}
-
-function skillKey(name) {
-  return `skill:${String(name || "")
-    .replace(/[^a-z0-9]/gi, "")
-    .toLowerCase()}`;
-}
-
-function namedSkill(kind, value) {
-  const text = String(value || "").trim();
-  if (!text) return "";
-  const prefix = kind === "skill:profession" ? "Profession" : "Craft";
-  if (text.toLowerCase().startsWith(`${prefix.toLowerCase()} (`)) return text;
-  return `${prefix} (${text})`;
 }
 
 function setLootStatus(message, type = "info") {
@@ -566,7 +425,16 @@ function normalizeWondrousSourceItem(item, index) {
       cost: details.cost || "",
       link: item.link || "",
     },
-    effects: [],
+    effects: Array.isArray(item.effects) ? item.effects : [],
+    damageReduction: Array.isArray(item.damageReduction)
+      ? item.damageReduction
+      : [],
+    spellResistance: Array.isArray(item.spellResistance)
+      ? item.spellResistance
+      : [],
+    classSkillGrants: Array.isArray(item.classSkillGrants)
+      ? item.classSkillGrants
+      : [],
   };
 }
 
@@ -624,6 +492,15 @@ function normalizeMundaneSourceItem(item, index) {
       summary: details.summary || "",
     },
     effects: Array.isArray(item.effects) ? item.effects : [],
+    damageReduction: Array.isArray(item.damageReduction)
+      ? item.damageReduction
+      : [],
+    spellResistance: Array.isArray(item.spellResistance)
+      ? item.spellResistance
+      : [],
+    classSkillGrants: Array.isArray(item.classSkillGrants)
+      ? item.classSkillGrants
+      : [],
   };
 }
 
@@ -666,6 +543,15 @@ function normalizeWeaponSourceItem(item, index) {
       link: details.link || "",
     },
     effects: Array.isArray(item.effects) ? item.effects : [],
+    damageReduction: Array.isArray(item.damageReduction)
+      ? item.damageReduction
+      : [],
+    spellResistance: Array.isArray(item.spellResistance)
+      ? item.spellResistance
+      : [],
+    classSkillGrants: Array.isArray(item.classSkillGrants)
+      ? item.classSkillGrants
+      : [],
   };
 }
 
@@ -711,11 +597,22 @@ function normalizeArmorShieldSourceItem(item, index) {
       summary: details.summary || "",
     },
     effects: Array.isArray(item.effects) ? item.effects : [],
+    damageReduction: Array.isArray(item.damageReduction)
+      ? item.damageReduction
+      : [],
+    spellResistance: Array.isArray(item.spellResistance)
+      ? item.spellResistance
+      : [],
+    classSkillGrants: Array.isArray(item.classSkillGrants)
+      ? item.classSkillGrants
+      : [],
   };
 }
 
 async function loadSourceItems() {
-  const rawWondrousItems = typeof wItems === "undefined" ? [] : wItems;
+  const rawWondrousItems = window.PFItemData
+    ? await window.PFItemData.loadWondrousItems()
+    : [];
   const wondrous = Array.isArray(rawWondrousItems)
     ? rawWondrousItems.map(normalizeWondrousSourceItem)
     : [];
@@ -924,10 +821,7 @@ function populateLootForm(item, selectedCharacterId = "") {
     lootEditorConfig(),
     details.specialMaterial || "",
   );
-  el("lootEffectRows").innerHTML = "";
-  (Array.isArray(item.effects) ? item.effects : []).forEach((effect) =>
-    addLootEffectRow(effect),
-  );
+  lootEffectsAccordion.reset(item);
   toggleLootDetailFields();
   syncLootSlotForType();
 }
@@ -1117,145 +1011,6 @@ function setLootAttackScale(value = "STR") {
     });
 }
 
-function addLootEffectRow(data = {}) {
-  const row = document.createElement("div");
-  row.className = "loot-effect-row";
-  const selectedStat = String(data.skillName || "")
-    .toLowerCase()
-    .startsWith("profession")
-    ? "skill:profession"
-    : String(data.skillName || "")
-          .toLowerCase()
-          .startsWith("craft")
-      ? "skill:craft"
-      : data.stat || "";
-  row.innerHTML = `
-    <div>
-      <label>Stat</label>
-      <select data-effect-field="stat" class="form-select form-select-sm">
-        ${effectStatOptions(selectedStat)}
-      </select>
-    </div>
-    <div class="loot-named-skill-field d-none"><label>Skill Name</label><input data-effect-field="skillName" class="form-control form-control-sm" value="${escapeHtml(data.skillName || "")}" placeholder="Alchemy"></div>
-    <div class="effect-value-field">
-      <label>Value</label>
-      <div class="item-number-stepper" data-item-stepper>
-        <button
-          class="btn btn-outline-light btn-sm item-stepper-btn"
-          type="button"
-          data-item-stepper-delta="-1"
-          aria-label="Decrease effect value"
-        >
-          -
-        </button>
-        <input
-          data-effect-field="value"
-          class="form-control form-control-sm no-spinner"
-          type="number"
-          value="${data.value ?? 0}"
-          inputmode="numeric"
-        >
-        <button
-          class="btn btn-outline-light btn-sm item-stepper-btn"
-          type="button"
-          data-item-stepper-delta="1"
-          aria-label="Increase effect value"
-        >
-          +
-        </button>
-      </div>
-    </div>
-    <div class="effect-type-field">
-      <label>Type</label>
-      <select data-effect-field="type" class="form-select form-select-sm">
-        ${BONUS_TYPES.map((type) => `<option value="${type}" ${(data.type || "untyped") === type ? "selected" : ""}>${escapeHtml(type)}</option>`).join("")}
-      </select>
-    </div>
-    <div>
-      <label>Stacks</label>
-      <div class="form-check form-switch">
-        <input data-effect-field="stacks" class="form-check-input" type="checkbox" ${data.stacks ? "checked" : ""}>
-      </div>
-    </div>
-    <div>
-      <label>Class Skill</label>
-      <div class="form-check form-switch">
-        <input data-effect-field="classSkillGrant" class="form-check-input" type="checkbox" ${data.classSkillGrant ? "checked" : ""}>
-      </div>
-    </div>
-    <div class="loot-condition-inline">
-      <div>
-        <label>Conditional</label>
-        <div class="form-check form-switch">
-          <input data-effect-field="conditional" class="form-check-input" type="checkbox" ${data.conditional ? "checked" : ""}>
-        </div>
-      </div>
-      <div><label>Applies When</label><input data-effect-field="appliesWhen" class="form-control form-control-sm" value="${escapeHtml(data.appliesWhen || "")}" placeholder="vs undead"></div>
-    </div>
-    <button class="btn btn-danger btn-sm" type="button" aria-label="Delete effect"><i class="bi bi-trash"></i></button>
-  `;
-  const statSelect = row.querySelector('[data-effect-field="stat"]');
-  const namedSkillField = row.querySelector(".loot-named-skill-field");
-  const skillNameInput = row.querySelector('[data-effect-field="skillName"]');
-  const syncNamedSkill = () => {
-    const named = ["skill:craft", "skill:profession"].includes(
-      statSelect.value,
-    );
-    namedSkillField.classList.toggle("d-none", !named);
-    skillNameInput.placeholder =
-      statSelect.value === "skill:profession" ? "Sailor" : "Alchemy";
-  };
-  statSelect.addEventListener("change", syncNamedSkill);
-  syncNamedSkill();
-  const classSkillCheckbox = row.querySelector(
-    '[data-effect-field="classSkillGrant"]',
-  );
-  const syncClassSkillGrant = () => {
-    const granting = classSkillCheckbox.checked;
-    row.querySelector(".effect-value-field").classList.toggle("d-none", granting);
-    row.querySelector(".effect-type-field").classList.toggle("d-none", granting);
-  };
-  classSkillCheckbox.addEventListener("change", syncClassSkillGrant);
-  syncClassSkillGrant();
-  row.querySelector("button").addEventListener("click", () => row.remove());
-  el("lootEffectRows").appendChild(row);
-}
-
-function collectLootEffects() {
-  return [...el("lootEffectRows").querySelectorAll(".loot-effect-row")].map(
-    (row) => {
-      const selectedStat = row.querySelector(
-        '[data-effect-field="stat"]',
-      ).value;
-      const skillName = ["skill:craft", "skill:profession"].includes(
-        selectedStat,
-      )
-        ? namedSkill(
-            selectedStat,
-            row.querySelector('[data-effect-field="skillName"]')?.value,
-          )
-        : "";
-      const effect = {
-        stat: skillName ? skillKey(skillName) : selectedStat,
-        value: Number(
-          row.querySelector('[data-effect-field="value"]').value || 0,
-        ),
-        type:
-          row.querySelector('[data-effect-field="type"]').value || "untyped",
-        stacks: row.querySelector('[data-effect-field="stacks"]').checked,
-        conditional: row.querySelector('[data-effect-field="conditional"]')
-          .checked,
-        appliesWhen: row
-          .querySelector('[data-effect-field="appliesWhen"]')
-          .value.trim(),
-      };
-      if (skillName) effect.skillName = skillName;
-      if (row.querySelector('[data-effect-field="classSkillGrant"]').checked)
-        effect.classSkillGrant = true;
-      return effect;
-    },
-  );
-}
 
 function collectLootDetails() {
   const type = el("lootType").value;
@@ -1338,23 +1093,42 @@ function renderLootAttributes(item) {
 
 function renderLootEffects(item) {
   const effects = Array.isArray(item.effects) ? item.effects : [];
-  if (!effects.length) return "";
+  const damageReduction = Array.isArray(item.damageReduction)
+    ? item.damageReduction
+    : [];
+  const spellResistance = Array.isArray(item.spellResistance)
+    ? item.spellResistance
+    : [];
+  const classSkillGrants = Array.isArray(item.classSkillGrants)
+    ? item.classSkillGrants
+    : [];
+  const lines = [
+    ...effects.map(
+      (effect) =>
+        `${escapeHtml(window.PFEffectEditor.titleCaseStat(effect.stat || "effect"))} ${signedValue(effect.value)} (${escapeHtml(effect.type || "untyped")})${effect.conditional ? ` (${escapeHtml(effect.appliesWhen || "conditional")})` : ""}${effect.stacks ? " stacks" : ""}`,
+    ),
+    ...damageReduction.map(
+      (dr) =>
+        `DR ${Number(dr.amount || 0)}/${escapeHtml(String(dr.overcomeType || "").trim() || "-")}`,
+    ),
+    ...spellResistance.map(
+      (sr) =>
+        `SR ${Number(sr.amount || 0)}${sr.conditional ? ` (${escapeHtml(sr.appliesWhen || "conditional")})` : ""}`,
+    ),
+    ...classSkillGrants.map((grant) =>
+      escapeHtml(
+        window.PFEffectEditor.classSkillGrantText(
+          grant,
+          window.PFEffectEditor.titleCaseStat,
+        ),
+      ),
+    ),
+  ];
+  if (!lines.length) return "";
   return `
     <div class="loot-effects-display">
       <div class="loot-meta">Item effects</div>
-      ${effects
-        .map(
-          (effect) => `
-        <div class="loot-effect-display">
-          ${
-            effect.classSkillGrant
-              ? `${escapeHtml(titleCaseStat(effect.stat || "effect"))} becomes a class skill`
-              : `${escapeHtml(titleCaseStat(effect.stat || "effect"))} ${signedValue(effect.value)} (${escapeHtml(effect.type || "untyped")})`
-          }${effect.conditional ? ` (${escapeHtml(effect.appliesWhen || "conditional")})` : ""}${effect.stacks ? " stacks" : ""}
-        </div>
-      `,
-        )
-        .join("")}
+      ${lines.map((line) => `<div class="loot-effect-display">${line}</div>`).join("")}
     </div>
   `;
 }
@@ -1599,7 +1373,7 @@ function resetLootForm() {
   el("lootWeaponCritical").value = "";
   el("lootWeaponCapacity").value = "";
   el("lootWeaponMisfire").value = "";
-  el("lootEffectRows").innerHTML = "";
+  lootEffectsAccordion.reset({});
   toggleLootDetailFields();
   renderCharacterOptions(el("lootAssignedTo"));
 }
@@ -1756,7 +1530,7 @@ async function submitLootForm(event) {
       type: selectedType,
       assignedCharacterId: el("lootAssignedTo").value,
       details,
-      effects: collectLootEffects(),
+      ...lootEffectsAccordion.collect(),
     },
     bagContextKey,
   );
@@ -1804,7 +1578,7 @@ async function loadBagContext(contextKey, showLoading = true) {
 function lootEditorConfig() {
   return {
     formId: "lootForm",
-    effectsRootId: "lootEffectRows",
+    effectsRootId: "lootEffectsAccordion",
     generalTabId: "lootEditorGeneralTab",
     effectsTabId: "lootEditorEffectsTab",
     generalPanelId: "lootEditorGeneralPanel",
@@ -1856,7 +1630,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   el("lootType").addEventListener("change", toggleLootDetailFields);
   el("lootWeaponType").addEventListener("change", toggleLootDetailFields);
   setupLootScalingControls();
-  el("addLootEffect").addEventListener("click", () => addLootEffectRow());
+  lootEffectsAccordion = window.PFEffectEditor.mountEffectsAccordion(
+    el("lootEffectsAccordion"),
+    { idPrefix: "lootEffects" },
+  );
   el("moveLootForm").addEventListener("submit", submitLootMove);
   el("deleteLootForm").addEventListener("submit", submitLootDelete);
   el("lootSearch").addEventListener("input", (event) => {

@@ -35,16 +35,25 @@
       .effect-active-adjustments { display: flex; flex-wrap: wrap; gap: 8px; align-items: end; margin-top: 8px; }
       .effect-active-adjustments .effect-tracker-inline input[type="number"] { width: 68px; }
       .effect-duration-grid { display: grid; grid-template-columns: .75fr 1fr .7fr; gap: 8px; align-items: end; }
-      .effect-toggle-field { min-height: 31px; display: flex; align-items: center; margin: 0; padding-left: 0; }
-      .effect-toggle-field .form-check-input { width: 2.75rem; height: 1.4rem; margin-left: 0; cursor: pointer; }
-      .effect-custom-row { position: relative; display: grid; grid-template-columns: 1.5fr .7fr 1fr .7fr .7fr auto; gap: 6px; align-items: end; padding: 10px 48px 10px 10px; background: #242424; border: 1px solid #444; border-radius: 8px; }
-      .effect-named-skill-field { grid-column: 1 / -1; max-width: 280px; }
-      .effect-row-delete { position: absolute; top: 8px; right: 8px; width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center; padding: 0; }
-      .effect-condition-fields { grid-column: 1 / -1; display: grid; grid-template-columns: auto minmax(160px, 260px); gap: 8px; align-items: end; }
-      .effect-condition-fields [data-field="appliesWhen"] { max-width: 260px; }
-      .effect-scale-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: 6px; align-items: end; }
+      .shared-bonus-row { position: relative; display: grid; grid-template-columns: 1.5fr .7fr 1fr .7fr auto; gap: 8px; align-items: end; background: #242424; border: 1px solid #444; border-radius: 8px; padding: 10px 48px 10px 10px; }
+      .shared-bonus-row .shared-named-skill-field { grid-column: 1 / -1; max-width: 280px; }
+      .shared-bonus-row button[aria-label="Delete effect"] { position: absolute; top: 8px; right: 8px; width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center; padding: 0; }
+      .shared-bonus-condition-inline { grid-column: 1 / -1; display: grid; grid-template-columns: auto minmax(160px, 260px); gap: 8px; align-items: end; }
+      .shared-bonus-row [data-scale-summary] { grid-column: 1 / -1; }
+      .shared-dr-row { display: grid; grid-template-columns: 0.7fr 1.3fr auto auto; gap: 8px; align-items: end; background: #242424; border: 1px solid #444; border-radius: 8px; padding: 8px; }
+      .shared-sr-row { display: grid; grid-template-columns: 0.5fr auto 0.9fr auto auto; gap: 8px; align-items: end; background: #242424; border: 1px solid #444; border-radius: 8px; padding: 8px; }
+      .shared-dr-row [data-scale-summary], .shared-sr-row [data-scale-summary] { grid-column: 1 / -1; }
+      .shared-class-skill-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: end; background: #242424; border: 1px solid #444; border-radius: 8px; padding: 8px; }
+      .shared-class-skill-row .shared-named-skill-field { grid-column: 1 / -1; }
+      .shared-extra-accordion .accordion-item { background: transparent; border: 0; }
+      .shared-extra-accordion .accordion-button { background: #242424; color: #ddd; padding: 8px 10px; font-size: 13px; }
+      .shared-extra-accordion .accordion-button:not(.collapsed) { background: #2b2b2b; color: #fff; box-shadow: none; }
+      .shared-extra-accordion .accordion-button::after { filter: invert(1) grayscale(1) brightness(1.6); }
+      .shared-extra-accordion .accordion-body { background: #1e1e1e; border: 1px solid #333; border-top: 0; padding: 10px; }
+      .shared-extra-subsection { margin-bottom: 14px; }
+      .shared-extra-subsection:last-child { margin-bottom: 0; }
       @media (max-width: 700px) { .effect-duration-grid { grid-template-columns: 1fr 1fr; } }
-      @media (max-width: 700px) { .effect-custom-row { grid-template-columns: 1fr 1fr; } }
+      @media (max-width: 700px) { .shared-bonus-row, .shared-bonus-condition-inline { grid-template-columns: 1fr 1fr; } .shared-bonus-condition-inline { grid-column: auto; } }
       @media (max-width: 700px) {
         .effect-search-modal-dialog { min-width: 0; }
         .effect-tracker-grid,
@@ -82,45 +91,6 @@
     wis: "WIS",
     cha: "CHA",
   };
-  const EFFECT_STATS = [
-    "strength",
-    "dexterity",
-    "constitution",
-    "intelligence",
-    "wisdom",
-    "charisma",
-    "attack",
-    "melee attack",
-    "ranged attack",
-    "extra attack",
-    "damage",
-    "melee damage",
-    "ranged damage",
-    "ac",
-    "touch ac",
-    "flat-footed ac",
-    "remove dex bonus to ac",
-    "natural armor",
-    "deflection",
-    "fortitude",
-    "reflex",
-    "will",
-    "all saves",
-    "initiative",
-    "cmb",
-    "cmd",
-    "hit points",
-    "spell resistance",
-  ];
-  const SKILL_STATS = [
-    "skill checks",
-    "strength skill checks",
-    "dexterity skill checks",
-    "constitution skill checks",
-    "intelligence skill checks",
-    "wisdom skill checks",
-    "charisma skill checks",
-  ];
   const PF_SKILLS = [
     "Acrobatics",
     "Appraise",
@@ -154,9 +124,6 @@
     "Swim",
     "Use Magic Device",
   ];
-  const SPECIFIC_SKILL_STATS = PF_SKILLS.map(
-    (skill) => `skill:${skill.replace(/[^a-z0-9]/gi, "").toLowerCase()}`,
-  );
   const SKILL_STAT_LABELS = {
     "skill checks": "Skill: All Checks",
     "strength skill checks": "Skill: STR Checks",
@@ -172,30 +139,6 @@
       ]),
     ),
   };
-  const CRAFT_SKILL_STAT = "skill:craft";
-  const PROFESSION_SKILL_STAT = "skill:profession";
-  const SPECIAL_SKILL_STATS = [CRAFT_SKILL_STAT, PROFESSION_SKILL_STAT];
-  const BONUS_TYPES = [
-    "untyped",
-    "alchemical",
-    "condition",
-    "penalty",
-    "armor",
-    "circumstance",
-    "competence",
-    "deflection",
-    "dodge",
-    "enhancement",
-    "insight",
-    "luck",
-    "morale",
-    "natural armor",
-    "profane",
-    "resistance",
-    "sacred",
-    "shield",
-    "size",
-  ];
   const DURATION_UNITS = ["variable", "turn", "round", "minute", "hour", "day"];
   const EFFECT_CATEGORIES = [
     "Spell",
@@ -261,45 +204,6 @@
       else groups.push({ category, rows: [row] });
       return groups;
     }, []);
-  }
-
-  function statOptionValue(data = {}) {
-    const skillName = String(data.skillName || "").toLowerCase();
-    if (skillName.startsWith("craft")) return CRAFT_SKILL_STAT;
-    if (skillName.startsWith("profession")) return PROFESSION_SKILL_STAT;
-    return data.stat || "";
-  }
-
-  function statOptions(data = {}, effectStats = EFFECT_STATS) {
-    const selected = statOptionValue(data);
-    const option = (stat, label = titleCaseStat(stat)) =>
-      `<option value="${stat}" ${selected === stat ? "selected" : ""}>${escapeHtml(label)}</option>`;
-    return `
-      <optgroup label="Stats">
-        ${effectStats.map((stat) => option(stat)).join("")}
-      </optgroup>
-      <optgroup label="Skills">
-        ${SKILL_STATS.map((stat) => option(stat)).join("")}
-        ${option(CRAFT_SKILL_STAT, "Skill: Craft")}
-        ${option(PROFESSION_SKILL_STAT, "Skill: Profession")}
-        ${SPECIFIC_SKILL_STATS.map((stat) => option(stat)).join("")}
-      </optgroup>
-      ${window.PFEffectStats?.choiceOptgroupHtml?.(selected, escapeHtml) || ""}
-    `;
-  }
-
-  function skillKey(name) {
-    return `skill:${String(name || "")
-      .replace(/[^a-z0-9]/gi, "")
-      .toLowerCase()}`;
-  }
-
-  function namedSkill(kind, value) {
-    const text = String(value || "").trim();
-    if (!text) return "";
-    const prefix = kind === PROFESSION_SKILL_STAT ? "Profession" : "Craft";
-    if (text.toLowerCase().startsWith(`${prefix.toLowerCase()} (`)) return text;
-    return `${prefix} (${text})`;
   }
 
   function categoryIcon(category) {
@@ -449,11 +353,6 @@
       const text = "Removes DEX bonus to AC";
       return bonus.appliesWhen ? `${text} (${bonus.appliesWhen})` : text;
     }
-    if (bonus.classSkillGrant) {
-      const statLabel = bonus.skillName || titleCaseStat(bonus.stat);
-      const text = `${statLabel} becomes a class skill`;
-      return bonus.appliesWhen ? `${text} (${bonus.appliesWhen})` : text;
-    }
     const value = Number(bonus.value || 0);
     const scale = scaleText(bonus.bonusScale || bonus.scale);
     const statLabel = bonus.skillName || titleCaseStat(bonus.stat);
@@ -520,11 +419,9 @@
       this.active = [];
       this.prefix = `effectTracker${Math.random().toString(36).slice(2)}`;
       this.saveTimer = null;
-      this.customBonusCount = 0;
       this.isAdmin = false;
       this.editingEffectId = null;
       this.deletingEffectId = null;
-      this.editingScaleRow = null;
       this.activeTypeFilter = "all";
     }
 
@@ -586,58 +483,11 @@
                     </div>
                   </div>
                 </div>
-                <div class="small-text mb-1">Bonuses</div>
-                <div id="${this.prefix}CustomRows" class="vstack gap-2 mb-2"></div>
+                <div class="accordion accordion-flush shared-extra-accordion mb-3" id="${this.prefix}EffectsAccordion"></div>
                 <div id="${this.prefix}CustomStatus" class="small-text mt-2"></div>
               </div>
               <div class="modal-footer">
-                <button id="${this.prefix}AddCustomBonus" class="btn btn-outline-light btn-sm" type="button">Add Bonus</button>
                 <button id="${this.prefix}SaveCustom" class="btn btn-primary btn-sm" type="button">Save Effect</button>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="modal fade" id="${this.prefix}ScaleModal" tabindex="-1" aria-labelledby="${this.prefix}ScaleLabel" aria-hidden="true">
-          <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-            <div class="modal-content bg-dark text-white border-secondary">
-              <div class="modal-header">
-                <h5 class="modal-title" id="${this.prefix}ScaleLabel">Bonus Scale</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div class="modal-body">
-                <div class="mb-3">
-                  <label class="small" for="${this.prefix}ScaleSource">Level Source</label>
-                  <select id="${this.prefix}ScaleSource" class="form-select form-select-sm">
-                    ${window.PFEffectMeta?.levelSourceOptions?.({ type: "caster" }) || '<option value="caster">Caster level</option>'}
-                  </select>
-                </div>
-                <div class="form-check form-switch mb-3">
-                  <input id="${this.prefix}ScaleMinOne" class="form-check-input" type="checkbox">
-                  <label class="form-check-label" for="${this.prefix}ScaleMinOne">Minimum 1 (never rounds down to 0)</label>
-                </div>
-                <div class="small-text mb-2">Milestones</div>
-                <div id="${this.prefix}ScaleRows" class="vstack gap-2 mb-3"></div>
-                <button id="${this.prefix}AddScaleMilestone" class="btn btn-outline-light btn-sm mb-3" type="button">Add Milestone</button>
-                <div class="small-text mb-2">Repeating Increase</div>
-                <div class="row g-2">
-                  <div class="col-md-4">
-                    <label class="small" for="${this.prefix}ScaleAfter">After level</label>
-                    <input id="${this.prefix}ScaleAfter" class="form-control form-control-sm" type="number" min="1" placeholder="X">
-                  </div>
-                  <div class="col-md-4">
-                    <label class="small" for="${this.prefix}ScaleEvery">Every levels</label>
-                    <input id="${this.prefix}ScaleEvery" class="form-control form-control-sm" type="number" min="1" placeholder="Y">
-                  </div>
-                  <div class="col-md-4">
-                    <label class="small" for="${this.prefix}ScaleIncrease">Increase bonus by</label>
-                    <input id="${this.prefix}ScaleIncrease" class="form-control form-control-sm" type="number" placeholder="Z">
-                  </div>
-                </div>
-                <div id="${this.prefix}ScaleStatus" class="small-text mt-2"></div>
-              </div>
-              <div class="modal-footer">
-                <button id="${this.prefix}ClearScale" class="btn btn-outline-danger btn-sm" type="button">Clear Scale</button>
-                <button id="${this.prefix}SaveScale" class="btn btn-primary btn-sm" type="button">Save Scale</button>
               </div>
             </div>
           </div>
@@ -670,7 +520,6 @@
       );
       this.pickerModalEl = document.getElementById(`${this.prefix}PickerModal`);
       this.customModalEl = document.getElementById(`${this.prefix}CustomModal`);
-      this.scaleModalEl = document.getElementById(`${this.prefix}ScaleModal`);
       this.deleteModalEl = document.getElementById(`${this.prefix}DeleteModal`);
       this.customNameEl = document.getElementById(`${this.prefix}CustomName`);
       this.editDurationEl = document.getElementById(
@@ -680,7 +529,22 @@
         `${this.prefix}DurationSummary`,
       );
       this.customLabelEl = document.getElementById(`${this.prefix}CustomLabel`);
-      this.customRowsEl = document.getElementById(`${this.prefix}CustomRows`);
+      this.effectsAccordion = window.PFEffectEditor.mountEffectsAccordion(
+        document.getElementById(`${this.prefix}EffectsAccordion`),
+        {
+          idPrefix: `${this.prefix}Effects`,
+          skills: this.options.choicePoolSkills,
+          effectStats: this.options.effectStats,
+          titleCaseStat,
+          effectsKey: "bonuses",
+          // Debuff/Condition effects default new bonus rows to a
+          // stacking penalty -- but only while creating a brand-new
+          // effect, never overriding an existing one's saved values.
+          onEffectAdded: (row) => {
+            if (!this.editingEffectId) this.applyCustomDefaults(row);
+          },
+        },
+      );
       this.customCategoryEl = document.getElementById(
         `${this.prefix}CustomCategory`,
       );
@@ -691,14 +555,6 @@
       this.searchEl = document.getElementById(`${this.prefix}Search`);
       this.resultsEl = document.getElementById(`${this.prefix}Results`);
       this.activeEl = document.getElementById(`${this.prefix}Active`);
-      this.scaleRowsEl = document.getElementById(`${this.prefix}ScaleRows`);
-      this.scaleAfterEl = document.getElementById(`${this.prefix}ScaleAfter`);
-      this.scaleEveryEl = document.getElementById(`${this.prefix}ScaleEvery`);
-      this.scaleIncreaseEl = document.getElementById(
-        `${this.prefix}ScaleIncrease`,
-      );
-      this.scaleMinOneEl = document.getElementById(`${this.prefix}ScaleMinOne`);
-      this.scaleStatusEl = document.getElementById(`${this.prefix}ScaleStatus`);
       this.deleteNameEl = document.getElementById(`${this.prefix}DeleteName`);
       this.deleteStatusEl = document.getElementById(
         `${this.prefix}DeleteStatus`,
@@ -706,34 +562,19 @@
       this.durationEditor = window.PFEffectDurationEditor
         ? new window.PFEffectDurationEditor(this.prefix)
         : null;
-      [
-        this.pickerModalEl,
-        this.customModalEl,
-        this.scaleModalEl,
-        this.deleteModalEl,
-      ].forEach((modal) => {
-        if (modal && modal.parentElement !== document.body)
-          document.body.appendChild(modal);
-      });
+      [this.pickerModalEl, this.customModalEl, this.deleteModalEl].forEach(
+        (modal) => {
+          if (modal && modal.parentElement !== document.body)
+            document.body.appendChild(modal);
+        },
+      );
       this.searchEl.addEventListener("input", () => this.renderResults());
       this.openSearchEl.addEventListener("click", () => this.openPicker());
       this.openButtonEl.addEventListener("click", () => this.openPicker());
       this.createButtonEl.addEventListener("click", () => this.openCustom());
       document
-        .getElementById(`${this.prefix}AddCustomBonus`)
-        .addEventListener("click", () => this.addCustomBonusRow());
-      document
         .getElementById(`${this.prefix}SaveCustom`)
         .addEventListener("click", () => this.saveCustomEffect());
-      document
-        .getElementById(`${this.prefix}AddScaleMilestone`)
-        .addEventListener("click", () => this.addScaleMilestoneRow());
-      document
-        .getElementById(`${this.prefix}ClearScale`)
-        .addEventListener("click", () => this.clearScale());
-      document
-        .getElementById(`${this.prefix}SaveScale`)
-        .addEventListener("click", () => this.saveScale());
       document
         .getElementById(`${this.prefix}ConfirmDelete`)
         .addEventListener("click", () => this.deleteEffect());
@@ -794,10 +635,10 @@
         { count: null, unit: "variable", factors: [] },
         false,
       );
-      this.customRowsEl.innerHTML = "";
+      this.effectsAccordion.reset({});
+      this.effectsAccordion.addEffect();
       this.saveCustomEl.textContent = "Save Effect";
       this.customStatus("");
-      if (!this.customRowsEl.children.length) this.addCustomBonusRow();
       bootstrap.Modal.getOrCreateInstance(this.customModalEl).show();
     }
 
@@ -815,14 +656,11 @@
         effect.durationConfig || durationParts(effect),
         false,
       );
-      this.customRowsEl.innerHTML = "";
+      this.effectsAccordion.reset(effect);
+      if (!Array.isArray(effect.bonuses) || !effect.bonuses.length)
+        this.effectsAccordion.addEffect();
       this.saveCustomEl.textContent = "Save Effect";
       this.customStatus("");
-
-      const bonuses = Array.isArray(effect.bonuses) ? effect.bonuses : [];
-      if (bonuses.length)
-        bonuses.forEach((bonus) => this.addCustomBonusRow(bonus));
-      else this.addCustomBonusRow();
 
       bootstrap.Modal.getOrCreateInstance(this.customModalEl).show();
     }
@@ -849,204 +687,22 @@
       });
     }
 
-    addCustomBonusRow(data = {}) {
-      const index = this.customBonusCount++;
-      const row = document.createElement("div");
-      row.className = "effect-custom-row";
-      row.dataset.customBonusIndex = index;
-      row.innerHTML = `
-        <div>
-          <label class="small">Stat</label>
-          <select data-field="stat" class="form-select form-select-sm">
-            ${statOptions(data, this.options.effectStats || EFFECT_STATS)}
-          </select>
-        </div>
-        <div class="effect-named-skill-field d-none">
-          <label class="small">Skill Name</label>
-          <input data-field="skillName" class="form-control form-control-sm" value="${escapeHtml(data.skillName || "")}" placeholder="Alchemy">
-        </div>
-        <div class="effect-value-field">
-          <label class="small">Value</label>
-          <input data-field="value" class="form-control form-control-sm" type="number" value="${data.value ?? 0}">
-        </div>
-        <div class="effect-type-field">
-          <label class="small">Type</label>
-          <select data-field="type" class="form-select form-select-sm">
-            ${BONUS_TYPES.map((type) => `<option value="${type}" ${(data.type || "untyped") === type ? "selected" : ""}>${type}</option>`).join("")}
-          </select>
-        </div>
-        <div>
-          <label class="small">Stacks</label>
-          <label class="form-check form-switch effect-toggle-field">
-            <input data-field="stacks" class="form-check-input" type="checkbox" ${data.stacks ? "checked" : ""}>
-          </label>
-        </div>
-        <div>
-          <label class="small">Class Skill</label>
-          <label class="form-check form-switch effect-toggle-field">
-            <input data-field="classSkillGrant" class="form-check-input" type="checkbox" ${data.classSkillGrant ? "checked" : ""}>
-          </label>
-        </div>
-        <button class="btn btn-outline-info btn-sm effect-scale-button" type="button" data-scale-bonus>Bonus Scale</button>
-        <button class="btn btn-danger btn-sm effect-row-delete" type="button" aria-label="Delete bonus"><i class="bi bi-trash"></i></button>
-        <div class="effect-condition-fields">
-          <div>
-            <label class="small">Conditional</label>
-            <label class="form-check form-switch effect-toggle-field">
-              <input data-field="conditional" class="form-check-input" type="checkbox" ${data.conditional ? "checked" : ""}>
-            </label>
-          </div>
-          <div>
-            <label class="small">Applies When</label>
-            <input data-field="appliesWhen" class="form-control form-control-sm" value="${escapeHtml(data.appliesWhen || "")}" placeholder="for example: vs melee, while charging">
-          </div>
-        </div>
-      `;
-      row._bonusScale = data.bonusScale || data.scale || null;
-      const statSelect = row.querySelector('[data-field="stat"]');
-      const namedSkillField = row.querySelector(".effect-named-skill-field");
-      const skillNameInput = row.querySelector('[data-field="skillName"]');
-      const syncNamedSkill = () => {
-        const named = [CRAFT_SKILL_STAT, PROFESSION_SKILL_STAT].includes(
-          statSelect.value,
-        );
-        namedSkillField.classList.toggle("d-none", !named);
-        skillNameInput.placeholder =
-          statSelect.value === PROFESSION_SKILL_STAT ? "Sailor" : "Alchemy";
-      };
-      statSelect.addEventListener("change", syncNamedSkill);
-      syncNamedSkill();
-      const classSkillCheckbox = row.querySelector(
-        '[data-field="classSkillGrant"]',
-      );
-      const syncClassSkillGrant = () => {
-        const granting = classSkillCheckbox.checked;
-        row.querySelector(".effect-value-field").classList.toggle("d-none", granting);
-        row.querySelector(".effect-type-field").classList.toggle("d-none", granting);
-        row.querySelector(".effect-scale-button").classList.toggle("d-none", granting);
-      };
-      classSkillCheckbox.addEventListener("change", syncClassSkillGrant);
-      syncClassSkillGrant();
-      row
-        .querySelector("[data-scale-bonus]")
-        .addEventListener("click", () => this.openScaleModal(row));
-      row
-        .querySelector('button[aria-label="Delete bonus"]')
-        .addEventListener("click", () => row.remove());
-      this.customRowsEl.appendChild(row);
-      if (!this.editingEffectId) this.applyCustomDefaults(row);
-    }
-
-    openScaleModal(row) {
-      this.editingScaleRow = row;
-      this.scaleRowsEl.innerHTML = "";
-      this.scaleStatus("");
-      const scale = row._bonusScale || {};
-      const source = scale.source || { type: "caster" };
-      const sourceSelect = document.getElementById(`${this.prefix}ScaleSource`);
-      if (sourceSelect && window.PFEffectMeta?.levelSourceOptions) {
-        sourceSelect.innerHTML = window.PFEffectMeta.levelSourceOptions(source);
-      }
-      const milestones = Array.isArray(scale.milestones)
-        ? scale.milestones
-        : [];
-      if (milestones.length)
-        milestones.forEach((milestone) => this.addScaleMilestoneRow(milestone));
-      else this.addScaleMilestoneRow();
-      const every = scale.every || {};
-      this.scaleAfterEl.value = every.afterLevel || "";
-      this.scaleEveryEl.value = every.everyLevels || "";
-      this.scaleIncreaseEl.value = every.increase ?? "";
-      this.scaleMinOneEl.checked = Boolean(scale.minimumOne);
-      bootstrap.Modal.getOrCreateInstance(this.scaleModalEl).show();
-    }
-
-    addScaleMilestoneRow(data = {}) {
-      const row = document.createElement("div");
-      row.className = "effect-scale-row";
-      row.innerHTML = `
-        <div>
-          <label class="small">Level</label>
-          <input data-scale-field="level" class="form-control form-control-sm" type="number" min="1" value="${data.level || ""}">
-        </div>
-        <div>
-          <label class="small">Bonus Value</label>
-          <input data-scale-field="value" class="form-control form-control-sm" type="number" value="${data.value ?? ""}">
-        </div>
-        <button class="btn btn-danger btn-sm" type="button" aria-label="Delete scale milestone">Delete</button>
-      `;
-      row.querySelector("button").addEventListener("click", () => row.remove());
-      this.scaleRowsEl.appendChild(row);
-    }
-
-    collectScale() {
-      const milestones = [
-        ...this.scaleRowsEl.querySelectorAll(".effect-scale-row"),
-      ]
-        .map((row) => ({
-          level: Number.parseInt(
-            row.querySelector('[data-scale-field="level"]').value,
-            10,
-          ),
-          value: Number(row.querySelector('[data-scale-field="value"]').value),
-        }))
-        .filter(
-          (milestone) =>
-            milestone.level > 0 && Number.isFinite(milestone.value),
-        )
-        .sort((a, b) => a.level - b.level);
-      const afterLevel = Number.parseInt(this.scaleAfterEl.value, 10);
-      const everyLevels = Number.parseInt(this.scaleEveryEl.value, 10);
-      const increase = Number(this.scaleIncreaseEl.value);
-      const every =
-        afterLevel > 0 &&
-        everyLevels > 0 &&
-        Number.isFinite(increase) &&
-        increase !== 0
-          ? { afterLevel, everyLevels, increase }
-          : null;
-      const minimumOne = this.scaleMinOneEl.checked;
-      if (!milestones.length && !every && !minimumOne) return null;
-      const sourceSelect = document.getElementById(`${this.prefix}ScaleSource`);
-      const source = window.PFEffectMeta?.sourceFromSelect
-        ? window.PFEffectMeta.sourceFromSelect(sourceSelect?.value || "caster")
-        : { type: "caster" };
-      return {
-        source,
-        milestones,
-        every,
-        ...(minimumOne ? { minimumOne: true } : {}),
-      };
-    }
-
-    scaleStatus(message, type = "muted") {
-      if (!this.scaleStatusEl) return;
-      this.scaleStatusEl.className = `small mt-2 text-${type}`;
-      this.scaleStatusEl.textContent = message;
-    }
-
-    clearScale() {
-      if (!this.editingScaleRow) return;
-      this.editingScaleRow._bonusScale = null;
-      bootstrap.Modal.getInstance(this.scaleModalEl)?.hide();
-    }
-
-    saveScale() {
-      if (!this.editingScaleRow) return;
-      this.editingScaleRow._bonusScale = this.collectScale();
-      this.scaleStatus("Scale saved.", "success");
-      bootstrap.Modal.getInstance(this.scaleModalEl)?.hide();
-    }
-
-    applyCustomDefaults(scope = this.customRowsEl) {
+    // With no row given, re-applies to every existing Effects row (used
+    // when the category dropdown itself changes to Debuff/Condition).
+    // With a row given, applies to just that freshly-added one.
+    applyCustomDefaults(row) {
       const category = this.customCategoryEl.value;
       if (!["Debuff", "Condition"].includes(category)) return;
-      const rows = scope.classList?.contains("effect-custom-row")
-        ? [scope]
-        : [...(scope.querySelectorAll?.(".effect-custom-row") || [])];
-      rows.forEach((row) => {
-        const type = row.querySelector('[data-field="type"]');
-        const stacks = row.querySelector('[data-field="stacks"]');
+      const rows = row
+        ? [row]
+        : [
+            ...(document
+              .getElementById(`${this.prefix}EffectsAccordion`)
+              ?.querySelectorAll(".shared-bonus-row") || []),
+          ];
+      rows.forEach((r) => {
+        const type = r.querySelector('[data-effect-field="type"]');
+        const stacks = r.querySelector('[data-effect-field="stacks"]');
         if (type && type.value === "untyped") type.value = "penalty";
         if (stacks) stacks.checked = true;
       });
@@ -1075,35 +731,7 @@
         durationPerLevel,
         durationConfig,
         contextKey: this.options.contextKey,
-        bonuses: [
-          ...this.customRowsEl.querySelectorAll(".effect-custom-row"),
-        ].map((row) => {
-          const selectedStat = row.querySelector('[data-field="stat"]').value;
-          const skillName = [CRAFT_SKILL_STAT, PROFESSION_SKILL_STAT].includes(
-            selectedStat,
-          )
-            ? namedSkill(
-                selectedStat,
-                row.querySelector('[data-field="skillName"]')?.value,
-              )
-            : "";
-          const bonus = {
-            stat: skillName ? skillKey(skillName) : selectedStat,
-            value: Number(row.querySelector('[data-field="value"]').value || 0),
-            type: row.querySelector('[data-field="type"]').value || "untyped",
-            stacks: row.querySelector('[data-field="stacks"]').checked,
-            conditional: row.querySelector('[data-field="conditional"]')
-              .checked,
-            appliesWhen: row
-              .querySelector('[data-field="appliesWhen"]')
-              .value.trim(),
-          };
-          if (skillName) bonus.skillName = skillName;
-          if (row._bonusScale) bonus.bonusScale = row._bonusScale;
-          if (row.querySelector('[data-field="classSkillGrant"]').checked)
-            bonus.classSkillGrant = true;
-          return bonus;
-        }),
+        ...this.effectsAccordion.collect(),
       };
     }
 
@@ -1218,18 +846,32 @@
       this.resultsEl.innerHTML = matches
         .map((effect) => {
           const index = this.effects.indexOf(effect);
-          const bonuses = (effect.bonuses || []).slice(0, 8);
-          const bonusHtml = bonuses.length
-            ? bonuses
+          const allChips = [
+            ...(effect.bonuses || []).map(bonusText),
+            ...(effect.damageReduction || []).map(
+              (dr) =>
+                `DR ${Number(dr.amount || 0)}/${String(dr.overcomeType || "").trim() || "-"}`,
+            ),
+            ...(effect.spellResistance || []).map(
+              (sr) =>
+                `SR ${Number(sr.amount || 0)}${sr.conditional ? ` (${sr.appliesWhen || "conditional"})` : ""}`,
+            ),
+            ...(effect.classSkillGrants || []).map((grant) =>
+              window.PFEffectEditor.classSkillGrantText(grant, titleCaseStat),
+            ),
+          ];
+          const chips = allChips.slice(0, 8);
+          const bonusHtml = chips.length
+            ? chips
                 .map(
-                  (bonus) =>
-                    `<span class="effect-tracker-chip">${escapeHtml(bonusText(bonus))}</span>`,
+                  (text) =>
+                    `<span class="effect-tracker-chip">${escapeHtml(text)}</span>`,
                 )
                 .join("")
             : `<span class="small-text">No numerical changes</span>`;
           const more =
-            (effect.bonuses || []).length > bonuses.length
-              ? `<span class="small-text">+${(effect.bonuses || []).length - bonuses.length} more</span>`
+            allChips.length > chips.length
+              ? `<span class="small-text">+${allChips.length - chips.length} more</span>`
               : "";
           const abilitySource =
             effect.fromAbility && effect.source
@@ -1333,21 +975,25 @@
       `;
     }
 
-    // Resolves any "choice:<poolId>" bonuses on an effect definition into
-    // concrete stats by prompting the player (e.g. Ancestor Totem, Lesser
-    // bundled into Rage: "+2 insight to a skill of your choice"). Returns
-    // the resolved bonuses array, or null if the player cancelled a pick.
-    async resolveChoiceBonuses(effect) {
-      const bonuses = Array.isArray(effect.bonuses) ? effect.bonuses : [];
-      if (!bonuses.some((bonus) => window.PFEffectStats?.isChoiceStat(bonus.stat)))
-        return bonuses;
+    // Resolves any "choice:<poolId>" stats within a list of stat-bearing
+    // items into concrete stats by prompting the player -- used for both
+    // an effect's bonuses (e.g. Ancestor Totem, Lesser bundled into
+    // Rage: "+2 insight to a skill of your choice") and its
+    // classSkillGrants (a trait/rage power saying "choose a skill; it
+    // becomes a class skill"), since both carry the exact same
+    // { stat, skillName? } shape. Returns the resolved list, or null if
+    // the player cancelled a pick.
+    async resolveChoiceStats(items, effect) {
+      const list = Array.isArray(items) ? items : [];
+      if (!list.some((item) => window.PFEffectStats?.isChoiceStat(item.stat)))
+        return list;
       const resolved = [];
-      for (const bonus of bonuses) {
-        if (!window.PFEffectStats?.isChoiceStat(bonus.stat)) {
-          resolved.push(bonus);
+      for (const item of list) {
+        if (!window.PFEffectStats?.isChoiceStat(item.stat)) {
+          resolved.push(item);
           continue;
         }
-        const poolId = window.PFEffectStats.choicePoolIdFromStat(bonus.stat);
+        const poolId = window.PFEffectStats.choicePoolIdFromStat(item.stat);
         const pool = window.PFEffectStats.poolById(poolId);
         const options = await window.PFEffectStats.resolveChoicePoolOptions(
           poolId,
@@ -1360,9 +1006,13 @@
             })
           : null;
         if (!picked) return null;
-        resolved.push({ ...bonus, stat: picked });
+        resolved.push({ ...item, stat: picked });
       }
       return resolved;
+    }
+
+    async resolveChoiceBonuses(effect) {
+      return this.resolveChoiceStats(effect.bonuses, effect);
     }
 
     async addEffect(index) {
@@ -1425,17 +1075,32 @@
         durationLabel: appliedDurationLabel,
       };
 
-      const needsChoice = (finalizedEffect.bonuses || []).some((bonus) =>
-        window.PFEffectStats?.isChoiceStat(bonus.stat),
-      );
+      const needsChoice = [
+        ...(finalizedEffect.bonuses || []),
+        ...(finalizedEffect.classSkillGrants || []),
+      ].some((item) => window.PFEffectStats?.isChoiceStat(item.stat));
       if (needsChoice && this.options.isOwnCharacter === false) {
         await this.requestEffectChoice(finalizedEffect);
         return;
       }
 
-      const resolvedBonuses = await this.resolveChoiceBonuses(finalizedEffect);
+      const resolvedBonuses = await this.resolveChoiceStats(
+        finalizedEffect.bonuses,
+        finalizedEffect,
+      );
       if (resolvedBonuses === null) return;
-      this.active.push({ ...finalizedEffect, bonuses: resolvedBonuses });
+      const resolvedClassSkillGrants = await this.resolveChoiceStats(
+        finalizedEffect.classSkillGrants,
+        finalizedEffect,
+      );
+      if (resolvedClassSkillGrants === null) return;
+      this.active.push({
+        ...finalizedEffect,
+        bonuses: resolvedBonuses,
+        ...(resolvedClassSkillGrants.length
+          ? { classSkillGrants: resolvedClassSkillGrants }
+          : {}),
+      });
       this.renderActive();
       this.notifyChange();
       this.queueSave();
@@ -1627,11 +1292,22 @@
 
       const renderRow = ({ effect, index }) => {
         const detailsId = `${this.prefix}Details${index}`;
-        const bonuses = (effect.bonuses || [])
-          .map(
-            (bonus) =>
-              `<div class="small-text">${escapeHtml(bonusText(bonus))}</div>`,
-          )
+        const detailLines = [
+          ...(effect.bonuses || []).map(bonusText),
+          ...(effect.damageReduction || []).map(
+            (dr) =>
+              `DR ${Number(dr.amount || 0)}/${String(dr.overcomeType || "").trim() || "-"}`,
+          ),
+          ...(effect.spellResistance || []).map(
+            (sr) =>
+              `SR ${Number(sr.amount || 0)}${sr.conditional ? ` (${sr.appliesWhen || "conditional"})` : ""}`,
+          ),
+          ...(effect.classSkillGrants || []).map((grant) =>
+            window.PFEffectEditor.classSkillGrantText(grant, titleCaseStat),
+          ),
+        ];
+        const bonuses = detailLines
+          .map((text) => `<div class="small-text">${escapeHtml(text)}</div>`)
           .join("");
         const lockedToItem = isItemSourcedEffect(effect);
         return `

@@ -182,12 +182,14 @@
     const contributedEffects = new Map();
     const contributedDr = new Map();
     const contributedSr = new Map();
+    const contributedClassSkillGrants = new Map();
     const contributedNames = new Map();
     contributedOptions.forEach((options, targetKey) => {
       const finalOptions = terminalOptions(options);
       const effects = [];
       const dr = [];
       const sr = [];
+      const classSkillGrants = [];
       const names = [];
       finalOptions.forEach((option) => {
         if (Array.isArray(option.effects) && option.effects.length)
@@ -202,11 +204,18 @@
           option.spellResistance.length
         )
           sr.push(...option.spellResistance);
+        if (
+          Array.isArray(option.classSkillGrants) &&
+          option.classSkillGrants.length
+        )
+          classSkillGrants.push(...option.classSkillGrants);
         names.push(option.name);
       });
       if (effects.length) contributedEffects.set(targetKey, effects);
       if (dr.length) contributedDr.set(targetKey, dr);
       if (sr.length) contributedSr.set(targetKey, sr);
+      if (classSkillGrants.length)
+        contributedClassSkillGrants.set(targetKey, classSkillGrants);
       if (names.length) contributedNames.set(targetKey, names);
     });
 
@@ -236,6 +245,8 @@
       const bundled = contributedEffects.get(targetKey) || [];
       const bundledDr = contributedDr.get(targetKey) || [];
       const bundledSr = contributedSr.get(targetKey) || [];
+      const bundledClassSkillGrants =
+        contributedClassSkillGrants.get(targetKey) || [];
       const bundledNames = contributedNames.get(targetKey) || [];
       const durationConfig = feature.durationConfig || {
         count: null,
@@ -254,6 +265,12 @@
           : []),
         ...bundledSr,
       ];
+      const classSkillGrants = [
+        ...(Array.isArray(feature.classSkillGrants)
+          ? feature.classSkillGrants
+          : []),
+        ...bundledClassSkillGrants,
+      ];
       abilities.set(key, {
         id: `ability:${key}`,
         name: feature.name || "Class Feature",
@@ -267,6 +284,7 @@
         ],
         ...(damageReduction.length ? { damageReduction } : {}),
         ...(spellResistance.length ? { spellResistance } : {}),
+        ...(classSkillGrants.length ? { classSkillGrants } : {}),
         durationConfig,
         duration: window.PFEffectMeta?.durationLabel
           ? window.PFEffectMeta.durationLabel(durationConfig)

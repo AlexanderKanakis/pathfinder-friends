@@ -302,36 +302,6 @@ const LOOT_EFFECT_STATS = [
   "hit points",
   "spell resistance",
 ];
-const LOOT_SKILL_STATS = [
-  "skill checks",
-  "strength skill checks",
-  "dexterity skill checks",
-  "constitution skill checks",
-  "intelligence skill checks",
-  "wisdom skill checks",
-  "charisma skill checks",
-];
-const LOOT_BONUS_TYPES = [
-  "untyped",
-  "alchemical",
-  "condition",
-  "penalty",
-  "armor",
-  "circumstance",
-  "competence",
-  "deflection",
-  "dodge",
-  "enhancement",
-  "insight",
-  "luck",
-  "morale",
-  "natural armor",
-  "profane",
-  "resistance",
-  "sacred",
-  "shield",
-  "size",
-];
 let weaponCount = 0;
 let armorCount = 0;
 let gearCount = 0;
@@ -361,6 +331,10 @@ let customSkills = [];
 let skillSearchTerm = "";
 let classFeatureChoices = {};
 let classFeatureChoicePickerConfigs = new Map();
+// Effects + DR/SR/Class Skill grants on an inventory item -- mounted once
+// (see initCharacterSheet below) via the shared scripts/effect-editor.js
+// accordion.
+let inventoryEffectsAccordion = null;
 let characterSpells = {};
 let spellMobilePanels = {};
 let inventoryItemModal = null;
@@ -1313,38 +1287,6 @@ function titleCaseStat(value) {
     .join(" ");
 }
 
-function lootEffectStatOptions(selected = "") {
-  const skillStats = allSkills().map(
-    ([skill]) => `skill:${normalizeSkillName(skill)}`,
-  );
-  const option = (value, label = titleCaseStat(value)) =>
-    `<option value="${escapeHtml(value)}" ${selected === value ? "selected" : ""}>${escapeHtml(label)}</option>`;
-  return `
-    <optgroup label="Stats">${LOOT_EFFECT_STATS.map((stat) => option(stat)).join("")}</optgroup>
-    <optgroup label="Skills">
-      ${LOOT_SKILL_STATS.map((stat) => option(stat)).join("")}
-      <option value="skill:craft" ${selected === "skill:craft" ? "selected" : ""}>Skill: Craft</option>
-      <option value="skill:profession" ${selected === "skill:profession" ? "selected" : ""}>Skill: Profession</option>
-      ${skillStats.map((stat) => option(stat)).join("")}
-    </optgroup>
-    ${window.PFEffectStats?.choiceOptgroupHtml?.(selected, escapeHtml) || ""}
-  `;
-}
-
-function skillKey(name) {
-  return `skill:${String(name || "")
-    .replace(/[^a-z0-9]/gi, "")
-    .toLowerCase()}`;
-}
-
-function namedSkill(kind, value) {
-  const text = String(value || "").trim();
-  if (!text) return "";
-  const prefix = kind === "skill:profession" ? "Profession" : "Craft";
-  if (text.toLowerCase().startsWith(`${prefix.toLowerCase()} (`)) return text;
-  return `${prefix} (${text})`;
-}
-
 function enhancementValue(value) {
   return Math.max(0, Math.min(5, Number(value || 0)));
 }
@@ -1954,7 +1896,16 @@ function normalizeWondrousSourceItem(item, index) {
       cost: details.cost || "",
       link: item.link || "",
     },
-    effects: [],
+    effects: Array.isArray(item.effects) ? item.effects : [],
+    damageReduction: Array.isArray(item.damageReduction)
+      ? item.damageReduction
+      : [],
+    spellResistance: Array.isArray(item.spellResistance)
+      ? item.spellResistance
+      : [],
+    classSkillGrants: Array.isArray(item.classSkillGrants)
+      ? item.classSkillGrants
+      : [],
   };
 }
 
@@ -2012,6 +1963,15 @@ function normalizeMundaneSourceItem(item, index) {
       summary: details.summary || "",
     },
     effects: Array.isArray(item.effects) ? item.effects : [],
+    damageReduction: Array.isArray(item.damageReduction)
+      ? item.damageReduction
+      : [],
+    spellResistance: Array.isArray(item.spellResistance)
+      ? item.spellResistance
+      : [],
+    classSkillGrants: Array.isArray(item.classSkillGrants)
+      ? item.classSkillGrants
+      : [],
   };
 }
 
@@ -2054,6 +2014,15 @@ function normalizeWeaponSourceItem(item, index) {
       link: details.link || "",
     },
     effects: Array.isArray(item.effects) ? item.effects : [],
+    damageReduction: Array.isArray(item.damageReduction)
+      ? item.damageReduction
+      : [],
+    spellResistance: Array.isArray(item.spellResistance)
+      ? item.spellResistance
+      : [],
+    classSkillGrants: Array.isArray(item.classSkillGrants)
+      ? item.classSkillGrants
+      : [],
   };
 }
 
@@ -2099,11 +2068,22 @@ function normalizeArmorShieldSourceItem(item, index) {
       summary: details.summary || "",
     },
     effects: Array.isArray(item.effects) ? item.effects : [],
+    damageReduction: Array.isArray(item.damageReduction)
+      ? item.damageReduction
+      : [],
+    spellResistance: Array.isArray(item.spellResistance)
+      ? item.spellResistance
+      : [],
+    classSkillGrants: Array.isArray(item.classSkillGrants)
+      ? item.classSkillGrants
+      : [],
   };
 }
 
 async function loadEnemySourceItems() {
-  const rawWondrousItems = typeof wItems === "undefined" ? [] : wItems;
+  const rawWondrousItems = window.PFItemData
+    ? await window.PFItemData.loadWondrousItems()
+    : [];
   const wondrous = Array.isArray(rawWondrousItems)
     ? rawWondrousItems.map(normalizeWondrousSourceItem)
     : [];
@@ -2681,11 +2661,33 @@ function collectClassFeatureSpellResistance() {
   return entries;
 }
 
+// SR shows up two ways in this app: the dedicated DR/SR/Class-Skill
+// "entity" (a flat SR value like "SR 13" -- doesn't stack with other
+// flat SR, you use whichever applies) collected above by
+// collectClassFeatureSpellResistance(), and a plain numeric "spell
+// resistance" stat in the Effects list, for items/effects that instead
+// ADD to whatever SR you already have (e.g. Ring of the Godless: "the
+// wearer's spell resistance, if any, increases by..."). That second
+// kind is already summed correctly (respecting bonus-type stacking,
+// same as AC/attack/etc.) by PFBuffs.calculateStatsDetailed -- it just
+// was never surfaced anywhere. This pulls that total (and, since a
+// bonus like the Ring's genuinely only applies vs. divine spells, its
+// conditional entries too) into the same hint line.
 function updateClassFeatureSpellResistanceSummary() {
   const summary = el("spellResistanceFromClasses");
   if (!summary) return;
   const entries = collectClassFeatureSpellResistance();
-  if (!entries.length) {
+  const buffed = window.PFBuffs?.calculateStatsDetailed(
+    calculationBuffs(),
+    sheetToBaseline(),
+  );
+  const srBreakdown = buffed?.breakdown?.["spell resistance"] || [];
+  const bonusTotal = buffed?.totals?.["spell resistance"] || 0;
+  const bonusUsed = srBreakdown.filter((entry) => entry.applied === true);
+  const bonusConditional = srBreakdown.filter(
+    (entry) => entry.applied === "conditional",
+  );
+  if (!entries.length && !bonusUsed.length && !bonusConditional.length) {
     summary.textContent = "";
     summary.classList.add("d-none");
     return;
@@ -2698,6 +2700,21 @@ function updateClassFeatureSpellResistanceSummary() {
   if (active.length)
     parts.push(
       `While active: ${active.map((entry) => `${srEntryText(entry)} (${entry.source})`).join(", ")}`,
+    );
+  if (bonusUsed.length)
+    parts.push(
+      `Add ${signed(bonusTotal)} to SR: ${bonusUsed
+        .map((entry) => `${entry.source} ${signed(Number(entry.value || 0))}`)
+        .join(", ")}`,
+    );
+  if (bonusConditional.length)
+    parts.push(
+      `Add to SR when conditional: ${bonusConditional
+        .map(
+          (entry) =>
+            `${signed(Number(entry.value || 0))} ${entry.detail || "conditional"} (${entry.source})`,
+        )
+        .join(", ")}`,
     );
   summary.textContent = parts.join(" | ");
   summary.classList.remove("d-none");
@@ -2752,35 +2769,72 @@ function characterClassSkillKeys() {
   return keys;
 }
 
-// Skills granted class-skill status by an effect (a feat/trait/racial
-// ability/class feature saying "X becomes a class skill for you") --
-// scans the same buffs (always-on class features + active effects)
-// recalculateSheet() already reads for numeric bonuses. Traits, feats,
-// and any other buff added through the tracker (activatable abilities
-// included) already have their "choice:<poolId>" stats resolved to a
-// concrete skill via PFEffectChoicePicker at add/cast time (see
-// resolveChoiceBonuses in buff-tracker-widget.js), so those work here
-// with no extra plumbing. The one gap: a class feature that is (a) not
-// activatable -- i.e. baked straight into calculationBuffs() every
-// recalc with no "add" step -- and (b) itself carries a raw
-// "choice:<poolId>" stat (either directly on feature.effects, or on a
-// selected pool option's effects) never passes through that picker, so
-// its stat stays unresolved and is skipped here rather than applied
-// nonsensically.
-function grantedClassSkillKeys() {
+// Skills granted class-skill status by a feat/trait/racial ability/
+// class feature/item -- each carries its own classSkillGrants array
+// (see scripts/effect-editor.js's createClassSkillRow), read exactly
+// the same way collectClassFeatureDamageReduction/...SpellResistance
+// read DR/SR: always-on class features + whichever pool option is
+// currently selected walk classFeatureChoices, and any active buff
+// (trait, cast ability, equipped item) contributes its own array too.
+// Traits, feats, and anything added through the tracker (activatable
+// abilities included) already have their "choice:<poolId>" stats
+// resolved to a concrete skill via PFEffectChoicePicker at add/cast
+// time (see resolveChoiceStats in buff-tracker-widget.js), so those
+// work here with no extra plumbing. The one gap: a class feature that
+// is (a) not activatable -- i.e. baked straight into calculationBuffs()
+// every recalc with no "add" step -- and (b) itself carries a raw
+// "choice:<poolId>" stat never passes through that picker, so its stat
+// stays unresolved and is skipped here rather than applied
+// nonsensically (DR/SR don't have this gap -- they're plain numbers,
+// nothing to resolve).
+function collectClassFeatureClassSkillGrants() {
+  const limit = Math.max(1, num("characterLevel") || 1);
+  const counts = {};
   const keys = new Set();
-  calculationBuffs().forEach((buff) => {
-    (buff.bonuses || []).forEach((bonus) => {
-      if (!bonus.classSkillGrant) return;
-      const stat = String(bonus.stat || "");
+  const addGrants = (grants) => {
+    (Array.isArray(grants) ? grants : []).forEach((grant) => {
+      const stat = String(grant?.stat || "");
       if (stat.startsWith("skill:")) keys.add(stat);
     });
+  };
+  classProgression.slice(0, limit).forEach((row) => {
+    const className = row.className;
+    if (!className) return;
+    counts[className] = (counts[className] || 0) + 1;
+    const classLevel = counts[className];
+    const definition = classDefinitionByName(className);
+    const levelData = classLevelAt(definition, classLevel);
+    const features = levelData?.classFeatures || levelData?.special || [];
+    features.forEach((feature) => {
+      if (typeof feature === "string") return;
+      if (!feature.activatable) addGrants(feature.classSkillGrants);
+      featurePools(feature).forEach((pool) => {
+        if (pool.contributesToAbility) return;
+        const key = classFeatureChoiceKey(
+          { ...feature, className, classLevel, characterLevel: row.level },
+          pool,
+          { className, classLevel, characterLevel: row.level },
+        );
+        const selected = classFeatureChoices[key];
+        const option = (pool.options || []).find(
+          (item) => item.name === selected,
+        );
+        if (option) addGrants(option.classSkillGrants);
+      });
+    });
   });
+  // Active buffs (traits, cast abilities, equipped items) carry their
+  // own classSkillGrants -- same reasoning as DR/SR's "while active"
+  // half in collectClassFeatureDamageReduction.
+  (activeBuffs || []).forEach((buff) => addGrants(buff.classSkillGrants));
   return keys;
 }
 
 function characterClassSkillSet() {
-  return new Set([...characterClassSkillKeys(), ...grantedClassSkillKeys()]);
+  return new Set([
+    ...characterClassSkillKeys(),
+    ...collectClassFeatureClassSkillGrants(),
+  ]);
 }
 
 function computeClassProgressionTotals() {
@@ -3013,21 +3067,35 @@ function renderClassFeatureEffects(feature) {
           const stat = titleCaseStat(
             effect.skillName || effect.stat || "effect",
           );
-          const value = effect.classSkillGrant
-            ? "becomes a class skill"
-            : String(effect.stat || "").toLowerCase() ===
-                "remove dex bonus to ac"
+          const value =
+            String(effect.stat || "").toLowerCase() ===
+            "remove dex bonus to ac"
               ? "removes DEX bonus"
               : `${signed(Number(effect.value || 0))} ${effect.type || "untyped"}`;
           const conditional = effect.conditional
             ? ` (${effect.appliesWhen || "conditional"})`
             : "";
           const stacks = effect.stacks ? "; stacks" : "";
-          const scale = effect.classSkillGrant
-            ? ""
-            : classFeatureScaleText(effect.bonusScale || effect.scale);
+          const scale = classFeatureScaleText(effect.bonusScale || effect.scale);
           return `<span class="class-feature-effect-pill">${escapeHtml(`${stat}: ${value}${conditional}${stacks}${scale}`)}</span>`;
         })
+        .join("")}
+    </div>
+  `;
+}
+
+function renderClassFeatureClassSkillGrants(feature) {
+  const entries = Array.isArray(feature.classSkillGrants)
+    ? feature.classSkillGrants
+    : [];
+  if (!entries.length) return "";
+  return `
+    <div class="class-feature-effects">
+      ${entries
+        .map(
+          (grant) =>
+            `<span class="class-feature-effect-pill">${escapeHtml(window.PFEffectEditor.classSkillGrantText(grant, titleCaseStat))}</span>`,
+        )
         .join("")}
     </div>
   `;
@@ -3259,6 +3327,9 @@ function renderClassFeatures() {
                 spellResistance: Array.isArray(feature.spellResistance)
                   ? feature.spellResistance
                   : [],
+                classSkillGrants: Array.isArray(feature.classSkillGrants)
+                  ? feature.classSkillGrants
+                  : [],
                 pools: featurePools(feature),
               };
         groups.get(row.level).push(nextFeature);
@@ -3286,6 +3357,7 @@ function renderClassFeatures() {
               ${renderClassFeatureEffects(feature)}
               ${renderClassFeatureDamageReduction(feature)}
               ${renderClassFeatureSpellResistance(feature)}
+              ${renderClassFeatureClassSkillGrants(feature)}
               ${renderClassFeaturePools(feature)}
               <div id="${collapseId}" class="collapse small mt-2">${feature.description ? escapeHtml(feature.description) : "No description scraped."}</div>
             </article>
@@ -4615,13 +4687,42 @@ function updateWornCardFromLoot(item) {
 function syncEquippedLootBuffFromItem(item) {
   const index = activeBuffs.findIndex((buff) => buff.sourceLootId === item.id);
   const effects = Array.isArray(item.effects) ? item.effects : [];
-  if (!effects.length) {
+  const damageReduction = Array.isArray(item.damageReduction)
+    ? item.damageReduction
+    : [];
+  const spellResistance = Array.isArray(item.spellResistance)
+    ? item.spellResistance
+    : [];
+  const classSkillGrants = Array.isArray(item.classSkillGrants)
+    ? item.classSkillGrants
+    : [];
+  // An item can grant DR/SR/class-skill status with no plain "effects"
+  // at all (a ring of protection from acid, say) -- so "has nothing to
+  // contribute" has to check all four, not just effects, or the buff
+  // gets dropped (or never created) even though the item does
+  // something.
+  if (
+    !effects.length &&
+    !damageReduction.length &&
+    !spellResistance.length &&
+    !classSkillGrants.length
+  ) {
     if (index >= 0) {
       activeBuffs.splice(index, 1);
       return true;
     }
     return false;
   }
+  // Only attach damageReduction/spellResistance/classSkillGrants when
+  // there's actually something in them -- an item with none of the
+  // three keeps the exact object shape it always had. Unconditionally
+  // stamping empty arrays onto every equipped item's buff made the
+  // JSON.stringify comparison below see a "change" against any buff
+  // saved before this feature existed (present-with-[] vs.
+  // absent-key), so the plain act of loading the sheet kept looking
+  // like something changed -- triggering a save + recalculate + active
+  // effects list rebuild every single time (window focus, tab switch,
+  // any inventory reload), which is what "pop in and out" was.
   const next = {
     ...(index >= 0 ? activeBuffs[index] : {}),
     name: item.name,
@@ -4630,6 +4731,9 @@ function syncEquippedLootBuffFromItem(item) {
     permanent: true,
     durationLabel: "Equipped",
     bonuses: effects,
+    ...(damageReduction.length ? { damageReduction } : {}),
+    ...(spellResistance.length ? { spellResistance } : {}),
+    ...(classSkillGrants.length ? { classSkillGrants } : {}),
   };
   if (index >= 0 && JSON.stringify(activeBuffs[index]) === JSON.stringify(next))
     return false;
@@ -5530,7 +5634,15 @@ function renderInventoryAttributes(item) {
 
 function renderInventoryEffects(item) {
   const effects = Array.isArray(item.effects) ? item.effects : [];
-  if (!effects.length) return "";
+  const damageReduction = Array.isArray(item.damageReduction)
+    ? item.damageReduction
+    : [];
+  const spellResistance = Array.isArray(item.spellResistance)
+    ? item.spellResistance
+    : [];
+  const classSkillGrants = Array.isArray(item.classSkillGrants)
+    ? item.classSkillGrants
+    : [];
   const effectText = (effect) => {
     if (
       String(effect.stat || "")
@@ -5539,23 +5651,27 @@ function renderInventoryEffects(item) {
     ) {
       return `Removes DEX bonus to AC${effect.conditional ? ` (${escapeHtml(effect.appliesWhen || "conditional")})` : ""}${effect.stacks ? " stacks" : ""}`;
     }
-    if (effect.classSkillGrant) {
-      return `${escapeHtml(titleCaseStat(effect.stat || "effect"))} becomes a class skill${effect.conditional ? ` (${escapeHtml(effect.appliesWhen || "conditional")})` : ""}`;
-    }
     return `${escapeHtml(titleCaseStat(effect.stat || "effect"))} ${signed(Number(effect.value || 0))} (${escapeHtml(effect.type || "untyped")})${effect.conditional ? ` (${escapeHtml(effect.appliesWhen || "conditional")})` : ""}${effect.stacks ? " stacks" : ""}`;
   };
+  const lines = [
+    ...effects.map(effectText),
+    ...damageReduction.map(
+      (dr) =>
+        `DR ${Number(dr.amount || 0)}/${escapeHtml(String(dr.overcomeType || "").trim() || "-")}`,
+    ),
+    ...spellResistance.map(
+      (sr) =>
+        `SR ${Number(sr.amount || 0)}${sr.conditional ? ` (${escapeHtml(sr.appliesWhen || "conditional")})` : ""}`,
+    ),
+    ...classSkillGrants.map((grant) =>
+      escapeHtml(window.PFEffectEditor.classSkillGrantText(grant, titleCaseStat)),
+    ),
+  ];
+  if (!lines.length) return "";
   return `
     <div class="inventory-effects">
       <div class="small-text">Item effects</div>
-      ${effects
-        .map(
-          (effect) => `
-        <div class="inventory-effect">
-          ${effectText(effect)}
-        </div>
-      `,
-        )
-        .join("")}
+      ${lines.map((line) => `<div class="inventory-effect">${line}</div>`).join("")}
     </div>
   `;
 }
@@ -5573,6 +5689,9 @@ function makeEnemyInventoryItem(source) {
     type: source.type || "Item",
     details: cloneJson(source.details || {}),
     effects: cloneJson(source.effects || []),
+    damageReduction: cloneJson(source.damageReduction || []),
+    spellResistance: cloneJson(source.spellResistance || []),
+    classSkillGrants: cloneJson(source.classSkillGrants || []),
   };
 }
 
@@ -5689,152 +5808,6 @@ function setupInventoryScalingControls() {
     });
 }
 
-function addInventoryEffectRow(data = {}) {
-  const row = document.createElement("div");
-  row.className = "inventory-effect-row";
-  const selectedStat = String(data.skillName || "")
-    .toLowerCase()
-    .startsWith("profession")
-    ? "skill:profession"
-    : String(data.skillName || "")
-          .toLowerCase()
-          .startsWith("craft")
-      ? "skill:craft"
-      : data.stat || "";
-  row.innerHTML = `
-    <div>
-      <label>Stat</label>
-      <select data-inventory-effect-field="stat" class="form-select form-select-sm">
-        ${lootEffectStatOptions(selectedStat)}
-      </select>
-    </div>
-    <div class="inventory-named-skill-field d-none"><label>Skill Name</label><input data-inventory-effect-field="skillName" class="form-control form-control-sm" value="${escapeHtml(data.skillName || "")}" placeholder="Alchemy"></div>
-    <div class="effect-value-field">
-      <label>Value</label>
-      <div class="item-number-stepper" data-item-stepper>
-        <button
-          class="btn btn-outline-light btn-sm item-stepper-btn"
-          type="button"
-          data-item-stepper-delta="-1"
-          aria-label="Decrease effect value"
-        >
-          -
-        </button>
-        <input
-          data-inventory-effect-field="value"
-          class="form-control form-control-sm no-spinner"
-          type="number"
-          value="${data.value ?? 0}"
-          inputmode="numeric"
-        >
-        <button
-          class="btn btn-outline-light btn-sm item-stepper-btn"
-          type="button"
-          data-item-stepper-delta="1"
-          aria-label="Increase effect value"
-        >
-          +
-        </button>
-      </div>
-    </div>
-    <div class="effect-type-field">
-      <label>Type</label>
-      <select data-inventory-effect-field="type" class="form-select form-select-sm">
-        ${LOOT_BONUS_TYPES.map((type) => `<option value="${type}" ${(data.type || "untyped") === type ? "selected" : ""}>${escapeHtml(type)}</option>`).join("")}
-      </select>
-    </div>
-    <div>
-      <label>Stacks</label>
-      <div class="form-check form-switch">
-        <input data-inventory-effect-field="stacks" class="form-check-input" type="checkbox" ${data.stacks ? "checked" : ""}>
-      </div>
-    </div>
-    <div>
-      <label>Class Skill</label>
-      <div class="form-check form-switch">
-        <input data-inventory-effect-field="classSkillGrant" class="form-check-input" type="checkbox" ${data.classSkillGrant ? "checked" : ""}>
-      </div>
-    </div>
-    <div class="inventory-condition-inline">
-      <div>
-        <label>Conditional</label>
-        <div class="form-check form-switch">
-          <input data-inventory-effect-field="conditional" class="form-check-input" type="checkbox" ${data.conditional ? "checked" : ""}>
-        </div>
-      </div>
-      <div><label>Applies When</label><input data-inventory-effect-field="appliesWhen" class="form-control form-control-sm" value="${escapeHtml(data.appliesWhen || "")}" placeholder="vs undead"></div>
-    </div>
-    <button class="btn btn-danger btn-sm" type="button" aria-label="Delete effect"><i class="bi bi-trash"></i></button>
-  `;
-  const statSelect = row.querySelector('[data-inventory-effect-field="stat"]');
-  const namedSkillField = row.querySelector(".inventory-named-skill-field");
-  const skillNameInput = row.querySelector(
-    '[data-inventory-effect-field="skillName"]',
-  );
-  const syncNamedSkill = () => {
-    const named = ["skill:craft", "skill:profession"].includes(
-      statSelect.value,
-    );
-    namedSkillField.classList.toggle("d-none", !named);
-    skillNameInput.placeholder =
-      statSelect.value === "skill:profession" ? "Sailor" : "Alchemy";
-  };
-  statSelect.addEventListener("change", syncNamedSkill);
-  syncNamedSkill();
-  const classSkillCheckbox = row.querySelector(
-    '[data-inventory-effect-field="classSkillGrant"]',
-  );
-  const syncClassSkillGrant = () => {
-    const granting = classSkillCheckbox.checked;
-    row.querySelector(".effect-value-field").classList.toggle("d-none", granting);
-    row.querySelector(".effect-type-field").classList.toggle("d-none", granting);
-  };
-  classSkillCheckbox.addEventListener("change", syncClassSkillGrant);
-  syncClassSkillGrant();
-  row.querySelector("button").addEventListener("click", () => row.remove());
-  el("inventoryEffectRows").appendChild(row);
-}
-
-function collectInventoryEffects() {
-  return [
-    ...el("inventoryEffectRows").querySelectorAll(".inventory-effect-row"),
-  ].map((row) => {
-    const selectedStat = row.querySelector(
-      '[data-inventory-effect-field="stat"]',
-    ).value;
-    const skillName = ["skill:craft", "skill:profession"].includes(selectedStat)
-      ? namedSkill(
-          selectedStat,
-          row.querySelector('[data-inventory-effect-field="skillName"]')?.value,
-        )
-      : "";
-    const effect = {
-      stat: skillName ? skillKey(skillName) : selectedStat,
-      value: Number(
-        row.querySelector('[data-inventory-effect-field="value"]').value || 0,
-      ),
-      type:
-        row.querySelector('[data-inventory-effect-field="type"]').value ||
-        "untyped",
-      stacks: row.querySelector('[data-inventory-effect-field="stacks"]')
-        .checked,
-      conditional: row.querySelector(
-        '[data-inventory-effect-field="conditional"]',
-      ).checked,
-      appliesWhen: row
-        .querySelector('[data-inventory-effect-field="appliesWhen"]')
-        .value.trim(),
-    };
-    if (skillName) effect.skillName = skillName;
-    if (
-      row.querySelector('[data-inventory-effect-field="classSkillGrant"]')
-        .checked
-    )
-      effect.classSkillGrant = true;
-    return effect;
-  });
-}
-
 function collectInventoryDetails() {
   const type = el("inventoryItemType").value;
   const slot = el("inventorySlotInput").value.trim();
@@ -5906,10 +5879,7 @@ function openInventoryItemEditor(itemId) {
     inventoryEditorConfig(),
     details.specialMaterial || "",
   );
-  el("inventoryEffectRows").innerHTML = "";
-  (Array.isArray(item.effects) ? item.effects : []).forEach((effect) =>
-    addInventoryEffectRow(effect),
-  );
+  inventoryEffectsAccordion.reset(item);
   toggleInventoryDetailFields();
   syncInventorySlotForType();
   inventoryItemModal = bootstrap.Modal.getOrCreateInstance(
@@ -5939,7 +5909,7 @@ async function submitInventoryItemEdit(event) {
       count: el("inventoryItemCount").value,
       type: el("inventoryItemType").value,
       details: updatedEnemyDetails,
-      effects: collectInventoryEffects(),
+      ...inventoryEffectsAccordion.collect(),
     };
     characterInventoryItems = characterInventoryItems.map((entry) =>
       entry.id === editingInventoryItemId
@@ -5972,7 +5942,7 @@ async function submitInventoryItemEdit(event) {
       type: el("inventoryItemType").value,
       assignedCharacterId: item.assigned_character_id || currentSheetId,
       details: savedDetails,
-      effects: collectInventoryEffects(),
+      ...inventoryEffectsAccordion.collect(),
     },
     sheetContextKey,
   );
@@ -7046,7 +7016,7 @@ window.PFCharacterSheetBridge = {
 function inventoryEditorConfig() {
   return {
     formId: "inventoryItemForm",
-    effectsRootId: "inventoryEffectRows",
+    effectsRootId: "inventoryEffectsAccordion",
     generalTabId: "inventoryEditorGeneralTab",
     effectsTabId: "inventoryEditorEffectsTab",
     generalPanelId: "inventoryEditorGeneralPanel",
@@ -7258,8 +7228,14 @@ async function initCharacterSheet() {
     "submit",
     submitInventoryItemDelete,
   );
-  el("addInventoryEffect").addEventListener("click", () =>
-    addInventoryEffectRow(),
+  inventoryEffectsAccordion = window.PFEffectEditor.mountEffectsAccordion(
+    el("inventoryEffectsAccordion"),
+    {
+      idPrefix: "inventoryEffects",
+      skills: allSkills(),
+      effectStats: LOOT_EFFECT_STATS,
+      titleCaseStat,
+    },
   );
   enemySourceItemModal = bootstrap.Modal.getOrCreateInstance(
     el("enemySourceItemsModal"),

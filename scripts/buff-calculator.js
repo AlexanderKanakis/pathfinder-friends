@@ -200,11 +200,6 @@
 
     activeBuffs.forEach((buff) => {
       (buff.bonuses || []).forEach((rawBonus) => {
-        // "X becomes a class skill" isn't a numeric bonus -- it's read
-        // separately (character-sheet.js's grantedClassSkillKeys) to
-        // drive the +3 class skill bonus, so it shouldn't also show up
-        // here as a stray "+0 untyped" entry.
-        if (rawBonus.classSkillGrant) return;
         const stat = normalizeStat(rawBonus.stat);
         const targets = stat === "all saves" ? ALL_SAVES_STATS : [stat];
         const value = scaledBonusValue(rawBonus, buff);

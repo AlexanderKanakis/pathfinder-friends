@@ -1084,6 +1084,15 @@
       durationPerLevel: Boolean(durationPerLevel),
       durationConfig,
       bonuses: Array.isArray(row.bonuses) ? row.bonuses : [],
+      damageReduction: Array.isArray(row.damage_reduction)
+        ? row.damage_reduction
+        : [],
+      spellResistance: Array.isArray(row.spell_resistance)
+        ? row.spell_resistance
+        : [],
+      classSkillGrants: Array.isArray(row.class_skill_grants)
+        ? row.class_skill_grants
+        : [],
       source: row.source || "custom",
       contextKey: row.context_key || "general",
       gameId: row.game_id || null,
@@ -1166,6 +1175,9 @@
       duration_per_level: Boolean(buff.durationPerLevel),
       duration_config: buff.durationConfig || null,
       bonuses: buff.bonuses || [],
+      damage_reduction: buff.damageReduction || [],
+      spell_resistance: buff.spellResistance || [],
+      class_skill_grants: buff.classSkillGrants || [],
       source: "custom",
       context_key: context.contextKey,
       game_id: context.gameId,
@@ -1191,7 +1203,7 @@
 
     let { data, error } = await query
       .select(
-        "id,name,category,duration,duration_count,duration_unit,duration_per_level,duration_config,bonuses,source,context_key,game_id",
+        "id,name,category,duration,duration_count,duration_unit,duration_per_level,duration_config,bonuses,damage_reduction,spell_resistance,class_skill_grants,source,context_key,game_id",
       )
       .single();
 
@@ -1201,6 +1213,9 @@
       delete legacyPayload.duration_unit;
       delete legacyPayload.duration_per_level;
       delete legacyPayload.duration_config;
+      delete legacyPayload.damage_reduction;
+      delete legacyPayload.spell_resistance;
+      delete legacyPayload.class_skill_grants;
       query = existing?.id
         ? client
             .from("buff_definitions")
@@ -1226,7 +1241,7 @@
     const user = await getUser();
     if (!client || !user || !buffId) return null;
 
-    let { data, error } = await client.rpc("admin_update_buff_definition", {
+    const sharedArgs = {
       target_buff_id: buffId,
       new_name: buff.name,
       new_category: buff.category || "Custom",
@@ -1240,30 +1255,51 @@
       new_duration_count: buff.durationCount || null,
       new_duration_unit: buff.durationUnit || "variable",
       new_duration_per_level: Boolean(buff.durationPerLevel),
-      new_duration_config: buff.durationConfig || null,
       new_bonuses: Array.isArray(buff.bonuses) ? buff.bonuses : [],
+    };
+
+    // Each RPC call below targets a different vintage of
+    // admin_update_buff_definition's signature -- PostgREST resolves
+    // RPCs by exact argument set, so a repo whose migrations haven't
+    // caught up yet 404s (PGRST202) on the newest call and needs to
+    // fall back to whatever the deployed function actually accepts,
+    // oldest last.
+    let { data, error } = await client.rpc("admin_update_buff_definition", {
+      ...sharedArgs,
+      new_duration_config: buff.durationConfig || null,
+      new_damage_reduction: Array.isArray(buff.damageReduction)
+        ? buff.damageReduction
+        : [],
+      new_spell_resistance: Array.isArray(buff.spellResistance)
+        ? buff.spellResistance
+        : [],
+      new_class_skill_grants: Array.isArray(buff.classSkillGrants)
+        ? buff.classSkillGrants
+        : [],
     });
+
+    if (
+      error?.code === "PGRST202" ||
+      String(error?.message || "").includes("new_damage_reduction") ||
+      String(error?.message || "").includes("new_spell_resistance") ||
+      String(error?.message || "").includes("new_class_skill_grants")
+    ) {
+      const fallback = await client.rpc("admin_update_buff_definition", {
+        ...sharedArgs,
+        new_duration_config: buff.durationConfig || null,
+      });
+      data = fallback.data;
+      error = fallback.error;
+    }
 
     if (
       error?.code === "PGRST202" ||
       String(error?.message || "").includes("new_duration_config")
     ) {
-      const fallback = await client.rpc("admin_update_buff_definition", {
-        target_buff_id: buffId,
-        new_name: buff.name,
-        new_category: buff.category || "Custom",
-        new_duration:
-          buff.duration ||
-          formatDurationLabel(
-            buff.durationCount,
-            buff.durationUnit,
-            buff.durationPerLevel,
-          ),
-        new_duration_count: buff.durationCount || null,
-        new_duration_unit: buff.durationUnit || "variable",
-        new_duration_per_level: Boolean(buff.durationPerLevel),
-        new_bonuses: Array.isArray(buff.bonuses) ? buff.bonuses : [],
-      });
+      const fallback = await client.rpc(
+        "admin_update_buff_definition",
+        sharedArgs,
+      );
       data = fallback.data;
       error = fallback.error;
     }
@@ -1922,25 +1958,77 @@
     return results;
   }
 
+  // game_loot is otherwise a raw pass-through (no normalize step, unlike
+  // buff_definitions) -- but damageReduction/spellResistance/
+  // classSkillGrants have to come back camelCase, matching every other
+  // buff-shaped object (see syncEquippedLootBuffFromItem in
+  // character-sheet.js, which reads item.damageReduction etc. straight
+  // off the loaded item), so those three specifically get mapped here.
+  function normalizeLootItem(row) {
+    return {
+      ...row,
+      damageReduction: Array.isArray(row.damage_reduction)
+        ? row.damage_reduction
+        : [],
+      spellResistance: Array.isArray(row.spell_resistance)
+        ? row.spell_resistance
+        : [],
+      classSkillGrants: Array.isArray(row.class_skill_grants)
+        ? row.class_skill_grants
+        : [],
+    };
+  }
+
+  // A repo whose migration hasn't reached its Supabase project yet
+  // doesn't have damage_reduction/spell_resistance/class_skill_grants
+  // as real columns -- selecting them fails the WHOLE query, which
+  // used to just return [] on any error. For loot that means every
+  // equipped item vanishes from the sheet the moment this shipped,
+  // not just the new DR/SR/class-skill fields, so a missing-column
+  // error here specifically retries without them instead of giving up.
+  const LOOT_COLUMNS =
+    "id,name,description,count,type,assigned_to,assigned_character_id,details,effects,damage_reduction,spell_resistance,class_skill_grants,created_by,updated_at";
+  const LOOT_COLUMNS_LEGACY =
+    "id,name,description,count,type,assigned_to,assigned_character_id,details,effects,created_by,updated_at";
+
+  function isMissingLootColumnsError(error) {
+    if (!error) return false;
+    if (error.code === "42703") return true;
+    const message = String(error.message || "");
+    return (
+      message.includes("damage_reduction") ||
+      message.includes("spell_resistance") ||
+      message.includes("class_skill_grants")
+    );
+  }
+
   async function loadLootItems(contextKey = getSelectedContextKey()) {
     const user = await getUser();
     if (!user) return [];
 
     const context = normalizeContext(contextKey);
-    const { data, error } = await client
+    let { data, error } = await client
       .from("game_loot")
-      .select(
-        "id,name,description,count,type,assigned_to,assigned_character_id,details,effects,created_by,updated_at",
-      )
+      .select(LOOT_COLUMNS)
       .eq("context_key", context.contextKey)
       .order("updated_at", { ascending: false });
+
+    if (isMissingLootColumnsError(error)) {
+      const fallback = await client
+        .from("game_loot")
+        .select(LOOT_COLUMNS_LEGACY)
+        .eq("context_key", context.contextKey)
+        .order("updated_at", { ascending: false });
+      data = fallback.data;
+      error = fallback.error;
+    }
 
     if (error) {
       console.error(error);
       return [];
     }
 
-    return data || [];
+    return (data || []).map(normalizeLootItem);
   }
 
   async function saveLootItem(item, contextKey = getSelectedContextKey()) {
@@ -1957,6 +2045,15 @@
       assigned_character_id: item.assignedCharacterId || null,
       details: item.details || {},
       effects: Array.isArray(item.effects) ? item.effects : [],
+      damage_reduction: Array.isArray(item.damageReduction)
+        ? item.damageReduction
+        : [],
+      spell_resistance: Array.isArray(item.spellResistance)
+        ? item.spellResistance
+        : [],
+      class_skill_grants: Array.isArray(item.classSkillGrants)
+        ? item.classSkillGrants
+        : [],
       context_key: context.contextKey,
       game_id: context.gameId,
       updated_at: new Date().toISOString(),
@@ -1966,18 +2063,29 @@
       ? client.from("game_loot").update(payload).eq("id", item.id)
       : client.from("game_loot").insert({ ...payload, created_by: user.id });
 
-    const { data, error } = await query
-      .select(
-        "id,name,description,count,type,assigned_to,assigned_character_id,details,effects,created_by,updated_at",
-      )
-      .single();
+    let { data, error } = await query.select(LOOT_COLUMNS).single();
+
+    if (isMissingLootColumnsError(error)) {
+      const legacyPayload = { ...payload };
+      delete legacyPayload.damage_reduction;
+      delete legacyPayload.spell_resistance;
+      delete legacyPayload.class_skill_grants;
+      const legacyQuery = item.id
+        ? client.from("game_loot").update(legacyPayload).eq("id", item.id)
+        : client
+            .from("game_loot")
+            .insert({ ...legacyPayload, created_by: user.id });
+      const fallback = await legacyQuery.select(LOOT_COLUMNS_LEGACY).single();
+      data = fallback.data;
+      error = fallback.error;
+    }
 
     if (error) {
       console.error(error);
       return null;
     }
 
-    return data;
+    return normalizeLootItem(data);
   }
 
   async function deleteLootItem(itemId) {

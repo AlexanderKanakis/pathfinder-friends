@@ -1,3 +1,12 @@
+// wondrous.js (a plain `<script>` global, `wItems`) was converted to
+// data/wondrous.json -- everything below that used to read that global
+// synchronously now reads this cache instead, populated once at load
+// via scripts/item-data.js (which must load before this file).
+let wondrousItemsCache = [];
+(async function preloadWondrousItems() {
+  wondrousItemsCache = (await window.PFItemData?.loadWondrousItems()) || [];
+})();
+
 //========================================
 // Tensor Flow
 //========================================
@@ -18,7 +27,7 @@ async function embedItemsInBatches(batchSize = 100) {
 
   test = [];
   for (var i = 0; i < 2000; i++) {
-    test.push(wItems[i]);
+    test.push(wondrousItemsCache[i]);
   }
 
   for (let i = 0; i < test.length; i += batchSize) {
@@ -119,7 +128,7 @@ async function findMostSimilar(wItems, description, topN = 20, batchSize = 20) {
 }
 
 async function exportVectors() {
-  console.log(wItems.length);
+  console.log(wondrousItemsCache.length);
   // Step 1: Get your tensor embeddings
   const vectoredItems = await embedItemsInBatches();
 
@@ -203,7 +212,7 @@ var bools = [
 
 function getDistinctItemsByName() {
   const seen = new Set();
-  return wItems.filter((item) => {
+  return wondrousItemsCache.filter((item) => {
     if (seen.has(item.name)) return false;
     seen.add(item.name);
     return true;
@@ -302,14 +311,16 @@ function searchWItem() {
     return;
   }
 
-  const filteredItems = wItems.filter(
+  const filteredItems = wondrousItemsCache.filter(
     (item) =>
       findInType(item, filteredItemTypes) &&
       findInSlot(item, filteredItemSlots) &&
       (findInName(item, term) || findInDesc(item, term)),
   );
   for (const filteredItem of filteredItems) {
-    const index = wItems.findIndex((item) => item.name === filteredItem.name);
+    const index = wondrousItemsCache.findIndex(
+      (item) => item.name === filteredItem.name,
+    );
     const itemUnit = document.createElement("div");
     itemUnit.setAttribute(
       "class",
