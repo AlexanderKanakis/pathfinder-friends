@@ -2729,8 +2729,16 @@ function render3DPreview() {
       })()
     : "";
 
+  // Same faint per-cell grid the 2D stage draws (see .map-stage in
+  // css/map.css) -- two repeating 1px hairline gradients stacked on
+  // top of the actual art. Reused here (base plate + every block's
+  // top face) so the 3D preview still gives a sense of individual
+  // cells instead of going fully blank/textureless between the
+  // (now much more restrained) region rims.
+  const GRID_LINES_CSS = `linear-gradient(to right, rgba(255,255,255,0.18) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.18) 1px, transparent 1px)`;
+
   const baseHtml = `
-    <div class="map-3d-base" style="width:${mapW}px;height:${mapH}px;background-image:${bgCss};${baseMaskCss}"></div>
+    <div class="map-3d-base" style="width:${mapW}px;height:${mapH}px;background-image:${GRID_LINES_CSS},${bgCss};background-size:${MAP_3D_CELL_PX}px ${MAP_3D_CELL_PX}px,${MAP_3D_CELL_PX}px ${MAP_3D_CELL_PX}px,${mapW}px ${mapH}px;background-repeat:repeat,repeat,no-repeat;${baseMaskCss}"></div>
   `;
 
   // A raised block's walls hinge at the top face and fold DOWN to
@@ -2762,12 +2770,17 @@ function render3DPreview() {
     const h = gh * MAP_3D_CELL_PX;
     const wallPx = Math.abs(z);
     const pitClass = z < 0 ? " pit" : "";
-    const rimColor = escapeHtml(color || "#61dafb");
-    const rim = `1.5px solid ${rimColor}`;
+    const rawColor = escapeHtml(color || "#61dafb");
+    // Faded to ~60% alpha (an 8-digit hex works wherever this app
+    // already assumes a hex color, i.e. everywhere shape.color comes
+    // from) -- a full-strength saturated rim on every region read as
+    // "glowing" even without the earlier box-shadow blur.
+    const rimColor = /^#[0-9a-f]{6}$/i.test(rawColor) ? `${rawColor}99` : rawColor;
+    const rim = `1px solid ${rimColor}`;
     const borderCss = `border-top:${sides.north ? rim : "none"};border-bottom:${sides.south ? rim : "none"};border-left:${sides.west ? rim : "none"};border-right:${sides.east ? rim : "none"};`;
     return `
       <div class="map-3d-block${pitClass}" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;">
-        <div class="map-3d-block-top" style="transform:translateZ(${z}px);background-image:${bgCss};background-size:${mapW}px ${mapH}px;background-position:-${x}px -${y}px;${borderCss}">
+        <div class="map-3d-block-top" style="transform:translateZ(${z}px);background-image:${GRID_LINES_CSS},${bgCss};background-size:${MAP_3D_CELL_PX}px ${MAP_3D_CELL_PX}px,${MAP_3D_CELL_PX}px ${MAP_3D_CELL_PX}px,${mapW}px ${mapH}px;background-position:0 0,0 0,-${x}px -${y}px;background-repeat:repeat,repeat,no-repeat;${borderCss}">
           ${sides.south ? `<div class="map-3d-wall map-3d-wall-south" style="height:${wallPx}px;"></div>` : ""}
           ${sides.north ? `<div class="map-3d-wall map-3d-wall-north" style="height:${wallPx}px;"></div>` : ""}
           ${sides.east ? `<div class="map-3d-wall map-3d-wall-east" style="width:${wallPx}px;"></div>` : ""}
