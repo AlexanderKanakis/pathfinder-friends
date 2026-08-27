@@ -14432,7 +14432,20 @@
       "cost": "750 gp",
       "description": "</h3>Protective symbols adorn this magic ring. It functions as a <a href=\"MagicWondrousDisplay.aspx?FinalName=Cloak of Resistance1\" style=\"text-decoration:underline\"><i>cloak of resistance</i></a> with an equivalent bonus."
     },
-    "link": "http://www.aonprd.com/MagicRingsDisplay.aspx?FinalName=Ring of Resistance1"
+    "link": "http://www.aonprd.com/MagicRingsDisplay.aspx?FinalName=Ring of Resistance1",
+    "effects": [
+      {
+        "stat": "all saves",
+        "value": 1,
+        "type": "resistance",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      }
+    ],
+    "damageReduction": [],
+    "spellResistance": [],
+    "classSkillGrants": []
   },
   {
     "name": "Ring of Resistance +2",
@@ -14447,7 +14460,20 @@
       "cost": "3,000 gp",
       "description": "</h3>Protective symbols adorn this magic ring. It functions as a <a href=\"MagicWondrousDisplay.aspx?FinalName=Cloak of Resistance1\" style=\"text-decoration:underline\"><i>cloak of resistance</i></a> with an equivalent bonus."
     },
-    "link": "http://www.aonprd.com/MagicRingsDisplay.aspx?FinalName=Ring of Resistance1"
+    "link": "http://www.aonprd.com/MagicRingsDisplay.aspx?FinalName=Ring of Resistance1",
+    "effects": [
+      {
+        "stat": "all saves",
+        "value": 2,
+        "type": "resistance",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      }
+    ],
+    "damageReduction": [],
+    "spellResistance": [],
+    "classSkillGrants": []
   },
   {
     "name": "Ring of Resistance +3",
@@ -14462,7 +14488,20 @@
       "cost": "6,750 gp",
       "description": "</h3>Protective symbols adorn this magic ring. It functions as a <a href=\"MagicWondrousDisplay.aspx?FinalName=Cloak of Resistance1\" style=\"text-decoration:underline\"><i>cloak of resistance</i></a> with an equivalent bonus."
     },
-    "link": "http://www.aonprd.com/MagicRingsDisplay.aspx?FinalName=Ring of Resistance1"
+    "link": "http://www.aonprd.com/MagicRingsDisplay.aspx?FinalName=Ring of Resistance1",
+    "effects": [
+      {
+        "stat": "all saves",
+        "value": 3,
+        "type": "resistance",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      }
+    ],
+    "damageReduction": [],
+    "spellResistance": [],
+    "classSkillGrants": []
   },
   {
     "name": "Ring of Resistance +4",
@@ -14477,7 +14516,20 @@
       "cost": "12,000 gp",
       "description": "</h3>Protective symbols adorn this magic ring. It functions as a <a href=\"MagicWondrousDisplay.aspx?FinalName=Cloak of Resistance1\" style=\"text-decoration:underline\"><i>cloak of resistance</i></a> with an equivalent bonus."
     },
-    "link": "http://www.aonprd.com/MagicRingsDisplay.aspx?FinalName=Ring of Resistance1"
+    "link": "http://www.aonprd.com/MagicRingsDisplay.aspx?FinalName=Ring of Resistance1",
+    "effects": [
+      {
+        "stat": "all saves",
+        "value": 4,
+        "type": "resistance",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      }
+    ],
+    "damageReduction": [],
+    "spellResistance": [],
+    "classSkillGrants": []
   },
   {
     "name": "Ring of Resistance +5",
@@ -14492,7 +14544,20 @@
       "cost": "17,750 gp",
       "description": "</h3>Protective symbols adorn this magic ring. It functions as a <a href=\"MagicWondrousDisplay.aspx?FinalName=Cloak of Resistance1\" style=\"text-decoration:underline\"><i>cloak of resistance</i></a> with an equivalent bonus."
     },
-    "link": "http://www.aonprd.com/MagicRingsDisplay.aspx?FinalName=Ring of Resistance1"
+    "link": "http://www.aonprd.com/MagicRingsDisplay.aspx?FinalName=Ring of Resistance1",
+    "effects": [
+      {
+        "stat": "all saves",
+        "value": 5,
+        "type": "resistance",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      }
+    ],
+    "damageReduction": [],
+    "spellResistance": [],
+    "classSkillGrants": []
   },
   {
     "name": "Deadeye's Spotter Ring",
@@ -14563,7 +14628,20 @@
       "cost": "1,000 gp",
       "description": "</h3>This ring offers continual magical protection in the form of a deflection bonus of +1 to +5 to AC."
     },
-    "link": "http://www.aonprd.com/MagicRingsDisplay.aspx?FinalName=Ring of Protection1"
+    "link": "http://www.aonprd.com/MagicRingsDisplay.aspx?FinalName=Ring of Protection1",
+    "effects": [
+      {
+        "stat": "ac",
+        "value": 1,
+        "type": "deflection",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      }
+    ],
+    "damageReduction": [],
+    "spellResistance": [],
+    "classSkillGrants": []
   },
   {
     "name": "Ring of Protection +2",
@@ -14578,7 +14656,20 @@
       "cost": "4,000 gp",
       "description": "</h3>This ring offers continual magical protection in the form of a deflection bonus of +1 to +5 to AC."
     },
-    "link": "http://www.aonprd.com/MagicRingsDisplay.aspx?FinalName=Ring of Protection1"
+    "link": "http://www.aonprd.com/MagicRingsDisplay.aspx?FinalName=Ring of Protection1",
+    "effects": [
+      {
+        "stat": "ac",
+        "value": 2,
+        "type": "deflection",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      }
+    ],
+    "damageReduction": [],
+    "spellResistance": [],
+    "classSkillGrants": []
   },
   {
     "name": "Ring of Protection +3",
@@ -14593,7 +14684,20 @@
       "cost": "9,000 gp",
       "description": "</h3>This ring offers continual magical protection in the form of a deflection bonus of +1 to +5 to AC."
     },
-    "link": "http://www.aonprd.com/MagicRingsDisplay.aspx?FinalName=Ring of Protection1"
+    "link": "http://www.aonprd.com/MagicRingsDisplay.aspx?FinalName=Ring of Protection1",
+    "effects": [
+      {
+        "stat": "all saves",
+        "value": 3,
+        "type": "deflection",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      }
+    ],
+    "damageReduction": [],
+    "spellResistance": [],
+    "classSkillGrants": []
   },
   {
     "name": "Ring of Protection +4",
@@ -14608,7 +14712,20 @@
       "cost": "16,000 gp",
       "description": "</h3>This ring offers continual magical protection in the form of a deflection bonus of +1 to +5 to AC."
     },
-    "link": "http://www.aonprd.com/MagicRingsDisplay.aspx?FinalName=Ring of Protection1"
+    "link": "http://www.aonprd.com/MagicRingsDisplay.aspx?FinalName=Ring of Protection1",
+    "effects": [
+      {
+        "stat": "ac",
+        "value": 4,
+        "type": "deflection",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      }
+    ],
+    "damageReduction": [],
+    "spellResistance": [],
+    "classSkillGrants": []
   },
   {
     "name": "Ring of Protection +5",
@@ -14623,7 +14740,20 @@
       "cost": "25,000 gp",
       "description": "</h3>This ring offers continual magical protection in the form of a deflection bonus of +1 to +5 to AC."
     },
-    "link": "http://www.aonprd.com/MagicRingsDisplay.aspx?FinalName=Ring of Protection1"
+    "link": "http://www.aonprd.com/MagicRingsDisplay.aspx?FinalName=Ring of Protection1",
+    "effects": [
+      {
+        "stat": "ac",
+        "value": 5,
+        "type": "resistance",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      }
+    ],
+    "damageReduction": [],
+    "spellResistance": [],
+    "classSkillGrants": []
   },
   {
     "name": "Bloodletting Thimble",
@@ -15352,7 +15482,20 @@
       "cost": "4,000 gp",
       "description": "</h3>These rings are said to have first been forged in Rahadoum by the Council of Elders to help root out the hidden faithful and other practitioners of the divine. A <i>ring of the godless </i>grants a luck bonus on saving throws against divine spells. This bonus does not apply to spell-like or supernatural abilities unless they are class abilities of a divine spellcasting class, such as channel energy or domain powers, or unless they are used by a creature that has been called, created, or summoned by divine magic. The wearer’s spell resistance (if any) increases by an amount equal to the ring’s luck bonus, though this increase applies only against divine spells (and spell-like abilities as described above).<br/><br/> A <i>ring of the godless </i>also allows the wearer to use <i>detect magic </i>at will, though it detects only divine magic. In addition, the wearer can use a specialized form of <i>arcane sight </i>a number of times per day equal to the ring’s luck bonus. This ability can be activated as a swift action, its effect lasts until the end of the wearer’s turn, and it detects only divine magic or divine spellcasting ability."
     },
-    "link": "http://www.aonprd.com/MagicRingsDisplay.aspx?FinalName=Ring of the Godless1"
+    "link": "http://www.aonprd.com/MagicRingsDisplay.aspx?FinalName=Ring of the Godless1",
+    "effects": [
+      {
+        "stat": "strength",
+        "value": 0,
+        "type": "untyped",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      }
+    ],
+    "damageReduction": [],
+    "spellResistance": [],
+    "classSkillGrants": []
   },
   {
     "name": "Ring of the Godless +2",
@@ -17050,7 +17193,11 @@
       "cost": "1,000 gp",
       "description": "</h3>This thin, black canvas belt is typically tied loosely about the waist to secure a robe, kimono, or martial artist’s dobok. Three times per day as a free action, the wearer can select a combat maneuver and receive an enhancement bonus of +1 to +5 on combat maneuver checks for this combat maneuver and a +1 to +5 bonus to CMD when defending against this maneuver for 1 round. Additionally, when worn by a brawler, the belt grants one additional use of her martial flexibility class feature each day."
     },
-    "link": "http://www.aonprd.com/MagicWondrousDisplay.aspx?FinalName=Belt of Superior Maneuvers1"
+    "link": "http://www.aonprd.com/MagicWondrousDisplay.aspx?FinalName=Belt of Superior Maneuvers1",
+    "effects": [],
+    "damageReduction": [],
+    "spellResistance": [],
+    "classSkillGrants": []
   },
   {
     "name": "Belt of Superior Maneuvers +2",
@@ -17235,9 +17382,22 @@
       "requirements": "Craft Wondrous Item, bear's endurance",
       "bonus": "2",
       "cost": "2,000 gp",
-      "description": "</h3>This belt’s golden buckle depicts a\r bear’s head. The belt grants the wearer\r an enhancement bonus to Constitution\r of +2, +4, or +6. Treat this as a temporary\r ability bonus for the first 24 hours the belt is worn."
+      "description": "</h3>This belt’s golden buckle depicts a\n bear’s head. The belt grants the wearer\n an enhancement bonus to Constitution\n of +2, +4, or +6. Treat this as a temporary\n ability bonus for the first 24 hours the belt is worn."
     },
-    "link": "http://www.aonprd.com/MagicWondrousDisplay.aspx?FinalName=Belt of Mighty Constitution2"
+    "link": "http://www.aonprd.com/MagicWondrousDisplay.aspx?FinalName=Belt of Mighty Constitution2",
+    "effects": [
+      {
+        "stat": "constitution",
+        "value": 2,
+        "type": "enhancement",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      }
+    ],
+    "damageReduction": [],
+    "spellResistance": [],
+    "classSkillGrants": []
   },
   {
     "name": "Belt of Mighty Constitution +4",
@@ -17250,9 +17410,22 @@
       "requirements": "Craft Wondrous Item, bear's endurance",
       "bonus": "4",
       "cost": "8,000 gp",
-      "description": "</h3>This belt’s golden buckle depicts a\r bear’s head. The belt grants the wearer\r an enhancement bonus to Constitution\r of +2, +4, or +6. Treat this as a temporary\r ability bonus for the first 24 hours the belt is worn."
+      "description": "</h3>This belt’s golden buckle depicts a\n bear’s head. The belt grants the wearer\n an enhancement bonus to Constitution\n of +2, +4, or +6. Treat this as a temporary\n ability bonus for the first 24 hours the belt is worn."
     },
-    "link": "http://www.aonprd.com/MagicWondrousDisplay.aspx?FinalName=Belt of Mighty Constitution2"
+    "link": "http://www.aonprd.com/MagicWondrousDisplay.aspx?FinalName=Belt of Mighty Constitution2",
+    "effects": [
+      {
+        "stat": "constitution",
+        "value": 4,
+        "type": "enhancement",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      }
+    ],
+    "damageReduction": [],
+    "spellResistance": [],
+    "classSkillGrants": []
   },
   {
     "name": "Belt of Mighty Constitution +6",
@@ -17265,9 +17438,22 @@
       "requirements": "Craft Wondrous Item, bear's endurance",
       "bonus": "6",
       "cost": "18,000 gp",
-      "description": "</h3>This belt’s golden buckle depicts a\r bear’s head. The belt grants the wearer\r an enhancement bonus to Constitution\r of +2, +4, or +6. Treat this as a temporary\r ability bonus for the first 24 hours the belt is worn."
+      "description": "</h3>This belt’s golden buckle depicts a\n bear’s head. The belt grants the wearer\n an enhancement bonus to Constitution\n of +2, +4, or +6. Treat this as a temporary\n ability bonus for the first 24 hours the belt is worn."
     },
-    "link": "http://www.aonprd.com/MagicWondrousDisplay.aspx?FinalName=Belt of Mighty Constitution2"
+    "link": "http://www.aonprd.com/MagicWondrousDisplay.aspx?FinalName=Belt of Mighty Constitution2",
+    "effects": [
+      {
+        "stat": "constitution",
+        "value": 6,
+        "type": "enhancement",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      }
+    ],
+    "damageReduction": [],
+    "spellResistance": [],
+    "classSkillGrants": []
   },
   {
     "name": "Gloves of Dexterity +2",
@@ -17280,9 +17466,22 @@
       "requirements": "Craft Wondrous Item, cat's grace",
       "bonus": "2",
       "cost": "2,000 gp",
-      "description": "</h3> The gloves grant the wearer\r an enhancement bonus to Dexterity\r of +2, +4, or +6. Treat this as a temporary\r ability bonus for the first 24 hours the gloves are worn."
+      "description": "</h3> The gloves grant the wearer\n an enhancement bonus to Dexterity\n of +2, +4, or +6. Treat this as a temporary\n ability bonus for the first 24 hours the gloves are worn."
     },
-    "link": "http://www.aonprd.com/MagicWondrousDisplay.aspx?FinalName=Belt of Mighty Constitution2"
+    "link": "http://www.aonprd.com/MagicWondrousDisplay.aspx?FinalName=Belt of Mighty Constitution2",
+    "effects": [
+      {
+        "stat": "dexterity",
+        "value": 2,
+        "type": "enhancement",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      }
+    ],
+    "damageReduction": [],
+    "spellResistance": [],
+    "classSkillGrants": []
   },
   {
     "name": "Gloves of Dexterity +4",
@@ -17295,9 +17494,22 @@
       "requirements": "Craft Wondrous Item, cat's grace",
       "bonus": "4",
       "cost": "8,000 gp",
-      "description": "</h3> The gloves grant the wearer\r an enhancement bonus to Dexterity\r of +2, +4, or +6. Treat this as a temporary\r ability bonus for the first 24 hours the gloves are worn."
+      "description": "</h3> The gloves grant the wearer\n an enhancement bonus to Dexterity\n of +2, +4, or +6. Treat this as a temporary\n ability bonus for the first 24 hours the gloves are worn."
     },
-    "link": "http://www.aonprd.com/MagicWondrousDisplay.aspx?FinalName=Belt of Mighty Constitution2"
+    "link": "http://www.aonprd.com/MagicWondrousDisplay.aspx?FinalName=Belt of Mighty Constitution2",
+    "effects": [
+      {
+        "stat": "dexterity",
+        "value": 4,
+        "type": "enhancement",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      }
+    ],
+    "damageReduction": [],
+    "spellResistance": [],
+    "classSkillGrants": []
   },
   {
     "name": "Gloves of Dexterity +6",
@@ -17310,9 +17522,22 @@
       "requirements": "Craft Wondrous Item, cat's grace",
       "bonus": "6",
       "cost": "18,000 gp",
-      "description": "</h3> The gloves grant the wearer\r an enhancement bonus to Dexterity\r of +2, +4, or +6. Treat this as a temporary\r ability bonus for the first 24 hours the gloves are worn."
+      "description": "</h3> The gloves grant the wearer\n an enhancement bonus to Dexterity\n of +2, +4, or +6. Treat this as a temporary\n ability bonus for the first 24 hours the gloves are worn."
     },
-    "link": "http://www.aonprd.com/MagicWondrousDisplay.aspx?FinalName=Belt of Mighty Constitution2"
+    "link": "http://www.aonprd.com/MagicWondrousDisplay.aspx?FinalName=Belt of Mighty Constitution2",
+    "effects": [
+      {
+        "stat": "dexterity",
+        "value": 6,
+        "type": "enhancement",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      }
+    ],
+    "damageReduction": [],
+    "spellResistance": [],
+    "classSkillGrants": []
   },
   {
     "name": "Belt of Giant Strength +2",
@@ -17325,9 +17550,22 @@
       "requirements": "Craft Wondrous Item, bull's strength",
       "bonus": "2",
       "cost": "2,000 gp",
-      "description": "</h3>This belt is a thick leather affair,\r often decorated with huge metal\r buckles. The belt grants the wearer\r an enhancement bonus to Strength of\r +2, +4, or +6. Treat this as a temporary\r ability bonus for the first 24 hours the belt is worn."
+      "description": "</h3>This belt is a thick leather affair,\n often decorated with huge metal\n buckles. The belt grants the wearer\n an enhancement bonus to Strength of\n +2, +4, or +6. Treat this as a temporary\n ability bonus for the first 24 hours the belt is worn."
     },
-    "link": "http://www.aonprd.com/MagicWondrousDisplay.aspx?FinalName=Belt of Giant Strength2"
+    "link": "http://www.aonprd.com/MagicWondrousDisplay.aspx?FinalName=Belt of Giant Strength2",
+    "effects": [
+      {
+        "stat": "strength",
+        "value": 2,
+        "type": "enhancement",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      }
+    ],
+    "damageReduction": [],
+    "spellResistance": [],
+    "classSkillGrants": []
   },
   {
     "name": "Belt of Giant Strength +4",
@@ -17340,9 +17578,22 @@
       "requirements": "Craft Wondrous Item, bull's strength",
       "bonus": "4",
       "cost": "8,000 gp",
-      "description": "</h3>This belt is a thick leather affair,\r often decorated with huge metal\r buckles. The belt grants the wearer\r an enhancement bonus to Strength of\r +2, +4, or +6. Treat this as a temporary\r ability bonus for the first 24 hours the belt is worn."
+      "description": "</h3>This belt is a thick leather affair,\n often decorated with huge metal\n buckles. The belt grants the wearer\n an enhancement bonus to Strength of\n +2, +4, or +6. Treat this as a temporary\n ability bonus for the first 24 hours the belt is worn."
     },
-    "link": "http://www.aonprd.com/MagicWondrousDisplay.aspx?FinalName=Belt of Giant Strength2"
+    "link": "http://www.aonprd.com/MagicWondrousDisplay.aspx?FinalName=Belt of Giant Strength2",
+    "effects": [
+      {
+        "stat": "strength",
+        "value": 4,
+        "type": "enhancement",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      }
+    ],
+    "damageReduction": [],
+    "spellResistance": [],
+    "classSkillGrants": []
   },
   {
     "name": "Belt of Giant Strength +6",
@@ -17355,9 +17606,22 @@
       "requirements": "Craft Wondrous Item, bull's strength",
       "bonus": "6",
       "cost": "18,000 gp",
-      "description": "</h3>This belt is a thick leather affair,\r often decorated with huge metal\r buckles. The belt grants the wearer\r an enhancement bonus to Strength of\r +2, +4, or +6. Treat this as a temporary\r ability bonus for the first 24 hours the belt is worn."
+      "description": "</h3>This belt is a thick leather affair,\n often decorated with huge metal\n buckles. The belt grants the wearer\n an enhancement bonus to Strength of\n +2, +4, or +6. Treat this as a temporary\n ability bonus for the first 24 hours the belt is worn."
     },
-    "link": "http://www.aonprd.com/MagicWondrousDisplay.aspx?FinalName=Belt of Giant Strength2"
+    "link": "http://www.aonprd.com/MagicWondrousDisplay.aspx?FinalName=Belt of Giant Strength2",
+    "effects": [
+      {
+        "stat": "strength",
+        "value": 6,
+        "type": "enhancement",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      }
+    ],
+    "damageReduction": [],
+    "spellResistance": [],
+    "classSkillGrants": []
   },
   {
     "name": "Belt of Incredible Dexterity +2",
@@ -17370,9 +17634,22 @@
       "requirements": "Craft Wondrous Item, cat's grace",
       "bonus": "2",
       "cost": "2,000 gp",
-      "description": "</h3>This belt has a large silver buckle,\r usually depicting the image of a\r tiger. The belt grants the wearer an\r enhancement bonus to Dexterity\r of +2, +4, or +6. Treat this as a\r temporary ability bonus for the first 24 hours the belt is worn."
+      "description": "</h3>This belt has a large silver buckle,\n usually depicting the image of a\n tiger. The belt grants the wearer an\n enhancement bonus to Dexterity\n of +2, +4, or +6. Treat this as a\n temporary ability bonus for the first 24 hours the belt is worn."
     },
-    "link": "http://www.aonprd.com/MagicWondrousDisplay.aspx?FinalName=Belt of Incredible Dexterity2"
+    "link": "http://www.aonprd.com/MagicWondrousDisplay.aspx?FinalName=Belt of Incredible Dexterity2",
+    "effects": [
+      {
+        "stat": "dexterity",
+        "value": 2,
+        "type": "enhancement",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      }
+    ],
+    "damageReduction": [],
+    "spellResistance": [],
+    "classSkillGrants": []
   },
   {
     "name": "Belt of Incredible Dexterity +4",
@@ -17385,9 +17662,22 @@
       "requirements": "Craft Wondrous Item, cat's grace",
       "bonus": "4",
       "cost": "8,000 gp",
-      "description": "</h3>This belt has a large silver buckle,\r usually depicting the image of a\r tiger. The belt grants the wearer an\r enhancement bonus to Dexterity\r of +2, +4, or +6. Treat this as a\r temporary ability bonus for the first 24 hours the belt is worn."
+      "description": "</h3>This belt has a large silver buckle,\n usually depicting the image of a\n tiger. The belt grants the wearer an\n enhancement bonus to Dexterity\n of +2, +4, or +6. Treat this as a\n temporary ability bonus for the first 24 hours the belt is worn."
     },
-    "link": "http://www.aonprd.com/MagicWondrousDisplay.aspx?FinalName=Belt of Incredible Dexterity2"
+    "link": "http://www.aonprd.com/MagicWondrousDisplay.aspx?FinalName=Belt of Incredible Dexterity2",
+    "effects": [
+      {
+        "stat": "dexterity",
+        "value": 4,
+        "type": "untyped",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      }
+    ],
+    "damageReduction": [],
+    "spellResistance": [],
+    "classSkillGrants": []
   },
   {
     "name": "Belt of Incredible Dexterity +6",
@@ -17400,9 +17690,22 @@
       "requirements": "Craft Wondrous Item, cat's grace",
       "bonus": "6",
       "cost": "18,000 gp",
-      "description": "</h3>This belt has a large silver buckle,\r usually depicting the image of a\r tiger. The belt grants the wearer an\r enhancement bonus to Dexterity\r of +2, +4, or +6. Treat this as a\r temporary ability bonus for the first 24 hours the belt is worn."
+      "description": "</h3>This belt has a large silver buckle,\n usually depicting the image of a\n tiger. The belt grants the wearer an\n enhancement bonus to Dexterity\n of +2, +4, or +6. Treat this as a\n temporary ability bonus for the first 24 hours the belt is worn."
     },
-    "link": "http://www.aonprd.com/MagicWondrousDisplay.aspx?FinalName=Belt of Incredible Dexterity2"
+    "link": "http://www.aonprd.com/MagicWondrousDisplay.aspx?FinalName=Belt of Incredible Dexterity2",
+    "effects": [
+      {
+        "stat": "dexterity",
+        "value": 6,
+        "type": "enhancement",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      }
+    ],
+    "damageReduction": [],
+    "spellResistance": [],
+    "classSkillGrants": []
   },
   {
     "name": "Belt of Teeth",
@@ -17643,7 +17946,7 @@
     "link": "http://www.aonprd.com/MagicWondrousDisplay.aspx?FinalName=Monkey Belt"
   },
   {
-    "name": "Belt of Physical Might +2",
+    "name": "Belt of Physical Might +2 (STR, DEX)",
     "details": {
       "aura": "strong transmutation",
       "cl": "12th",
@@ -17653,12 +17956,105 @@
       "requirements": "Craft Wondrous Item, bear's endurance , bull's strength , and/or cat's grace",
       "bonus": "2",
       "cost": "5,000 gp",
-      "description": "</h3>This belt grants the wearer an\r enhancement bonus to two physical\r ability scores (Strength, Dexterity, or\r Constitution) of +2, +4, or +6. Treat\r this as a temporary ability bonus for\r the first 24 hours the belt is worn. These bonuses are chosen\r when the belt is created and cannot be changed."
+      "description": "</h3>This belt grants the wearer an\n enhancement bonus to two physical\n ability scores (Strength, Dexterity, or\n Constitution) of +2, +4, or +6. Treat\n this as a temporary ability bonus for\n the first 24 hours the belt is worn. These bonuses are chosen\n when the belt is created and cannot be changed."
     },
-    "link": "http://www.aonprd.com/MagicWondrousDisplay.aspx?FinalName=Belt of Physical Might2"
+    "link": "http://www.aonprd.com/MagicWondrousDisplay.aspx?FinalName=Belt of Physical Might2",
+    "effects": [
+      {
+        "stat": "strength",
+        "value": 2,
+        "type": "enhancement",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      },
+      {
+        "stat": "dexterity",
+        "value": 2,
+        "type": "enhancement",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      }
+    ],
+    "damageReduction": [],
+    "spellResistance": [],
+    "classSkillGrants": []
   },
   {
-    "name": "Belt of Physical Might +4",
+    "name": "Belt of Physical Might +2 (STR, CON)",
+    "details": {
+      "aura": "strong transmutation",
+      "cl": "12th",
+      "slot": "belt",
+      "price": "10,000 gp",
+      "weight": "1 lb.",
+      "requirements": "Craft Wondrous Item, bear's endurance , bull's strength , and/or cat's grace",
+      "bonus": "2",
+      "cost": "5,000 gp",
+      "description": "</h3>This belt grants the wearer an\n enhancement bonus to two physical\n ability scores (Strength, Dexterity, or\n Constitution) of +2, +4, or +6. Treat\n this as a temporary ability bonus for\n the first 24 hours the belt is worn. These bonuses are chosen\n when the belt is created and cannot be changed."
+    },
+    "link": "http://www.aonprd.com/MagicWondrousDisplay.aspx?FinalName=Belt of Physical Might2",
+    "effects": [
+      {
+        "stat": "strength",
+        "value": 2,
+        "type": "enhancement",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      },
+      {
+        "stat": "constitution",
+        "value": 2,
+        "type": "enhancement",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      }
+    ],
+    "damageReduction": [],
+    "spellResistance": [],
+    "classSkillGrants": []
+  },
+  {
+    "name": "Belt of Physical Might +2 (DEX, CON)",
+    "details": {
+      "aura": "strong transmutation",
+      "cl": "12th",
+      "slot": "belt",
+      "price": "10,000 gp",
+      "weight": "1 lb.",
+      "requirements": "Craft Wondrous Item, bear's endurance , bull's strength , and/or cat's grace",
+      "bonus": "2",
+      "cost": "5,000 gp",
+      "description": "</h3>This belt grants the wearer an\n enhancement bonus to two physical\n ability scores (Strength, Dexterity, or\n Constitution) of +2, +4, or +6. Treat\n this as a temporary ability bonus for\n the first 24 hours the belt is worn. These bonuses are chosen\n when the belt is created and cannot be changed."
+    },
+    "link": "http://www.aonprd.com/MagicWondrousDisplay.aspx?FinalName=Belt of Physical Might2",
+    "effects": [
+      {
+        "stat": "dexterity",
+        "value": 2,
+        "type": "enhancement",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      },
+      {
+        "stat": "constitution",
+        "value": 2,
+        "type": "enhancement",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      }
+    ],
+    "damageReduction": [],
+    "spellResistance": [],
+    "classSkillGrants": []
+  },
+  {
+    "name": "Belt of Physical Might +4 (STR, DEX)",
     "details": {
       "aura": "strong transmutation",
       "cl": "12th",
@@ -17668,12 +18064,105 @@
       "requirements": "Craft Wondrous Item, bear's endurance , bull's strength , and/or cat's grace",
       "bonus": "4",
       "cost": "20,000 gp",
-      "description": "</h3>This belt grants the wearer an\r enhancement bonus to two physical\r ability scores (Strength, Dexterity, or\r Constitution) of +2, +4, or +6. Treat\r this as a temporary ability bonus for\r the first 24 hours the belt is worn. These bonuses are chosen\r when the belt is created and cannot be changed."
+      "description": "</h3>This belt grants the wearer an\n enhancement bonus to two physical\n ability scores (Strength, Dexterity, or\n Constitution) of +2, +4, or +6. Treat\n this as a temporary ability bonus for\n the first 24 hours the belt is worn. These bonuses are chosen\n when the belt is created and cannot be changed."
     },
-    "link": "http://www.aonprd.com/MagicWondrousDisplay.aspx?FinalName=Belt of Physical Might2"
+    "link": "http://www.aonprd.com/MagicWondrousDisplay.aspx?FinalName=Belt of Physical Might2",
+    "effects": [
+      {
+        "stat": "strength",
+        "value": 4,
+        "type": "enhancement",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      },
+      {
+        "stat": "dexterity",
+        "value": 4,
+        "type": "enhancement",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      }
+    ],
+    "damageReduction": [],
+    "spellResistance": [],
+    "classSkillGrants": []
   },
   {
-    "name": "Belt of Physical Might +6",
+    "name": "Belt of Physical Might +4 (STR, CON)",
+    "details": {
+      "aura": "strong transmutation",
+      "cl": "12th",
+      "slot": "belt",
+      "price": "40,000 gp",
+      "weight": "1 lb.",
+      "requirements": "Craft Wondrous Item, bear's endurance , bull's strength , and/or cat's grace",
+      "bonus": "4",
+      "cost": "20,000 gp",
+      "description": "</h3>This belt grants the wearer an\n enhancement bonus to two physical\n ability scores (Strength, Dexterity, or\n Constitution) of +2, +4, or +6. Treat\n this as a temporary ability bonus for\n the first 24 hours the belt is worn. These bonuses are chosen\n when the belt is created and cannot be changed."
+    },
+    "link": "http://www.aonprd.com/MagicWondrousDisplay.aspx?FinalName=Belt of Physical Might2",
+    "effects": [
+      {
+        "stat": "strength",
+        "value": 4,
+        "type": "enhancement",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      },
+      {
+        "stat": "constitution",
+        "value": 4,
+        "type": "enhancement",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      }
+    ],
+    "damageReduction": [],
+    "spellResistance": [],
+    "classSkillGrants": []
+  },
+  {
+    "name": "Belt of Physical Might +4 (DEX, CON)",
+    "details": {
+      "aura": "strong transmutation",
+      "cl": "12th",
+      "slot": "belt",
+      "price": "40,000 gp",
+      "weight": "1 lb.",
+      "requirements": "Craft Wondrous Item, bear's endurance , bull's strength , and/or cat's grace",
+      "bonus": "4",
+      "cost": "20,000 gp",
+      "description": "</h3>This belt grants the wearer an\n enhancement bonus to two physical\n ability scores (Strength, Dexterity, or\n Constitution) of +2, +4, or +6. Treat\n this as a temporary ability bonus for\n the first 24 hours the belt is worn. These bonuses are chosen\n when the belt is created and cannot be changed."
+    },
+    "link": "http://www.aonprd.com/MagicWondrousDisplay.aspx?FinalName=Belt of Physical Might2",
+    "effects": [
+      {
+        "stat": "dexterity",
+        "value": 4,
+        "type": "enhancement",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      },
+      {
+        "stat": "constitution",
+        "value": 4,
+        "type": "enhancement",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      }
+    ],
+    "damageReduction": [],
+    "spellResistance": [],
+    "classSkillGrants": []
+  },
+  {
+    "name": "Belt of Physical Might +6 (STR, DEX)",
     "details": {
       "aura": "strong transmutation",
       "cl": "12th",
@@ -17683,9 +18172,102 @@
       "requirements": "Craft Wondrous Item, bear's endurance , bull's strength , and/or cat's grace",
       "bonus": "6",
       "cost": "45,000 gp",
-      "description": "</h3>This belt grants the wearer an\r enhancement bonus to two physical\r ability scores (Strength, Dexterity, or\r Constitution) of +2, +4, or +6. Treat\r this as a temporary ability bonus for\r the first 24 hours the belt is worn. These bonuses are chosen\r when the belt is created and cannot be changed."
+      "description": "</h3>This belt grants the wearer an\n enhancement bonus to two physical\n ability scores (Strength, Dexterity, or\n Constitution) of +2, +4, or +6. Treat\n this as a temporary ability bonus for\n the first 24 hours the belt is worn. These bonuses are chosen\n when the belt is created and cannot be changed."
     },
-    "link": "http://www.aonprd.com/MagicWondrousDisplay.aspx?FinalName=Belt of Physical Might2"
+    "link": "http://www.aonprd.com/MagicWondrousDisplay.aspx?FinalName=Belt of Physical Might2",
+    "effects": [
+      {
+        "stat": "strength",
+        "value": 6,
+        "type": "enhancement",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      },
+      {
+        "stat": "dexterity",
+        "value": 6,
+        "type": "enhancement",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      }
+    ],
+    "damageReduction": [],
+    "spellResistance": [],
+    "classSkillGrants": []
+  },
+  {
+    "name": "Belt of Physical Might +6 (STR, CON)",
+    "details": {
+      "aura": "strong transmutation",
+      "cl": "12th",
+      "slot": "belt",
+      "price": "90,000 gp",
+      "weight": "1 lb.",
+      "requirements": "Craft Wondrous Item, bear's endurance , bull's strength , and/or cat's grace",
+      "bonus": "6",
+      "cost": "45,000 gp",
+      "description": "</h3>This belt grants the wearer an\n enhancement bonus to two physical\n ability scores (Strength, Dexterity, or\n Constitution) of +2, +4, or +6. Treat\n this as a temporary ability bonus for\n the first 24 hours the belt is worn. These bonuses are chosen\n when the belt is created and cannot be changed."
+    },
+    "link": "http://www.aonprd.com/MagicWondrousDisplay.aspx?FinalName=Belt of Physical Might2",
+    "effects": [
+      {
+        "stat": "strength",
+        "value": 6,
+        "type": "enhancement",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      },
+      {
+        "stat": "constitution",
+        "value": 6,
+        "type": "enhancement",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      }
+    ],
+    "damageReduction": [],
+    "spellResistance": [],
+    "classSkillGrants": []
+  },
+  {
+    "name": "Belt of Physical Might +6 (DEX, CON)",
+    "details": {
+      "aura": "strong transmutation",
+      "cl": "12th",
+      "slot": "belt",
+      "price": "90,000 gp",
+      "weight": "1 lb.",
+      "requirements": "Craft Wondrous Item, bear's endurance , bull's strength , and/or cat's grace",
+      "bonus": "6",
+      "cost": "45,000 gp",
+      "description": "</h3>This belt grants the wearer an\n enhancement bonus to two physical\n ability scores (Strength, Dexterity, or\n Constitution) of +2, +4, or +6. Treat\n this as a temporary ability bonus for\n the first 24 hours the belt is worn. These bonuses are chosen\n when the belt is created and cannot be changed."
+    },
+    "link": "http://www.aonprd.com/MagicWondrousDisplay.aspx?FinalName=Belt of Physical Might2",
+    "effects": [
+      {
+        "stat": "strength",
+        "value": 6,
+        "type": "enhancement",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      },
+      {
+        "stat": "dexterity",
+        "value": 6,
+        "type": "enhancement",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      }
+    ],
+    "damageReduction": [],
+    "spellResistance": [],
+    "classSkillGrants": []
   },
   {
     "name": "Belt of the Weasel",
@@ -17880,9 +18462,38 @@
       "requirements": "Craft Wondrous Item, bear's endurance , bull's strength , cat's grace",
       "bonus": "2",
       "cost": "8,000 gp",
-      "description": "</h3>This belt has a large platinum buckle\r and grants the wearer an enhancement\r bonus to all physical ability scores\r (Strength, Dexterity, and Constitution)\r of +2, +4, or +6. Treat this as a temporary\r ability bonus for the first 24 hours the belt is worn."
+      "description": "</h3>This belt has a large platinum buckle\n and grants the wearer an enhancement\n bonus to all physical ability scores\n (Strength, Dexterity, and Constitution)\n of +2, +4, or +6. Treat this as a temporary\n ability bonus for the first 24 hours the belt is worn."
     },
-    "link": "http://www.aonprd.com/MagicWondrousDisplay.aspx?FinalName=Belt of Physical Perfection2"
+    "link": "http://www.aonprd.com/MagicWondrousDisplay.aspx?FinalName=Belt of Physical Perfection2",
+    "effects": [
+      {
+        "stat": "strength",
+        "value": 2,
+        "type": "enhancement",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      },
+      {
+        "stat": "dexterity",
+        "value": 2,
+        "type": "enhancement",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      },
+      {
+        "stat": "constitution",
+        "value": 2,
+        "type": "enhancement",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      }
+    ],
+    "damageReduction": [],
+    "spellResistance": [],
+    "classSkillGrants": []
   },
   {
     "name": "Belt of Physical Perfection +4",
@@ -17895,9 +18506,38 @@
       "requirements": "Craft Wondrous Item, bear's endurance , bull's strength , cat's grace",
       "bonus": "4",
       "cost": "32,000 gp",
-      "description": "</h3>This belt has a large platinum buckle\r and grants the wearer an enhancement\r bonus to all physical ability scores\r (Strength, Dexterity, and Constitution)\r of +2, +4, or +6. Treat this as a temporary\r ability bonus for the first 24 hours the belt is worn."
+      "description": "</h3>This belt has a large platinum buckle\n and grants the wearer an enhancement\n bonus to all physical ability scores\n (Strength, Dexterity, and Constitution)\n of +2, +4, or +6. Treat this as a temporary\n ability bonus for the first 24 hours the belt is worn."
     },
-    "link": "http://www.aonprd.com/MagicWondrousDisplay.aspx?FinalName=Belt of Physical Perfection2"
+    "link": "http://www.aonprd.com/MagicWondrousDisplay.aspx?FinalName=Belt of Physical Perfection2",
+    "effects": [
+      {
+        "stat": "strength",
+        "value": 4,
+        "type": "enhancement",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      },
+      {
+        "stat": "dexterity",
+        "value": 4,
+        "type": "enhancement",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      },
+      {
+        "stat": "constitution",
+        "value": 4,
+        "type": "enhancement",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      }
+    ],
+    "damageReduction": [],
+    "spellResistance": [],
+    "classSkillGrants": []
   },
   {
     "name": "Belt of Physical Perfection +6",
@@ -17910,9 +18550,38 @@
       "requirements": "Craft Wondrous Item, bear's endurance , bull's strength , cat's grace",
       "bonus": "6",
       "cost": "77,000 gp",
-      "description": "</h3>This belt has a large platinum buckle\r and grants the wearer an enhancement\r bonus to all physical ability scores\r (Strength, Dexterity, and Constitution)\r of +2, +4, or +6. Treat this as a temporary\r ability bonus for the first 24 hours the belt is worn."
+      "description": "</h3>This belt has a large platinum buckle\n and grants the wearer an enhancement\n bonus to all physical ability scores\n (Strength, Dexterity, and Constitution)\n of +2, +4, or +6. Treat this as a temporary\n ability bonus for the first 24 hours the belt is worn."
     },
-    "link": "http://www.aonprd.com/MagicWondrousDisplay.aspx?FinalName=Belt of Physical Perfection2"
+    "link": "http://www.aonprd.com/MagicWondrousDisplay.aspx?FinalName=Belt of Physical Perfection2",
+    "effects": [
+      {
+        "stat": "strength",
+        "value": 6,
+        "type": "enhancement",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      },
+      {
+        "stat": "dexterity",
+        "value": 6,
+        "type": "enhancement",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      },
+      {
+        "stat": "constitution",
+        "value": 6,
+        "type": "enhancement",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      }
+    ],
+    "damageReduction": [],
+    "spellResistance": [],
+    "classSkillGrants": []
   },
   {
     "name": "Belt of Impossible Action (Vudrani)",
@@ -18331,9 +19000,13 @@
       "bonus": "1",
       "requirements": "Craft Wondrous Item, greater magic fang , creator's caster level must be at least three times the bodywrap's bonus, plus any requirements of the melee weapon special abilities",
       "cost": "1,500 gp",
-      "description": "</h3>This long cloth is wrapped around the chest multiple times\r like a bandage. Once per round, the wearer may add an\r enhancement bonus of +1 to +5 on one attack and damage\r roll for an unarmed strike or natural attack (for one specific\r attack, not all attacks made with an unarmed strike that\r round). The wearer may use this item an additional time per\r round when his BAB reaches +6, +11, and +16.<br/><br/>\r Choosing to enhance an unarmed strike is not an action\r and may occur when it is not the wearer’s turn (such as when\r making an attack of opportunity). The wearer must decide\r to use the item before the attack roll is made, but does not\r have to expend all uses at the same time. For example, if the\r wearer can use the item twice per round, he can use it once\r on his turn when making an attack and save the second for\r the possibility of making an attack of opportunity.<br/><br/>\r Additionally, the bodywrap can grant melee weapon\r special abilities to a creature’s unarmed attacks, so long\r as those special abilities to be added apply to unarmed\r attacks. See Table 3–8: Melee Weapon Special Abilities\r (page 137) for a list of abilities. Special abilities count as\r additional bonuses for determining the market value of\r the item, but do not modify attack or damage bonuses.\r Any special abilities are set at the time of creation. A <i>bodywrap of mighty strikes</i> cannot have a modified\r bonus (enhancement bonus plus special ability bonus\r equivalents) higher than +7. Unlike an<i> amulet of mighty\r fists</i>, a bodywrap needs to have a +1 enhancement bonus\r to grant a melee weapon special ability."
+      "description": "</h3>This long cloth is wrapped around the chest multiple times\n like a bandage. Once per round, the wearer may add an\n enhancement bonus of +1 to +5 on one attack and damage\n roll for an unarmed strike or natural attack (for one specific\n attack, not all attacks made with an unarmed strike that\n round). The wearer may use this item an additional time per\n round when his BAB reaches +6, +11, and +16.<br/><br/>\n Choosing to enhance an unarmed strike is not an action\n and may occur when it is not the wearer’s turn (such as when\n making an attack of opportunity). The wearer must decide\n to use the item before the attack roll is made, but does not\n have to expend all uses at the same time. For example, if the\n wearer can use the item twice per round, he can use it once\n on his turn when making an attack and save the second for\n the possibility of making an attack of opportunity.<br/><br/>\n Additionally, the bodywrap can grant melee weapon\n special abilities to a creature’s unarmed attacks, so long\n as those special abilities to be added apply to unarmed\n attacks. See Table 3–8: Melee Weapon Special Abilities\n (page 137) for a list of abilities. Special abilities count as\n additional bonuses for determining the market value of\n the item, but do not modify attack or damage bonuses.\n Any special abilities are set at the time of creation. A <i>bodywrap of mighty strikes</i> cannot have a modified\n bonus (enhancement bonus plus special ability bonus\n equivalents) higher than +7. Unlike an<i> amulet of mighty\n fists</i>, a bodywrap needs to have a +1 enhancement bonus\n to grant a melee weapon special ability."
     },
-    "link": "http://www.aonprd.com/MagicWondrousDisplay.aspx?FinalName=Bodywrap of Mighty Strikes1"
+    "link": "http://www.aonprd.com/MagicWondrousDisplay.aspx?FinalName=Bodywrap of Mighty Strikes1",
+    "effects": [],
+    "damageReduction": [],
+    "spellResistance": [],
+    "classSkillGrants": []
   },
   {
     "name": "Bodywrap of Mighty Strikes +2",
