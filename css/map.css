@@ -34,6 +34,12 @@ body {
   border-bottom: 1px solid #333;
 }
 
+.map-toolbar-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .map-toolbar .form-control,
 .map-toolbar .form-select {
   width: auto;
@@ -404,6 +410,88 @@ body {
   outline-offset: 2px;
 }
 
+/* OS-window-style resize handles -- see startResize()/moveResize() in
+   map.js. Only shown once a shape is selected, so unselected shapes
+   stay uncluttered. */
+.map-resize-handle {
+  display: none;
+  position: absolute;
+  background: #8fd19e;
+  border: 1px solid #1a1a1a;
+  z-index: 3;
+}
+
+.map-shape.selected .map-resize-handle {
+  display: block;
+}
+
+.map-resize-n,
+.map-resize-s {
+  left: 50%;
+  width: 14px;
+  height: 8px;
+  margin-left: -7px;
+  cursor: ns-resize;
+}
+
+.map-resize-e,
+.map-resize-w {
+  top: 50%;
+  width: 8px;
+  height: 14px;
+  margin-top: -7px;
+  cursor: ew-resize;
+}
+
+.map-resize-n {
+  top: -5px;
+}
+
+.map-resize-s {
+  bottom: -5px;
+}
+
+.map-resize-e {
+  right: -5px;
+}
+
+.map-resize-w {
+  left: -5px;
+}
+
+.map-resize-ne,
+.map-resize-nw,
+.map-resize-se,
+.map-resize-sw {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.map-resize-ne {
+  top: -5px;
+  right: -5px;
+  cursor: nesw-resize;
+}
+
+.map-resize-nw {
+  top: -5px;
+  left: -5px;
+  cursor: nwse-resize;
+}
+
+.map-resize-se {
+  bottom: -5px;
+  right: -5px;
+  cursor: nwse-resize;
+}
+
+.map-resize-sw {
+  bottom: -5px;
+  left: -5px;
+  cursor: nesw-resize;
+}
+
 .map-token.turn-active {
   outline: 4px solid #f0d58c;
   outline-offset: 3px;
@@ -542,6 +630,34 @@ body {
   background-repeat: no-repeat;
   background-size: 600% 400%;
   background-position: var(--tile-x) var(--tile-y);
+}
+
+/* Height Layer regions (see renderHeightShape() in map.js) -- a
+   distinct look from ordinary gameplay shapes above, since they only
+   ever appear in this dedicated view, never mixed in with tokens. */
+.map-height-shape {
+  border: 2px dashed var(--color);
+  background-color: var(--color);
+}
+
+@supports (background: color-mix(in srgb, red 50%, transparent)) {
+  .map-height-shape {
+    background: color-mix(in srgb, var(--color) 22%, transparent);
+  }
+}
+
+.map-height-shape.pit {
+  border-style: dotted;
+}
+
+.map-height-shape-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #0d0d0d;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 999px;
+  padding: 1px 8px;
+  pointer-events: none;
 }
 
 .shape-texture-picker {
@@ -1511,4 +1627,138 @@ textarea {
   border-radius: 6px;
   padding: 5px;
   background: #181818;
+}
+
+/* ---------------------------------------------------------------
+   3D Preview (experimental) -- see render3DPreview() in map.js.
+   Renders a separate, flattened snapshot of the map (not the live
+   interactive stage) so nothing here touches token/fog/wall DOM,
+   and so this is safe to run inside a Capacitor WebView on iOS,
+   which has known rendering quirks with preserve-3d on deeply
+   nested live DOM trees.
+   --------------------------------------------------------------- */
+.map-3d-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px 14px;
+  min-height: 0;
+}
+
+.map-3d-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.map-3d-controls input[type="range"] {
+  max-width: 260px;
+}
+
+.map-3d-viewport {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0c0c0c;
+  border: 1px solid #333;
+  border-radius: 8px;
+  perspective: 1400px;
+}
+
+.map-3d-scene {
+  position: relative;
+  transform-style: preserve-3d;
+  /* --map-3d-angle is set from the camera-angle slider in map.js. */
+  transform: rotateX(var(--map-3d-angle, 55deg));
+}
+
+.map-3d-base {
+  position: relative;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  border: 1px solid #000;
+}
+
+.map-3d-block {
+  position: absolute;
+  transform-style: preserve-3d;
+}
+
+.map-3d-block-top {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  background-repeat: no-repeat;
+  outline: 1px solid rgba(0, 0, 0, 0.4);
+}
+
+.map-3d-wall {
+  position: absolute;
+  background: linear-gradient(
+    to bottom,
+    #7a6a52,
+    #4d4232
+  );
+  border: 1px solid rgba(0, 0, 0, 0.35);
+}
+
+.map-3d-wall-south {
+  left: 0;
+  top: 100%;
+  width: 100%;
+  transform-origin: top;
+  transform: rotateX(-90deg);
+}
+
+.map-3d-wall-north {
+  left: 0;
+  bottom: 100%;
+  width: 100%;
+  transform-origin: bottom;
+  transform: rotateX(90deg);
+}
+
+.map-3d-wall-east {
+  top: 0;
+  left: 100%;
+  height: 100%;
+  transform-origin: left;
+  transform: rotateY(90deg);
+}
+
+.map-3d-wall-west {
+  top: 0;
+  right: 100%;
+  height: 100%;
+  transform-origin: right;
+  transform: rotateY(-90deg);
+}
+
+/* A pit's top/floor face sits BELOW ground (negative translateZ), so
+   its walls need to fold the opposite way to reach back UP to Z=0 --
+   every wall's fold direction here is the mirror image of the default
+   (raised-block) rotation above. See render3DPreview()'s comment. */
+.map-3d-block.pit .map-3d-wall-south {
+  transform: rotateX(90deg);
+}
+
+.map-3d-block.pit .map-3d-wall-north {
+  transform: rotateX(-90deg);
+}
+
+.map-3d-block.pit .map-3d-wall-east {
+  transform: rotateY(-90deg);
+}
+
+.map-3d-block.pit .map-3d-wall-west {
+  transform: rotateY(90deg);
+}
+
+.map-3d-empty-hint {
+  color: #aaa;
+  text-align: center;
+  padding: 40px 20px;
 }

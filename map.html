@@ -29,40 +29,74 @@
             ></nav>
             <div id="mapSlotLabel" class="map-slot-label"></div>
           </div>
+          <div id="mapNormalToolbar" class="map-toolbar-group">
+            <button
+              id="addCharacterToken"
+              class="btn btn-primary btn-sm"
+              type="button"
+            >
+              <i class="bi bi-person-plus"></i> Character
+            </button>
+            <button
+              id="addEnemyToken"
+              class="btn btn-danger btn-sm"
+              type="button"
+            >
+              <i class="bi bi-bug"></i> Enemy
+            </button>
+            <button
+              id="addGenericToken"
+              class="btn btn-outline-info btn-sm"
+              type="button"
+            >
+              <i class="bi bi-circle-fill"></i> Token
+            </button>
+            <button
+              id="addRectShape"
+              class="btn btn-outline-light btn-sm"
+              type="button"
+            >
+              <i class="bi bi-square"></i> Rect
+            </button>
+            <button
+              id="addCircleShape"
+              class="btn btn-outline-light btn-sm"
+              type="button"
+            >
+              <i class="bi bi-circle"></i> Circle
+            </button>
+            <button
+              id="enterHeightEditMode"
+              class="btn btn-outline-info btn-sm"
+              type="button"
+              title="Paint elevation on a separate layer, not visible on the regular map"
+            >
+              <i class="bi bi-layers"></i> Edit Heights
+            </button>
+          </div>
+          <div id="mapHeightToolbar" class="map-toolbar-group d-none">
+            <button
+              id="addHeightShapeBtn"
+              class="btn btn-info btn-sm"
+              type="button"
+            >
+              <i class="bi bi-plus-lg"></i> Add Height Region
+            </button>
+            <button
+              id="exitHeightEditMode"
+              class="btn btn-outline-light btn-sm"
+              type="button"
+            >
+              <i class="bi bi-x-lg"></i> Exit Height Layer
+            </button>
+          </div>
           <button
-            id="addCharacterToken"
-            class="btn btn-primary btn-sm"
-            type="button"
-          >
-            <i class="bi bi-person-plus"></i> Character
-          </button>
-          <button
-            id="addEnemyToken"
-            class="btn btn-danger btn-sm"
-            type="button"
-          >
-            <i class="bi bi-bug"></i> Enemy
-          </button>
-          <button
-            id="addGenericToken"
+            id="open3DPreview"
             class="btn btn-outline-info btn-sm"
             type="button"
+            title="Preview Height Layer regions as raised (or sunken) 3D terrain"
           >
-            <i class="bi bi-circle-fill"></i> Token
-          </button>
-          <button
-            id="addRectShape"
-            class="btn btn-outline-light btn-sm"
-            type="button"
-          >
-            <i class="bi bi-square"></i> Rect
-          </button>
-          <button
-            id="addCircleShape"
-            class="btn btn-outline-light btn-sm"
-            type="button"
-          >
-            <i class="bi bi-circle"></i> Circle
+            <i class="bi bi-box"></i> 3D Preview
           </button>
           <button
             id="openBackgroundOptions"
@@ -1172,6 +1206,48 @@
           </div>
           <div class="modal-body">
             <div id="mapEffectTracker"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="modal fade"
+      id="map3DPreviewModal"
+      tabindex="-1"
+      aria-labelledby="map3DPreviewModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content bg-dark text-white border-secondary">
+          <div class="modal-header border-secondary">
+            <h5 class="modal-title" id="map3DPreviewModalLabel">
+              3D Preview
+              <span class="small-text d-block">
+                Experimental -- shows the Height Layer's regions as raised (or sunken) terrain. Movement/tokens are unaffected; this is a visual preview only.
+              </span>
+            </h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body map-3d-modal-body">
+            <div class="map-3d-controls">
+              <label for="map3DAngle">Camera angle</label>
+              <input
+                id="map3DAngle"
+                type="range"
+                min="20"
+                max="75"
+                value="55"
+              />
+            </div>
+            <div class="map-3d-viewport" id="map3DViewport">
+              <div class="map-3d-scene" id="map3DScene"></div>
+            </div>
           </div>
         </div>
       </div>

@@ -1,3 +1,8 @@
+let map3DPreviewModal = null;
+// Height Layer (experimental "3D Preview" feature) -- see
+// toggleHeightEditMode()/state.heightShapes.
+let heightEditMode = false;
+
 let mapContextKey = "";
 let mapCharacters = [];
 let mapClassDefinitions = null;
@@ -8,6 +13,7 @@ let selectedId = "";
 let characterPanelCharacterId = "";
 let saveTimer = null;
 let dragState = null;
+let resizeState = null;
 let mapRealtimeChannel = null;
 let pendingRemoteState = null;
 let mapViewSlot = 1;
@@ -75,6 +81,14 @@ const defaultState = {
   },
   tokens: [],
   shapes: [],
+  // Height Layer regions (experimental "3D Preview" feature) -- a
+  // dedicated set of rects, separate from the ordinary gameplay shapes
+  // above, edited in their own view (see toggleHeightEditMode()) so
+  // painting elevation never clutters the regular map. Each entry:
+  // { id, x, y, w, h, heightFeet, color }. heightFeet is a multiple of
+  // 5 (1 "unit" = 5ft, a standard humanoid's height) and can be
+  // negative for a pit/depression. See render3DPreview().
+  heightShapes: [],
   initiative: [],
   activeTurn: 0,
   roundsPassed: 1,
@@ -1529,6 +1543,7 @@ function normalizeState(raw) {
     settings,
     tokens,
     shapes: Array.isArray(raw?.shapes) ? raw.shapes : [],
+    heightShapes: Array.isArray(raw?.heightShapes) ? raw.heightShapes : [],
     initiative: normalizedInitiative,
     activeTurn: clamp(
       Number(raw?.activeTurn || 0),
@@ -1966,34 +1981,48 @@ function renderMap() {
   // The background always fills the whole cols x rows grid, so resizing
   // Cell X/Y (linked) scales the picture with it instead of cropping it.
 
-  const visibleTokens = state.tokens.filter(canSeeToken);
-  stage.innerHTML = [
-    ...visibleTokens.map(renderAura),
-    ...(isGm
-      ? visibleTokens.map((token) =>
-          renderRevealIndicator(token, "light", "map-reveal-light", "#f0d58c"),
-        )
-      : []),
-    ...(isGm
-      ? visibleTokens.map((token) =>
-          renderRevealIndicator(
-            token,
-            "limitedView",
-            "map-reveal-limited",
-            "#61dafb",
-          ),
-        )
-      : []),
-    ...state.shapes.map(renderShape),
-    ...visibleTokens.map(renderToken),
-    renderFogLayer(),
-    renderLimitedViewGrayscale(),
-    renderOwnTokenFogReveal(visibleTokens),
-    `<div id="tokenHoverLayer" class="token-hover-layer"></div>`,
-  ].join("");
+  // Height Layer mode replaces the whole stage contents with just the
+  // height regions -- no tokens, ordinary shapes, or fog, so painting
+  // elevation never risks nudging something used in actual play. See
+  // toggleHeightEditMode().
+  if (heightEditMode) {
+    stage.innerHTML = [
+      ...state.heightShapes.map(renderHeightShape),
+      `<div id="tokenHoverLayer" class="token-hover-layer"></div>`,
+    ].join("");
+  } else {
+    const visibleTokens = state.tokens.filter(canSeeToken);
+    stage.innerHTML = [
+      ...visibleTokens.map(renderAura),
+      ...(isGm
+        ? visibleTokens.map((token) =>
+            renderRevealIndicator(token, "light", "map-reveal-light", "#f0d58c"),
+          )
+        : []),
+      ...(isGm
+        ? visibleTokens.map((token) =>
+            renderRevealIndicator(
+              token,
+              "limitedView",
+              "map-reveal-limited",
+              "#61dafb",
+            ),
+          )
+        : []),
+      ...state.shapes.map(renderShape),
+      ...visibleTokens.map(renderToken),
+      renderFogLayer(),
+      renderLimitedViewGrayscale(),
+      renderOwnTokenFogReveal(visibleTokens),
+      `<div id="tokenHoverLayer" class="token-hover-layer"></div>`,
+    ].join("");
+  }
 
   stage.onpointerdown = startMovementMeasure;
-  stage.querySelectorAll("[data-map-id]").forEach((node) => {
+  stage.querySelectorAll("[data-resize-handle]").forEach((handle) => {
+    handle.addEventListener("pointerdown", startResize);
+  });
+  stage.querySelectorAll("[data-map-id]:not([data-resize-handle])").forEach((node) => {
     node.addEventListener("pointerdown", startDrag);
     node.addEventListener("mouseenter", () =>
       showTokenHover(node.dataset.mapId),
@@ -2420,6 +2449,32 @@ function shapeTileIndex(shape, mask, x, y) {
   return spriteCellIndex(15);
 }
 
+// OS-window-style resize handles -- see startResize()/moveResize().
+// Rendered on every shape (only visible/interactive once selected, via
+// css/map.css) so both regular map shapes and Height Layer regions
+// (renderHeightShape()) can share the exact same drag-resize code.
+const RESIZE_HANDLES = ["n", "s", "e", "w", "ne", "nw", "se", "sw"];
+function resizeHandlesHtml(id) {
+  return RESIZE_HANDLES.map(
+    (dir) =>
+      `<span class="map-resize-handle map-resize-${dir}" data-map-id="${escapeHtml(id)}" data-resize-handle="${dir}"></span>`,
+  ).join("");
+}
+
+function heightFeetLabel(feet) {
+  const value = Number(feet || 0);
+  return value >= 0 ? `+${value} ft` : `${value} ft`;
+}
+
+function renderHeightShape(shape) {
+  const selectedClass = shape.id === selectedId ? " selected" : "";
+  const pitClass = Number(shape.heightFeet || 0) < 0 ? " pit" : "";
+  return `<div class="map-shape map-height-shape${pitClass}${selectedClass}" data-map-id="${escapeHtml(shape.id)}" style="--x:${shape.x};--y:${shape.y};--w:${shape.w || 2};--h:${shape.h || 2};--z:2;--color:${escapeHtml(shape.color || "#61dafb")};">
+    <span class="map-height-shape-label">${heightFeetLabel(shape.heightFeet)}</span>
+    ${resizeHandlesHtml(shape.id)}
+  </div>`;
+}
+
 function renderShape(shape) {
   const selectedClass = shape.id === selectedId ? " selected" : "";
   const texture = shapeTexture(shape.texture);
@@ -2450,10 +2505,110 @@ function renderShape(shape) {
     return `
       <div class="map-shape shape-grid${selectedClass}" data-map-id="${escapeHtml(shape.id)}" style="--x:${shape.x};--y:${shape.y};--w:${mask.cols};--h:${mask.rows};--z:${Number(shape.zIndex || 2)};--shape-cols:${mask.cols};--shape-rows:${mask.rows};--color:${escapeHtml(shape.color || "#f0d58c")};">
         ${cells.join("")}
+        ${resizeHandlesHtml(shape.id)}
       </div>
     `;
   }
-  return `<div class="map-shape ${shape.shape || "rect"}${selectedClass}" data-map-id="${escapeHtml(shape.id)}" style="--x:${shape.x};--y:${shape.y};--w:${shape.w || 2};--h:${shape.h || 2};--z:${Number(shape.zIndex || 2)};--color:${escapeHtml(shape.color || "#f0d58c")};"></div>`;
+  return `<div class="map-shape ${shape.shape || "rect"}${selectedClass}" data-map-id="${escapeHtml(shape.id)}" style="--x:${shape.x};--y:${shape.y};--w:${shape.w || 2};--h:${shape.h || 2};--z:${Number(shape.zIndex || 2)};--color:${escapeHtml(shape.color || "#f0d58c")};">${resizeHandlesHtml(shape.id)}</div>`;
+}
+
+// ---------------------------------------------------------------
+// 3D Preview (experimental). Renders a separate, flattened snapshot of
+// the map -- deliberately NOT a live-tilted version of the real
+// interactive #mapStage, both because that stage is far too deeply
+// nested for CSS 3D to render reliably (iOS WebKit especially -- see
+// css/map.css's comment above .map-3d-modal-body) and because a
+// snapshot is much simpler to reason about for a first pass: read the
+// current state once, build a small stack of flat "plates," done.
+//
+// Every region in state.heightShapes (see toggleHeightEditMode())
+// becomes a block:
+// - its top/floor face is the map texture cropped to that region's
+//   footprint, floating at translateZ(feet-to-px(heightFeet))
+// - four walls connect that face back down (or, for a negative/pit
+//   height, back UP) to true ground level at Z=0
+// Circles and textured shapes were never an option here -- Height
+// Layer regions are always plain rects (see addHeightShape()).
+//
+// Overlapping height regions aren't reconciled into a proper
+// heightfield (no adjacency/merging) -- each block is just an
+// independent floating platform. Fine for the common case (a
+// raised dais, a cliff ledge, a pit) but two overlapping blocks will
+// visibly clip through each other rather than blend.
+// ---------------------------------------------------------------
+const MAP_3D_CELL_PX = 40;
+// 1 height unit = 5ft (a standard humanoid's height, per the Height
+// Region panel) = this many px in the preview scene.
+const MAP_3D_PX_PER_5FT = 32;
+
+function feetToPreviewPx(feet) {
+  return (Number(feet || 0) / 5) * MAP_3D_PX_PER_5FT;
+}
+
+function render3DPreview() {
+  const scene = el("map3DScene");
+  const { cols, rows, backgroundUrl } = state.settings;
+  const mapW = Number(cols || 0) * MAP_3D_CELL_PX;
+  const mapH = Number(rows || 0) * MAP_3D_CELL_PX;
+  scene.style.width = `${mapW}px`;
+  scene.style.height = `${mapH}px`;
+  scene.style.setProperty(
+    "--map-3d-angle",
+    `${el("map3DAngle").value || 55}deg`,
+  );
+
+  if (!backgroundUrl) {
+    scene.innerHTML = `<div class="map-3d-empty-hint">Set a map background first (Map Settings) to preview it in 3D.</div>`;
+    return;
+  }
+
+  // Single-quoted url() -- this gets embedded inside a double-quoted
+  // HTML style="..." attribute below (built via innerHTML, unlike
+  // stage.style.setProperty's background-image elsewhere in this file,
+  // which goes through the CSSOM directly and never has this problem).
+  const bgCss = `url('${cssUrl(backgroundUrl)}')`;
+  const blocks = [...state.heightShapes]
+    .filter((shape) => Number(shape.heightFeet) !== 0)
+    // Draw shortest-magnitude first so a small block nested in a much
+    // taller one's footprint still ends up on top in the DOM (paint
+    // order matters less with preserve-3d's real depth sorting, but
+    // keeping it sane costs nothing).
+    .sort((a, b) => Math.abs(a.heightFeet) - Math.abs(b.heightFeet));
+
+  const baseHtml = `
+    <div class="map-3d-base" style="width:${mapW}px;height:${mapH}px;background-image:${bgCss};"></div>
+  `;
+
+  const blockHtml = blocks
+    .map((shape) => {
+      const x = Number(shape.x || 0) * MAP_3D_CELL_PX;
+      const y = Number(shape.y || 0) * MAP_3D_CELL_PX;
+      const w = Number(shape.w || 1) * MAP_3D_CELL_PX;
+      const h = Number(shape.h || 1) * MAP_3D_CELL_PX;
+      const z = feetToPreviewPx(shape.heightFeet);
+      const wallPx = Math.abs(z);
+      // A raised block's walls hinge at the top face and fold DOWN to
+      // ground (the default CSS rotation in css/map.css). A pit is the
+      // mirror image: its "top" face already sits below ground, so its
+      // walls need to fold the OPPOSITE way to reach back UP to Z=0 --
+      // see the .pit override in css/map.css for the reversed
+      // rotateX/rotateY signs (worked out by hand, then confirmed by
+      // screenshotting both a raised block and a pit side by side).
+      const pitClass = z < 0 ? " pit" : "";
+      return `
+        <div class="map-3d-block${pitClass}" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;">
+          <div class="map-3d-block-top" style="transform:translateZ(${z}px);background-image:${bgCss};background-size:${mapW}px ${mapH}px;background-position:-${x}px -${y}px;">
+            <div class="map-3d-wall map-3d-wall-south" style="height:${wallPx}px;"></div>
+            <div class="map-3d-wall map-3d-wall-north" style="height:${wallPx}px;"></div>
+            <div class="map-3d-wall map-3d-wall-east" style="width:${wallPx}px;"></div>
+            <div class="map-3d-wall map-3d-wall-west" style="width:${wallPx}px;"></div>
+          </div>
+        </div>
+      `;
+    })
+    .join("");
+
+  scene.innerHTML = baseHtml + blockHtml;
 }
 
 const DPAD_MOVE_COOLDOWN_MS = 200;
@@ -2652,7 +2807,67 @@ function bindQuickControlsPanel(item) {
   });
 }
 
+// Height Layer's own selected-item panel -- deliberately separate
+// from renderSelectedPanel()'s character/token/shape panel below,
+// since a height region only ever needs X/Y/W/H/feet/color, none of
+// the effects/sheet/texture machinery the regular panel carries.
+function renderHeightShapePanel() {
+  const item = state.heightShapes.find((shape) => shape.id === selectedId);
+  if (!item) {
+    el("selectedPanel").innerHTML = `
+      <div class="small-text">
+        Draw a Height Region to set its elevation. Height Layer regions aren't visible on the regular map -- only in the 3D Preview.
+      </div>
+    `;
+    return;
+  }
+  el("selectedPanel").innerHTML = `
+    <label>Height Region</label>
+    <div class="row g-2">
+      <div class="col-6"><label>X</label><input data-height-field="x" class="form-control form-control-sm" type="number" value="${item.x || 0}"></div>
+      <div class="col-6"><label>Y</label><input data-height-field="y" class="form-control form-control-sm" type="number" value="${item.y || 0}"></div>
+      <div class="col-6"><label>W</label><input data-height-field="w" class="form-control form-control-sm" type="number" min="1" value="${item.w || 1}"></div>
+      <div class="col-6"><label>H</label><input data-height-field="h" class="form-control form-control-sm" type="number" min="1" value="${item.h || 1}"></div>
+      <div class="col-12">
+        <label>Height (ft) <span class="small-text">1 unit = 5ft, negative = pit</span></label>
+        <input data-height-field="heightFeet" class="form-control form-control-sm" type="number" step="5" value="${Number(item.heightFeet || 0)}">
+      </div>
+      <div class="col-12"><label>Color</label><input data-height-field="color" class="form-control form-control-sm" type="color" value="${escapeHtml(item.color || "#61dafb")}"></div>
+    </div>
+    <button class="btn btn-outline-danger btn-sm w-100 mt-2" type="button" data-delete-height-shape>
+      <i class="bi bi-trash"></i> Delete
+    </button>
+  `;
+  bindHeightShapePanelInteractions(item);
+}
+
+function bindHeightShapePanelInteractions(item) {
+  el("selectedPanel")
+    .querySelectorAll("[data-height-field]")
+    .forEach((input) => {
+      input.addEventListener("input", () => {
+        const field = input.dataset.heightField;
+        if (field === "color") {
+          item.color = input.value;
+        } else if (field === "w" || field === "h") {
+          item[field] = Math.max(1, Number(input.value || 1));
+        } else {
+          item[field] = Number(input.value || 0);
+        }
+        renderMap();
+        queueSave();
+      });
+    });
+  el("selectedPanel")
+    .querySelector("[data-delete-height-shape]")
+    ?.addEventListener("click", () => deleteHeightShape(item.id));
+}
+
 function renderSelectedPanel() {
+  if (heightEditMode) {
+    renderHeightShapePanel();
+    return;
+  }
   const item = selectedObject();
   const wasDetailsOpen =
     el("selectedDetailsCollapse")?.classList.contains("show") || false;
@@ -3061,9 +3276,11 @@ function applyRemoteMapState(remoteState) {
 function flushPendingRemoteState() {
   if (!pendingRemoteState) return;
   const localDraggedId = dragState?.id;
-  const localDraggedItem = [...state.tokens, ...state.shapes].find(
-    (entry) => entry.id === localDraggedId,
-  );
+  const localDraggedItem = [
+    ...state.tokens,
+    ...state.shapes,
+    ...state.heightShapes,
+  ].find((entry) => entry.id === localDraggedId);
   const remoteState = normalizeState(pendingRemoteState);
   pendingRemoteState = null;
 
@@ -3105,7 +3322,7 @@ function startDrag(event) {
   hideContextMenu();
   suppressStageClick = true;
   const id = event.currentTarget.dataset.mapId;
-  const item = [...state.tokens, ...state.shapes].find(
+  const item = [...state.tokens, ...state.shapes, ...state.heightShapes].find(
     (entry) => entry.id === id,
   );
   if (!item) return;
@@ -3117,7 +3334,15 @@ function startDrag(event) {
     x: item.x || 0,
     y: item.y || 0,
   };
-  event.currentTarget.setPointerCapture(event.pointerId);
+  // Not fatal if this throws (e.g. no active pointer with this id) --
+  // the drag still works via the window-level listeners below, just
+  // without a captured pointer guaranteeing events keep arriving if
+  // the cursor leaves the element.
+  try {
+    event.currentTarget.setPointerCapture(event.pointerId);
+  } catch {
+    /* see comment above */
+  }
   window.addEventListener("pointermove", moveDrag);
   window.addEventListener("pointerup", endDrag, { once: true });
   renderAll(false);
@@ -3126,7 +3351,7 @@ function startDrag(event) {
 
 function moveDrag(event) {
   if (!dragState) return;
-  const item = [...state.tokens, ...state.shapes].find(
+  const item = [...state.tokens, ...state.shapes, ...state.heightShapes].find(
     (entry) => entry.id === dragState.id,
   );
   if (!item) return;
@@ -3136,6 +3361,84 @@ function moveDrag(event) {
   item.x = clamp(dragState.x + dx, 0, state.settings.cols - (item.w || 1));
   item.y = clamp(dragState.y + dy, 0, state.settings.rows - (item.h || 1));
   renderAll(false);
+}
+
+// Same OS-window-style resize for both regular map shapes and Height
+// Layer regions -- whichever array is "active" depends on whether the
+// Height Layer is open (see resizableItemsList()).
+function resizableItemsList() {
+  return heightEditMode ? state.heightShapes : state.shapes;
+}
+
+function startResize(event) {
+  if (event.button !== 0) return;
+  event.preventDefault();
+  event.stopPropagation();
+  hideContextMenu();
+  suppressStageClick = true;
+  const id = event.currentTarget.dataset.mapId;
+  const handle = event.currentTarget.dataset.resizeHandle;
+  const item = resizableItemsList().find((entry) => entry.id === id);
+  if (!item) return;
+  selectedId = id;
+  resizeState = {
+    id,
+    handle,
+    startX: event.clientX,
+    startY: event.clientY,
+    x: item.x || 0,
+    y: item.y || 0,
+    w: item.w || 1,
+    h: item.h || 1,
+  };
+  // setPointerCapture can throw (e.g. no active pointer with this id) --
+  // when it does, the drag should still work via the window-level
+  // listeners below, just without a captured pointer guaranteeing
+  // events keep arriving if the cursor leaves the handle.
+  try {
+    event.currentTarget.setPointerCapture(event.pointerId);
+  } catch {
+    /* not fatal -- see comment above */
+  }
+  window.addEventListener("pointermove", moveResize);
+  window.addEventListener("pointerup", endResize, { once: true });
+  renderAll(false);
+  showSelectedPanel();
+}
+
+function moveResize(event) {
+  if (!resizeState) return;
+  const item = resizableItemsList().find(
+    (entry) => entry.id === resizeState.id,
+  );
+  if (!item) return;
+  const cell = Number(localGridSize || 48);
+  const dx = Math.round((event.clientX - resizeState.startX) / cell);
+  const dy = Math.round((event.clientY - resizeState.startY) / cell);
+  const handle = resizeState.handle;
+  let { x, y, w, h } = resizeState;
+  if (handle.includes("e")) w = Math.max(1, resizeState.w + dx);
+  if (handle.includes("s")) h = Math.max(1, resizeState.h + dy);
+  if (handle.includes("w")) {
+    w = Math.max(1, resizeState.w - dx);
+    x = resizeState.x + (resizeState.w - w);
+  }
+  if (handle.includes("n")) {
+    h = Math.max(1, resizeState.h - dy);
+    y = resizeState.y + (resizeState.h - h);
+  }
+  item.w = Math.min(w, state.settings.cols);
+  item.h = Math.min(h, state.settings.rows);
+  item.x = clamp(x, 0, state.settings.cols - item.w);
+  item.y = clamp(y, 0, state.settings.rows - item.h);
+  renderAll(false);
+}
+
+function endResize() {
+  flushPendingRemoteState();
+  resizeState = null;
+  window.removeEventListener("pointermove", moveResize);
+  renderAll();
 }
 
 function endDrag() {
@@ -3414,6 +3717,40 @@ function addShape(shape) {
   state.shapes.push(item);
   selectedId = item.id;
   renderAll();
+}
+
+function addHeightShape() {
+  const item = {
+    id: uid("height"),
+    x: 3,
+    y: 3,
+    w: 3,
+    h: 3,
+    sizeLinked: false,
+    heightFeet: 5,
+    color: "#61dafb",
+  };
+  state.heightShapes.push(item);
+  selectedId = item.id;
+  renderAll();
+}
+
+function deleteHeightShape(id) {
+  state.heightShapes = state.heightShapes.filter((shape) => shape.id !== id);
+  if (selectedId === id) selectedId = "";
+  renderAll();
+}
+
+// Swaps the whole toolbar + stage + selected-panel into a dedicated
+// view for painting elevation (state.heightShapes) -- separate from
+// the ordinary gameplay Rect/Circle shapes, tokens, and fog, none of
+// which render while this is open. See renderMap()/renderSelectedPanel().
+function toggleHeightEditMode(next = !heightEditMode) {
+  heightEditMode = next;
+  selectedId = "";
+  el("mapNormalToolbar").classList.toggle("d-none", heightEditMode);
+  el("mapHeightToolbar").classList.toggle("d-none", !heightEditMode);
+  renderAll(false);
 }
 
 function deleteSelected() {
@@ -5705,6 +6042,24 @@ document.addEventListener("DOMContentLoaded", async () => {
   genericTokenModal = new bootstrap.Modal(el("genericTokenModal"));
   el("genericTokenForm").addEventListener("submit", submitGenericToken);
   mapEffectsModal = new bootstrap.Modal(el("mapEffectsModal"));
+  map3DPreviewModal = new bootstrap.Modal(el("map3DPreviewModal"));
+  el("open3DPreview").addEventListener("click", () => {
+    map3DPreviewModal.show();
+    render3DPreview();
+  });
+  el("map3DAngle").addEventListener("input", (event) => {
+    el("map3DScene").style.setProperty(
+      "--map-3d-angle",
+      `${event.target.value}deg`,
+    );
+  });
+  el("enterHeightEditMode").addEventListener("click", () =>
+    toggleHeightEditMode(true),
+  );
+  el("exitHeightEditMode").addEventListener("click", () =>
+    toggleHeightEditMode(false),
+  );
+  el("addHeightShapeBtn").addEventListener("click", addHeightShape);
   quickEffectModal = new bootstrap.Modal(el("quickEffectModal"));
   quickEffectTargetsModal = new bootstrap.Modal(el("quickEffectTargetsModal"));
   rollModal = new bootstrap.Modal(el("rollModal"));
