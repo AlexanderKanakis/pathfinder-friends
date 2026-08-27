@@ -1780,7 +1780,15 @@ textarea {
   inset: 0;
   transform-style: preserve-3d;
   background-repeat: no-repeat;
-  outline: 1px solid rgba(0, 0, 0, 0.4);
+  /* --block-rim (set per-block from the region's own `color`, see
+     render3DPreview()) instead of a plain dark outline -- geometry
+     alone (a short wall, a top face cropped from the map art) can
+     read as flush with the ground when the region is shallow or its
+     surroundings are already dark/similarly colored (water is the
+     classic case), so every region gets an unmistakable, art-agnostic
+     rim + glow in its own accent color. */
+  outline: 2px solid var(--block-rim, #61dafb);
+  box-shadow: 0 0 10px 1px var(--block-rim, #61dafb);
 }
 
 .map-3d-wall {

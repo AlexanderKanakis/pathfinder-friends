@@ -2683,8 +2683,54 @@ function render3DPreview() {
     // keeping it sane costs nothing).
     .sort((a, b) => Math.abs(a.heightFeet) - Math.abs(b.heightFeet));
 
+  // A raised block naturally sits in front of the base plate (it's
+  // closer to the camera) so it's visible with no extra work. A pit
+  // is the opposite: its floor is FARTHER from the camera than the
+  // base plate at that same x/y, and the base plate is one solid,
+  // opaque rectangle covering the entire map -- so without a literal
+  // hole cut into it, that plate sits between the camera and the
+  // pit's floor/walls and hides them completely, however correctly
+  // those are actually being rendered underneath. Cut a hole via a
+  // CSS mask-image, one rect per pit cell/footprint, so the camera
+  // can actually see down into the pit instead of skimming a solid
+  // roof over it.
+  const pitCutouts = blocks
+    .filter((shape) => Number(shape.heightFeet) < 0)
+    .flatMap((shape) => {
+      const sx = Number(shape.x || 0);
+      const sy = Number(shape.y || 0);
+      if (Array.isArray(shape.cells)) {
+        return shape.cells.map((key) => {
+          const [dx, dy] = key.split(",").map(Number);
+          return { gx: sx + dx, gy: sy + dy, gw: 1, gh: 1 };
+        });
+      }
+      return [{ gx: sx, gy: sy, gw: Number(shape.w || 1), gh: Number(shape.h || 1) }];
+    });
+  const baseMaskCss = pitCutouts.length
+    ? (() => {
+        const holes = pitCutouts
+          .map(
+            ({ gx, gy, gw, gh }) =>
+              `<rect x="${gx * MAP_3D_CELL_PX}" y="${gy * MAP_3D_CELL_PX}" width="${gw * MAP_3D_CELL_PX}" height="${gh * MAP_3D_CELL_PX}" fill="black"/>`,
+          )
+          .join("");
+        // CSS mask-image reads an image source's ALPHA channel, not its
+        // color/luminance -- a plain white-rect-plus-black-rect SVG is
+        // fully opaque everywhere (alpha 1 for both colors) and would
+        // mask nothing at all. Routing through the SVG's OWN <mask>
+        // element (which IS luminance-based) bakes real transparency
+        // into the rendered image first -- white areas of that inner
+        // mask become alpha 1, black areas become alpha 0 -- so the
+        // image this produces then works correctly as a CSS mask source.
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${mapW}" height="${mapH}"><mask id="pitHoles"><rect width="100%" height="100%" fill="white"/>${holes}</mask><rect width="100%" height="100%" fill="white" mask="url(#pitHoles)"/></svg>`;
+        const maskUrl = `url('data:image/svg+xml,${encodeURIComponent(svg)}')`;
+        return `mask-image:${maskUrl};-webkit-mask-image:${maskUrl};mask-size:${mapW}px ${mapH}px;-webkit-mask-size:${mapW}px ${mapH}px;mask-repeat:no-repeat;-webkit-mask-repeat:no-repeat;`;
+      })()
+    : "";
+
   const baseHtml = `
-    <div class="map-3d-base" style="width:${mapW}px;height:${mapH}px;background-image:${bgCss};"></div>
+    <div class="map-3d-base" style="width:${mapW}px;height:${mapH}px;background-image:${bgCss};${baseMaskCss}"></div>
   `;
 
   // A raised block's walls hinge at the top face and fold DOWN to
@@ -2694,15 +2740,25 @@ function render3DPreview() {
   // see the .pit override in css/map.css for the reversed
   // rotateX/rotateY signs (worked out by hand, then confirmed by
   // screenshotting both a raised block and a pit side by side).
-  function blockHtmlAt(gx, gy, gw, gh, z) {
+  // A region's top face is cropped straight from the map art, so a
+  // shallow pit (or a raised block whose color happens to be close to
+  // the surrounding terrain -- water is the classic case) can end up
+  // nearly indistinguishable from ground level: the geometry is
+  // correct but there's nothing high-contrast to actually see. Every
+  // region already carries its own accent `color` (used for the 2D
+  // hazard-stripe/label styling) -- reuse it here as a bright rim
+  // around the top face so a region is always identifiable by its own
+  // color regardless of how dark/similar the underlying art is.
+  function blockHtmlAt(gx, gy, gw, gh, z, color) {
     const x = gx * MAP_3D_CELL_PX;
     const y = gy * MAP_3D_CELL_PX;
     const w = gw * MAP_3D_CELL_PX;
     const h = gh * MAP_3D_CELL_PX;
     const wallPx = Math.abs(z);
     const pitClass = z < 0 ? " pit" : "";
+    const rimColor = escapeHtml(color || "#61dafb");
     return `
-      <div class="map-3d-block${pitClass}" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;">
+      <div class="map-3d-block${pitClass}" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;--block-rim:${rimColor};">
         <div class="map-3d-block-top" style="transform:translateZ(${z}px);background-image:${bgCss};background-size:${mapW}px ${mapH}px;background-position:-${x}px -${y}px;">
           <div class="map-3d-wall map-3d-wall-south" style="height:${wallPx}px;"></div>
           <div class="map-3d-wall map-3d-wall-north" style="height:${wallPx}px;"></div>
@@ -2716,6 +2772,7 @@ function render3DPreview() {
   const blockHtml = blocks
     .map((shape) => {
       const z = feetToPreviewPx(shape.heightFeet);
+      const color = shape.color;
       if (Array.isArray(shape.cells)) {
         // No single rectangle formula covers an arbitrary painted
         // outline, so a freeform region becomes one 1x1 block per
@@ -2733,6 +2790,7 @@ function render3DPreview() {
               1,
               1,
               z,
+              color,
             );
           })
           .join("");
@@ -2743,6 +2801,7 @@ function render3DPreview() {
         Number(shape.w || 1),
         Number(shape.h || 1),
         z,
+        color,
       );
     })
     .join("");
