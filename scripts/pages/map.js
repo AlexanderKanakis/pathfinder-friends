@@ -2,6 +2,9 @@ let map3DPreviewModal = null;
 // Height Layer (experimental "3D Preview" feature) -- see
 // toggleHeightEditMode()/state.heightShapes.
 let heightEditMode = false;
+// "Draw Height Region" paint tool -- see toggleHeightDrawMode().
+let heightDrawMode = false;
+let paintState = null;
 
 let mapContextKey = "";
 let mapCharacters = [];
@@ -1988,6 +1991,7 @@ function renderMap() {
   if (heightEditMode) {
     stage.innerHTML = [
       ...state.heightShapes.map(renderHeightShape),
+      `<div id="heightPaintPreview" class="height-paint-preview"></div>`,
       `<div id="tokenHoverLayer" class="token-hover-layer"></div>`,
     ].join("");
   } else {
@@ -2018,7 +2022,12 @@ function renderMap() {
     ].join("");
   }
 
-  stage.onpointerdown = startMovementMeasure;
+  // The movement ruler doesn't mean anything in the Height Layer --
+  // clicking the stage background there starts a paint stroke instead
+  // (a no-op unless the Draw tool is actually toggled on).
+  stage.onpointerdown = heightEditMode
+    ? startPaintHeightShape
+    : startMovementMeasure;
   stage.querySelectorAll("[data-resize-handle]").forEach((handle) => {
     handle.addEventListener("pointerdown", startResize);
   });
@@ -2463,14 +2472,49 @@ function resizeHandlesHtml(id) {
 
 function heightFeetLabel(feet) {
   const value = Number(feet || 0);
-  return value >= 0 ? `+${value} ft` : `${value} ft`;
+  // The arrow is the primary "raised vs. sunken" signal (a dashed vs.
+  // dotted border, the only distinction this used to have, was too
+  // subtle to notice at a glance) -- see the hazard-stripe pit fill in
+  // css/map.css for the second, harder-to-miss one.
+  if (value > 0) return `▲ +${value} ft`;
+  if (value < 0) return `▼ ${value} ft`;
+  return `${value} ft`;
 }
 
+// A Height Layer region is either a plain rect (from "Add Height
+// Region") or a freeform set of painted cells (from "Draw Height
+// Region" -- see endPaintHeightShape()). The two need different
+// markup: a rect is one positioned box; a painted shape mirrors
+// renderShape()'s circle/texture handling -- one cell per occupied
+// square within the bounding box, everything else left empty -- so an
+// L-shaped or diagonal paint stroke actually looks like one.
 function renderHeightShape(shape) {
   const selectedClass = shape.id === selectedId ? " selected" : "";
   const pitClass = Number(shape.heightFeet || 0) < 0 ? " pit" : "";
+  const label = `<span class="map-height-shape-label">${heightFeetLabel(shape.heightFeet)}</span>`;
+  if (Array.isArray(shape.cells)) {
+    const occupied = new Set(shape.cells);
+    const cols = Math.max(1, Number(shape.w || 1));
+    const rows = Math.max(1, Number(shape.h || 1));
+    const cells = [];
+    for (let y = 0; y < rows; y += 1) {
+      for (let x = 0; x < cols; x += 1) {
+        cells.push(
+          occupied.has(`${x},${y}`)
+            ? `<span class="height-shape-cell"></span>`
+            : `<span></span>`,
+        );
+      }
+    }
+    return `
+      <div class="map-shape map-height-shape height-shape-grid${pitClass}${selectedClass}" data-map-id="${escapeHtml(shape.id)}" style="--x:${shape.x};--y:${shape.y};--w:${cols};--h:${rows};--z:2;--shape-cols:${cols};--shape-rows:${rows};--color:${escapeHtml(shape.color || "#61dafb")};">
+        ${cells.join("")}
+        ${label}
+      </div>
+    `;
+  }
   return `<div class="map-shape map-height-shape${pitClass}${selectedClass}" data-map-id="${escapeHtml(shape.id)}" style="--x:${shape.x};--y:${shape.y};--w:${shape.w || 2};--h:${shape.h || 2};--z:2;--color:${escapeHtml(shape.color || "#61dafb")};">
-    <span class="map-height-shape-label">${heightFeetLabel(shape.heightFeet)}</span>
+    ${label}
     ${resizeHandlesHtml(shape.id)}
   </div>`;
 }
@@ -2579,32 +2623,63 @@ function render3DPreview() {
     <div class="map-3d-base" style="width:${mapW}px;height:${mapH}px;background-image:${bgCss};"></div>
   `;
 
+  // A raised block's walls hinge at the top face and fold DOWN to
+  // ground (the default CSS rotation in css/map.css). A pit is the
+  // mirror image: its "top" face already sits below ground, so its
+  // walls need to fold the OPPOSITE way to reach back UP to Z=0 --
+  // see the .pit override in css/map.css for the reversed
+  // rotateX/rotateY signs (worked out by hand, then confirmed by
+  // screenshotting both a raised block and a pit side by side).
+  function blockHtmlAt(gx, gy, gw, gh, z) {
+    const x = gx * MAP_3D_CELL_PX;
+    const y = gy * MAP_3D_CELL_PX;
+    const w = gw * MAP_3D_CELL_PX;
+    const h = gh * MAP_3D_CELL_PX;
+    const wallPx = Math.abs(z);
+    const pitClass = z < 0 ? " pit" : "";
+    return `
+      <div class="map-3d-block${pitClass}" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;">
+        <div class="map-3d-block-top" style="transform:translateZ(${z}px);background-image:${bgCss};background-size:${mapW}px ${mapH}px;background-position:-${x}px -${y}px;">
+          <div class="map-3d-wall map-3d-wall-south" style="height:${wallPx}px;"></div>
+          <div class="map-3d-wall map-3d-wall-north" style="height:${wallPx}px;"></div>
+          <div class="map-3d-wall map-3d-wall-east" style="width:${wallPx}px;"></div>
+          <div class="map-3d-wall map-3d-wall-west" style="width:${wallPx}px;"></div>
+        </div>
+      </div>
+    `;
+  }
+
   const blockHtml = blocks
     .map((shape) => {
-      const x = Number(shape.x || 0) * MAP_3D_CELL_PX;
-      const y = Number(shape.y || 0) * MAP_3D_CELL_PX;
-      const w = Number(shape.w || 1) * MAP_3D_CELL_PX;
-      const h = Number(shape.h || 1) * MAP_3D_CELL_PX;
       const z = feetToPreviewPx(shape.heightFeet);
-      const wallPx = Math.abs(z);
-      // A raised block's walls hinge at the top face and fold DOWN to
-      // ground (the default CSS rotation in css/map.css). A pit is the
-      // mirror image: its "top" face already sits below ground, so its
-      // walls need to fold the OPPOSITE way to reach back UP to Z=0 --
-      // see the .pit override in css/map.css for the reversed
-      // rotateX/rotateY signs (worked out by hand, then confirmed by
-      // screenshotting both a raised block and a pit side by side).
-      const pitClass = z < 0 ? " pit" : "";
-      return `
-        <div class="map-3d-block${pitClass}" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;">
-          <div class="map-3d-block-top" style="transform:translateZ(${z}px);background-image:${bgCss};background-size:${mapW}px ${mapH}px;background-position:-${x}px -${y}px;">
-            <div class="map-3d-wall map-3d-wall-south" style="height:${wallPx}px;"></div>
-            <div class="map-3d-wall map-3d-wall-north" style="height:${wallPx}px;"></div>
-            <div class="map-3d-wall map-3d-wall-east" style="width:${wallPx}px;"></div>
-            <div class="map-3d-wall map-3d-wall-west" style="width:${wallPx}px;"></div>
-          </div>
-        </div>
-      `;
+      if (Array.isArray(shape.cells)) {
+        // No single rectangle formula covers an arbitrary painted
+        // outline, so a freeform region becomes one 1x1 block per
+        // occupied cell instead -- same top-face crop math, just run
+        // per cell. Same-height neighbors will show a thin seam where
+        // their walls meet rather than blending into one smooth
+        // platform; an acceptable v1 tradeoff for actually respecting
+        // the shape that got painted instead of squaring it off.
+        return shape.cells
+          .map((key) => {
+            const [dx, dy] = key.split(",").map(Number);
+            return blockHtmlAt(
+              Number(shape.x || 0) + dx,
+              Number(shape.y || 0) + dy,
+              1,
+              1,
+              z,
+            );
+          })
+          .join("");
+      }
+      return blockHtmlAt(
+        Number(shape.x || 0),
+        Number(shape.y || 0),
+        Number(shape.w || 1),
+        Number(shape.h || 1),
+        z,
+      );
     })
     .join("");
 
@@ -2821,13 +2896,23 @@ function renderHeightShapePanel() {
     `;
     return;
   }
+  const isPainted = Array.isArray(item.cells);
+  // A painted (freeform) region's cell mask has no resize formula the
+  // way a plain rect's w/h does -- editing W/H wouldn't do anything
+  // sensible to it, so those fields are swapped for a plain cell
+  // count and a hint to delete + redraw instead.
+  const sizeFieldsHtml = isPainted
+    ? `<div class="col-12 small-text">${item.cells.length} cell${item.cells.length === 1 ? "" : "s"} painted -- delete and redraw with the Draw tool to reshape.</div>`
+    : `
+      <div class="col-6"><label>W</label><input data-height-field="w" class="form-control form-control-sm" type="number" min="1" value="${item.w || 1}"></div>
+      <div class="col-6"><label>H</label><input data-height-field="h" class="form-control form-control-sm" type="number" min="1" value="${item.h || 1}"></div>
+    `;
   el("selectedPanel").innerHTML = `
     <label>Height Region</label>
     <div class="row g-2">
       <div class="col-6"><label>X</label><input data-height-field="x" class="form-control form-control-sm" type="number" value="${item.x || 0}"></div>
       <div class="col-6"><label>Y</label><input data-height-field="y" class="form-control form-control-sm" type="number" value="${item.y || 0}"></div>
-      <div class="col-6"><label>W</label><input data-height-field="w" class="form-control form-control-sm" type="number" min="1" value="${item.w || 1}"></div>
-      <div class="col-6"><label>H</label><input data-height-field="h" class="form-control form-control-sm" type="number" min="1" value="${item.h || 1}"></div>
+      ${sizeFieldsHtml}
       <div class="col-12">
         <label>Height (ft) <span class="small-text">1 unit = 5ft, negative = pit</span></label>
         <input data-height-field="heightFeet" class="form-control form-control-sm" type="number" step="5" value="${Number(item.heightFeet || 0)}">
@@ -3357,6 +3442,10 @@ function startDrag(event) {
   event.stopPropagation();
   hideContextMenu();
   suppressStageClick = true;
+  // Grabbing an existing shape means the user wants to move/select it,
+  // not paint -- drop out of the Draw tool so the next click on empty
+  // stage doesn't unexpectedly start a new stroke.
+  if (heightDrawMode) toggleHeightDrawMode(false);
   const id = event.currentTarget.dataset.mapId;
   const item = [...state.tokens, ...state.shapes, ...state.heightShapes].find(
     (entry) => entry.id === id,
@@ -3784,9 +3873,90 @@ function deleteHeightShape(id) {
 function toggleHeightEditMode(next = !heightEditMode) {
   heightEditMode = next;
   selectedId = "";
+  if (!heightEditMode) toggleHeightDrawMode(false);
   el("mapNormalToolbar").classList.toggle("d-none", heightEditMode);
   el("mapHeightToolbar").classList.toggle("d-none", !heightEditMode);
   renderAll(false);
+}
+
+// "Draw Height Region" tool -- paints individual grid cells while the
+// left mouse button is held over the Height Layer stage; every cell
+// the pointer crosses joins the same in-progress shape, finalized into
+// state.heightShapes on release. See renderHeightShape()'s freeform
+// (shape.cells) branch for how that gets rendered afterward, and
+// render3DPreview()'s per-cell block handling for the 3D side.
+function toggleHeightDrawMode(next = !heightDrawMode) {
+  heightDrawMode = next;
+  el("drawHeightShapeBtn")?.classList.toggle("active", heightDrawMode);
+  el("mapStage")?.classList.toggle("height-draw-active", heightDrawMode);
+  if (!heightDrawMode) paintState = null;
+}
+
+function startPaintHeightShape(event) {
+  if (!heightDrawMode || event.button !== 0) return;
+  event.preventDefault();
+  hideContextMenu();
+  const { x, y } = stageCellFromEvent(event);
+  paintState = { cells: new Set([`${x},${y}`]) };
+  renderPaintPreview();
+  window.addEventListener("pointermove", movePaintHeightShape);
+  window.addEventListener("pointerup", endPaintHeightShape, { once: true });
+}
+
+function movePaintHeightShape(event) {
+  if (!paintState) return;
+  const { x, y } = stageCellFromEvent(event);
+  const key = `${x},${y}`;
+  if (!paintState.cells.has(key)) {
+    paintState.cells.add(key);
+    renderPaintPreview();
+  }
+}
+
+function endPaintHeightShape() {
+  window.removeEventListener("pointermove", movePaintHeightShape);
+  if (!paintState) return;
+  const coords = [...paintState.cells].map((key) => key.split(",").map(Number));
+  paintState = null;
+  renderPaintPreview();
+  if (!coords.length) return;
+  const minX = Math.min(...coords.map((c) => c[0]));
+  const minY = Math.min(...coords.map((c) => c[1]));
+  const maxX = Math.max(...coords.map((c) => c[0]));
+  const maxY = Math.max(...coords.map((c) => c[1]));
+  const shape = {
+    id: uid("height"),
+    x: minX,
+    y: minY,
+    w: maxX - minX + 1,
+    h: maxY - minY + 1,
+    cells: coords.map(([cx, cy]) => `${cx - minX},${cy - minY}`),
+    heightFeet: 5,
+    color: "#61dafb",
+  };
+  state.heightShapes.push(shape);
+  selectedId = shape.id;
+  renderAll();
+}
+
+// Cheap live feedback for an in-progress paint stroke -- doesn't go
+// through the full renderMap()/state.heightShapes pipeline (that would
+// mean a real state mutation on every single pointermove), just
+// highlights cells directly in a dedicated overlay layer.
+function renderPaintPreview() {
+  const preview = el("heightPaintPreview");
+  if (!preview) return;
+  if (!paintState) {
+    preview.innerHTML = "";
+    return;
+  }
+  const cell = Number(localGridSize || 48);
+  preview.innerHTML = [...paintState.cells]
+    .map((key) => {
+      const [x, y] = key.split(",").map(Number);
+      return `<span class="height-paint-preview-cell" style="left:${x * cell}px;top:${y * cell}px;width:${cell}px;height:${cell}px;"></span>`;
+    })
+    .join("");
 }
 
 function deleteSelected() {
@@ -6096,6 +6266,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     toggleHeightEditMode(false),
   );
   el("addHeightShapeBtn").addEventListener("click", addHeightShape);
+  el("drawHeightShapeBtn").addEventListener("click", () =>
+    toggleHeightDrawMode(),
+  );
   // A remote map update that arrived while a field in the selected-item
   // panel was focused gets held (see applyRemoteMapState()) instead of
   // rebuilding the panel's DOM out from under the user's cursor. Once

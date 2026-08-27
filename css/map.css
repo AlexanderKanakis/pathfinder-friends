@@ -552,6 +552,26 @@ body {
   bottom: auto;
 }
 
+/* "Draw Height Region" tool -- see toggleHeightDrawMode()/
+   startPaintHeightShape() in map.js. */
+#mapStage.height-draw-active {
+  cursor: crosshair;
+}
+
+.height-paint-preview {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.height-paint-preview-cell {
+  position: absolute;
+  background: rgba(97, 218, 251, 0.45);
+  border: 2px solid #61dafb;
+  box-sizing: border-box;
+}
+
 .token-hover-name {
   font-weight: 700;
   overflow: hidden;
@@ -646,11 +666,28 @@ body {
   }
 }
 
+/* A negative-height (pit) region needs to read as visually different
+   from a raised one at a glance -- a border-style change alone (the
+   original version of this) was too subtle to notice. Solid border +
+   diagonal hazard stripes reads as "hole in the ground" the same way
+   it does on any hazard signage; the label's own ▼ (see
+   heightFeetLabel() in map.js) backs it up. */
 .map-height-shape.pit {
-  border-style: dotted;
+  border-style: solid;
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 6px,
+    rgba(0, 0, 0, 0.4) 6px,
+    rgba(0, 0, 0, 0.4) 12px
+  );
 }
 
 .map-height-shape-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   font-size: 12px;
   font-weight: 700;
   color: #0d0d0d;
@@ -658,6 +695,42 @@ body {
   border-radius: 999px;
   padding: 1px 8px;
   pointer-events: none;
+  white-space: nowrap;
+}
+
+/* Freeform painted regions (see "Draw Height Region" -- endPaintHeightShape()
+   in map.js) -- same grid-of-cells trick renderShape() uses for circle
+   shapes, so an L-shaped or diagonal paint stroke keeps its actual outline
+   instead of being squared off into its bounding box. */
+.map-height-shape.height-shape-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--shape-cols), var(--cell));
+  grid-template-rows: repeat(var(--shape-rows), var(--cell));
+  place-items: stretch;
+  border: 0;
+  background: transparent;
+}
+
+.height-shape-cell {
+  background-color: var(--color);
+  border: 1px solid var(--color);
+}
+
+@supports (background: color-mix(in srgb, red 50%, transparent)) {
+  .height-shape-cell {
+    background: color-mix(in srgb, var(--color) 28%, transparent);
+  }
+}
+
+.map-height-shape.height-shape-grid.pit .height-shape-cell {
+  border-color: var(--color);
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 6px,
+    rgba(0, 0, 0, 0.4) 6px,
+    rgba(0, 0, 0, 0.4) 12px
+  );
 }
 
 .shape-texture-picker {
@@ -1755,6 +1828,13 @@ textarea {
 
 .map-3d-block.pit .map-3d-wall-west {
   transform: rotateY(90deg);
+}
+
+/* Cool/dark gradient (vs. the warm cliffside tone above) so a pit
+   reads as "shadowed hole" rather than just "a shorter cliff" -- at a
+   glance, wall color alone should say raised vs. sunken. */
+.map-3d-block.pit .map-3d-wall {
+  background: linear-gradient(to bottom, #1c2230, #05070a);
 }
 
 .map-3d-empty-hint {
