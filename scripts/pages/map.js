@@ -3255,14 +3255,39 @@ function renderAll(save = true) {
   if (save) queueSave();
 }
 
+// selectedObject() only searches tokens/shapes (its full return value --
+// kind, effects, etc. -- only ever makes sense for those two), so it's
+// the wrong check for "does *anything* with this id still exist" once
+// heightShapes is a third possible source. Kept separate on purpose.
+function mapItemExists(id) {
+  return [...state.tokens, ...state.shapes, ...state.heightShapes].some(
+    (entry) => entry.id === id,
+  );
+}
+
+// True while focus is inside an editable field in the selected-item
+// panel (typing a name, a color, the Height Layer's feet input, ...).
+// A remote map update arriving mid-edit shouldn't blow that field's
+// DOM node away and steal focus -- see applyRemoteMapState() below.
+function isEditingSelectedPanelField() {
+  const active = document.activeElement;
+  const panel = el("selectedPanel");
+  return Boolean(
+    panel &&
+      active &&
+      panel.contains(active) &&
+      ["INPUT", "TEXTAREA", "SELECT"].includes(active.tagName),
+  );
+}
+
 function applyRemoteMapState(remoteState) {
-  if (dragState) {
+  if (dragState || resizeState || isEditingSelectedPanelField()) {
     pendingRemoteState = remoteState;
     return;
   }
   clearTimeout(saveTimer);
   state = normalizeState(remoteState);
-  if (selectedId && !selectedObject()) selectedId = "";
+  if (selectedId && !mapItemExists(selectedId)) selectedId = "";
   if (
     contextMenuTokenId &&
     !state.tokens.some((token) => token.id === contextMenuTokenId)
@@ -3275,25 +3300,36 @@ function applyRemoteMapState(remoteState) {
 
 function flushPendingRemoteState() {
   if (!pendingRemoteState) return;
-  const localDraggedId = dragState?.id;
-  const localDraggedItem = [
-    ...state.tokens,
-    ...state.shapes,
-    ...state.heightShapes,
-  ].find((entry) => entry.id === localDraggedId);
+  if (isEditingSelectedPanelField()) return; // still editing -- wait
+  const localDraggedId = dragState?.id || resizeState?.id;
+  // Which of the three arrays localDraggedId actually lives in matters
+  // for putting it back in the right place below -- tokens/shapes and
+  // heightShapes items don't carry anything (like .kind) that tells
+  // them apart after the fact, so track the source array at lookup
+  // time instead of guessing from the item's own shape.
+  let localDraggedItem = null;
+  let sourceKey = null;
+  for (const key of ["tokens", "shapes", "heightShapes"]) {
+    const found = state[key].find((entry) => entry.id === localDraggedId);
+    if (found) {
+      localDraggedItem = found;
+      sourceKey = key;
+      break;
+    }
+  }
   const remoteState = normalizeState(pendingRemoteState);
   pendingRemoteState = null;
 
   if (!localDraggedId || !localDraggedItem) {
     state = remoteState;
-    if (selectedId && !selectedObject()) selectedId = "";
+    if (selectedId && !mapItemExists(selectedId)) selectedId = "";
     applySettingsToInputs();
     renderAll(false);
     return;
   }
 
   state = remoteState;
-  const collection = localDraggedItem.kind ? state.tokens : state.shapes;
+  const collection = state[sourceKey];
   const existingIndex = collection.findIndex(
     (entry) => entry.id === localDraggedId,
   );
@@ -3302,7 +3338,7 @@ function flushPendingRemoteState() {
   } else {
     collection.push(localDraggedItem);
   }
-  if (selectedId && !selectedObject()) selectedId = "";
+  if (selectedId && !mapItemExists(selectedId)) selectedId = "";
   applySettingsToInputs();
   renderAll(false);
 }
@@ -6060,6 +6096,25 @@ document.addEventListener("DOMContentLoaded", async () => {
     toggleHeightEditMode(false),
   );
   el("addHeightShapeBtn").addEventListener("click", addHeightShape);
+  // A remote map update that arrived while a field in the selected-item
+  // panel was focused gets held (see applyRemoteMapState()) instead of
+  // rebuilding the panel's DOM out from under the user's cursor. Once
+  // they click/tab away, apply whatever was waiting. #selectedPanel
+  // itself persists across renders (only its innerHTML is swapped), so
+  // this only needs binding once, not per-render.
+  el("selectedPanel").addEventListener("focusout", () => {
+    setTimeout(() => {
+      if (!isEditingSelectedPanelField()) flushPendingRemoteState();
+    }, 0);
+  });
+  // Backup for the focusout listener above -- focus/blur events aren't
+  // guaranteed to fire in every environment this runs in (e.g. some
+  // WebView/embedded contexts), so a held remote update shouldn't be
+  // able to wait forever if that listener is ever missed.
+  setInterval(() => {
+    if (pendingRemoteState && !isEditingSelectedPanelField())
+      flushPendingRemoteState();
+  }, 3000);
   quickEffectModal = new bootstrap.Modal(el("quickEffectModal"));
   quickEffectTargetsModal = new bootstrap.Modal(el("quickEffectTargetsModal"));
   rollModal = new bootstrap.Modal(el("rollModal"));
