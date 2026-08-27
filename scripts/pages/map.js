@@ -2599,6 +2599,60 @@ function feetToPreviewPx(feet) {
   return (Number(feet || 0) / 5) * MAP_3D_PX_PER_5FT;
 }
 
+// True if `shape`'s footprint (rect, or the absolute cells of a
+// freeform paint) shares any cell with the x/y/w/h footprint given.
+function shapeOverlapsFootprint(shape, x, y, w, h) {
+  const sx = Number(shape.x || 0);
+  const sy = Number(shape.y || 0);
+  if (Array.isArray(shape.cells)) {
+    return shape.cells.some((key) => {
+      const [dx, dy] = key.split(",").map(Number);
+      const gx = sx + dx;
+      const gy = sy + dy;
+      return gx >= x && gx < x + w && gy >= y && gy < y + h;
+    });
+  }
+  const sw = Number(shape.w || 1);
+  const sh = Number(shape.h || 1);
+  return sx < x + w && sx + sw > x && sy < y + h && sy + sh > y;
+}
+
+// Tokens aren't part of the Height Layer and get no block/wall
+// treatment of their own in the 3D preview -- they're just placed
+// (flat, no tilt of their own beyond the whole scene's) at the
+// elevation of the tallest height region their footprint overlaps, so
+// they visibly stand on top of a platform instead of floating at
+// ground level cutting through it. Ground level (no region beneath,
+// or every region beneath is a pit) is 0.
+function tallestHeightFeetUnder(x, y, w, h) {
+  let tallest = 0;
+  for (const shape of state.heightShapes) {
+    const feet = Number(shape.heightFeet || 0);
+    if (feet <= tallest) continue;
+    if (shapeOverlapsFootprint(shape, x, y, w, h)) tallest = feet;
+  }
+  return tallest;
+}
+
+function render3DToken(token) {
+  const x = Number(token.x || 0);
+  const y = Number(token.y || 0);
+  const w = Number(token.w || 1);
+  const h = Number(token.h || 1);
+  const z = feetToPreviewPx(tallestHeightFeetUnder(x, y, w, h));
+  const identityHidden = tokenNameIsHidden(token);
+  const imageUrl = identityHidden ? "" : String(token.imageUrl || "").trim();
+  const tokenImage = imageUrl ? `url('${cssUrl(imageUrl)}')` : "none";
+  const label = escapeHtml(
+    identityHidden ? "?" : tokenInitials(tokenActualName(token)),
+  );
+  return `
+    <div class="map-3d-token" style="left:${x * MAP_3D_CELL_PX}px;top:${y * MAP_3D_CELL_PX}px;width:${w * MAP_3D_CELL_PX}px;height:${h * MAP_3D_CELL_PX}px;transform:translateZ(${z}px);--token-color:${escapeHtml(token.color || "#8fd19e")};--token-image:${tokenImage};">
+      <div class="map-3d-token-label">${label}</div>
+    </div>
+  `;
+}
+
 function render3DPreview() {
   const scene = el("map3DScene");
   const { cols, rows, backgroundUrl } = state.settings;
@@ -2693,7 +2747,12 @@ function render3DPreview() {
     })
     .join("");
 
-  scene.innerHTML = baseHtml + blockHtml;
+  // Same visibility rules as the real 2D stage (fog, hidden enemies,
+  // etc.) -- see renderMap()'s use of the same filter -- so the 3D
+  // preview can't leak something the viewer isn't meant to see.
+  const tokenHtml = state.tokens.filter(canSeeToken).map(render3DToken).join("");
+
+  scene.innerHTML = baseHtml + blockHtml + tokenHtml;
 }
 
 const DPAD_MOVE_COOLDOWN_MS = 200;

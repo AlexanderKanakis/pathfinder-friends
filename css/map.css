@@ -1857,3 +1857,27 @@ textarea {
   text-align: center;
   padding: 40px 20px;
 }
+
+/* Tokens in the 3D preview are deliberately flat -- a plain disc
+   placed at the right height (see render3DToken()), not a block with
+   walls of its own. It tilts along with the rest of the scene (it's
+   still inside .map-3d-scene's rotateX) but has no depth beyond that. */
+.map-3d-token {
+  position: absolute;
+  border-radius: 50%;
+  background-color: var(--token-color);
+  background-image: var(--token-image, none);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border: 2px solid #f8f9fa;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+  display: grid;
+  place-items: center;
+  color: #111;
+  font-weight: 800;
+}
+
+.map-3d-token-label {
+  pointer-events: none;
+}
