@@ -73,6 +73,40 @@
             >
               <i class="bi bi-layers"></i> Edit Heights
             </button>
+            <button
+              id="toggleView3DBtn"
+              class="btn btn-outline-info btn-sm"
+              type="button"
+              title="View the map tilted in 3D, with Height Layer terrain -- tokens still work as normal"
+            >
+              <i class="bi bi-box"></i> 3D View
+            </button>
+          </div>
+          <div class="map-toolbar-group map-zoom-controls">
+            <label for="mapZoom">Zoom</label>
+            <input
+              id="mapZoom"
+              type="range"
+              min="24"
+              max="96"
+              value="48"
+            />
+            <span id="mapZoomValue" class="small text-secondary">48px</span>
+          </div>
+          <div id="map3DControls" class="map-toolbar-group map-3d-controls d-none">
+            <label for="map3DAngle">Camera angle</label>
+            <input id="map3DAngle" type="range" min="20" max="75" value="55" />
+            <label for="map3DRotate">Rotate</label>
+            <input id="map3DRotate" type="range" min="-180" max="180" value="0" />
+            <button
+              id="reset3DCamera"
+              class="btn btn-outline-light btn-sm btn-icon"
+              type="button"
+              title="Reset camera"
+              aria-label="Reset camera"
+            >
+              <i class="bi bi-arrow-counterclockwise"></i>
+            </button>
           </div>
           <div id="mapHeightToolbar" class="map-toolbar-group d-none">
             <button
@@ -98,14 +132,6 @@
               <i class="bi bi-x-lg"></i> Exit Height Layer
             </button>
           </div>
-          <button
-            id="open3DPreview"
-            class="btn btn-outline-info btn-sm"
-            type="button"
-            title="Preview Height Layer regions as raised (or sunken) 3D terrain"
-          >
-            <i class="bi bi-box"></i> 3D Preview
-          </button>
           <button
             id="openBackgroundOptions"
             class="btn btn-outline-light btn-sm btn-icon map-settings-button"
@@ -1214,56 +1240,6 @@
           </div>
           <div class="modal-body">
             <div id="mapEffectTracker"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div
-      class="modal fade"
-      id="map3DPreviewModal"
-      tabindex="-1"
-      aria-labelledby="map3DPreviewModalLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog modal-fullscreen">
-        <div class="modal-content bg-dark text-white border-secondary">
-          <div class="modal-header border-secondary">
-            <h5 class="modal-title" id="map3DPreviewModalLabel">
-              3D Preview
-              <span class="small-text d-block">
-                Experimental -- shows the Height Layer's regions as raised (or sunken) terrain. Movement/tokens are unaffected; this is a visual preview only.
-              </span>
-            </h5>
-            <button
-              type="button"
-              class="btn-close btn-close-white"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
-          </div>
-          <div class="modal-body map-3d-modal-body">
-            <div class="map-3d-controls">
-              <label for="map3DAngle">Camera angle</label>
-              <input
-                id="map3DAngle"
-                type="range"
-                min="20"
-                max="75"
-                value="55"
-              />
-              <label for="map3DRotate">Rotate</label>
-              <input
-                id="map3DRotate"
-                type="range"
-                min="-180"
-                max="180"
-                value="0"
-              />
-            </div>
-            <div class="map-3d-viewport" id="map3DViewport">
-              <div class="map-3d-scene" id="map3DScene"></div>
-            </div>
           </div>
         </div>
       </div>

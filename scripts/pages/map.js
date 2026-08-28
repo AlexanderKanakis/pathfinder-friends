@@ -1,10 +1,16 @@
-let map3DPreviewModal = null;
-// Height Layer (experimental "3D Preview" feature) -- see
-// toggleHeightEditMode()/state.heightShapes.
+// Height Layer (experimental) -- see toggleHeightEditMode()/
+// state.heightShapes. Editing (painting regions) is 2D-only; the
+// terrain it produces shows up in both the normal 2D view and the 3D
+// View toggle below.
 let heightEditMode = false;
 // "Draw Height Region" paint tool -- see toggleHeightDrawMode().
 let heightDrawMode = false;
 let paintState = null;
+// 3D View (experimental) -- tilts the live #mapStage in place, see
+// toggleView3DMode(). Independent of heightEditMode: this is a view
+// of the normal token/shape map, not a Height Layer editing mode.
+let view3DMode = false;
+let hovered3DTokenId = "";
 
 let mapContextKey = "";
 let mapCharacters = [];
@@ -19,6 +25,10 @@ let dragState = null;
 let resizeState = null;
 let mapRealtimeChannel = null;
 let pendingRemoteState = null;
+let mapSaveInFlight = 0;
+let mapSaveChain = Promise.resolve();
+let lastAppliedMapMeta = null;
+let localMapRevision = 0;
 let mapViewSlot = 1;
 let mapSlotMeta = [];
 let pendingBackgroundFootprint = null;
@@ -65,8 +75,19 @@ let auraEffectDismissed = new Set();
 let auraEffectInside = new Set();
 let turnAdvanceBusy = false;
 let seenTurnEffectNotices = new Set();
+let dpadJoystickState = null;
+let mapToastTimer = null;
+let shapeFogRenderContext = null;
 
 const MAP_SLOT_COUNT = 6;
+const MAP_CLIENT_ID_KEY = "pf_map_client_id";
+const MAP_CLIENT_ID =
+  sessionStorage.getItem(MAP_CLIENT_ID_KEY) ||
+  (() => {
+    const id = uid("map_client");
+    sessionStorage.setItem(MAP_CLIENT_ID_KEY, id);
+    return id;
+  })();
 // Pixels-per-cell assumed when converting a newly loaded background image's
 // natural size into a cell count. Fixed and independent of anyone's local
 // zoom ("Map Size") so the resulting grid is identical for every viewer.
@@ -90,7 +111,7 @@ const defaultState = {
   // painting elevation never clutters the regular map. Each entry:
   // { id, x, y, w, h, heightFeet, color }. heightFeet is a multiple of
   // 5 (1 "unit" = 5ft, a standard humanoid's height) and can be
-  // negative for a pit/depression. See render3DPreview().
+  // negative for a pit/depression. See render3DTerrainHtml().
   heightShapes: [],
   initiative: [],
   activeTurn: 0,
@@ -590,9 +611,26 @@ function tokenCharacter(token) {
 }
 function tokenActualName(token) {
   if (!token) return "Unnamed";
-  if (token.kind === "character")
-    return tokenCharacter(token)?.name || token.name || "Character";
-  return token.name || (token.kind === "enemy" ? "Enemy" : "Token");
+  if (token.kind === "character") {
+    const character = tokenCharacter(token);
+    return (
+      character?.name ||
+      character?.sheet?.fields?.characterName ||
+      token.name ||
+      "Character"
+    );
+  }
+  if (token.kind === "enemy") {
+    const enemy = mapEnemies.find((item) => item.id === token.enemyId);
+    return (
+      enemy?.name ||
+      enemy?.sheet?.fields?.characterName ||
+      token.sheet?.fields?.characterName ||
+      token.name ||
+      "Enemy"
+    );
+  }
+  return token.name || "Token";
 }
 function tokenNameIsHidden(token) {
   return Boolean(token?.hideName && token.kind !== "shape");
@@ -1543,6 +1581,14 @@ function normalizeState(raw) {
     MAP_SIZE_MAX,
   );
   const nextState = {
+    _meta:
+      raw?._meta && typeof raw._meta === "object"
+        ? {
+            clientId: String(raw._meta.clientId || ""),
+            revision: Math.max(0, Number(raw._meta.revision || 0)),
+            savedAt: Math.max(0, Number(raw._meta.savedAt || 0)),
+          }
+        : null,
     settings,
     tokens,
     shapes: Array.isArray(raw?.shapes) ? raw.shapes : [],
@@ -1570,6 +1616,39 @@ function normalizeState(raw) {
   state = nextState;
   normalizeZIndexes();
   return nextState;
+}
+
+function mapMetaOf(mapState = state) {
+  const meta = mapState?._meta || {};
+  return {
+    clientId: String(meta.clientId || ""),
+    revision: Math.max(0, Number(meta.revision || 0)),
+    savedAt: Math.max(0, Number(meta.savedAt || 0)),
+  };
+}
+
+function stampLocalMapState() {
+  localMapRevision += 1;
+  state._meta = {
+    clientId: MAP_CLIENT_ID,
+    revision: localMapRevision,
+    savedAt: Date.now(),
+  };
+  lastAppliedMapMeta = mapMetaOf(state);
+}
+
+function isStaleSelfRemote(remoteState) {
+  const meta = mapMetaOf(remoteState);
+  if (meta.clientId !== MAP_CLIENT_ID) return false;
+  return meta.revision <= localMapRevision;
+}
+
+function isOlderThanLocal(remoteState) {
+  const remoteMeta = mapMetaOf(remoteState);
+  const localMeta = mapMetaOf(state);
+  if (!remoteMeta.savedAt && localMeta.savedAt) return true;
+  if (!remoteMeta.savedAt || !localMeta.savedAt) return false;
+  return remoteMeta.savedAt < localMeta.savedAt;
 }
 
 function currentMapSlotName() {
@@ -1699,6 +1778,8 @@ function handleCellSizeChange(sourceId) {
 
 function applySettingsToInputs() {
   el("gridSize").value = localGridSize;
+  el("mapZoom").value = localGridSize;
+  el("mapZoomValue").textContent = `${localGridSize}px`;
   el("cellX").value = state.settings.cols;
   el("cellY").value = state.settings.rows;
   el("backgroundUrl").value = state.settings.backgroundUrl || "";
@@ -1888,9 +1969,22 @@ function moveContextItemZ(action) {
 }
 
 function stageCellFromEvent(event) {
+  const cell = Number(localGridSize || 48);
+  // A tilted/spun 3D stage (see toggleView3DMode()) makes the simple
+  // rect-relative math below meaningless -- the stage's on-screen
+  // bounding box no longer lines up with its actual grid cells once
+  // rotated. cell3DFromPoint()/build3DHitGrid() answer the same
+  // question via the browser's own (transform-aware) hit-testing
+  // instead. Requires a hit grid to already be built (see
+  // startDrag()/startMovementMeasure()); falls through to the flat
+  // math below if there isn't one (e.g. 3D View was toggled off mid-
+  // gesture).
+  if (view3DMode && !heightEditMode) {
+    const hit = cell3DFromPoint(event.clientX, event.clientY);
+    if (hit) return { x: hit.x, y: hit.y, px: (hit.x + 0.5) * cell, py: (hit.y + 0.5) * cell };
+  }
   const stage = el("mapStage");
   const rect = stage.getBoundingClientRect();
-  const cell = Number(localGridSize || 48);
   const x = clamp(
     Math.floor((event.clientX - rect.left) / cell),
     0,
@@ -1946,6 +2040,9 @@ function clearMovementMeasure(delay = 0) {
 function startMovementMeasure(event) {
   if (event.button !== 2) return;
   hideContextMenu();
+  // Must exist before stageCellFromEvent()'s 3D branch can answer
+  // anything -- see build3DHitGrid().
+  if (view3DMode && !heightEditMode) build3DHitGrid();
   const point = stageCellFromEvent(event);
   movementMeasure = { start: point, current: point, dragged: false };
   renderMovementMeasure();
@@ -1969,6 +2066,7 @@ function endMovementMeasure() {
   suppressNextContextMenu = wasDragged;
   window.removeEventListener("pointermove", moveMovementMeasure);
   clearMovementMeasure(wasDragged ? 700 : 0);
+  teardown3DHitGrid();
 }
 
 function renderMap() {
@@ -1984,6 +2082,83 @@ function renderMap() {
   // The background always fills the whole cols x rows grid, so resizing
   // Cell X/Y (linked) scales the picture with it instead of cropping it.
 
+  // 3D View only applies to the normal token/shape stage -- Height
+  // Layer editing (painting regions) stays 2D-only regardless of the
+  // toggle's own state, so this re-derives it fresh every render
+  // instead of trusting view3DMode alone.
+  const is3D = view3DMode && !heightEditMode;
+  const visibleTokens = heightEditMode ? [] : state.tokens.filter(canSeeToken);
+  stage.classList.toggle("is-3d", is3D);
+  const stageWrap = el("mapStageWrap");
+  stageWrap?.classList.toggle("is-3d", is3D);
+  if (is3D) {
+    set3DViewVars();
+    // The camera needs to stay comfortably farther away than the
+    // scene is wide/tall, or a big map's flat ground plane can rotate
+    // enough to cross behind the perspective origin -- CSS doesn't
+    // clip that cleanly, it distorts catastrophically (the plane's
+    // own bounding box balloons to several times the viewport at
+    // wildly wrong coordinates), visually burying every block/token
+    // on top of it. A fixed perspective distance can't work across
+    // both a small map and a large one at a normal zoom level, so
+    // this scales with the map's own rendered diagonal
+    // (cols/rows * localGridSize, the same size the terrain/tokens
+    // actually render at) instead of a constant.
+    const mapDiagonal = Math.hypot(
+      Number(cols || 0) * Number(localGridSize || 48),
+      Number(rows || 0) * Number(localGridSize || 48),
+    );
+    stageWrap?.style.setProperty(
+      "--map-3d-perspective",
+      `${Math.max(1400, mapDiagonal * 2)}px`,
+    );
+  }
+
+  // See token3DFogRevealStrength()'s comment: 3D has no full-stage fog
+  // overlay to hide tokens for free (2D gets that for free from the
+  // opaque SVG fog layer sitting above them in z-index), so it's done
+  // by hand here -- dropped entirely for a player who can't see that
+  // cell (unless it's their own token, which they can always see),
+  // just dimmed for the GM (matching the 0.45 the terrain fog itself
+  // dims to). Computed once up top so both the innerHTML build below
+  // and render3DTokenBillboards() see the same filtered set.
+  const fog3DActive = is3D && !heightEditMode && Boolean(state.fog?.visible);
+  const fog3DLimitedCircles = fog3DActive ? limitedViewRevealCircles() : [];
+  const fog3DLightCircles = fog3DActive ? lightRevealCircles() : [];
+  shapeFogRenderContext = {
+    active: fog3DActive,
+    limitedCircles: fog3DLimitedCircles,
+    lightCircles: fog3DLightCircles,
+    color: state.fog?.color || "#000000",
+  };
+  const token3DRevealStrength = (token) =>
+    token3DFogRevealStrength(token, fog3DLimitedCircles, fog3DLightCircles);
+  const token3DFogOpacity = (token) => {
+    if (!fog3DActive || token.ownerId === currentUserId) return 1;
+    const revealStrength = token3DRevealStrength(token);
+    return revealStrength > 0.08 ? 0.45 + revealStrength * 0.55 : 0.45;
+  };
+  // Mirrors renderLimitedViewGrayscale()'s 2D rule: grayscale/high
+  // contrast for anyone standing inside a Special Vision circle,
+  // unconditionally -- even where a light also reaches them.
+  const token3DGrayscale = (token) => {
+    if (!fog3DActive || !fog3DLimitedCircles.length) return false;
+    const center = tokenCenter(token);
+    const gx = Math.floor(center.x);
+    const gy = Math.floor(center.y);
+    return fog3DLimitedCircles.some(
+      (circle) => flatRevealStrengthAtCell(circle, gx, gy) > 0.02,
+    );
+  };
+  const tokens3D = !fog3DActive
+    ? visibleTokens
+    : visibleTokens.filter(
+        (token) =>
+          isGm ||
+          token.ownerId === currentUserId ||
+          token3DRevealStrength(token) > 0.08,
+      );
+
   // Height Layer mode replaces the whole stage contents with just the
   // height regions -- no tokens, ordinary shapes, or fog, so painting
   // elevation never risks nudging something used in actual play. See
@@ -1995,15 +2170,15 @@ function renderMap() {
       `<div id="tokenHoverLayer" class="token-hover-layer"></div>`,
     ].join("");
   } else {
-    const visibleTokens = state.tokens.filter(canSeeToken);
     stage.innerHTML = [
-      ...visibleTokens.map(renderAura),
-      ...(isGm
+      is3D ? render3DTerrainHtml() : "",
+      ...(is3D ? tokens3D : visibleTokens).map(renderAura),
+      ...(isGm && !is3D
         ? visibleTokens.map((token) =>
             renderRevealIndicator(token, "light", "map-reveal-light", "#f0d58c"),
           )
         : []),
-      ...(isGm
+      ...(isGm && !is3D
         ? visibleTokens.map((token) =>
             renderRevealIndicator(
               token,
@@ -2014,13 +2189,27 @@ function renderMap() {
           )
         : []),
       ...state.shapes.map(renderShape),
-      ...visibleTokens.map(renderToken),
-      renderFogLayer(),
-      renderLimitedViewGrayscale(),
-      renderOwnTokenFogReveal(visibleTokens),
+      ...(is3D ? tokens3D : visibleTokens).map((token) =>
+        renderToken(token, {
+          tz: is3D ? token3DHeights(token).tz : 0,
+          fogOpacity: is3D ? token3DFogOpacity(token) : 1,
+          grayscale: is3D && token3DGrayscale(token),
+        }),
+      ),
+      is3D ? tokens3D.map(render3DFlightConnector).join("") : "",
+      is3D ? "" : renderFogLayer(false),
+      is3D ? "" : renderLimitedViewGrayscale(),
+      is3D ? "" : renderOwnTokenFogReveal(visibleTokens),
       `<div id="tokenHoverLayer" class="token-hover-layer"></div>`,
     ].join("");
   }
+
+  // stage.innerHTML above just wiped out any in-progress 3D hit-test
+  // grid (see build3DHitGrid()) along with everything else -- move
+  // the already-built one back in rather than losing it mid-drag;
+  // startDrag()/startMovementMeasure() are what actually build it.
+  if (is3D && hit3DGridEl) stage.appendChild(hit3DGridEl);
+  render3DTokenBillboards(is3D ? tokens3D : []);
 
   // The movement ruler doesn't mean anything in the Height Layer --
   // clicking the stage background there starts a paint stroke instead
@@ -2124,6 +2313,7 @@ function lightRevealCircles() {
       x: center.x,
       y: center.y,
       radius: Math.max(1, Number(token.light.radius || 1)),
+      elevationFeet: Number(token.elevationFeet || 0),
     });
   });
   return circles;
@@ -2142,6 +2332,7 @@ function limitedViewRevealCircles() {
       x: center.x,
       y: center.y,
       radius: Math.max(1, Number(token.limitedView.radius || 1)),
+      elevationFeet: Number(token.elevationFeet || 0),
     });
   });
   return circles;
@@ -2151,8 +2342,220 @@ function fogRevealCircles() {
   return [...lightRevealCircles(), ...limitedViewRevealCircles()];
 }
 
-function renderFogLayer() {
+// 3D View only -- in 2D, fog already hides tokens for free: the opaque
+// SVG fog layer paints over them (z-index 25 vs. a token's z-index ~2,
+// see .map-fog-layer/.map-token in css/map.css), and renderOwnTokenFogReveal()
+// redraws just the viewer's own token on top of that so they can still
+// see themselves. 3D has no such full-stage overlay (fog there is baked
+// per-terrain-cell, see renderSurfaceFogCells()), so without this a
+// token's billboard/portrait/aura would stay fully visible in 3D no
+// matter how dark the ground under it went.
+function token3DFogRevealStrength(token, limitedCircles, lightCircles) {
+  const center = tokenCenter(token);
+  const targetFeet =
+    tallestHeightFeetUnder(
+      Number(token.x || 0),
+      Number(token.y || 0),
+      Number(token.w || 1),
+      Number(token.h || 1),
+    ) + Number(token.elevationFeet || 0);
+  return fogRevealStrengthAt3DPoint(
+    center.x,
+    center.y,
+    targetFeet,
+    Math.floor(center.x),
+    Math.floor(center.y),
+    limitedCircles,
+    lightCircles,
+  );
+}
+
+function surfaceFeetAtCell(gx, gy) {
+  return tallestHeightFeetUnder(gx, gy, 1, 1);
+}
+
+const FOG_SOFT_EDGE_CELLS = 0.85;
+const FOG_OCCLUSION_EPSILON_FEET = 0.5;
+
+function revealStrengthFromDistance(distance, radius) {
+  const safeRadius = Math.max(1, Number(radius || 1));
+  const inner = Math.max(0, safeRadius - FOG_SOFT_EDGE_CELLS);
+  const outer = safeRadius + FOG_SOFT_EDGE_CELLS;
+  if (distance <= inner) return 1;
+  if (distance >= outer) return 0;
+  return clamp((outer - distance) / (outer - inner), 0, 1);
+}
+
+function flatRevealStrengthAtCell(circle, gx, gy) {
+  const distance = Math.hypot(gx + 0.5 - circle.x, gy + 0.5 - circle.y);
+  return revealStrengthFromDistance(distance, circle.radius);
+}
+
+function lightPathBlockedAtPoint(
+  light,
+  targetX,
+  targetY,
+  targetFeet,
+  targetGx,
+  targetGy,
+) {
+  const sourceSurfaceFeet = surfaceFeetAtCell(
+    Math.floor(light.x),
+    Math.floor(light.y),
+  );
+  const sourceFeet = sourceSurfaceFeet + Number(light.elevationFeet || 0);
+  const dx = targetX - light.x;
+  const dy = targetY - light.y;
+  const steps = Math.max(2, Math.ceil(Math.max(Math.abs(dx), Math.abs(dy)) * 3));
+  const sourceGx = Math.floor(light.x);
+  const sourceGy = Math.floor(light.y);
+
+  for (let step = 1; step < steps; step += 1) {
+    const t = step / steps;
+    const sampleGx = Math.floor(light.x + dx * t);
+    const sampleGy = Math.floor(light.y + dy * t);
+    if (
+      (sampleGx === sourceGx && sampleGy === sourceGy) ||
+      (sampleGx === targetGx && sampleGy === targetGy)
+    ) {
+      continue;
+    }
+    const pathFeet = sourceFeet + (targetFeet - sourceFeet) * t;
+    if (
+      surfaceFeetAtCell(sampleGx, sampleGy) >
+      pathFeet + FOG_OCCLUSION_EPSILON_FEET
+    ) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function lightRevealStrengthAtCell(light, gx, gy) {
+  return flatRevealStrengthAtCell(light, gx, gy);
+}
+
+function revealStrengthAt3DPoint(circle, targetX, targetY, targetFeet) {
+  const sourceSurfaceFeet = surfaceFeetAtCell(
+    Math.floor(circle.x),
+    Math.floor(circle.y),
+  );
+  const sourceFeet = sourceSurfaceFeet + Number(circle.elevationFeet || 0);
+  const distance = Math.hypot(
+    targetX - circle.x,
+    targetY - circle.y,
+    (targetFeet - sourceFeet) / 5,
+  );
+  return revealStrengthFromDistance(distance, circle.radius);
+}
+
+function fogRevealStrengthAt3DPoint(
+  targetX,
+  targetY,
+  targetFeet,
+  targetGx,
+  targetGy,
+  limitedCircles,
+  lightCircles,
+) {
+  let strength = 0;
+  limitedCircles.forEach((circle) => {
+    strength = Math.max(
+      strength,
+      revealStrengthAt3DPoint(circle, targetX, targetY, targetFeet),
+    );
+  });
+  lightCircles.forEach((light) => {
+    const lightStrength = revealStrengthAt3DPoint(
+      light,
+      targetX,
+      targetY,
+      targetFeet,
+    );
+    if (
+      lightStrength > 0 &&
+      !lightPathBlockedAtPoint(
+        light,
+        targetX,
+        targetY,
+        targetFeet,
+        targetGx,
+        targetGy,
+      )
+    ) {
+      strength = Math.max(strength, lightStrength);
+    }
+  });
+  return strength;
+}
+
+function fogRevealStrengthAtCell(gx, gy, limitedCircles, lightCircles) {
+  let strength = 0;
+  limitedCircles.forEach((circle) => {
+    strength = Math.max(strength, flatRevealStrengthAtCell(circle, gx, gy));
+  });
+  lightCircles.forEach((light) => {
+    strength = Math.max(strength, lightRevealStrengthAtCell(light, gx, gy));
+  });
+  return strength;
+}
+
+function fogOpacityAt3DCell(gx, gy, limitedCircles, lightCircles) {
+  const revealStrength = fogRevealStrengthAtCell(
+    gx,
+    gy,
+    limitedCircles,
+    lightCircles,
+  );
+  return (isGm ? 0.45 : 1) * (1 - revealStrength);
+}
+
+function fogColorWithOpacity(color, opacity) {
+  const alpha = clamp(Number(opacity || 0), 0, 1);
+  const hex = String(color || "#000000").trim();
+  const match = hex.match(/^#?([0-9a-f]{6})$/i);
+  if (!match) return escapeHtml(hex);
+  const value = match[1];
+  const red = parseInt(value.slice(0, 2), 16);
+  const green = parseInt(value.slice(2, 4), 16);
+  const blue = parseInt(value.slice(4, 6), 16);
+  return `rgba(${red}, ${green}, ${blue}, ${alpha.toFixed(3)})`;
+}
+
+function grayscaleHexColor(color) {
+  const hex = String(color || "#8fd19e").trim();
+  const match = hex.match(/^#?([0-9a-f]{6})$/i);
+  if (!match) return color;
+  const value = match[1];
+  const red = parseInt(value.slice(0, 2), 16);
+  const green = parseInt(value.slice(2, 4), 16);
+  const blue = parseInt(value.slice(4, 6), 16);
+  const gray = Math.round(red * 0.299 + green * 0.587 + blue * 0.114);
+  const part = gray.toString(16).padStart(2, "0");
+  return `#${part}${part}${part}`;
+}
+
+function highest3DSceneZ(tokens = state.tokens) {
+  const terrainFeet = state.heightShapes.reduce(
+    (max, shape) => Math.max(max, Number(shape.heightFeet || 0)),
+    0,
+  );
+  const tokenFeet = tokens.reduce((max, token) => {
+    const surfaceFeet = tallestHeightFeetUnder(
+      Number(token.x || 0),
+      Number(token.y || 0),
+      Number(token.w || 1),
+      Number(token.h || 1),
+    );
+    return Math.max(max, surfaceFeet + Number(token.elevationFeet || 0));
+  }, 0);
+  return feetToPreviewPx(Math.max(0, terrainFeet, tokenFeet));
+}
+
+function renderFogLayer(is3D = false) {
   if (!state.fog?.visible) return "";
+  if (is3D) return "";
   const { cols, rows } = state.settings;
   const holes = fogRevealCircles()
     .map(
@@ -2296,7 +2699,10 @@ function renderAuraEffectToasts() {
   });
 }
 
-function renderToken(token, { ghost = false } = {}) {
+function renderToken(
+  token,
+  { ghost = false, tz = 0, fogOpacity = 1, grayscale = false } = {},
+) {
   const enemyClass = token.kind === "enemy" ? " enemy" : "";
   const genericClass = token.kind === "token" ? " generic-token" : "";
   const identityHidden = tokenNameIsHidden(token);
@@ -2306,6 +2712,11 @@ function renderToken(token, { ghost = false } = {}) {
   const imageClass = imageUrl ? " has-image" : "";
   const identityHiddenClass = identityHidden ? " identity-hidden" : "";
   const tokenImage = imageUrl ? `url('${cssUrl(imageUrl)}')` : "none";
+  const baseColor = grayscale
+    ? grayscaleHexColor(token.color || "#8fd19e")
+    : token.color || "#8fd19e";
+  const tokenW = Number(token.w || 1);
+  const tokenH = Number(token.h || 1);
   const hiddenClass =
     token.kind === "enemy" && token.visible === false && isGm
       ? " enemy-hidden"
@@ -2320,13 +2731,137 @@ function renderToken(token, { ghost = false } = {}) {
       : "";
   const ghostClass = ghost ? " map-token-fog-reveal" : "";
   const idAttr = ghost ? "" : ` data-map-id="${escapeHtml(token.id)}"`;
+  const shortLabel = tokenNameIsHidden(token)
+    ? isGm
+      ? `? ${tokenInitials(tokenActualName(token))}`
+      : "?"
+    : tokenInitials(tokenActualName(token));
+  // opacity/filter < 1 (or != none) force transform-style:preserve-3d
+  // to compute as flat on whatever element they're set on (CSS
+  // Transforms spec) -- fine for an imageless token (.map-token has no
+  // 3D-transformed children to flatten), but .map-token itself needs
+  // real preserve-3d in 3D mode so .map-token-3d-image's own
+  // translateZ + counter-rotation (see css/map.css) still composes
+  // against the tilted scene instead of collapsing onto it. That
+  // collapse is exactly what made a dimmed token's portrait render
+  // tilted flat with the ground instead of billboarded upright, only
+  // for tokens dim enough to carry the style at all -- i.e. everything
+  // short of "fully revealed". So both styles go on the leaf image
+  // itself when there is one, and only fall back to the container when
+  // there's no image (nothing under it needs preserve-3d).
+  const grayscaleFilter = grayscale ? "grayscale(1) contrast(1.75)" : "";
+  const tokenEffectStyle = [
+    fogOpacity < 1 ? `opacity:${fogOpacity};` : "",
+    grayscaleFilter
+      ? `filter:${grayscaleFilter};-webkit-filter:${grayscaleFilter};`
+      : "",
+  ].join("");
+  const portraitHtml = imageUrl
+    ? `<img class="map-token-3d-image" src="${escapeHtml(cssUrl(imageUrl))}" alt="" style="${tokenEffectStyle}">`
+    : "";
+  const baseFogHtml =
+    fogOpacity < 1
+      ? `<div class="map-token-3d-base-fog" style="background:${fogColorWithOpacity("#000000", 1 - fogOpacity)};"></div>`
+      : "";
+  const containerEffectStyle = imageUrl
+    ? ""
+    : [
+        grayscaleFilter
+          ? `filter:${grayscaleFilter};-webkit-filter:${grayscaleFilter};`
+          : "",
+      ].join("");
   return `
-    <div class="map-token${enemyClass}${genericClass}${imageClass}${identityHiddenClass}${hiddenClass}${tokenHiddenClass}${selectedClass}${activeClass}${ghostClass}"${idAttr} style="--x:${token.x};--y:${token.y};--w:${token.w || 1};--h:${token.h || 1};--z:${Number(token.zIndex || 2)};--color:${escapeHtml(token.color || "#8fd19e")};--token-image:${tokenImage};">
+    <div class="map-token${enemyClass}${genericClass}${imageClass}${identityHiddenClass}${hiddenClass}${tokenHiddenClass}${selectedClass}${activeClass}${ghostClass}"${idAttr} style="--x:${token.x};--y:${token.y};--w:${tokenW};--h:${tokenH};--z:${Number(token.zIndex || 2)};--tz:${tz}px;--color:${escapeHtml(baseColor)};--token-image:${tokenImage};${containerEffectStyle}">
+      ${baseFogHtml}
+      ${portraitHtml}
       <div class="text-center">
-        <div class="token-label">${escapeHtml(tokenNameIsHidden(token) ? (isGm ? `? ${tokenInitials(tokenActualName(token))}` : "?") : tokenInitials(tokenActualName(token)))}</div>
+        <div class="token-label">${escapeHtml(shortLabel)}</div>
       </div>
     </div>
   `;
+}
+
+function setMapZoom(value, { render = true } = {}) {
+  localGridSize = clamp(Number(value || 48), 24, 96);
+  sessionStorage.setItem("pf_map_grid_size", String(localGridSize));
+  el("gridSize").value = localGridSize;
+  el("mapZoom").value = localGridSize;
+  el("mapZoomValue").textContent = `${localGridSize}px`;
+  if (render) renderAll(false);
+}
+
+function render3DTokenBillboards(tokens) {
+  const wrap = el("mapStageWrap");
+  let layer = el("token3DBillboardLayer");
+  if (!wrap) return;
+  if (!layer) {
+    layer = document.createElement("div");
+    layer.id = "token3DBillboardLayer";
+    layer.className = "token-3d-billboard-layer";
+    wrap.appendChild(layer);
+  }
+  if (!view3DMode || heightEditMode) {
+    layer.innerHTML = "";
+    layer.classList.add("d-none");
+    return;
+  }
+  layer.classList.remove("d-none");
+  const wrapRect = wrap.getBoundingClientRect();
+  const pieces = [];
+  for (const token of tokens) {
+    const node = wrap.querySelector(
+      `.map-token[data-map-id="${CSS.escape(token.id)}"]`,
+    );
+    if (!node) continue;
+    const rect = node.getBoundingClientRect();
+    const centerX = rect.left - wrapRect.left + wrap.scrollLeft + rect.width / 2;
+    const centerY = rect.top - wrapRect.top + wrap.scrollTop + rect.height / 2;
+    const tokenBasePx =
+      Math.min(Number(token.w || 1), Number(token.h || 1)) *
+      Number(localGridSize || 48);
+    const size = Math.round(clamp(tokenBasePx * 1.35, 56, 128));
+    const hoverHtml =
+      hovered3DTokenId === token.id ? render3DTokenHover(token, centerX, centerY, size) : "";
+    if (hoverHtml) pieces.push(hoverHtml);
+  }
+  layer.innerHTML = pieces.join("");
+}
+
+function render3DTokenHover(token, centerX, centerY, portraitSize) {
+  const hoverName =
+    token.kind === "character" || token.kind === "token" || (token.kind === "enemy" && isGm)
+      ? displayTokenName(token)
+      : "";
+  if (!hoverName) return "";
+  const hoverHp =
+    token.kind === "character"
+      ? tokenHpText(token)
+      : token.kind === "enemy" && isGm
+        ? `${tokenCurrentHp(token) || "?"}/${tokenTotalHp(token) || "?"} HP`
+        : "";
+  return `
+    <div class="token-3d-hover-card" style="left:${centerX}px;top:${centerY - portraitSize / 2 - 8}px;">
+      <div class="token-hover-name">${escapeHtml(hoverName)}</div>
+      ${hoverHp ? `<div class="token-hover-hp">${escapeHtml(hoverHp)}</div>` : ""}
+    </div>
+  `;
+}
+
+function set3DViewVars() {
+  const stage = el("mapStage");
+  if (!stage) return;
+  const angle = Number(el("map3DAngle")?.value || 55);
+  const rotate = Number(el("map3DRotate")?.value || 0);
+  stage.style.setProperty("--map-3d-angle", `${angle}deg`);
+  stage.style.setProperty("--map-3d-rotate", `${rotate}deg`);
+  stage.style.setProperty("--map-3d-angle-inverse", `${-angle}deg`);
+  stage.style.setProperty("--map-3d-rotate-inverse", `${-rotate}deg`);
+  document.documentElement.style.setProperty("--map-dpad-rotation", `${rotate}deg`);
+  if (view3DMode && !heightEditMode) {
+    requestAnimationFrame(() =>
+      render3DTokenBillboards(state.tokens.filter(canSeeToken)),
+    );
+  }
 }
 
 function renderOwnTokenFogReveal(visibleTokens) {
@@ -2338,11 +2873,21 @@ function renderOwnTokenFogReveal(visibleTokens) {
 }
 
 function hideTokenHover() {
+  hovered3DTokenId = "";
+  if (view3DMode && !heightEditMode) {
+    render3DTokenBillboards(state.tokens.filter(canSeeToken));
+  }
   const layer = el("tokenHoverLayer");
   if (layer) layer.innerHTML = "";
 }
 
 function showTokenHover(tokenId) {
+  if (view3DMode && !heightEditMode) {
+    hovered3DTokenId = tokenId;
+    el("tokenHoverLayer") && (el("tokenHoverLayer").innerHTML = "");
+    render3DTokenBillboards(state.tokens.filter(canSeeToken));
+    return;
+  }
   const token = tokenById(tokenId);
   const layer = el("tokenHoverLayer");
   if (!token || !layer) return;
@@ -2491,6 +3036,90 @@ function heightFeetLabel(feet) {
   return `${value} ft`;
 }
 
+function showMapToast(message) {
+  let container = el("mapToastContainer");
+  if (!container) {
+    container = document.createElement("div");
+    container.id = "mapToastContainer";
+    container.className = "map-toast-container";
+    document.body.appendChild(container);
+  }
+  container.innerHTML = `<div class="map-toast">${escapeHtml(message)}</div>`;
+  clearTimeout(mapToastTimer);
+  mapToastTimer = setTimeout(() => {
+    container.innerHTML = "";
+  }, 2200);
+}
+
+function shapeDepth(shape) {
+  const rawDepth = Number(shape?.d || 0);
+  return Math.max(
+    shape?.texture ? 1 : 0,
+    Number.isFinite(rawDepth) ? rawDepth : 0,
+  );
+}
+
+function enforceShapeDepthMinimum(shape, input = null) {
+  if (!shape?.shape || !shape.texture || Number(shape.d || 0) >= 1) return false;
+  shape.d = 1;
+  if (input) input.value = "1";
+  showMapToast("Textured shapes need at least 1 height.");
+  return true;
+}
+
+function renderShape3DTextureSprite(texture, depth) {
+  const rows = Math.max(1, Math.round(Number(depth || 1)));
+  const virtualMask = {
+    cols: 1,
+    rows,
+    occupied: new Set(Array.from({ length: rows }, (_, row) => `0,${row}`)),
+  };
+  return Array.from({ length: rows }, (_, row) => {
+    const tile = tilePosition(
+      shapeTileIndex({ shape: "rect" }, virtualMask, 0, row),
+    );
+    return `<span class="shape-3d-sprite-segment texture-cell" style="background-image:url('${cssUrl(texture.url)}');--tile-x:${tile.x};--tile-y:${tile.y};"></span>`;
+  }).join("");
+}
+
+function shape3DCellFogState(shape, gx, gy, depth) {
+  const context = shapeFogRenderContext;
+  if (!context?.active) return { opacity: 0, grayscale: false };
+  const targetFeet =
+    surfaceFeetAtCell(gx, gy) + Math.max(0, Number(depth || 0)) * 5;
+  const revealStrength = fogRevealStrengthAt3DPoint(
+    gx + 0.5,
+    gy + 0.5,
+    targetFeet,
+    gx,
+    gy,
+    context.limitedCircles,
+    context.lightCircles,
+  );
+  const opacity = (isGm ? 0.45 : 1) * (1 - revealStrength);
+  const grayscale = context.limitedCircles.some(
+    (circle) => flatRevealStrengthAtCell(circle, gx, gy) > 0.02,
+  );
+  return { opacity, grayscale };
+}
+
+function renderShape3DFogOverlay(fogState) {
+  if (!shapeFogRenderContext?.active || fogState.opacity <= 0.01) return "";
+  return `<span class="shape-3d-fog" style="background:${fogColorWithOpacity(shapeFogRenderContext.color, fogState.opacity)};"></span>`;
+}
+
+function shape3DSpriteFogStyle(fogState) {
+  if (!shapeFogRenderContext?.active) return "";
+  const visibleOpacity = clamp(1 - fogState.opacity, 0, 1);
+  const grayscaleFilter = fogState.grayscale ? "grayscale(1) contrast(1.75)" : "";
+  return [
+    `opacity:${visibleOpacity};`,
+    grayscaleFilter
+      ? `filter:${grayscaleFilter};-webkit-filter:${grayscaleFilter};`
+      : "",
+  ].join("");
+}
+
 // A Height Layer region is either a plain rect (from "Add Height
 // Region") or a freeform set of painted cells (from "Draw Height
 // Region" -- see endPaintHeightShape()). The two need different
@@ -2532,8 +3161,88 @@ function renderHeightShape(shape) {
 function renderShape(shape) {
   const selectedClass = shape.id === selectedId ? " selected" : "";
   const texture = shapeTexture(shape.texture);
+  const depth = shapeDepth(shape);
+  const mask = shapeMask(shape);
+  if (view3DMode && texture && depth > 0 && !heightEditMode) {
+    const surfaceZ = feetToPreviewPx(
+      tallestHeightFeetUnder(shape.x, shape.y, mask.cols, mask.rows),
+    );
+    const spriteHtml = renderShape3DTextureSprite(texture, depth);
+    const cells = [];
+    for (let y = 0; y < mask.rows; y += 1) {
+      for (let x = 0; x < mask.cols; x += 1) {
+        cells.push(
+          mask.occupied.has(`${x},${y}`)
+            ? (() => {
+                const gx = Number(shape.x || 0) + x;
+                const gy = Number(shape.y || 0) + y;
+                const fogState = shape3DCellFogState(shape, gx, gy, depth);
+                return `<span class="shape-3d-sprite-cell"><span class="shape-3d-sprite" style="${shape3DSpriteFogStyle(fogState)}">${spriteHtml}</span>${renderShape3DFogOverlay(fogState)}</span>`;
+              })()
+            : "<span></span>",
+        );
+      }
+    }
+    return `
+      <div class="map-shape shape-grid shape-3d-texture${selectedClass}" data-map-id="${escapeHtml(shape.id)}" style="--x:${shape.x};--y:${shape.y};--w:${mask.cols};--h:${mask.rows};--z:${Number(shape.zIndex || 2)};--shape-cols:${mask.cols};--shape-rows:${mask.rows};--color:${escapeHtml(shape.color || "#f0d58c")};--tz:${surfaceZ}px;--shape-sprite-rows:${Math.max(1, Math.round(depth))};">
+        ${cells.join("")}
+        ${resizeHandlesHtml(shape.id)}
+      </div>
+    `;
+  }
+  if (view3DMode && depth > 0 && !heightEditMode) {
+    const depthPx = feetToPreviewPx(depth * 5);
+    const surfaceZ = feetToPreviewPx(
+      tallestHeightFeetUnder(shape.x, shape.y, mask.cols, mask.rows),
+    );
+    const cells = [];
+    for (let y = 0; y < mask.rows; y += 1) {
+      for (let x = 0; x < mask.cols; x += 1) {
+        const occupied = mask.occupied.has(`${x},${y}`);
+        if (!occupied) {
+          cells.push("<span></span>");
+          continue;
+        }
+        const gx = Number(shape.x || 0) + x;
+        const gy = Number(shape.y || 0) + y;
+        const fogState = shape3DCellFogState(shape, gx, gy, depth);
+        const fogOverlay = renderShape3DFogOverlay(fogState);
+        const sides = [
+          ["north", !mask.occupied.has(`${x},${y - 1}`)],
+          ["south", !mask.occupied.has(`${x},${y + 1}`)],
+          ["east", !mask.occupied.has(`${x + 1},${y}`)],
+          ["west", !mask.occupied.has(`${x - 1},${y}`)],
+        ]
+          .filter(([, visible]) => visible)
+          .map(
+            ([side]) =>
+              `<span class="shape-3d-wall shape-3d-wall-${side}">${fogOverlay}</span>`,
+          )
+          .join("");
+        const topStyle = texture
+          ? (() => {
+              const tile = tilePosition(shapeTileIndex(shape, mask, x, y));
+              return `background-image:url('${cssUrl(texture.url)}');--tile-x:${tile.x};--tile-y:${tile.y};`;
+            })()
+          : "";
+        cells.push(`
+          <span class="shape-3d-cell">
+            <span class="shape-3d-cell-top-plane">
+              <span class="shape-3d-top${texture ? " texture-cell" : ""}" style="${topStyle}">${fogOverlay}</span>
+              ${sides}
+            </span>
+          </span>
+        `);
+      }
+    }
+    return `
+      <div class="map-shape shape-grid shape-3d${selectedClass}" data-map-id="${escapeHtml(shape.id)}" style="--x:${shape.x};--y:${shape.y};--w:${mask.cols};--h:${mask.rows};--z:${Number(shape.zIndex || 2)};--shape-cols:${mask.cols};--shape-rows:${mask.rows};--color:${escapeHtml(shape.color || "#f0d58c")};--tz:${surfaceZ}px;--shape-depth:${depthPx}px;">
+        ${cells.join("")}
+        ${resizeHandlesHtml(shape.id)}
+      </div>
+    `;
+  }
   if (texture || shape.shape === "circle") {
-    const mask = shapeMask(shape);
     const cells = [];
     for (let y = 0; y < mask.rows; y += 1) {
       for (let x = 0; x < mask.cols; x += 1) {
@@ -2567,20 +3276,18 @@ function renderShape(shape) {
 }
 
 // ---------------------------------------------------------------
-// 3D Preview (experimental). Renders a separate, flattened snapshot of
-// the map -- deliberately NOT a live-tilted version of the real
-// interactive #mapStage, both because that stage is far too deeply
-// nested for CSS 3D to render reliably (iOS WebKit especially -- see
-// css/map.css's comment above .map-3d-modal-body) and because a
-// snapshot is much simpler to reason about for a first pass: read the
-// current state once, build a small stack of flat "plates," done.
+// 3D Map View (experimental). Tilts the REAL, live #mapStage in
+// place -- see toggleView3DMode() -- rather than a separate snapshot.
+// Height Layer regions render as raised/sunken terrain alongside the
+// normal tokens/shapes, which keep their existing drag/select/
+// context-menu wiring since they're the same DOM elements as always.
 //
 // Every region in state.heightShapes (see toggleHeightEditMode())
 // becomes a block:
 // - its top/floor face is the map texture cropped to that region's
 //   footprint, floating at translateZ(feet-to-px(heightFeet))
-// - four walls connect that face back down (or, for a negative/pit
-//   height, back UP) to true ground level at Z=0
+// - raised walls connect the top face back down to ground; pit walls
+//   hinge from ground level and fold down to the sunken floor
 // Circles and textured shapes were never an option here -- Height
 // Layer regions are always plain rects (see addHeightShape()).
 //
@@ -2590,9 +3297,10 @@ function renderShape(shape) {
 // raised dais, a cliff ledge, a pit) but two overlapping blocks will
 // visibly clip through each other rather than blend.
 // ---------------------------------------------------------------
-const MAP_3D_CELL_PX = 40;
 // 1 height unit = 5ft (a standard humanoid's height, per the Height
-// Region panel) = this many px in the preview scene.
+// Region panel) = this many px of translateZ. Independent of cell
+// size (localGridSize) -- controls how exaggerated height looks, not
+// how big a grid cell is.
 const MAP_3D_PX_PER_5FT = 32;
 
 function feetToPreviewPx(feet) {
@@ -2640,27 +3348,21 @@ function tallestHeightFeetUnder(x, y, w, h) {
 // be, so an ordinary token never needs to be re-set every time it
 // walks from open ground onto a platform. Only a nonzero value (set
 // deliberately, e.g. for a flying enemy) offsets it above/below that
-// surface -- see render3DToken().
-function render3DToken(token) {
-  const x = Number(token.x || 0);
-  const y = Number(token.y || 0);
-  const w = Number(token.w || 1);
-  const h = Number(token.h || 1);
-  const surfaceFeet = tallestHeightFeetUnder(x, y, w, h);
-  const elevationFeet = Number(token.elevationFeet || 0);
-  const z = feetToPreviewPx(surfaceFeet + elevationFeet);
-  const identityHidden = tokenNameIsHidden(token);
-  const imageUrl = identityHidden ? "" : String(token.imageUrl || "").trim();
-  const tokenImage = imageUrl ? `url('${cssUrl(imageUrl)}')` : "none";
-  const label = escapeHtml(
-    identityHidden ? "?" : tokenInitials(tokenActualName(token)),
+// surface. Returns the token's own translateZ px (for renderToken()'s
+// --tz) plus the surface's, for render3DFlightConnector().
+function token3DHeights(token) {
+  const surfaceFeet = tallestHeightFeetUnder(
+    Number(token.x || 0),
+    Number(token.y || 0),
+    Number(token.w || 1),
+    Number(token.h || 1),
   );
-  const tokenHtml = `
-    <div class="map-3d-token" style="left:${x * MAP_3D_CELL_PX}px;top:${y * MAP_3D_CELL_PX}px;width:${w * MAP_3D_CELL_PX}px;height:${h * MAP_3D_CELL_PX}px;transform:translateZ(${z}px);--token-color:${escapeHtml(token.color || "#8fd19e")};--token-image:${tokenImage};">
-      <div class="map-3d-token-label">${label}</div>
-    </div>
-  `;
-  return tokenHtml + render3DFlightConnector(x, y, w, h, surfaceFeet, elevationFeet);
+  const elevationFeet = Number(token.elevationFeet || 0);
+  return {
+    tz: feetToPreviewPx(surfaceFeet + elevationFeet),
+    surfaceZ: feetToPreviewPx(surfaceFeet),
+    elevationFeet,
+  };
 }
 
 // The "is this token flying" line: a token whose actual Z isn't the
@@ -2668,48 +3370,44 @@ function render3DToken(token) {
 // its own height straight down (or up) to that surface, so it's
 // obvious at a glance that it's off the ground/platform rather than
 // just badly aligned with it.
-function render3DFlightConnector(x, y, w, h, surfaceFeet, elevationFeet) {
+function render3DFlightConnector(token) {
+  const { tz, surfaceZ, elevationFeet } = token3DHeights(token);
   if (elevationFeet === 0) return "";
-  const tokenZ = feetToPreviewPx(surfaceFeet + elevationFeet);
-  const surfaceZ = feetToPreviewPx(surfaceFeet);
-  const poleLenPx = Math.abs(tokenZ - surfaceZ);
-  // Hinged at the token's own height (tokenZ) and folded toward the
-  // surface -- same "fold down to reach a lower Z" trick blockHtmlAt's
-  // walls use, just pointed whichever way the surface actually is.
-  const foldClass = tokenZ < surfaceZ ? " fold-up" : "";
+  const cell = Number(localGridSize || 48);
+  const x = Number(token.x || 0) * cell;
+  const y = Number(token.y || 0) * cell;
+  const w = Number(token.w || 1) * cell;
+  const h = Number(token.h || 1) * cell;
+  const poleLenPx = Math.abs(tz - surfaceZ);
+  // Hinged at the token's own height (tz) and folded toward the
+  // surface -- same "fold down to reach a lower Z" trick the height
+  // blocks' walls use, just pointed whichever way the surface
+  // actually is.
+  const foldClass = tz < surfaceZ ? " fold-up" : "";
   return `
-    <div class="map-3d-flight-anchor" style="left:${x * MAP_3D_CELL_PX}px;top:${y * MAP_3D_CELL_PX}px;width:${w * MAP_3D_CELL_PX}px;height:${h * MAP_3D_CELL_PX}px;transform:translateZ(${tokenZ}px);">
+    <div class="map-3d-flight-anchor" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;transform:translateZ(${tz}px);">
       <div class="map-3d-flight-pole${foldClass}" style="height:${poleLenPx}px;"></div>
-      <div class="map-3d-flight-anchor-mark" style="transform:translateZ(${surfaceZ - tokenZ}px);"></div>
+      <div class="map-3d-flight-anchor-mark" style="transform:translateZ(${surfaceZ - tz}px);"></div>
     </div>
   `;
 }
 
-function render3DPreview() {
-  const scene = el("map3DScene");
+// Ground layer + all raised/sunken block terrain, sized to the
+// CURRENT cell size (localGridSize) so it lines up exactly with
+// token/shape positioning (--x/--y/--cell), which uses the same
+// value. Returns HTML to prepend to the stage's normal content.
+function render3DTerrainHtml() {
   const { cols, rows, backgroundUrl } = state.settings;
-  const mapW = Number(cols || 0) * MAP_3D_CELL_PX;
-  const mapH = Number(rows || 0) * MAP_3D_CELL_PX;
-  scene.style.width = `${mapW}px`;
-  scene.style.height = `${mapH}px`;
-  scene.style.setProperty(
-    "--map-3d-angle",
-    `${el("map3DAngle").value || 55}deg`,
-  );
-  scene.style.setProperty(
-    "--map-3d-rotate",
-    `${el("map3DRotate").value || 0}deg`,
-  );
-
-  if (!backgroundUrl) {
-    scene.innerHTML = `<div class="map-3d-empty-hint">Set a map background first (Map Settings) to preview it in 3D.</div>`;
-    return;
-  }
+  if (!backgroundUrl) return "";
+  const cellPx = Number(localGridSize || 48);
+  const mapW = Number(cols || 0) * cellPx;
+  const mapH = Number(rows || 0) * cellPx;
 
   // Single-quoted url() -- this gets embedded inside a double-quoted
   // HTML style="..." attribute below (built via innerHTML, unlike
-  // stage.style.setProperty's background-image elsewhere in this file,
-  // which goes through the CSSOM directly and never has this problem).
+  // stage.style.setProperty's background-image elsewhere in this
+  // file, which goes through the CSSOM directly and never has this
+  // problem).
   const bgCss = `url('${cssUrl(backgroundUrl)}')`;
   const blocks = [...state.heightShapes]
     .filter((shape) => Number(shape.heightFeet) !== 0)
@@ -2721,15 +3419,11 @@ function render3DPreview() {
 
   // A raised block naturally sits in front of the base plate (it's
   // closer to the camera) so it's visible with no extra work. A pit
-  // is the opposite: its floor is FARTHER from the camera than the
-  // base plate at that same x/y, and the base plate is one solid,
-  // opaque rectangle covering the entire map -- so without a literal
-  // hole cut into it, that plate sits between the camera and the
-  // pit's floor/walls and hides them completely, however correctly
-  // those are actually being rendered underneath. Cut a hole via a
-  // CSS mask-image, one rect per pit cell/footprint, so the camera
-  // can actually see down into the pit instead of skimming a solid
-  // roof over it.
+  // is the opposite: its floor is farther from the camera than the
+  // base plate at that same x/y, so the base needs a real transparent
+  // cutout there. This is the same masked-base approach used by the
+  // original pushed 3D Preview modal, where the bitmap was known to
+  // render correctly.
   const pitCutouts = blocks
     .filter((shape) => Number(shape.heightFeet) < 0)
     .flatMap((shape) => {
@@ -2748,17 +3442,9 @@ function render3DPreview() {
         const holes = pitCutouts
           .map(
             ({ gx, gy, gw, gh }) =>
-              `<rect x="${gx * MAP_3D_CELL_PX}" y="${gy * MAP_3D_CELL_PX}" width="${gw * MAP_3D_CELL_PX}" height="${gh * MAP_3D_CELL_PX}" fill="black"/>`,
+              `<rect x="${gx * cellPx}" y="${gy * cellPx}" width="${gw * cellPx}" height="${gh * cellPx}" fill="black"/>`,
           )
           .join("");
-        // CSS mask-image reads an image source's ALPHA channel, not its
-        // color/luminance -- a plain white-rect-plus-black-rect SVG is
-        // fully opaque everywhere (alpha 1 for both colors) and would
-        // mask nothing at all. Routing through the SVG's OWN <mask>
-        // element (which IS luminance-based) bakes real transparency
-        // into the rendered image first -- white areas of that inner
-        // mask become alpha 1, black areas become alpha 0 -- so the
-        // image this produces then works correctly as a CSS mask source.
         const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${mapW}" height="${mapH}"><mask id="pitHoles"><rect width="100%" height="100%" fill="white"/>${holes}</mask><rect width="100%" height="100%" fill="white" mask="url(#pitHoles)"/></svg>`;
         const maskUrl = `url('data:image/svg+xml,${encodeURIComponent(svg)}')`;
         return `mask-image:${maskUrl};-webkit-mask-image:${maskUrl};mask-size:${mapW}px ${mapH}px;-webkit-mask-size:${mapW}px ${mapH}px;mask-repeat:no-repeat;-webkit-mask-repeat:no-repeat;`;
@@ -2768,22 +3454,184 @@ function render3DPreview() {
   // Same faint per-cell grid the 2D stage draws (see .map-stage in
   // css/map.css) -- two repeating 1px hairline gradients stacked on
   // top of the actual art. Reused here (base plate + every block's
-  // top face) so the 3D preview still gives a sense of individual
-  // cells instead of going fully blank/textureless between the
-  // (now much more restrained) region rims.
+  // top face) so cells stay visible on tilted terrain too.
   const GRID_LINES_CSS = `linear-gradient(to right, rgba(255,255,255,0.18) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.18) 1px, transparent 1px)`;
+  const fogVisible = Boolean(state.fog?.visible);
+  const terrainLimitedCircles = fogVisible ? limitedViewRevealCircles() : [];
+  const terrainLightCircles = fogVisible ? lightRevealCircles() : [];
+  const terrainFogColor = state.fog?.color || "#000000";
+  // Each cell/block is its own independently-positioned element (see
+  // blockHtmlAt() below), so gx*cellPx boundaries between neighbors
+  // don't always land on whole device pixels -- a fog cell sized to
+  // exactly match its own cell can leave a hairline sub-pixel gap at
+  // the seam with the next one, which read as a bright, un-fogged
+  // line tracing every cell/shape boundary once the fog itself goes
+  // fully opaque. Overdrawing each fog cell by a little in every
+  // direction makes neighbors overlap instead of merely touch, which
+  // papers over that gap (harmless: they're flat, single-color, so an
+  // overlapped seam looks identical to a clean one).
+  const FOG_CELL_OVERDRAW_PX = 1;
+  const renderSurfaceFogCells = (gx, gy, gw, gh) => {
+    if (!fogVisible) return "";
+    let fogHtml = "";
+    for (let localY = 0; localY < gh; localY += 1) {
+      for (let localX = 0; localX < gw; localX += 1) {
+        const opacity = fogOpacityAt3DCell(
+          gx + localX,
+          gy + localY,
+          terrainLimitedCircles,
+          terrainLightCircles,
+        );
+        if (opacity <= 0.02) continue;
+        const left = localX * cellPx - FOG_CELL_OVERDRAW_PX;
+        const top = localY * cellPx - FOG_CELL_OVERDRAW_PX;
+        const size = cellPx + FOG_CELL_OVERDRAW_PX * 2;
+        fogHtml += `<div class="map-3d-surface-fog-cell" style="left:${left}px;top:${top}px;width:${size}px;height:${size}px;background:${fogColorWithOpacity(terrainFogColor, opacity)};"></div>`;
+      }
+    }
+    return fogHtml;
+  };
 
-  const baseHtml = `
-    <div class="map-3d-base" style="width:${mapW}px;height:${mapH}px;background-image:${GRID_LINES_CSS},${bgCss};background-size:${MAP_3D_CELL_PX}px ${MAP_3D_CELL_PX}px,${MAP_3D_CELL_PX}px ${MAP_3D_CELL_PX}px,${mapW}px ${mapH}px;background-repeat:repeat,repeat,no-repeat;${baseMaskCss}"></div>
+  // 2D's Special Vision circle (.map-limited-view-grayscale in
+  // css/map.css) is one big backdrop-filter'd circle sitting above the
+  // fog layer -- there's no equivalent single flat layer to lay over a
+  // tilted 3D scene, so this mirrors renderSurfaceFogCells() instead:
+  // one small backdrop-filter'd quad per cell, nested in the same
+  // tilted coordinate frame as the terrain it needs to sit on top of.
+  // Unconditional within a limited-view circle regardless of whether a
+  // light also reaches that cell, same as the 2D version -- special
+  // vision reads as black-and-white even where a torch is also
+  // burning.
+  const limitedViewStrengthAtCell = (gx, gy) =>
+    terrainLimitedCircles.reduce(
+      (max, circle) => Math.max(max, flatRevealStrengthAtCell(circle, gx, gy)),
+      0,
+    );
+  // A cell is either inside a Special Vision circle or it isn't -- the
+  // 2D circle (.map-limited-view-grayscale) is one constant-strength
+  // backdrop-filter with a crisp border-radius:50% edge, no fade. This
+  // used to scale grayscale()/contrast() down by the same soft-edge
+  // falloff fog uses, but that falloff covers most of a circle's AREA
+  // (a ring near the radius is most of a circle, geometrically), so
+  // nearly the whole thing ended up close enough to strength 0 to
+  // still read as "in color" -- constant full-strength inside the
+  // threshold, same as 2D, fixes that.
+  const GRAYSCALE_FILTER = "grayscale(1) contrast(1.75)";
+  const renderSurfaceGrayscaleCells = (gx, gy, gw, gh) => {
+    if (!fogVisible || !terrainLimitedCircles.length) return "";
+    let html = "";
+    for (let localY = 0; localY < gh; localY += 1) {
+      for (let localX = 0; localX < gw; localX += 1) {
+        const strength = limitedViewStrengthAtCell(gx + localX, gy + localY);
+        if (strength <= 0.02) continue;
+        const globalX = (gx + localX) * cellPx;
+        const globalY = (gy + localY) * cellPx;
+        html += `<div class="map-3d-surface-grayscale-cell" style="left:${localX * cellPx}px;top:${localY * cellPx}px;width:${cellPx}px;height:${cellPx}px;background-image:${GRID_LINES_CSS},${bgCss};background-size:${cellPx}px ${cellPx}px,${cellPx}px ${cellPx}px,${mapW}px ${mapH}px;background-position:0 0,0 0,-${globalX}px -${globalY}px;background-repeat:repeat,repeat,no-repeat;filter:${GRAYSCALE_FILTER};-webkit-filter:${GRAYSCALE_FILTER};"></div>`;
+      }
+    }
+    return html;
+  };
+
+  const groundHtml = `
+    <div class="map-3d-base" style="width:${mapW}px;height:${mapH}px;background-image:${GRID_LINES_CSS},${bgCss};background-size:${cellPx}px ${cellPx}px,${cellPx}px ${cellPx}px,${mapW}px ${mapH}px;background-repeat:repeat,repeat,no-repeat;${baseMaskCss}">
+      ${renderSurfaceGrayscaleCells(0, 0, Number(cols || 0), Number(rows || 0))}
+      ${renderSurfaceFogCells(0, 0, Number(cols || 0), Number(rows || 0))}
+    </div>
   `;
+  // How dark a wall segment should read: the strongest reveal strength
+  // among the cells it separates (itself + its outward neighbor), same
+  // per-cell math the ground/top-face fog cells use. NOTE: this only
+  // ever *tints* a wall -- it must never be used to skip rendering the
+  // wall outright. A block's top face has backface-visibility:visible
+  // (see .map-3d-block-top in css/map.css) so it stays legible at
+  // extreme spin angles; omitting a wall when its area is unrevealed
+  // used to leave a gap there, and looking through that gap exposed
+  // the top face's own *backface* -- its terrain art bitmap, mirrored
+  // -- which read as "the wall gained a background texture" that
+  // came and went with whatever the light's position/radius currently
+  // revealed. Always keeping the wall in the DOM (just darkened) seals
+  // that gap.
+  const wallFogOpacity = (gx, gy, gw, gh, side) => {
+    if (!fogVisible) return 0;
+    const strengthAt = (x, y) =>
+      fogRevealStrengthAtCell(x, y, terrainLimitedCircles, terrainLightCircles);
+    let maxStrength = 0;
+    if (side === "north") {
+      for (let x = gx; x < gx + gw; x += 1) {
+        maxStrength = Math.max(maxStrength, strengthAt(x, gy), strengthAt(x, gy - 1));
+      }
+    } else if (side === "south") {
+      for (let x = gx; x < gx + gw; x += 1) {
+        maxStrength = Math.max(
+          maxStrength,
+          strengthAt(x, gy + gh - 1),
+          strengthAt(x, gy + gh),
+        );
+      }
+    } else if (side === "west") {
+      for (let y = gy; y < gy + gh; y += 1) {
+        maxStrength = Math.max(maxStrength, strengthAt(gx, y), strengthAt(gx - 1, y));
+      }
+    } else if (side === "east") {
+      for (let y = gy; y < gy + gh; y += 1) {
+        maxStrength = Math.max(
+          maxStrength,
+          strengthAt(gx + gw - 1, y),
+          strengthAt(gx + gw, y),
+        );
+      }
+    }
+    return (isGm ? 0.45 : 1) * (1 - maxStrength);
+  };
 
-  // A raised block's walls hinge at the top face and fold DOWN to
-  // ground (the default CSS rotation in css/map.css). A pit is the
-  // mirror image: its "top" face already sits below ground, so its
-  // walls need to fold the OPPOSITE way to reach back UP to Z=0 --
-  // see the .pit override in css/map.css for the reversed
-  // rotateX/rotateY signs (worked out by hand, then confirmed by
-  // screenshotting both a raised block and a pit side by side).
+  // Wall counterpart to renderSurfaceGrayscaleCells()'s per-cell
+  // grayscale -- same "strongest of the two cells this edge
+  // separates" shape as wallFogOpacity() above, but using only
+  // Special Vision circles (limitedViewStrengthAtCell), since this is
+  // the unconditional-within-the-circle effect, not fog reveal.
+  const wallGrayscaleStrength = (gx, gy, gw, gh, side) => {
+    if (!fogVisible || !terrainLimitedCircles.length) return 0;
+    let maxStrength = 0;
+    if (side === "north") {
+      for (let x = gx; x < gx + gw; x += 1) {
+        maxStrength = Math.max(
+          maxStrength,
+          limitedViewStrengthAtCell(x, gy),
+          limitedViewStrengthAtCell(x, gy - 1),
+        );
+      }
+    } else if (side === "south") {
+      for (let x = gx; x < gx + gw; x += 1) {
+        maxStrength = Math.max(
+          maxStrength,
+          limitedViewStrengthAtCell(x, gy + gh - 1),
+          limitedViewStrengthAtCell(x, gy + gh),
+        );
+      }
+    } else if (side === "west") {
+      for (let y = gy; y < gy + gh; y += 1) {
+        maxStrength = Math.max(
+          maxStrength,
+          limitedViewStrengthAtCell(gx, y),
+          limitedViewStrengthAtCell(gx - 1, y),
+        );
+      }
+    } else if (side === "east") {
+      for (let y = gy; y < gy + gh; y += 1) {
+        maxStrength = Math.max(
+          maxStrength,
+          limitedViewStrengthAtCell(gx + gw - 1, y),
+          limitedViewStrengthAtCell(gx + gw, y),
+        );
+      }
+    }
+    return maxStrength;
+  };
+
+  // A raised block's walls hinge at the top face and fold down to
+  // ground. A pit is the mirror image: its floor face sits below
+  // ground, so its walls fold the opposite way to reach back up to
+  // Z=0. This matches the original 3D Preview modal.
   // `sides` controls which of the 4 edges actually get a wall -- for
   // a freeform region made of many 1x1 cells, an edge shared with
   // another cell of the SAME region isn't a real boundary and drawing
@@ -2791,19 +3639,40 @@ function render3DPreview() {
   // distracting grid that reads as "flat textured ground," not "one
   // recessed/raised area." Only the true outer perimeter gets one.
   function blockHtmlAt(gx, gy, gw, gh, z, sides) {
-    const x = gx * MAP_3D_CELL_PX;
-    const y = gy * MAP_3D_CELL_PX;
-    const w = gw * MAP_3D_CELL_PX;
-    const h = gh * MAP_3D_CELL_PX;
+    const x = gx * cellPx;
+    const y = gy * cellPx;
+    const w = gw * cellPx;
+    const h = gh * cellPx;
     const wallPx = Math.abs(z);
+    const faceStyle = `background-image:${GRID_LINES_CSS},${bgCss};background-size:${cellPx}px ${cellPx}px,${cellPx}px ${cellPx}px,${mapW}px ${mapH}px;background-position:0 0,0 0,-${x}px -${y}px;background-repeat:repeat,repeat,no-repeat;`;
     const pitClass = z < 0 ? " pit" : "";
+    // A wall on the true outer perimeter (per `sides`) always gets
+    // rendered -- fog only ever darkens it via a nested tint div, see
+    // wallFogOpacity()'s comment for why skipping the element itself
+    // is the wrong way to hide an unrevealed wall.
+    const wallHtml = (side, sizeStyle) => {
+      if (!sides[side]) return "";
+      const opacity = wallFogOpacity(gx, gy, gw, gh, side);
+      const tint =
+        opacity > 0.02
+          ? `<div class="map-3d-wall-fog" style="background:${fogColorWithOpacity(terrainFogColor, opacity)};"></div>`
+          : "";
+      const grayStrength = wallGrayscaleStrength(gx, gy, gw, gh, side);
+      const grayTint =
+        grayStrength > 0.02
+          ? `<div class="map-3d-wall-grayscale"></div>`
+          : "";
+      return `<div class="map-3d-wall map-3d-wall-${side}" style="${sizeStyle}">${grayTint}${tint}</div>`;
+    };
     return `
       <div class="map-3d-block${pitClass}" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;">
-        <div class="map-3d-block-top" style="transform:translateZ(${z}px);background-image:${GRID_LINES_CSS},${bgCss};background-size:${MAP_3D_CELL_PX}px ${MAP_3D_CELL_PX}px,${MAP_3D_CELL_PX}px ${MAP_3D_CELL_PX}px,${mapW}px ${mapH}px;background-position:0 0,0 0,-${x}px -${y}px;background-repeat:repeat,repeat,no-repeat;">
-          ${sides.south ? `<div class="map-3d-wall map-3d-wall-south" style="height:${wallPx}px;"></div>` : ""}
-          ${sides.north ? `<div class="map-3d-wall map-3d-wall-north" style="height:${wallPx}px;"></div>` : ""}
-          ${sides.east ? `<div class="map-3d-wall map-3d-wall-east" style="width:${wallPx}px;"></div>` : ""}
-          ${sides.west ? `<div class="map-3d-wall map-3d-wall-west" style="width:${wallPx}px;"></div>` : ""}
+        <div class="map-3d-block-top" style="transform:translateZ(${z}px);${faceStyle}">
+          ${renderSurfaceGrayscaleCells(gx, gy, gw, gh)}
+          ${renderSurfaceFogCells(gx, gy, gw, gh)}
+          ${wallHtml("south", `height:${wallPx}px;`)}
+          ${wallHtml("north", `height:${wallPx}px;`)}
+          ${wallHtml("east", `width:${wallPx}px;`)}
+          ${wallHtml("west", `width:${wallPx}px;`)}
         </div>
       </div>
     `;
@@ -2811,6 +3680,9 @@ function render3DPreview() {
 
   const ALL_SIDES = { north: true, south: true, east: true, west: true };
 
+  // Each freeform-painted cell becomes its own separate block (top
+  // face + up to 4 walls, each nested transform-style:preserve-3d --
+  // see blockHtmlAt()).
   const blockHtml = blocks
     .map((shape) => {
       const z = feetToPreviewPx(shape.heightFeet);
@@ -2825,20 +3697,15 @@ function render3DPreview() {
         return shape.cells
           .map((key) => {
             const [dx, dy] = key.split(",").map(Number);
+            const gx = Number(shape.x || 0) + dx;
+            const gy = Number(shape.y || 0) + dy;
             const sides = {
               north: !cellSet.has(`${dx},${dy - 1}`),
               south: !cellSet.has(`${dx},${dy + 1}`),
               west: !cellSet.has(`${dx - 1},${dy}`),
               east: !cellSet.has(`${dx + 1},${dy}`),
             };
-            return blockHtmlAt(
-              Number(shape.x || 0) + dx,
-              Number(shape.y || 0) + dy,
-              1,
-              1,
-              z,
-              sides,
-            );
+            return blockHtmlAt(gx, gy, 1, 1, z, sides);
           })
           .join("");
       }
@@ -2853,21 +3720,131 @@ function render3DPreview() {
     })
     .join("");
 
-  // Same visibility rules as the real 2D stage (fog, hidden enemies,
-  // etc.) -- see renderMap()'s use of the same filter -- so the 3D
-  // preview can't leak something the viewer isn't meant to see.
-  const tokenHtml = state.tokens.filter(canSeeToken).map(render3DToken).join("");
-
-  scene.innerHTML = baseHtml + blockHtml + tokenHtml;
+  return groundHtml + blockHtml;
 }
 
-const DPAD_MOVE_COOLDOWN_MS = 200;
+// ---------------------------------------------------------------
+// 3D drag/measure support: elementFromPoint()-based cell detection.
+// A tilted+spun stage means a raw pixel delta (event.clientX minus a
+// remembered start X -- the 2D drag's whole approach, see moveDrag())
+// no longer maps linearly to grid cells once rotation is involved.
+// Rather than inverting that transform by hand, an invisible grid of
+// per-cell hit targets is built (only while a drag/measure is
+// actually in progress -- see build3DHitGrid()) and the browser's own
+// elementFromPoint() -- which DOES correctly account for the full
+// transform stack -- is asked which one the pointer is over.
+// ---------------------------------------------------------------
+let hit3DGridEl = null;
+
+// The grid cells currently scrolled into view (+ marginCells of
+// slack), in map.stage-wrap's own untransformed scroll metrics --
+// those aren't affected by #mapStage's own tilt/spin transform (CSS
+// transforms are purely visual/paint-time; scrollable overflow is
+// computed pre-transform), so this plain 2D math is safe to use even
+// though the content it's describing is rendered tilted. Shared by
+// build3DHitGrid() and render3DTerrainHtml()'s block-count cap --
+// both need "what's actually in view" for the same reason: keeping
+// the number of live DOM/preserve-3d elements bounded regardless of
+// how large the underlying map or how much terrain is painted on it.
+function visible3DCellRange(marginCells) {
+  const cols = state.settings.cols;
+  const rows = state.settings.rows;
+  const wrap = el("mapStageWrap");
+  const cell = Number(localGridSize || 48);
+  // .map-stage-wrap.is-3d carries extra padding on every side (see
+  // css/map.css) so there's room to scroll to wherever a tilted/spun
+  // map's edges land once they're outside #mapStage's own untransformed
+  // box. scrollLeft/scrollTop measure from that padded edge, not from
+  // the map content's actual top-left corner, so back the padding back
+  // out before converting to cells -- otherwise this creeps the
+  // "visible" range off by however many cells the 3D padding is worth
+  // (currently several), which would UNDER-count what's in view rather
+  // than just over-count it (harmless slack the marginCells below
+  // already covers).
+  const wrapStyle = getComputedStyle(wrap);
+  const padLeft = parseFloat(wrapStyle.paddingLeft) || 0;
+  const padTop = parseFloat(wrapStyle.paddingTop) || 0;
+  const contentScrollLeft = wrap.scrollLeft - padLeft;
+  const contentScrollTop = wrap.scrollTop - padTop;
+  return {
+    minX: clamp(Math.floor(contentScrollLeft / cell) - marginCells, 0, cols - 1),
+    minY: clamp(Math.floor(contentScrollTop / cell) - marginCells, 0, rows - 1),
+    maxX: clamp(
+      Math.ceil((contentScrollLeft + wrap.clientWidth) / cell) + marginCells,
+      0,
+      cols - 1,
+    ),
+    maxY: clamp(
+      Math.ceil((contentScrollTop + wrap.clientHeight) / cell) + marginCells,
+      0,
+      rows - 1,
+    ),
+  };
+}
+
+// Bounded so a large map (up to 300x300, see MAP_SIZE_MAX) never
+// generates tens of thousands of hit-test divs: small/medium maps get
+// full coverage; a genuinely huge one only gets the scrolled-into-
+// view region (+ margin), which is all a drag needs anyway.
+const HIT_3D_GRID_MAX_CELLS = 2000;
+
+function hit3DGridRange() {
+  const cols = state.settings.cols;
+  const rows = state.settings.rows;
+  if (cols * rows <= HIT_3D_GRID_MAX_CELLS) {
+    return { minX: 0, minY: 0, maxX: cols - 1, maxY: rows - 1 };
+  }
+  return visible3DCellRange(10);
+}
+
+function build3DHitGrid() {
+  const cell = Number(localGridSize || 48);
+  const { minX, minY, maxX, maxY } = hit3DGridRange();
+  const container = document.createElement("div");
+  container.id = "hit3DGrid";
+  let html = "";
+  for (let gy = minY; gy <= maxY; gy++) {
+    for (let gx = minX; gx <= maxX; gx++) {
+      // +2px over the visible terrain surface -- purely so this
+      // (invisible) cell wins elementFromPoint() ties against the
+      // real terrain top face sitting at the exact same Z, not a
+      // visible offset.
+      const z = feetToPreviewPx(tallestHeightFeetUnder(gx, gy, 1, 1)) + 2;
+      html += `<div class="map-3d-hit-cell" data-gx="${gx}" data-gy="${gy}" style="left:${gx * cell}px;top:${gy * cell}px;width:${cell}px;height:${cell}px;transform:translateZ(${z}px);"></div>`;
+    }
+  }
+  container.innerHTML = html;
+  hit3DGridEl = container;
+  el("mapStage").appendChild(hit3DGridEl);
+}
+
+// renderMap() rebuilds #mapStage.innerHTML from scratch on every move
+// (see moveDrag()), which would otherwise lose this grid every time --
+// it re-appends hit3DGridEl itself when one exists, so nothing needs
+// to call this explicitly except at the end of a drag/measure.
+function teardown3DHitGrid() {
+  hit3DGridEl?.remove();
+  hit3DGridEl = null;
+}
+
+function cell3DFromPoint(clientX, clientY) {
+  const found = document
+    .elementFromPoint(clientX, clientY)
+    ?.closest("[data-gx]");
+  if (!found) return null;
+  return { x: Number(found.dataset.gx), y: Number(found.dataset.gy) };
+}
+
+const DPAD_MOVE_COOLDOWN_MS = 150;
+const DPAD_JOYSTICK_INTERVAL_MS = 170;
+const DPAD_JOYSTICK_DEADZONE_PX = 7;
+const DPAD_JOYSTICK_MAX_PX = 15;
 
 function canUseQuickControls(item) {
   return Boolean(item?.kind) && canManageMapItem(item);
 }
 
-function moveTokenByDpad(item, dx, dy) {
+function moveTokenByDpad(item, dx, dy, { renderPanel = true } = {}) {
   if (dpadMovingIds.has(item.id) || !canManageMapItem(item)) return;
   const maxX = state.settings.cols - (item.w || 1);
   const maxY = state.settings.rows - (item.h || 1);
@@ -2877,11 +3854,18 @@ function moveTokenByDpad(item, dx, dy) {
   item.x = nextX;
   item.y = nextY;
   dpadMovingIds.add(item.id);
-  renderAll();
+  if (renderPanel) {
+    renderAll();
+  } else {
+    renderMap();
+    renderAuraEffectToasts();
+    renderTurnEffectNotices();
+    queueSave();
+  }
   removeOutOfRangeAuraEffects();
   setTimeout(() => {
     dpadMovingIds.delete(item.id);
-    if (selectedObject()?.id === item.id) renderSelectedPanel();
+    if (renderPanel && selectedObject()?.id === item.id) renderSelectedPanel();
   }, DPAD_MOVE_COOLDOWN_MS);
 }
 
@@ -2893,12 +3877,94 @@ function renderMovementDpad(item) {
     </button>
   `;
   return `
-    <div class="dpad-grid">
+    <div class="dpad-grid${view3DMode && !heightEditMode ? " dpad-grid-rotated" : ""}">
       <div></div>${dpadButton("up", "bi-caret-up-fill", 0, -1)}<div></div>
-      ${dpadButton("left", "bi-caret-left-fill", -1, 0)}<div class="dpad-center"></div>${dpadButton("right", "bi-caret-right-fill", 1, 0)}
+      ${dpadButton("left", "bi-caret-left-fill", -1, 0)}
+      <button type="button" class="dpad-center" data-dpad-joystick aria-label="Drag to move continuously">
+        <span></span>
+      </button>
+      ${dpadButton("right", "bi-caret-right-fill", 1, 0)}
       <div></div>${dpadButton("down", "bi-caret-down-fill", 0, 1)}<div></div>
     </div>
   `;
+}
+
+function rotatedDpadVector(event, center) {
+  const dx = event.clientX - center.x;
+  const dy = event.clientY - center.y;
+  const rotate =
+    view3DMode && !heightEditMode ? Number(el("map3DRotate")?.value || 0) : 0;
+  const radians = (-rotate * Math.PI) / 180;
+  const cos = Math.cos(radians);
+  const sin = Math.sin(radians);
+  return {
+    x: dx * cos - dy * sin,
+    y: dx * sin + dy * cos,
+  };
+}
+
+function dpadDirectionFromVector(vector) {
+  const length = Math.hypot(vector.x, vector.y);
+  if (length < DPAD_JOYSTICK_DEADZONE_PX) return null;
+  const nx = vector.x / length;
+  const ny = vector.y / length;
+  const diagonalThreshold = 0.38;
+  let dx = Math.abs(nx) >= diagonalThreshold ? Math.sign(nx) : 0;
+  let dy = Math.abs(ny) >= diagonalThreshold ? Math.sign(ny) : 0;
+  if (!dx && !dy) {
+    if (Math.abs(nx) > Math.abs(ny)) dx = Math.sign(nx);
+    else dy = Math.sign(ny);
+  }
+  return { dx, dy };
+}
+
+function setJoystickHandle(centerEl, vector) {
+  const length = Math.hypot(vector.x, vector.y);
+  const scale = length > DPAD_JOYSTICK_MAX_PX
+    ? DPAD_JOYSTICK_MAX_PX / length
+    : 1;
+  centerEl.style.setProperty("--joystick-x", `${vector.x * scale}px`);
+  centerEl.style.setProperty("--joystick-y", `${vector.y * scale}px`);
+}
+
+function stopDpadJoystick() {
+  if (!dpadJoystickState) return;
+  clearInterval(dpadJoystickState.timer);
+  dpadJoystickState.centerEl.classList.remove("dragging");
+  dpadJoystickState.centerEl.style.removeProperty("--joystick-x");
+  dpadJoystickState.centerEl.style.removeProperty("--joystick-y");
+  try {
+    dpadJoystickState.centerEl.releasePointerCapture(
+      dpadJoystickState.pointerId,
+    );
+  } catch {
+    // Pointer capture may already be gone if the panel was rerendered.
+  }
+  dpadJoystickState = null;
+}
+
+function updateDpadJoystick(event) {
+  if (!dpadJoystickState || event.pointerId !== dpadJoystickState.pointerId) {
+    return;
+  }
+  const vector = rotatedDpadVector(event, dpadJoystickState.center);
+  setJoystickHandle(dpadJoystickState.centerEl, vector);
+  dpadJoystickState.direction = dpadDirectionFromVector(vector);
+}
+
+function tickDpadJoystick() {
+  if (!dpadJoystickState?.direction) return;
+  const item = selectedObject();
+  if (!item || item.id !== dpadJoystickState.itemId) {
+    stopDpadJoystick();
+    return;
+  }
+  moveTokenByDpad(
+    item,
+    dpadJoystickState.direction.dx,
+    dpadJoystickState.direction.dy,
+    { renderPanel: false },
+  );
 }
 
 // Some quick actions are grouped under one expandable entry, same as the
@@ -3042,6 +4108,32 @@ function bindQuickControlsPanel(item) {
       moveTokenByDpad(item, dx, dy);
     });
   });
+  panel.querySelector("[data-dpad-joystick]")?.addEventListener("pointerdown", (event) => {
+    if (event.button !== 0) return;
+    event.preventDefault();
+    event.stopPropagation();
+    stopDpadJoystick();
+    const centerEl = event.currentTarget;
+    const rect = centerEl.getBoundingClientRect();
+    dpadJoystickState = {
+      itemId: item.id,
+      centerEl,
+      pointerId: event.pointerId,
+      center: {
+        x: rect.left + rect.width / 2,
+        y: rect.top + rect.height / 2,
+      },
+      direction: null,
+      timer: setInterval(tickDpadJoystick, DPAD_JOYSTICK_INTERVAL_MS),
+    };
+    centerEl.classList.add("dragging");
+    centerEl.setPointerCapture(event.pointerId);
+    updateDpadJoystick(event);
+    tickDpadJoystick();
+  });
+  panel.querySelector("[data-dpad-joystick]")?.addEventListener("pointermove", updateDpadJoystick);
+  panel.querySelector("[data-dpad-joystick]")?.addEventListener("pointerup", stopDpadJoystick);
+  panel.querySelector("[data-dpad-joystick]")?.addEventListener("pointercancel", stopDpadJoystick);
   panel.querySelectorAll("[data-quick-group-toggle]").forEach((button) => {
     button.addEventListener("click", () => {
       const group = button.dataset.quickGroupToggle;
@@ -3218,10 +4310,13 @@ function renderSelectedPanel() {
   // Relative to whatever's underneath, not an absolute world height --
   // 0 always means "resting on the ground/platform below it," so this
   // never needs touching for an ordinary token walking around the
-  // map. Only used by the 3D preview (see render3DToken()): a nonzero
-  // value there draws a "flying" line down to the surface below.
+  // map. Only used by 3D View (see token3DHeights()): a nonzero value
+  // there draws a "flying" line down to the surface below.
   const elevationField = item.kind
     ? `<div class="col-4"><label>Z <span class="small-text">(ft)</span></label><input data-selected-field="elevationFeet" class="form-control form-control-sm" type="number" step="5" value="${Number(item.elevationFeet || 0)}"></div>`
+    : "";
+  const shapeDepthField = item.shape
+    ? `<div><label>D <span class="small-text">(height)</span></label><input data-selected-field="d" class="form-control form-control-sm" type="number" min="0" step="1" value="${shapeDepth(item)}"></div>`
     : "";
   const sizeLinked = item.sizeLinked !== false;
   const sizeLinkIcon = sizeLinked ? "bi-link-45deg" : "bi-unlink";
@@ -3257,12 +4352,13 @@ function renderSelectedPanel() {
               <div class="col-4"><label>Y</label><input data-selected-field="y" class="form-control form-control-sm" type="number" value="${item.y || 0}"></div>
               ${elevationField}
               <div class="col-12">
-                <div class="size-link-row">
+                <div class="size-link-row${item.shape ? " has-depth" : ""}">
                   <div><label>W</label><input data-selected-field="w" class="form-control form-control-sm" type="number" min="1" value="${item.w || 1}"></div>
                   <button class="btn ${sizeLinked ? "btn-info" : "btn-outline-light"} btn-sm size-link-toggle" type="button" data-toggle-size-link title="${sizeLinked ? "Unlink width and height" : "Link width and height"}" aria-label="${sizeLinked ? "Unlink width and height" : "Link width and height"}">
                     <i class="bi ${sizeLinkIcon}"></i>
                   </button>
                   <div><label>H</label><input data-selected-field="h" class="form-control form-control-sm" type="number" min="1" value="${item.h || 1}"></div>
+                  ${shapeDepthField}
                 </div>
               </div>
               ${tokenImageField}
@@ -3324,11 +4420,15 @@ function bindSelectedPanelInteractions(item) {
           "y",
           "w",
           "h",
+          "d",
           "elevationFeet",
         ].includes(input.dataset.selectedField)
           ? Number(input.value || 0)
           : input.value;
         item[input.dataset.selectedField] = value;
+        if (input.dataset.selectedField === "d") {
+          enforceShapeDepthMinimum(item, input);
+        }
         if (
           (input.dataset.selectedField === "w" ||
             input.dataset.selectedField === "h") &&
@@ -3412,6 +4512,7 @@ function bindSelectedPanelInteractions(item) {
     .forEach((button) => {
       button.addEventListener("click", () => {
         item.texture = button.dataset.shapeTexture || "";
+        enforceShapeDepthMinimum(item);
         renderAll();
       });
     });
@@ -3580,12 +4681,19 @@ function isEditingSelectedPanelField() {
 }
 
 function applyRemoteMapState(remoteState) {
+  if (isStaleSelfRemote(remoteState)) return;
+  if (saveTimer || mapSaveInFlight > 0) {
+    pendingRemoteState = remoteState;
+    return;
+  }
+  if (isOlderThanLocal(remoteState)) return;
   if (dragState || resizeState || isEditingSelectedPanelField()) {
     pendingRemoteState = remoteState;
     return;
   }
   clearTimeout(saveTimer);
   state = normalizeState(remoteState);
+  lastAppliedMapMeta = mapMetaOf(state);
   if (selectedId && !mapItemExists(selectedId)) selectedId = "";
   if (
     contextMenuTokenId &&
@@ -3599,6 +4707,11 @@ function applyRemoteMapState(remoteState) {
 
 function flushPendingRemoteState() {
   if (!pendingRemoteState) return;
+  if (saveTimer || mapSaveInFlight > 0) return;
+  if (isStaleSelfRemote(pendingRemoteState) || isOlderThanLocal(pendingRemoteState)) {
+    pendingRemoteState = null;
+    return;
+  }
   if (isEditingSelectedPanelField()) return; // still editing -- wait
   const localDraggedId = dragState?.id || resizeState?.id;
   // Which of the three arrays localDraggedId actually lives in matters
@@ -3621,6 +4734,7 @@ function flushPendingRemoteState() {
 
   if (!localDraggedId || !localDraggedItem) {
     state = remoteState;
+    lastAppliedMapMeta = mapMetaOf(state);
     if (selectedId && !mapItemExists(selectedId)) selectedId = "";
     applySettingsToInputs();
     renderAll(false);
@@ -3628,6 +4742,7 @@ function flushPendingRemoteState() {
   }
 
   state = remoteState;
+  lastAppliedMapMeta = mapMetaOf(state);
   const collection = state[sourceKey];
   const existingIndex = collection.findIndex(
     (entry) => entry.id === localDraggedId,
@@ -3645,8 +4760,22 @@ function flushPendingRemoteState() {
 function queueSave() {
   clearTimeout(saveTimer);
   const slot = mapViewSlot;
+  stampLocalMapState();
+  const snapshot = structuredClone(state);
   saveTimer = setTimeout(async () => {
-    await PFApp.saveMapState(state, mapContextKey, slot);
+    saveTimer = null;
+    mapSaveInFlight += 1;
+    mapSaveChain = mapSaveChain
+      .catch(() => {})
+      .then(async () => {
+        const saved = await PFApp.saveMapState(snapshot, mapContextKey, slot);
+        if (saved) lastAppliedMapMeta = mapMetaOf(snapshot);
+      })
+      .finally(() => {
+        mapSaveInFlight = Math.max(0, mapSaveInFlight - 1);
+        flushPendingRemoteState();
+      });
+    await mapSaveChain;
   }, 500);
 }
 
@@ -3662,13 +4791,28 @@ function startDrag(event) {
   );
   if (!item) return;
   selectedId = id;
-  dragState = {
-    id,
-    startX: event.clientX,
-    startY: event.clientY,
-    x: item.x || 0,
-    y: item.y || 0,
-  };
+  const is3D = view3DMode && !heightEditMode;
+  if (is3D) {
+    // Must exist before cell3DFromPoint() can answer anything -- see
+    // build3DHitGrid(). Grab offset (not just "snap the item's origin
+    // to whatever cell was clicked") so dragging feels the same as
+    // 2D: wherever on the item you grabbed stays under the cursor.
+    build3DHitGrid();
+    const cell = cell3DFromPoint(event.clientX, event.clientY);
+    dragState = {
+      id,
+      grabDx: cell ? cell.x - (item.x || 0) : 0,
+      grabDy: cell ? cell.y - (item.y || 0) : 0,
+    };
+  } else {
+    dragState = {
+      id,
+      startX: event.clientX,
+      startY: event.clientY,
+      x: item.x || 0,
+      y: item.y || 0,
+    };
+  }
   // Not fatal if this throws (e.g. no active pointer with this id) --
   // the drag still works via the window-level listeners below, just
   // without a captured pointer guaranteeing events keep arriving if
@@ -3690,6 +4834,28 @@ function moveDrag(event) {
     (entry) => entry.id === dragState.id,
   );
   if (!item) return;
+  if (view3DMode && !heightEditMode) {
+    // A tilted/spun stage means a raw pixel delta from the drag's
+    // start no longer maps linearly to grid cells -- see
+    // stageCellFromEvent()'s comment. Ask the hit grid which cell the
+    // pointer is over now instead of computing an offset from where
+    // it started.
+    const cell = cell3DFromPoint(event.clientX, event.clientY);
+    if (cell) {
+      item.x = clamp(
+        cell.x - dragState.grabDx,
+        0,
+        state.settings.cols - (item.w || 1),
+      );
+      item.y = clamp(
+        cell.y - dragState.grabDy,
+        0,
+        state.settings.rows - (item.h || 1),
+      );
+    }
+    renderAll(false);
+    return;
+  }
   const cell = Number(localGridSize || 48);
   const dx = Math.round((event.clientX - dragState.startX) / cell);
   const dy = Math.round((event.clientY - dragState.startY) / cell);
@@ -3780,6 +4946,7 @@ function endDrag() {
   flushPendingRemoteState();
   dragState = null;
   window.removeEventListener("pointermove", moveDrag);
+  teardown3DHitGrid();
   renderAll();
   removeOutOfRangeAuraEffects();
 }
@@ -4045,6 +5212,7 @@ function addShape(shape) {
     y: 3,
     w: 3,
     h: 3,
+    d: 0,
     sizeLinked: true,
     zIndex: nextMapZIndex(),
     color: "#f0d58c",
@@ -4086,6 +5254,27 @@ function toggleHeightEditMode(next = !heightEditMode) {
   if (!heightEditMode) toggleHeightDrawMode(false);
   el("mapNormalToolbar").classList.toggle("d-none", heightEditMode);
   el("mapHeightToolbar").classList.toggle("d-none", !heightEditMode);
+  // #map3DControls lives outside mapNormalToolbar (so it doesn't
+  // vanish/reappear every time the Draw tool toggles selection), so
+  // it needs its own visibility check here -- shown only when 3D View
+  // is actually on AND Height editing (2D-only) isn't.
+  el("map3DControls")?.classList.toggle(
+    "d-none",
+    !view3DMode || heightEditMode,
+  );
+  renderAll(false);
+}
+
+// 3D View -- tilts the live #mapStage (see renderMap()'s use of
+// view3DMode/render3DTerrainHtml()) instead of opening a separate
+// preview. Tokens/shapes keep working exactly as in 2D (same
+// elements, same drag/select/context-menu wiring) -- see
+// startDrag()/moveDrag()/stageCellFromEvent() for how those adapt to
+// the tilt via build3DHitGrid() rather than raw pixel-delta math.
+function toggleView3DMode(next = !view3DMode) {
+  view3DMode = next;
+  el("toggleView3DBtn")?.classList.toggle("active", view3DMode);
+  el("map3DControls")?.classList.toggle("d-none", !view3DMode);
   renderAll(false);
 }
 
@@ -4094,7 +5283,7 @@ function toggleHeightEditMode(next = !heightEditMode) {
 // the pointer crosses joins the same in-progress shape, finalized into
 // state.heightShapes on release. See renderHeightShape()'s freeform
 // (shape.cells) branch for how that gets rendered afterward, and
-// render3DPreview()'s per-cell block handling for the 3D side.
+// render3DTerrainHtml()'s per-cell block handling for the 3D View.
 function toggleHeightDrawMode(next = !heightDrawMode) {
   heightDrawMode = next;
   el("drawHeightShapeBtn")?.classList.toggle("active", heightDrawMode);
@@ -6225,8 +7414,7 @@ function openMapDocumentation() {
 
 async function saveBackgroundOptions(event) {
   event.preventDefault();
-  localGridSize = clamp(Number(el("gridSize").value || 48), 24, 96);
-  sessionStorage.setItem("pf_map_grid_size", String(localGridSize));
+  setMapZoom(el("gridSize").value, { render: false });
 
   const newBackgroundUrl = el("backgroundUrl").value.trim();
   let footprint = { cols: 0, rows: 0 };
@@ -6339,6 +7527,11 @@ async function loadMapSlot(slot) {
   unsubscribeMapRealtime();
   mapViewSlot = clamp(Number(slot) || 1, 1, MAP_SLOT_COUNT);
   state = normalizeState(await PFApp.loadMapState(mapContextKey, mapViewSlot));
+  lastAppliedMapMeta = mapMetaOf(state);
+  if (lastAppliedMapMeta.clientId === MAP_CLIENT_ID) {
+    localMapRevision = Math.max(localMapRevision, lastAppliedMapMeta.revision);
+  }
+  pendingRemoteState = null;
   await refreshMapTokenSheets({ save: false });
   applySettingsToInputs();
   renderMapSlotNav();
@@ -6419,12 +7612,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     switchMapSlot(button.dataset.mapSlot);
   });
 
-  el("gridSize").addEventListener("change", () => {
-    localGridSize = clamp(Number(el("gridSize").value || 48), 24, 96);
-    sessionStorage.setItem("pf_map_grid_size", String(localGridSize));
-    applySettingsToInputs();
-    renderAll(false);
-  });
+  el("gridSize").addEventListener("change", () => setMapZoom(el("gridSize").value));
+  el("mapZoom").addEventListener("input", () => setMapZoom(el("mapZoom").value));
 
   ["cellX", "cellY"].forEach((id) => {
     el(id).addEventListener("change", () => handleCellSizeChange(id));
@@ -6467,23 +7656,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   genericTokenModal = new bootstrap.Modal(el("genericTokenModal"));
   el("genericTokenForm").addEventListener("submit", submitGenericToken);
   mapEffectsModal = new bootstrap.Modal(el("mapEffectsModal"));
-  map3DPreviewModal = new bootstrap.Modal(el("map3DPreviewModal"));
-  el("open3DPreview").addEventListener("click", () => {
-    map3DPreviewModal.show();
-    render3DPreview();
+  el("toggleView3DBtn").addEventListener("click", () => toggleView3DMode());
+  el("reset3DCamera").addEventListener("click", () => {
+    el("map3DAngle").value = "55";
+    el("map3DRotate").value = "0";
+    set3DViewVars();
   });
-  el("map3DAngle").addEventListener("input", (event) => {
-    el("map3DScene").style.setProperty(
-      "--map-3d-angle",
-      `${event.target.value}deg`,
-    );
-  });
-  el("map3DRotate").addEventListener("input", (event) => {
-    el("map3DScene").style.setProperty(
-      "--map-3d-rotate",
-      `${event.target.value}deg`,
-    );
-  });
+  el("map3DAngle").addEventListener("input", set3DViewVars);
+  el("map3DRotate").addEventListener("input", set3DViewVars);
   el("enterHeightEditMode").addEventListener("click", () =>
     toggleHeightEditMode(true),
   );
@@ -6630,12 +7810,18 @@ document.addEventListener("DOMContentLoaded", async () => {
   window.addEventListener("resize", () => {
     hideContextMenu();
     updateAuraToastPosition();
+    if (view3DMode && !heightEditMode) {
+      render3DTokenBillboards(state.tokens.filter(canSeeToken));
+    }
   });
   window.addEventListener(
     "scroll",
     () => {
       hideContextMenu();
       updateAuraToastPosition();
+      if (view3DMode && !heightEditMode) {
+        render3DTokenBillboards(state.tokens.filter(canSeeToken));
+      }
     },
     true,
   );

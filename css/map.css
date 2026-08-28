@@ -40,6 +40,26 @@ body {
   gap: 8px;
 }
 
+.map-zoom-controls,
+.map-3d-controls {
+  align-items: center;
+}
+
+.map-zoom-controls input[type="range"] {
+  width: 130px;
+}
+
+.map-zoom-controls label,
+.map-3d-controls label {
+  margin: 0;
+  color: #cfd8dc;
+  font-size: 0.78rem;
+}
+
+#mapZoomValue {
+  min-width: 34px;
+}
+
 .map-toolbar .form-control,
 .map-toolbar .form-select {
   width: auto;
@@ -337,7 +357,7 @@ body {
   width: 100%;
   height: 100%;
   pointer-events: none;
-  z-index: 25;
+  z-index: 100000;
 }
 
 .map-limited-view-grayscale {
@@ -348,14 +368,35 @@ body {
   height: calc(var(--aura-size) * var(--cell));
   border-radius: 50%;
   pointer-events: none;
-  z-index: 26;
+  z-index: 100001;
   backdrop-filter: grayscale(1) contrast(1.75);
   -webkit-backdrop-filter: grayscale(1) contrast(1.75);
 }
 
+.map-3d-surface-fog-cell {
+  position: absolute;
+  pointer-events: none;
+  transform: translateZ(1px);
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  will-change: transform;
+}
+
+/* 3D counterpart to .map-limited-view-grayscale -- per-cell instead of
+   one big circle, but as a grayscale copy of the terrain art rather
+   than backdrop-filter. Backdrop filters are fragile inside transformed
+   3D surfaces and can leave colored edge cells. */
+.map-3d-surface-grayscale-cell {
+  position: absolute;
+  pointer-events: none;
+  transform: translateZ(2px);
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+
 .map-token.map-token-fog-reveal {
   pointer-events: none;
-  z-index: 30;
+  z-index: 100002;
 }
 
 .map-token {
@@ -430,6 +471,15 @@ body {
    handles would otherwise still be visible and inert, implying a
    resize that a click there won't actually do. */
 #mapStage.height-draw-active .map-resize-handle {
+  display: none;
+}
+
+/* Shape resizing hasn't been made 3D-aware yet (its drag math is
+   still plain screen-pixel deltas, which don't mean anything once
+   the stage is tilted/spun -- see startDrag()'s comment on the same
+   issue for tokens) -- hide the handles in 3D View so nothing looks
+   grabbable that would actually misbehave if grabbed. */
+#mapStage.is-3d .map-resize-handle {
   display: none;
 }
 
@@ -615,6 +665,27 @@ body {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
 }
 
+.map-toast-container {
+  position: fixed;
+  top: 18px;
+  right: 18px;
+  z-index: 2147483000;
+  display: grid;
+  gap: 8px;
+  width: min(320px, calc(100vw - 36px));
+  pointer-events: none;
+}
+
+.map-toast {
+  color: #f8f9fa;
+  background: rgba(28, 32, 36, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-left: 4px solid #0dcaf0;
+  border-radius: 8px;
+  padding: 10px 12px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+}
+
 .map-shape {
   border: 2px solid var(--color);
   /* Fallback for browsers without color-mix() -- see .map-aura above for
@@ -658,6 +729,151 @@ body {
   background-repeat: no-repeat;
   background-size: 600% 400%;
   background-position: var(--tile-x) var(--tile-y);
+}
+
+.map-shape.shape-3d {
+  transform-style: preserve-3d;
+}
+
+.shape-3d-cell {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  transform-style: preserve-3d;
+}
+
+.shape-3d-cell-top-plane {
+  position: absolute;
+  inset: 0;
+  transform: translateZ(var(--shape-depth));
+  transform-style: preserve-3d;
+}
+
+.shape-3d-top {
+  position: absolute;
+  inset: 0;
+  display: block;
+  overflow: hidden;
+  background-color: var(--color);
+  border: 1px solid var(--color);
+  backface-visibility: hidden;
+}
+
+@supports (background: color-mix(in srgb, red 50%, transparent)) {
+  .shape-3d-top {
+    background: color-mix(in srgb, var(--color) 42%, transparent);
+  }
+}
+
+.shape-3d-top.texture-cell {
+  border: 0;
+  background-color: transparent;
+  background-repeat: no-repeat;
+  background-size: 600% 400%;
+  background-position: var(--tile-x) var(--tile-y);
+}
+
+.shape-3d-wall {
+  position: absolute;
+  display: block;
+  overflow: hidden;
+  background: rgba(125, 109, 77, 0.95);
+  border: 1px solid rgba(0, 0, 0, 0.28);
+  backface-visibility: hidden;
+}
+
+.shape-3d-fog {
+  position: absolute;
+  inset: -1px;
+  display: block;
+  pointer-events: none;
+  backface-visibility: hidden;
+}
+
+@supports (background: color-mix(in srgb, red 50%, transparent)) {
+  .shape-3d-wall {
+    background: linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--color) 54%, #1b1b1b),
+      color-mix(in srgb, var(--color) 28%, #090909)
+    );
+  }
+}
+
+.shape-3d-wall-north,
+.shape-3d-wall-south {
+  left: 0;
+  width: var(--cell);
+  height: var(--shape-depth);
+  transform-origin: top center;
+}
+
+.shape-3d-wall-north {
+  top: 0;
+  transform: rotateX(90deg);
+}
+
+.shape-3d-wall-south {
+  top: var(--cell);
+  transform: rotateX(-90deg);
+}
+
+.shape-3d-wall-east,
+.shape-3d-wall-west {
+  top: 0;
+  width: var(--shape-depth);
+  height: var(--cell);
+  transform-origin: left center;
+}
+
+.shape-3d-wall-east {
+  left: var(--cell);
+  transform: rotateY(90deg);
+}
+
+.shape-3d-wall-west {
+  left: 0;
+  transform: rotateY(-90deg);
+}
+
+.map-shape.shape-3d-texture {
+  transform-style: preserve-3d;
+}
+
+.shape-3d-sprite-cell {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  overflow: visible;
+  transform-style: preserve-3d;
+}
+
+.shape-3d-sprite {
+  position: absolute;
+  left: 50%;
+  bottom: 50%;
+  display: grid;
+  grid-template-rows: repeat(var(--shape-sprite-rows), var(--cell));
+  width: var(--cell);
+  height: calc(var(--shape-sprite-rows) * var(--cell));
+  overflow: hidden;
+  pointer-events: none;
+  transform: translate(-50%, 0) translateZ(6px)
+    rotateZ(var(--map-3d-rotate-inverse, 0deg))
+    rotateX(var(--map-3d-angle-inverse, -55deg));
+  transform-origin: center bottom;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+
+.shape-3d-sprite-segment {
+  display: block;
+  min-width: 0;
+  min-height: 0;
+  background-repeat: no-repeat;
+  background-size: 600% 400%;
+  background-position: var(--tile-x) var(--tile-y);
+  backface-visibility: hidden;
 }
 
 /* Height Layer regions (see renderHeightShape() in map.js) -- a
@@ -1338,6 +1554,10 @@ body {
   align-items: end;
 }
 
+.size-link-row.has-depth {
+  grid-template-columns: 1fr auto 1fr 1fr;
+}
+
 .size-link-toggle {
   width: 32px;
   height: 31px;
@@ -1686,6 +1906,12 @@ textarea {
   gap: 4px;
   justify-content: center;
   margin: 16px 0;
+  transform-origin: center;
+  transition: transform 120ms ease;
+}
+
+.dpad-grid-rotated {
+  transform: rotate(var(--map-dpad-rotation, 0deg));
 }
 
 .dpad-btn {
@@ -1696,9 +1922,38 @@ textarea {
 }
 
 .dpad-center {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: #242424;
   border: 1px solid #444;
   border-radius: 6px;
+  padding: 0;
+  cursor: grab;
+  touch-action: none;
+}
+
+.dpad-center.dragging {
+  cursor: grabbing;
+  border-color: #0dcaf0;
+}
+
+.dpad-center span {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #8fd19e;
+  box-shadow:
+    0 0 0 2px rgba(255, 255, 255, 0.18),
+    0 3px 8px rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+  transform: translate(var(--joystick-x, 0), var(--joystick-y, 0));
+  transition: transform 80ms ease;
+}
+
+.dpad-center.dragging span {
+  transition: none;
 }
 
 .quick-actions-list {
@@ -1718,21 +1973,16 @@ textarea {
 }
 
 /* ---------------------------------------------------------------
-   3D Preview (experimental) -- see render3DPreview() in map.js.
-   Renders a separate, flattened snapshot of the map (not the live
-   interactive stage) so nothing here touches token/fog/wall DOM,
-   and so this is safe to run inside a Capacitor WebView on iOS,
-   which has known rendering quirks with preserve-3d on deeply
-   nested live DOM trees.
+   3D Map View (experimental) -- toggled via #toggleView3DBtn, see
+   toggleView3DMode() in map.js. Unlike the old 3D Preview modal, this
+   tilts the REAL, live #mapStage in place: tokens/shapes are the same
+   DOM elements the 2D view uses (same drag/select/context-menu
+   wiring, see renderMap()), just under transform-style:preserve-3d
+   alongside rendered Height Layer terrain. Height Layer EDITING
+   (painting regions) stays 2D-only -- precise top-down clicking is
+   much easier there, and this toggle only affects the normal
+   token/shape view.
    --------------------------------------------------------------- */
-.map-3d-modal-body {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 10px 14px;
-  min-height: 0;
-}
-
 .map-3d-controls {
   display: flex;
   align-items: center;
@@ -1740,24 +1990,36 @@ textarea {
 }
 
 .map-3d-controls input[type="range"] {
-  max-width: 260px;
+  max-width: 160px;
 }
 
-.map-3d-viewport {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow: auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #0c0c0c;
-  border: 1px solid #333;
-  border-radius: 8px;
-  perspective: 1400px;
+.map-stage-wrap.is-3d {
+  /* --map-3d-perspective is set from map.js, scaled to the map's
+     actual rendered size (cols/rows * localGridSize) -- see
+     renderMap(). A fixed distance here can't work across both a
+     small map and a large one at a normal zoom level: too close for
+     a big map and parts of its flat ground plane, once tilted/spun,
+     end up BEHIND the camera's near plane, which CSS doesn't clip
+     cleanly -- it distorts catastrophically instead (observed: a
+     mapW x mapH ground layer's own bounding box ballooning to
+     several times the viewport, at wildly negative coordinates),
+     visually burying everything else including any pits/platforms
+     underneath it. */
+  perspective: var(--map-3d-perspective, 1400px);
+  /* rotateX/rotateZ on #mapStage are paint-time only -- they don't
+     change #mapStage's own layout box, so the scrollable area this
+     wrap offers is still sized to the FLAT, untilted map. Tilted (and
+     especially spun) the map's actual on-screen footprint reaches
+     well outside that flat box on whichever side the current angle
+     pushes it toward, with no way to scroll there. Padding the wrap
+     itself (rather than margin on #mapStage) is what actually grows
+     the scrollable range: extra room on every side since a full
+     360deg spin can push the overhang toward any of them, left
+     biggest since that's the one this got reported against. */
+  padding: 220px 220px 220px 360px;
 }
 
-.map-3d-scene {
-  position: relative;
+#mapStage.is-3d {
   transform-style: preserve-3d;
   /* --map-3d-angle (tilt) and --map-3d-rotate (turntable spin) are set
      from the two sliders in map.js. Order matters: rotateZ applies
@@ -1768,8 +2030,21 @@ textarea {
      instead of turning cleanly. */
   transform: rotateX(var(--map-3d-angle, 55deg))
     rotateZ(var(--map-3d-rotate, 0deg));
+  /* #mapStage's own 2D background (.map-stage, grid lines + map art)
+     is otherwise still painted as part of the stage element's own
+     box -- at the stage's own Z, it acts as one giant, un-holed
+     occluding plane sitting in front of anything positioned behind it
+     (any pit). The pushed 3D Preview modal used a transparent scene,
+     so clear both image and color here and let .map-3d-base provide
+     the actual bitmap plate. */
+  background-image: none;
+  background-color: transparent;
 }
 
+/* #mapStage's own background (2D mode) is replaced by a masked 3D
+   base plate in live 3D mode. This mirrors the old 3D Preview modal:
+   the base carries the bitmap, and mask holes reveal negative-Z pit
+   floors beneath it. */
 .map-3d-base {
   position: relative;
   background-repeat: no-repeat;
@@ -1780,14 +2055,16 @@ textarea {
 .map-3d-block {
   position: absolute;
   transform-style: preserve-3d;
+  backface-visibility: visible;
 }
 
 .map-3d-block-top {
   position: absolute;
   inset: 0;
   transform-style: preserve-3d;
+  backface-visibility: visible;
   background-repeat: no-repeat;
-  /* Per-side border (not a uniform outline) -- render3DPreview() sets
+  /* Per-side border (not a uniform outline) -- render3DTerrainHtml() sets
      border-top/right/bottom/left individually so only a region's true
      outer perimeter gets a rim in its own `color`, not every internal
      edge between same-height neighbor cells (see blockHtmlAt()). */
@@ -1801,6 +2078,38 @@ textarea {
     #4d4232
   );
   border: 1px solid rgba(0, 0, 0, 0.35);
+}
+
+/* Darkens an unrevealed wall toward the fog color without ever
+   removing the wall element itself -- see wallFogOpacity() in
+   map.js for why leaving a wall out of the DOM is the wrong way to
+   hide it in the dark. inset:-2px (not 0) so the tint also covers
+   .map-3d-wall's own 1px border -- inset:0 sits flush with the
+   padding edge, inside that border, so the border's own color (barely
+   noticeable against a lit wall) reads as a bright outline once the
+   fill it used to blend into goes solid black -- and the extra px
+   past the border eats the same kind of sub-pixel seam noted on
+   FOG_CELL_OVERDRAW_PX in map.js, here between a wall and whatever
+   neighboring wall/ground-fog-cell it abuts. */
+.map-3d-wall-fog {
+  position: absolute;
+  inset: -2px;
+  pointer-events: none;
+}
+
+/* Wall counterpart to .map-3d-surface-grayscale-cell -- without this,
+   a Special Vision circle grayscaled every top face/ground cell it
+   touched but left an elevated block's own side walls at full color,
+   which read as "edge tiles are still saturated" once the top next to
+   them had already gone black-and-white. Same -2px overdraw as
+   .map-3d-wall-fog, same reason (covers the wall's own border and the
+   sub-pixel seam against its neighbor). */
+.map-3d-wall-grayscale {
+  position: absolute;
+  inset: -2px;
+  pointer-events: none;
+  background: rgba(160, 160, 160, 0.28);
+  mix-blend-mode: saturation;
 }
 
 .map-3d-wall-south {
@@ -1835,10 +2144,8 @@ textarea {
   transform: rotateY(-90deg);
 }
 
-/* A pit's top/floor face sits BELOW ground (negative translateZ), so
-   its walls need to fold the opposite way to reach back UP to Z=0 --
-   every wall's fold direction here is the mirror image of the default
-   (raised-block) rotation above. See render3DPreview()'s comment. */
+/* A pit's top/floor face sits below ground (negative translateZ), so
+   its walls fold the opposite way to reach back up to Z=0. */
 .map-3d-block.pit .map-3d-wall-south {
   transform: rotateX(90deg);
 }
@@ -1862,37 +2169,113 @@ textarea {
   background: linear-gradient(to bottom, #1c2230, #05070a);
 }
 
-.map-3d-empty-hint {
-  color: #aaa;
-  text-align: center;
-  padding: 40px 20px;
+/* Tokens/shapes get their Z offset only while the stage is actually
+   in 3D mode -- --tz is harmless to set in 2D too (unused there), but
+   scoping the transform itself to .is-3d keeps 2D positioning exactly
+   as it always was. renderToken()/renderShape() set --tz per item. */
+#mapStage.is-3d .map-token,
+#mapStage.is-3d .map-shape {
+  transform: translateZ(var(--tz, 0px));
 }
 
-/* Tokens in the 3D preview are deliberately flat -- a plain disc
-   placed at the right height (see render3DToken()), not a block with
-   walls of its own. It tilts along with the rest of the scene (it's
-   still inside .map-3d-scene's rotateX) but has no depth beyond that. */
-.map-3d-token {
+#mapStage.is-3d .map-token {
+  overflow: visible;
+  transform-style: preserve-3d;
+  background-image: none;
+  box-shadow:
+    0 8px 0 rgba(0, 0, 0, 0.5),
+    0 12px 16px rgba(0, 0, 0, 0.45);
+}
+
+#mapStage.is-3d .map-token::before {
   position: absolute;
+  inset: 2px;
+  content: "";
   border-radius: 50%;
-  background-color: var(--token-color);
-  background-image: var(--token-image, none);
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  border: 2px solid #f8f9fa;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
-  display: grid;
-  place-items: center;
-  color: #111;
-  font-weight: 800;
-}
-
-.map-3d-token-label {
+  background: rgba(0, 0, 0, 0.35);
   pointer-events: none;
+  transform: translateZ(-9px) translateY(7px);
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
 }
 
-/* A token whose elevationFeet isn't 0 (see render3DToken()) is
+#mapStage.is-3d .map-token > .text-center {
+  display: none;
+}
+
+.map-token-3d-base-fog {
+  position: absolute;
+  inset: -1px;
+  border-radius: 50%;
+  pointer-events: none;
+  transform: translateZ(1px);
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+
+.map-token-3d-image {
+  display: none;
+}
+
+#mapStage.is-3d .map-token.has-image .map-token-3d-image {
+  position: absolute;
+  left: 50%;
+  bottom: 46%;
+  display: block;
+  width: min(calc(var(--w) * var(--cell) * 1.35), 128px);
+  height: min(calc(var(--h) * var(--cell) * 1.35), 128px);
+  border: 3px solid #f8f9fa;
+  border-radius: 50%;
+  background-color: #f8f9fa;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+  object-fit: cover;
+  object-position: center;
+  pointer-events: none;
+  transform: translate(-50%, -20%) translateZ(28px)
+    rotateZ(var(--map-3d-rotate-inverse, 0deg))
+    rotateX(var(--map-3d-angle-inverse, -55deg));
+  transform-origin: center bottom;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+
+.token-3d-billboard-layer {
+  position: absolute;
+  left: 0;
+  top: 0;
+  min-width: 100%;
+  min-height: 100%;
+  pointer-events: none;
+  z-index: 2147482500;
+}
+
+.token-3d-hover-card {
+  position: absolute;
+  min-width: 150px;
+  max-width: 220px;
+  padding: 6px 8px;
+  border: 1px solid #555;
+  border-radius: 6px;
+  color: #f8f9fa;
+  text-align: center;
+  background: #1e1e1e;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+  font-size: 12px;
+  line-height: 1.25;
+  transform: translate(-50%, -100%);
+}
+
+.token-3d-hover-card::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: #555;
+}
+
+/* A token whose elevationFeet isn't 0 (see token3DHeights()) is
    "flying" -- this pole runs from the token's own height straight
    down (or up, for a negative offset) to the surface directly beneath
    it, ending in a small ring marking exactly where that is. Same
@@ -1933,4 +2316,15 @@ textarea {
   border-radius: 50%;
   border: 2px solid rgba(255, 255, 255, 0.85);
   background: rgba(0, 0, 0, 0.25);
+}
+
+/* Invisible per-cell hit targets, built only while a drag/measure is
+   active in 3D mode (see build3DHitGrid() in map.js). Native
+   elementFromPoint() hit-testing already accounts for the tilt/spin
+   transform correctly, sidestepping needing to invert that transform
+   by hand just to answer "which grid cell is the pointer over now."
+   Never rendered outside an active drag, so it can't compete with
+   normal click-to-select hit-testing on tokens/shapes. */
+.map-3d-hit-cell {
+  position: absolute;
 }
