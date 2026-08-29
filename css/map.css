@@ -307,6 +307,16 @@ body {
   min-height: calc(var(--rows) * var(--cell));
   background-color: #202020;
   border: 1px solid #555;
+  /* No-op at rest (scale(1)) -- set to a live ratio and given a
+     transform-origin by updateZoomPreview() (map.js) while the zoom
+     slider is being dragged, so the whole already-rendered stage
+     scales via the GPU compositor instead of the background image
+     being resampled and the terrain rebuilt on every drag tick. */
+  transform: scale(var(--zoom-preview-scale, 1));
+}
+
+.map-stage.zoom-previewing {
+  will-change: transform;
 }
 
 .map-background-layer {
@@ -2383,8 +2393,15 @@ textarea {
      already-spun scene to the viewing angle -- reversed, the spin
      would happen around an axis that's already tilted and wobble
      instead of turning cleanly. */
-  transform: rotateX(var(--map-3d-angle, 55deg))
-    rotateZ(var(--map-3d-rotate, 0deg));
+  /* scale() goes leftmost -- per the ordering rule above (rightmost
+     function applies first/innermost, leftmost applies last/outermost)
+     that makes it the outermost transform, so a live zoom preview (see
+     .map-stage's own comment) uniformly scales the already-tilted/spun
+     3D result as a whole, the same as zooming a camera in on a
+     finished scene, rather than distorting the tilt/spin composition
+     underneath it. */
+  transform: scale(var(--zoom-preview-scale, 1))
+    rotateX(var(--map-3d-angle, 55deg)) rotateZ(var(--map-3d-rotate, 0deg));
   /* #mapStage's own 2D background (.map-stage, grid lines + map art)
      is otherwise still painted as part of the stage element's own
      box -- at the stage's own Z, it acts as one giant, un-holed

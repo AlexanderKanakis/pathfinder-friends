@@ -1901,6 +1901,22 @@ function mapViewportCenterRatio() {
   };
 }
 
+// Same numerator mapViewportCenterRatio() divides down to a 0-1 ratio,
+// left as raw px in .map-stage's own coordinate space -- what's
+// currently centered in the scrollable viewport, in a form usable as
+// a transform-origin so a live zoom preview (see updateZoomPreview())
+// scales around the spot the player is actually looking at instead of
+// the map's absolute center.
+function mapViewportCenterStagePoint() {
+  const wrap = el("mapStageWrap");
+  if (!wrap) return { x: 0, y: 0 };
+  const padding = mapWrapPadding();
+  return {
+    x: wrap.scrollLeft - padding.left + wrap.clientWidth / 2,
+    y: wrap.scrollTop - padding.top + wrap.clientHeight / 2,
+  };
+}
+
 function scrollMapViewportToRatio(ratio = { x: 0.5, y: 0.5 }) {
   const wrap = el("mapStageWrap");
   if (!wrap) return;
@@ -2958,6 +2974,58 @@ function renderToken(
       </div>
     </div>
   `;
+}
+
+// Dragging the zoom slider used to call setMapZoom() on every single
+// "input" tick -- resampling the whole map background image (2D) or
+// rebuilding the full 3D terrain (3D) as often as the input fired,
+// which can be more than once per animation frame on a fast/high-
+// frequency drag. That's what caused the visible flicker on the big
+// ground layer (individual height-shape floors are tiny by comparison
+// and never showed it). Throttling those same calls to once per rAF
+// frame still did that expensive work on every frame, which just
+// traded flicker for a stutter/"shaking" feel.
+//
+// Instead, dragging only applies a cheap GPU transform: scale() to
+// whatever is *already* rendered -- the same trick apps that show a
+// blurry placeholder use while the real tile renders elsewhere -- and
+// the real, expensive setMapZoom() only runs once the drag settles
+// (a short pause) or ends (slider release), via commitZoomPreview().
+// The preview is deliberately allowed to look a little soft/scaled
+// during the drag; that's the cost of it being nearly free to update.
+const ZOOM_PREVIEW_COMMIT_DELAY_MS = 140;
+let zoomPreviewTimer = null;
+let zoomPreviewActive = false;
+
+function updateZoomPreview(liveValue) {
+  const stage = el("mapStage");
+  if (!stage) return;
+  if (!zoomPreviewActive) {
+    zoomPreviewActive = true;
+    const point = mapViewportCenterStagePoint();
+    stage.style.transformOrigin = `${point.x}px ${point.y}px`;
+    stage.classList.add("zoom-previewing");
+  }
+  const scale = clamp(Number(liveValue || localGridSize) / localGridSize, 0.2, 5);
+  stage.style.setProperty("--zoom-preview-scale", scale);
+  clearTimeout(zoomPreviewTimer);
+  zoomPreviewTimer = setTimeout(
+    () => commitZoomPreview(liveValue),
+    ZOOM_PREVIEW_COMMIT_DELAY_MS,
+  );
+}
+
+function commitZoomPreview(liveValue) {
+  clearTimeout(zoomPreviewTimer);
+  zoomPreviewTimer = null;
+  const stage = el("mapStage");
+  if (stage) {
+    stage.classList.remove("zoom-previewing");
+    stage.style.transformOrigin = "";
+    stage.style.removeProperty("--zoom-preview-scale");
+  }
+  zoomPreviewActive = false;
+  setMapZoom(liveValue);
 }
 
 function setMapZoom(value, { render = true } = {}) {
@@ -8228,7 +8296,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   el("gridSize").addEventListener("change", () => setMapZoom(el("gridSize").value));
-  el("mapZoom").addEventListener("input", () => setMapZoom(el("mapZoom").value));
+  // See updateZoomPreview()'s own comment -- "input" only drives a
+  // cheap live-scale preview, the real (expensive) commit happens on
+  // "change" (slider release) or after a short pause mid-drag.
+  el("mapZoom").addEventListener("input", () =>
+    updateZoomPreview(el("mapZoom").value),
+  );
+  el("mapZoom").addEventListener("change", () =>
+    commitZoomPreview(el("mapZoom").value),
+  );
 
   ["cellX", "cellY"].forEach((id) => {
     el(id).addEventListener("change", () => handleCellSizeChange(id));
