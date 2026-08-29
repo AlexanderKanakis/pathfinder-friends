@@ -3502,13 +3502,21 @@ function renderShape(shape) {
 // visibly clip through each other rather than blend.
 // ---------------------------------------------------------------
 // 1 height unit = 5ft (a standard humanoid's height, per the Height
-// Region panel) = this many px of translateZ. Independent of cell
-// size (localGridSize) -- controls how exaggerated height looks, not
-// how big a grid cell is.
+// Region panel) = this many px of translateZ at the reference cell
+// size below. Scaled by the current zoom (localGridSize) rather than
+// fixed, so a region keeps the same footprint-to-height proportions
+// whether cells are rendering at the 48px default or all the way down
+// to mobile's 12px minimum -- a fixed px-per-5ft looked fine at the
+// default zoom but towered unnaturally once the footprint shrank with
+// zoom and the height didn't.
 const MAP_3D_PX_PER_5FT = 32;
+const MAP_3D_REFERENCE_CELL_PX = 48;
 
 function feetToPreviewPx(feet) {
-  return (Number(feet || 0) / 5) * MAP_3D_PX_PER_5FT;
+  const scale =
+    Number(localGridSize || MAP_3D_REFERENCE_CELL_PX) /
+    MAP_3D_REFERENCE_CELL_PX;
+  return (Number(feet || 0) / 5) * MAP_3D_PX_PER_5FT * scale;
 }
 
 // True if `shape`'s footprint (rect, or the absolute cells of a
