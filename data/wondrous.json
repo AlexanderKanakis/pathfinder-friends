@@ -29416,7 +29416,28 @@
       "cost": "50,000 gp",
       "description": "</h3>This exotic, fur-trimmed cloak is decorated with golden filigree. In addition to offering magical protection, the cloak guides a skilled wearer’s blade to block attacks. Such cloaks are often commissioned by Aldori Academy graduates when they attain swordlord status.<br/><br/> A <i>swordlord’s cloak</i> acts as a <i>cloak of resistance</i>. In addition, whenever the wearer is benefiting from the defensive parry class feature, he receives an insight bonus to his AC equal to the cloak’s resistance bonus."
     },
-    "link": "http://www.aonprd.com/MagicWondrousDisplay.aspx?FinalName=Swordlord's Cloak1 bonus"
+    "link": "http://www.aonprd.com/MagicWondrousDisplay.aspx?FinalName=Swordlord's Cloak1 bonus",
+    "effects": [
+      {
+        "stat": "all saves",
+        "value": 5,
+        "type": "resistance",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      },
+      {
+        "stat": "ac",
+        "value": 5,
+        "type": "insight",
+        "stacks": false,
+        "conditional": true,
+        "appliesWhen": "defensive parry class feature"
+      }
+    ],
+    "damageReduction": [],
+    "spellResistance": [],
+    "classSkillGrants": []
   },
   {
     "name": "Cloak of the Yeti",
@@ -30848,11 +30869,15 @@
       "price": "64,000 gp",
       "weight": "1 lb.",
       "bonus": "8",
-      "requirements": "Craft Wondrous Item, mage armor , creator’s caster level must\r be at least two times that of the bonus placed on the bracers,\r plus any requirements of the armor special abilities",
+      "requirements": "Craft Wondrous Item, mage armor , creator’s caster level must be at least two times that of the bonus placed on the bracers, plus any requirements of the armor special abilities",
       "cost": "32,000 gp",
-      "description": "</h3>These items appear to be wrist or\r arm guards, sometimes etched with\r symbols of protection or depictions of\r vigilant-looking animals. <i>Bracers of\r armor</i> surround the wearer with an\r invisible but tangible field of force,\r granting him an armor bonus of +1\r to +8, just as though he were wearing armor. Both <i>bracers of\r armor</i> must be worn for the magic to be effective.<br/><br/>Alternatively, <i>bracers of armor</i> can be enchanted with\r armor special abilities. See Table 3–3: Armor Special Abilities\r for a list of abilities. Special abilities usually count as\r additional bonuses for determining the market value of an\r item, but do not improve AC. <i>Bracers of armor</i> cannot have a\r modified bonus (armor bonus plus armor special ability bonus\r equivalents) higher than +8. <i>Bracers of armor</i> must have at\r least a +1 armor bonus to grant an armor special ability.\r Bracers of armor cannot have any armor special abilities\r that add a flat gp amount to their cost. <i>Bracers of armor</i> and\r ordinary armor do not stack. If the wearer receives a larger\r armor bonus from another source, the <i>bracers of armor</i> cease\r functioning and do not grant their armor bonus or their armor\r special abilities. If the <i>bracers of armor</i> grant a larger armor\r bonus, the other source of armor ceases functioning."
+      "description": "</h3>These items appear to be wrist or\n arm guards, sometimes etched with\n symbols of protection or depictions of\n vigilant-looking animals. <i>Bracers of\n armor</i> surround the wearer with an\n invisible but tangible field of force,\n granting him an armor bonus of +1\n to +8, just as though he were wearing armor. Both <i>bracers of\n armor</i> must be worn for the magic to be effective.<br/><br/>Alternatively, <i>bracers of armor</i> can be enchanted with\n armor special abilities. See Table 3–3: Armor Special Abilities\n for a list of abilities. Special abilities usually count as\n additional bonuses for determining the market value of an\n item, but do not improve AC. <i>Bracers of armor</i> cannot have a\n modified bonus (armor bonus plus armor special ability bonus\n equivalents) higher than +8. <i>Bracers of armor</i> must have at\n least a +1 armor bonus to grant an armor special ability.\n Bracers of armor cannot have any armor special abilities\n that add a flat gp amount to their cost. <i>Bracers of armor</i> and\n ordinary armor do not stack. If the wearer receives a larger\n armor bonus from another source, the <i>bracers of armor</i> cease\n functioning and do not grant their armor bonus or their armor\n special abilities. If the <i>bracers of armor</i> grant a larger armor\n bonus, the other source of armor ceases functioning."
     },
-    "link": "http://www.aonprd.com/MagicWondrousDisplay.aspx?FinalName=Bracers of Armor1"
+    "link": "http://www.aonprd.com/MagicWondrousDisplay.aspx?FinalName=Bracers of Armor1",
+    "effects": [],
+    "damageReduction": [],
+    "spellResistance": [],
+    "classSkillGrants": []
   },
   {
     "name": "Decorum Band",
@@ -44633,9 +44658,22 @@
       "requirements": "Craft Wondrous Item, miracle or wish",
       "bonus": "1",
       "cost": "26,250 gp",
-      "description": "</h3>This ponderous book details suggestions for persuading and\r inspiring others, but entwined within the words is a powerful\r magical effect. If anyone reads this book, which takes a total of\r 48 hours over a minimum of 6 days, he gains an inherent bonus\r from +1 to +5 (depending on the type of tome) to his Charisma\r score. Once the book is read, the magic disappears from the\r pages and it becomes a normal book."
+      "description": "</h3>This ponderous book details suggestions for persuading and\n inspiring others, but entwined within the words is a powerful\n magical effect. If anyone reads this book, which takes a total of\n 48 hours over a minimum of 6 days, he gains an inherent bonus\n from +1 to +5 (depending on the type of tome) to his Charisma\n score. Once the book is read, the magic disappears from the\n pages and it becomes a normal book."
     },
-    "link": "http://www.aonprd.com/MagicWondrousDisplay.aspx?FinalName=Tome of Leadership and Influence1"
+    "link": "http://www.aonprd.com/MagicWondrousDisplay.aspx?FinalName=Tome of Leadership and Influence1",
+    "effects": [
+      {
+        "stat": "charisma",
+        "value": 1,
+        "type": "untyped",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      }
+    ],
+    "damageReduction": [],
+    "spellResistance": [],
+    "classSkillGrants": []
   },
   {
     "name": "Tome of Leadership and Influence +2",

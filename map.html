@@ -31,40 +31,61 @@
           </div>
           <div id="mapNormalToolbar" class="map-toolbar-group">
             <button
-              id="addCharacterToken"
-              class="btn btn-primary btn-sm"
-              type="button"
-            >
-              <i class="bi bi-person-plus"></i> Character
-            </button>
-            <button
-              id="addEnemyToken"
-              class="btn btn-danger btn-sm"
-              type="button"
-            >
-              <i class="bi bi-bug"></i> Enemy
-            </button>
-            <button
-              id="addGenericToken"
-              class="btn btn-outline-info btn-sm"
-              type="button"
-            >
-              <i class="bi bi-circle-fill"></i> Token
-            </button>
-            <button
-              id="addRectShape"
               class="btn btn-outline-light btn-sm"
               type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#mapElementsCollapse"
+              aria-expanded="false"
+              aria-controls="mapElementsCollapse"
             >
-              <i class="bi bi-square"></i> Rect
+              <i class="bi bi-plus-square"></i> Map Elements
             </button>
-            <button
-              id="addCircleShape"
-              class="btn btn-outline-light btn-sm"
-              type="button"
-            >
-              <i class="bi bi-circle"></i> Circle
-            </button>
+            <div id="mapElementsCollapse" class="collapse map-elements-collapse">
+              <div class="map-elements-menu">
+                <button
+                  id="addCharacterToken"
+                  class="btn btn-primary btn-sm"
+                  type="button"
+                >
+                  <i class="bi bi-person-plus"></i> Character
+                </button>
+                <button
+                  id="addEnemyToken"
+                  class="btn btn-danger btn-sm"
+                  type="button"
+                >
+                  <i class="bi bi-bug"></i> Enemy
+                </button>
+                <button
+                  id="addGenericToken"
+                  class="btn btn-outline-info btn-sm"
+                  type="button"
+                >
+                  <i class="bi bi-circle-fill"></i> Token
+                </button>
+                <button
+                  id="addLightToken"
+                  class="btn btn-outline-warning btn-sm"
+                  type="button"
+                >
+                  <i class="bi bi-lightbulb"></i> Light
+                </button>
+                <button
+                  id="addRectShape"
+                  class="btn btn-outline-light btn-sm"
+                  type="button"
+                >
+                  <i class="bi bi-square"></i> Rect
+                </button>
+                <button
+                  id="addCircleShape"
+                  class="btn btn-outline-light btn-sm"
+                  type="button"
+                >
+                  <i class="bi bi-circle"></i> Circle
+                </button>
+              </div>
+            </div>
             <button
               id="enterHeightEditMode"
               class="btn btn-outline-info btn-sm"
@@ -82,17 +103,18 @@
               <i class="bi bi-box"></i> 3D View
             </button>
           </div>
-          <div class="map-toolbar-group map-zoom-controls">
+          <div id="mapZoomControlsGroup" class="map-toolbar-group map-zoom-controls">
             <label for="mapZoom">Zoom</label>
             <input
               id="mapZoom"
               type="range"
-              min="24"
+              min="12"
               max="96"
               value="48"
             />
             <span id="mapZoomValue" class="small text-secondary">48px</span>
           </div>
+          <span id="zoomControlsAnchor" style="display: none" aria-hidden="true"></span>
           <div id="map3DControls" class="map-toolbar-group map-3d-controls d-none">
             <label for="map3DAngle">Camera angle</label>
             <input id="map3DAngle" type="range" min="20" max="75" value="55" />
@@ -108,6 +130,7 @@
               <i class="bi bi-arrow-counterclockwise"></i>
             </button>
           </div>
+          <span id="threeDControlsAnchor" style="display: none" aria-hidden="true"></span>
           <div id="mapHeightToolbar" class="map-toolbar-group d-none">
             <button
               id="addHeightShapeBtn"
@@ -123,6 +146,15 @@
               title="Click and drag across cells to paint a freeform region; release to finish"
             >
               <i class="bi bi-pencil"></i> Draw Height Region
+            </button>
+            <button
+              id="editHeightShapeBtn"
+              class="btn btn-outline-warning btn-sm"
+              type="button"
+              disabled
+              title="Continue drawing cells for the selected height region"
+            >
+              <i class="bi bi-brush"></i> Edit Height Region
             </button>
             <button
               id="exitHeightEditMode"
@@ -146,9 +178,26 @@
         <div class="map-stage-wrap" id="mapStageWrap">
           <div id="mapStage" class="map-stage" aria-label="Battle map"></div>
         </div>
+
+        <!-- Mobile-only floating map chrome (see setupMobileLayout() in
+             map.js). Hidden on desktop by default CSS; the mobile media
+             query in css/map.css is what actually shows these. -->
+        <button
+          id="mapMobileMenuBtn"
+          class="map-mobile-menu-btn"
+          type="button"
+          data-bs-toggle="modal"
+          data-bs-target="#mapMobileMenuModal"
+          aria-label="Map menu"
+        >
+          <i class="bi bi-layout-sidebar-inset"></i>
+        </button>
+        <div id="mapMobileSliders" class="map-mobile-sliders"></div>
+        <div id="mapMobileHud" class="map-mobile-hud d-none"></div>
       </section>
 
-      <aside class="map-side">
+      <span id="mapSideAnchor" style="display: none" aria-hidden="true"></span>
+      <aside id="mapSide" class="map-side">
         <div class="side-tabs">
           <div>
             <h5 class="mb-0">Map</h5>
@@ -473,6 +522,42 @@
       </button>
     </div>
 
+    <!-- Mobile-only "Map Menu" modal -- see setupMobileLayout()/
+         relocateMapSide() in map.js. On mobile, the whole #mapSide
+         <aside> (Character/Initiative/Timeline/Map tabs, the latter
+         already hosting the relocated toolbar via
+         relocateMapToolbar()) gets moved into #mapMobileMenuModalBody
+         below, and moved back out to mapSideAnchor's spot when the
+         viewport widens back past the mobile breakpoint. Nothing here
+         is ever duplicated -- same DOM nodes, same ids, same
+         listeners, just a different parent. No modal-header/title bar
+         on purpose -- #mapSide already opens on its own "Map" heading,
+         so a second header here was just doubled-up chrome. A single
+         floating close button stands in for it instead (dismissing
+         still works via backdrop-tap/Escape too either way); the
+         title below stays for screen readers even though it's not
+         shown on screen. -->
+    <div
+      class="modal fade"
+      id="mapMobileMenuModal"
+      tabindex="-1"
+      aria-labelledby="mapMobileMenuModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-fullscreen modal-dialog-scrollable">
+        <div class="modal-content bg-dark text-white border-secondary map-mobile-menu-modal-content">
+          <h2 id="mapMobileMenuModalLabel" class="visually-hidden">Map Menu</h2>
+          <button
+            type="button"
+            class="btn-close btn-close-white map-mobile-menu-modal-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+          <div class="modal-body" id="mapMobileMenuModalBody"></div>
+        </div>
+      </div>
+    </div>
+
     <div
       class="modal fade"
       id="rollModal"
@@ -508,11 +593,30 @@
                 <i class="bi bi-crosshair me-1"></i> Attack
               </button>
               <button
+                id="rollFullAttackBtn"
                 class="btn btn-outline-light btn-sm text-start"
                 type="button"
                 data-roll-action="fullAttack"
               >
                 <i class="bi bi-crosshair2 me-1"></i> Full Attack
+              </button>
+              <button
+                id="rollFullAttackMeleeBtn"
+                class="btn btn-outline-light btn-sm text-start d-none"
+                type="button"
+                data-roll-action="fullAttackMelee"
+                title="Every melee weapon's full attack sequence, together -- no picking just one"
+              >
+                <i class="bi bi-crosshair2 me-1"></i> Full Attack (Melee)
+              </button>
+              <button
+                id="rollFullAttackRangedBtn"
+                class="btn btn-outline-light btn-sm text-start d-none"
+                type="button"
+                data-roll-action="fullAttackRanged"
+                title="Every ranged weapon's full attack sequence, together -- no picking just one"
+              >
+                <i class="bi bi-crosshair2 me-1"></i> Full Attack (Ranged)
               </button>
               <button
                 class="btn btn-outline-light btn-sm text-start"
@@ -568,7 +672,7 @@
       aria-labelledby="rollResultModalLabel"
       aria-hidden="true"
     >
-      <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content bg-dark text-white border-secondary">
           <div class="modal-header border-secondary">
             <h5 id="rollResultModalLabel" class="modal-title">Roll Result</h5>
@@ -757,7 +861,7 @@
                   id="gridSize"
                   class="form-control form-control-sm no-spinner"
                   type="number"
-                  min="24"
+                  min="12"
                   max="96"
                   value="48"
                   inputmode="numeric"
@@ -1258,6 +1362,7 @@
     <script src="modals/pending-effect-choices.js?v=class-skills-2"></script>
     <script src="scripts/buff-tracker-widget.js?v=unified-bonus-row-1"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="scripts/wall-patterns.js"></script>
     <script src="scripts/pages/map.js"></script>
   </body>
 </html>

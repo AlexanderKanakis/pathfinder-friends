@@ -183,6 +183,7 @@
     const contributedDr = new Map();
     const contributedSr = new Map();
     const contributedClassSkillGrants = new Map();
+    const contributedSizeChanges = new Map();
     const contributedNames = new Map();
     contributedOptions.forEach((options, targetKey) => {
       const finalOptions = terminalOptions(options);
@@ -190,6 +191,7 @@
       const dr = [];
       const sr = [];
       const classSkillGrants = [];
+      const sizeChanges = [];
       const names = [];
       finalOptions.forEach((option) => {
         if (Array.isArray(option.effects) && option.effects.length)
@@ -209,6 +211,8 @@
           option.classSkillGrants.length
         )
           classSkillGrants.push(...option.classSkillGrants);
+        if (Array.isArray(option.sizeChanges) && option.sizeChanges.length)
+          sizeChanges.push(...option.sizeChanges);
         names.push(option.name);
       });
       if (effects.length) contributedEffects.set(targetKey, effects);
@@ -216,6 +220,8 @@
       if (sr.length) contributedSr.set(targetKey, sr);
       if (classSkillGrants.length)
         contributedClassSkillGrants.set(targetKey, classSkillGrants);
+      if (sizeChanges.length)
+        contributedSizeChanges.set(targetKey, sizeChanges);
       if (names.length) contributedNames.set(targetKey, names);
     });
 
@@ -247,6 +253,7 @@
       const bundledSr = contributedSr.get(targetKey) || [];
       const bundledClassSkillGrants =
         contributedClassSkillGrants.get(targetKey) || [];
+      const bundledSizeChanges = contributedSizeChanges.get(targetKey) || [];
       const bundledNames = contributedNames.get(targetKey) || [];
       const durationConfig = feature.durationConfig || {
         count: null,
@@ -271,6 +278,10 @@
           : []),
         ...bundledClassSkillGrants,
       ];
+      const sizeChanges = [
+        ...(Array.isArray(feature.sizeChanges) ? feature.sizeChanges : []),
+        ...bundledSizeChanges,
+      ];
       abilities.set(key, {
         id: `ability:${key}`,
         name: feature.name || "Class Feature",
@@ -285,6 +296,7 @@
         ...(damageReduction.length ? { damageReduction } : {}),
         ...(spellResistance.length ? { spellResistance } : {}),
         ...(classSkillGrants.length ? { classSkillGrants } : {}),
+        ...(sizeChanges.length ? { sizeChanges } : {}),
         durationConfig,
         duration: window.PFEffectMeta?.durationLabel
           ? window.PFEffectMeta.durationLabel(durationConfig)

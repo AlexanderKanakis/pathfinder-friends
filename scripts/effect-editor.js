@@ -128,7 +128,9 @@
     "sacred",
     "shield",
     "size",
+    "inherit",
   ];
+  const SIZE_CHANGE_VALUES = [-2, -1, 1, 2];
 
   // The plain, un-abbreviated formatter every surface used to
   // duplicate. Pass a surface-specific one (options.titleCaseStat) to
@@ -865,7 +867,38 @@
     return `${label} becomes a class skill`;
   }
 
-  // DR, SR, and Class Skill grants are three separate things but they're
+  function createSizeChangeRow(data = {}, { onDelete } = {}) {
+    const row = document.createElement("div");
+    row.className = "shared-size-change-row";
+    const value = SIZE_CHANGE_VALUES.includes(Number(data.value ?? data.steps))
+      ? Number(data.value ?? data.steps)
+      : 1;
+    row.innerHTML = `
+      <div>
+        <label>Size Change</label>
+        <select data-size-change-field="value" class="form-select form-select-sm">
+          ${SIZE_CHANGE_VALUES.map(
+            (entry) =>
+              `<option value="${entry}" ${value === entry ? "selected" : ""}>${entry > 0 ? "+" : ""}${entry}</option>`,
+          ).join("")}
+        </select>
+      </div>
+      <button class="btn btn-outline-danger btn-sm" type="button" aria-label="Delete size change"><i class="bi bi-trash"></i></button>
+    `;
+    row
+      .querySelector('button[aria-label="Delete size change"]')
+      .addEventListener("click", () => {
+        row.remove();
+        onDelete?.();
+      });
+    const collect = () => ({
+      value: Number(row.querySelector('[data-size-change-field="value"]').value),
+    });
+    row._collect = collect;
+    return { element: row, collect };
+  }
+
+  // DR, SR, Class Skill grants, and Size Changes are separate things but they're
   // always authored together and rarely used -- one collapsed "Extra"
   // accordion item holding all three (instead of three separate
   // always-visible sections, or three separate accordion items) is
@@ -882,10 +915,10 @@
   // options.skills: forwarded to createClassSkillRow. options.onChange:
   // called after any add/delete/edit inside the section.
   //
-  // Returns { addDr, addSr, addClassSkill, reset(item), collect() }.
+  // Returns { addDr, addSr, addClassSkill, addSizeChange, reset(item), collect() }.
   // reset(item) clears and repopulates all three lists from
   // item.damageReduction/spellResistance/classSkillGrants; collect()
-  // returns { damageReduction, spellResistance, classSkillGrants }.
+  // returns { damageReduction, spellResistance, classSkillGrants, sizeChanges }.
   function mountExtraAccordion(container, options = {}) {
     const prefix = options.idPrefix;
     const parentAttr = options.accordionParentId
@@ -921,6 +954,13 @@
               </div>
               <div id="${prefix}ClassSkillRows" class="vstack gap-2"></div>
             </div>
+            <div class="shared-extra-subsection">
+              <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
+                <div class="small text-secondary">Size Change</div>
+                <button id="${prefix}AddSizeChange" class="btn btn-outline-info btn-sm" type="button">Add Size Change</button>
+              </div>
+              <div id="${prefix}SizeChangeRows" class="vstack gap-2"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -929,13 +969,15 @@
     const drRowsEl = document.getElementById(`${prefix}DrRows`);
     const srRowsEl = document.getElementById(`${prefix}SrRows`);
     const csRowsEl = document.getElementById(`${prefix}ClassSkillRows`);
+    const sizeRowsEl = document.getElementById(`${prefix}SizeChangeRows`);
     const countBadge = document.getElementById(`${prefix}Count`);
 
     const updateCount = () => {
       const count =
         drRowsEl.children.length +
         srRowsEl.children.length +
-        csRowsEl.children.length;
+        csRowsEl.children.length +
+        sizeRowsEl.children.length;
       if (countBadge) {
         countBadge.textContent = count ? String(count) : "";
         countBadge.classList.toggle("d-none", !count);
@@ -961,6 +1003,13 @@
       csRowsEl.appendChild(element);
       updateCount();
     };
+    const addSizeChange = (data = {}) => {
+      const { element } = createSizeChangeRow(data, {
+        onDelete: updateCount,
+      });
+      sizeRowsEl.appendChild(element);
+      updateCount();
+    };
 
     document
       .getElementById(`${prefix}AddDr`)
@@ -971,6 +1020,9 @@
     document
       .getElementById(`${prefix}AddClassSkill`)
       .addEventListener("click", () => addClassSkill());
+    document
+      .getElementById(`${prefix}AddSizeChange`)
+      .addEventListener("click", () => addSizeChange());
 
     const collectRows = (rowsEl) =>
       [...rowsEl.querySelectorAll(":scope > *")]
@@ -981,10 +1033,12 @@
       addDr,
       addSr,
       addClassSkill,
+      addSizeChange,
       reset(item = {}) {
         drRowsEl.innerHTML = "";
         srRowsEl.innerHTML = "";
         csRowsEl.innerHTML = "";
+        sizeRowsEl.innerHTML = "";
         (Array.isArray(item.damageReduction) ? item.damageReduction : []).forEach(
           addDr,
         );
@@ -994,6 +1048,9 @@
         (Array.isArray(item.classSkillGrants) ? item.classSkillGrants : []).forEach(
           addClassSkill,
         );
+        (Array.isArray(item.sizeChanges) ? item.sizeChanges : []).forEach(
+          addSizeChange,
+        );
         updateCount();
       },
       collect() {
@@ -1001,6 +1058,7 @@
           damageReduction: collectRows(drRowsEl),
           spellResistance: collectRows(srRowsEl),
           classSkillGrants: collectRows(csRowsEl),
+          sizeChanges: collectRows(sizeRowsEl),
         };
       },
     };

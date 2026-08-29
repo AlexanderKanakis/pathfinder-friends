@@ -35,9 +35,34 @@ body {
 }
 
 .map-toolbar-group {
+  position: relative;
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+}
+
+.map-elements-collapse {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 2147482000;
+  min-width: 180px;
+}
+
+.map-elements-menu {
+  display: grid;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid #333;
+  border-radius: 8px;
+  background: #171717;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.42);
+}
+
+.map-elements-menu .btn {
+  justify-content: flex-start;
+  text-align: left;
+  white-space: nowrap;
 }
 
 .map-zoom-controls,
@@ -281,6 +306,14 @@ body {
   min-width: calc(var(--cols) * var(--cell));
   min-height: calc(var(--rows) * var(--cell));
   background-color: #202020;
+  border: 1px solid #555;
+}
+
+.map-background-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
   background-image: linear-gradient(
       to right,
       rgba(255, 255, 255, 0.18) 1px,
@@ -300,7 +333,6 @@ body {
     0 0,
     center;
   background-repeat: repeat, repeat, no-repeat;
-  border: 1px solid #555;
 }
 
 .map-token,
@@ -432,6 +464,34 @@ body {
 .map-token.generic-token {
   border-color: #9ec5fe;
   color: #fff;
+}
+
+/* Dedicated static Light element (see addLightToken()/renderToken() in
+   map.js) -- a bulb glyph instead of a portrait/color-fill token, in
+   both 2D (this icon, sized off the live --cell zoom var) and 3D
+   (.map-token-light-bulb below, the floating billboard every token
+   gets). canSeeToken() keeps the whole marker GM/admin-only; the fog
+   reveal it produces is unaffected by any of this since that reads
+   state.tokens directly. */
+.map-token.light-token {
+  background-image: none !important;
+  border-color: #d99a3e;
+}
+
+.map-token-2d-light-icon {
+  color: #3a2410;
+  font-size: calc(var(--cell, 48px) * 0.5);
+  line-height: 1;
+  pointer-events: none;
+}
+
+#mapStage.is-3d .map-token-2d-light-icon {
+  display: none;
+}
+
+.map-token-light-bulb i {
+  color: #d99a3e;
+  font-size: calc(var(--portrait-size) * 0.5);
 }
 
 .map-token.enemy.enemy-hidden {
@@ -614,6 +674,11 @@ body {
    startPaintHeightShape() in map.js. */
 #mapStage.height-draw-active {
   cursor: crosshair;
+}
+
+#mapStage.height-draw-active,
+#mapStage.height-draw-active * {
+  cursor: crosshair !important;
 }
 
 .height-paint-preview {
@@ -929,6 +994,50 @@ body {
   align-items: center;
 }
 
+/* Height Region wall-dressing picker -- one swatch per scripts/wall-patterns.js
+   entry (each already carries its own background-image via
+   PFWallPatterns.backgroundStyle()), plus a leading "None" swatch that
+   falls back to the flat gradient/color blockHtmlAt() has always used. */
+.wall-pattern-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  max-height: 132px;
+  overflow-y: auto;
+  padding: 2px;
+}
+
+.wall-pattern-swatch {
+  width: 30px;
+  height: 30px;
+  flex: 0 0 auto;
+  padding: 0;
+  border-radius: 5px;
+  border: 2px solid transparent;
+  background-color: #1c1c1c;
+  background-repeat: repeat;
+  cursor: pointer;
+}
+
+.wall-pattern-swatch:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.wall-pattern-swatch.active {
+  border-color: #0dcaf0;
+}
+
+.wall-pattern-swatch-none {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: #999;
+  font-size: 15px;
+  line-height: 1;
+}
+
 /* Freeform painted regions (see "Draw Height Region" -- endPaintHeightShape()
    in map.js) -- same grid-of-cells trick renderShape() uses for circle
    shapes, so an L-shaped or diagonal paint stroke keeps its actual outline
@@ -945,6 +1054,31 @@ body {
 .height-shape-cell {
   background-color: var(--color);
   border: 1px solid var(--color);
+}
+
+.height-edit-mode .height-shape-cell.edge-n {
+  border-top-width: 4px;
+}
+
+.height-edit-mode .height-shape-cell.edge-s {
+  border-bottom-width: 4px;
+}
+
+.height-edit-mode .height-shape-cell.edge-w {
+  border-left-width: 4px;
+}
+
+.height-edit-mode .height-shape-cell.edge-e {
+  border-right-width: 4px;
+}
+
+.height-edit-mode .map-height-shape:not(.height-shape-grid) {
+  border-width: 4px;
+}
+
+.height-edit-mode .map-height-shape.editing .height-shape-cell,
+.height-edit-mode .map-height-shape.editing:not(.height-shape-grid) {
+  box-shadow: 0 0 0 2px rgba(255, 193, 7, 0.65) inset;
 }
 
 @supports (background: color-mix(in srgb, red 50%, transparent)) {
@@ -1036,6 +1170,27 @@ body {
   overflow: hidden;
 }
 
+.map-side.height-edit-mode {
+  grid-template-rows: minmax(0, 1fr);
+}
+
+.map-side.height-edit-mode .side-tabs {
+  display: none;
+}
+
+.map-side.height-edit-mode .tab-pane {
+  display: none !important;
+}
+
+.map-side.height-edit-mode #mapCharacterPane {
+  display: block !important;
+  opacity: 1;
+}
+
+.map-side.height-edit-mode #mapCharacterPane > .side-title {
+  display: none;
+}
+
 .side-tabs {
   padding: 10px;
   border-bottom: 1px solid #333;
@@ -1087,6 +1242,219 @@ body {
 .map-toolbar-mobile-slot .map-toolbar {
   border-bottom: 0;
   padding: 0;
+}
+
+/* Mobile map-view floating chrome -- hidden on desktop; the
+   max-width:980px block above turns each on. All three are
+   position:fixed (pinned to the viewport, not .map-stage-wrap's own
+   scroll/pan) and semi-transparent so the map itself stays the focus
+   underneath them. */
+.map-mobile-menu-btn,
+.map-mobile-sliders,
+.map-mobile-hud {
+  display: none;
+}
+
+.map-mobile-menu-btn {
+  position: fixed;
+  top: calc(var(--map-navbar-height, 56px) + 10px);
+  right: 12px;
+  z-index: 40;
+  width: 42px;
+  height: 42px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 50%;
+  background: rgba(24, 24, 24, 0.6);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color: #fff;
+  font-size: 18px;
+}
+
+.map-mobile-menu-btn:active {
+  background: rgba(24, 24, 24, 0.8);
+}
+
+/* #mapMobileMenuModal has no .modal-header (see its own comment in
+   map.html) -- this anchors a single floating close button over the
+   relocated #mapSide content instead, and drops modal-body's default
+   padding so #mapSide's own internal spacing (.side-tabs/.side-scroll
+   already pad themselves) is the only padding, not a second layer of
+   it stacked on top. */
+.map-mobile-menu-modal-content {
+  position: relative;
+}
+
+.map-mobile-menu-modal-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 5;
+}
+
+#mapMobileMenuModalBody {
+  padding: 0;
+}
+
+.map-mobile-sliders {
+  position: fixed;
+  /* Left-anchored, not centered -- .map-mobile-hud now sits flush in
+     the bottom-right corner (see below), so this shifts left to share
+     the same bottom row without the two colliding. */
+  left: 12px;
+  bottom: 14px;
+  z-index: 40;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  background: rgba(20, 20, 20, 0.32);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  max-width: calc(100vw - 24px);
+}
+
+.map-mobile-sliders .map-toolbar-group {
+  flex-wrap: nowrap;
+  gap: 4px;
+}
+
+/* No room for the "48px" readout in the compact mobile bar -- the
+   slider position already shows the value, this just ate width that
+   could go to the track itself. */
+#mapMobileSliders #mapZoomValue {
+  display: none;
+}
+
+/* This bar shares its row with .map-mobile-hud pinned to the right
+   edge (see both elements' own comments), so every px here is one
+   less px of clearance between them on a narrow phone -- 100px keeps
+   a few px of clearance down to a ~360px-wide screen; padding/gap
+   above and the label width below are trimmed as tight as they can
+   go without wrapping to make room for it. */
+.map-mobile-sliders input[type="range"] {
+  width: 100px;
+}
+
+.map-mobile-sliders label {
+  color: #ddd;
+  font-size: 12px;
+  margin-bottom: 0;
+  /* Fixed so every row's slider -- Zoom's own flex row and Camera
+     angle/Rotate's grid rows below -- starts at the same x regardless
+     of label text length. 74px is "Camera angle"'s own rendered width
+     (the longest label here) plus a hair of buffer. */
+  min-width: 74px;
+}
+
+.map-mobile-hud {
+  position: fixed;
+  /* Flush in the corner -- .map-mobile-sliders moved to the left edge
+     (see above) instead of this being raised to clear a centered
+     slider bar, so both now share the same bottom row. */
+  right: 12px;
+  bottom: 14px;
+  z-index: 40;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  background: rgba(20, 20, 20, 0.32);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.map-mobile-hud.d-none {
+  display: none;
+}
+
+/* Smaller than the sidebar's own .dpad-grid (40px cells) -- this one's
+   a corner overlay competing with the map underneath it for space,
+   not a sidebar panel with room to spare. */
+.map-mobile-hud .dpad-grid {
+  grid-template-columns: repeat(3, 30px);
+  grid-template-rows: repeat(3, 30px);
+  gap: 3px;
+  margin: 0;
+}
+
+.map-mobile-hud .dpad-btn,
+.map-mobile-hud .dpad-center {
+  font-size: 12px;
+}
+
+.map-mobile-hud .dpad-center span {
+  width: 11px;
+  height: 11px;
+}
+
+.map-mobile-hud-card {
+  width: 112px;
+  text-align: center;
+}
+
+.map-mobile-hud-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.map-mobile-hp-bar {
+  position: relative;
+  margin-top: 4px;
+  height: 16px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+}
+
+.map-mobile-hp-fill {
+  height: 100%;
+  background: #8fd19e;
+  transition: width 150ms ease;
+}
+
+.map-mobile-hp-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+/* The editable half of .map-mobile-hp-text -- current HP only (total
+   stays plain text next to it, read-only same as everywhere else HP
+   is shown). Overrides the global input{} rule's !important so it
+   still reads as bar text, not a form field. */
+.map-mobile-hp-input {
+  width: 26px;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: #fff !important;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: right;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+.map-mobile-hp-input:focus {
+  outline: 1px solid rgba(255, 255, 255, 0.5);
+  outline-offset: 1px;
 }
 
 .map-side-nav .nav-link.active {
@@ -1328,6 +1696,18 @@ body {
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
+}
+
+/* Which weapon this row's bonus came from -- only present on attack
+   rows (see row.target in makeAttackRollData()/rollAttack()); saves,
+   skills, and attribute checks never set it. Matters most now that an
+   enemy's Full Attack (Melee/Ranged) mixes several weapons' sequences
+   into one list -- see rollFullAttackByCategory(). */
+.roll-result-weapon {
+  color: #f0d58c;
+  text-transform: none;
+  font-weight: 700;
+  letter-spacing: normal;
 }
 
 .roll-die-value {
@@ -1776,31 +2156,6 @@ textarea {
   padding: 0;
 }
 
-@media (max-width: 980px) {
-  .map-shell {
-    display: block;
-    height: auto;
-  }
-
-  .map-main {
-    display: none;
-  }
-
-  .map-side {
-    max-width: 640px;
-    min-height: calc(100vh - 110px);
-    margin: 0 auto;
-  }
-
-  .map-mobile-tab {
-    display: block;
-  }
-
-  .map-side-nav {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-}
-
 @media (max-width: 620px) {
   .map-settings-button {
     margin-left: 0;
@@ -2016,7 +2371,7 @@ textarea {
      the scrollable range: extra room on every side since a full
      360deg spin can push the overhang toward any of them, left
      biggest since that's the one this got reported against. */
-  padding: 220px 220px 220px 360px;
+  padding: 360px;
 }
 
 #mapStage.is-3d {
@@ -2213,17 +2568,37 @@ textarea {
   backface-visibility: hidden;
 }
 
-.map-token-3d-image {
+.map-token-3d-portrait {
   display: none;
 }
 
-#mapStage.is-3d .map-token.has-image .map-token-3d-image {
+.map-token-3d-portrait-anchor {
+  display: none;
+}
+
+#mapStage.is-3d .map-token .map-token-3d-portrait-anchor {
   position: absolute;
   left: 50%;
-  bottom: 46%;
+  top: 50%;
   display: block;
-  width: min(calc(var(--w) * var(--cell) * 1.35), 128px);
-  height: min(calc(var(--h) * var(--cell) * 1.35), 128px);
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  transform: translateZ(28px) rotateZ(var(--map-3d-rotate-inverse, 0deg))
+    rotateX(var(--map-3d-angle-inverse, -55deg));
+  transform-origin: center center;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+
+#mapStage.is-3d .map-token .map-token-3d-portrait {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: grid;
+  place-items: center;
+  width: var(--portrait-size);
+  height: var(--portrait-size);
   border: 3px solid #f8f9fa;
   border-radius: 50%;
   background-color: #f8f9fa;
@@ -2231,12 +2606,34 @@ textarea {
   object-fit: cover;
   object-position: center;
   pointer-events: none;
-  transform: translate(-50%, -20%) translateZ(28px)
-    rotateZ(var(--map-3d-rotate-inverse, 0deg))
-    rotateX(var(--map-3d-angle-inverse, -55deg));
-  transform-origin: center bottom;
-  transform-style: preserve-3d;
+  transform: translate(-50%, -92%);
+  transform-origin: center center;
   backface-visibility: hidden;
+}
+
+#mapStage.is-3d .map-token .map-token-3d-image {
+  display: block;
+}
+
+#mapStage.is-3d .map-token .map-token-3d-initials {
+  color: #111;
+  font-size: clamp(18px, calc(var(--portrait-size) * 0.34), 34px);
+  font-weight: 800;
+  line-height: 1;
+  text-align: center;
+}
+
+.token-3d-billboard-image {
+  position: absolute;
+  display: block;
+  border: 3px solid #f8f9fa;
+  border-radius: 50%;
+  background-color: #f8f9fa;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+  object-fit: cover;
+  object-position: center;
+  pointer-events: none;
+  transform: translate(-50%, -95%);
 }
 
 .token-3d-billboard-layer {
@@ -2327,4 +2724,222 @@ textarea {
    normal click-to-select hit-testing on tokens/shapes. */
 .map-3d-hit-cell {
   position: absolute;
+}
+
+/* Mobile map view: the map is the whole screen, full stop -- see
+   setupMobileLayout()/relocateMapSliders()/relocateMapSide() in
+   map.js. Everything that isn't the map itself either becomes a small
+   floating overlay (menu button, Zoom/Camera sliders, the selected-
+   token HUD -- all handled below, all semi-transparent) or moves into
+   the Map Menu modal (#mapSide's Character/Initiative/Timeline/Map
+   tabs, the last of which still hosts the relocated toolbar exactly
+   as before). Nothing here touches desktop, which keeps the original
+   side-by-side layout untouched. */
+@media (max-width: 980px) {
+  .map-shell {
+    display: block;
+    height: calc(100vh - var(--map-navbar-height, 56px));
+    height: calc(100dvh - var(--map-navbar-height, 56px));
+    padding: 0;
+    gap: 0;
+  }
+
+  .map-main {
+    display: block;
+    height: 100%;
+    border: 0;
+    border-radius: 0;
+    position: relative;
+  }
+
+  /* Hides #mapToolbar in its normal desktop spot at the top of
+     .map-main. Once relocateMapToolbar() moves it into the Map tab
+     inside the modal (see .map-toolbar-mobile-slot override below),
+     it's the same element/class -- this bare selector would otherwise
+     keep it display:none there too, which is exactly what was making
+     the Map tab look empty despite the toolbar genuinely being
+     present in it. */
+  .map-toolbar {
+    display: none;
+  }
+
+  /* Every button stacked in one column for easy tapping, except
+     Settings (the gear) -- pulled out of the flow and pinned to the
+     tab's own top-right corner instead, same relative spot
+     .map-settings-button's margin-left:auto already puts it in on
+     desktop's horizontal row, just done with absolute positioning
+     since a column layout has no "push right" to repurpose. */
+  .map-toolbar-mobile-slot .map-toolbar {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    position: relative;
+    padding-right: 46px;
+  }
+
+  .map-toolbar-mobile-slot .map-toolbar-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .map-toolbar-mobile-slot .map-toolbar-group .btn {
+    width: 100%;
+  }
+
+  .map-toolbar-mobile-slot .map-settings-button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin-left: 0;
+  }
+
+  .map-stage-wrap {
+    height: 100%;
+  }
+
+  /* 360px on every side (see .map-stage-wrap.is-3d's own comment) is
+     sized for a desktop viewport with room to spare -- on a ~375px
+     phone screen it's most of the scrollable area, which is what was
+     pushing the actual tilted map so far off-center that centering on
+     load barely showed any of it. */
+  .map-stage-wrap.is-3d {
+    padding: 100px;
+  }
+
+  /* Rotate stacked under Camera angle instead of one long horizontal
+     row -- grid-template-columns: auto auto with 2 items per label
+     wraps every (label, slider) pair onto its own row automatically,
+     no HTML reordering needed. Second column is auto (not 1fr) so the
+     row hugs the slider's own width (set via
+     .map-mobile-sliders input[type="range"]) instead of stretching
+     across leftover width and leaving dead space beside it. */
+  .map-3d-controls {
+    display: grid;
+    grid-template-columns: auto auto;
+    align-items: center;
+    gap: 6px 8px;
+  }
+
+  /* Not part of the mobile HUD -- Rotate/Camera angle reset from the
+     floating slider bar with a stray icon button; dragging either
+     slider back is enough on a phone. */
+  .map-3d-controls #reset3DCamera {
+    display: none;
+  }
+
+  /* Relocated into the Map Menu modal by relocateMapSide() before this
+     ever matters in practice -- this is just the pre-relocation/no-JS
+     fallback so it doesn't flash full-width below the map for a frame.
+     The more specific rule right below wins once it's actually inside
+     the modal, restoring its normal grid layout there. */
+  #mapSide {
+    display: none;
+  }
+
+  #mapMobileMenuModalBody #mapSide {
+    display: grid;
+    height: 100%;
+  }
+
+  .map-mobile-tab {
+    display: block;
+  }
+
+  .map-side-nav {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .map-mobile-menu-btn,
+  .map-mobile-sliders,
+  .map-mobile-hud {
+    display: flex;
+  }
+
+  /* Compact roll results -- a Full Attack against a multi-weapon enemy
+     (see rollFullAttackByCategory()) can produce a long list of rows,
+     and the desktop card (46px die, stacked breakdown + divider,
+     ~90px tall each) doesn't scale to that on a phone. This packs each
+     row into a single compact line: die badge on the left, spanning
+     both text rows; label+weapon on top, bonus/total/note inline
+     underneath. Same markup as desktop (see showRollResultModal()),
+     just re-laid-out via grid -- nothing here changes what's rendered. */
+  .roll-result-list {
+    gap: 6px;
+  }
+
+  .roll-result-card {
+    display: grid;
+    grid-template-columns: 40px 1fr;
+    grid-template-rows: auto auto;
+    align-items: center;
+    column-gap: 8px;
+    row-gap: 1px;
+    padding: 6px 10px;
+    text-align: left;
+  }
+
+  .roll-die-value {
+    grid-row: 1 / 3;
+    grid-column: 1;
+    font-size: 22px;
+    justify-self: center;
+  }
+
+  .roll-result-label {
+    grid-column: 2;
+    grid-row: 1;
+    font-size: 11px;
+  }
+
+  .roll-breakdown {
+    grid-column: 2;
+    grid-row: 2;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 3px 10px;
+    margin-top: 0;
+  }
+
+  .roll-breakdown-row {
+    justify-content: flex-start;
+    gap: 4px;
+    color: #aaa;
+    font-size: 11px;
+  }
+
+  .roll-breakdown-row strong {
+    font-size: 13px;
+  }
+
+  .roll-total-divider {
+    display: none;
+  }
+
+  .roll-total-row {
+    gap: 4px;
+    font-size: 11px;
+  }
+
+  .roll-total-row strong {
+    font-size: 15px;
+  }
+
+  .roll-result-note {
+    grid-column: 2;
+    grid-row: 3;
+    margin-top: 0;
+    font-size: 11px;
+  }
+
+  .roll-result-note:empty {
+    display: none;
+  }
+
+  /* Redundant on mobile once the list is already compact -- the footer
+     still has its own Close button, plus backdrop-tap and Escape both
+     already dismiss the modal regardless. */
+  #rollResultModal .modal-header .btn-close {
+    display: none;
+  }
 }

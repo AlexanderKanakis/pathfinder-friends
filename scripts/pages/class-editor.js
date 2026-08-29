@@ -1066,7 +1066,7 @@ function syncPoolAcrossLevels(levelIndex, featureIndex, poolIndex) {
           );
           if (!match) return;
           let changed = false;
-          ["effects", "damageReduction", "spellResistance"].forEach((key) => {
+          ["effects", "damageReduction", "spellResistance", "sizeChanges"].forEach((key) => {
             if (Array.isArray(match[key]) && match[key].length) {
               option[key] = cloneJson(match[key]);
               changed = true;

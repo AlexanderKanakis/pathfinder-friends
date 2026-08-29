@@ -6,6 +6,7 @@ let heightEditMode = false;
 // "Draw Height Region" paint tool -- see toggleHeightDrawMode().
 let heightDrawMode = false;
 let paintState = null;
+let heightEditingShapeId = "";
 // 3D View (experimental) -- tilts the live #mapStage in place, see
 // toggleView3DMode(). Independent of heightEditMode: this is a view
 // of the normal token/shape map, not a Height Layer editing mode.
@@ -78,6 +79,7 @@ let seenTurnEffectNotices = new Set();
 let dpadJoystickState = null;
 let mapToastTimer = null;
 let shapeFogRenderContext = null;
+let appliedMapBackgroundUrl = null;
 
 const MAP_SLOT_COUNT = 6;
 const MAP_CLIENT_ID_KEY = "pf_map_client_id";
@@ -208,6 +210,7 @@ const MAP_CONTEXT_DOCUMENTATION = [
       "An effect that grants an extra attack at highest BAB inserts another copy of the first attack. When TWF is active, these effect-granted attacks apply only to the primary weapon.",
       "Rapid Shot inserts one extra attack at the selected ranged weapon's highest bonus and applies -2 to all weapon attacks while active.",
       "Full Attack results are displayed as Attack 1, Attack 2, Attack 3, and so on across the complete sequence.",
+      "For enemies specifically, Full Attack is Melee or Ranged, not a chosen weapon -- every equipped weapon in that category contributes its own full sequence. See the Roll doc.",
     ],
     access:
       "Roll permissions follow the selected token: owners roll their characters, while GM and admin can roll all characters and enemies.",
@@ -287,6 +290,7 @@ const MAP_CONTEXT_DOCUMENTATION = [
       "Roll attacks, saves, skills, or attributes using the selected token's calculated sheet values.",
     usage: [
       "Attack rolls the highest attack for the selected weapon. Full Attack rolls every available attack.",
+      "For enemies, Full Attack has no single-weapon option -- it's Full Attack (Melee) or Full Attack (Ranged), each rolling every equipped weapon in that category's own full sequence together. A category button is hidden if the enemy has nothing equipped in it. Attack still targets one chosen weapon regardless.",
       "Threat ranges, firearm misfires, critical successes, and critical failures are identified automatically.",
       "Every result is added to the timeline. The result modal can reroll the same action.",
     ],
@@ -391,11 +395,77 @@ function relocateMapToolbar(isMobile) {
   }
 }
 
-function setupMobileToolbar() {
-  relocateMapToolbar(mapMobileQuery.matches);
-  mapMobileQuery.addEventListener("change", (event) =>
-    relocateMapToolbar(event.matches),
+// On mobile the map fills the screen and everything else (element
+// buttons, height layer, background settings, ...) lives in the
+// #mapMobileMenuModal instead -- but Zoom/Camera angle/Rotate stay out
+// of that modal, as a small always-visible floating bar bottom-center,
+// since they're the one thing worth adjusting without leaving the map
+// view. Both groups keep their real ids/listeners; this only ever
+// moves them, via the same anchor-element trick relocateMapSide() uses
+// below, never clones them.
+function relocateMapSliders(isMobile) {
+  const zoomGroup = el("mapZoomControlsGroup");
+  const threeDGroup = el("map3DControls");
+  const mobileContainer = el("mapMobileSliders");
+  const zoomAnchor = el("zoomControlsAnchor");
+  const threeDAnchor = el("threeDControlsAnchor");
+  if (!zoomGroup || !threeDGroup || !mobileContainer || !zoomAnchor || !threeDAnchor)
+    return;
+  if (isMobile) {
+    mobileContainer.appendChild(zoomGroup);
+    mobileContainer.appendChild(threeDGroup);
+  } else {
+    zoomAnchor.parentElement.insertBefore(zoomGroup, zoomAnchor);
+    threeDAnchor.parentElement.insertBefore(threeDGroup, threeDAnchor);
+  }
+}
+
+// The whole #mapSide <aside> (Character/Initiative/Timeline/Map tabs)
+// moves into the "Map Menu" modal on mobile instead of sitting beside
+// (desktop) or below (old mobile layout) the map -- see the modal's
+// own comment in map.html. #mapSideAnchor marks its original spot in
+// the flow so switching back to desktop restores it exactly, the same
+// pattern relocateMapSliders() above uses.
+function relocateMapSide(isMobile) {
+  const side = el("mapSide");
+  const modalBody = el("mapMobileMenuModalBody");
+  const anchor = el("mapSideAnchor");
+  if (!side || !modalBody || !anchor) return;
+  if (isMobile) {
+    modalBody.appendChild(side);
+  } else {
+    anchor.parentElement.insertBefore(side, anchor);
+  }
+}
+
+// #appNavbar's real height varies (it wraps to a taller, stacked layout
+// under ~850px -- see navbar.js), so "100dvh minus a fixed guess" would
+// leave either a gap or an overflow depending on how it's currently
+// wrapped. Measuring it for real and exposing it as a CSS var is what
+// lets .map-shell's mobile height (see css/map.css) actually fill the
+// rest of the screen under the navbar, whatever shape it's in.
+function updateMobileNavbarHeightVar() {
+  const navbar = el("appNavbar");
+  if (!navbar) return;
+  document.documentElement.style.setProperty(
+    "--map-navbar-height",
+    `${navbar.getBoundingClientRect().height}px`,
   );
+}
+
+function setupMobileLayout() {
+  const applyLayout = (isMobile) => {
+    relocateMapToolbar(isMobile);
+    relocateMapSliders(isMobile);
+    relocateMapSide(isMobile);
+    updateMobileNavbarHeightVar();
+  };
+  applyLayout(mapMobileQuery.matches);
+  mapMobileQuery.addEventListener("change", (event) => {
+    applyLayout(event.matches);
+    renderMobileHud();
+  });
+  window.addEventListener("resize", updateMobileNavbarHeightVar);
 }
 function showSelectedPanel() {
   const sideScroll = document.querySelector(".side-scroll");
@@ -671,6 +741,11 @@ function nextMapZIndex() {
   );
 }
 function canSeeToken(token) {
+  // A light's marker is a GM/admin-only editing aid -- the fog reveal
+  // it produces still applies to everyone (lightRevealCircles() reads
+  // state.tokens directly, not this filtered view), so hiding it here
+  // only hides the bulb icon/aura, never the illumination itself.
+  if (token.kind === "light" && !isGm) return false;
   if (token.kind === "enemy" && token.visible === false && !isGm) return false;
   if (token.hidden === true && !canManageMapItem(token)) return false;
   return true;
@@ -740,12 +815,12 @@ function canManageMapItem(item) {
   return false;
 }
 function canManageAura(token) {
-  if (!token?.kind) return false;
+  if (!token?.kind || token.kind === "light") return false;
   if (isGm) return true;
   return token.kind === "character" && token.ownerId === currentUserId;
 }
 function canManageEffects(token) {
-  if (!token?.kind) return false;
+  if (!token?.kind || token.kind === "light") return false;
   if (token.panelOnly) return false;
   if (isGm) return true;
   return token.kind === "character" && token.ownerId === currentUserId;
@@ -1796,6 +1871,74 @@ function applySettingsToInputs() {
   captureNoImageCellRatio();
 }
 
+function mapWrapPadding() {
+  const wrap = el("mapStageWrap");
+  if (!wrap) return { left: 0, top: 0 };
+  const style = getComputedStyle(wrap);
+  return {
+    left: parseFloat(style.paddingLeft) || 0,
+    top: parseFloat(style.paddingTop) || 0,
+  };
+}
+
+function mapViewportCenterRatio() {
+  const wrap = el("mapStageWrap");
+  if (!wrap) return { x: 0.5, y: 0.5 };
+  const padding = mapWrapPadding();
+  const mapWidth = Math.max(1, Number(state.settings.cols || 1) * localGridSize);
+  const mapHeight = Math.max(1, Number(state.settings.rows || 1) * localGridSize);
+  return {
+    x: clamp(
+      (wrap.scrollLeft - padding.left + wrap.clientWidth / 2) / mapWidth,
+      0,
+      1,
+    ),
+    y: clamp(
+      (wrap.scrollTop - padding.top + wrap.clientHeight / 2) / mapHeight,
+      0,
+      1,
+    ),
+  };
+}
+
+function scrollMapViewportToRatio(ratio = { x: 0.5, y: 0.5 }) {
+  const wrap = el("mapStageWrap");
+  if (!wrap) return;
+  const padding = mapWrapPadding();
+  const mapWidth = Math.max(1, Number(state.settings.cols || 1) * localGridSize);
+  const mapHeight = Math.max(1, Number(state.settings.rows || 1) * localGridSize);
+  wrap.scrollLeft = ratio.x * mapWidth - wrap.clientWidth / 2 + padding.left;
+  wrap.scrollTop = ratio.y * mapHeight - wrap.clientHeight / 2 + padding.top;
+}
+
+function centerMapViewport() {
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => scrollMapViewportToRatio({ x: 0.5, y: 0.5 }));
+  });
+}
+
+function visibleSpawnCell(width = 1, height = 1) {
+  const wrap = el("mapStageWrap");
+  const padding = mapWrapPadding();
+  const cell = Math.max(1, Number(localGridSize || 48));
+  const cols = Number(state.settings.cols || 1);
+  const rows = Number(state.settings.rows || 1);
+  const fallbackX = Math.floor(cols / 2 - width / 2);
+  const fallbackY = Math.floor(rows / 2 - height / 2);
+  if (!wrap) {
+    return {
+      x: clamp(fallbackX, 0, Math.max(0, cols - width)),
+      y: clamp(fallbackY, 0, Math.max(0, rows - height)),
+    };
+  }
+  const centerX = (wrap.scrollLeft - padding.left + wrap.clientWidth / 2) / cell;
+  const centerY = (wrap.scrollTop - padding.top + wrap.clientHeight / 2) / cell;
+  return {
+    x: clamp(Math.floor(centerX - width / 2), 0, Math.max(0, cols - width)),
+    y: clamp(Math.floor(centerY - height / 2), 0, Math.max(0, rows - height)),
+  };
+}
+
 // Fires while editing the Background URL field in the modal: measures the
 // new image (if any) and, if it's genuinely a different image, defaults
 // Cell X/Y to match its aspect ratio -- purely a starting point, the GM can
@@ -1902,13 +2045,18 @@ function showMapContextMenu(event, item) {
       : item.kind
         ? displayTokenName(item)
         : item.name || "Shape";
-  el("toggleEmitMenu").classList.toggle("d-none", !canManageAura(item));
+  // A light's only right-click option is Remove -- no aura/effect/roll,
+  // no visibility toggles, no z-index (nothing else ever draws on top
+  // of a light's own layer in a way reordering it would matter for).
+  const isLight = item.kind === "light";
+  el("toggleEmitMenu").classList.toggle("d-none", isLight || !canManageAura(item));
   el("emitMenu").classList.add("d-none");
   el("toggleEmitMenu").setAttribute("aria-expanded", "false");
-  el("openApplyEffect").classList.toggle("d-none", !canManageEffects(item));
-  el("openRollMenu").classList.toggle("d-none", !canRollToken(item));
+  el("openApplyEffect").classList.toggle("d-none", isLight || !canManageEffects(item));
+  el("openRollMenu").classList.toggle("d-none", isLight || !canRollToken(item));
   const tokenVisibilityButton = el("toggleTokenVisibility");
-  const canToggleTokenVisibility = Boolean(item.kind && canManageMapItem(item));
+  const canToggleTokenVisibility =
+    !isLight && Boolean(item.kind && canManageMapItem(item));
   tokenVisibilityButton.classList.toggle("d-none", !canToggleTokenVisibility);
   if (canToggleTokenVisibility) {
     tokenVisibilityButton.innerHTML =
@@ -1926,7 +2074,7 @@ function showMapContextMenu(event, item) {
         : `<i class="bi bi-eye-slash me-1"></i> Hide enemy`;
   }
   const nameVisibilityButton = el("toggleTokenNameVisibility");
-  const canToggleName = isGm && Boolean(item.kind);
+  const canToggleName = !isLight && isGm && Boolean(item.kind);
   nameVisibilityButton.classList.toggle("d-none", !canToggleName);
   if (canToggleName) {
     nameVisibilityButton.innerHTML = item.hideName
@@ -1934,6 +2082,7 @@ function showMapContextMenu(event, item) {
       : `<i class="bi bi-incognito me-1"></i> Hide name`;
   }
   el("zIndexMenu").classList.add("d-none");
+  el("toggleZIndexMenu").classList.toggle("d-none", isLight);
   el("toggleZIndexMenu").setAttribute("aria-expanded", "false");
   menu.classList.remove("d-none");
   const rect = menu.getBoundingClientRect();
@@ -2071,14 +2220,8 @@ function endMovementMeasure() {
 
 function renderMap() {
   const stage = el("mapStage");
-  const { cols, rows, backgroundUrl } = state.settings;
-  stage.style.setProperty("--cell", `${localGridSize}px`);
-  stage.style.setProperty("--cols", cols);
-  stage.style.setProperty("--rows", rows);
-  stage.style.setProperty(
-    "--map-bg",
-    backgroundUrl ? `url("${backgroundUrl.replaceAll('"', "%22")}")` : "none",
-  );
+  const { cols, rows } = state.settings;
+  applyMapStageVars();
   // The background always fills the whole cols x rows grid, so resizing
   // Cell X/Y (linked) scales the picture with it instead of cropping it.
 
@@ -2165,13 +2308,14 @@ function renderMap() {
   // toggleHeightEditMode().
   if (heightEditMode) {
     stage.innerHTML = [
+      renderMapBackgroundLayer(),
       ...state.heightShapes.map(renderHeightShape),
       `<div id="heightPaintPreview" class="height-paint-preview"></div>`,
       `<div id="tokenHoverLayer" class="token-hover-layer"></div>`,
     ].join("");
   } else {
     stage.innerHTML = [
-      is3D ? render3DTerrainHtml() : "",
+      is3D ? render3DTerrainHtml() : renderMapBackgroundLayer(),
       ...(is3D ? tokens3D : visibleTokens).map(renderAura),
       ...(isGm && !is3D
         ? visibleTokens.map((token) =>
@@ -2276,6 +2420,33 @@ function renderMap() {
     selectedId = "";
     renderAll(false);
   };
+  updateHeightEditControls();
+  // Lives outside #mapStage (a sibling in .map-main, see map.html), so
+  // rebuilding the stage above never touches it -- hooked here instead
+  // of into every renderSelectedPanel() call site because renderMap()
+  // is the one function every state change already goes through
+  // (drag, dpad move, remote sync, ...), so the HUD never goes stale.
+  renderMobileHud();
+}
+
+function renderMapBackgroundLayer() {
+  return `<div class="map-background-layer"></div>`;
+}
+
+function applyMapStageVars() {
+  const stage = el("mapStage");
+  if (!stage) return;
+  const { cols, rows, backgroundUrl } = state.settings;
+  stage.style.setProperty("--cell", `${localGridSize}px`);
+  stage.style.setProperty("--cols", cols);
+  stage.style.setProperty("--rows", rows);
+  if (backgroundUrl !== appliedMapBackgroundUrl) {
+    appliedMapBackgroundUrl = backgroundUrl || "";
+    stage.style.setProperty(
+      "--map-bg",
+      backgroundUrl ? `url("${backgroundUrl.replaceAll('"', "%22")}")` : "none",
+    );
+  }
 }
 
 function renderAura(token) {
@@ -2705,6 +2876,7 @@ function renderToken(
 ) {
   const enemyClass = token.kind === "enemy" ? " enemy" : "";
   const genericClass = token.kind === "token" ? " generic-token" : "";
+  const lightClass = token.kind === "light" ? " light-token" : "";
   const identityHidden = tokenNameIsHidden(token);
   const imageUrl = tokenNameIsHidden(token)
     ? ""
@@ -2717,6 +2889,9 @@ function renderToken(
     : token.color || "#8fd19e";
   const tokenW = Number(token.w || 1);
   const tokenH = Number(token.h || 1);
+  const portraitSize = Math.round(
+    clamp(Math.min(tokenW, tokenH) * Number(localGridSize || 48) * 1.35, 56, 128),
+  );
   const hiddenClass =
     token.kind === "enemy" && token.visible === false && isGm
       ? " enemy-hidden"
@@ -2756,14 +2931,17 @@ function renderToken(
       ? `filter:${grayscaleFilter};-webkit-filter:${grayscaleFilter};`
       : "",
   ].join("");
-  const portraitHtml = imageUrl
-    ? `<img class="map-token-3d-image" src="${escapeHtml(cssUrl(imageUrl))}" alt="" style="${tokenEffectStyle}">`
-    : "";
+  const portraitHtml =
+    token.kind === "light"
+      ? `<div class="map-token-3d-portrait-anchor"><div class="map-token-3d-portrait map-token-light-bulb" style="${tokenEffectStyle}"><i class="bi bi-lightbulb-fill"></i></div></div>`
+      : imageUrl
+        ? `<div class="map-token-3d-portrait-anchor"><img class="map-token-3d-portrait map-token-3d-image" src="${escapeHtml(cssUrl(imageUrl))}" alt="" style="${tokenEffectStyle}"></div>`
+        : `<div class="map-token-3d-portrait-anchor"><div class="map-token-3d-portrait map-token-3d-initials" style="${tokenEffectStyle}">${escapeHtml(shortLabel)}</div></div>`;
   const baseFogHtml =
     fogOpacity < 1
       ? `<div class="map-token-3d-base-fog" style="background:${fogColorWithOpacity("#000000", 1 - fogOpacity)};"></div>`
       : "";
-  const containerEffectStyle = imageUrl
+  const containerEffectStyle = imageUrl || (view3DMode && !heightEditMode)
     ? ""
     : [
         grayscaleFilter
@@ -2771,8 +2949,9 @@ function renderToken(
           : "",
       ].join("");
   return `
-    <div class="map-token${enemyClass}${genericClass}${imageClass}${identityHiddenClass}${hiddenClass}${tokenHiddenClass}${selectedClass}${activeClass}${ghostClass}"${idAttr} style="--x:${token.x};--y:${token.y};--w:${tokenW};--h:${tokenH};--z:${Number(token.zIndex || 2)};--tz:${tz}px;--color:${escapeHtml(baseColor)};--token-image:${tokenImage};${containerEffectStyle}">
+    <div class="map-token${enemyClass}${genericClass}${lightClass}${imageClass}${identityHiddenClass}${hiddenClass}${tokenHiddenClass}${selectedClass}${activeClass}${ghostClass}"${idAttr} style="--x:${token.x};--y:${token.y};--w:${tokenW};--h:${tokenH};--z:${Number(token.zIndex || 2)};--tz:${tz}px;--portrait-size:${portraitSize}px;--color:${escapeHtml(baseColor)};--token-image:${tokenImage};${containerEffectStyle}">
       ${baseFogHtml}
+      ${token.kind === "light" ? `<i class="bi bi-lightbulb-fill map-token-2d-light-icon"></i>` : ""}
       ${portraitHtml}
       <div class="text-center">
         <div class="token-label">${escapeHtml(shortLabel)}</div>
@@ -2782,12 +2961,20 @@ function renderToken(
 }
 
 function setMapZoom(value, { render = true } = {}) {
-  localGridSize = clamp(Number(value || 48), 24, 96);
+  const centerRatio = mapViewportCenterRatio();
+  localGridSize = clamp(Number(value || 48), 12, 96);
   sessionStorage.setItem("pf_map_grid_size", String(localGridSize));
   el("gridSize").value = localGridSize;
   el("mapZoom").value = localGridSize;
   el("mapZoomValue").textContent = `${localGridSize}px`;
-  if (render) renderAll(false);
+  if (render) {
+    if (view3DMode || heightEditMode) {
+      renderAll(false);
+    } else {
+      applyMapStageVars();
+    }
+    requestAnimationFrame(() => scrollMapViewportToRatio(centerRatio));
+  }
 }
 
 function render3DTokenBillboards(tokens) {
@@ -2825,6 +3012,21 @@ function render3DTokenBillboards(tokens) {
     if (hoverHtml) pieces.push(hoverHtml);
   }
   layer.innerHTML = pieces.join("");
+}
+
+function token3DGrayscaleFromContext(token) {
+  if (
+    !shapeFogRenderContext?.active ||
+    !shapeFogRenderContext.limitedCircles.length
+  ) {
+    return false;
+  }
+  const center = tokenCenter(token);
+  const gx = Math.floor(center.x);
+  const gy = Math.floor(center.y);
+  return shapeFogRenderContext.limitedCircles.some(
+    (circle) => flatRevealStrengthAtCell(circle, gx, gy) > 0.02,
+  );
 }
 
 function render3DTokenHover(token, centerX, centerY, portraitSize) {
@@ -3129,6 +3331,7 @@ function shape3DSpriteFogStyle(fogState) {
 // L-shaped or diagonal paint stroke actually looks like one.
 function renderHeightShape(shape) {
   const selectedClass = shape.id === selectedId ? " selected" : "";
+  const editingClass = shape.id === heightEditingShapeId ? " editing" : "";
   const pitClass = Number(shape.heightFeet || 0) < 0 ? " pit" : "";
   const label = `<span class="map-height-shape-label">${heightFeetLabel(shape.heightFeet)}</span>`;
   if (Array.isArray(shape.cells)) {
@@ -3138,21 +3341,22 @@ function renderHeightShape(shape) {
     const cells = [];
     for (let y = 0; y < rows; y += 1) {
       for (let x = 0; x < cols; x += 1) {
+        const isOccupied = occupied.has(`${x},${y}`);
         cells.push(
-          occupied.has(`${x},${y}`)
-            ? `<span class="height-shape-cell"></span>`
+          isOccupied
+            ? `<span class="height-shape-cell${!occupied.has(`${x},${y - 1}`) ? " edge-n" : ""}${!occupied.has(`${x},${y + 1}`) ? " edge-s" : ""}${!occupied.has(`${x - 1},${y}`) ? " edge-w" : ""}${!occupied.has(`${x + 1},${y}`) ? " edge-e" : ""}"></span>`
             : `<span></span>`,
         );
       }
     }
     return `
-      <div class="map-shape map-height-shape height-shape-grid${pitClass}${selectedClass}" data-map-id="${escapeHtml(shape.id)}" style="--x:${shape.x};--y:${shape.y};--w:${cols};--h:${rows};--z:2;--shape-cols:${cols};--shape-rows:${rows};--color:${escapeHtml(shape.color || "#61dafb")};">
+      <div class="map-shape map-height-shape height-shape-grid${pitClass}${selectedClass}${editingClass}" data-map-id="${escapeHtml(shape.id)}" style="--x:${shape.x};--y:${shape.y};--w:${cols};--h:${rows};--z:2;--shape-cols:${cols};--shape-rows:${rows};--color:${escapeHtml(shape.color || "#61dafb")};">
         ${cells.join("")}
         ${label}
       </div>
     `;
   }
-  return `<div class="map-shape map-height-shape${pitClass}${selectedClass}" data-map-id="${escapeHtml(shape.id)}" style="--x:${shape.x};--y:${shape.y};--w:${shape.w || 2};--h:${shape.h || 2};--z:2;--color:${escapeHtml(shape.color || "#61dafb")};">
+  return `<div class="map-shape map-height-shape${pitClass}${selectedClass}${editingClass}" data-map-id="${escapeHtml(shape.id)}" style="--x:${shape.x};--y:${shape.y};--w:${shape.w || 2};--h:${shape.h || 2};--z:2;--color:${escapeHtml(shape.color || "#61dafb")};">
     ${label}
     ${resizeHandlesHtml(shape.id)}
   </div>`;
@@ -3638,7 +3842,7 @@ function render3DTerrainHtml() {
   // a wall there anyway chops the whole platform up into a
   // distracting grid that reads as "flat textured ground," not "one
   // recessed/raised area." Only the true outer perimeter gets one.
-  function blockHtmlAt(gx, gy, gw, gh, z, sides) {
+  function blockHtmlAt(gx, gy, gw, gh, z, sides, pattern) {
     const x = gx * cellPx;
     const y = gy * cellPx;
     const w = gw * cellPx;
@@ -3646,6 +3850,15 @@ function render3DTerrainHtml() {
     const wallPx = Math.abs(z);
     const faceStyle = `background-image:${GRID_LINES_CSS},${bgCss};background-size:${cellPx}px ${cellPx}px,${cellPx}px ${cellPx}px,${mapW}px ${mapH}px;background-position:0 0,0 0,-${x}px -${y}px;background-repeat:repeat,repeat,no-repeat;`;
     const pitClass = z < 0 ? " pit" : "";
+    // A region can opt into a textured wall (see scripts/wall-patterns.js
+    // + the Height Region panel's picker) in place of the flat
+    // raised/pit gradient .map-3d-wall carries by default -- inline
+    // style beats both of those class-based rules, and the same
+    // texture applies whether the region is raised or a pit (the
+    // material doesn't care which way the wall folds).
+    const wallPatternStyle = pattern
+      ? window.PFWallPatterns?.backgroundStyle(pattern) || ""
+      : "";
     // A wall on the true outer perimeter (per `sides`) always gets
     // rendered -- fog only ever darkens it via a nested tint div, see
     // wallFogOpacity()'s comment for why skipping the element itself
@@ -3662,7 +3875,7 @@ function render3DTerrainHtml() {
         grayStrength > 0.02
           ? `<div class="map-3d-wall-grayscale"></div>`
           : "";
-      return `<div class="map-3d-wall map-3d-wall-${side}" style="${sizeStyle}">${grayTint}${tint}</div>`;
+      return `<div class="map-3d-wall map-3d-wall-${side}" style="${sizeStyle}${wallPatternStyle}">${grayTint}${tint}</div>`;
     };
     return `
       <div class="map-3d-block${pitClass}" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;">
@@ -3705,7 +3918,7 @@ function render3DTerrainHtml() {
               west: !cellSet.has(`${dx - 1},${dy}`),
               east: !cellSet.has(`${dx + 1},${dy}`),
             };
-            return blockHtmlAt(gx, gy, 1, 1, z, sides);
+            return blockHtmlAt(gx, gy, 1, 1, z, sides, shape.pattern);
           })
           .join("");
       }
@@ -3716,6 +3929,7 @@ function render3DTerrainHtml() {
         Number(shape.h || 1),
         z,
         ALL_SIDES,
+        shape.pattern,
       );
     })
     .join("");
@@ -3866,6 +4080,12 @@ function moveTokenByDpad(item, dx, dy, { renderPanel = true } = {}) {
   setTimeout(() => {
     dpadMovingIds.delete(item.id);
     if (renderPanel && selectedObject()?.id === item.id) renderSelectedPanel();
+    // renderSelectedPanel() only rebuilds the sidebar's own copy of
+    // this dpad -- the mobile HUD is a separate element (see
+    // renderMobileHud()) that renderMap() normally keeps in sync, but
+    // nothing else calls renderMap() once this cooldown ends, so its
+    // buttons were staying stuck disabled after the very first tap.
+    renderMobileHud();
   }, DPAD_MOVE_COOLDOWN_MS);
 }
 
@@ -3995,6 +4215,13 @@ const QUICK_ACTION_GROUPS = {
 let quickExpandedGroups = new Set();
 
 function quickActionRows(item) {
+  // A light's own dedicated side panel (renderLightPanel()) never opens
+  // this Quick Controls surface at all, but hardening it here too means
+  // nothing else that happens to call quickActionRows() on a light can
+  // accidentally surface more than removal.
+  if (item.kind === "light") {
+    return [["remove", "bi-box-arrow-right", "btn-outline-danger", "Remove from map"]];
+  }
   const rows = [];
   if (canManageAura(item))
     rows.push(["emit-toggle", "bi-broadcast-pin", "btn-outline-info", "Emit"]);
@@ -4070,6 +4297,75 @@ function renderQuickControlsPanel(item) {
   `;
 }
 
+// The mobile map view's bottom-right HUD -- name, an HP bar, and the
+// dpad for whatever's currently selected, always visible (no toggle,
+// unlike the sidebar's quick-controls panel) since it's the only
+// per-token UI mobile has left once everything else moves into the
+// Map Menu modal. Hooked into renderMap() (see its own comment) so it
+// never goes stale, not into renderSelectedPanel() -- deliberately,
+// see the dpadJoystickState guard below.
+function renderMobileHud() {
+  const hud = el("mapMobileHud");
+  if (!hud) return;
+  if (!mapMobileQuery.matches) {
+    hud.classList.add("d-none");
+    hud.innerHTML = "";
+    return;
+  }
+  // A joystick drag in progress holds a live reference to its own
+  // center element (bindDpadControls()'s pointerdown handler) and
+  // relies on that exact DOM node surviving the whole drag for pointer
+  // capture + setJoystickHandle()'s --joystick-x/y vars to keep
+  // working. renderMap() calls this on every joystick tick too (see
+  // tickDpadJoystick()), so rebuilding the HUD's innerHTML here mid-
+  // drag would yank the joystick out from under an active gesture.
+  // Nothing shown here changes during a pure positional drag anyway.
+  if (dpadJoystickState) return;
+  const item = selectedObject();
+  if (!item || item.kind === "light" || !canUseQuickControls(item)) {
+    hud.classList.add("d-none");
+    hud.innerHTML = "";
+    return;
+  }
+  hud.classList.remove("d-none");
+  const currentRaw = tokenCurrentHp(item);
+  const totalRaw = tokenTotalHp(item);
+  const hasHp = currentRaw !== "" && totalRaw !== "";
+  const current = sheetNum(currentRaw, 0);
+  const total = Math.max(1, sheetNum(totalRaw, 0));
+  const pct = hasHp ? clamp((current / total) * 100, 0, 100) : 0;
+  const editableHp = hasHp && canEditTokenHp(item);
+  hud.innerHTML = `
+    <div class="map-mobile-hud-card">
+      <div class="map-mobile-hud-name">${escapeHtml(displayTokenName(item))}</div>
+      ${
+        hasHp
+          ? `<div class="map-mobile-hp-bar">
+              <div class="map-mobile-hp-fill" style="width:${pct}%;"></div>
+              <div class="map-mobile-hp-text">
+                ${
+                  editableHp
+                    ? `<input data-token-current-hp="${escapeHtml(item.id)}" class="map-mobile-hp-input no-spinner" type="number" value="${current}">`
+                    : `<span>${current}</span>`
+                }<span>/${total}</span>
+              </div>
+            </div>`
+          : ""
+      }
+    </div>
+    ${renderMovementDpad(item)}
+  `;
+  bindDpadControls(item, hud);
+  if (editableHp) {
+    const hpInput = hud.querySelector("[data-token-current-hp]");
+    const hpFill = hud.querySelector(".map-mobile-hp-fill");
+    bindHpInput(hpInput, item.id, () => {
+      const pct = clamp((sheetNum(hpInput.value, 0) / total) * 100, 0, 100);
+      hpFill.style.width = `${pct}%`;
+    });
+  }
+}
+
 const QUICK_ACTION_HANDLERS = {
   aura: openAuraOptions,
   light: openLightOptions,
@@ -4092,23 +4388,21 @@ function runQuickAction(item, action) {
   QUICK_ACTION_HANDLERS[action]?.();
 }
 
-function bindQuickControlsPanel(item) {
-  const panel = el("selectedPanel");
-  panel
-    .querySelector("[data-quick-controls-toggle]")
-    ?.addEventListener("click", () => {
-      quickControlsOpenId = quickControlsOpenId === item.id ? "" : item.id;
-      quickExpandedGroups.clear();
-      renderSelectedPanel();
-    });
-  if (quickControlsOpenId !== item.id) return;
-  panel.querySelectorAll("[data-dpad-move]").forEach((button) => {
+// Shared by bindQuickControlsPanel() (the sidebar's collapsible quick
+// controls) and bindMobileHudDpad() (the always-visible mobile HUD) --
+// both just need the same buttons/joystick wired inside whichever
+// container currently holds them. dpadJoystickState tracks the moving
+// item by id (see tickDpadJoystick()), not by container, so the same
+// joystick element works unmodified in either spot.
+function bindDpadControls(item, container) {
+  container.querySelectorAll("[data-dpad-move]").forEach((button) => {
     button.addEventListener("click", () => {
       const [dx, dy] = button.dataset.dpadMove.split(",").map(Number);
       moveTokenByDpad(item, dx, dy);
     });
   });
-  panel.querySelector("[data-dpad-joystick]")?.addEventListener("pointerdown", (event) => {
+  const joystick = container.querySelector("[data-dpad-joystick]");
+  joystick?.addEventListener("pointerdown", (event) => {
     if (event.button !== 0) return;
     event.preventDefault();
     event.stopPropagation();
@@ -4131,9 +4425,22 @@ function bindQuickControlsPanel(item) {
     updateDpadJoystick(event);
     tickDpadJoystick();
   });
-  panel.querySelector("[data-dpad-joystick]")?.addEventListener("pointermove", updateDpadJoystick);
-  panel.querySelector("[data-dpad-joystick]")?.addEventListener("pointerup", stopDpadJoystick);
-  panel.querySelector("[data-dpad-joystick]")?.addEventListener("pointercancel", stopDpadJoystick);
+  joystick?.addEventListener("pointermove", updateDpadJoystick);
+  joystick?.addEventListener("pointerup", stopDpadJoystick);
+  joystick?.addEventListener("pointercancel", stopDpadJoystick);
+}
+
+function bindQuickControlsPanel(item) {
+  const panel = el("selectedPanel");
+  panel
+    .querySelector("[data-quick-controls-toggle]")
+    ?.addEventListener("click", () => {
+      quickControlsOpenId = quickControlsOpenId === item.id ? "" : item.id;
+      quickExpandedGroups.clear();
+      renderSelectedPanel();
+    });
+  if (quickControlsOpenId !== item.id) return;
+  bindDpadControls(item, panel);
   panel.querySelectorAll("[data-quick-group-toggle]").forEach((button) => {
     button.addEventListener("click", () => {
       const group = button.dataset.quickGroupToggle;
@@ -4183,18 +4490,44 @@ function renderHeightShapePanel() {
       <div class="col-12">
         <label>Height (ft) <span class="small-text">1 unit = 5ft, negative = pit</span></label>
         <div class="height-feet-stepper">
-          <button class="btn btn-outline-light btn-sm" type="button" data-height-step="-5" aria-label="Decrease height by 5 feet">-5</button>
+          <button class="btn btn-outline-light btn-sm" type="button" data-height-step="-5" aria-label="Decrease height by 5 feet">-</button>
           <input data-height-field="heightFeet" class="form-control form-control-sm" type="number" step="5" value="${Number(item.heightFeet || 0)}">
-          <button class="btn btn-outline-light btn-sm" type="button" data-height-step="5" aria-label="Increase height by 5 feet">+5</button>
+          <button class="btn btn-outline-light btn-sm" type="button" data-height-step="5" aria-label="Increase height by 5 feet">+</button>
         </div>
       </div>
       <div class="col-12"><label>Color</label><input data-height-field="color" class="form-control form-control-sm" type="color" value="${escapeHtml(item.color || "#61dafb")}"></div>
+      <div class="col-12">
+        <label>Wall Dressing <span class="small-text">textures the region's 3D side walls</span></label>
+        ${wallPatternPickerHtml(item.pattern || "")}
+      </div>
     </div>
     <button class="btn btn-outline-danger btn-sm w-100 mt-2" type="button" data-delete-height-shape>
       <i class="bi bi-trash"></i> Delete
     </button>
   `;
+  updateHeightEditControls();
   bindHeightShapePanelInteractions(item);
+}
+
+// One swatch per scripts/wall-patterns.js entry, plus a leading "None"
+// swatch (empty string) that keeps blockHtmlAt()'s original flat
+// gradient/color wall instead of a texture.
+function wallPatternPickerHtml(activeId) {
+  const patterns = window.PFWallPatterns?.list || [];
+  const noneActive = !activeId ? " active" : "";
+  const swatches = patterns
+    .map((p) => {
+      const active = p.id === activeId ? " active" : "";
+      const style = window.PFWallPatterns.backgroundStyle(p.id);
+      return `<button type="button" class="wall-pattern-swatch${active}" data-pattern-id="${escapeHtml(p.id)}" title="${escapeHtml(p.label)} — ${escapeHtml(p.category)}" style="${style}"></button>`;
+    })
+    .join("");
+  return `
+    <div class="wall-pattern-picker" data-wall-pattern-picker>
+      <button type="button" class="wall-pattern-swatch${noneActive}" data-pattern-id="" title="None (flat color)"><span class="wall-pattern-swatch-none">&times;</span></button>
+      ${swatches}
+    </div>
+  `;
 }
 
 function bindHeightShapePanelInteractions(item) {
@@ -4235,6 +4568,19 @@ function bindHeightShapePanelInteractions(item) {
       });
     });
   el("selectedPanel")
+    .querySelectorAll("[data-wall-pattern-picker] [data-pattern-id]")
+    .forEach((swatch) => {
+      swatch.addEventListener("click", () => {
+        item.pattern = swatch.dataset.patternId || "";
+        swatch
+          .closest("[data-wall-pattern-picker]")
+          .querySelectorAll(".wall-pattern-swatch")
+          .forEach((other) => other.classList.toggle("active", other === swatch));
+        renderMap();
+        queueSave();
+      });
+    });
+  el("selectedPanel")
     .querySelector("[data-delete-height-shape]")
     ?.addEventListener("click", () => deleteHeightShape(item.id));
 }
@@ -4245,6 +4591,14 @@ function renderSelectedPanel() {
     return;
   }
   const item = selectedObject();
+  // A light only ever needs a name + radius -- see renderLightPanel()'s
+  // own comment for why it skips the rest of this function (sheet,
+  // effects, texture, quick controls, etc.) entirely rather than
+  // threading kind==="light" checks through each of those fields.
+  if (item?.kind === "light") {
+    renderLightPanel(item);
+    return;
+  }
   const wasDetailsOpen =
     el("selectedDetailsCollapse")?.classList.contains("show") || false;
   if (item?.kind === "character" && canViewTokenSheet(item)) {
@@ -4386,6 +4740,51 @@ function renderSelectedPanel() {
   bindSelectedPanelInteractions(item);
 }
 
+// A dedicated static Light's side panel -- deliberately separate from
+// renderSelectedPanel()'s general token panel (same reasoning as
+// renderHeightShapePanel() above it) since a light only ever needs a
+// name and a radius, none of the sheet/effects/texture/quick-controls
+// machinery every other token kind carries.
+function renderLightPanel(item) {
+  el("selectedPanel").innerHTML = `
+    <label>Light</label>
+    <div class="row g-2">
+      <div class="col-12">
+        <label>Name</label>
+        <input data-light-field="name" class="form-control form-control-sm" value="${escapeHtml(item.name || "")}">
+      </div>
+      <div class="col-12">
+        <label>Radius <span class="small-text">(cells)</span></label>
+        <input data-light-field="radius" class="form-control form-control-sm" type="number" min="1" step="1" value="${Number(item.light?.radius || 1)}">
+      </div>
+    </div>
+    <button class="btn btn-outline-danger btn-sm w-100 mt-2" type="button" data-remove-light>
+      <i class="bi bi-trash"></i> Remove from map
+    </button>
+  `;
+  bindLightPanelInteractions(item);
+}
+
+function bindLightPanelInteractions(item) {
+  el("selectedPanel")
+    .querySelectorAll("[data-light-field]")
+    .forEach((input) => {
+      input.addEventListener("input", () => {
+        const field = input.dataset.lightField;
+        if (field === "name") {
+          item.name = input.value;
+        } else if (field === "radius") {
+          item.light = { ...item.light, visible: true, radius: Math.max(1, Number(input.value || 1)) };
+        }
+        renderMap();
+        queueSave();
+      });
+    });
+  el("selectedPanel")
+    .querySelector("[data-remove-light]")
+    ?.addEventListener("click", () => removeMapItem(item.id));
+}
+
 function bindSelectedPanelInteractions(item) {
   el("selectedPanel")
     .querySelector("[data-character-panel-back]")
@@ -4461,24 +4860,7 @@ function bindSelectedPanelInteractions(item) {
     });
   el("selectedPanel")
     .querySelectorAll("[data-token-current-hp]")
-    .forEach((input) => {
-      input.addEventListener("input", () =>
-        queueTokenCurrentHp(input.dataset.tokenCurrentHp, input.value),
-      );
-      input.addEventListener("change", () =>
-        flushTokenCurrentHp(input.dataset.tokenCurrentHp, input.value),
-      );
-      input.addEventListener("blur", () =>
-        flushTokenCurrentHp(input.dataset.tokenCurrentHp, input.value),
-      );
-      input.addEventListener("keydown", (event) => {
-        if (event.key === "Enter") {
-          event.preventDefault();
-          flushTokenCurrentHp(input.dataset.tokenCurrentHp, input.value);
-          input.blur();
-        }
-      });
-    });
+    .forEach((input) => bindHpInput(input, input.dataset.tokenCurrentHp));
   el("selectedPanel")
     .querySelectorAll("[data-open-token-effects]")
     .forEach((button) => {
@@ -4966,13 +5348,14 @@ function addToken(kind) {
     return;
   }
   const name = "Token";
+  const spawn = visibleSpawnCell(1, 1);
   const token = {
     id: uid("token"),
     kind,
     ownerId: currentUserId,
     name,
-    x: 1,
-    y: 1,
+    x: spawn.x,
+    y: spawn.y,
     w: 1,
     h: 1,
     sizeLinked: true,
@@ -4982,6 +5365,50 @@ function addToken(kind) {
   state.tokens.push(token);
   selectedId = token.id;
   addTimeline(`${name} entered the map.`);
+  renderAll();
+}
+
+// "Light 1" / "Light 2" / ... -- reuses the lowest free number rather
+// than an ever-climbing counter, so deleting Light 1 and adding a new
+// one names it "Light 1" again instead of skipping to "Light 3".
+function nextLightName() {
+  const used = new Set(
+    state.tokens
+      .filter((token) => token.kind === "light")
+      .map((token) => Number(String(token.name || "").match(/^Light (\d+)$/)?.[1]))
+      .filter((n) => Number.isFinite(n)),
+  );
+  let n = 1;
+  while (used.has(n)) n += 1;
+  return `Light ${n}`;
+}
+
+// A dedicated static light source -- see canSeeToken()/quickActionRows()/
+// showMapContextMenu()/renderToken()/renderSelectedPanel() for the rest
+// of what makes "light" a distinct token kind: GM/admin-only icon, no
+// resize, no timeline/initiative entry, and a stripped-down "just a
+// radius" side panel instead of the full token panel. The actual fog
+// reveal it produces reuses lightRevealCircles() unchanged -- that
+// already reads any token's .light field regardless of kind, so a
+// light token lights up the map for everyone the same way a torch-
+// bearing NPC token would, it just has no NPC attached.
+function addLightToken() {
+  const spawn = visibleSpawnCell(1, 1);
+  const token = {
+    id: uid("token"),
+    kind: "light",
+    ownerId: currentUserId,
+    name: nextLightName(),
+    x: spawn.x,
+    y: spawn.y,
+    w: 1,
+    h: 1,
+    zIndex: nextMapZIndex(),
+    color: "#f0d58c",
+    light: { visible: true, radius: 3 },
+  };
+  state.tokens.push(token);
+  selectedId = token.id;
   renderAll();
 }
 
@@ -4995,14 +5422,15 @@ function openGenericTokenModal() {
 function submitGenericToken(event) {
   event.preventDefault();
   const name = el("genericTokenName").value.trim() || "Token";
+  const spawn = visibleSpawnCell(1, 1);
   const token = {
     id: uid("token"),
     kind: "token",
     ownerId: currentUserId,
     name,
     hideName: el("genericTokenHideName").checked,
-    x: 1,
-    y: 1,
+    x: spawn.x,
+    y: spawn.y,
     w: 1,
     h: 1,
     sizeLinked: true,
@@ -5098,6 +5526,11 @@ async function openCharacterPicker() {
   setTimeout(() => el("characterPickerSearch").focus(), 150);
 }
 
+function tokenSizeFromSheet(source) {
+  const raw = Number(source?.sheet?.calculated?.size?.tokenSize);
+  return Number.isFinite(raw) && raw > 0 ? raw : 1;
+}
+
 function addCharacterTokenFromLibrary(characterId) {
   const character = mapCharacters.find((item) => item.id === characterId);
   if (!character) return;
@@ -5111,16 +5544,16 @@ function addCharacterTokenFromLibrary(characterId) {
     showSelectedPanel();
     return;
   }
+  const size = tokenSizeFromSheet(character);
   const token = {
     id: uid("token"),
     kind: "character",
     characterId: character.id,
     ownerId: character.userId || currentUserId,
     name: character.name || "Character",
-    x: 1,
-    y: 1,
-    w: 1,
-    h: 1,
+    ...visibleSpawnCell(size, size),
+    w: size,
+    h: size,
     sizeLinked: true,
     zIndex: nextMapZIndex(),
     color: "#8fd19e",
@@ -5176,15 +5609,15 @@ async function openEnemyPicker() {
 function addEnemyTokenFromLibrary(enemyId) {
   const enemy = mapEnemies.find((item) => item.id === enemyId);
   if (!enemy) return;
+  const size = tokenSizeFromSheet(enemy);
   const token = {
     id: uid("token"),
     kind: "enemy",
     enemyId: enemy.id,
     name: enemy.name,
-    x: 1,
-    y: 1,
-    w: 1,
-    h: 1,
+    ...visibleSpawnCell(size, size),
+    w: size,
+    h: size,
     sizeLinked: true,
     zIndex: nextMapZIndex(),
     hp: enemyHpText(enemy),
@@ -5194,6 +5627,7 @@ function addEnemyTokenFromLibrary(enemyId) {
     sheet: structuredClone(enemy.sheet || {}),
     color: "#b02a37",
   };
+  syncTokenFromSheet(token, enemy);
   state.tokens.push(token);
   ensureTokenInitiative(token);
   selectedId = token.id;
@@ -5203,13 +5637,14 @@ function addEnemyTokenFromLibrary(enemyId) {
 }
 
 function addShape(shape) {
+  const spawn = visibleSpawnCell(3, 3);
   const item = {
     id: uid("shape"),
     shape,
     ownerId: currentUserId,
     name: shape === "circle" ? "Circle" : "Rectangle",
-    x: 3,
-    y: 3,
+    x: spawn.x,
+    y: spawn.y,
     w: 3,
     h: 3,
     d: 0,
@@ -5223,10 +5658,11 @@ function addShape(shape) {
 }
 
 function addHeightShape() {
+  const spawn = visibleSpawnCell(3, 3);
   const item = {
     id: uid("height"),
-    x: 3,
-    y: 3,
+    x: spawn.x,
+    y: spawn.y,
     w: 3,
     h: 3,
     sizeLinked: false,
@@ -5241,7 +5677,22 @@ function addHeightShape() {
 function deleteHeightShape(id) {
   state.heightShapes = state.heightShapes.filter((shape) => shape.id !== id);
   if (selectedId === id) selectedId = "";
+  if (heightEditingShapeId === id) heightEditingShapeId = "";
   renderAll();
+}
+
+function updateHeightEditControls() {
+  const selectedHeightShape = state.heightShapes.some(
+    (shape) => shape.id === selectedId,
+  );
+  const editButton = el("editHeightShapeBtn");
+  if (editButton) {
+    editButton.disabled = !heightEditMode || !selectedHeightShape || heightDrawMode;
+    editButton.classList.toggle(
+      "active",
+      heightDrawMode && Boolean(heightEditingShapeId),
+    );
+  }
 }
 
 // Swaps the whole toolbar + stage + selected-panel into a dedicated
@@ -5252,6 +5703,11 @@ function toggleHeightEditMode(next = !heightEditMode) {
   heightEditMode = next;
   selectedId = "";
   if (!heightEditMode) toggleHeightDrawMode(false);
+  el("mapStage")?.classList.toggle("height-edit-mode", heightEditMode);
+  document.querySelector(".map-side")?.classList.toggle(
+    "height-edit-mode",
+    heightEditMode,
+  );
   el("mapNormalToolbar").classList.toggle("d-none", heightEditMode);
   el("mapHeightToolbar").classList.toggle("d-none", !heightEditMode);
   // #map3DControls lives outside mapNormalToolbar (so it doesn't
@@ -5276,6 +5732,10 @@ function toggleView3DMode(next = !view3DMode) {
   el("toggleView3DBtn")?.classList.toggle("active", view3DMode);
   el("map3DControls")?.classList.toggle("d-none", !view3DMode);
   renderAll(false);
+  if (view3DMode) {
+    centerMapViewport();
+    setTimeout(centerMapViewport, 80);
+  }
 }
 
 // "Draw Height Region" tool -- paints individual grid cells while the
@@ -5284,11 +5744,13 @@ function toggleView3DMode(next = !view3DMode) {
 // state.heightShapes on release. See renderHeightShape()'s freeform
 // (shape.cells) branch for how that gets rendered afterward, and
 // render3DTerrainHtml()'s per-cell block handling for the 3D View.
-function toggleHeightDrawMode(next = !heightDrawMode) {
+function toggleHeightDrawMode(next = !heightDrawMode, editShapeId = "") {
   heightDrawMode = next;
+  heightEditingShapeId = heightDrawMode ? editShapeId : "";
   el("drawHeightShapeBtn")?.classList.toggle("active", heightDrawMode);
+  el("editHeightShapeBtn")?.classList.toggle("active", Boolean(heightEditingShapeId));
   el("mapStage")?.classList.toggle("height-draw-active", heightDrawMode);
-  if (heightDrawMode) selectedId = ""; // no panel/handles make sense mid-draw
+  if (heightDrawMode && !heightEditingShapeId) selectedId = "";
   else paintState = null;
   // renderMap() is what actually (un)wires drag/resize/click listeners
   // on existing shape elements based on heightDrawMode (see its
@@ -5305,18 +5767,32 @@ function startPaintHeightShape(event) {
   event.preventDefault();
   hideContextMenu();
   const { x, y } = stageCellFromEvent(event);
-  paintState = { cells: new Set([`${x},${y}`]) };
+  paintState = { cells: new Set(), toggled: new Set() };
+  togglePaintHeightCell(x, y);
   renderPaintPreview();
   window.addEventListener("pointermove", movePaintHeightShape);
   window.addEventListener("pointerup", endPaintHeightShape, { once: true });
 }
 
+function togglePaintHeightCell(x, y) {
+  if (!paintState) return;
+  const key = `${x},${y}`;
+  if (heightEditingShapeId) {
+    if (paintState.toggled.has(key)) return;
+    paintState.toggled.add(key);
+    if (paintState.cells.has(key)) paintState.cells.delete(key);
+    else paintState.cells.add(key);
+    return;
+  }
+  paintState.cells.add(key);
+}
+
 function movePaintHeightShape(event) {
   if (!paintState) return;
   const { x, y } = stageCellFromEvent(event);
-  const key = `${x},${y}`;
-  if (!paintState.cells.has(key)) {
-    paintState.cells.add(key);
+  const before = paintState.cells.size;
+  togglePaintHeightCell(x, y);
+  if (paintState.cells.size !== before || heightEditingShapeId) {
     renderPaintPreview();
   }
 }
@@ -5324,9 +5800,54 @@ function movePaintHeightShape(event) {
 function endPaintHeightShape() {
   window.removeEventListener("pointermove", movePaintHeightShape);
   if (!paintState) return;
+  const editingShape = heightEditingShapeId
+    ? state.heightShapes.find((shape) => shape.id === heightEditingShapeId)
+    : null;
+  if (editingShape) {
+    const existingCells = new Set(
+      Array.isArray(editingShape.cells)
+        ? editingShape.cells.map((key) => {
+            const [dx, dy] = key.split(",").map(Number);
+            return `${Number(editingShape.x || 0) + dx},${
+              Number(editingShape.y || 0) + dy
+            }`;
+          })
+        : Array.from({ length: Number(editingShape.h || 1) }, (_, y) =>
+            Array.from({ length: Number(editingShape.w || 1) }, (_, x) =>
+              `${Number(editingShape.x || 0) + x},${
+                Number(editingShape.y || 0) + y
+              }`,
+            ),
+          ).flat(),
+    );
+    paintState.toggled.forEach((key) => {
+      if (existingCells.has(key)) existingCells.delete(key);
+      else existingCells.add(key);
+    });
+    const coords = [...existingCells].map((key) => key.split(",").map(Number));
+    paintState = null;
+    toggleHeightDrawMode(false);
+    if (!coords.length) {
+      deleteHeightShape(editingShape.id);
+      return;
+    }
+    const minX = Math.min(...coords.map((c) => c[0]));
+    const minY = Math.min(...coords.map((c) => c[1]));
+    const maxX = Math.max(...coords.map((c) => c[0]));
+    const maxY = Math.max(...coords.map((c) => c[1]));
+    editingShape.x = minX;
+    editingShape.y = minY;
+    editingShape.w = maxX - minX + 1;
+    editingShape.h = maxY - minY + 1;
+    editingShape.cells = coords.map(([cx, cy]) => `${cx - minX},${cy - minY}`);
+    selectedId = editingShape.id;
+    renderAll();
+    return;
+  }
   const coords = [...paintState.cells].map((key) => key.split(",").map(Number));
   paintState = null;
   renderPaintPreview();
+  toggleHeightDrawMode(false);
   if (!coords.length) return;
   const minX = Math.min(...coords.map((c) => c[0]));
   const minY = Math.min(...coords.map((c) => c[1]));
@@ -5415,6 +5936,31 @@ function nextHpSaveSeq(tokenId) {
   const seq = (hpSaveSeq.get(tokenId) || 0) + 1;
   hpSaveSeq.set(tokenId, seq);
   return seq;
+}
+
+// Shared input/change/blur/Enter wiring for an editable current-HP
+// field -- used by both the sidebar's compactHpStat() input and the
+// mobile HUD's bar-overlay input (see renderMobileHud()).
+// queueTokenCurrentHp()/flushTokenCurrentHp() are keyed by token id,
+// not by container, so the same debounce/save logic works unmodified
+// from either spot. onInput is an optional extra callback for
+// anything else that needs to react live as the value changes (the
+// HUD's fill bar, which isn't part of this input itself).
+function bindHpInput(input, tokenId, onInput) {
+  if (!input) return;
+  input.addEventListener("input", () => {
+    onInput?.();
+    queueTokenCurrentHp(tokenId, input.value);
+  });
+  input.addEventListener("change", () => flushTokenCurrentHp(tokenId, input.value));
+  input.addEventListener("blur", () => flushTokenCurrentHp(tokenId, input.value));
+  input.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      flushTokenCurrentHp(tokenId, input.value);
+      input.blur();
+    }
+  });
 }
 
 function queueTokenCurrentHp(tokenId, value) {
@@ -6866,7 +7412,7 @@ function showRollResultModal(title, rows) {
     .map(
       (row, index) => `
     <div class="roll-result-card" data-roll-result-row="${index}">
-      <div class="roll-result-label">${escapeHtml(row.label || "Roll")}</div>
+      <div class="roll-result-label">${escapeHtml(row.label || "Roll")}${row.target ? `<span class="roll-result-weapon"> &middot; ${escapeHtml(row.target)}</span>` : ""}</div>
       <div class="roll-die-value" data-roll-die>${d20()}</div>
       <div class="roll-breakdown">
         <div class="roll-breakdown-row"><span>Bonus</span><strong data-roll-bonus>...</strong></div>
@@ -6970,6 +7516,43 @@ function rollAttack(full = false) {
   rollModal?.hide();
   showRollResultModal(
     `${rollTokenName(token)}: ${full ? "Full Attack" : "Attack"}`,
+    rows,
+  );
+  renderAll();
+}
+
+// The enemy-only Full Attack stipulation: every weapon in one category
+// (melee or ranged) rolls its own full iterative sequence, together --
+// there's no equivalent of rollAttack()'s single selectedRollWeapon()
+// pick here on purpose. Each weapon's .attacks already reflects
+// whatever that weapon's own sheet-side calculation (TWF penalties
+// included, if configured there) produced, so this just aggregates
+// those pre-calculated sequences rather than recomputing anything.
+function rollFullAttackByCategory(ranged) {
+  const token = mapRollToken();
+  if (!token) return;
+  lastRollAction = () => rollFullAttackByCategory(ranged);
+  const categoryLabel = ranged ? "Ranged" : "Melee";
+  const weapons = rollWeaponsForToken(token).filter(
+    (weapon) => mapWeaponTypeIsRanged(weapon.weaponType) === ranged,
+  );
+  if (!weapons.length) {
+    el("rollModalStatus").textContent =
+      `No ${categoryLabel.toLowerCase()} weapon attack bonus found.`;
+    return;
+  }
+  const rows = weapons.flatMap((weapon) =>
+    weapon.attacks.map((bonus) =>
+      makeAttackRollData(token, weapon, bonus, "Attack"),
+    ),
+  );
+  rows.forEach((row, index) => {
+    row.label = `Attack ${index + 1}`;
+  });
+  rows.forEach(recordAttackRoll);
+  rollModal?.hide();
+  showRollResultModal(
+    `${rollTokenName(token)}: Full Attack (${categoryLabel})`,
     rows,
   );
   renderAll();
@@ -7192,6 +7775,29 @@ function openRollModal() {
         `<option value="${index}">${escapeHtml(weapon.name)} (${escapeHtml(weapon.attackText || weapon.attacks.map(signedNumberText).join("/"))})</option>`,
     )
     .join("");
+  // Enemies can't cherry-pick a single weapon's iterative sequence for
+  // Full Attack -- it's every melee weapon together or every ranged
+  // weapon together, an explicit either/or instead of the free weapon
+  // pick characters still get. "Attack" (one weapon, one roll) is
+  // unaffected either way -- this only replaces the generic Full
+  // Attack button with the two category ones, each hidden if that
+  // enemy has nothing in that category. See rollFullAttackByCategory().
+  const isEnemy = token.kind === "enemy";
+  const hasMelee = weapons.some(
+    (weapon) => !mapWeaponTypeIsRanged(weapon.weaponType),
+  );
+  const hasRanged = weapons.some((weapon) =>
+    mapWeaponTypeIsRanged(weapon.weaponType),
+  );
+  el("rollFullAttackBtn").classList.toggle("d-none", isEnemy);
+  el("rollFullAttackMeleeBtn").classList.toggle(
+    "d-none",
+    !isEnemy || !hasMelee,
+  );
+  el("rollFullAttackRangedBtn").classList.toggle(
+    "d-none",
+    !isEnemy || !hasRanged,
+  );
   el("rollDetailPanel").classList.add("d-none");
   el("rollModalStatus").textContent = "";
   rollModal?.show();
@@ -7537,6 +8143,7 @@ async function loadMapSlot(slot) {
   renderMapSlotNav();
   selectedId = "";
   renderAll(false);
+  centerMapViewport();
   subscribeMapRealtime();
 }
 
@@ -7603,7 +8210,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   currentUserId = user.id;
   currentUserEmail = user.email || "";
 
-  setupMobileToolbar();
+  setupMobileLayout();
   bindNumberSteppers();
 
   el("mapSlotNav").addEventListener("click", (event) => {
@@ -7674,6 +8281,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   el("drawHeightShapeBtn").addEventListener("click", () =>
     toggleHeightDrawMode(),
   );
+  el("editHeightShapeBtn").addEventListener("click", () => {
+    const selectedHeightShape = state.heightShapes.find(
+      (shape) => shape.id === selectedId,
+    );
+    if (!selectedHeightShape) return;
+    toggleHeightDrawMode(true, selectedHeightShape.id);
+  });
   // A remote map update that arrived while a field in the selected-item
   // panel was focused gets held (see applyRemoteMapState()) instead of
   // rebuilding the panel's DOM out from under the user's cursor. Once
@@ -7709,6 +8323,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   );
   el("addEnemyToken").addEventListener("click", () => addToken("enemy"));
   el("addGenericToken").addEventListener("click", () => addToken("token"));
+  el("addLightToken").addEventListener("click", addLightToken);
   el("addRectShape").addEventListener("click", () => addShape("rect"));
   el("addCircleShape").addEventListener("click", () => addShape("circle"));
   el("toggleEmitMenu").addEventListener("click", (event) => {
@@ -7736,9 +8351,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   el("rollModal")
     .querySelectorAll("[data-roll-action]")
     .forEach((button) => {
-      button.addEventListener("click", () =>
-        rollAttack(button.dataset.rollAction === "fullAttack"),
-      );
+      button.addEventListener("click", () => {
+        const action = button.dataset.rollAction;
+        if (action === "fullAttackMelee") rollFullAttackByCategory(false);
+        else if (action === "fullAttackRanged") rollFullAttackByCategory(true);
+        else rollAttack(action === "fullAttack");
+      });
     });
   el("rollModal")
     .querySelectorAll("[data-roll-panel]")

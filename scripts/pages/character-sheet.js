@@ -11,6 +11,18 @@ const SAVES = [
   ["reflex", "Reflex", "dex"],
   ["will", "Will", "wis"],
 ];
+const CREATURE_SIZES = [
+  { name: "Fine", modifier: 8, specialModifier: -8, flyModifier: 8, stealthModifier: 16, space: "1/2 ft.", reach: "0 ft.", tokenSize: 1 },
+  { name: "Diminutive", modifier: 4, specialModifier: -4, flyModifier: 6, stealthModifier: 12, space: "1 ft.", reach: "0 ft.", tokenSize: 1 },
+  { name: "Tiny", modifier: 2, specialModifier: -2, flyModifier: 4, stealthModifier: 8, space: "2-1/2 ft.", reach: "0 ft.", tokenSize: 1 },
+  { name: "Small", modifier: 1, specialModifier: -1, flyModifier: 2, stealthModifier: 4, space: "5 ft.", reach: "5 ft.", tokenSize: 1 },
+  { name: "Medium", modifier: 0, specialModifier: 0, flyModifier: 0, stealthModifier: 0, space: "5 ft.", reach: "5 ft.", tokenSize: 1 },
+  { name: "Large", modifier: -1, specialModifier: 1, flyModifier: -2, stealthModifier: -4, space: "10 ft.", reach: "10 ft.", tokenSize: 2 },
+  { name: "Huge", modifier: -2, specialModifier: 2, flyModifier: -4, stealthModifier: -8, space: "15 ft.", reach: "15 ft.", tokenSize: 3 },
+  { name: "Gargantuan", modifier: -4, specialModifier: 4, flyModifier: -6, stealthModifier: -12, space: "20 ft.", reach: "20 ft.", tokenSize: 4 },
+  { name: "Colossal", modifier: -8, specialModifier: 8, flyModifier: -8, stealthModifier: -16, space: "30 ft.", reach: "30 ft.", tokenSize: 5 },
+];
+const SIZE_CHANGE_VALUES = [-2, -1, 1, 2];
 const SKILLS = [
   ["Acrobatics", "dex"],
   ["Appraise", "int"],
@@ -56,6 +68,7 @@ const SIMPLE_FIELDS = [
   "deity",
   "homeland",
   "size",
+  "reach",
   "senses",
   "aura",
   "gender",
@@ -1242,15 +1255,96 @@ function raceOptions(selected = "") {
   return `${selectOption("", "None", normalized)}${customOption}${groups}`;
 }
 
+function normalizeCreatureSize(value = "") {
+  const text = String(value || "").trim();
+  if (!text) return "Medium";
+  const compact = text
+    .replace(/\s*\((?:tall|long)\)\s*/gi, "")
+    .toLowerCase();
+  return (
+    CREATURE_SIZES.find((size) => size.name.toLowerCase() === compact)?.name ||
+    "Medium"
+  );
+}
+
+function creatureSizeOptions(selected = "") {
+  const normalized = normalizeCreatureSize(selected);
+  return CREATURE_SIZES.map((size) =>
+    selectOption(size.name, size.name, normalized),
+  ).join("");
+}
+
+function creatureSizeIndex(value = "") {
+  const normalized = normalizeCreatureSize(value);
+  return Math.max(
+    0,
+    CREATURE_SIZES.findIndex((size) => size.name === normalized),
+  );
+}
+
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
+function creatureSizeByStep(value = "", step = 0) {
+  return CREATURE_SIZES[
+    clamp(creatureSizeIndex(value) + Number(step || 0), 0, CREATURE_SIZES.length - 1)
+  ];
+}
+
+function collectSizeChangeEntries() {
+  const entries = [];
+  const addEntries = (list, source = "Effect") => {
+    (Array.isArray(list) ? list : []).forEach((entry) => {
+      const value = Number(entry.value ?? entry.steps ?? 0);
+      if (!SIZE_CHANGE_VALUES.includes(value)) return;
+      entries.push({
+        value,
+        source,
+      });
+    });
+  };
+
+  collectClassFeatureBuffs().forEach((buff) =>
+    addEntries(buff.sizeChanges, buff.name || "Class Feature"),
+  );
+  (activeBuffs || []).forEach((buff) =>
+    addEntries(buff.sizeChanges, buff.name || "Active Effect"),
+  );
+  return entries;
+}
+
+function finalCreatureSize() {
+  const baseSize = normalizeCreatureSize(el("size")?.value || "Medium");
+  const totalSteps = collectSizeChangeEntries().reduce(
+    (sum, entry) => sum + Number(entry.value || 0),
+    0,
+  );
+  return creatureSizeByStep(baseSize, totalSteps);
+}
+
+function updateCreatureSizeFields() {
+  const sizeSelect = el("size");
+  if (sizeSelect && !sizeSelect.options.length) {
+    sizeSelect.innerHTML = creatureSizeOptions(sizeSelect.value || "Medium");
+  }
+  if (sizeSelect) sizeSelect.value = normalizeCreatureSize(sizeSelect.value);
+  const finalSize = finalCreatureSize();
+  if (el("reach")) el("reach").value = finalSize.reach;
+}
+
 function setSelectValuePreservingUnknown(id, value = "") {
   const select = el(id);
   if (!select) return;
   const nextValue =
     id === "alignment"
       ? normalizeAlignmentValue(value)
+      : id === "size"
+        ? normalizeCreatureSize(value)
       : String(value || "").trim();
   if (id === "alignment") select.innerHTML = alignmentOptions(nextValue);
   if (id === "race") select.innerHTML = raceOptions(nextValue);
+  if (id === "size") select.innerHTML = creatureSizeOptions(nextValue);
   select.value = nextValue;
   if (nextValue && select.value !== nextValue) {
     select.insertAdjacentHTML(
@@ -1906,6 +2000,7 @@ function normalizeWondrousSourceItem(item, index) {
     classSkillGrants: Array.isArray(item.classSkillGrants)
       ? item.classSkillGrants
       : [],
+    sizeChanges: Array.isArray(item.sizeChanges) ? item.sizeChanges : [],
   };
 }
 
@@ -1972,6 +2067,7 @@ function normalizeMundaneSourceItem(item, index) {
     classSkillGrants: Array.isArray(item.classSkillGrants)
       ? item.classSkillGrants
       : [],
+    sizeChanges: Array.isArray(item.sizeChanges) ? item.sizeChanges : [],
   };
 }
 
@@ -2023,6 +2119,7 @@ function normalizeWeaponSourceItem(item, index) {
     classSkillGrants: Array.isArray(item.classSkillGrants)
       ? item.classSkillGrants
       : [],
+    sizeChanges: Array.isArray(item.sizeChanges) ? item.sizeChanges : [],
   };
 }
 
@@ -2077,6 +2174,7 @@ function normalizeArmorShieldSourceItem(item, index) {
     classSkillGrants: Array.isArray(item.classSkillGrants)
       ? item.classSkillGrants
       : [],
+    sizeChanges: Array.isArray(item.sizeChanges) ? item.sizeChanges : [],
   };
 }
 
@@ -2436,13 +2534,14 @@ function collectClassFeatureBuffs() {
       // their effects only apply once cast, via collectActivatableAbilities.
       if (
         !feature.activatable &&
-        Array.isArray(feature.effects) &&
-        feature.effects.length
+        ((Array.isArray(feature.effects) && feature.effects.length) ||
+          (Array.isArray(feature.sizeChanges) && feature.sizeChanges.length))
       ) {
         buffs.push({
           ...context,
           name: feature.name || "Class Feature",
           bonuses: feature.effects,
+          sizeChanges: feature.sizeChanges,
         });
       }
       featurePools(feature).forEach((pool) => {
@@ -2464,11 +2563,16 @@ function collectClassFeatureBuffs() {
         const option = (pool.options || []).find(
           (item) => item.name === selected,
         );
-        if (option && Array.isArray(option.effects) && option.effects.length) {
+        if (
+          option &&
+          ((Array.isArray(option.effects) && option.effects.length) ||
+            (Array.isArray(option.sizeChanges) && option.sizeChanges.length))
+        ) {
           buffs.push({
             ...context,
             name: option.name || pool.name || "Class Feature Choice",
             bonuses: option.effects,
+            sizeChanges: option.sizeChanges,
           });
         }
       });
@@ -3101,6 +3205,21 @@ function renderClassFeatureClassSkillGrants(feature) {
   `;
 }
 
+function renderClassFeatureSizeChanges(feature) {
+  const entries = Array.isArray(feature.sizeChanges) ? feature.sizeChanges : [];
+  if (!entries.length) return "";
+  return `
+    <div class="class-feature-effects">
+      ${entries
+        .map((entry) => {
+          const value = Number(entry.value || 0);
+          return `<span class="class-feature-effect-pill">${escapeHtml(`Size Change: ${value > 0 ? "+" : ""}${value}`)}</span>`;
+        })
+        .join("")}
+    </div>
+  `;
+}
+
 function featurePools(feature) {
   return Array.isArray(feature.pools)
     ? feature.pools
@@ -3330,6 +3449,9 @@ function renderClassFeatures() {
                 classSkillGrants: Array.isArray(feature.classSkillGrants)
                   ? feature.classSkillGrants
                   : [],
+                sizeChanges: Array.isArray(feature.sizeChanges)
+                  ? feature.sizeChanges
+                  : [],
                 pools: featurePools(feature),
               };
         groups.get(row.level).push(nextFeature);
@@ -3358,6 +3480,7 @@ function renderClassFeatures() {
               ${renderClassFeatureDamageReduction(feature)}
               ${renderClassFeatureSpellResistance(feature)}
               ${renderClassFeatureClassSkillGrants(feature)}
+              ${renderClassFeatureSizeChanges(feature)}
               ${renderClassFeaturePools(feature)}
               <div id="${collapseId}" class="collapse small mt-2">${feature.description ? escapeHtml(feature.description) : "No description scraped."}</div>
             </article>
@@ -4026,6 +4149,8 @@ function setStatus(message, type = "info") {
 function buildSheet() {
   setSelectValuePreservingUnknown("race", el("race")?.value || "");
   setSelectValuePreservingUnknown("alignment", el("alignment")?.value || "");
+  setSelectValuePreservingUnknown("size", el("size")?.value || "Medium");
+  updateCreatureSizeFields();
   el("abilityRows").innerHTML = ABILITIES.map(
     ([key, label]) => `
     <tr>
@@ -4696,6 +4821,7 @@ function syncEquippedLootBuffFromItem(item) {
   const classSkillGrants = Array.isArray(item.classSkillGrants)
     ? item.classSkillGrants
     : [];
+  const sizeChanges = Array.isArray(item.sizeChanges) ? item.sizeChanges : [];
   // An item can grant DR/SR/class-skill status with no plain "effects"
   // at all (a ring of protection from acid, say) -- so "has nothing to
   // contribute" has to check all four, not just effects, or the buff
@@ -4705,7 +4831,8 @@ function syncEquippedLootBuffFromItem(item) {
     !effects.length &&
     !damageReduction.length &&
     !spellResistance.length &&
-    !classSkillGrants.length
+    !classSkillGrants.length &&
+    !sizeChanges.length
   ) {
     if (index >= 0) {
       activeBuffs.splice(index, 1);
@@ -4734,6 +4861,7 @@ function syncEquippedLootBuffFromItem(item) {
     ...(damageReduction.length ? { damageReduction } : {}),
     ...(spellResistance.length ? { spellResistance } : {}),
     ...(classSkillGrants.length ? { classSkillGrants } : {}),
+    ...(sizeChanges.length ? { sizeChanges } : {}),
   };
   if (index >= 0 && JSON.stringify(activeBuffs[index]) === JSON.stringify(next))
     return false;
@@ -5285,6 +5413,7 @@ function toggleAppliedBuffs() {
 
 function recalculateSheet() {
   updateClassDerivedViews();
+  updateCreatureSizeFields();
   if (el("bab")) el("bab").value = num("babBase") + num("babMisc");
   const gearAc = calculateGearAc();
   syncArmorCardsDisplay();
@@ -5666,6 +5795,10 @@ function renderInventoryEffects(item) {
     ...classSkillGrants.map((grant) =>
       escapeHtml(window.PFEffectEditor.classSkillGrantText(grant, titleCaseStat)),
     ),
+    ...sizeChanges.map(
+      (entry) =>
+        `Size ${Number(entry.value || 0) > 0 ? "+" : ""}${Number(entry.value || 0)}`,
+    ),
   ];
   if (!lines.length) return "";
   return `
@@ -5692,6 +5825,7 @@ function makeEnemyInventoryItem(source) {
     damageReduction: cloneJson(source.damageReduction || []),
     spellResistance: cloneJson(source.spellResistance || []),
     classSkillGrants: cloneJson(source.classSkillGrants || []),
+    sizeChanges: cloneJson(source.sizeChanges || []),
   };
 }
 
@@ -6395,8 +6529,18 @@ function collectCalculatedSummary() {
       };
     },
   );
+  const finalSize = finalCreatureSize();
+  const baseSize = normalizeCreatureSize(el("size")?.value || "Medium");
 
   return {
+    size: {
+      base: baseSize,
+      final: finalSize.name,
+      reach: finalSize.reach,
+      space: finalSize.space,
+      tokenSize: finalSize.tokenSize,
+      changes: collectSizeChangeEntries(),
+    },
     conditionals: conditionalGroups,
     hp: {
       current: el("currentHitPoints")?.value || "",
@@ -6658,13 +6802,17 @@ function restoreSheet(sheet) {
     "alignment",
     data.fields?.alignment || data.alignment || "",
   );
+  setSelectValuePreservingUnknown(
+    "size",
+    data.fields?.size || data.size || "Medium",
+  );
   Object.entries(data.fields || {}).forEach(([id, value]) => {
-    if (id === "race" || id === "alignment")
+    if (id === "race" || id === "alignment" || id === "size")
       setSelectValuePreservingUnknown(id, value);
     else if (el(id)) el(id).value = value;
   });
   Object.entries(data).forEach(([id, value]) => {
-    if (id === "race" || id === "alignment")
+    if (id === "race" || id === "alignment" || id === "size")
       setSelectValuePreservingUnknown(id, value);
     else if (typeof value !== "object" && el(id)) el(id).value = value;
   });
