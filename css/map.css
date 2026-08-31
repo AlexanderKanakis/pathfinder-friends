@@ -1446,23 +1446,20 @@ body {
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
 }
 
-/* The editable half of .map-mobile-hp-text -- current HP only (total
-   stays plain text next to it, read-only same as everywhere else HP
-   is shown). Overrides the global input{} rule's !important so it
-   still reads as bar text, not a form field. */
-.map-mobile-hp-input {
-  width: 26px;
-  padding: 0 !important;
-  border: 0 !important;
-  background: transparent !important;
+.map-mobile-hp-button {
+  min-width: 22px;
+  padding: 0;
+  border: 0;
+  background: transparent;
   color: #fff !important;
   font-size: 11px;
   font-weight: 700;
   text-align: right;
+  line-height: 1;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
 }
 
-.map-mobile-hp-input:focus {
+.map-mobile-hp-button:focus-visible {
   outline: 1px solid rgba(255, 255, 255, 0.5);
   outline-offset: 1px;
 }

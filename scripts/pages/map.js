@@ -4118,9 +4118,11 @@ function teardown3DHitGrid() {
 }
 
 function cell3DFromPoint(clientX, clientY) {
-  const found = document
-    .elementFromPoint(clientX, clientY)
-    ?.closest("[data-gx]");
+  const found = (document.elementsFromPoint?.(clientX, clientY) || [
+    document.elementFromPoint(clientX, clientY),
+  ])
+    .map((node) => node?.closest?.("[data-gx]"))
+    .find(Boolean);
   if (!found) return null;
   return { x: Number(found.dataset.gx), y: Number(found.dataset.gy) };
 }
@@ -4421,7 +4423,7 @@ function renderMobileHud() {
               <div class="map-mobile-hp-text">
                 ${
                   editableHp
-                    ? `<input data-token-current-hp="${escapeHtml(item.id)}" class="map-mobile-hp-input no-spinner" type="number" value="${current}">`
+                    ? `<button data-open-mobile-hp="${escapeHtml(item.id)}" class="map-mobile-hp-button" type="button">${current}</button>`
                     : `<span>${current}</span>`
                 }<span>/${total}</span>
               </div>
@@ -4433,12 +4435,9 @@ function renderMobileHud() {
   `;
   bindDpadControls(item, hud);
   if (editableHp) {
-    const hpInput = hud.querySelector("[data-token-current-hp]");
-    const hpFill = hud.querySelector(".map-mobile-hp-fill");
-    bindHpInput(hpInput, item.id, () => {
-      const pct = clamp((sheetNum(hpInput.value, 0) / total) * 100, 0, 100);
-      hpFill.style.width = `${pct}%`;
-    });
+    hud
+      .querySelector("[data-open-mobile-hp]")
+      ?.addEventListener("click", () => openMobileHpEditor(item.id));
   }
 }
 
@@ -5259,8 +5258,10 @@ function startDrag(event) {
     const cell = cell3DFromPoint(event.clientX, event.clientY);
     dragState = {
       id,
-      grabDx: cell ? cell.x - (item.x || 0) : 0,
-      grabDy: cell ? cell.y - (item.y || 0) : 0,
+      startCellX: cell?.x ?? Number(item.x || 0),
+      startCellY: cell?.y ?? Number(item.y || 0),
+      x: Number(item.x || 0),
+      y: Number(item.y || 0),
     };
   } else {
     dragState = {
@@ -5293,20 +5294,21 @@ function moveDrag(event) {
   );
   if (!item) return;
   if (view3DMode && !heightEditMode) {
-    // A tilted/spun stage means a raw pixel delta from the drag's
-    // start no longer maps linearly to grid cells -- see
-    // stageCellFromEvent()'s comment. Ask the hit grid which cell the
-    // pointer is over now instead of computing an offset from where
-    // it started.
+    // A tilted/spun stage means raw pixel deltas no longer map
+    // linearly to grid cells -- see stageCellFromEvent()'s comment.
+    // Keep the same starting-cell offset instead of snapping the
+    // item's origin to the current pointer cell; this matters most for
+    // flying tokens, where the visual token is projected above the
+    // terrain cell used for hit-testing.
     const cell = cell3DFromPoint(event.clientX, event.clientY);
     if (cell) {
       item.x = clamp(
-        cell.x - dragState.grabDx,
+        dragState.x + (cell.x - dragState.startCellX),
         0,
         state.settings.cols - (item.w || 1),
       );
       item.y = clamp(
-        cell.y - dragState.grabDy,
+        dragState.y + (cell.y - dragState.startCellY),
         0,
         state.settings.rows - (item.h || 1),
       );
@@ -6014,14 +6016,32 @@ function nextHpSaveSeq(tokenId) {
   return seq;
 }
 
+function openMobileHpEditor(tokenId) {
+  const token = tokenById(tokenId);
+  if (!token || !canEditTokenHp(token) || !window.PFMapHpEditor) return;
+  const current = tokenCurrentHp(token);
+  const total = tokenTotalHp(token);
+  window.PFMapHpEditor.open({
+    title: `${displayTokenName(token)} HP`,
+    current,
+    total,
+    onSave: async (value) => {
+      pendingTokenHp.set(tokenId, value);
+      updateTokenHpPreview(token, value);
+      clearTimeout(hpSaveTimers.get(tokenId));
+      hpSaveTimers.delete(tokenId);
+      renderMap();
+      renderMobileHud();
+      await updateTokenCurrentHp(tokenId, value, nextHpSaveSeq(tokenId));
+    },
+  });
+}
+
 // Shared input/change/blur/Enter wiring for an editable current-HP
-// field -- used by both the sidebar's compactHpStat() input and the
-// mobile HUD's bar-overlay input (see renderMobileHud()).
+// field -- used by the sidebar's compactHpStat() input.
 // queueTokenCurrentHp()/flushTokenCurrentHp() are keyed by token id,
-// not by container, so the same debounce/save logic works unmodified
-// from either spot. onInput is an optional extra callback for
-// anything else that needs to react live as the value changes (the
-// HUD's fill bar, which isn't part of this input itself).
+// not by container. onInput is an optional extra callback for
+// anything else that needs to react live as the value changes.
 function bindHpInput(input, tokenId, onInput) {
   if (!input) return;
   input.addEventListener("input", () => {
