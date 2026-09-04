@@ -13,6 +13,10 @@
       rel="stylesheet"
     />
     <link href="css/map.css" rel="stylesheet" />
+    <link href="css/effect-editor.css" rel="stylesheet" />
+    <link href="modals/magic-search.css" rel="stylesheet" />
+    <link href="modals/map-hp-editor.css" rel="stylesheet" />
+    <link href="modals/custom-skill-list.css" rel="stylesheet" />
   </head>
   <body>
     <div id="appNavbar"></div>
@@ -83,6 +87,13 @@
                   type="button"
                 >
                   <i class="bi bi-circle"></i> Circle
+                </button>
+                <button
+                  id="togglePathRuler"
+                  class="btn btn-outline-warning btn-sm"
+                  type="button"
+                >
+                  <i class="bi bi-rulers"></i> Ruler
                 </button>
               </div>
             </div>
@@ -172,6 +183,18 @@
             aria-label="Map settings"
           >
             <i class="bi bi-gear"></i>
+          </button>
+          <!-- Map settings are GM-only -- non-GM players get this in the
+               same toolbar slot instead (see loadMap() in map.js), since
+               there's nothing else there for them to configure. -->
+          <button
+            id="openMapDocumentationIcon"
+            class="btn btn-outline-info btn-sm btn-icon map-settings-button d-none"
+            type="button"
+            title="Map documentation"
+            aria-label="Map documentation"
+          >
+            <i class="bi bi-book"></i>
           </button>
         </div>
 
@@ -463,6 +486,14 @@
         role="menuitem"
       >
         <i class="bi bi-incognito me-1"></i> Hide name
+      </button>
+      <button
+        id="transferToken3D"
+        class="btn btn-outline-info btn-sm mb-1 d-none"
+        type="button"
+        role="menuitem"
+      >
+        <i class="bi bi-arrows-move me-1"></i> Transfer to
       </button>
       <button
         id="toggleZIndexMenu"
@@ -1358,6 +1389,8 @@
     <script src="modals/effect-duration-editor.js"></script>
     <script src="scripts/effect-stat-options.js?v=fixed-resistance-1"></script>
     <script src="modals/effect-choice-picker.js?v=sequential-fix-1"></script>
+    <script src="modals/magic-search.js"></script>
+    <script src="modals/custom-skill-list.js"></script>
     <script src="scripts/effect-editor.js?v=unified-bonus-row-1"></script>
     <script src="modals/pending-effect-choices.js?v=class-skills-2"></script>
     <script src="scripts/buff-tracker-widget.js?v=unified-bonus-row-1"></script>

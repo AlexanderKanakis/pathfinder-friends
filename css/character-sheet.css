@@ -849,6 +849,17 @@ body.enemy-sheet-mode .enemy-field-pair {
   padding: 0;
 }
 
+.enemy-spell-header.character-spell-like-row,
+.enemy-spell-row.character-spell-like-row {
+  grid-template-columns: minmax(105px, 150px) minmax(0, 1fr);
+}
+
+.enemy-spell-row.character-spell-like-row input,
+.enemy-spell-row.character-spell-like-row textarea {
+  min-height: 31px;
+  height: 31px;
+}
+
 .enemy-spell-row textarea,
 .enemy-auto-textarea {
   min-height: 34px;

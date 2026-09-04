@@ -36,6 +36,8 @@
       "int skills": "intelligence skill checks",
       "wis skills": "wisdom skill checks",
       "cha skills": "charisma skill checks",
+      "craft skills": "craft skill checks",
+      "craft checks": "craft skill checks",
       "extra attacks": "extra attack",
       "extra attack at highest bab": "extra attack",
       "extra attacks at highest bab": "extra attack",
@@ -51,6 +53,23 @@
   // point bonuses get bucketed, so the rest of the calc never needs to
   // know "all saves" exists.
   const ALL_SAVES_STATS = ["fortitude", "reflex", "will"];
+
+  function skillStatKey(skillName) {
+    return `skill:${String(skillName || "").replace(/[^a-z0-9]/gi, "").toLowerCase()}`;
+  }
+
+  function expandedStatsForBonus(rawBonus) {
+    const stat = normalizeStat(rawBonus.stat);
+    if (stat === "all saves") return ALL_SAVES_STATS;
+    if (!stat.startsWith("skill-list:")) return [stat];
+    const skills = Array.isArray(rawBonus.skillList?.skills)
+      ? rawBonus.skillList.skills
+      : [];
+    if (!skills.length) return [stat];
+    return skills.map((skill) =>
+      /^craft$/i.test(skill) ? "craft skill checks" : skillStatKey(skill),
+    );
+  }
 
   function stacksByType(type) {
     return type === "untyped" || type === "dodge" || type === "circumstance";
@@ -200,8 +219,7 @@
 
     activeBuffs.forEach((buff) => {
       (buff.bonuses || []).forEach((rawBonus) => {
-        const stat = normalizeStat(rawBonus.stat);
-        const targets = stat === "all saves" ? ALL_SAVES_STATS : [stat];
+        const targets = expandedStatsForBonus(rawBonus);
         const value = scaledBonusValue(rawBonus, buff);
         targets.forEach((targetStat) => {
           if (!map[targetStat]) map[targetStat] = [];
@@ -426,6 +444,7 @@
       "luck",
       "morale",
       "profane",
+      "racial",
       "sacred",
     ];
     const cmdAcApplied = applyBonuses(

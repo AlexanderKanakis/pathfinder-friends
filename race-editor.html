@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>PathFriends Class Editor</title>
+    <title>PathFriends Race Editor</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
@@ -12,7 +12,7 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
       rel="stylesheet"
     />
-    <link href="css/class-editor.css" rel="stylesheet" />
+    <link href="css/race-editor.css" rel="stylesheet" />
     <link href="css/effect-editor.css" rel="stylesheet" />
     <link href="modals/magic-search.css" rel="stylesheet" />
     <link href="modals/custom-skill-list.css" rel="stylesheet" />
@@ -25,9 +25,9 @@
         class="d-flex justify-content-between align-items-start gap-2 flex-wrap mb-3"
       >
         <div>
-          <h3 class="mb-0">PathFriends Class Editor</h3>
+          <h3 class="mb-0">PathFriends Race Editor</h3>
           <div class="small-text">
-            Local static-data editor for <code>data/classes/*.json</code>.
+            Local static-data editor for <code>data/races.json</code>.
           </div>
         </div>
         <div class="d-flex gap-2 flex-wrap justify-content-end">
@@ -39,39 +39,36 @@
             <i class="bi bi-folder2-open"></i> Open Project Folder
           </button>
           <button
-            id="exportSelectedClassBtn"
+            id="exportSelectedRaceBtn"
             class="btn btn-outline-light btn-sm"
             type="button"
-            title="Download just the selected class as its own file, matching the format of the files in data/classes/"
           >
-            <i class="bi bi-filetype-json"></i> Export Selected Class
+            <i class="bi bi-filetype-json"></i> Export Selected Race
           </button>
-          <button
-            id="saveClassesFileBtn"
-            class="btn btn-primary btn-sm"
-            type="button"
-          >
+          <button id="saveRacesFileBtn" class="btn btn-primary btn-sm" type="button">
             <i class="bi bi-save"></i> Save to Project
           </button>
         </div>
       </div>
 
-      <div id="classEditorStatus" class="alert d-none py-2"></div>
+      <div id="raceEditorStatus" class="alert d-none py-2"></div>
 
       <div class="editor-shell">
         <aside class="panel">
-          <label for="classSearch">Search Classes</label>
+          <label for="raceSearch">Search Races</label>
           <input
-            id="classSearch"
+            id="raceSearch"
             class="form-control form-control-sm mb-2"
-            placeholder="Class name"
+            placeholder="Race name"
           />
-          <div id="classCount" class="small-text mb-2"></div>
-          <div id="classList" class="class-list"></div>
+          <label for="raceGroupFilter">Group</label>
+          <select id="raceGroupFilter" class="form-select form-select-sm mb-2"></select>
+          <div id="raceCount" class="small-text mb-2"></div>
+          <div id="raceList" class="race-list"></div>
         </aside>
 
-        <section id="classEditorPanel" class="panel">
-          <div class="small-text">Choose a class to edit.</div>
+        <section id="raceEditorPanel" class="panel">
+          <div class="small-text">Choose a race to edit.</div>
         </section>
       </div>
     </main>
@@ -80,16 +77,14 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="scripts/supabase-config.js"></script>
     <script src="scripts/app-supabase.js"></script>
-    <script src="scripts/class-data.js"></script>
-    <script src="modals/effect-duration-editor.js?v=choice-pools-1"></script>
+    <script src="scripts/race-data.js"></script>
+    <script src="modals/effect-duration-editor.js"></script>
     <script src="scripts/effect-stat-options.js?v=fixed-resistance-1"></script>
     <script src="modals/effect-choice-picker.js?v=sequential-fix-1"></script>
     <script src="modals/magic-search.js"></script>
     <script src="modals/custom-skill-list.js"></script>
     <script src="scripts/effect-editor.js?v=unified-bonus-row-1"></script>
-    <script src="modals/class-feature-editor.js?v=unified-bonus-row-1"></script>
-    <script src="modals/class-feature-pool-editor.js?v=feature-pools-3"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="scripts/pages/class-editor.js"></script>
+    <script src="scripts/pages/race-editor.js"></script>
   </body>
 </html>

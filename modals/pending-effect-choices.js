@@ -142,7 +142,10 @@
       const pool = window.PFEffectStats.poolById(poolId);
       const options = await window.PFEffectStats.resolveChoicePoolOptions(
         poolId,
-        { skills: pollOptions?.choicePoolSkillsFor?.(request.character_id) },
+        {
+          skills: pollOptions?.choicePoolSkillsFor?.(request.character_id),
+          choicePool: item.choicePool,
+        },
       );
       const picked = window.PFEffectChoicePicker
         ? await window.PFEffectChoicePicker.open({

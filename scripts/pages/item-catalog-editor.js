@@ -827,6 +827,7 @@ function commitSelectedItem() {
     spellResistance,
     classSkillGrants,
     sizeChanges,
+    spellLikeAbilities,
   } =
     currentEffectsAccordion.collect();
   item.effects = effects;
@@ -834,6 +835,7 @@ function commitSelectedItem() {
   item.spellResistance = spellResistance;
   item.classSkillGrants = classSkillGrants;
   item.sizeChanges = sizeChanges;
+  item.spellLikeAbilities = spellLikeAbilities;
 }
 
 // ---------------------------------------------------------------

@@ -1,0 +1,44 @@
+.shared-spell-like-row {
+  display: grid;
+  grid-template-columns:
+    minmax(72px, 0.35fr)
+    minmax(140px, 0.65fr)
+    minmax(180px, 1.4fr)
+    auto;
+  gap: 8px;
+  align-items: end;
+}
+
+.shared-spell-like-row label {
+  display: block;
+  color: #ced4da;
+  font-size: 12px;
+  margin-bottom: 3px;
+}
+
+.shared-spell-like-picker {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 31px;
+  gap: 8px;
+  text-align: left;
+}
+
+.shared-spell-like-picker span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .shared-spell-like-row {
+    grid-template-columns: 1fr;
+  }
+
+  .shared-spell-like-row .btn-icon,
+  .shared-spell-like-row button[aria-label="Delete spell-like ability"] {
+    width: 100%;
+  }
+}

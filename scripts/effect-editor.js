@@ -71,6 +71,7 @@
     "intelligence skill checks",
     "wisdom skill checks",
     "charisma skill checks",
+    "craft skill checks",
   ];
   const PF_SKILLS = [
     "Acrobatics",
@@ -124,6 +125,7 @@
     "morale",
     "natural armor",
     "profane",
+    "racial",
     "resistance",
     "sacred",
     "shield",
@@ -175,17 +177,93 @@
     const specificSkillStats = skillNames.map((skill) => skillKey(skill));
     const option = (value, label = format(value)) =>
       `<option value="${escapeHtml(value)}" ${selected === value ? "selected" : ""}>${escapeHtml(label)}</option>`;
+    const customSkillLists = window.PFEffectStats?.customSkillLists?.() || [];
+    const skillListOptions = customSkillLists
+      .map((list) =>
+        option(
+          window.PFEffectStats.skillListStatValue(list),
+          `${list.name} Skills`,
+        ),
+      )
+      .join("");
     return `
       <optgroup label="Stats">${stats.map((stat) => option(stat)).join("")}</optgroup>
       <optgroup label="Skills">
         ${SKILL_STATS.map((stat) => option(stat)).join("")}
         <option value="skill:craft" ${selected === "skill:craft" ? "selected" : ""}>Skill: Craft</option>
         <option value="skill:profession" ${selected === "skill:profession" ? "selected" : ""}>Skill: Profession</option>
+        ${skillListOptions}
         ${specificSkillStats.map((stat) => option(stat)).join("")}
+        <option value="${window.PFEffectStats?.CREATE_SKILL_LIST_STAT_VALUE || "__create-custom-skill-list-stat__"}">Create custom skill list...</option>
       </optgroup>
       ${window.PFEffectStats?.energyResistanceOptgroupHtml?.(selected, escapeHtml) || ""}
       ${window.PFEffectStats?.choiceOptgroupHtml?.(selected, escapeHtml) || ""}
     `;
+  }
+
+  function customSkillListPayloadForStat(stat) {
+    if (!window.PFEffectStats?.skillListForStat) return null;
+    const list = window.PFEffectStats.skillListForStat(stat);
+    return list
+      ? {
+          id: list.id,
+          name: list.name,
+          skills: [...(list.skills || [])],
+        }
+      : null;
+  }
+
+  function optionIsCreateSkillList(value) {
+    return (
+      value ===
+        (window.PFEffectStats?.CREATE_SKILL_LIST_STAT_VALUE ||
+          "__create-custom-skill-list-stat__") ||
+      value ===
+        (window.PFEffectStats?.CREATE_SKILL_LIST_CHOICE_VALUE ||
+          "__create-custom-skill-list-choice__")
+    );
+  }
+
+  function wireCustomSkillListSelect(select, options = {}) {
+    const renderer = options.renderOptions;
+    const sync = options.sync || (() => {});
+    select.dataset.lastValidValue = select.value || "";
+    select.addEventListener("focus", () => {
+      if (!optionIsCreateSkillList(select.value)) {
+        select.dataset.lastValidValue = select.value || "";
+      }
+    });
+    select.addEventListener("change", async () => {
+      if (!optionIsCreateSkillList(select.value)) {
+        select.dataset.lastValidValue = select.value || "";
+        sync();
+        return;
+      }
+      const previous = select.dataset.lastValidValue || "";
+      if (!window.PFCustomSkillListModal) {
+        select.value = previous;
+        sync();
+        return;
+      }
+      const createChoice =
+        select.value === window.PFEffectStats?.CREATE_SKILL_LIST_CHOICE_VALUE;
+      const list = await window.PFCustomSkillListModal.open({
+        skills: options.skills,
+      });
+      if (!list) {
+        select.innerHTML = renderer(previous);
+        select.value = previous;
+        sync();
+        return;
+      }
+      const nextValue = createChoice
+        ? `choice:${window.PFEffectStats.skillListStatValue(list)}`
+        : window.PFEffectStats.skillListStatValue(list);
+      select.innerHTML = renderer(nextValue);
+      select.value = nextValue;
+      select.dataset.lastValidValue = nextValue;
+      sync();
+    });
   }
 
   // data: { stat, value, type, stacks, conditional, appliesWhen,
@@ -257,7 +335,11 @@
       skillNameInput.placeholder =
         statSelect.value === "skill:profession" ? "Sailor" : "Alchemy";
     };
-    statSelect.addEventListener("change", syncNamedSkill);
+    wireCustomSkillListSelect(statSelect, {
+      skills: options.skills,
+      renderOptions: (selected) => bonusStatOptionsHtml(selected, options),
+      sync: syncNamedSkill,
+    });
     syncNamedSkill();
     wireScaleButton(
       row,
@@ -291,6 +373,13 @@
           .value.trim(),
       };
       if (skillName) effect.skillName = skillName;
+      const skillList = customSkillListPayloadForStat(effect.stat);
+      if (skillList) effect.skillList = skillList;
+      if (window.PFEffectStats?.isChoiceStat(effect.stat)) {
+        const poolId = window.PFEffectStats.choicePoolIdFromStat(effect.stat);
+        const choicePool = customSkillListPayloadForStat(poolId);
+        if (choicePool) effect.choicePool = choicePool;
+      }
       if (row._bonusScale) effect.bonusScale = row._bonusScale;
       return effect;
     };
@@ -331,18 +420,29 @@
     const option = (value, label) =>
       `<option value="${escapeHtml(value)}" ${selected === value ? "selected" : ""}>${escapeHtml(label)}</option>`;
     const skillPools = (window.PFEffectStats?.ALL_POOLS || []).filter(
-      (pool) => pool.kind === "skill",
+      (pool) => pool.kind === "skill" || pool.kind === "custom-skill-list",
     );
+    const customSkillLists = window.PFEffectStats?.customSkillLists?.() || [];
     return `
       <optgroup label="Skills">
         ${list.map((skill) => option(slugifySkillName(skill), skill)).join("")}
         ${option("skill:craft", "Skill: Craft")}
         ${option("skill:profession", "Skill: Profession")}
+        ${customSkillLists
+          .map((customList) =>
+            option(
+              window.PFEffectStats.skillListStatValue(customList),
+              `${customList.name} Skills`,
+            ),
+          )
+          .join("")}
+        ${option(window.PFEffectStats?.CREATE_SKILL_LIST_STAT_VALUE || "__create-custom-skill-list-stat__", "Create custom skill list...")}
       </optgroup>
       <optgroup label="Choose When Applied">
         ${skillPools
           .map((pool) => option(`choice:${pool.id}`, `${pool.label} (choose one)`))
           .join("")}
+        ${option(window.PFEffectStats?.CREATE_SKILL_LIST_CHOICE_VALUE || "__create-custom-skill-list-choice__", "Create custom skill list...")}
       </optgroup>
     `;
   }
@@ -835,7 +935,11 @@
       skillNameInput.placeholder =
         statSelect.value === "skill:profession" ? "Sailor" : "Alchemy";
     };
-    statSelect.addEventListener("change", syncNamedSkill);
+    wireCustomSkillListSelect(statSelect, {
+      skills,
+      renderOptions: (selected) => skillStatOptionsHtml(selected, { skills }),
+      sync: syncNamedSkill,
+    });
     syncNamedSkill();
     row
       .querySelector('button[aria-label="Delete class skill"]')
@@ -850,7 +954,15 @@
         const name = namedSkill(selected, skillNameInput.value);
         return name ? { stat: skillKey(name), skillName: name } : null;
       }
-      return { stat: selected };
+      const grant = { stat: selected };
+      const skillList = customSkillListPayloadForStat(selected);
+      if (skillList) grant.skillList = skillList;
+      if (window.PFEffectStats?.isChoiceStat(selected)) {
+        const poolId = window.PFEffectStats.choicePoolIdFromStat(selected);
+        const choicePool = customSkillListPayloadForStat(poolId);
+        if (choicePool) grant.choicePool = choicePool;
+      }
+      return grant;
     };
     row._collect = collect;
     return { element: row, collect };
@@ -898,12 +1010,96 @@
     return { element: row, collect };
   }
 
-  // DR, SR, Class Skill grants, and Size Changes are separate things but they're
-  // always authored together and rarely used -- one collapsed "Extra"
-  // accordion item holding all three (instead of three separate
-  // always-visible sections, or three separate accordion items) is
+  function spellLikeAbilityName(data = {}) {
+    return data.spellName || data.name || data.spell?.name || "";
+  }
+
+  function spellLikeMinimumLevel(data = {}) {
+    const value = Number(data.minimumLevel ?? data.level ?? 1);
+    if (!Number.isFinite(value)) return 1;
+    return Math.max(1, Math.floor(value));
+  }
+
+  function compactSpellPayload(spell = {}) {
+    if (!spell || typeof spell !== "object") return null;
+    return {
+      name: spell.name || "",
+      details: spell.details || {},
+      link: spell.link || "",
+    };
+  }
+
+  function createSpellLikeAbilityRow(data = {}, { onDelete } = {}) {
+    const row = document.createElement("div");
+    row.className = "shared-spell-like-row";
+    row._spell = compactSpellPayload(data.spell) || null;
+    row.innerHTML = `
+      <div>
+        <label>Level</label>
+        <input data-spell-like-field="minimumLevel" class="form-control form-control-sm" type="number" min="1" value="${spellLikeMinimumLevel(data)}">
+      </div>
+      <div>
+        <label>Frequency</label>
+        <input data-spell-like-field="frequency" class="form-control form-control-sm" value="${escapeHtml(data.frequency || "")}" placeholder="At will (Level 0)">
+      </div>
+      <div>
+        <label>Spell</label>
+        <button class="btn btn-outline-light btn-sm w-100 shared-spell-like-picker" type="button" data-spell-like-select>
+          <span data-spell-like-name>${escapeHtml(spellLikeAbilityName(data) || "Choose spell")}</span>
+          <i class="bi bi-search"></i>
+        </button>
+      </div>
+      <button class="btn btn-outline-danger btn-sm" type="button" aria-label="Delete spell-like ability"><i class="bi bi-trash"></i></button>
+    `;
+    const spellLabel = row.querySelector("[data-spell-like-name]");
+    const setSpell = (spell) => {
+      row._spell = compactSpellPayload(spell);
+      spellLabel.textContent = row._spell?.name || "Choose spell";
+    };
+    row
+      .querySelector("[data-spell-like-select]")
+      .addEventListener("click", async () => {
+        if (!window.PFMagicSearchModal) return;
+        const spell = await window.PFMagicSearchModal.open({
+          title: "Choose Spell-Like Ability",
+        });
+        if (spell) setSpell(spell);
+      });
+    row
+      .querySelector('button[aria-label="Delete spell-like ability"]')
+      .addEventListener("click", () => {
+        row.remove();
+        onDelete?.();
+      });
+    const collect = () => {
+      const spellName = row._spell?.name || spellLabel.textContent.trim();
+      if (!spellName || spellName === "Choose spell") return null;
+      return {
+        minimumLevel: spellLikeMinimumLevel({
+          minimumLevel: row.querySelector('[data-spell-like-field="minimumLevel"]')
+            .value,
+        }),
+        frequency: row
+          .querySelector('[data-spell-like-field="frequency"]')
+          .value.trim(),
+        spellName,
+        spell: row._spell || { name: spellName },
+      };
+    };
+    row._collect = collect;
+    return { element: row, collect };
+  }
+
+  // DR, SR, Class Skill grants, Size Changes, and Spell-Like Abilities
+  // are separate things but they're always authored together and rarely
+  // used -- one collapsed "Extra" accordion item holding all of them is
   // what every effect-authoring surface in the app mounts now, built
   // here once so there's exactly one place defining what "Extra" means.
+  //
+  // Spell-Like Abilities are stored as spellLikeAbilities:
+  // [{ minimumLevel, frequency, spellName, spell }]. spellName is the
+  // stable display key; spell keeps the selected spell details handy
+  // for later sheet UI. minimumLevel defaults to 1 for old rows.
   //
   // container: the element to fill with the accordion-item markup.
   // options.idPrefix: unique id prefix for this mount (required --
@@ -915,10 +1111,9 @@
   // options.skills: forwarded to createClassSkillRow. options.onChange:
   // called after any add/delete/edit inside the section.
   //
-  // Returns { addDr, addSr, addClassSkill, addSizeChange, reset(item), collect() }.
-  // reset(item) clears and repopulates all three lists from
-  // item.damageReduction/spellResistance/classSkillGrants; collect()
-  // returns { damageReduction, spellResistance, classSkillGrants, sizeChanges }.
+  // Returns helpers plus reset(item) and collect(). reset(item) clears
+  // and repopulates the extra lists; collect() returns the same extras
+  // using their app-level camelCase names.
   function mountExtraAccordion(container, options = {}) {
     const prefix = options.idPrefix;
     const parentAttr = options.accordionParentId
@@ -961,6 +1156,13 @@
               </div>
               <div id="${prefix}SizeChangeRows" class="vstack gap-2"></div>
             </div>
+            <div class="shared-extra-subsection">
+              <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
+                <div class="small text-secondary">Spell-Like Abilities</div>
+                <button id="${prefix}AddSpellLikeAbility" class="btn btn-outline-info btn-sm" type="button">Add Spell-Like Ability</button>
+              </div>
+              <div id="${prefix}SpellLikeAbilityRows" class="vstack gap-2"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -970,6 +1172,7 @@
     const srRowsEl = document.getElementById(`${prefix}SrRows`);
     const csRowsEl = document.getElementById(`${prefix}ClassSkillRows`);
     const sizeRowsEl = document.getElementById(`${prefix}SizeChangeRows`);
+    const slaRowsEl = document.getElementById(`${prefix}SpellLikeAbilityRows`);
     const countBadge = document.getElementById(`${prefix}Count`);
 
     const updateCount = () => {
@@ -977,7 +1180,8 @@
         drRowsEl.children.length +
         srRowsEl.children.length +
         csRowsEl.children.length +
-        sizeRowsEl.children.length;
+        sizeRowsEl.children.length +
+        slaRowsEl.children.length;
       if (countBadge) {
         countBadge.textContent = count ? String(count) : "";
         countBadge.classList.toggle("d-none", !count);
@@ -1010,6 +1214,13 @@
       sizeRowsEl.appendChild(element);
       updateCount();
     };
+    const addSpellLikeAbility = (data = {}) => {
+      const { element } = createSpellLikeAbilityRow(data, {
+        onDelete: updateCount,
+      });
+      slaRowsEl.appendChild(element);
+      updateCount();
+    };
 
     document
       .getElementById(`${prefix}AddDr`)
@@ -1023,6 +1234,9 @@
     document
       .getElementById(`${prefix}AddSizeChange`)
       .addEventListener("click", () => addSizeChange());
+    document
+      .getElementById(`${prefix}AddSpellLikeAbility`)
+      .addEventListener("click", () => addSpellLikeAbility());
 
     const collectRows = (rowsEl) =>
       [...rowsEl.querySelectorAll(":scope > *")]
@@ -1034,11 +1248,13 @@
       addSr,
       addClassSkill,
       addSizeChange,
+      addSpellLikeAbility,
       reset(item = {}) {
         drRowsEl.innerHTML = "";
         srRowsEl.innerHTML = "";
         csRowsEl.innerHTML = "";
         sizeRowsEl.innerHTML = "";
+        slaRowsEl.innerHTML = "";
         (Array.isArray(item.damageReduction) ? item.damageReduction : []).forEach(
           addDr,
         );
@@ -1051,6 +1267,10 @@
         (Array.isArray(item.sizeChanges) ? item.sizeChanges : []).forEach(
           addSizeChange,
         );
+        (Array.isArray(item.spellLikeAbilities)
+          ? item.spellLikeAbilities
+          : []
+        ).forEach(addSpellLikeAbility);
         updateCount();
       },
       collect() {
@@ -1059,6 +1279,7 @@
           spellResistance: collectRows(srRowsEl),
           classSkillGrants: collectRows(csRowsEl),
           sizeChanges: collectRows(sizeRowsEl),
+          spellLikeAbilities: collectRows(slaRowsEl),
         };
       },
     };
@@ -1164,6 +1385,8 @@
       addDr: extra.addDr,
       addSr: extra.addSr,
       addClassSkill: extra.addClassSkill,
+      addSizeChange: extra.addSizeChange,
+      addSpellLikeAbility: extra.addSpellLikeAbility,
       reset(item = {}) {
         const effectsKey = options.effectsKey || "effects";
         effectRowsEl.innerHTML = "";
@@ -1192,6 +1415,7 @@
     createDrRow,
     createSrRow,
     createClassSkillRow,
+    createSpellLikeAbilityRow,
     mountExtraAccordion,
     mountEffectsAccordion,
     classSkillGrantText,

@@ -7,18 +7,19 @@
     document.body.insertAdjacentHTML(
       "beforeend",
       `
-        <div class="modal fade" id="${MODAL_ID}" tabindex="-1" aria-labelledby="${MODAL_ID}Label" aria-hidden="true">
-          <div class="modal-dialog modal-dialog-centered">
-            <form class="modal-content bg-dark text-white border-secondary" id="${MODAL_ID}Form">
-              <div class="modal-header border-secondary">
-                <h5 class="modal-title" id="${MODAL_ID}Label">Hit Points</h5>
+        <div class="modal fade" id="${MODAL_ID}" tabindex="-1" aria-label="Hit Points" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered map-hp-editor-dialog">
+            <form class="modal-content bg-dark text-white border-secondary map-hp-editor-content" id="${MODAL_ID}Form">
+              <div class="modal-body map-hp-editor-body">
+                <div class="mini-sheet-card map-hp-editor-card">
+                  <div class="mini-sheet-label">HP</div>
+                  <div class="mini-sheet-value d-flex align-items-center justify-content-center gap-1">
+                    <input id="${MODAL_ID}Input" class="form-control form-control-sm hp-number-input map-hp-editor-input" type="number" inputmode="numeric">
+                    <span id="${MODAL_ID}Total"></span>
+                  </div>
+                </div>
               </div>
-              <div class="modal-body">
-                <label class="form-label" for="${MODAL_ID}Input">Current HP</label>
-                <input id="${MODAL_ID}Input" class="form-control form-control-sm" type="number" inputmode="numeric">
-                <div class="small text-secondary mt-2" id="${MODAL_ID}Total"></div>
-              </div>
-              <div class="modal-footer border-secondary">
+              <div class="modal-footer border-secondary map-hp-editor-footer">
                 <button class="btn btn-outline-light btn-sm" type="button" data-bs-dismiss="modal">Cancel</button>
                 <button class="btn btn-primary btn-sm" type="submit">Save</button>
               </div>
@@ -30,14 +31,13 @@
     return document.getElementById(MODAL_ID);
   }
 
-  function open({ title = "Hit Points", current = "", total = "", onSave } = {}) {
+  function open({ current = "", total = "", onSave } = {}) {
     const modalEl = ensureModal();
     const input = document.getElementById(`${MODAL_ID}Input`);
     const totalEl = document.getElementById(`${MODAL_ID}Total`);
     const form = document.getElementById(`${MODAL_ID}Form`);
-    document.getElementById(`${MODAL_ID}Label`).textContent = title;
     input.value = current;
-    totalEl.textContent = total ? `Total HP: ${total}` : "";
+    totalEl.textContent = total ? `/ ${total}` : "";
 
     const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
     const submit = async (event) => {

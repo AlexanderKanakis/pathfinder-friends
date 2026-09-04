@@ -184,6 +184,7 @@
     const contributedSr = new Map();
     const contributedClassSkillGrants = new Map();
     const contributedSizeChanges = new Map();
+    const contributedSpellLikeAbilities = new Map();
     const contributedNames = new Map();
     contributedOptions.forEach((options, targetKey) => {
       const finalOptions = terminalOptions(options);
@@ -192,6 +193,7 @@
       const sr = [];
       const classSkillGrants = [];
       const sizeChanges = [];
+      const spellLikeAbilities = [];
       const names = [];
       finalOptions.forEach((option) => {
         if (Array.isArray(option.effects) && option.effects.length)
@@ -213,6 +215,11 @@
           classSkillGrants.push(...option.classSkillGrants);
         if (Array.isArray(option.sizeChanges) && option.sizeChanges.length)
           sizeChanges.push(...option.sizeChanges);
+        if (
+          Array.isArray(option.spellLikeAbilities) &&
+          option.spellLikeAbilities.length
+        )
+          spellLikeAbilities.push(...option.spellLikeAbilities);
         names.push(option.name);
       });
       if (effects.length) contributedEffects.set(targetKey, effects);
@@ -222,6 +229,8 @@
         contributedClassSkillGrants.set(targetKey, classSkillGrants);
       if (sizeChanges.length)
         contributedSizeChanges.set(targetKey, sizeChanges);
+      if (spellLikeAbilities.length)
+        contributedSpellLikeAbilities.set(targetKey, spellLikeAbilities);
       if (names.length) contributedNames.set(targetKey, names);
     });
 
@@ -254,6 +263,8 @@
       const bundledClassSkillGrants =
         contributedClassSkillGrants.get(targetKey) || [];
       const bundledSizeChanges = contributedSizeChanges.get(targetKey) || [];
+      const bundledSpellLikeAbilities =
+        contributedSpellLikeAbilities.get(targetKey) || [];
       const bundledNames = contributedNames.get(targetKey) || [];
       const durationConfig = feature.durationConfig || {
         count: null,
@@ -282,6 +293,12 @@
         ...(Array.isArray(feature.sizeChanges) ? feature.sizeChanges : []),
         ...bundledSizeChanges,
       ];
+      const spellLikeAbilities = [
+        ...(Array.isArray(feature.spellLikeAbilities)
+          ? feature.spellLikeAbilities
+          : []),
+        ...bundledSpellLikeAbilities,
+      ];
       abilities.set(key, {
         id: `ability:${key}`,
         name: feature.name || "Class Feature",
@@ -297,6 +314,7 @@
         ...(spellResistance.length ? { spellResistance } : {}),
         ...(classSkillGrants.length ? { classSkillGrants } : {}),
         ...(sizeChanges.length ? { sizeChanges } : {}),
+        ...(spellLikeAbilities.length ? { spellLikeAbilities } : {}),
         durationConfig,
         duration: window.PFEffectMeta?.durationLabel
           ? window.PFEffectMeta.durationLabel(durationConfig)

@@ -319,6 +319,14 @@ body {
   will-change: transform;
 }
 
+.map-stage.path-ruler-active {
+  cursor: crosshair;
+}
+
+.map-stage.transfer-target-active {
+  cursor: cell;
+}
+
 .map-background-layer {
   position: absolute;
   inset: 0;
@@ -421,7 +429,6 @@ body {
   transform: translateZ(1px);
   transform-style: preserve-3d;
   backface-visibility: hidden;
-  will-change: transform;
 }
 
 /* 3D counterpart to .map-limited-view-grayscale -- per-cell instead of
@@ -1172,6 +1179,64 @@ body {
   white-space: nowrap;
   pointer-events: none;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.45);
+}
+
+.path-ruler {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 21;
+  overflow: visible;
+  transform-style: preserve-3d;
+}
+
+.path-ruler-segment {
+  position: absolute;
+  height: 3px;
+  border-radius: 999px;
+  background: repeating-linear-gradient(
+    90deg,
+    #22d3ee 0,
+    #22d3ee 8px,
+    transparent 8px,
+    transparent 13px
+  );
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.75));
+  transform: translateZ(var(--ruler-z, 0px)) rotate(var(--ruler-angle, 0rad));
+  transform-origin: left center;
+  transform-style: preserve-3d;
+}
+
+.path-ruler-segment.is-preview {
+  opacity: 0.65;
+}
+
+.path-ruler-point {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border: 2px solid #102a32;
+  border-radius: 50%;
+  background: #22d3ee;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.65);
+  transform: translate(-50%, -50%) translateZ(var(--ruler-z, 0px));
+  transform-style: preserve-3d;
+}
+
+.path-ruler-point.is-start {
+  width: 12px;
+  height: 12px;
+}
+
+.path-ruler-point.is-preview {
+  opacity: 0.7;
+}
+
+.path-ruler-label {
+  border-color: #0e7490;
+  color: #a5f3fc;
+  transform: translate(-50%, calc(-100% - 8px))
+    translateZ(var(--ruler-z, 0px));
 }
 
 .map-side {
@@ -2225,7 +2290,7 @@ textarea {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
+  width: 100%;
   height: 32px;
   padding: 0;
   margin-top: 6px;

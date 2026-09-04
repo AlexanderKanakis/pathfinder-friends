@@ -38,7 +38,13 @@ const STAT_GROUPS = {
   armor: ["ac", "touch ac", "flat-footed ac"],
   saves: ["fortitude", "reflex", "will"],
   combat: ["melee attack", "ranged attack", "damage", "cmb", "cmd"],
-  misc: ["initiative", "hit points", "skill checks", "spell resistance"],
+  misc: [
+    "initiative",
+    "hit points",
+    "skill checks",
+    "craft skill checks",
+    "spell resistance",
+  ],
 };
 
 let selectedCharacterId = "";
@@ -74,6 +80,7 @@ const BUFF_STATS = [
   "cmd",
   "hit points",
   "skill checks",
+  "craft skill checks",
   "spell resistance",
 ];
 const BONUS_TYPES = [
@@ -92,6 +99,7 @@ const BONUS_TYPES = [
   "morale",
   "natural armor",
   "profane",
+  "racial",
   "resistance",
   "sacred",
   "shield",
@@ -842,6 +850,7 @@ function calculateStatsDetailed() {
     "luck",
     "morale",
     "profane",
+    "racial",
     "sacred",
   ];
   const cmdAcApplied = applyBonuses(

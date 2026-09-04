@@ -40,6 +40,8 @@ let contextMenuTokenId = "";
 let quickControlsOpenId = "";
 let dpadMovingIds = new Set();
 let movementMeasure = null;
+let pathRuler = null;
+let transferTargetTokenId = "";
 let suppressNextContextMenu = false;
 let auraModal = null;
 let auraEditingTokenId = "";
@@ -80,6 +82,11 @@ let dpadJoystickState = null;
 let mapToastTimer = null;
 let shapeFogRenderContext = null;
 let appliedMapBackgroundUrl = null;
+let current3DRenderTokens = [];
+let tokenBillboardFrame = 0;
+const shapeMaskCache = new WeakMap();
+let sortedHeightShapesCache = { signature: "", blocks: [] };
+let heightCellGridCache = { signature: "", cols: 0, rows: 0, grid: null };
 
 const MAP_SLOT_COUNT = 6;
 const MAP_CLIENT_ID_KEY = "pf_map_client_id";
@@ -96,6 +103,10 @@ const MAP_CLIENT_ID =
 const MAP_IMAGE_REFERENCE_CELL_PX = 48;
 const MAP_SIZE_MIN = 8;
 const MAP_SIZE_MAX = 300;
+const MAP_GRID_LINES_CSS = [
+  "linear-gradient(to right, rgba(255,255,255,0.18) 1px, transparent 1px)",
+  "linear-gradient(to bottom, rgba(255,255,255,0.18) 1px, transparent 1px)",
+].join(", ");
 const defaultState = {
   settings: {
     cols: 30,
@@ -635,12 +646,19 @@ function effectBonusText(bonus) {
   const text = `${fmtSigned(bonus.value || 0)} ${bonus.type || "untyped"} ${statLabel}${scale ? `; ${scale}` : ""}`;
   return bonus.appliesWhen ? `${text} (${bonus.appliesWhen})` : text;
 }
+function spellLikeText(entry = {}) {
+  const spellName = entry.spellName || entry.spell?.name || "Spell";
+  const minimumLevel = Number(entry.minimumLevel ?? entry.level ?? 1) || 1;
+  const levelText = minimumLevel > 1 ? `level ${minimumLevel}, ` : "";
+  return `SLA ${levelText}${entry.frequency ? `${entry.frequency}: ` : ""}${spellName}`;
+}
 function effectSearchText(effect) {
   return [
     effect.name,
     effect.category,
     durationLabel(effect),
     ...(effect.bonuses || []).map(effectBonusText),
+    ...(effect.spellLikeAbilities || []).map(spellLikeText),
   ]
     .join(" ")
     .toLowerCase();
@@ -2047,7 +2065,32 @@ function hideContextMenu() {
   el("mapContextMenu").classList.add("d-none");
 }
 
+function pathRulerActive() {
+  return Boolean(pathRuler?.active);
+}
+
+function pointForMapCell(x, y, { heightOffsetFeet = 0 } = {}) {
+  const cell = Number(localGridSize || 48);
+  const gx = clamp(Number(x || 0), 0, state.settings.cols - 1);
+  const gy = clamp(Number(y || 0), 0, state.settings.rows - 1);
+  const surfaceZ = surfaceFeetAtCell(gx, gy);
+  return {
+    x: gx,
+    y: gy,
+    surfaceZ,
+    z: surfaceZ + Number(heightOffsetFeet || 0),
+    px: (gx + 0.5) * cell,
+    py: (gy + 0.5) * cell,
+  };
+}
+
 function showMapContextMenu(event, item) {
+  if (pathRulerActive()) {
+    event.preventDefault();
+    event.stopPropagation();
+    undoPathRulerPoint();
+    return;
+  }
   if (!canManageMapItem(item) || (!item.kind && !item.shape)) return;
   event.preventDefault();
   event.stopPropagation();
@@ -2097,6 +2140,10 @@ function showMapContextMenu(event, item) {
       ? `<i class="bi bi-eye me-1"></i> Unhide name`
       : `<i class="bi bi-incognito me-1"></i> Hide name`;
   }
+  el("transferToken3D")?.classList.toggle(
+    "d-none",
+    !(view3DMode && !heightEditMode && item.kind && !isLight),
+  );
   el("zIndexMenu").classList.add("d-none");
   el("toggleZIndexMenu").classList.toggle("d-none", isLight);
   el("toggleZIndexMenu").setAttribute("aria-expanded", "false");
@@ -2133,7 +2180,7 @@ function moveContextItemZ(action) {
   renderAll();
 }
 
-function stageCellFromEvent(event) {
+function stageCellFromEvent(event, options = {}) {
   const cell = Number(localGridSize || 48);
   // A tilted/spun 3D stage (see toggleView3DMode()) makes the simple
   // rect-relative math below meaningless -- the stage's on-screen
@@ -2146,7 +2193,7 @@ function stageCellFromEvent(event) {
   // gesture).
   if (view3DMode && !heightEditMode) {
     const hit = cell3DFromPoint(event.clientX, event.clientY);
-    if (hit) return { x: hit.x, y: hit.y, px: (hit.x + 0.5) * cell, py: (hit.y + 0.5) * cell };
+    if (hit) return pointForMapCell(hit.x, hit.y, options);
   }
   const stage = el("mapStage");
   const rect = stage.getBoundingClientRect();
@@ -2160,15 +2207,71 @@ function stageCellFromEvent(event) {
     0,
     state.settings.rows - 1,
   );
-  return { x, y, px: (x + 0.5) * cell, py: (y + 0.5) * cell };
+  return pointForMapCell(x, y, options);
 }
 
 function pathfinderDistance(start, end) {
-  const dx = Math.abs(end.x - start.x);
-  const dy = Math.abs(end.y - start.y);
-  const diagonals = Math.min(dx, dy);
-  const straight = Math.max(dx, dy) - diagonals;
+  const dx = Math.abs(Number(end.x || 0) - Number(start.x || 0));
+  const dy = Math.abs(Number(end.y || 0) - Number(start.y || 0));
+  const dz = Math.round(
+    Math.abs(Number(end.z || 0) - Number(start.z || 0)) / 5,
+  );
+  const axes = [dx, dy, dz].sort((a, b) => a - b);
+  const diagonals = axes[1];
+  const straight = axes[2] - axes[1];
   return straight * 5 + Math.floor(diagonals / 2) * 15 + (diagonals % 2) * 5;
+}
+
+function pathfinderPathDistance(points) {
+  return points.slice(1).reduce(
+    (total, point, index) => total + pathfinderDistance(points[index], point),
+    0,
+  );
+}
+
+function pointHeightSuffix(point) {
+  const z = Number(point?.z || 0);
+  if (!z) return "";
+  return ` (${z > 0 ? "+" : ""}${z} ft z)`;
+}
+
+function rulerPointZPx(point) {
+  if (!view3DMode || heightEditMode) return 0;
+  return feetToPreviewPx(Number(point?.z || 0)) + 4;
+}
+
+function renderPathRulerSegment(previous, point, isPreview = false) {
+  const dx = point.px - previous.px;
+  const dy = point.py - previous.py;
+  const length = Math.hypot(dx, dy);
+  const angle = Math.atan2(dy, dx);
+  const pieces = Math.max(1, Math.ceil(length / 14));
+  const pieceLength = length / pieces;
+  const startZ = rulerPointZPx(previous);
+  const endZ = rulerPointZPx(point);
+  return Array.from({ length: pieces }, (_, index) => {
+    const startRatio = index / pieces;
+    const endRatio = (index + 1) / pieces;
+    const midRatio = (startRatio + endRatio) / 2;
+    const x = previous.px + dx * startRatio;
+    const y = previous.py + dy * startRatio;
+    const zPx = startZ + (endZ - startZ) * midRatio;
+    return `
+      <span
+        class="path-ruler-segment${isPreview ? " is-preview" : ""}"
+        style="left:${x}px;top:${y}px;width:${pieceLength + 1}px;--ruler-angle:${angle}rad;--ruler-z:${zPx}px;"
+      ></span>
+    `;
+  }).join("");
+}
+
+function renderPathRulerPoint(point, index, isPreview = false) {
+  return `
+    <span
+      class="path-ruler-point${index === 0 ? " is-start" : ""}${isPreview ? " is-preview" : ""}"
+      style="left:${point.px}px;top:${point.py}px;--ruler-z:${rulerPointZPx(point)}px;"
+    ></span>
+  `;
 }
 
 function renderMovementMeasure() {
@@ -2190,6 +2293,212 @@ function renderMovementMeasure() {
   stage.appendChild(layer);
 }
 
+function renderPathRuler() {
+  document.querySelector(".path-ruler")?.remove();
+  if (!pathRuler?.points?.length) return;
+  const stage = el("mapStage");
+  const committedPoints = pathRuler.points;
+  const points =
+    pathRuler.active && pathRuler.preview
+      ? [...committedPoints, pathRuler.preview]
+      : committedPoints;
+  const segments = points
+    .slice(1)
+    .map((point, index) => {
+      const previous = points[index];
+      return renderPathRulerSegment(
+        previous,
+        point,
+        pathRuler.active && Boolean(pathRuler.preview) && index === points.length - 2,
+      );
+    })
+    .join("");
+  const dots = committedPoints
+    .map(
+      (point, index) => renderPathRulerPoint(point, index),
+    )
+    .join("");
+  const previewDot =
+    pathRuler.active && pathRuler.preview
+      ? renderPathRulerPoint(pathRuler.preview, points.length - 1, true)
+      : "";
+  const last = points[points.length - 1];
+  const distance = pathfinderPathDistance(points);
+  const nextOffset = Number(pathRuler.elevationOffsetFeet || 0);
+  const nextHeightLabel =
+    pathRuler.active && nextOffset
+      ? ` | next ${nextOffset > 0 ? "+" : ""}${nextOffset} ft`
+      : "";
+  const layer = document.createElement("div");
+  layer.className = "path-ruler";
+  layer.innerHTML = `
+    ${segments}
+    ${dots}
+    ${previewDot}
+    <div class="movement-ruler-label path-ruler-label" style="left:${last.px}px;top:${last.py}px;--ruler-z:${rulerPointZPx(last)}px;">${distance} ft${pointHeightSuffix(last)}${nextHeightLabel}</div>
+  `;
+  stage.appendChild(layer);
+}
+
+function updatePathRulerButton() {
+  const button = el("togglePathRuler");
+  if (!button) return;
+  const active = Boolean(pathRuler?.active);
+  const hasPath = Boolean(pathRuler?.points?.length);
+  button.classList.toggle("active", active);
+  button.innerHTML = active
+    ? `<i class="bi bi-check2"></i> Finish Ruler`
+    : hasPath
+      ? `<i class="bi bi-trash"></i> Clear Ruler`
+      : `<i class="bi bi-rulers"></i> Ruler`;
+}
+
+function clearPathRuler() {
+  pathRuler = null;
+  document.querySelector(".path-ruler")?.remove();
+  el("mapStage")?.classList.remove("path-ruler-active");
+  updatePathRulerButton();
+  if (!dragState && !transferTargetTokenId) teardown3DHitGrid();
+}
+
+function finishPathRuler() {
+  if (!pathRuler) return;
+  pathRuler.active = false;
+  pathRuler.preview = null;
+  el("mapStage")?.classList.remove("path-ruler-active");
+  updatePathRulerButton();
+  renderPathRuler();
+  if (!dragState && !transferTargetTokenId) teardown3DHitGrid();
+}
+
+function startPathRuler() {
+  hideContextMenu();
+  cancelTransferTarget();
+  pathRuler = {
+    active: true,
+    points: [],
+    preview: null,
+    elevationOffsetFeet: 0,
+  };
+  el("mapStage")?.classList.add("path-ruler-active");
+  updatePathRulerButton();
+  showMapToast("Ruler active: click cells to add path points.");
+  if (view3DMode && !heightEditMode) build3DHitGrid();
+}
+
+function togglePathRuler() {
+  if (pathRuler?.active) {
+    finishPathRuler();
+    return;
+  }
+  if (pathRuler?.points?.length) {
+    clearPathRuler();
+    return;
+  }
+  startPathRuler();
+}
+
+function addPathRulerPoint(event) {
+  if (!pathRuler?.active) return false;
+  event.preventDefault();
+  event.stopPropagation();
+  const point = stageCellFromEvent(event, {
+    heightOffsetFeet: pathRuler.elevationOffsetFeet,
+  });
+  if (!point) return true;
+  const last = pathRuler.points[pathRuler.points.length - 1];
+  if (!last || last.x !== point.x || last.y !== point.y || last.z !== point.z) {
+    pathRuler.points.push(point);
+  }
+  pathRuler.preview = null;
+  renderPathRuler();
+  updatePathRulerButton();
+  return true;
+}
+
+function movePathRulerPreview(event) {
+  if (!pathRuler?.active || !pathRuler.points.length) return;
+  const point = stageCellFromEvent(event, {
+    heightOffsetFeet: pathRuler.elevationOffsetFeet,
+  });
+  if (!point) return;
+  pathRuler.preview = point;
+  renderPathRuler();
+}
+
+function adjustPathRulerElevation(event) {
+  if (!pathRuler?.active) return false;
+  event.preventDefault();
+  event.stopPropagation();
+  const direction = Number(event.deltaY || 0) < 0 ? 1 : -1;
+  pathRuler.elevationOffsetFeet =
+    Number(pathRuler.elevationOffsetFeet || 0) + direction * 5;
+  if (pathRuler.preview) {
+    pathRuler.preview = pointForMapCell(pathRuler.preview.x, pathRuler.preview.y, {
+      heightOffsetFeet: pathRuler.elevationOffsetFeet,
+    });
+  }
+  showMapToast(
+    `Ruler next point ${pathRuler.elevationOffsetFeet > 0 ? "+" : ""}${pathRuler.elevationOffsetFeet} ft.`,
+  );
+  renderPathRuler();
+  return true;
+}
+
+function undoPathRulerPoint() {
+  if (!pathRuler?.points?.length) return;
+  pathRuler.points.pop();
+  pathRuler.preview = null;
+  updatePathRulerButton();
+  renderPathRuler();
+  if (!pathRuler.points.length) {
+    document.querySelector(".path-ruler")?.remove();
+  }
+}
+
+function cancelTransferTarget() {
+  transferTargetTokenId = "";
+  el("mapStage")?.classList.remove("transfer-target-active");
+  if (!dragState && !pathRuler?.active) teardown3DHitGrid();
+}
+
+function startTransferTarget() {
+  const token = tokenById(contextMenuTokenId);
+  if (!token || !canManageMapItem(token) || !view3DMode || heightEditMode) return;
+  finishPathRuler();
+  transferTargetTokenId = token.id;
+  hideContextMenu();
+  el("mapStage")?.classList.add("transfer-target-active");
+  build3DHitGrid();
+  showMapToast("Transfer active: click a 3D cell to place the token.");
+}
+
+function transferTokenToPoint(event) {
+  if (!transferTargetTokenId) return false;
+  event.preventDefault();
+  event.stopPropagation();
+  const token = tokenById(transferTargetTokenId);
+  const point = stageCellFromEvent(event);
+  if (!token || !point || !canManageMapItem(token)) {
+    cancelTransferTarget();
+    return true;
+  }
+  token.x = clamp(
+    point.x,
+    0,
+    Math.max(0, Number(state.settings.cols || 0) - Number(token.w || 1)),
+  );
+  token.y = clamp(
+    point.y,
+    0,
+    Math.max(0, Number(state.settings.rows || 0) - Number(token.h || 1)),
+  );
+  selectedId = token.id;
+  cancelTransferTarget();
+  renderAll();
+  return true;
+}
+
 function clearMovementMeasure(delay = 0) {
   const clear = () => {
     movementMeasure = null;
@@ -2204,6 +2513,11 @@ function clearMovementMeasure(delay = 0) {
 
 function startMovementMeasure(event) {
   if (event.button !== 2) return;
+  if (pathRulerActive()) {
+    event.preventDefault();
+    event.stopPropagation();
+    return;
+  }
   hideContextMenu();
   // Must exist before stageCellFromEvent()'s 3D branch can answer
   // anything -- see build3DHitGrid().
@@ -2251,7 +2565,7 @@ function renderMap() {
   const stageWrap = el("mapStageWrap");
   stageWrap?.classList.toggle("is-3d", is3D);
   if (is3D) {
-    set3DViewVars();
+    set3DViewVars({ preserveCenter: false });
     // The camera needs to stay comfortably farther away than the
     // scene is wide/tall, or a big map's flat ground plane can rotate
     // enough to cross behind the perspective origin -- CSS doesn't
@@ -2317,6 +2631,7 @@ function renderMap() {
           token.ownerId === currentUserId ||
           token3DRevealStrength(token) > 0.08,
       );
+  current3DRenderTokens = is3D ? tokens3D : [];
 
   // Height Layer mode replaces the whole stage contents with just the
   // height regions -- no tokens, ordinary shapes, or fog, so painting
@@ -2392,10 +2707,11 @@ function renderMap() {
     stage.querySelectorAll("[data-map-id]:not([data-resize-handle])").forEach((node) => {
       node.addEventListener("pointerdown", startDrag);
       node.addEventListener("mouseenter", () =>
-        showTokenHover(node.dataset.mapId),
+        pathRulerActive() ? null : showTokenHover(node.dataset.mapId),
       );
       node.addEventListener("mouseleave", hideTokenHover);
       node.addEventListener("click", (event) => {
+        if (transferTokenToPoint(event) || addPathRulerPoint(event)) return;
         event.stopPropagation();
         suppressStageClick = true;
         hideContextMenu();
@@ -2404,6 +2720,12 @@ function renderMap() {
         showSelectedPanel();
       });
       node.addEventListener("contextmenu", (event) => {
+        if (pathRulerActive()) {
+          event.preventDefault();
+          event.stopPropagation();
+          undoPathRulerPoint();
+          return;
+        }
         if (suppressNextContextMenu) {
           event.preventDefault();
           suppressNextContextMenu = false;
@@ -2419,6 +2741,12 @@ function renderMap() {
     });
   }
   stage.oncontextmenu = (event) => {
+    if (pathRulerActive()) {
+      event.preventDefault();
+      event.stopPropagation();
+      undoPathRulerPoint();
+      return;
+    }
     if (suppressNextContextMenu) {
       event.preventDefault();
       suppressNextContextMenu = false;
@@ -2427,6 +2755,7 @@ function renderMap() {
     if (event.target === stage) event.preventDefault();
   };
   stage.onclick = (event) => {
+    if (transferTokenToPoint(event) || addPathRulerPoint(event)) return;
     if (suppressStageClick) {
       suppressStageClick = false;
       return;
@@ -2436,6 +2765,12 @@ function renderMap() {
     selectedId = "";
     renderAll(false);
   };
+  stage.onpointermove = (event) => {
+    movePathRulerPreview(event);
+  };
+  stage.onwheel = (event) => {
+    adjustPathRulerElevation(event);
+  };
   updateHeightEditControls();
   // Lives outside #mapStage (a sibling in .map-main, see map.html), so
   // rebuilding the stage above never touches it -- hooked here instead
@@ -2443,6 +2778,8 @@ function renderMap() {
   // is the one function every state change already goes through
   // (drag, dpad move, remote sync, ...), so the HUD never goes stale.
   renderMobileHud();
+  renderPathRuler();
+  updatePathRulerButton();
 }
 
 function renderMapBackgroundLayer() {
@@ -2472,7 +2809,7 @@ function renderAura(token) {
   const size = radius * 2;
   const centerX = Number(token.x || 0) + Number(token.w || 1) / 2;
   const centerY = Number(token.y || 0) + Number(token.h || 1) / 2;
-  return `<div class="map-aura" style="--aura-x:${centerX - radius};--aura-y:${centerY - radius};--aura-size:${size};--aura-color:${escapeHtml(aura.color || "#8fd19e")};"></div>`;
+  return `<div class="map-aura" data-aura-token-id="${escapeHtml(token.id)}" data-aura-field="aura" style="--aura-x:${centerX - radius};--aura-y:${centerY - radius};--aura-size:${size};--aura-color:${escapeHtml(aura.color || "#8fd19e")};"></div>`;
 }
 
 function tokenCenter(token) {
@@ -2488,7 +2825,7 @@ function renderRevealIndicator(token, field, className, color) {
   const radius = Math.max(1, Number(data.radius || 1));
   const size = radius * 2;
   const center = tokenCenter(token);
-  return `<div class="map-aura ${className}" style="--aura-x:${center.x - radius};--aura-y:${center.y - radius};--aura-size:${size};--aura-color:${color};"></div>`;
+  return `<div class="map-aura ${className}" data-aura-token-id="${escapeHtml(token.id)}" data-aura-field="${escapeHtml(field)}" style="--aura-x:${center.x - radius};--aura-y:${center.y - radius};--aura-size:${size};--aura-color:${color};"></div>`;
 }
 
 function lightRevealCircles() {
@@ -2558,7 +2895,7 @@ function token3DFogRevealStrength(token, limitedCircles, lightCircles) {
 }
 
 function surfaceFeetAtCell(gx, gy) {
-  return tallestHeightFeetUnder(gx, gy, 1, 1);
+  return heightFeetAtCell(Math.floor(Number(gx || 0)), Math.floor(Number(gy || 0)));
 }
 
 const FOG_SOFT_EDGE_CELLS = 0.85;
@@ -3028,8 +3365,20 @@ function commitZoomPreview(liveValue) {
   setMapZoom(liveValue);
 }
 
+function updateMapStageTransformOrigin() {
+  const stage = el("mapStage");
+  if (!stage) return;
+  if (!view3DMode && !zoomPreviewActive) {
+    stage.style.transformOrigin = "";
+    return;
+  }
+  const point = mapViewportCenterStagePoint();
+  stage.style.transformOrigin = `${point.x}px ${point.y}px`;
+}
+
 function setMapZoom(value, { render = true } = {}) {
   const centerRatio = mapViewportCenterRatio();
+  updateMapStageTransformOrigin();
   localGridSize = clamp(Number(value || 48), 12, 96);
   sessionStorage.setItem("pf_map_grid_size", String(localGridSize));
   el("gridSize").value = localGridSize;
@@ -3041,7 +3390,10 @@ function setMapZoom(value, { render = true } = {}) {
     } else {
       applyMapStageVars();
     }
-    requestAnimationFrame(() => scrollMapViewportToRatio(centerRatio));
+    requestAnimationFrame(() => {
+      scrollMapViewportToRatio(centerRatio);
+      updateMapStageTransformOrigin();
+    });
   }
 }
 
@@ -3060,26 +3412,43 @@ function render3DTokenBillboards(tokens) {
     layer.classList.add("d-none");
     return;
   }
+  if (!hovered3DTokenId) {
+    layer.innerHTML = "";
+    layer.classList.add("d-none");
+    return;
+  }
+  const token = tokens.find((entry) => entry.id === hovered3DTokenId);
+  if (!token) {
+    layer.innerHTML = "";
+    layer.classList.add("d-none");
+    return;
+  }
   layer.classList.remove("d-none");
   const wrapRect = wrap.getBoundingClientRect();
-  const pieces = [];
-  for (const token of tokens) {
-    const node = wrap.querySelector(
-      `.map-token[data-map-id="${CSS.escape(token.id)}"]`,
-    );
-    if (!node) continue;
-    const rect = node.getBoundingClientRect();
-    const centerX = rect.left - wrapRect.left + wrap.scrollLeft + rect.width / 2;
-    const centerY = rect.top - wrapRect.top + wrap.scrollTop + rect.height / 2;
-    const tokenBasePx =
-      Math.min(Number(token.w || 1), Number(token.h || 1)) *
-      Number(localGridSize || 48);
-    const size = Math.round(clamp(tokenBasePx * 1.35, 56, 128));
-    const hoverHtml =
-      hovered3DTokenId === token.id ? render3DTokenHover(token, centerX, centerY, size) : "";
-    if (hoverHtml) pieces.push(hoverHtml);
+  const node = wrap.querySelector(
+    `.map-token[data-map-id="${CSS.escape(token.id)}"]`,
+  );
+  if (!node) {
+    layer.innerHTML = "";
+    layer.classList.add("d-none");
+    return;
   }
-  layer.innerHTML = pieces.join("");
+  const rect = node.getBoundingClientRect();
+  const centerX = rect.left - wrapRect.left + wrap.scrollLeft + rect.width / 2;
+  const centerY = rect.top - wrapRect.top + wrap.scrollTop + rect.height / 2;
+  const tokenBasePx =
+    Math.min(Number(token.w || 1), Number(token.h || 1)) *
+    Number(localGridSize || 48);
+  const size = Math.round(clamp(tokenBasePx * 1.35, 56, 128));
+  layer.innerHTML = render3DTokenHover(token, centerX, centerY, size);
+}
+
+function schedule3DTokenBillboards() {
+  if (tokenBillboardFrame) return;
+  tokenBillboardFrame = requestAnimationFrame(() => {
+    tokenBillboardFrame = 0;
+    render3DTokenBillboards(current3DRenderTokens);
+  });
 }
 
 function token3DGrayscaleFromContext(token) {
@@ -3117,9 +3486,14 @@ function render3DTokenHover(token, centerX, centerY, portraitSize) {
   `;
 }
 
-function set3DViewVars() {
+function set3DViewVars({
+  preserveCenter = true,
+  updateOrigin = preserveCenter,
+} = {}) {
+  const centerRatio = preserveCenter ? mapViewportCenterRatio() : null;
   const stage = el("mapStage");
   if (!stage) return;
+  if (updateOrigin) updateMapStageTransformOrigin();
   const angle = Number(el("map3DAngle")?.value || 55);
   const rotate = Number(el("map3DRotate")?.value || 0);
   stage.style.setProperty("--map-3d-angle", `${angle}deg`);
@@ -3128,9 +3502,13 @@ function set3DViewVars() {
   stage.style.setProperty("--map-3d-rotate-inverse", `${-rotate}deg`);
   document.documentElement.style.setProperty("--map-dpad-rotation", `${rotate}deg`);
   if (view3DMode && !heightEditMode) {
-    requestAnimationFrame(() =>
-      render3DTokenBillboards(state.tokens.filter(canSeeToken)),
-    );
+    schedule3DTokenBillboards();
+  }
+  if (centerRatio) {
+    requestAnimationFrame(() => {
+      scrollMapViewportToRatio(centerRatio);
+      updateMapStageTransformOrigin();
+    });
   }
 }
 
@@ -3145,7 +3523,7 @@ function renderOwnTokenFogReveal(visibleTokens) {
 function hideTokenHover() {
   hovered3DTokenId = "";
   if (view3DMode && !heightEditMode) {
-    render3DTokenBillboards(state.tokens.filter(canSeeToken));
+    render3DTokenBillboards(current3DRenderTokens);
   }
   const layer = el("tokenHoverLayer");
   if (layer) layer.innerHTML = "";
@@ -3155,7 +3533,7 @@ function showTokenHover(tokenId) {
   if (view3DMode && !heightEditMode) {
     hovered3DTokenId = tokenId;
     el("tokenHoverLayer") && (el("tokenHoverLayer").innerHTML = "");
-    render3DTokenBillboards(state.tokens.filter(canSeeToken));
+    render3DTokenBillboards(current3DRenderTokens);
     return;
   }
   const token = tokenById(tokenId);
@@ -3194,7 +3572,19 @@ function cssUrl(value) {
     .replaceAll(")", "%29");
 }
 
+function shapeMaskSignature(shape) {
+  return [
+    shape.shape || "rect",
+    Number(shape.w || 2),
+    Number(shape.h || 2),
+    Array.isArray(shape.cells) ? shape.cells.join("|") : "",
+  ].join("::");
+}
+
 function shapeMask(shape) {
+  const signature = shapeMaskSignature(shape);
+  const cached = shapeMaskCache.get(shape);
+  if (cached?.signature === signature) return cached.mask;
   const cols = Math.max(1, Number(shape.w || 2));
   const rows = Math.max(1, Number(shape.h || 2));
   const occupied = new Set();
@@ -3202,7 +3592,9 @@ function shapeMask(shape) {
     for (let y = 0; y < rows; y += 1) {
       for (let x = 0; x < cols; x += 1) occupied.add(`${x},${y}`);
     }
-    return { cols, rows, occupied };
+    const mask = { cols, rows, occupied };
+    shapeMaskCache.set(shape, { signature, mask });
+    return mask;
   }
 
   const centerX = cols / 2;
@@ -3216,7 +3608,9 @@ function shapeMask(shape) {
       if (dx * dx + dy * dy <= 1) occupied.add(`${x},${y}`);
     }
   }
-  return { cols, rows, occupied };
+  const mask = { cols, rows, occupied };
+  shapeMaskCache.set(shape, { signature, mask });
+  return mask;
 }
 
 function spriteCellIndex(cellNumber) {
@@ -3605,6 +3999,67 @@ function shapeOverlapsFootprint(shape, x, y, w, h) {
   return sx < x + w && sx + sw > x && sy < y + h && sy + sh > y;
 }
 
+function setHeightGridCell(grid, cols, rows, gx, gy, feet) {
+  if (gx < 0 || gy < 0 || gx >= cols || gy >= rows) return;
+  const index = gy * cols + gx;
+  if (feet > grid[index]) grid[index] = feet;
+}
+
+function heightCellGridSignature() {
+  const { cols, rows } = state.settings;
+  return [
+    Number(cols || 0),
+    Number(rows || 0),
+    state.heightShapes.map(heightShapeRenderSignature).join("||"),
+  ].join("::");
+}
+
+function heightCellGrid() {
+  const cols = Number(state.settings.cols || 0);
+  const rows = Number(state.settings.rows || 0);
+  const signature = heightCellGridSignature();
+  if (
+    heightCellGridCache.signature === signature &&
+    heightCellGridCache.cols === cols &&
+    heightCellGridCache.rows === rows
+  ) {
+    return heightCellGridCache.grid;
+  }
+
+  const grid = new Float32Array(Math.max(0, cols * rows));
+  state.heightShapes.forEach((shape) => {
+    const feet = Number(shape.heightFeet || 0);
+    if (feet <= 0) return;
+    const sx = Number(shape.x || 0);
+    const sy = Number(shape.y || 0);
+    if (Array.isArray(shape.cells)) {
+      shape.cells.forEach((key) => {
+        const [dx, dy] = key.split(",").map(Number);
+        setHeightGridCell(grid, cols, rows, sx + dx, sy + dy, feet);
+      });
+      return;
+    }
+    const startX = Math.floor(sx);
+    const startY = Math.floor(sy);
+    const endX = Math.ceil(sx + Number(shape.w || 1));
+    const endY = Math.ceil(sy + Number(shape.h || 1));
+    for (let gy = startY; gy < endY; gy += 1) {
+      for (let gx = startX; gx < endX; gx += 1) {
+        setHeightGridCell(grid, cols, rows, gx, gy, feet);
+      }
+    }
+  });
+  heightCellGridCache = { signature, cols, rows, grid };
+  return grid;
+}
+
+function heightFeetAtCell(gx, gy) {
+  const cols = Number(state.settings.cols || 0);
+  const rows = Number(state.settings.rows || 0);
+  if (gx < 0 || gy < 0 || gx >= cols || gy >= rows) return 0;
+  return heightCellGrid()[gy * cols + gx] || 0;
+}
+
 // Tokens aren't part of the Height Layer and get no block/wall
 // treatment of their own in the 3D preview -- they're just placed
 // (flat, no tilt of their own beyond the whole scene's) at the
@@ -3613,11 +4068,15 @@ function shapeOverlapsFootprint(shape, x, y, w, h) {
 // ground level cutting through it. Ground level (no region beneath,
 // or every region beneath is a pit) is 0.
 function tallestHeightFeetUnder(x, y, w, h) {
+  const startX = Math.floor(Number(x || 0));
+  const startY = Math.floor(Number(y || 0));
+  const endX = Math.ceil(Number(x || 0) + Number(w || 1));
+  const endY = Math.ceil(Number(y || 0) + Number(h || 1));
   let tallest = 0;
-  for (const shape of state.heightShapes) {
-    const feet = Number(shape.heightFeet || 0);
-    if (feet <= tallest) continue;
-    if (shapeOverlapsFootprint(shape, x, y, w, h)) tallest = feet;
+  for (let gy = startY; gy < endY; gy += 1) {
+    for (let gx = startX; gx < endX; gx += 1) {
+      tallest = Math.max(tallest, heightFeetAtCell(gx, gy));
+    }
   }
   return tallest;
 }
@@ -3665,11 +4124,41 @@ function render3DFlightConnector(token) {
   // actually is.
   const foldClass = tz < surfaceZ ? " fold-up" : "";
   return `
-    <div class="map-3d-flight-anchor" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;transform:translateZ(${tz}px);">
+    <div class="map-3d-flight-anchor" data-flight-token-id="${escapeHtml(token.id)}" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;transform:translateZ(${tz}px);">
       <div class="map-3d-flight-pole${foldClass}" style="height:${poleLenPx}px;"></div>
       <div class="map-3d-flight-anchor-mark" style="transform:translateZ(${surfaceZ - tz}px);"></div>
     </div>
   `;
+}
+
+function heightShapeRenderSignature(shape) {
+  return [
+    shape.id || "",
+    Number(shape.x || 0),
+    Number(shape.y || 0),
+    Number(shape.w || 1),
+    Number(shape.h || 1),
+    Number(shape.heightFeet || 0),
+    shape.pattern || "",
+    Array.isArray(shape.cells) ? shape.cells.join("|") : "",
+  ].join("::");
+}
+
+function sortedHeightBlocks() {
+  const signature = state.heightShapes.map(heightShapeRenderSignature).join("||");
+  if (sortedHeightShapesCache.signature === signature) {
+    return sortedHeightShapesCache.blocks;
+  }
+  const blocks = state.heightShapes
+    .filter((shape) => Number(shape.heightFeet) !== 0)
+    // Draw shortest-magnitude first so a small block nested in a much
+    // taller one's footprint still ends up on top in the DOM (paint
+    // order matters less with preserve-3d's real depth sorting, but
+    // keeping it sane costs nothing).
+    .slice()
+    .sort((a, b) => Math.abs(a.heightFeet) - Math.abs(b.heightFeet));
+  sortedHeightShapesCache = { signature, blocks };
+  return blocks;
 }
 
 // Ground layer + all raised/sunken block terrain, sized to the
@@ -3689,13 +4178,15 @@ function render3DTerrainHtml() {
   // file, which goes through the CSSOM directly and never has this
   // problem).
   const bgCss = `url('${cssUrl(backgroundUrl)}')`;
-  const blocks = [...state.heightShapes]
-    .filter((shape) => Number(shape.heightFeet) !== 0)
-    // Draw shortest-magnitude first so a small block nested in a much
-    // taller one's footprint still ends up on top in the DOM (paint
-    // order matters less with preserve-3d's real depth sorting, but
-    // keeping it sane costs nothing).
-    .sort((a, b) => Math.abs(a.heightFeet) - Math.abs(b.heightFeet));
+  const backgroundStack = `${MAP_GRID_LINES_CSS},${bgCss}`;
+  const backgroundSize = [
+    `${cellPx}px ${cellPx}px`,
+    `${cellPx}px ${cellPx}px`,
+    `${mapW}px ${mapH}px`,
+  ].join(",");
+  const terrainBackgroundStyle = (x = 0, y = 0) =>
+    `background-image:${backgroundStack};background-size:${backgroundSize};background-position:0 0,0 0,-${x}px -${y}px;background-repeat:repeat,repeat,no-repeat;`;
+  const blocks = sortedHeightBlocks();
 
   // A raised block naturally sits in front of the base plate (it's
   // closer to the camera) so it's visible with no extra work. A pit
@@ -3735,7 +4226,6 @@ function render3DTerrainHtml() {
   // css/map.css) -- two repeating 1px hairline gradients stacked on
   // top of the actual art. Reused here (base plate + every block's
   // top face) so cells stay visible on tilted terrain too.
-  const GRID_LINES_CSS = `linear-gradient(to right, rgba(255,255,255,0.18) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.18) 1px, transparent 1px)`;
   const fogVisible = Boolean(state.fog?.visible);
   const terrainLimitedCircles = fogVisible ? limitedViewRevealCircles() : [];
   const terrainLightCircles = fogVisible ? lightRevealCircles() : [];
@@ -3806,14 +4296,14 @@ function render3DTerrainHtml() {
         if (strength <= 0.02) continue;
         const globalX = (gx + localX) * cellPx;
         const globalY = (gy + localY) * cellPx;
-        html += `<div class="map-3d-surface-grayscale-cell" style="left:${localX * cellPx}px;top:${localY * cellPx}px;width:${cellPx}px;height:${cellPx}px;background-image:${GRID_LINES_CSS},${bgCss};background-size:${cellPx}px ${cellPx}px,${cellPx}px ${cellPx}px,${mapW}px ${mapH}px;background-position:0 0,0 0,-${globalX}px -${globalY}px;background-repeat:repeat,repeat,no-repeat;filter:${GRAYSCALE_FILTER};-webkit-filter:${GRAYSCALE_FILTER};"></div>`;
+        html += `<div class="map-3d-surface-grayscale-cell" style="left:${localX * cellPx}px;top:${localY * cellPx}px;width:${cellPx}px;height:${cellPx}px;${terrainBackgroundStyle(globalX, globalY)}filter:${GRAYSCALE_FILTER};-webkit-filter:${GRAYSCALE_FILTER};"></div>`;
       }
     }
     return html;
   };
 
   const groundHtml = `
-    <div class="map-3d-base" style="width:${mapW}px;height:${mapH}px;background-image:${GRID_LINES_CSS},${bgCss};background-size:${cellPx}px ${cellPx}px,${cellPx}px ${cellPx}px,${mapW}px ${mapH}px;background-repeat:repeat,repeat,no-repeat;${baseMaskCss}">
+    <div class="map-3d-base" style="width:${mapW}px;height:${mapH}px;${terrainBackgroundStyle()}${baseMaskCss}">
       ${renderSurfaceGrayscaleCells(0, 0, Number(cols || 0), Number(rows || 0))}
       ${renderSurfaceFogCells(0, 0, Number(cols || 0), Number(rows || 0))}
     </div>
@@ -3924,7 +4414,7 @@ function render3DTerrainHtml() {
     const w = gw * cellPx;
     const h = gh * cellPx;
     const wallPx = Math.abs(z);
-    const faceStyle = `background-image:${GRID_LINES_CSS},${bgCss};background-size:${cellPx}px ${cellPx}px,${cellPx}px ${cellPx}px,${mapW}px ${mapH}px;background-position:0 0,0 0,-${x}px -${y}px;background-repeat:repeat,repeat,no-repeat;`;
+    const faceStyle = terrainBackgroundStyle(x, y);
     const pitClass = z < 0 ? " pit" : "";
     // A region can opt into a textured wall (see scripts/wall-patterns.js
     // + the Height Region panel's picker) in place of the flat
@@ -4088,6 +4578,7 @@ function hit3DGridRange() {
 }
 
 function build3DHitGrid() {
+  teardown3DHitGrid();
   const cell = Number(localGridSize || 48);
   const { minX, minY, maxX, maxY } = hit3DGridRange();
   const container = document.createElement("div");
@@ -5236,8 +5727,164 @@ function queueSave() {
   }, 500);
 }
 
+function draggedItemEntries(item) {
+  return [
+    {
+      item,
+      startX: Number(item.x || 0),
+      startY: Number(item.y || 0),
+    },
+  ];
+}
+
+function clampedDragDelta(entries, dx, dy) {
+  const cols = Number(state.settings.cols || 0);
+  const rows = Number(state.settings.rows || 0);
+  let minDx = -Infinity;
+  let maxDx = Infinity;
+  let minDy = -Infinity;
+  let maxDy = Infinity;
+  entries.forEach(({ item, startX, startY }) => {
+    minDx = Math.max(minDx, -startX);
+    minDy = Math.max(minDy, -startY);
+    maxDx = Math.min(maxDx, cols - Number(item.w || 1) - startX);
+    maxDy = Math.min(maxDy, rows - Number(item.h || 1) - startY);
+  });
+  return {
+    dx: clamp(dx, minDx, maxDx),
+    dy: clamp(dy, minDy, maxDy),
+  };
+}
+
+function updateAuraDragPreview(token) {
+  const stage = el("mapStage");
+  if (!stage || !token?.kind) return;
+  stage
+    .querySelectorAll(`[data-aura-token-id="${CSS.escape(token.id)}"]`)
+    .forEach((node) => {
+      const field = node.dataset.auraField || "aura";
+      const data = token[field] || {};
+      const radius = Math.max(1, Number(data.radius || 1));
+      const center = tokenCenter(token);
+      node.style.setProperty("--aura-x", center.x - radius);
+      node.style.setProperty("--aura-y", center.y - radius);
+    });
+}
+
+function updateFlightConnectorDragPreview(token, heights) {
+  const stage = el("mapStage");
+  const connector = stage?.querySelector(
+    `[data-flight-token-id="${CSS.escape(token.id)}"]`,
+  );
+  if (!connector) return;
+  const cell = Number(localGridSize || 48);
+  const x = Number(token.x || 0) * cell;
+  const y = Number(token.y || 0) * cell;
+  const w = Number(token.w || 1) * cell;
+  const h = Number(token.h || 1) * cell;
+  const poleLenPx = Math.abs(heights.tz - heights.surfaceZ);
+  connector.style.left = `${x}px`;
+  connector.style.top = `${y}px`;
+  connector.style.width = `${w}px`;
+  connector.style.height = `${h}px`;
+  connector.style.transform = `translateZ(${heights.tz}px)`;
+  connector.querySelector(".map-3d-flight-pole")?.style.setProperty(
+    "height",
+    `${poleLenPx}px`,
+  );
+  connector
+    .querySelector(".map-3d-flight-anchor-mark")
+    ?.style.setProperty(
+      "transform",
+      `translateZ(${heights.surfaceZ - heights.tz}px)`,
+    );
+}
+
+function tokenAffectsRevealPreview(token) {
+  return Boolean(
+    token?.kind &&
+      (token.light?.visible || token.limitedView?.visible),
+  );
+}
+
+function refresh2DRevealLayers() {
+  if (heightEditMode) return;
+  const stage = el("mapStage");
+  if (!stage) return;
+  stage
+    .querySelectorAll(
+      ".map-fog-layer, .map-limited-view-grayscale, .map-token-fog-reveal",
+    )
+    .forEach((node) => node.remove());
+  const anchor = el("tokenHoverLayer");
+  const visibleTokens = state.tokens.filter(canSeeToken);
+  const wrapper = document.createElement("template");
+  wrapper.innerHTML = [
+    renderFogLayer(false),
+    renderLimitedViewGrayscale(),
+    renderOwnTokenFogReveal(visibleTokens),
+  ].join("");
+  const nodes = [...wrapper.content.childNodes];
+  nodes.forEach((node) => {
+    if (anchor) stage.insertBefore(node, anchor);
+    else stage.appendChild(node);
+  });
+}
+
+function refreshDragRevealPreview(items) {
+  if (!state.fog?.visible || heightEditMode) return;
+  const affectsReveal = items.some(({ item }) => tokenAffectsRevealPreview(item));
+  if (!affectsReveal) return;
+  if (view3DMode && !heightEditMode) {
+    renderMap();
+    return;
+  }
+  refresh2DRevealLayers();
+}
+
+function updateDraggedItemPreview(item) {
+  const stage = el("mapStage");
+  const node = stage?.querySelector(`[data-map-id="${CSS.escape(item.id)}"]`);
+  if (!node) return;
+  node.style.setProperty("--x", Number(item.x || 0));
+  node.style.setProperty("--y", Number(item.y || 0));
+  if (view3DMode && !heightEditMode) {
+    if (item.kind) {
+      const heights = token3DHeights(item);
+      node.style.setProperty("--tz", `${heights.tz}px`);
+      updateFlightConnectorDragPreview(item, heights);
+    } else if (item.shape && shapeDepth(item) > 0) {
+      const mask = shapeMask(item);
+      const surfaceZ = feetToPreviewPx(
+        tallestHeightFeetUnder(item.x, item.y, mask.cols, mask.rows),
+      );
+      node.style.setProperty("--tz", `${surfaceZ}px`);
+    }
+  }
+  updateAuraDragPreview(item);
+}
+
+function applyDragPreview(dx, dy) {
+  if (!dragState?.items?.length) return;
+  const delta = clampedDragDelta(dragState.items, dx, dy);
+  if (dragState.lastDx === delta.dx && dragState.lastDy === delta.dy) return;
+  dragState.lastDx = delta.dx;
+  dragState.lastDy = delta.dy;
+  dragState.items.forEach((entry) => {
+    entry.item.x = entry.startX + delta.dx;
+    entry.item.y = entry.startY + delta.dy;
+    updateDraggedItemPreview(entry.item);
+  });
+  refreshDragRevealPreview(dragState.items);
+}
+
 function startDrag(event) {
   if (event.button !== 0) return;
+  if (pathRulerActive()) {
+    event.preventDefault();
+    event.stopPropagation();
+    return;
+  }
   event.preventDefault();
   event.stopPropagation();
   hideContextMenu();
@@ -5247,7 +5894,9 @@ function startDrag(event) {
     (entry) => entry.id === id,
   );
   if (!item) return;
+  hideTokenHover();
   selectedId = id;
+  const items = draggedItemEntries(item);
   const is3D = view3DMode && !heightEditMode;
   if (is3D) {
     // Must exist before cell3DFromPoint() can answer anything -- see
@@ -5260,16 +5909,14 @@ function startDrag(event) {
       id,
       startCellX: cell?.x ?? Number(item.x || 0),
       startCellY: cell?.y ?? Number(item.y || 0),
-      x: Number(item.x || 0),
-      y: Number(item.y || 0),
+      items,
     };
   } else {
     dragState = {
       id,
       startX: event.clientX,
       startY: event.clientY,
-      x: item.x || 0,
-      y: item.y || 0,
+      items,
     };
   }
   // Not fatal if this throws (e.g. no active pointer with this id) --
@@ -5289,10 +5936,6 @@ function startDrag(event) {
 
 function moveDrag(event) {
   if (!dragState) return;
-  const item = [...state.tokens, ...state.shapes, ...state.heightShapes].find(
-    (entry) => entry.id === dragState.id,
-  );
-  if (!item) return;
   if (view3DMode && !heightEditMode) {
     // A tilted/spun stage means raw pixel deltas no longer map
     // linearly to grid cells -- see stageCellFromEvent()'s comment.
@@ -5302,26 +5945,17 @@ function moveDrag(event) {
     // terrain cell used for hit-testing.
     const cell = cell3DFromPoint(event.clientX, event.clientY);
     if (cell) {
-      item.x = clamp(
-        dragState.x + (cell.x - dragState.startCellX),
-        0,
-        state.settings.cols - (item.w || 1),
-      );
-      item.y = clamp(
-        dragState.y + (cell.y - dragState.startCellY),
-        0,
-        state.settings.rows - (item.h || 1),
+      applyDragPreview(
+        cell.x - dragState.startCellX,
+        cell.y - dragState.startCellY,
       );
     }
-    renderAll(false);
     return;
   }
   const cell = Number(localGridSize || 48);
   const dx = Math.round((event.clientX - dragState.startX) / cell);
   const dy = Math.round((event.clientY - dragState.startY) / cell);
-  item.x = clamp(dragState.x + dx, 0, state.settings.cols - (item.w || 1));
-  item.y = clamp(dragState.y + dy, 0, state.settings.rows - (item.h || 1));
-  renderAll(false);
+  applyDragPreview(dx, dy);
 }
 
 // Same OS-window-style resize for both regular map shapes and Height
@@ -5333,6 +5967,11 @@ function resizableItemsList() {
 
 function startResize(event) {
   if (event.button !== 0) return;
+  if (pathRulerActive()) {
+    event.preventDefault();
+    event.stopPropagation();
+    return;
+  }
   event.preventDefault();
   event.stopPropagation();
   hideContextMenu();
@@ -5780,6 +6419,8 @@ function updateHeightEditControls() {
 function toggleHeightEditMode(next = !heightEditMode) {
   heightEditMode = next;
   selectedId = "";
+  cancelTransferTarget();
+  if (heightEditMode && pathRuler?.active) finishPathRuler();
   if (!heightEditMode) toggleHeightDrawMode(false);
   el("mapStage")?.classList.toggle("height-edit-mode", heightEditMode);
   document.querySelector(".map-side")?.classList.toggle(
@@ -5807,9 +6448,11 @@ function toggleHeightEditMode(next = !heightEditMode) {
 // the tilt via build3DHitGrid() rather than raw pixel-delta math.
 function toggleView3DMode(next = !view3DMode) {
   view3DMode = next;
+  if (!view3DMode) cancelTransferTarget();
   el("toggleView3DBtn")?.classList.toggle("active", view3DMode);
   el("map3DControls")?.classList.toggle("d-none", !view3DMode);
   renderAll(false);
+  if (view3DMode && pathRuler?.active) build3DHitGrid();
   if (view3DMode) {
     centerMapViewport();
     setTimeout(centerMapViewport, 80);
@@ -6022,7 +6665,6 @@ function openMobileHpEditor(tokenId) {
   const current = tokenCurrentHp(token);
   const total = tokenTotalHp(token);
   window.PFMapHpEditor.open({
-    title: `${displayTokenName(token)} HP`,
     current,
     total,
     onSave: async (value) => {
@@ -6355,18 +6997,22 @@ function tokenLevel(token) {
 }
 
 function effectCardHtml(effect, index, prefix, defaultCl) {
-  const bonuses = (effect.bonuses || []).slice(0, 8);
-  const bonusHtml = bonuses.length
-    ? bonuses
+  const chips = [
+    ...(effect.bonuses || []).map(effectBonusText),
+    ...(effect.spellLikeAbilities || []).map(spellLikeText),
+  ];
+  const visibleChips = chips.slice(0, 8);
+  const bonusHtml = visibleChips.length
+    ? visibleChips
         .map(
-          (bonus) =>
-            `<span class="quick-effect-chip">${escapeHtml(effectBonusText(bonus))}</span>`,
+          (text) =>
+            `<span class="quick-effect-chip">${escapeHtml(text)}</span>`,
         )
         .join("")
     : `<span class="small text-secondary">No numerical changes</span>`;
   const more =
-    (effect.bonuses || []).length > bonuses.length
-      ? `<span class="small text-secondary">+${(effect.bonuses || []).length - bonuses.length} more</span>`
+    chips.length > visibleChips.length
+      ? `<span class="small text-secondary">+${chips.length - visibleChips.length} more</span>`
       : "";
   const needsCl = durationUsesCasterLevel(effect);
   const condition = isConditionEffect(effect);
@@ -6832,7 +7478,7 @@ async function resolveEffectChoicesForToken(token, effect) {
     const pool = window.PFEffectStats.poolById(poolId);
     const options = await window.PFEffectStats.resolveChoicePoolOptions(
       poolId,
-      { skills },
+      { skills, choicePool: bonus.choicePool },
     );
     const picked = window.PFEffectChoicePicker
       ? await window.PFEffectChoicePicker.open({
@@ -8110,8 +8756,18 @@ function renderMapDocumentation(selectedId = MAP_CONTEXT_DOCUMENTATION[0]?.id) {
 function openMapDocumentation() {
   renderMapDocumentation();
   el("mapDocsLayout").classList.remove("detail-open");
-  backgroundModal.hide();
-  window.setTimeout(() => mapDocumentationModal.show(), 160);
+  // Also reachable directly from the toolbar now (non-GM players, who
+  // never have Map Settings open to begin with -- see loadMap()), not
+  // just from the Documentation button inside that modal's footer.
+  // Only wait out Map Settings' own close transition when it's
+  // actually open; jumping straight to .show() otherwise would fight
+  // Bootstrap over the shared modal backdrop.
+  if (el("backgroundOptionsModal").classList.contains("show")) {
+    backgroundModal.hide();
+    window.setTimeout(() => mapDocumentationModal.show(), 160);
+  } else {
+    mapDocumentationModal.show();
+  }
 }
 
 async function saveBackgroundOptions(event) {
@@ -8190,6 +8846,11 @@ async function loadMap(contextKey) {
   startPendingEffectChoicePolling();
   isGm = await determineGm(mapContextKey);
   el("addEnemyToken").classList.toggle("d-none", !isGm);
+  // Map settings (background/grid/fog/name) are GM-only -- a player
+  // gets the documentation button in that same toolbar slot instead,
+  // since there's nothing else for them to configure there.
+  el("openBackgroundOptions").classList.toggle("d-none", !isGm);
+  el("openMapDocumentationIcon").classList.toggle("d-none", isGm);
   el("gmHint").textContent = isGm ? "GM tools enabled" : "Player view";
   if (isGm) mapEnemies = await PFApp.loadEnemies(mapContextKey);
   mapSlotMeta = await PFApp.loadMapSlotSummaries(mapContextKey);
@@ -8352,9 +9013,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   el("openBackgroundOptions").addEventListener("click", openBackgroundOptions);
+  el("togglePathRuler")?.addEventListener("click", togglePathRuler);
   backgroundModal = new bootstrap.Modal(el("backgroundOptionsModal"));
   mapDocumentationModal = new bootstrap.Modal(el("mapDocumentationModal"));
   el("openMapDocumentation").addEventListener("click", openMapDocumentation);
+  el("openMapDocumentationIcon").addEventListener("click", openMapDocumentation);
   el("mapDocsBack").addEventListener("click", () => {
     el("mapDocsLayout").classList.remove("detail-open");
   });
@@ -8487,6 +9150,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     "click",
     toggleContextTokenNameVisibility,
   );
+  el("transferToken3D")?.addEventListener("click", startTransferTarget);
   el("toggleZIndexMenu").addEventListener("click", (event) => {
     event.preventDefault();
     event.stopPropagation();
@@ -8527,13 +9191,23 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!event.target.closest("#mapContextMenu")) hideContextMenu();
   });
   document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") hideContextMenu();
+    if (event.key === "Escape") {
+      if (transferTargetTokenId) {
+        cancelTransferTarget();
+        return;
+      }
+      if (pathRuler?.active) {
+        clearPathRuler();
+        return;
+      }
+      hideContextMenu();
+    }
   });
   window.addEventListener("resize", () => {
     hideContextMenu();
     updateAuraToastPosition();
     if (view3DMode && !heightEditMode) {
-      render3DTokenBillboards(state.tokens.filter(canSeeToken));
+      schedule3DTokenBillboards();
     }
   });
   window.addEventListener(
@@ -8542,7 +9216,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       hideContextMenu();
       updateAuraToastPosition();
       if (view3DMode && !heightEditMode) {
-        render3DTokenBillboards(state.tokens.filter(canSeeToken));
+        schedule3DTokenBillboards();
       }
     },
     true,

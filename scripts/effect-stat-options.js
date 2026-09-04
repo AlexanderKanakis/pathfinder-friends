@@ -70,17 +70,21 @@
     "Transmutation",
   ].map((label) => ({ value: slugify(label), label }));
 
-  // The 5 PF1e energy types (acid/cold/electricity/fire/sonic) -- e.g.
-  // "Energy Resistance 10 against an energy type of your choice."
+  // PF1e's common resistance choices. Positive/negative energy are not
+  // part of the classic five energy damage types, but a number of
+  // creatures and effects care about resisting them, so expose them
+  // alongside the elemental set.
   const ENERGY_RESISTANCE_OPTIONS = [
     "Acid",
     "Cold",
     "Electricity",
     "Fire",
+    "Negative Energy",
+    "Positive Energy",
     "Sonic",
   ].map((label) => ({ value: slugify(label), label }));
 
-  // Same 5 energy types, but as fixed stats an author picks directly --
+  // Same resistance types, but as fixed stats an author picks directly --
   // "gain 5 fire resistance" (Draconic bloodline, energy resistance
   // traits, etc.) doesn't leave the type up to the player, unlike the
   // "Energy Resistance" choice pool above. Reuses the exact same
@@ -154,6 +158,9 @@
   // those 4 named exceptions from the restricted abilities.
   const RAGE_USABLE_ABILITIES = ["str", "con", "wis"];
   const RAGE_USABLE_EXCEPTION_NAMES = ["Acrobatics", "Fly", "Intimidate", "Ride"];
+  const CUSTOM_SKILL_LIST_STORAGE_KEY = "pf_effect_custom_skill_lists_v1";
+  const CREATE_SKILL_LIST_STAT_VALUE = "__create-custom-skill-list-stat__";
+  const CREATE_SKILL_LIST_CHOICE_VALUE = "__create-custom-skill-list-choice__";
 
   // Skill pools are resolved dynamically against whichever skill list is
   // passed in (base 30 PF skills by default, or a character's actual
@@ -164,6 +171,16 @@
     { id: "skills-dex", label: "Dexterity Skills", ability: "dex" },
     { id: "skills-con", label: "Constitution Skills", ability: "con" },
     { id: "skills-int", label: "Intelligence Skills", ability: "int" },
+    {
+      id: "skills-knowledge",
+      label: "Knowledge Skills",
+      namePrefix: "Knowledge",
+    },
+    {
+      id: "skills-craft",
+      label: "Craft Skills",
+      namePrefix: "Craft",
+    },
     { id: "skills-wis", label: "Wisdom Skills", ability: "wis" },
     { id: "skills-cha", label: "Charisma Skills", ability: "cha" },
     {
@@ -215,13 +232,99 @@
     return weaponListPromise;
   }
 
-  const ALL_POOLS = [
+  const BASE_POOLS = [
     ...SKILL_POOLS.map((pool) => ({ ...pool, kind: "skill" })),
     ...STATIC_POOLS.map((pool) => ({ ...pool, kind: "static" })),
     { id: "weapons-all", label: "All Weapons", kind: "weapon" },
   ];
+  const ALL_POOLS = [];
+
+  function normalizeSkillName(skill) {
+    return String(skill || "")
+      .replace(/[^a-z0-9]/gi, "")
+      .toLowerCase();
+  }
+
+  function normalizeCustomSkillList(raw = {}) {
+    const name = String(raw.name || raw.label || "").trim();
+    const skills = (Array.isArray(raw.skills) ? raw.skills : [])
+      .map((skill) => String(skill || "").trim())
+      .filter(Boolean);
+    if (!name || !skills.length) return null;
+    const id =
+      String(raw.id || "")
+        .toLowerCase()
+        .replace(/[^a-z0-9-]+/g, "-")
+        .replace(/^-+|-+$/g, "") ||
+      `${slugify(name)}-${Date.now().toString(36)}`;
+    return { id, name, skills };
+  }
+
+  function loadCustomSkillLists() {
+    try {
+      const parsed = JSON.parse(
+        localStorage.getItem(CUSTOM_SKILL_LIST_STORAGE_KEY) || "[]",
+      );
+      return (Array.isArray(parsed) ? parsed : [])
+        .map(normalizeCustomSkillList)
+        .filter(Boolean);
+    } catch {
+      return [];
+    }
+  }
+
+  function saveCustomSkillLists(lists = []) {
+    const normalized = lists.map(normalizeCustomSkillList).filter(Boolean);
+    localStorage.setItem(
+      CUSTOM_SKILL_LIST_STORAGE_KEY,
+      JSON.stringify(normalized),
+    );
+    refreshAllPools();
+    window.dispatchEvent(new CustomEvent("pf-custom-skill-lists-updated"));
+    return normalized;
+  }
+
+  function customSkillLists() {
+    return loadCustomSkillLists();
+  }
+
+  function saveCustomSkillList(list = {}) {
+    const normalized = normalizeCustomSkillList(list);
+    if (!normalized) return null;
+    const lists = customSkillLists();
+    const existingIndex = lists.findIndex((item) => item.id === normalized.id);
+    if (existingIndex >= 0) lists[existingIndex] = normalized;
+    else lists.push(normalized);
+    saveCustomSkillLists(lists);
+    return normalized;
+  }
+
+  function customSkillListById(id) {
+    return customSkillLists().find((list) => list.id === id) || null;
+  }
+
+  function customPoolFromList(list = {}) {
+    return {
+      id: `skill-list:${list.id}`,
+      label: list.name,
+      kind: "custom-skill-list",
+      skills: [...(list.skills || [])],
+    };
+  }
+
+  function refreshAllPools() {
+    ALL_POOLS.splice(
+      0,
+      ALL_POOLS.length,
+      ...BASE_POOLS,
+      ...customSkillLists().map(customPoolFromList),
+    );
+  }
+
+  refreshAllPools();
 
   function poolById(id) {
+    refreshAllPools();
     return ALL_POOLS.find((pool) => pool.id === id) || null;
   }
 
@@ -238,12 +341,84 @@
     return `skill:${slugify(skillName).replace(/-/g, "")}`;
   }
 
+  function skillListStatValue(listOrId) {
+    const id =
+      typeof listOrId === "string" ? listOrId : String(listOrId?.id || "");
+    return id.startsWith("skill-list:") ? id : `skill-list:${id}`;
+  }
+
+  function skillListIdFromStat(value) {
+    const match = /^skill-list:(.+)$/.exec(String(value || ""));
+    return match ? match[1] : "";
+  }
+
+  function choicePoolFallbackFromOptions(poolId, options = {}) {
+    const fallback = options.choicePool || options.skillList;
+    if (!fallback || typeof fallback !== "object") return null;
+    const normalized = normalizeCustomSkillList(fallback);
+    if (!normalized) return null;
+    const expected = poolId.replace(/^skill-list:/, "");
+    if (expected && normalized.id !== expected) return null;
+    return customPoolFromList(normalized);
+  }
+
+  function skillListForStat(value, fallback = null) {
+    const id = skillListIdFromStat(value);
+    if (!id) return null;
+    return customSkillListById(id) || normalizeCustomSkillList(fallback) || null;
+  }
+
+  function skillListIncludesSkill(listOrStat, skillName, fallback = null) {
+    const list =
+      typeof listOrStat === "string"
+        ? skillListForStat(listOrStat, fallback)
+        : normalizeCustomSkillList(listOrStat);
+    if (!list) return false;
+    const target = normalizeSkillName(skillName);
+    return list.skills.some((skill) => {
+      if (/^craft$/i.test(skill)) return /^craft/i.test(skillName);
+      if (/^profession$/i.test(skill)) return /^profession/i.test(skillName);
+      return normalizeSkillName(skill) === target;
+    });
+  }
+
   // skills: optional override list of [name, ability] pairs (or {name,
   // ability} objects) -- pass a character's own allSkills() to include
   // homebrew custom skills; falls back to the base 30 PF skills.
-  async function resolveChoicePoolOptions(poolId, { skills } = {}) {
-    const pool = poolById(poolId);
+  async function resolveChoicePoolOptions(poolId, options = {}) {
+    const { skills } = options;
+    const pool = poolById(poolId) || choicePoolFallbackFromOptions(poolId, options);
     if (!pool) return [];
+    if (pool.kind === "custom-skill-list") {
+      const liveSkills = (skills || PF_SKILLS_WITH_ABILITY).map((entry) =>
+        Array.isArray(entry)
+          ? { name: entry[0], ability: entry[1] }
+          : { name: entry.name, ability: entry.ability },
+      );
+      const options = [];
+      const addSkill = (skill) => {
+        if (!skill?.name) return;
+        if (options.some((option) => option.value === skillStatValue(skill.name)))
+          return;
+        options.push({ value: skillStatValue(skill.name), label: skill.name });
+      };
+      (pool.skills || []).forEach((skill) => {
+        if (/^craft$/i.test(skill)) {
+          liveSkills
+            .filter((entry) => /^craft(?:\s*\(|\b)/i.test(entry.name))
+            .forEach(addSkill);
+          return;
+        }
+        if (/^profession$/i.test(skill)) {
+          liveSkills
+            .filter((entry) => /^profession(?:\s*\(|\b)/i.test(entry.name))
+            .forEach(addSkill);
+          return;
+        }
+        addSkill({ name: skill });
+      });
+      return options;
+    }
     if (pool.kind === "skill") {
       const list = (skills || PF_SKILLS_WITH_ABILITY)
         .map((entry) =>
@@ -252,11 +427,15 @@
             : { name: entry.name, ability: entry.ability },
         )
         .filter((entry) => {
-          if (pool.usableAbilities || pool.names) {
+          if (pool.usableAbilities || pool.names || pool.namePrefix) {
             return (
               (pool.usableAbilities &&
                 pool.usableAbilities.includes(entry.ability)) ||
-              (pool.names && pool.names.includes(entry.name))
+              (pool.names && pool.names.includes(entry.name)) ||
+              (pool.namePrefix &&
+                entry.name
+                  .toLowerCase()
+                  .startsWith(pool.namePrefix.toLowerCase()))
             );
           }
           return !pool.ability || entry.ability === pool.ability;
@@ -302,12 +481,14 @@
 
   function choiceOptgroupHtml(selected, escapeHtml) {
     const esc = escapeHtml || ((value) => String(value ?? ""));
+    refreshAllPools();
     return `
       <optgroup label="Choose When Applied">
         ${ALL_POOLS.map(
           (pool) =>
             `<option value="choice:${pool.id}" ${selected === `choice:${pool.id}` ? "selected" : ""}>${esc(pool.label)} (choose one)</option>`,
         ).join("")}
+        <option value="${CREATE_SKILL_LIST_CHOICE_VALUE}">Create custom skill list...</option>
       </optgroup>
     `;
   }
@@ -324,6 +505,10 @@
       return `Spell School: ${unslugify(key.slice("spell-school:".length))}`;
     if (key.startsWith("resistance:"))
       return `Resistance: ${unslugify(key.slice("resistance:".length))}`;
+    if (key.startsWith("skill-list:")) {
+      const list = skillListForStat(key);
+      return list ? `${list.name} Skills` : "Custom Skill List";
+    }
     if (key.startsWith("choice:")) {
       // Unresolved -- the stat is still a pool reference rather than a
       // concrete pick (e.g. a worn item's effect that hasn't gone through
@@ -339,6 +524,8 @@
     ALL_POOLS,
     PF_SKILLS_WITH_ABILITY,
     ENERGY_RESISTANCE_STAT_OPTIONS,
+    CREATE_SKILL_LIST_STAT_VALUE,
+    CREATE_SKILL_LIST_CHOICE_VALUE,
     poolById,
     isChoiceStat,
     choicePoolIdFromStat,
@@ -346,6 +533,15 @@
     choiceOptgroupHtml,
     energyResistanceOptgroupHtml,
     choiceStatLabel,
+    customSkillLists,
+    saveCustomSkillList,
+    saveCustomSkillLists,
+    customSkillListById,
+    skillListStatValue,
+    skillListIdFromStat,
+    skillListForStat,
+    skillListIncludesSkill,
+    normalizeSkillName,
     slugify,
     unslugify,
   };

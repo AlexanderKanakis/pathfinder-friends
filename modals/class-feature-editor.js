@@ -217,12 +217,21 @@
         .getElementById("classFeatureDescription")
         .value.trim(),
     };
-    const { effects, damageReduction, spellResistance, classSkillGrants } =
-      effectsAccordion.collect();
+    const {
+      effects,
+      damageReduction,
+      spellResistance,
+      classSkillGrants,
+      sizeChanges,
+      spellLikeAbilities,
+    } = effectsAccordion.collect();
     if (effects.length) feature.effects = effects;
     if (damageReduction.length) feature.damageReduction = damageReduction;
     if (spellResistance.length) feature.spellResistance = spellResistance;
     if (classSkillGrants.length) feature.classSkillGrants = classSkillGrants;
+    if (sizeChanges.length) feature.sizeChanges = sizeChanges;
+    if (spellLikeAbilities.length)
+      feature.spellLikeAbilities = spellLikeAbilities;
     if (activatable) {
       feature.activatable = true;
       if (featureDurationConfig) feature.durationConfig = featureDurationConfig;

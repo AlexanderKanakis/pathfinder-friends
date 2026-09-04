@@ -1,0 +1,144 @@
+.racial-traits-modal .modal-header {
+  padding: 10px 14px;
+}
+
+.racial-traits-modal .modal-title {
+  font-size: 16px;
+}
+
+.racial-traits-modal .modal-body {
+  padding: 12px 14px;
+}
+
+.racial-traits-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+  color: #adb5bd;
+  font-size: 13px;
+}
+
+.racial-traits-heading {
+  font-size: 14px;
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+
+.racial-traits-section + .racial-traits-section {
+  margin-top: 16px;
+}
+
+.racial-trait-list {
+  display: grid;
+  gap: 8px;
+}
+
+.racial-trait-group {
+  display: grid;
+  gap: 8px;
+}
+
+.racial-trait-group + .racial-trait-group {
+  margin-top: 12px;
+}
+
+.racial-trait-group-title {
+  color: #adb5bd;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.racial-trait-card {
+  position: relative;
+  display: grid;
+  gap: 7px;
+  border: 1px solid #444;
+  border-radius: 8px;
+  background: #242424;
+  padding: 10px;
+}
+
+.racial-trait-card.is-selected {
+  border-color: #0dcaf0;
+  box-shadow: 0 0 0 1px rgba(13, 202, 240, 0.2);
+}
+
+.racial-trait-card.is-replaced {
+  opacity: 0.62;
+}
+
+.racial-trait-card.is-modifier {
+  border-color: #6ea8fe;
+}
+
+.racial-trait-topline {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.racial-trait-name {
+  min-width: 0;
+  font-weight: 700;
+  color: #fff;
+}
+
+.racial-trait-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.racial-trait-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: 1px solid #555;
+  border-radius: 999px;
+  padding: 2px 8px;
+  color: #d7d7d7;
+  font-size: 12px;
+}
+
+.racial-trait-pill.is-replaces {
+  border-color: #ffc107;
+  color: #ffe08a;
+}
+
+.racial-trait-pill.is-modifies {
+  border-color: #6ea8fe;
+  color: #b6d4fe;
+}
+
+.racial-trait-search {
+  margin-bottom: 8px;
+}
+
+.racial-trait-details {
+  color: #ddd;
+  font-size: 13px;
+}
+
+.racial-trait-details summary {
+  width: max-content;
+  cursor: pointer;
+  color: #9eeaf9;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.racial-trait-description {
+  margin-top: 6px;
+  line-height: 1.35;
+  white-space: pre-wrap;
+}
+
+.racial-trait-empty {
+  color: #adb5bd;
+  font-size: 13px;
+}

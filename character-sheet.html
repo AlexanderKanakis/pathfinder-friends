@@ -21,6 +21,10 @@
     />
 
     <link href="css/character-sheet.css" rel="stylesheet" />
+    <link href="css/effect-editor.css" rel="stylesheet" />
+    <link href="modals/magic-search.css" rel="stylesheet" />
+    <link href="modals/custom-skill-list.css" rel="stylesheet" />
+    <link href="modals/racial-traits.css" rel="stylesheet" />
   </head>
 
   <body>
@@ -1076,8 +1080,8 @@
                 </div>
               </section>
 
-              <div class="enemy-section-stack enemy-only">
-                <section class="sheet-section">
+              <div class="enemy-section-stack sheet-extra-magic-stack">
+                <section class="sheet-section enemy-only">
                   <div class="sheet-title">Defensive Abilities</div>
                   <textarea
                     id="defensiveAbilities"
@@ -1086,7 +1090,7 @@
                   ></textarea>
                 </section>
 
-                <section class="sheet-section">
+                <section class="sheet-section enemy-only">
                   <div class="sheet-title">Special Attacks</div>
                   <textarea
                     id="specialAttacks"
@@ -1095,35 +1099,37 @@
                   ></textarea>
                 </section>
 
-                <section class="sheet-section">
+                <section id="sheetSpellLikeSection" class="sheet-section d-none">
                   <div
                     class="d-flex justify-content-between align-items-center mb-2"
                   >
                     <div class="sheet-title mb-0">Spell-Like Abilities</div>
                     <button
-                      class="btn btn-outline-info btn-sm"
+                      class="btn btn-outline-info btn-sm enemy-only"
                       type="button"
                       onclick="addEnemySpellRow('spellLikeAbilityRows')"
                     >
                       Add
                     </button>
                   </div>
-                  <div class="enemy-spell-meta-grid">
-                    <div>
-                      <label for="spellLikeCl">CL</label
-                      ><input
-                        id="spellLikeCl"
-                        class="form-control form-control-sm sheet-input enemy-auto-input"
-                        readonly
-                      />
-                    </div>
-                    <div>
-                      <label for="spellLikeConcentration">Concentration</label
-                      ><input
-                        id="spellLikeConcentration"
-                        class="form-control form-control-sm sheet-input enemy-auto-input"
-                        readonly
-                      />
+                  <div class="enemy-only">
+                    <div class="enemy-spell-meta-grid">
+                      <div>
+                        <label for="spellLikeCl">CL</label
+                        ><input
+                          id="spellLikeCl"
+                          class="form-control form-control-sm sheet-input enemy-auto-input"
+                          readonly
+                        />
+                      </div>
+                      <div>
+                        <label for="spellLikeConcentration">Concentration</label
+                        ><input
+                          id="spellLikeConcentration"
+                          class="form-control form-control-sm sheet-input enemy-auto-input"
+                          readonly
+                        />
+                      </div>
                     </div>
                   </div>
                   <input
@@ -1134,7 +1140,7 @@
                   <div id="spellLikeAbilityRows" class="enemy-spell-grid"></div>
                 </section>
 
-                <section class="sheet-section">
+                <section class="sheet-section enemy-only">
                   <div class="sheet-title">Spells</div>
                   <input id="enemySpells" class="sheet-input" type="hidden" />
                   <input
@@ -1195,6 +1201,20 @@
                     </div>
                   </div>
                 </div>
+              </section>
+              <section class="sheet-section character-only">
+                <button
+                  id="racialTraitsButton"
+                  class="btn btn-outline-info btn-sm w-100"
+                  type="button"
+                >
+                  <i class="bi bi-person-lines-fill"></i>
+                  <span>Racial Traits</span>
+                  <span
+                    id="racialTraitsButtonCount"
+                    class="text-secondary"
+                  ></span>
+                </button>
               </section>
               <div class="enemy-section-stack enemy-only">
                 <section class="sheet-section">
@@ -1935,15 +1955,19 @@
     <script src="scripts/app-supabase.js"></script>
     <script src="scripts/buff-calculator.js?v=class-skills-2"></script>
     <script src="scripts/class-data.js"></script>
+    <script src="scripts/race-data.js"></script>
     <script src="scripts/class-feature-abilities.js?v=class-skills-2"></script>
     <script src="modals/effect-duration-editor.js"></script>
     <script src="scripts/effect-stat-options.js?v=fixed-resistance-1"></script>
     <script src="modals/effect-choice-picker.js?v=sequential-fix-1"></script>
+    <script src="modals/magic-search.js"></script>
+    <script src="modals/custom-skill-list.js"></script>
     <script src="scripts/effect-editor.js?v=unified-bonus-row-1"></script>
     <script src="modals/pending-effect-choices.js?v=class-skills-2"></script>
     <script src="modals/class-feature-choice-picker.js"></script>
     <script src="modals/spell-picker.js"></script>
     <script src="modals/spellcasting-info.js"></script>
+    <script src="modals/racial-traits.js"></script>
     <script src="scripts/buff-tracker-widget.js?v=unified-bonus-row-1"></script>
     <script src="scripts/item-data.js?v=1"></script>
     <script src="scripts/scripts.js"></script>

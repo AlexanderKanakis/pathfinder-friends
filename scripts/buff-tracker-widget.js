@@ -45,6 +45,9 @@
       .shared-dr-row [data-scale-summary], .shared-sr-row [data-scale-summary] { grid-column: 1 / -1; }
       .shared-class-skill-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: end; background: #242424; border: 1px solid #444; border-radius: 8px; padding: 8px; }
       .shared-class-skill-row .shared-named-skill-field { grid-column: 1 / -1; }
+      .shared-spell-like-row { display: grid; grid-template-columns: minmax(72px, 0.35fr) minmax(140px, 0.65fr) minmax(180px, 1.4fr) auto; gap: 8px; align-items: end; background: #242424; border: 1px solid #444; border-radius: 8px; padding: 8px; }
+      .shared-spell-like-picker { display: flex; align-items: center; justify-content: space-between; min-height: 31px; gap: 8px; text-align: left; }
+      .shared-spell-like-picker span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
       .shared-extra-accordion .accordion-item { background: transparent; border: 0; }
       .shared-extra-accordion .accordion-button { background: #242424; color: #ddd; padding: 8px 10px; font-size: 13px; }
       .shared-extra-accordion .accordion-button:not(.collapsed) { background: #2b2b2b; color: #fff; box-shadow: none; }
@@ -132,6 +135,7 @@
     "intelligence skill checks": "Skill: INT Checks",
     "wisdom skill checks": "Skill: WIS Checks",
     "charisma skill checks": "Skill: CHA Checks",
+    "craft skill checks": "Skill: Craft Checks",
     ...Object.fromEntries(
       PF_SKILLS.map((skill) => [
         `skill:${skill.replace(/[^a-z0-9]/gi, "").toLowerCase()}`,
@@ -360,6 +364,13 @@
     return bonus.appliesWhen ? `${text} (${bonus.appliesWhen})` : text;
   }
 
+  function spellLikeText(entry = {}) {
+    const spellName = entry.spellName || entry.spell?.name || "Spell";
+    const minimumLevel = Number(entry.minimumLevel ?? entry.level ?? 1) || 1;
+    const levelText = minimumLevel > 1 ? `level ${minimumLevel}, ` : "";
+    return `SLA ${levelText}${entry.frequency ? `${entry.frequency}: ` : ""}${spellName}`;
+  }
+
   function scaleText(scale) {
     if (!scale) return "";
     const parts = [];
@@ -396,6 +407,7 @@
       effect.category,
       durationLabel(effect),
       ...(effect.bonuses || []).map(bonusText),
+      ...(effect.spellLikeAbilities || []).map(spellLikeText),
     ]
       .join(" ")
       .toLowerCase();
@@ -657,7 +669,15 @@
         false,
       );
       this.effectsAccordion.reset(effect);
-      if (!Array.isArray(effect.bonuses) || !effect.bonuses.length)
+      if (
+        !Array.isArray(effect.bonuses) ||
+        (!effect.bonuses.length &&
+          !effect.damageReduction?.length &&
+          !effect.spellResistance?.length &&
+          !effect.classSkillGrants?.length &&
+          !effect.sizeChanges?.length &&
+          !effect.spellLikeAbilities?.length)
+      )
         this.effectsAccordion.addEffect();
       this.saveCustomEl.textContent = "Save Effect";
       this.customStatus("");
@@ -751,8 +771,15 @@
         this.customStatus("Name is required.", "warning");
         return;
       }
-      if (!effect.bonuses.length) {
-        this.customStatus("Add at least one bonus.", "warning");
+      if (
+        !effect.bonuses.length &&
+        !effect.damageReduction?.length &&
+        !effect.spellResistance?.length &&
+        !effect.classSkillGrants?.length &&
+        !effect.sizeChanges?.length &&
+        !effect.spellLikeAbilities?.length
+      ) {
+        this.customStatus("Add at least one effect or extra.", "warning");
         return;
       }
 
@@ -859,6 +886,7 @@
             ...(effect.classSkillGrants || []).map((grant) =>
               window.PFEffectEditor.classSkillGrantText(grant, titleCaseStat),
             ),
+            ...(effect.spellLikeAbilities || []).map(spellLikeText),
           ];
           const chips = allChips.slice(0, 8);
           const bonusHtml = chips.length
@@ -997,7 +1025,10 @@
         const pool = window.PFEffectStats.poolById(poolId);
         const options = await window.PFEffectStats.resolveChoicePoolOptions(
           poolId,
-          { skills: this.options.choicePoolSkills },
+          {
+            skills: this.options.choicePoolSkills,
+            choicePool: item.choicePool,
+          },
         );
         const picked = window.PFEffectChoicePicker
           ? await window.PFEffectChoicePicker.open({
@@ -1305,6 +1336,7 @@
           ...(effect.classSkillGrants || []).map((grant) =>
             window.PFEffectEditor.classSkillGrantText(grant, titleCaseStat),
           ),
+          ...(effect.spellLikeAbilities || []).map(spellLikeText),
         ];
         const bonuses = detailLines
           .map((text) => `<div class="small-text">${escapeHtml(text)}</div>`)

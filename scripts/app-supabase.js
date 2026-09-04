@@ -189,7 +189,6 @@
     const enemiesOption = document.querySelector(
       '#navPageSelect option[value="enemies.html"]',
     );
-
     const canManageEnemies = admin || (await isGameManager(contextKey));
     enemiesItem?.classList.toggle("d-none", !canManageEnemies);
     if (enemiesOption) {
@@ -1093,6 +1092,10 @@
       classSkillGrants: Array.isArray(row.class_skill_grants)
         ? row.class_skill_grants
         : [],
+      sizeChanges: Array.isArray(row.size_changes) ? row.size_changes : [],
+      spellLikeAbilities: Array.isArray(row.spell_like_abilities)
+        ? row.spell_like_abilities
+        : [],
       source: row.source || "custom",
       contextKey: row.context_key || "general",
       gameId: row.game_id || null,
@@ -1131,9 +1134,24 @@
     let { data, error } = await client
       .from("buff_definitions")
       .select(
-        "id,name,category,duration,duration_count,duration_unit,duration_per_level,duration_config,bonuses,source,context_key,game_id",
+        "id,name,category,duration,duration_count,duration_unit,duration_per_level,duration_config,bonuses,damage_reduction,spell_resistance,class_skill_grants,size_changes,spell_like_abilities,source,context_key,game_id",
       )
       .order("name", { ascending: true });
+
+    if (
+      error?.code === "42703" &&
+      (String(error.message || "").includes("size_changes") ||
+        String(error.message || "").includes("spell_like_abilities"))
+    ) {
+      const fallback = await client
+        .from("buff_definitions")
+        .select(
+          "id,name,category,duration,duration_count,duration_unit,duration_per_level,duration_config,bonuses,damage_reduction,spell_resistance,class_skill_grants,source,context_key,game_id",
+        )
+        .order("name", { ascending: true });
+      data = fallback.data;
+      error = fallback.error;
+    }
 
     if (error?.code === "42703") {
       const fallback = await client
@@ -1178,6 +1196,8 @@
       damage_reduction: buff.damageReduction || [],
       spell_resistance: buff.spellResistance || [],
       class_skill_grants: buff.classSkillGrants || [],
+      size_changes: buff.sizeChanges || [],
+      spell_like_abilities: buff.spellLikeAbilities || [],
       source: "custom",
       context_key: context.contextKey,
       game_id: context.gameId,
@@ -1203,9 +1223,32 @@
 
     let { data, error } = await query
       .select(
-        "id,name,category,duration,duration_count,duration_unit,duration_per_level,duration_config,bonuses,damage_reduction,spell_resistance,class_skill_grants,source,context_key,game_id",
+        "id,name,category,duration,duration_count,duration_unit,duration_per_level,duration_config,bonuses,damage_reduction,spell_resistance,class_skill_grants,size_changes,spell_like_abilities,source,context_key,game_id",
       )
       .single();
+
+    if (
+      error?.code === "42703" &&
+      (String(error.message || "").includes("size_changes") ||
+        String(error.message || "").includes("spell_like_abilities"))
+    ) {
+      const fallbackPayload = { ...payload };
+      delete fallbackPayload.size_changes;
+      delete fallbackPayload.spell_like_abilities;
+      query = existing?.id
+        ? client
+            .from("buff_definitions")
+            .update(fallbackPayload)
+            .eq("id", existing.id)
+        : client.from("buff_definitions").insert(fallbackPayload);
+      const fallback = await query
+        .select(
+          "id,name,category,duration,duration_count,duration_unit,duration_per_level,duration_config,bonuses,damage_reduction,spell_resistance,class_skill_grants,source,context_key,game_id",
+        )
+        .single();
+      data = fallback.data;
+      error = fallback.error;
+    }
 
     if (error?.code === "42703") {
       const legacyPayload = { ...payload };
@@ -1216,6 +1259,8 @@
       delete legacyPayload.damage_reduction;
       delete legacyPayload.spell_resistance;
       delete legacyPayload.class_skill_grants;
+      delete legacyPayload.size_changes;
+      delete legacyPayload.spell_like_abilities;
       query = existing?.id
         ? client
             .from("buff_definitions")
@@ -1276,7 +1321,33 @@
       new_class_skill_grants: Array.isArray(buff.classSkillGrants)
         ? buff.classSkillGrants
         : [],
+      new_size_changes: Array.isArray(buff.sizeChanges) ? buff.sizeChanges : [],
+      new_spell_like_abilities: Array.isArray(buff.spellLikeAbilities)
+        ? buff.spellLikeAbilities
+        : [],
     });
+
+    if (
+      error?.code === "PGRST202" ||
+      String(error?.message || "").includes("new_size_changes") ||
+      String(error?.message || "").includes("new_spell_like_abilities")
+    ) {
+      const fallback = await client.rpc("admin_update_buff_definition", {
+        ...sharedArgs,
+        new_duration_config: buff.durationConfig || null,
+        new_damage_reduction: Array.isArray(buff.damageReduction)
+          ? buff.damageReduction
+          : [],
+        new_spell_resistance: Array.isArray(buff.spellResistance)
+          ? buff.spellResistance
+          : [],
+        new_class_skill_grants: Array.isArray(buff.classSkillGrants)
+          ? buff.classSkillGrants
+          : [],
+      });
+      data = fallback.data;
+      error = fallback.error;
+    }
 
     if (
       error?.code === "PGRST202" ||
@@ -1960,10 +2031,11 @@
 
   // game_loot is otherwise a raw pass-through (no normalize step, unlike
   // buff_definitions) -- but damageReduction/spellResistance/
-  // classSkillGrants have to come back camelCase, matching every other
+  // classSkillGrants/spellLikeAbilities have to come back camelCase,
+  // matching every other
   // buff-shaped object (see syncEquippedLootBuffFromItem in
   // character-sheet.js, which reads item.damageReduction etc. straight
-  // off the loaded item), so those three specifically get mapped here.
+  // off the loaded item), so those extras specifically get mapped here.
   function normalizeLootItem(row) {
     return {
       ...row,
@@ -1976,17 +2048,24 @@
       classSkillGrants: Array.isArray(row.class_skill_grants)
         ? row.class_skill_grants
         : [],
+      sizeChanges: Array.isArray(row.size_changes) ? row.size_changes : [],
+      spellLikeAbilities: Array.isArray(row.spell_like_abilities)
+        ? row.spell_like_abilities
+        : [],
     };
   }
 
   // A repo whose migration hasn't reached its Supabase project yet
-  // doesn't have damage_reduction/spell_resistance/class_skill_grants
+  // doesn't have damage_reduction/spell_resistance/class_skill_grants/
+  // size_changes/spell_like_abilities
   // as real columns -- selecting them fails the WHOLE query, which
   // used to just return [] on any error. For loot that means every
   // equipped item vanishes from the sheet the moment this shipped,
   // not just the new DR/SR/class-skill fields, so a missing-column
   // error here specifically retries without them instead of giving up.
   const LOOT_COLUMNS =
+    "id,name,description,count,type,assigned_to,assigned_character_id,details,effects,damage_reduction,spell_resistance,class_skill_grants,size_changes,spell_like_abilities,created_by,updated_at";
+  const LOOT_COLUMNS_WITHOUT_NEW_EXTRAS =
     "id,name,description,count,type,assigned_to,assigned_character_id,details,effects,damage_reduction,spell_resistance,class_skill_grants,created_by,updated_at";
   const LOOT_COLUMNS_LEGACY =
     "id,name,description,count,type,assigned_to,assigned_character_id,details,effects,created_by,updated_at";
@@ -1998,7 +2077,19 @@
     return (
       message.includes("damage_reduction") ||
       message.includes("spell_resistance") ||
-      message.includes("class_skill_grants")
+      message.includes("class_skill_grants") ||
+      message.includes("size_changes") ||
+      message.includes("spell_like_abilities")
+    );
+  }
+
+  function isMissingNewLootExtrasError(error) {
+    if (!error) return false;
+    const message = String(error.message || "");
+    return (
+      error.code === "42703" &&
+      (message.includes("size_changes") ||
+        message.includes("spell_like_abilities"))
     );
   }
 
@@ -2012,6 +2103,16 @@
       .select(LOOT_COLUMNS)
       .eq("context_key", context.contextKey)
       .order("updated_at", { ascending: false });
+
+    if (isMissingNewLootExtrasError(error)) {
+      const fallback = await client
+        .from("game_loot")
+        .select(LOOT_COLUMNS_WITHOUT_NEW_EXTRAS)
+        .eq("context_key", context.contextKey)
+        .order("updated_at", { ascending: false });
+      data = fallback.data;
+      error = fallback.error;
+    }
 
     if (isMissingLootColumnsError(error)) {
       const fallback = await client
@@ -2054,6 +2155,10 @@
       class_skill_grants: Array.isArray(item.classSkillGrants)
         ? item.classSkillGrants
         : [],
+      size_changes: Array.isArray(item.sizeChanges) ? item.sizeChanges : [],
+      spell_like_abilities: Array.isArray(item.spellLikeAbilities)
+        ? item.spellLikeAbilities
+        : [],
       context_key: context.contextKey,
       game_id: context.gameId,
       updated_at: new Date().toISOString(),
@@ -2065,11 +2170,29 @@
 
     let { data, error } = await query.select(LOOT_COLUMNS).single();
 
+    if (isMissingNewLootExtrasError(error)) {
+      const fallbackPayload = { ...payload };
+      delete fallbackPayload.size_changes;
+      delete fallbackPayload.spell_like_abilities;
+      const fallbackQuery = item.id
+        ? client.from("game_loot").update(fallbackPayload).eq("id", item.id)
+        : client
+            .from("game_loot")
+            .insert({ ...fallbackPayload, created_by: user.id });
+      const fallback = await fallbackQuery
+        .select(LOOT_COLUMNS_WITHOUT_NEW_EXTRAS)
+        .single();
+      data = fallback.data;
+      error = fallback.error;
+    }
+
     if (isMissingLootColumnsError(error)) {
       const legacyPayload = { ...payload };
       delete legacyPayload.damage_reduction;
       delete legacyPayload.spell_resistance;
       delete legacyPayload.class_skill_grants;
+      delete legacyPayload.size_changes;
+      delete legacyPayload.spell_like_abilities;
       const legacyQuery = item.id
         ? client.from("game_loot").update(legacyPayload).eq("id", item.id)
         : client

@@ -19,7 +19,7 @@ let bagViewMode = sessionStorage.getItem("pf_bag_view") || "full";
 let editingLootId = null;
 let sourceLootTemplateDetails = null;
 let collapsedLootGroups = new Set();
-// Effects + DR/SR/Class Skill grants -- mounted once (see DOMContentLoaded
+// Effects + Extra grants -- mounted once (see DOMContentLoaded
 // below) via the shared scripts/effect-editor.js accordion.
 let lootEffectsAccordion = null;
 
@@ -1229,6 +1229,25 @@ function renderLootTypeSections(items) {
     .join("");
 }
 
+function lootEffectPayload(item = {}) {
+  return {
+    effects: Array.isArray(item.effects) ? item.effects : [],
+    damageReduction: Array.isArray(item.damageReduction)
+      ? item.damageReduction
+      : [],
+    spellResistance: Array.isArray(item.spellResistance)
+      ? item.spellResistance
+      : [],
+    classSkillGrants: Array.isArray(item.classSkillGrants)
+      ? item.classSkillGrants
+      : [],
+    sizeChanges: Array.isArray(item.sizeChanges) ? item.sizeChanges : [],
+    spellLikeAbilities: Array.isArray(item.spellLikeAbilities)
+      ? item.spellLikeAbilities
+      : [],
+  };
+}
+
 async function assignLoot(itemId, assignedTo) {
   const item = bagLoot.find((entry) => entry.id === itemId);
   if (!item) return;
@@ -1256,7 +1275,7 @@ async function assignLoot(itemId, assignedTo) {
       type: item.type,
       assignedCharacterId: item.assigned_character_id,
       details: item.details,
-      effects: item.effects,
+      ...lootEffectPayload(item),
     },
     bagContextKey,
   );
@@ -1311,7 +1330,7 @@ async function submitLootMove(event) {
         type: item.type,
         assignedCharacterId: target,
         details: item.details,
-        effects: item.effects,
+        ...lootEffectPayload(item),
       },
       bagContextKey,
     );
@@ -1332,7 +1351,7 @@ async function submitLootMove(event) {
         type: item.type,
         assignedCharacterId: pendingLootMove.previous || null,
         details: item.details,
-        effects: item.effects,
+        ...lootEffectPayload(item),
       },
       bagContextKey,
     );
@@ -1344,7 +1363,7 @@ async function submitLootMove(event) {
         type: item.type,
         assignedCharacterId: target,
         details: item.details,
-        effects: item.effects,
+        ...lootEffectPayload(item),
       },
       bagContextKey,
     );
@@ -1399,8 +1418,25 @@ async function syncEditedLootBuff(item) {
   if (!Array.isArray(buffs)) return;
   const index = buffs.findIndex((buff) => buff.sourceLootId === item.id);
   if (index < 0) return;
-  if (Array.isArray(item.effects) && item.effects.length) {
-    buffs[index] = { ...buffs[index], name: item.name, bonuses: item.effects };
+  const extras = lootEffectPayload(item);
+  const hasExtras =
+    extras.effects.length ||
+    extras.damageReduction.length ||
+    extras.spellResistance.length ||
+    extras.classSkillGrants.length ||
+    extras.sizeChanges.length ||
+    extras.spellLikeAbilities.length;
+  if (hasExtras) {
+    buffs[index] = {
+      ...buffs[index],
+      name: item.name,
+      bonuses: extras.effects,
+      damageReduction: extras.damageReduction,
+      spellResistance: extras.spellResistance,
+      classSkillGrants: extras.classSkillGrants,
+      sizeChanges: extras.sizeChanges,
+      spellLikeAbilities: extras.spellLikeAbilities,
+    };
   } else {
     buffs.splice(index, 1);
   }
@@ -1462,7 +1498,7 @@ async function deleteLootAmount(itemId, amountOverride = null) {
           type: item.type,
           assignedCharacterId: item.assigned_character_id,
           details: item.details,
-          effects: item.effects,
+          ...lootEffectPayload(item),
         },
         bagContextKey,
       ),

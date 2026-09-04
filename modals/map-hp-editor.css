@@ -1,0 +1,33 @@
+.map-hp-editor-dialog {
+  max-width: 260px;
+}
+
+.map-hp-editor-content {
+  border-radius: 8px;
+}
+
+.map-hp-editor-body {
+  padding: 10px;
+}
+
+.map-hp-editor-card {
+  text-align: center;
+}
+
+.map-hp-editor-card .mini-sheet-label {
+  font-size: 13px;
+}
+
+.map-hp-editor-card .mini-sheet-value {
+  font-size: 24px;
+}
+
+.map-hp-editor-input {
+  width: 90px;
+  font-size: 24px;
+  text-align: center;
+}
+
+.map-hp-editor-footer {
+  padding: 8px 10px;
+}
