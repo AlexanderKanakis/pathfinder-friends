@@ -152,7 +152,127 @@ const WEAPON_TYPES = [
   "Firearm (One-Handed)",
   "Firearm (Two-Handed)",
   "Natural",
+  "Natural Weapon",
 ];
+const NATURAL_ATTACK_DAMAGE_BY_SIZE = {
+  Bite: {
+    fine: "1",
+    diminutive: "1d2",
+    tiny: "1d3",
+    small: "1d4",
+    medium: "1d6",
+    large: "1d8",
+    huge: "2d6",
+    gargantuan: "2d8",
+    colossal: "4d6",
+    damageType: "B, P, and S",
+    attackRole: "Primary",
+  },
+  Claw: {
+    fine: "",
+    diminutive: "1",
+    tiny: "1d2",
+    small: "1d3",
+    medium: "1d4",
+    large: "1d6",
+    huge: "1d8",
+    gargantuan: "2d6",
+    colossal: "2d8",
+    damageType: "B and S",
+    attackRole: "Primary",
+  },
+  Gore: {
+    fine: "1",
+    diminutive: "1d2",
+    tiny: "1d3",
+    small: "1d4",
+    medium: "1d6",
+    large: "1d8",
+    huge: "2d6",
+    gargantuan: "2d8",
+    colossal: "4d6",
+    damageType: "P",
+    attackRole: "Primary",
+  },
+  "Hoof, Tentacle, Wing": {
+    fine: "",
+    diminutive: "1",
+    tiny: "1d2",
+    small: "1d3",
+    medium: "1d4",
+    large: "1d6",
+    huge: "1d8",
+    gargantuan: "2d6",
+    colossal: "2d8",
+    damageType: "B",
+    attackRole: "Secondary",
+  },
+  "Pincers, Tail Slap": {
+    fine: "1",
+    diminutive: "1d2",
+    tiny: "1d3",
+    small: "1d4",
+    medium: "1d6",
+    large: "1d8",
+    huge: "2d6",
+    gargantuan: "2d8",
+    colossal: "4d6",
+    damageType: "B",
+    attackRole: "Secondary",
+  },
+  Slam: {
+    fine: "",
+    diminutive: "1",
+    tiny: "1d2",
+    small: "1d3",
+    medium: "1d4",
+    large: "1d6",
+    huge: "1d8",
+    gargantuan: "2d6",
+    colossal: "2d8",
+    damageType: "B",
+    attackRole: "Primary",
+  },
+  Sting: {
+    fine: "",
+    diminutive: "1",
+    tiny: "1d2",
+    small: "1d3",
+    medium: "1d4",
+    large: "1d6",
+    huge: "1d8",
+    gargantuan: "2d6",
+    colossal: "2d8",
+    damageType: "P",
+    attackRole: "Primary",
+  },
+  Talons: {
+    fine: "",
+    diminutive: "1",
+    tiny: "1d2",
+    small: "1d3",
+    medium: "1d4",
+    large: "1d6",
+    huge: "1d8",
+    gargantuan: "2d6",
+    colossal: "2d8",
+    damageType: "S",
+    attackRole: "Primary",
+  },
+  Other: {
+    fine: "",
+    diminutive: "1",
+    tiny: "1d2",
+    small: "1d3",
+    medium: "1d4",
+    large: "1d6",
+    huge: "1d8",
+    gargantuan: "2d6",
+    colossal: "2d8",
+    damageType: "B, P, or S",
+    attackRole: "Secondary",
+  },
+};
 const ALIGNMENTS = [
   ["LG", "Lawful Good"],
   ["NG", "Neutral Good"],
@@ -332,6 +452,7 @@ const LOOT_EFFECT_STATS = [
 let weaponCount = 0;
 let armorCount = 0;
 let gearCount = 0;
+let generatedEquipmentSignature = "";
 let sheetSaveTimer;
 let sheetContextKey = "general";
 let showCalculations = true;
@@ -856,8 +977,54 @@ function spellLikeMinimumLevel(entry = {}) {
   return Math.max(1, Math.floor(value));
 }
 
+function spellLikeCastingAttrKey(entry = {}) {
+  const raw = String(
+    entry.castingAttr || entry.castingAbility || entry.ability || "",
+  )
+    .trim()
+    .toLowerCase();
+  const aliases = {
+    str: "str",
+    strength: "str",
+    dex: "dex",
+    dexterity: "dex",
+    con: "con",
+    constitution: "con",
+    int: "int",
+    intelligence: "int",
+    wis: "wis",
+    wisdom: "wis",
+    cha: "cha",
+    charisma: "cha",
+  };
+  return aliases[raw] || "";
+}
+
+function spellLikeMinimumScore(entry = {}) {
+  const value = Number(
+    entry.minimumScore ?? entry.minimumAbilityScore ?? entry.score,
+  );
+  return Number.isFinite(value) && value > 0 ? value : 0;
+}
+
+function spellLikeRequirementText(entry = {}) {
+  const attr = spellLikeCastingAttrKey(entry);
+  const minimumScore = spellLikeMinimumScore(entry);
+  return attr && minimumScore ? `${attr.toUpperCase()} ${minimumScore}` : "";
+}
+
+function spellLikeAbilityMeetsScoreRequirement(entry = {}) {
+  const attr = spellLikeCastingAttrKey(entry);
+  const minimumScore = spellLikeMinimumScore(entry);
+  if (!attr || !minimumScore) return true;
+  return Number(abilityDisplayValue(attr) || 0) >= minimumScore;
+}
+
 function spellLikeAbilityIsUnlocked(entry = {}) {
-  return (num("characterLevel") || 1) >= spellLikeMinimumLevel(entry);
+  return (
+    (num("characterLevel") || 1) >= spellLikeMinimumLevel(entry) &&
+    spellLikeAbilityMeetsScoreRequirement(entry)
+  );
 }
 
 function collectCharacterSpellLikeRows() {
@@ -970,6 +1137,10 @@ function isFirearmWeaponType(type) {
   return String(type || "").includes("Firearm");
 }
 
+function isNaturalWeaponType(type) {
+  return ["Natural", "Natural Weapon"].includes(String(type || ""));
+}
+
 function isMeleeWeaponType(type) {
   return !isRangedWeaponType(type);
 }
@@ -979,7 +1150,46 @@ function isTwoHandedWeaponType(type) {
 }
 
 function isLightOffHandWeaponType(type) {
-  return ["Melee Weapon (Light)", "Natural"].includes(type);
+  return ["Melee Weapon (Light)", "Natural", "Natural Weapon"].includes(type);
+}
+
+function naturalAttackKindFromName(name = "") {
+  const text = String(name || "").toLowerCase();
+  if (/\bbite\b/.test(text)) return "Bite";
+  if (/\bclaws?\b/.test(text)) return "Claw";
+  if (/\bgore\b/.test(text)) return "Gore";
+  if (/\bhoof\b|\bhooves\b|\btentacles?\b|\bwings?\b/.test(text))
+    return "Hoof, Tentacle, Wing";
+  if (/\bpincers?\b|\btail\s+slap\b|\btail\b/.test(text))
+    return "Pincers, Tail Slap";
+  if (/\bslams?\b/.test(text)) return "Slam";
+  if (/\bstings?\b/.test(text)) return "Sting";
+  if (/\btalons?\b/.test(text)) return "Talons";
+  return "Other";
+}
+
+function naturalAttackData(card) {
+  if (!card) return null;
+  const weaponType =
+    card.querySelector('[data-field="weaponType"]')?.value || "";
+  if (!isNaturalWeaponType(weaponType)) return null;
+  const explicitKind =
+    card.querySelector('[data-field="naturalAttackKind"]')?.value || "";
+  const name = card.querySelector('[data-field="name"]')?.value || "";
+  const kind = NATURAL_ATTACK_DAMAGE_BY_SIZE[explicitKind]
+    ? explicitKind
+    : naturalAttackKindFromName(name);
+  return {
+    kind,
+    ...(NATURAL_ATTACK_DAMAGE_BY_SIZE[kind] || NATURAL_ATTACK_DAMAGE_BY_SIZE.Other),
+  };
+}
+
+function naturalAttackDice(card) {
+  const data = naturalAttackData(card);
+  if (!data) return "";
+  const sizeKey = String(finalCreatureSize().name || "Medium").toLowerCase();
+  return data[sizeKey] || "";
 }
 
 const TWF_MODE_FIELDS = [
@@ -990,6 +1200,18 @@ const TWF_MODE_FIELDS = [
 ];
 const TWF_PRIMARY_FIELDS = ["twfNoFeatPrimary", "twfFeatPrimary"];
 const TWF_OFFHAND_FIELDS = ["twfNoFeatOff", "twfFeatOff"];
+const INVENTORY_WEAPON_ATTACK_OPTION_IDS = {
+  twoHanded: "inventoryTwoHanded",
+  powerAttack: "inventoryPowerAttack",
+  deadlyAim: "inventoryDeadlyAim",
+  rapidShot: "inventoryRapidShot",
+  twfNoFeatPrimary: "inventoryTwfNoFeatPrimary",
+  twfNoFeatOff: "inventoryTwfNoFeatOff",
+  twfFeatPrimary: "inventoryTwfFeatPrimary",
+  twfFeatOff: "inventoryTwfFeatOff",
+  improvedTwf: "inventoryImprovedTwf",
+  greaterTwf: "inventoryGreaterTwf",
+};
 
 function twfMode(card) {
   const active = TWF_MODE_FIELDS.find(
@@ -1272,8 +1494,22 @@ function skillStatKey(skill) {
   return `skill:${normalizeSkillName(skill)}`;
 }
 
-function isCraftSkill(skill) {
-  return /^craft(?:\s*\(|\b)/i.test(String(skill || "").trim());
+function skillFamilyBonusKey(skill) {
+  const name = String(skill || "").trim();
+  if (/^craft(?:\s*\(|\b)/i.test(name)) return "craft skill checks";
+  if (/^profession(?:\s*\(|\b)/i.test(name)) return "profession skill checks";
+  if (/^perform(?:\s*\(|\b)/i.test(name)) return "perform skill checks";
+  return "";
+}
+
+function skillFamilyLabel(stat) {
+  return (
+    {
+      "craft skill checks": "Craft skills",
+      "profession skill checks": "Profession skills",
+      "perform skill checks": "Perform skills",
+    }[stat] || ""
+  );
 }
 
 function iterativeBabBonuses(bab) {
@@ -1405,7 +1641,11 @@ function racialTraitChoiceKeyForTrait(trait = {}) {
   return racialTraitNameKey(trait);
 }
 
-function resolvedRacialAlternateTrait(trait = {}) {
+function resolvedRacialTrait(trait = {}) {
+  const hasChoice =
+    racialTraitMechanicsHaveChoiceStats(trait) ||
+    (trait.modifiedTraitOverrides || []).some(racialTraitOverrideHasChoiceStats);
+  if (!hasChoice) return trait;
   const choices =
     selectedRacialTraitChoices[racialTraitChoiceKeyForTrait(trait)];
   if (!choices || typeof choices !== "object") return trait;
@@ -1415,10 +1655,23 @@ function resolvedRacialAlternateTrait(trait = {}) {
     classSkillGrants: Array.isArray(choices.classSkillGrants)
       ? choices.classSkillGrants
       : trait.classSkillGrants,
+    immunities: Array.isArray(choices.immunities)
+      ? choices.immunities
+      : trait.immunities,
     spellLikeAbilities: Array.isArray(choices.spellLikeAbilities)
       ? choices.spellLikeAbilities
       : trait.spellLikeAbilities,
+    generatedEquipment: Array.isArray(choices.generatedEquipment)
+      ? choices.generatedEquipment
+      : trait.generatedEquipment,
+    modifiedTraitOverrides: Array.isArray(choices.modifiedTraitOverrides)
+      ? choices.modifiedTraitOverrides
+      : trait.modifiedTraitOverrides,
   };
+}
+
+function resolvedRacialAlternateTrait(trait = {}) {
+  return resolvedRacialTrait(trait);
 }
 
 function removeRacialTraitChoice(trait = {}) {
@@ -1455,35 +1708,116 @@ async function resolveRacialTraitChoiceStats(items, trait = {}) {
   return resolved;
 }
 
-async function resolveRacialTraitChoicesBeforeApply(trait = {}) {
+async function resolveRacialTraitMechanicChoices(item = {}, trait = {}) {
   const resolvedEffects = await resolveRacialTraitChoiceStats(
-    trait.effects,
+    item.effects,
     trait,
   );
   if (!resolvedEffects) return false;
   const resolvedClassSkillGrants = await resolveRacialTraitChoiceStats(
-    trait.classSkillGrants,
+    item.classSkillGrants,
     trait,
   );
   if (!resolvedClassSkillGrants) return false;
+  return {
+    ...item,
+    effects: resolvedEffects,
+    classSkillGrants: resolvedClassSkillGrants,
+  };
+}
 
-  const hasChoice =
-    (Array.isArray(trait.effects) &&
-      trait.effects.some((item) =>
-        window.PFEffectStats?.isChoiceStat(item.stat),
+async function resolveRacialTraitOperationValueChoice(
+  key = "",
+  value = {},
+  trait = {},
+) {
+  if (key === "effects" || key === "classSkillGrants") {
+    const resolved = await resolveRacialTraitChoiceStats([value], trait);
+    return resolved ? resolved[0] : null;
+  }
+  return value;
+}
+
+async function resolveRacialTraitOverrideChoices(override = {}, trait = {}) {
+  const resolved = { ...override, mechanicOverrides: {} };
+  for (const [key, operations] of Object.entries(
+    override.mechanicOverrides || {},
+  )) {
+    resolved.mechanicOverrides[key] = [];
+    for (const operation of Array.isArray(operations) ? operations : []) {
+      if (!["add", "replace"].includes(operation.action)) {
+        resolved.mechanicOverrides[key].push(operation);
+        continue;
+      }
+      const value = await resolveRacialTraitOperationValueChoice(
+        key,
+        operation.value,
+        trait,
+      );
+      if (!value) return null;
+      resolved.mechanicOverrides[key].push({ ...operation, value });
+    }
+  }
+  return resolved;
+}
+
+function racialTraitMechanicsHaveChoiceStats(item = {}) {
+  return (
+    (Array.isArray(item.effects) &&
+      item.effects.some((effect) =>
+        window.PFEffectStats?.isChoiceStat(effect.stat),
       )) ||
-    (Array.isArray(trait.classSkillGrants) &&
-      trait.classSkillGrants.some((item) =>
-        window.PFEffectStats?.isChoiceStat(item.stat),
-      ));
+    (Array.isArray(item.classSkillGrants) &&
+      item.classSkillGrants.some((grant) =>
+        window.PFEffectStats?.isChoiceStat(grant.stat),
+      ))
+  );
+}
+
+function racialTraitOverrideHasChoiceStats(override = {}) {
+  return Object.entries(override.mechanicOverrides || {}).some(
+    ([key, operations]) =>
+      ["effects", "classSkillGrants"].includes(key) &&
+      (Array.isArray(operations) ? operations : []).some(
+        (operation) =>
+          operation.value &&
+          window.PFEffectStats?.isChoiceStat(operation.value.stat),
+      ),
+  );
+}
+
+async function resolveRacialTraitChoicesBeforeApply(trait = {}) {
+  const resolvedTrait = await resolveRacialTraitMechanicChoices(trait, trait);
+  if (!resolvedTrait) return false;
+  const resolvedOverrides = [];
+  for (const override of trait.modifiedTraitOverrides || []) {
+    const resolvedOverride = await resolveRacialTraitOverrideChoices(
+      override,
+      trait,
+    );
+    if (!resolvedOverride) return false;
+    resolvedOverrides.push(resolvedOverride);
+  }
+  const hasChoice =
+    racialTraitMechanicsHaveChoiceStats(trait) ||
+    (trait.modifiedTraitOverrides || []).some(racialTraitOverrideHasChoiceStats);
   if (hasChoice) {
     selectedRacialTraitChoices[racialTraitChoiceKeyForTrait(trait)] = {
-      effects: cloneJson(resolvedEffects),
-      classSkillGrants: cloneJson(resolvedClassSkillGrants),
+      effects: cloneJson(resolvedTrait.effects),
+      classSkillGrants: cloneJson(resolvedTrait.classSkillGrants),
+      modifiedTraitOverrides: cloneJson(resolvedOverrides),
     };
   } else {
     removeRacialTraitChoice(trait);
   }
+  return true;
+}
+
+async function chooseRacialTraitMechanicTargets(trait = {}) {
+  const resolved = await resolveRacialTraitChoicesBeforeApply(trait);
+  if (!resolved) return false;
+  recalculateSheet();
+  queueSheetSave();
   return true;
 }
 
@@ -1512,6 +1846,126 @@ function activeStandardRacialTraits(race = selectedRaceDefinition()) {
   return (race.standardTraits || []).filter(
     (trait) => !replaced.has(racialTraitNameKey(trait)),
   );
+}
+
+const RACIAL_TRAIT_MECHANIC_KEYS = [
+  "effects",
+  "damageReduction",
+  "spellResistance",
+  "immunities",
+  "classSkillGrants",
+  "sizeChanges",
+  "spellLikeAbilities",
+  "generatedEquipment",
+];
+
+function racialTraitMechanicArray(item = {}, key = "") {
+  return Array.isArray(item[key]) ? item[key] : [];
+}
+
+function racialTraitHasMechanic(item = {}, key = "") {
+  return racialTraitMechanicArray(item, key).length > 0;
+}
+
+function racialTraitHasAnyMechanics(item = {}) {
+  return (
+    RACIAL_TRAIT_MECHANIC_KEYS.some((key) =>
+      racialTraitHasMechanic(item, key),
+    ) || racialTraitHasAnyMechanicOverrides(item)
+  );
+}
+
+function stableRacialMechanicKey(value) {
+  return JSON.stringify(stableRacialMechanicValue(value));
+}
+
+function stableRacialMechanicValue(value) {
+  if (Array.isArray(value)) return value.map(stableRacialMechanicValue);
+  if (!value || typeof value !== "object") return value ?? null;
+  const sorted = {};
+  Object.keys(value)
+    .sort()
+    .forEach((key) => {
+      sorted[key] = stableRacialMechanicValue(value[key]);
+    });
+  return sorted;
+}
+
+function racialTraitMechanicOperations(override = {}, key = "") {
+  const operations = override.mechanicOverrides?.[key];
+  return Array.isArray(operations) ? operations : [];
+}
+
+function racialTraitHasAnyMechanicOverrides(override = {}) {
+  return RACIAL_TRAIT_MECHANIC_KEYS.some((key) =>
+    racialTraitMechanicOperations(override, key).some(
+      (operation) =>
+        operation.action === "remove" ||
+        (["add", "replace"].includes(operation.action) && operation.value),
+    ),
+  );
+}
+
+function racialTraitMechanicOperationMatches(operation = {}, row = {}, index = 0) {
+  if (operation.targetKey) {
+    return operation.targetKey === stableRacialMechanicKey(row);
+  }
+  return Number(operation.targetIndex) === index;
+}
+
+function applyRacialTraitMechanicOperations(baseRows = [], operations = []) {
+  const rows = baseRows
+    .map((row, index) => {
+      const operation = [...operations]
+        .reverse()
+        .find((entry) =>
+          racialTraitMechanicOperationMatches(entry, row, index),
+        );
+      if (!operation || operation.action === "keep") return row;
+      if (operation.action === "remove") return null;
+      if (operation.action === "replace" && operation.value) {
+        return operation.value;
+      }
+      return row;
+    })
+    .filter(Boolean);
+  const additions = operations
+    .filter((operation) => operation.action === "add" && operation.value)
+    .map((operation) => operation.value);
+  return [...rows, ...additions];
+}
+
+function selectedRacialModifiedTraitOverrides(alternateTraits = []) {
+  const overrides = new Map();
+  alternateTraits.forEach((trait) => {
+    (trait.modifiedTraitOverrides || []).forEach((override) => {
+      if (!racialTraitHasAnyMechanics(override)) return;
+      const key = racialTraitKey(override.trait || override.name || "");
+      if (!key) return;
+      overrides.set(key, override);
+    });
+  });
+  return overrides;
+}
+
+function racialTraitWithModifierOverrides(trait = {}, overrides = new Map()) {
+  const override = overrides.get(racialTraitNameKey(trait));
+  if (!override) return trait;
+  const merged = { ...trait };
+  RACIAL_TRAIT_MECHANIC_KEYS.forEach((key) => {
+    const operations = racialTraitMechanicOperations(override, key);
+    if (operations.length) {
+      merged[key] = applyRacialTraitMechanicOperations(
+        racialTraitMechanicArray(trait, key),
+        operations,
+      );
+      return;
+    }
+    if (racialTraitHasMechanic(override, key)) {
+      merged[key] = override[key];
+    }
+  });
+  return merged;
 }
 
 function racialAbilityStat(value = "") {
@@ -1614,7 +2068,12 @@ function collectSelectedRaceBuffs() {
   const alternateTraits = selectedAlternateRacialTraits(race).map(
     resolvedRacialAlternateTrait,
   );
-  const abilityEffects = racialAbilityEffects(race, activeStandardTraits);
+  const modifiedTraitOverrides =
+    selectedRacialModifiedTraitOverrides(alternateTraits);
+  const modifiedActiveStandardTraits = activeStandardTraits
+    .map((trait) => racialTraitWithModifierOverrides(trait, modifiedTraitOverrides))
+    .map(resolvedRacialTrait);
+  const abilityEffects = racialAbilityEffects(race, modifiedActiveStandardTraits);
   if (abilityEffects.length) {
     buffs.push({
       ...context,
@@ -1625,6 +2084,7 @@ function collectSelectedRaceBuffs() {
 
   const addTraitBuff = (trait, sourceLabel, options = {}) => {
     if (!trait || typeof trait === "string") return;
+    if (trait.activatable) return;
     if (!options.parseAbilityTrait && /ability score/i.test(trait.name || ""))
       return;
     const hasEffects = Array.isArray(trait.effects) && trait.effects.length;
@@ -1638,21 +2098,30 @@ function collectSelectedRaceBuffs() {
       Array.isArray(trait.damageReduction) && trait.damageReduction.length;
     const hasSr =
       Array.isArray(trait.spellResistance) && trait.spellResistance.length;
+    const hasImmunities =
+      Array.isArray(trait.immunities) && trait.immunities.length;
     const hasClassSkills =
       Array.isArray(trait.classSkillGrants) && trait.classSkillGrants.length;
     const hasSizeChanges =
       Array.isArray(trait.sizeChanges) && trait.sizeChanges.length;
-    const hasSpellLikeAbilities =
-      Array.isArray(trait.spellLikeAbilities) &&
-      trait.spellLikeAbilities.length;
+    const spellLikeAbilities = Array.isArray(trait.spellLikeAbilities)
+      ? trait.spellLikeAbilities
+      : [];
+    const hasSpellLikeAbilities = spellLikeAbilities.length;
+    const generatedEquipment = Array.isArray(trait.generatedEquipment)
+      ? trait.generatedEquipment
+      : [];
+    const hasGeneratedEquipment = generatedEquipment.length;
     if (
       !hasEffects &&
       !parsedAbilityEffects.length &&
       !hasDr &&
       !hasSr &&
+      !hasImmunities &&
       !hasClassSkills &&
       !hasSizeChanges &&
-      !hasSpellLikeAbilities
+      !hasSpellLikeAbilities &&
+      !hasGeneratedEquipment
     )
       return;
     buffs.push({
@@ -1661,28 +2130,140 @@ function collectSelectedRaceBuffs() {
       bonuses: hasEffects ? trait.effects : parsedAbilityEffects,
       damageReduction: hasDr ? trait.damageReduction : [],
       spellResistance: hasSr ? trait.spellResistance : [],
+      immunities: hasImmunities ? trait.immunities : [],
       classSkillGrants: hasClassSkills ? trait.classSkillGrants : [],
       sizeChanges: hasSizeChanges ? trait.sizeChanges : [],
-      spellLikeAbilities: hasSpellLikeAbilities
-        ? trait.spellLikeAbilities
-        : [],
+      spellLikeAbilities: hasSpellLikeAbilities ? spellLikeAbilities : [],
+      generatedEquipment: hasGeneratedEquipment ? generatedEquipment : [],
     });
   };
 
-  activeStandardTraits.forEach((trait) => addTraitBuff(trait, "Race"));
+  modifiedActiveStandardTraits.forEach((trait) => addTraitBuff(trait, "Race"));
   alternateTraits.forEach((trait) =>
     addTraitBuff(trait, "Alternate Race", { parseAbilityTrait: true }),
   );
   return buffs;
 }
 
+function racialTraitAbilityFromTrait(trait, race, sourceLabel, options = {}) {
+  if (!trait || typeof trait === "string" || !trait.activatable) return null;
+  if (!options.parseAbilityTrait && /ability score/i.test(trait.name || ""))
+    return null;
+  const hasEffects = Array.isArray(trait.effects) && trait.effects.length;
+  const parsedAbilityEffects =
+    options.parseAbilityTrait &&
+    !hasEffects &&
+    /ability score/i.test(trait.name || "")
+      ? racialAbilityEffectsFromTrait({ standardTraits: [trait] }, [trait])
+      : [];
+  const generatedEquipment = Array.isArray(trait.generatedEquipment)
+    ? trait.generatedEquipment
+    : [];
+  const ability = {
+    ...racialTraitBuffContext(race),
+    id: `racial-trait:${race.name || "race"}:${trait.name || "trait"}`,
+    name: `${sourceLabel}: ${race.name || "Race"} ${trait.name || "Trait"}`,
+    category: "Race",
+    source: race.name || "Race",
+    bonuses: hasEffects ? trait.effects : parsedAbilityEffects,
+    damageReduction: Array.isArray(trait.damageReduction)
+      ? trait.damageReduction
+      : [],
+    spellResistance: Array.isArray(trait.spellResistance)
+      ? trait.spellResistance
+      : [],
+    immunities: Array.isArray(trait.immunities) ? trait.immunities : [],
+    classSkillGrants: Array.isArray(trait.classSkillGrants)
+      ? trait.classSkillGrants
+      : [],
+    sizeChanges: Array.isArray(trait.sizeChanges) ? trait.sizeChanges : [],
+    spellLikeAbilities: Array.isArray(trait.spellLikeAbilities)
+      ? trait.spellLikeAbilities
+      : [],
+    generatedEquipment,
+    durationConfig: trait.durationConfig || {
+      count: null,
+      unit: "variable",
+      factors: [],
+    },
+    duration: window.PFEffectMeta?.durationLabel
+      ? window.PFEffectMeta.durationLabel(
+          trait.durationConfig || {
+            count: null,
+            unit: "variable",
+            factors: [],
+          },
+        )
+      : "variable",
+    fromAbility: true,
+  };
+  const hasAny =
+    (ability.bonuses || []).length ||
+    (ability.damageReduction || []).length ||
+    (ability.spellResistance || []).length ||
+    (ability.immunities || []).length ||
+    (ability.classSkillGrants || []).length ||
+    (ability.sizeChanges || []).length ||
+    (ability.spellLikeAbilities || []).length ||
+    (ability.generatedEquipment || []).length;
+  return hasAny ? ability : null;
+}
+
+function collectActivatableRacialTraitAbilities() {
+  const race = selectedRaceDefinition();
+  if (!race) return [];
+  const activeStandardTraits = activeStandardRacialTraits(race);
+  const alternateTraits = selectedAlternateRacialTraits(race).map(
+    resolvedRacialAlternateTrait,
+  );
+  const modifiedTraitOverrides =
+    selectedRacialModifiedTraitOverrides(alternateTraits);
+  const modifiedActiveStandardTraits = activeStandardTraits
+    .map((trait) => racialTraitWithModifierOverrides(trait, modifiedTraitOverrides))
+    .map(resolvedRacialTrait);
+  return [
+    ...modifiedActiveStandardTraits.map((trait) =>
+      racialTraitAbilityFromTrait(trait, race, "Race"),
+    ),
+    ...alternateTraits.map((trait) =>
+      racialTraitAbilityFromTrait(trait, race, "Alternate Race", {
+        parseAbilityTrait: true,
+      }),
+    ),
+  ].filter(Boolean);
+}
+
 function applySelectedRaceDefaults() {
   const race = selectedRaceDefinition();
   if (!race) return;
-  if (race.size && el("size")) {
-    setSelectValuePreservingUnknown("size", race.size);
+  const size = defaultSizeForRace(race);
+  if (size && el("size")) {
+    setSelectValuePreservingUnknown("size", size);
     updateCreatureSizeFields();
   }
+}
+
+function defaultSizeForRace(race = {}) {
+  const direct = String(race.size || "").trim();
+  if (direct) return normalizeCreatureSize(direct);
+  const sizeTrait = (race.standardTraits || []).find(
+    (trait) => racialTraitNameKey(trait) === "size",
+  );
+  const description = String(sizeTrait?.description || "");
+  return (
+    CREATURE_SIZES.find((size) =>
+      new RegExp(`\\b${size.name}\\b`, "i").test(description),
+    )?.name || ""
+  );
+}
+
+function shouldApplyRaceDefaultSize(restoredSize = "") {
+  const raceSize = defaultSizeForRace(selectedRaceDefinition() || {});
+  if (!raceSize) return false;
+  const rawRestoredSize = String(restoredSize || "").trim();
+  if (!rawRestoredSize) return true;
+  const restored = normalizeCreatureSize(rawRestoredSize);
+  return raceSize !== "Medium" && restored === "Medium";
 }
 
 function updateRacialTraitsButton() {
@@ -1715,11 +2296,23 @@ function openRacialTraitsModal() {
     setStatus("Racial traits modal is not available.", "warning");
     return;
   }
+  const alternateTraits = selectedAlternateRacialTraits(race).map(
+    resolvedRacialTrait,
+  );
+  const modifiedTraitOverrides =
+    selectedRacialModifiedTraitOverrides(alternateTraits);
+  const effectiveStandardTraits = activeStandardRacialTraits(race).map((trait) =>
+    racialTraitWithModifierOverrides(trait, modifiedTraitOverrides),
+  );
   window.PFRacialTraitsModal.open({
     race,
     selectedAlternateTraits: selectedAlternateRacialTraits(race).map(
       (trait) => trait.name || "",
     ),
+    effectiveStandardTraits,
+    choices: cloneJson(selectedRacialTraitChoices),
+    getChoices: () => cloneJson(selectedRacialTraitChoices),
+    onChoose: chooseRacialTraitMechanicTargets,
     onBeforeApply: resolveRacialTraitChoicesBeforeApply,
     onRemove: (trait) => {
       removeRacialTraitChoice(trait);
@@ -2173,6 +2766,8 @@ function statDisplayLabel(stat) {
     "wisdom skill checks": "WIS skills",
     "charisma skill checks": "CHA skills",
     "craft skill checks": "Craft skills",
+    "profession skill checks": "Profession skills",
+    "perform skill checks": "Perform skills",
   };
   return (
     labels[key] ||
@@ -2275,8 +2870,9 @@ function simpleSkillRows(groups) {
         conditional: true,
       }),
     );
-    if (isCraftSkill(skill)) {
-      (groups["craft skill checks"] || []).forEach((row) =>
+    const familyKey = skillFamilyBonusKey(skill);
+    if (familyKey) {
+      (groups[familyKey] || []).forEach((row) =>
         rows.push({
           main: row.label,
           sub: row.total,
@@ -2485,12 +3081,16 @@ function normalizeWondrousSourceItem(item, index) {
     spellResistance: Array.isArray(item.spellResistance)
       ? item.spellResistance
       : [],
+    immunities: Array.isArray(item.immunities) ? item.immunities : [],
     classSkillGrants: Array.isArray(item.classSkillGrants)
       ? item.classSkillGrants
       : [],
     sizeChanges: Array.isArray(item.sizeChanges) ? item.sizeChanges : [],
     spellLikeAbilities: Array.isArray(item.spellLikeAbilities)
       ? item.spellLikeAbilities
+      : [],
+    generatedEquipment: Array.isArray(item.generatedEquipment)
+      ? item.generatedEquipment
       : [],
   };
 }
@@ -2555,12 +3155,16 @@ function normalizeMundaneSourceItem(item, index) {
     spellResistance: Array.isArray(item.spellResistance)
       ? item.spellResistance
       : [],
+    immunities: Array.isArray(item.immunities) ? item.immunities : [],
     classSkillGrants: Array.isArray(item.classSkillGrants)
       ? item.classSkillGrants
       : [],
     sizeChanges: Array.isArray(item.sizeChanges) ? item.sizeChanges : [],
     spellLikeAbilities: Array.isArray(item.spellLikeAbilities)
       ? item.spellLikeAbilities
+      : [],
+    generatedEquipment: Array.isArray(item.generatedEquipment)
+      ? item.generatedEquipment
       : [],
   };
 }
@@ -2610,12 +3214,16 @@ function normalizeWeaponSourceItem(item, index) {
     spellResistance: Array.isArray(item.spellResistance)
       ? item.spellResistance
       : [],
+    immunities: Array.isArray(item.immunities) ? item.immunities : [],
     classSkillGrants: Array.isArray(item.classSkillGrants)
       ? item.classSkillGrants
       : [],
     sizeChanges: Array.isArray(item.sizeChanges) ? item.sizeChanges : [],
     spellLikeAbilities: Array.isArray(item.spellLikeAbilities)
       ? item.spellLikeAbilities
+      : [],
+    generatedEquipment: Array.isArray(item.generatedEquipment)
+      ? item.generatedEquipment
       : [],
   };
 }
@@ -2668,12 +3276,16 @@ function normalizeArmorShieldSourceItem(item, index) {
     spellResistance: Array.isArray(item.spellResistance)
       ? item.spellResistance
       : [],
+    immunities: Array.isArray(item.immunities) ? item.immunities : [],
     classSkillGrants: Array.isArray(item.classSkillGrants)
       ? item.classSkillGrants
       : [],
     sizeChanges: Array.isArray(item.sizeChanges) ? item.sizeChanges : [],
     spellLikeAbilities: Array.isArray(item.spellLikeAbilities)
       ? item.spellLikeAbilities
+      : [],
+    generatedEquipment: Array.isArray(item.generatedEquipment)
+      ? item.generatedEquipment
       : [],
   };
 }
@@ -3040,15 +3652,20 @@ function collectClassFeatureBuffs() {
         !feature.activatable &&
         ((Array.isArray(feature.effects) && feature.effects.length) ||
           (Array.isArray(feature.sizeChanges) && feature.sizeChanges.length) ||
+          (Array.isArray(feature.immunities) && feature.immunities.length) ||
           (Array.isArray(feature.spellLikeAbilities) &&
-            feature.spellLikeAbilities.length))
+            feature.spellLikeAbilities.length) ||
+          (Array.isArray(feature.generatedEquipment) &&
+            feature.generatedEquipment.length))
       ) {
         buffs.push({
           ...context,
           name: feature.name || "Class Feature",
           bonuses: feature.effects,
           sizeChanges: feature.sizeChanges,
+          immunities: feature.immunities,
           spellLikeAbilities: feature.spellLikeAbilities,
+          generatedEquipment: feature.generatedEquipment,
         });
       }
       featurePools(feature).forEach((pool) => {
@@ -3074,15 +3691,20 @@ function collectClassFeatureBuffs() {
           option &&
           ((Array.isArray(option.effects) && option.effects.length) ||
             (Array.isArray(option.sizeChanges) && option.sizeChanges.length) ||
+            (Array.isArray(option.immunities) && option.immunities.length) ||
             (Array.isArray(option.spellLikeAbilities) &&
-              option.spellLikeAbilities.length))
+              option.spellLikeAbilities.length) ||
+            (Array.isArray(option.generatedEquipment) &&
+              option.generatedEquipment.length))
         ) {
           buffs.push({
             ...context,
             name: option.name || pool.name || "Class Feature Choice",
             bonuses: option.effects,
             sizeChanges: option.sizeChanges,
+            immunities: option.immunities,
             spellLikeAbilities: option.spellLikeAbilities,
+            generatedEquipment: option.generatedEquipment,
           });
         }
       });
@@ -3176,25 +3798,556 @@ function collectClassFeatureDamageReduction() {
   return entries;
 }
 
-function updateClassFeatureDamageReductionSummary() {
-  const summary = el("damageReductionFromClasses");
+function normalizeDamageReductionType(value = "") {
+  return String(value || "")
+    .trim()
+    .replace(/^dr\s+/i, "")
+    .replace(/[.;]+$/g, "")
+    .replace(/\s+/g, " ") || "-";
+}
+
+function damageReductionTypeKey(value = "") {
+  return normalizeDamageReductionType(value).toLowerCase();
+}
+
+function collectCustomDamageReduction() {
+  const text = el("damageReduction")?.value || "";
+  const entries = [];
+  const pattern = /(?:^|[,;\n|])\s*(?:DR\s*)?(\d+)\s*\/\s*([^,;\n|]+)/gi;
+  let match;
+  while ((match = pattern.exec(text))) {
+    const amount = Number(match[1] || 0);
+    if (amount <= 0) continue;
+    entries.push({
+      amount,
+      overcomeType: normalizeDamageReductionType(match[2]),
+      source: "Custom DR",
+      custom: true,
+    });
+  }
+  return entries;
+}
+
+function defenseConditionKey(entry = {}) {
+  return String(entry.appliesWhen || entry.condition || "").trim().toLowerCase();
+}
+
+function defenseSourceText(entry = {}) {
+  return String(entry.source || "Effect").trim() || "Effect";
+}
+
+function defenseEntryWithSource(entry = {}, textFn = () => "") {
+  return `${textFn(entry)} (${defenseSourceText(entry)})`;
+}
+
+function strongestDefenseApplicationBreakdown(entries = [], keyFn) {
+  const groups = new Map();
+  (Array.isArray(entries) ? entries : []).forEach((entry, order) => {
+    const amount = Number(entry.amount || entry.value || 0);
+    if (amount <= 0) return;
+    const key = keyFn(entry);
+    if (!key) return;
+    const normalized = {
+      ...entry,
+      amount,
+      _defenseKey: key,
+      _defenseOrder: order,
+    };
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(normalized);
+  });
+
+  const applied = [];
+  const overridden = [];
+  groups.forEach((group) => {
+    const best = group.reduce((winner, entry) => {
+      if (entry.amount > winner.amount) return entry;
+      if (
+        entry.amount === winner.amount &&
+        entry._defenseOrder < winner._defenseOrder
+      ) {
+        return entry;
+      }
+      return winner;
+    }, group[0]);
+    applied.push(best);
+    group
+      .filter((entry) => entry !== best)
+      .forEach((entry) => overridden.push({ ...entry, overriddenBy: best }));
+  });
+
+  const sortByAmount = (a, b) => {
+    const amountDiff = Number(b.amount || 0) - Number(a.amount || 0);
+    if (amountDiff) return amountDiff;
+    return defenseSourceText(a).localeCompare(defenseSourceText(b));
+  };
+  return {
+    applied: applied.sort(sortByAmount),
+    overridden: overridden.sort(sortByAmount),
+  };
+}
+
+function renderDefenseApplicationRows(
+  label,
+  entries = [],
+  textFn = () => "",
+  className = "",
+) {
+  if (!entries.length) return "";
+  const rows = entries
+    .map((entry) => {
+      const name = escapeHtml(defenseEntryWithSource(entry, textFn));
+      const coveredBy = entry.overriddenBy
+        ? ` covered by <span class="calc-buff-name">${escapeHtml(defenseEntryWithSource(entry.overriddenBy, textFn))}</span>`
+        : "";
+      return `<div class="${className}">${escapeHtml(label)}: <span class="calc-buff-name">${name}</span>${coveredBy}</div>`;
+    })
+    .join("");
+  return `<div class="calc-buff-block">${rows}</div>`;
+}
+
+function activeDefenseApplied(baseBreakdown, activeBreakdown) {
+  const baseAppliedKeys = new Set(
+    (baseBreakdown.applied || []).map((entry) => entry._defenseKey || ""),
+  );
+  return (activeBreakdown.applied || []).filter(
+    (entry) => entry.active && !baseAppliedKeys.has(entry._defenseKey),
+  );
+}
+
+function activeDefenseOverridden(activeBreakdown) {
+  return (activeBreakdown.overridden || []).filter(
+    (entry) => entry.active || entry.overriddenBy?.active,
+  );
+}
+
+function normalizeResistanceType(value = "") {
+  return String(value || "")
+    .trim()
+    .replace(/^resist(?:ance)?\s+(?:to\s+)?/i, "")
+    .replace(/\s+resistance$/i, "")
+    .replace(/[.;]+$/g, "")
+    .replace(/[-_]+/g, " ")
+    .replace(/\s+/g, " ");
+}
+
+function resistanceTypeKey(value = "") {
+  return normalizeResistanceType(value).toLowerCase();
+}
+
+function resistanceTypeText(value = "") {
+  return normalizeResistanceType(value)
+    .split(" ")
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
+
+function resistanceEntryText(entry = {}) {
+  const type = resistanceTypeText(entry.type || entry.resistanceType);
+  const isConditional = entry.conditional ?? Boolean(entry.condition);
+  const appliesWhen = entry.appliesWhen || entry.condition || "";
+  return `${type || "Resistance"} resistance ${Number(entry.amount || 0)}${
+    isConditional ? ` (${appliesWhen || "conditional"})` : ""
+  }`;
+}
+
+function collectCustomSpellResistance() {
+  const text = el("spellResistance")?.value || "";
+  const match = String(text).match(/\d+/);
+  const amount = match ? Number(match[0]) : 0;
+  if (amount <= 0) return [];
+  return [
+    {
+      amount,
+      source: "Custom SR",
+      custom: true,
+    },
+  ];
+}
+
+function collectCustomResistances() {
+  const text = el("resistances")?.value || "";
+  return String(text)
+    .split(/[,;\n|]+/)
+    .map((entry) => entry.trim())
+    .filter(Boolean)
+    .map((entry) => {
+      const amountFirst = entry.match(
+        /^(?:resist(?:ance)?\s*)?(\d+)\s+(.+?)(?:\s+resistance)?$/i,
+      );
+      const typeFirst = entry.match(
+        /^(?:resist(?:ance)?\s+(?:to\s+)?)?(.+?)(?:\s+resistance)?\s+(\d+)$/i,
+      );
+      const match = amountFirst || typeFirst;
+      if (!match) return null;
+      const amount = Number(amountFirst ? match[1] : match[2]);
+      const type = normalizeResistanceType(amountFirst ? match[2] : match[1]);
+      if (!type || amount <= 0) return null;
+      return {
+        type,
+        amount,
+        source: "Custom Resistance",
+        custom: true,
+      };
+    })
+    .filter(Boolean);
+}
+
+function collectEffectResistances() {
+  const entries = [];
+  const activeSet = new Set(activeBuffs || []);
+  calculationBuffs().forEach((buff) => {
+    (Array.isArray(buff.bonuses) ? buff.bonuses : []).forEach((bonus) => {
+      const stat = String(bonus.stat || "").trim().toLowerCase();
+      if (!stat.startsWith("resistance:")) return;
+      const amount = window.PFBuffs?.scaledBonusValue
+        ? window.PFBuffs.scaledBonusValue(bonus, buff)
+        : Number(bonus.value || 0);
+      if (amount <= 0) return;
+      entries.push({
+        type: normalizeResistanceType(stat.slice("resistance:".length)),
+        amount,
+        conditional: bonus.conditional,
+        appliesWhen: bonus.appliesWhen,
+        condition: bonus.condition,
+        source: buff.name || "Effect",
+        active: activeSet.has(buff),
+      });
+    });
+  });
+  return entries;
+}
+
+function updateResistanceSummary() {
+  const summary = el("resistancesFromEffects");
   if (!summary) return;
-  const entries = collectClassFeatureDamageReduction();
-  if (!entries.length) {
-    summary.textContent = "";
+  const custom = collectCustomResistances();
+  const entries = collectEffectResistances();
+  const always = entries.filter((entry) => !entry.active);
+  const active = entries.filter((entry) => entry.active);
+  const keyFn = (entry) =>
+    `${resistanceTypeKey(entry.type || entry.resistanceType)}|${defenseConditionKey(entry)}`;
+  const baseBreakdown = strongestDefenseApplicationBreakdown(
+    [...custom, ...always],
+    keyFn,
+  );
+  const activeBreakdown = strongestDefenseApplicationBreakdown(
+    [...custom, ...always, ...active],
+    keyFn,
+  );
+  const activeApplied = activeDefenseApplied(baseBreakdown, activeBreakdown);
+  const activeOverridden = activeDefenseOverridden(activeBreakdown);
+  if (
+    !custom.length &&
+    !always.length &&
+    !active.length &&
+    !baseBreakdown.applied.length
+  ) {
+    summary.innerHTML = "";
     summary.classList.add("d-none");
     return;
   }
+  const parts = [
+    renderDefenseApplicationRows(
+      "applied",
+      baseBreakdown.applied,
+      resistanceEntryText,
+      "calc-applied",
+    ),
+    renderDefenseApplicationRows(
+      "overridden",
+      baseBreakdown.overridden,
+      resistanceEntryText,
+      "calc-overridden",
+    ),
+    renderDefenseApplicationRows(
+      "while active",
+      activeApplied,
+      resistanceEntryText,
+      "calc-applied",
+    ),
+    renderDefenseApplicationRows(
+      "overridden while active",
+      activeOverridden,
+      resistanceEntryText,
+      "calc-overridden",
+    ),
+  ].filter(Boolean);
+  summary.innerHTML = `<div class="calc-buffs">${parts.join("")}</div>`;
+  summary.classList.remove("d-none");
+}
+
+function normalizeImmunityName(value = "") {
+  return String(value || "")
+    .trim()
+    .replace(/^immunit(?:y|ies)\s+(?:to\s+)?/i, "")
+    .replace(/[.;]+$/g, "")
+    .replace(/\s+/g, " ");
+}
+
+function immunityKey(entry = {}) {
+  return [
+    normalizeImmunityName(entry.name || entry.immunity || entry.type).toLowerCase(),
+    String(entry.appliesWhen || entry.condition || "").trim().toLowerCase(),
+  ].join("|");
+}
+
+function immunityEntryText(entry = {}) {
+  const name =
+    normalizeImmunityName(entry.name || entry.immunity || entry.type) || "-";
+  const isConditional = entry.conditional ?? Boolean(entry.condition);
+  const appliesWhen = entry.appliesWhen || entry.condition || "";
+  return `${name}${isConditional ? ` (${appliesWhen || "conditional"})` : ""}`;
+}
+
+function immunitySourceText(entry = {}) {
+  return String(entry.source || "Effect").trim() || "Effect";
+}
+
+function immunityEntryTextWithSource(entry = {}) {
+  return `${immunityEntryText(entry)} (${immunitySourceText(entry)})`;
+}
+
+function collectCustomImmunities() {
+  const text = el("immunities")?.value || "";
+  return String(text)
+    .split(/[,;\n|]+/)
+    .map(normalizeImmunityName)
+    .filter(Boolean)
+    .map((name) => ({
+      name,
+      source: "Custom Immunity",
+      custom: true,
+    }));
+}
+
+function collectClassFeatureImmunities() {
+  const limit = Math.max(1, num("characterLevel") || 1);
+  const counts = {};
+  const classLevels = progressionClassCounts(limit);
+  const entries = [];
+  const addEntries = (immunityList, sourceName, active = false) => {
+    (Array.isArray(immunityList) ? immunityList : []).forEach((immunity) => {
+      const name = normalizeImmunityName(
+        immunity.name || immunity.immunity || immunity.type,
+      );
+      if (!name) return;
+      entries.push({
+        name,
+        conditional: immunity.conditional,
+        appliesWhen: immunity.appliesWhen,
+        condition: immunity.condition,
+        source: sourceName,
+        active,
+      });
+    });
+  };
+  classProgression.slice(0, limit).forEach((row) => {
+    const className = row.className;
+    if (!className) return;
+    counts[className] = (counts[className] || 0) + 1;
+    const classLevel = counts[className];
+    const definition = classDefinitionByName(className);
+    const levelData = classLevelAt(definition, classLevel);
+    const features = levelData?.classFeatures || levelData?.special || [];
+    features.forEach((feature) => {
+      if (typeof feature === "string") return;
+      if (!feature.activatable) {
+        addEntries(feature.immunities, feature.name || "Class Feature");
+      }
+      featurePools(feature).forEach((pool) => {
+        if (pool.contributesToAbility) return;
+        const key = classFeatureChoiceKey(
+          { ...feature, className, classLevel, characterLevel: row.level },
+          pool,
+          { className, classLevel, characterLevel: row.level },
+        );
+        const selected = classFeatureChoices[key];
+        const option = (pool.options || []).find(
+          (item) => item.name === selected,
+        );
+        if (option) {
+          addEntries(
+            option.immunities,
+            option.name || pool.name || "Class Feature Choice",
+          );
+        }
+      });
+    });
+  });
+  collectSelectedRaceBuffs().forEach((buff) => {
+    addEntries(buff.immunities, buff.name || "Race");
+  });
+  (activeBuffs || []).forEach((buff) => {
+    addEntries(buff.immunities, buff.name || "Active Effect", true);
+  });
+  return entries;
+}
+
+function uniqueImmunityEntries(entries = []) {
+  const seen = new Map();
+  (Array.isArray(entries) ? entries : []).forEach((entry) => {
+    const key = immunityKey(entry);
+    if (!key.startsWith("|") && !seen.has(key)) seen.set(key, entry);
+  });
+  return [...seen.values()].sort((a, b) =>
+    immunityEntryText(a).localeCompare(immunityEntryText(b)),
+  );
+}
+
+function immunityApplicationBreakdown(entries = []) {
+  const seen = new Map();
+  const applied = [];
+  const overridden = [];
+  (Array.isArray(entries) ? entries : []).forEach((entry) => {
+    const key = immunityKey(entry);
+    if (key.startsWith("|")) return;
+    const normalized = {
+      ...entry,
+      name: normalizeImmunityName(entry.name || entry.immunity || entry.type),
+    };
+    const existing = seen.get(key);
+    if (existing) {
+      overridden.push({
+        ...normalized,
+        overriddenBy: existing,
+      });
+      return;
+    }
+    seen.set(key, normalized);
+    applied.push(normalized);
+  });
+  const sortByText = (a, b) =>
+    immunityEntryText(a).localeCompare(immunityEntryText(b));
+  return {
+    applied: applied.sort(sortByText),
+    overridden: overridden.sort(sortByText),
+  };
+}
+
+function renderImmunityApplicationRows(label, entries = [], className = "") {
+  if (!entries.length) return "";
+  const rows = entries
+    .map((entry) => {
+      const name = escapeHtml(immunityEntryTextWithSource(entry));
+      const coveredBy = entry.overriddenBy
+        ? ` covered by <span class="calc-buff-name">${escapeHtml(immunityEntryTextWithSource(entry.overriddenBy))}</span>`
+        : "";
+      return `<div class="${className}">${escapeHtml(label)}: <span class="calc-buff-name">${name}</span>${coveredBy}</div>`;
+    })
+    .join("");
+  return `<div class="calc-buff-block">${rows}</div>`;
+}
+
+function updateClassFeatureDamageReductionSummary() {
+  const summary = el("damageReductionFromClasses");
+  if (!summary) return;
+  const custom = collectCustomDamageReduction();
+  const entries = collectClassFeatureDamageReduction();
   const always = entries.filter((entry) => !entry.active);
   const active = entries.filter((entry) => entry.active);
-  const parts = [];
-  if (always.length)
-    parts.push(`Always on: ${always.map(drEntryText).join(", ")}`);
-  if (active.length)
-    parts.push(
-      `While active: ${active.map((entry) => `${drEntryText(entry)} (${entry.source})`).join(", ")}`,
-    );
-  summary.textContent = parts.join(" | ");
+  const keyFn = (entry) =>
+    `${damageReductionTypeKey(entry.overcomeType)}|${defenseConditionKey(entry)}`;
+  const baseBreakdown = strongestDefenseApplicationBreakdown(
+    [...custom, ...always],
+    keyFn,
+  );
+  const activeBreakdown = strongestDefenseApplicationBreakdown(
+    [...custom, ...always, ...active],
+    keyFn,
+  );
+  const activeApplied = activeDefenseApplied(baseBreakdown, activeBreakdown);
+  const activeOverridden = activeDefenseOverridden(activeBreakdown);
+  if (
+    !custom.length &&
+    !always.length &&
+    !active.length &&
+    !baseBreakdown.applied.length
+  ) {
+    summary.innerHTML = "";
+    summary.classList.add("d-none");
+    return;
+  }
+  const parts = [
+    renderDefenseApplicationRows(
+      "applied",
+      baseBreakdown.applied,
+      drEntryText,
+      "calc-applied",
+    ),
+    renderDefenseApplicationRows(
+      "overridden",
+      baseBreakdown.overridden,
+      drEntryText,
+      "calc-overridden",
+    ),
+    renderDefenseApplicationRows(
+      "while active",
+      activeApplied,
+      drEntryText,
+      "calc-applied",
+    ),
+    renderDefenseApplicationRows(
+      "overridden while active",
+      activeOverridden,
+      drEntryText,
+      "calc-overridden",
+    ),
+  ].filter(Boolean);
+  summary.innerHTML = `<div class="calc-buffs">${parts.join("")}</div>`;
+  summary.classList.remove("d-none");
+}
+
+function updateClassFeatureImmunitySummary() {
+  const summary = el("immunitiesFromEffects");
+  if (!summary) return;
+  const custom = collectCustomImmunities();
+  const entries = collectClassFeatureImmunities();
+  const always = entries.filter((entry) => !entry.active);
+  const active = entries.filter((entry) => entry.active);
+  const baseBreakdown = immunityApplicationBreakdown([...custom, ...always]);
+  const activeBreakdown = immunityApplicationBreakdown([
+    ...custom,
+    ...always,
+    ...active,
+  ]);
+  const baseAppliedKeys = new Set(baseBreakdown.applied.map(immunityKey));
+  const activeApplied = activeBreakdown.applied.filter(
+    (entry) => entry.active && !baseAppliedKeys.has(immunityKey(entry)),
+  );
+  const activeOverridden = activeBreakdown.overridden.filter(
+    (entry) => entry.active || entry.overriddenBy?.active,
+  );
+  if (
+    !custom.length &&
+    !always.length &&
+    !active.length &&
+    !baseBreakdown.applied.length
+  ) {
+    summary.innerHTML = "";
+    summary.classList.add("d-none");
+    return;
+  }
+  const parts = [
+    renderImmunityApplicationRows(
+      "applied",
+      baseBreakdown.applied,
+      "calc-applied",
+    ),
+    renderImmunityApplicationRows(
+      "overridden",
+      baseBreakdown.overridden,
+      "calc-overridden",
+    ),
+    renderImmunityApplicationRows("while active", activeApplied, "calc-applied"),
+    renderImmunityApplicationRows(
+      "overridden while active",
+      activeOverridden,
+      "calc-overridden",
+    ),
+  ].filter(Boolean);
+  summary.innerHTML = `<div class="calc-buffs">${parts.join("")}</div>`;
   summary.classList.remove("d-none");
 }
 
@@ -3296,47 +4449,89 @@ function collectClassFeatureSpellResistance() {
 function updateClassFeatureSpellResistanceSummary() {
   const summary = el("spellResistanceFromClasses");
   if (!summary) return;
+  const custom = collectCustomSpellResistance();
   const entries = collectClassFeatureSpellResistance();
   const buffed = window.PFBuffs?.calculateStatsDetailed(
     calculationBuffs(),
     sheetToBaseline(),
   );
   const srBreakdown = buffed?.breakdown?.["spell resistance"] || [];
-  const bonusTotal = buffed?.totals?.["spell resistance"] || 0;
   const bonusUsed = srBreakdown.filter((entry) => entry.applied === true);
   const bonusConditional = srBreakdown.filter(
     (entry) => entry.applied === "conditional",
   );
-  if (!entries.length && !bonusUsed.length && !bonusConditional.length) {
-    summary.textContent = "";
+  const bonusOverridden = srBreakdown.filter((entry) => entry.applied === false);
+  const always = entries.filter((entry) => !entry.active);
+  const active = entries.filter((entry) => entry.active);
+  const keyFn = (entry) => `sr|${defenseConditionKey(entry)}`;
+  const baseBreakdown = strongestDefenseApplicationBreakdown(
+    [...custom, ...always],
+    keyFn,
+  );
+  const activeBreakdown = strongestDefenseApplicationBreakdown(
+    [...custom, ...always, ...active],
+    keyFn,
+  );
+  const activeApplied = activeDefenseApplied(baseBreakdown, activeBreakdown);
+  const activeOverridden = activeDefenseOverridden(activeBreakdown);
+  if (
+    !custom.length &&
+    !entries.length &&
+    !bonusUsed.length &&
+    !bonusConditional.length &&
+    !bonusOverridden.length
+  ) {
+    summary.innerHTML = "";
     summary.classList.add("d-none");
     return;
   }
-  const always = entries.filter((entry) => !entry.active);
-  const active = entries.filter((entry) => entry.active);
-  const parts = [];
-  if (always.length)
-    parts.push(`Always on: ${always.map(srEntryText).join(", ")}`);
-  if (active.length)
-    parts.push(
-      `While active: ${active.map((entry) => `${srEntryText(entry)} (${entry.source})`).join(", ")}`,
-    );
-  if (bonusUsed.length)
-    parts.push(
-      `Add ${signed(bonusTotal)} to SR: ${bonusUsed
-        .map((entry) => `${entry.source} ${signed(Number(entry.value || 0))}`)
-        .join(", ")}`,
-    );
-  if (bonusConditional.length)
-    parts.push(
-      `Add to SR when conditional: ${bonusConditional
-        .map(
-          (entry) =>
-            `${signed(Number(entry.value || 0))} ${entry.detail || "conditional"} (${entry.source})`,
-        )
-        .join(", ")}`,
-    );
-  summary.textContent = parts.join(" | ");
+  const renderSrBonusRows = (label, rows = [], className = "") => {
+    if (!rows.length) return "";
+    return `<div class="calc-buff-block">${rows
+      .map((entry) => {
+        const detail = conciseBreakdownDetail(entry.detail);
+        const detailText = detail ? ` | ${escapeHtml(detail)}` : "";
+        const amount = Number(entry.value || 0);
+        const valueClass =
+          amount > 0
+            ? "calc-value-positive"
+            : amount < 0
+              ? "calc-value-negative"
+              : "calc-value-neutral";
+        return `<div class="${className}">${escapeHtml(label)}: <span class="calc-buff-name">${escapeHtml(entry.source || "Effect")}</span> <span class="${valueClass}">${signed(amount)}</span> (${escapeHtml(entry.type || "untyped")})${detailText}</div>`;
+      })
+      .join("")}</div>`;
+  };
+  const parts = [
+    renderDefenseApplicationRows(
+      "applied",
+      baseBreakdown.applied,
+      srEntryText,
+      "calc-applied",
+    ),
+    renderDefenseApplicationRows(
+      "overridden",
+      baseBreakdown.overridden,
+      srEntryText,
+      "calc-overridden",
+    ),
+    renderDefenseApplicationRows(
+      "while active",
+      activeApplied,
+      srEntryText,
+      "calc-applied",
+    ),
+    renderDefenseApplicationRows(
+      "overridden while active",
+      activeOverridden,
+      srEntryText,
+      "calc-overridden",
+    ),
+    renderSrBonusRows("applied bonus", bonusUsed, "calc-applied"),
+    renderSrBonusRows("overridden bonus", bonusOverridden, "calc-overridden"),
+    renderSrBonusRows("conditional bonus", bonusConditional, "calc-conditional"),
+  ].filter(Boolean);
+  summary.innerHTML = `<div class="calc-buffs">${parts.join("")}</div>`;
   summary.classList.remove("d-none");
 }
 
@@ -3348,7 +4543,7 @@ function updateClassFeatureSpellResistanceSummary() {
 // folded into the matching ability's bonuses (e.g. rage powers into Rage)
 // rather than applying on its own.
 function collectActivatableAbilities() {
-  return (
+  const classFeatureAbilities =
     window.PFClassFeatureAbilities?.collectActivatableAbilities({
       classDefinitions,
       classProgression,
@@ -3362,8 +4557,8 @@ function collectActivatableAbilities() {
         wis: num("wisScore"),
         cha: num("chaScore"),
       },
-    }) || []
-  );
+    }) || [];
+  return [...classFeatureAbilities, ...collectActivatableRacialTraitAbilities()];
 }
 
 function calculationBuffs() {
@@ -3634,9 +4829,10 @@ function classFeatureScaleText(scale) {
     );
   }
   const every = scale.every || {};
-  if (every.afterLevel && every.everyLevels && every.increase) {
+  const fromLevel = every.fromLevel || every.afterLevel || every.after;
+  if (fromLevel && every.everyLevels && every.increase) {
     parts.push(
-      `after ${sourceLabel} ${every.afterLevel}, every ${every.everyLevels}: ${signed(Number(every.increase || 0))}`,
+      `from ${sourceLabel} ${fromLevel}, every ${every.everyLevels}: ${signed(Number(every.increase || 0))}`,
     );
   }
   if (scale.minimumOne) parts.push("minimum 1");
@@ -3692,6 +4888,21 @@ function renderClassFeatureSpellResistance(feature) {
           const scale = classFeatureScaleText(sr.bonusScale || sr.scale);
           return `<span class="class-feature-sr-pill">${escapeHtml(`${srEntryText(sr)}${scale}`)}</span>`;
         })
+        .join("")}
+    </div>
+  `;
+}
+
+function renderClassFeatureImmunities(feature) {
+  const entries = Array.isArray(feature.immunities) ? feature.immunities : [];
+  if (!entries.length) return "";
+  return `
+    <div class="class-feature-effects">
+      ${entries
+        .map(
+          (immunity) =>
+            `<span class="class-feature-effect-pill">${escapeHtml(`Immune ${immunityEntryText(immunity)}`)}</span>`,
+        )
         .join("")}
     </div>
   `;
@@ -3771,7 +4982,27 @@ function renderClassFeatureSpellLikeAbilities(feature) {
             Number(entry.minimumLevel ?? entry.level ?? 1) || 1;
           const levelText =
             minimumLevel > 1 ? `level ${minimumLevel}, ` : "";
-          return `<span class="class-feature-effect-pill">${escapeHtml(`SLA ${levelText}${frequency}${spellName}`)}</span>`;
+          const requirement = spellLikeRequirementText(entry);
+          const requirementText = requirement ? `${requirement}, ` : "";
+          return `<span class="class-feature-effect-pill">${escapeHtml(`SLA ${levelText}${requirementText}${frequency}${spellName}`)}</span>`;
+        })
+        .join("")}
+    </div>
+  `;
+}
+
+function renderClassFeatureGeneratedEquipment(feature) {
+  const entries = Array.isArray(feature.generatedEquipment)
+    ? feature.generatedEquipment
+    : [];
+  if (!entries.length) return "";
+  return `
+    <div class="class-feature-effects">
+      ${entries
+        .map((entry) => {
+          const type = entry.type || "Equipment";
+          const name = entry.name || entry.item || "Generated item";
+          return `<span class="class-feature-effect-pill">${escapeHtml(`Generates ${type}: ${name}`)}</span>`;
         })
         .join("")}
     </div>
@@ -4004,6 +5235,9 @@ function renderClassFeatures() {
                 spellResistance: Array.isArray(feature.spellResistance)
                   ? feature.spellResistance
                   : [],
+                immunities: Array.isArray(feature.immunities)
+                  ? feature.immunities
+                  : [],
                 classSkillGrants: Array.isArray(feature.classSkillGrants)
                   ? feature.classSkillGrants
                   : [],
@@ -4012,6 +5246,9 @@ function renderClassFeatures() {
                   : [],
                 spellLikeAbilities: Array.isArray(feature.spellLikeAbilities)
                   ? feature.spellLikeAbilities
+                  : [],
+                generatedEquipment: Array.isArray(feature.generatedEquipment)
+                  ? feature.generatedEquipment
                   : [],
                 pools: featurePools(feature),
               };
@@ -4039,10 +5276,12 @@ function renderClassFeatures() {
               <div class="small-text">${escapeHtml(feature.className)} ${escapeHtml(feature.classLevel)}</div>
               ${renderClassFeatureEffects(feature)}
               ${renderClassFeatureDamageReduction(feature)}
+              ${renderClassFeatureImmunities(feature)}
               ${renderClassFeatureSpellResistance(feature)}
               ${renderClassFeatureClassSkillGrants(feature)}
               ${renderClassFeatureSizeChanges(feature)}
               ${renderClassFeatureSpellLikeAbilities(feature)}
+              ${renderClassFeatureGeneratedEquipment(feature)}
               ${renderClassFeaturePools(feature)}
               <div id="${collapseId}" class="collapse small mt-2">${feature.description ? escapeHtml(feature.description) : "No description scraped."}</div>
             </article>
@@ -4634,6 +5873,8 @@ function updateClassDerivedViews() {
   renderClassFeatures();
   renderSpellProgression();
   updateClassFeatureDamageReductionSummary();
+  updateResistanceSummary();
+  updateClassFeatureImmunitySummary();
   updateClassFeatureSpellResistanceSummary();
 }
 
@@ -4932,22 +6173,40 @@ function addWeapon(data = {}) {
   const greaterTwf = isYes(data.greaterTwf || data.greater_twf) ? "yes" : "no";
   const weaponType =
     data.weaponType || data.weapon_type || "Melee Weapon (One-Handed)";
+  const naturalAttackKind =
+    data.naturalAttackKind ||
+    data.natural_attack_kind ||
+    naturalAttackKindFromName(name);
+  const naturalAttackRole =
+    data.naturalAttackRole || data.natural_attack_role || "";
   const enhancement = data.enhancement || "0";
   const enchantment = data.enchantment || "";
   const specialMaterial = data.specialMaterial || data.special_material || "";
   const detailsText = data.details || data.type || "";
-  const sourceLocked = Boolean(sourceLootId);
+  const generatedEquipmentId =
+    data.generatedEquipmentId || data.generated_equipment_id || "";
+  const generatedSource = data.generatedSource || data.generated_source || "";
+  const generatedLocked = Boolean(generatedEquipmentId);
+  const sourceLocked = Boolean(sourceLootId || generatedLocked);
+  if (generatedLocked) card.dataset.generatedEquipment = "true";
   card.innerHTML = `
     <div class="equipment-card-header">
       <input data-field="name" class="form-control form-control-sm sheet-input fw-semibold equipment-name-input" value="${escapeHtml(name)}" ${sourceLocked ? "readonly" : ""}>
       <div class="equipment-actions">
+        ${
+          generatedLocked
+            ? `<span class="inventory-equipped-badge" title="${escapeHtml(generatedSource || "Generated by effect")}">Effect</span>`
+            : `
         <button class="btn btn-outline-light btn-sm" type="button" onclick="openEquipmentItemEditor(this)">More</button>
         <button class="btn btn-outline-danger btn-sm equipment-icon-btn" type="button" onclick="removeCard(this)" aria-label="Remove ${escapeHtml(name)}" title="Remove">
           <i class="bi bi-trash"></i>
-        </button>
+        </button>`
+        }
       </div>
     </div>
     <input data-field="sourceLootId" class="sheet-input" type="hidden" value="${sourceLootId}">
+    <input data-field="generatedEquipmentId" class="sheet-input" type="hidden" value="${escapeHtml(generatedEquipmentId)}">
+    <input data-field="generatedSource" class="sheet-input" type="hidden" value="${escapeHtml(generatedSource)}">
     <input data-field="templateAttack" class="sheet-input" type="hidden" value="${escapeHtml(data.templateAttack || data.template_attack || "")}">
     <div class="weapon-summary">
       <div class="weapon-attack-summary"><label>Attack Bonus</label><input data-attack-total class="form-control form-control-sm" readonly></div>
@@ -4960,6 +6219,8 @@ function addWeapon(data = {}) {
     <input data-field="enchantment" class="sheet-input" type="hidden" value="${escapeHtml(enchantment)}">
     <input data-field="specialMaterial" class="sheet-input" type="hidden" value="${escapeHtml(specialMaterial)}">
     <input data-field="weaponType" class="sheet-input" type="hidden" value="${escapeHtml(weaponType)}">
+    <input data-field="naturalAttackKind" class="sheet-input" type="hidden" value="${escapeHtml(naturalAttackKind)}">
+    <input data-field="naturalAttackRole" class="sheet-input" type="hidden" value="${escapeHtml(naturalAttackRole)}">
     <input data-field="attackScale" class="sheet-input" type="hidden" value="${escapeHtml(attackScale)}">
     <input data-field="attackMisc" class="sheet-input" type="hidden" value="${data.attackMisc || data.attack_misc || "0"}">
     <input data-field="damage" class="sheet-input" type="hidden" value="${escapeHtml(data.damage || "")}">
@@ -4999,21 +6260,33 @@ function addArmor(data = {}) {
   const enchantment = data.enchantment || "";
   const specialMaterial = data.specialMaterial || data.special_material || "";
   const sourceLootId = data.sourceLootId || data.source_loot_id || "";
-  const sourceLocked = Boolean(sourceLootId);
+  const generatedEquipmentId =
+    data.generatedEquipmentId || data.generated_equipment_id || "";
+  const generatedSource = data.generatedSource || data.generated_source || "";
+  const generatedLocked = Boolean(generatedEquipmentId);
+  const sourceLocked = Boolean(sourceLootId || generatedLocked);
+  if (generatedLocked) card.dataset.generatedEquipment = "true";
   card.innerHTML = `
     <div class="equipment-card-header">
       <input data-field="item" class="form-control form-control-sm sheet-input fw-semibold equipment-name-input" value="${escapeHtml(itemName)}" ${sourceLocked ? "readonly" : ""}>
       <div class="equipment-actions">
+        ${
+          generatedLocked
+            ? `<span class="inventory-equipped-badge" title="${escapeHtml(generatedSource || "Generated by effect")}">Effect</span>`
+            : `
         <button class="btn btn-outline-light btn-sm" type="button" onclick="openEquipmentItemEditor(this)">More</button>
         <button class="btn btn-outline-danger btn-sm equipment-icon-btn" type="button" onclick="removeCard(this)" aria-label="Remove ${escapeHtml(itemName)}" title="Remove">
           <i class="bi bi-trash"></i>
-        </button>
+        </button>`
+        }
       </div>
     </div>
     <div class="card-summary">
       <div><label>Total</label><input data-armor-total class="form-control form-control-sm" readonly></div>
     </div>
     <input data-field="sourceLootId" class="sheet-input" type="hidden" value="${sourceLootId}">
+    <input data-field="generatedEquipmentId" class="sheet-input" type="hidden" value="${escapeHtml(generatedEquipmentId)}">
+    <input data-field="generatedSource" class="sheet-input" type="hidden" value="${escapeHtml(generatedSource)}">
     <input data-field="type" class="sheet-input" type="hidden" value="${type}">
     <input data-field="bonus" class="sheet-input" type="hidden" value="${data.bonus || ""}">
     <input data-field="enhancement" class="sheet-input" type="hidden" value="${enhancement}">
@@ -5053,6 +6326,109 @@ function addGear(data = {}) {
   `;
   el("gearRows").appendChild(card);
   attachInputListeners(card);
+}
+
+function generatedEquipmentCardData(entry = {}, buff = {}, index = 0) {
+  const details = entry.details && typeof entry.details === "object"
+    ? entry.details
+    : {};
+  const type = ["Weapon", "Armor", "Shield"].includes(entry.type)
+    ? entry.type
+    : "Weapon";
+  const name = entry.name || entry.item || `Generated ${type}`;
+  const source = buff.name || buff.source || "Effect";
+  const generatedEquipmentId = [
+    source,
+    index,
+    type,
+    name,
+    JSON.stringify(details),
+  ].join("|");
+  if (type === "Weapon") {
+    return {
+      kind: "Weapon",
+      data: {
+        name,
+        generatedEquipmentId,
+        generatedSource: source,
+        weaponType: details.weaponType || "Natural Weapon",
+        naturalAttackKind:
+          details.naturalAttackKind ||
+          details.natural_attack_kind ||
+          naturalAttackKindFromName(name),
+        naturalAttackRole:
+          details.naturalAttackRole ||
+          details.natural_attack_role ||
+          NATURAL_ATTACK_DAMAGE_BY_SIZE[
+            details.naturalAttackKind ||
+              details.natural_attack_kind ||
+              naturalAttackKindFromName(name)
+          ]?.attackRole ||
+          "",
+        attackScale: details.attackScale || "STR",
+        attackMisc: details.attackMisc || details.attack_misc || "0",
+        damage: details.damage || "",
+        damageScale: details.damageScale || "STR",
+        damageMisc: details.damageMisc || details.damage_misc || "0",
+        enhancement: details.enhancement || "0",
+        enchantment: details.enchantment || "",
+        specialMaterial: details.specialMaterial || "",
+        details: details.details || details.summary || "",
+        range: details.range || "",
+        critical: details.critical || "",
+        capacity: details.capacity || "",
+        misfire: details.misfire || "",
+        twoHanded: details.twoHanded || details.two_handed || "no",
+        powerAttack: details.powerAttack || details.power_attack || "no",
+        deadlyAim: details.deadlyAim || details.deadly_aim || "no",
+        rapidShot: details.rapidShot || details.rapid_shot || "no",
+      },
+    };
+  }
+  return {
+    kind: "Armor",
+    data: {
+      item: name,
+      generatedEquipmentId,
+      generatedSource: source,
+      type,
+      bonus: details.bonus || "0",
+      enhancement: details.enhancement || "0",
+      enchantment: details.enchantment || "",
+      specialMaterial: details.specialMaterial || "",
+      penalty: details.penalty || "",
+      failure: details.failure || "",
+      weight: details.weight || "",
+    },
+  };
+}
+
+function collectGeneratedEquipmentCards() {
+  const generated = [];
+  calculationBuffs().forEach((buff) => {
+    (Array.isArray(buff.generatedEquipment) ? buff.generatedEquipment : []).forEach(
+      (entry, index) => {
+        generated.push(generatedEquipmentCardData(entry, buff, index));
+      },
+    );
+  });
+  return generated;
+}
+
+function syncGeneratedEquipmentCards() {
+  const generated = collectGeneratedEquipmentCards();
+  const signature = JSON.stringify(generated);
+  const existing = [
+    ...document.querySelectorAll('[data-generated-equipment="true"]'),
+  ];
+  if (signature === generatedEquipmentSignature && existing.length === generated.length)
+    return;
+  existing.forEach((card) => card.remove());
+  generated.forEach((entry) => {
+    if (entry.kind === "Weapon") addWeapon(entry.data);
+    else addArmor(entry.data);
+  });
+  generatedEquipmentSignature = signature;
 }
 
 function equipmentField(card, name) {
@@ -5299,6 +6675,21 @@ function updateWornCardFromLoot(item) {
     const nextType = details.weaponType || "Melee Weapon (One-Handed)";
     weaponCard.querySelector('[data-field="weaponType"]').value = nextType;
     syncWeaponTypeControls(weaponCard, previousType !== nextType);
+    weaponCard.querySelector('[data-field="attackMisc"]').value =
+      details.attackMisc || details.attack_misc || "0";
+    weaponCard.querySelector('[data-field="damageMisc"]').value =
+      details.damageMisc || details.damage_misc || "0";
+    Object.keys(INVENTORY_WEAPON_ATTACK_OPTION_IDS).forEach((field) => {
+      const input = weaponCard.querySelector(`[data-field="${field}"]`);
+      const snakeField = field.replace(
+        /[A-Z]/g,
+        (match) => `_${match.toLowerCase()}`,
+      );
+      if (input) input.checked = isYes(details[field] || details[snakeField]);
+    });
+    const rapidShotInput = weaponCard.querySelector('[data-field="rapidShot"]');
+    if (rapidShotInput?.checked) enforceRapidShotChoice(rapidShotInput);
+    syncTwfFeatControls(weaponCard);
     setCardScaling(weaponCard, "attackScale", details.attackScale || "STR");
     setCardScaling(weaponCard, "damageScale", details.damageScale || "STR");
   }
@@ -5339,8 +6730,10 @@ function updateWornCardFromLoot(item) {
       sourceLootId: item.id,
       weaponType: details.weaponType || "Melee Weapon (One-Handed)",
       attackScale: details.attackScale || "STR",
+      attackMisc: details.attackMisc || details.attack_misc || "0",
       damage: details.damage || "",
       damageScale: details.damageScale || "STR",
+      damageMisc: details.damageMisc || details.damage_misc || "0",
       enhancement: details.enhancement || "0",
       enchantment: details.enchantment || "",
       specialMaterial: details.specialMaterial || "",
@@ -5349,6 +6742,18 @@ function updateWornCardFromLoot(item) {
       critical: details.critical || "",
       capacity: details.capacity || "",
       misfire: details.misfire || "",
+      twoHanded: details.twoHanded || details.two_handed || "no",
+      powerAttack: details.powerAttack || details.power_attack || "no",
+      deadlyAim: details.deadlyAim || details.deadly_aim || "no",
+      rapidShot: details.rapidShot || details.rapid_shot || "no",
+      twfNoFeatPrimary:
+        details.twfNoFeatPrimary || details.twf_no_feat_primary || "no",
+      twfNoFeatOff: details.twfNoFeatOff || details.twf_no_feat_off || "no",
+      twfFeatPrimary:
+        details.twfFeatPrimary || details.twf_feat_primary || "no",
+      twfFeatOff: details.twfFeatOff || details.twf_feat_off || "no",
+      improvedTwf: details.improvedTwf || details.improved_twf || "no",
+      greaterTwf: details.greaterTwf || details.greater_twf || "no",
     });
   } else if (["Armor", "Shield"].includes(item.type) && !armorCard) {
     weaponCard?.remove();
@@ -5383,12 +6788,16 @@ function syncEquippedLootBuffFromItem(item) {
   const spellResistance = Array.isArray(item.spellResistance)
     ? item.spellResistance
     : [];
+  const immunities = Array.isArray(item.immunities) ? item.immunities : [];
   const classSkillGrants = Array.isArray(item.classSkillGrants)
     ? item.classSkillGrants
     : [];
   const sizeChanges = Array.isArray(item.sizeChanges) ? item.sizeChanges : [];
   const spellLikeAbilities = Array.isArray(item.spellLikeAbilities)
     ? item.spellLikeAbilities
+    : [];
+  const generatedEquipment = Array.isArray(item.generatedEquipment)
+    ? item.generatedEquipment
     : [];
   // An item can grant DR/SR/class-skill status with no plain "effects"
   // at all (a ring of protection from acid, say) -- so "has nothing to
@@ -5399,9 +6808,11 @@ function syncEquippedLootBuffFromItem(item) {
     !effects.length &&
     !damageReduction.length &&
     !spellResistance.length &&
+    !immunities.length &&
     !classSkillGrants.length &&
     !sizeChanges.length &&
-    !spellLikeAbilities.length
+    !spellLikeAbilities.length &&
+    !generatedEquipment.length
   ) {
     if (index >= 0) {
       activeBuffs.splice(index, 1);
@@ -5429,9 +6840,11 @@ function syncEquippedLootBuffFromItem(item) {
     bonuses: effects,
     ...(damageReduction.length ? { damageReduction } : {}),
     ...(spellResistance.length ? { spellResistance } : {}),
+    ...(immunities.length ? { immunities } : {}),
     ...(classSkillGrants.length ? { classSkillGrants } : {}),
     ...(sizeChanges.length ? { sizeChanges } : {}),
     ...(spellLikeAbilities.length ? { spellLikeAbilities } : {}),
+    ...(generatedEquipment.length ? { generatedEquipment } : {}),
   };
   if (index >= 0 && JSON.stringify(activeBuffs[index]) === JSON.stringify(next))
     return false;
@@ -5452,6 +6865,7 @@ function isLootEquipped(sourceLootId) {
 
 async function openEquipmentItemEditor(btn) {
   const card = btn.closest(".sheet-card");
+  if (card?.dataset.generatedEquipment === "true") return;
   const sourceLootId =
     card?.querySelector('[data-field="sourceLootId"]')?.value || "";
   if (sourceLootId) {
@@ -5582,20 +6996,33 @@ function calculateWeaponDamage(card, buffed, buffBonuses) {
     if (input.type === "checkbox") return input.checked ? "yes" : "no";
     return input.value || "";
   };
-  const dice = stripDamageModifier(field("damage"));
   const scalingTerms = parseScalingTerms(field("damageScale"), "STR");
   const weaponType = field("weaponType") || "Melee Weapon (One-Handed)";
+  const naturalData = naturalAttackData(card);
+  const dice = naturalData
+    ? naturalAttackDice(card) || stripDamageModifier(field("damage"))
+    : stripDamageModifier(field("damage"));
   const isRanged =
     isRangedWeaponType(weaponType) ||
     Boolean(field("range").trim()) ||
     parseScalingKeys(field("attackScale")).includes("dex");
+  const naturalSecondary =
+    naturalData &&
+    String(
+      field("naturalAttackRole") || naturalData.attackRole || "",
+    ).toLowerCase() === "secondary";
   const twoHanded =
-    isTwoHandedWeaponType(weaponType) || isYes(field("twoHanded"));
+    !naturalData &&
+    (isTwoHandedWeaponType(weaponType) || isYes(field("twoHanded")));
   const enhancement = enhancementValue(field("enhancement"));
   const miscBonus = Number(field("damageMisc") || 0);
   const feat = weaponFeatAdjustments(card);
   const scalingBonus = scalingTerms.reduce((total, term) => {
-    const multiplier = twoHanded && term.key === "str" ? 1.5 : term.multiplier;
+    const multiplier = naturalSecondary
+      ? 0.5
+      : twoHanded && term.key === "str"
+        ? 1.5
+        : term.multiplier;
     return total + Math.floor(abilityModFor(term.key, buffed) * multiplier);
   }, 0);
   const buffBonus =
@@ -5606,7 +7033,11 @@ function calculateWeaponDamage(card, buffed, buffBonuses) {
   const totalText = `${dice || "0"}${signed(totalBonus)}`;
   const statItems = scalingTerms.flatMap((term) => {
     const statName = ABILITY_STAT_NAMES[term.key];
-    const multiplier = twoHanded && term.key === "str" ? 1.5 : term.multiplier;
+    const multiplier = naturalSecondary
+      ? 0.5
+      : twoHanded && term.key === "str"
+        ? 1.5
+        : term.multiplier;
     return breakdownForStat(
       buffed,
       statName,
@@ -5627,7 +7058,8 @@ function calculateWeaponDamage(card, buffed, buffBonuses) {
     })),
     ...feat.breakdown.filter((item) => item.targetLabel === "Damage"),
   ];
-  const formula = `${dice || "0"} + scaling ${signed(scalingBonus)} + enhancement ${signed(enhancement)} + misc ${signed(miscBonus)} + buffs ${signed(buffBonus)} + feats ${signed(feat.damageBonus)}`;
+  const naturalSize = naturalData ? ` (${finalCreatureSize().name} ${naturalData.kind})` : "";
+  const formula = `${dice || "0"}${naturalSize} + scaling ${signed(scalingBonus)} + enhancement ${signed(enhancement)} + misc ${signed(miscBonus)} + buffs ${signed(buffBonus)} + feats ${signed(feat.damageBonus)}`;
   return {
     buffBonus,
     scalingBonus,
@@ -5650,6 +7082,8 @@ function calculateWeaponAttack(card, buffed, buffBonuses) {
     isRangedWeaponType(weaponType) ||
     Boolean(field("range").trim()) ||
     parseScalingKeys(field("attackScale")).includes("dex");
+  const size = finalCreatureSize();
+  const sizeAttack = Number(size.modifier || 0);
   const miscBonus = Number(field("attackMisc") || 0);
   const buffBonus =
     Number(buffBonuses.attack || 0) +
@@ -5659,8 +7093,21 @@ function calculateWeaponAttack(card, buffed, buffBonuses) {
     const attackValues =
       String(templateAttack)
         .match(/[+\-]?\d+/g)
-        ?.map((value) => signed(Number(value) + miscBonus + buffBonus)) || [];
+        ?.map((value) =>
+          signed(Number(value) + sizeAttack + miscBonus + buffBonus),
+        ) || [];
     const directItems = [
+      ...(sizeAttack
+        ? [
+            {
+              source: `${size.name} size`,
+              value: sizeAttack,
+              type: "size",
+              applied: true,
+              targetLabel: "Attack",
+            },
+          ]
+        : []),
       ...breakdownForStat(buffed, "attack").map((item) => ({
         ...item,
         targetLabel: "Attack",
@@ -5673,7 +7120,7 @@ function calculateWeaponAttack(card, buffed, buffBonuses) {
         targetLabel: isRanged ? "Ranged attack" : "Melee attack",
       })),
     ];
-    const formula = `template ${templateAttack} + misc ${signed(miscBonus)} + buffs ${signed(buffBonus)}`;
+    const formula = `template ${templateAttack} + size ${signed(sizeAttack)} + misc ${signed(miscBonus)} + buffs ${signed(buffBonus)}`;
     return {
       buffBonus,
       attacks: attackValues.join("/"),
@@ -5692,6 +7139,68 @@ function calculateWeaponAttack(card, buffed, buffBonuses) {
   );
   const enhancement = enhancementValue(field("enhancement"));
   const feat = weaponFeatAdjustments(card);
+  const naturalData = naturalAttackData(card);
+  if (naturalData) {
+    const role = String(
+      field("naturalAttackRole") || naturalData.attackRole || "Primary",
+    );
+    const secondaryPenalty =
+      role.toLowerCase() === "secondary" ? -5 : 0;
+    const totalBonus =
+      num("bab") +
+      scalingBonus +
+      enhancement +
+      sizeAttack +
+      miscBonus +
+      buffBonus +
+      feat.attackPenalty +
+      secondaryPenalty;
+    const statItems = scalingTerms.flatMap((term) =>
+      breakdownForStat(
+        buffed,
+        ABILITY_STAT_NAMES[term.key],
+        `${ABILITY_STAT_NAMES[term.key]} attack scaling`,
+      ).map((item) => ({ ...item, targetLabel: "Attack scaling" })),
+    );
+    const directItems = [
+      ...(sizeAttack
+        ? [
+            {
+              source: `${size.name} size`,
+              value: sizeAttack,
+              type: "size",
+              applied: true,
+              targetLabel: "Attack",
+            },
+          ]
+        : []),
+      ...breakdownForStat(buffed, "attack").map((item) => ({
+        ...item,
+        targetLabel: "Attack",
+      })),
+      ...breakdownForStat(buffed, "melee attack").map((item) => ({
+        ...item,
+        targetLabel: "Melee attack",
+      })),
+      ...feat.breakdown.filter((item) => item.targetLabel === "Attack"),
+    ];
+    if (secondaryPenalty) {
+      directItems.push({
+        source: "Secondary natural attack",
+        value: secondaryPenalty,
+        type: "natural",
+        applied: true,
+        targetLabel: "Attack",
+      });
+    }
+    const formula = `BAB ${signed(num("bab"))} + scaling ${signed(scalingBonus)} + enhancement ${signed(enhancement)} + size ${signed(sizeAttack)} + misc ${signed(miscBonus)} + buffs ${signed(buffBonus)} + feats ${signed(feat.attackPenalty)} + ${role} ${signed(secondaryPenalty)}`;
+    return {
+      buffBonus,
+      attacks: signed(totalBonus),
+      formula,
+      breakdown: [...statItems, ...directItems],
+    };
+  }
   const extraAttacks = Math.max(
     0,
     Math.floor(Number(buffBonuses["extra attack"] || 0)),
@@ -5720,6 +7229,7 @@ function calculateWeaponAttack(card, buffed, buffBonuses) {
   const totalBonus =
     scalingBonus +
     enhancement +
+    sizeAttack +
     miscBonus +
     buffBonus +
     feat.attackPenalty +
@@ -5757,6 +7267,17 @@ function calculateWeaponAttack(card, buffed, buffBonuses) {
     ).map((item) => ({ ...item, targetLabel: "Attack scaling" })),
   );
   const directItems = [
+    ...(sizeAttack
+      ? [
+          {
+            source: `${size.name} size`,
+            value: sizeAttack,
+            type: "size",
+            applied: true,
+            targetLabel: "Attack",
+          },
+        ]
+      : []),
     ...breakdownForStat(buffed, "attack").map((item) => ({
       ...item,
       targetLabel: "Attack",
@@ -5820,7 +7341,7 @@ function calculateWeaponAttack(card, buffed, buffBonuses) {
       applied: true,
       targetLabel: "Extra off-hand attack",
     });
-  const formula = `BAB ${twf.offhand && hasPrimaryWeapon ? "off-hand" : "iteratives"} + extra attacks ${effectExtraAttacks + (rapidShotOnThisWeapon ? 1 : 0)} + scaling ${signed(scalingBonus)} + enhancement ${signed(enhancement)} + misc ${signed(miscBonus)} + buffs ${signed(buffBonus)} + feats ${signed(feat.attackPenalty)} + TWF ${signed(twfAttackPenalty)} + Rapid Shot ${signed(rapidShotPenalty)}`;
+  const formula = `BAB ${twf.offhand && hasPrimaryWeapon ? "off-hand" : "iteratives"} + extra attacks ${effectExtraAttacks + (rapidShotOnThisWeapon ? 1 : 0)} + scaling ${signed(scalingBonus)} + enhancement ${signed(enhancement)} + size ${signed(sizeAttack)} + misc ${signed(miscBonus)} + buffs ${signed(buffBonus)} + feats ${signed(feat.attackPenalty)} + TWF ${signed(twfAttackPenalty)} + Rapid Shot ${signed(rapidShotPenalty)}`;
   return {
     buffBonus,
     attacks,
@@ -5984,6 +7505,7 @@ function toggleAppliedBuffs() {
 function recalculateSheet() {
   updateClassDerivedViews();
   updateCreatureSizeFields();
+  syncGeneratedEquipmentCards();
   if (el("bab")) el("bab").value = num("babBase") + num("babMisc");
   const gearAc = calculateGearAc();
   syncArmorCardsDisplay();
@@ -6144,10 +7666,11 @@ function recalculateSheet() {
     const abilityValue = abilityModFor(abilityKey, buffed);
     const skillAbilityBuffKey = skillBuffKeyForAbility(abilityKey);
     const specificSkillKey = skillStatKey(skill);
+    const familyKey = skillFamilyBonusKey(skill);
     const skillBuff =
       Number(buffBonuses["skill checks"] || 0) +
       Number(buffBonuses[skillAbilityBuffKey] || 0) +
-      (isCraftSkill(skill) ? Number(buffBonuses["craft skill checks"] || 0) : 0) +
+      (familyKey ? Number(buffBonuses[familyKey] || 0) : 0) +
       Number(buffBonuses[specificSkillKey] || 0);
     // +3 for ranking a class skill (from any of your classes, or a "X
     // becomes a class skill" grant) -- only once it actually has ranks
@@ -6179,8 +7702,8 @@ function recalculateSheet() {
         stat: skillAbilityBuffKey,
         target: `${abilityKey.toUpperCase()} skills`,
       },
-      ...(isCraftSkill(skill)
-        ? [{ stat: "craft skill checks", target: "Craft skills" }]
+      ...(familyKey
+        ? [{ stat: familyKey, target: skillFamilyLabel(familyKey) }]
         : []),
       { stat: specificSkillKey, target: skill },
     ]);
@@ -6344,6 +7867,7 @@ function renderInventoryEffects(item) {
   const spellResistance = Array.isArray(item.spellResistance)
     ? item.spellResistance
     : [];
+  const immunities = Array.isArray(item.immunities) ? item.immunities : [];
   const classSkillGrants = Array.isArray(item.classSkillGrants)
     ? item.classSkillGrants
     : [];
@@ -6371,6 +7895,10 @@ function renderInventoryEffects(item) {
       (sr) =>
         `SR ${Number(sr.amount || 0)}${sr.conditional ? ` (${escapeHtml(sr.appliesWhen || "conditional")})` : ""}`,
     ),
+    ...immunities.map(
+      (immunity) =>
+        `Immune ${escapeHtml(immunityEntryText(immunity))}`,
+    ),
     ...classSkillGrants.map((grant) =>
       escapeHtml(window.PFEffectEditor.classSkillGrantText(grant, titleCaseStat)),
     ),
@@ -6384,8 +7912,14 @@ function renderInventoryEffects(item) {
           Number(entry.minimumLevel ?? entry.level ?? 1) || 1;
         const levelText =
           minimumLevel > 1 ? `level ${minimumLevel}, ` : "";
-        return `SLA ${levelText}${entry.frequency ? `${escapeHtml(entry.frequency)}: ` : ""}${escapeHtml(entry.spellName || entry.spell?.name || "Spell")}`;
+        const requirement = spellLikeRequirementText(entry);
+        const requirementText = requirement ? `${escapeHtml(requirement)}, ` : "";
+        return `SLA ${levelText}${requirementText}${entry.frequency ? `${escapeHtml(entry.frequency)}: ` : ""}${escapeHtml(entry.spellName || entry.spell?.name || "Spell")}`;
       },
+    ),
+    ...generatedEquipment.map(
+      (entry) =>
+        `Generates ${escapeHtml(entry.type || "equipment")}: ${escapeHtml(entry.name || entry.item || "Generated item")}`,
     ),
   ];
   if (!lines.length) return "";
@@ -6412,9 +7946,11 @@ function makeEnemyInventoryItem(source) {
     effects: cloneJson(source.effects || []),
     damageReduction: cloneJson(source.damageReduction || []),
     spellResistance: cloneJson(source.spellResistance || []),
+    immunities: cloneJson(source.immunities || []),
     classSkillGrants: cloneJson(source.classSkillGrants || []),
     sizeChanges: cloneJson(source.sizeChanges || []),
     spellLikeAbilities: cloneJson(source.spellLikeAbilities || []),
+    generatedEquipment: cloneJson(source.generatedEquipment || []),
   };
 }
 
@@ -6447,10 +7983,11 @@ async function addEnemySourceItemToInventory(sourceItemId) {
   enemySourceItemModal.hide();
 }
 
-function toggleInventoryDetailFields() {
+function toggleInventoryDetailFields(resetAttackOptions = false) {
   const type = el("inventoryItemType")?.value || "Item";
+  const weaponType = el("inventoryWeaponType")?.value;
   const firearm =
-    type === "Weapon" && isFirearmWeaponType(el("inventoryWeaponType")?.value);
+    type === "Weapon" && isFirearmWeaponType(weaponType);
   el("inventoryWeaponFields")?.classList.toggle("d-none", type !== "Weapon");
   document
     .querySelectorAll(".inventory-firearm-field")
@@ -6467,6 +8004,7 @@ function toggleInventoryDetailFields() {
     el("inventoryArmorEnchantment").innerHTML = armorEnchantmentOptions(
       el("inventoryArmorEnchantment").value,
     );
+  syncInventoryWeaponAttackOptions(weaponType, resetAttackOptions);
   syncInventorySlotForType();
 }
 
@@ -6531,6 +8069,125 @@ function setupInventoryScalingControls() {
     });
 }
 
+function inventoryAttackCheckbox(field) {
+  return el(INVENTORY_WEAPON_ATTACK_OPTION_IDS[field]);
+}
+
+function setInventoryAttackCheckbox(field, value) {
+  const input = inventoryAttackCheckbox(field);
+  if (input) input.checked = isYes(value);
+}
+
+function inventoryAttackCheckboxValue(field) {
+  return inventoryAttackCheckbox(field)?.checked ? "yes" : "no";
+}
+
+function clearInventoryAttackOptions(fields) {
+  fields.forEach((field) => {
+    const input = inventoryAttackCheckbox(field);
+    if (input) input.checked = false;
+  });
+}
+
+function syncInventoryTwfFeatControls() {
+  const featOffhand = inventoryAttackCheckbox("twfFeatOff")?.checked;
+  document
+    .querySelectorAll("[data-inventory-twf-offhand-feat-option]")
+    .forEach((field) => field.classList.toggle("d-none", !featOffhand));
+  if (!featOffhand) clearInventoryAttackOptions(["improvedTwf", "greaterTwf"]);
+}
+
+function enforceInventoryTwfChoice(input) {
+  if (!input) return;
+  const field =
+    Object.entries(INVENTORY_WEAPON_ATTACK_OPTION_IDS).find(
+      ([, id]) => id === input.id,
+    )?.[0] || input.dataset.inventoryTwfOption;
+  if (!field || !input.checked) {
+    syncInventoryTwfFeatControls();
+    return;
+  }
+  if (field === "twoHanded") {
+    clearInventoryAttackOptions([
+      ...TWF_MODE_FIELDS,
+      "improvedTwf",
+      "greaterTwf",
+    ]);
+    syncInventoryTwfFeatControls();
+    return;
+  }
+  if (TWF_MODE_FIELDS.includes(field)) {
+    setInventoryAttackCheckbox("twoHanded", false);
+    TWF_MODE_FIELDS.forEach((otherField) => {
+      if (otherField !== field) setInventoryAttackCheckbox(otherField, false);
+    });
+  }
+  if (field === "greaterTwf") {
+    setInventoryAttackCheckbox("improvedTwf", true);
+  }
+  syncInventoryTwfFeatControls();
+}
+
+function syncInventoryWeaponAttackOptions(weaponType, resetInvalid = false) {
+  const type = el("inventoryItemType")?.value || "Item";
+  const isWeapon = type === "Weapon";
+  const melee = isWeapon && isMeleeWeaponType(weaponType);
+  const ranged = isWeapon && isRangedWeaponType(weaponType);
+  const twoHandedCompatible =
+    isWeapon &&
+    melee &&
+    !["Natural", "Melee Weapon (Light)"].includes(weaponType);
+  el("inventoryWeaponAttackOptions")?.classList.toggle("d-none", !isWeapon);
+  document
+    .querySelectorAll("[data-inventory-melee-weapon-option]")
+    .forEach((field) => field.classList.toggle("d-none", !melee));
+  document
+    .querySelectorAll("[data-inventory-ranged-weapon-option]")
+    .forEach((field) => field.classList.toggle("d-none", !ranged));
+  document
+    .querySelectorAll("[data-inventory-twf-compatible-option]")
+    .forEach((field) =>
+      field.classList.toggle("d-none", !twoHandedCompatible),
+    );
+  if (resetInvalid || !isWeapon) {
+    if (!melee) {
+      clearInventoryAttackOptions([
+        "twoHanded",
+        "powerAttack",
+        ...TWF_MODE_FIELDS,
+        "improvedTwf",
+        "greaterTwf",
+      ]);
+    }
+    if (!ranged) clearInventoryAttackOptions(["deadlyAim", "rapidShot"]);
+    if (!twoHandedCompatible) setInventoryAttackCheckbox("twoHanded", false);
+  }
+  syncInventoryTwfFeatControls();
+}
+
+function setInventoryWeaponAttackOptions(details = {}) {
+  Object.keys(INVENTORY_WEAPON_ATTACK_OPTION_IDS).forEach((field) => {
+    const snakeField = field.replace(
+      /[A-Z]/g,
+      (match) => `_${match.toLowerCase()}`,
+    );
+    setInventoryAttackCheckbox(field, details[field] || details[snakeField]);
+  });
+  el("inventoryAttackMisc").value =
+    details.attackMisc || details.attack_misc || "0";
+  el("inventoryDamageMisc").value =
+    details.damageMisc || details.damage_misc || "0";
+}
+
+function setupInventoryAttackOptionControls() {
+  Object.values(INVENTORY_WEAPON_ATTACK_OPTION_IDS).forEach((id) => {
+    const input = el(id);
+    if (!input || input.dataset.bound === "true") return;
+    input.dataset.bound = "true";
+    input.addEventListener("change", () => enforceInventoryTwfChoice(input));
+  });
+}
+
 function collectInventoryDetails() {
   const type = el("inventoryItemType").value;
   const slot = el("inventorySlotInput").value.trim();
@@ -6545,10 +8202,22 @@ function collectInventoryDetails() {
       damage: el("inventoryDamageDice").value.trim(),
       critical: el("inventoryWeaponCritical").value.trim(),
       damageScale: el("inventoryDamageScale").value.trim() || "STR",
+      attackMisc: el("inventoryAttackMisc").value || "0",
+      damageMisc: el("inventoryDamageMisc").value || "0",
       enhancement: el("inventoryWeaponEnhancement").value || "0",
       enchantment: el("inventoryWeaponEnchantment").value.trim(),
       specialMaterial: el("inventorySpecialMaterial").value,
       details: el("inventoryWeaponDetails").value.trim(),
+      twoHanded: inventoryAttackCheckboxValue("twoHanded"),
+      powerAttack: inventoryAttackCheckboxValue("powerAttack"),
+      deadlyAim: inventoryAttackCheckboxValue("deadlyAim"),
+      rapidShot: inventoryAttackCheckboxValue("rapidShot"),
+      twfNoFeatPrimary: inventoryAttackCheckboxValue("twfNoFeatPrimary"),
+      twfNoFeatOff: inventoryAttackCheckboxValue("twfNoFeatOff"),
+      twfFeatPrimary: inventoryAttackCheckboxValue("twfFeatPrimary"),
+      twfFeatOff: inventoryAttackCheckboxValue("twfFeatOff"),
+      improvedTwf: inventoryAttackCheckboxValue("improvedTwf"),
+      greaterTwf: inventoryAttackCheckboxValue("greaterTwf"),
     };
     if (isFirearmWeaponType(weaponType)) {
       details.capacity = el("inventoryWeaponCapacity").value.trim();
@@ -6595,6 +8264,7 @@ function openInventoryItemEditor(itemId) {
   el("inventoryWeaponEnhancement").value = details.enhancement || "0";
   el("inventoryWeaponEnchantment").value = details.enchantment || "";
   el("inventoryWeaponDetails").value = details.details || "";
+  setInventoryWeaponAttackOptions(details);
   el("inventoryArmorBonus").value = details.bonus || "0";
   el("inventoryArmorEnhancement").value = details.enhancement || "0";
   el("inventoryArmorEnchantment").value = details.enchantment || "";
@@ -6644,6 +8314,8 @@ async function submitInventoryItemEdit(event) {
     );
     renderCharacterInventory(characterInventoryItems);
     updateWornCardFromLoot(updatedEnemyItem);
+    recalculateSheet();
+    queueSheetSave();
     if (isLootEquipped(updatedEnemyItem.id))
       syncEquippedLootBuffFromItem(updatedEnemyItem);
     inventoryItemModal?.hide();
@@ -7045,6 +8717,25 @@ function collectCards(containerId) {
   });
 }
 
+function collectPersistedCards(containerId) {
+  return [...el(containerId).querySelectorAll(".sheet-card")]
+    .filter((card) => card.dataset.generatedEquipment !== "true")
+    .map((card) => {
+      const data = {};
+      card.querySelectorAll("[data-field]").forEach((input) => {
+        data[input.dataset.field] =
+          input.type === "checkbox"
+            ? input.checked
+              ? "yes"
+              : "no"
+            : input.value;
+      });
+      delete data.generatedEquipmentId;
+      delete data.generatedSource;
+      return data;
+    });
+}
+
 function collectCalculatedSummary() {
   const conditionalGroups = simpleConditionalsByStat();
   const abilityRows = ABILITIES.map(([key, label]) => ({
@@ -7063,14 +8754,22 @@ function collectCalculatedSummary() {
         { fort: "fortitude", reflex: "reflex", will: "will" }[key]
       ] || [],
   }));
-  const skillRows = allSkills().map(([skill]) => {
+  const skillRows = allSkills().map(([skill, ability]) => {
     const id = skillId(skill);
+    const familyKey = skillFamilyBonusKey(skill);
     return {
       key: id,
       label: skill,
       total: el(`${id}Total`)?.value || "",
       conditionals: [
         ...conditionalTableRows("skill checks", conditionalGroups),
+        ...conditionalTableRows(
+          skillBuffKeyForAbility(ability),
+          conditionalGroups,
+        ),
+        ...(familyKey
+          ? conditionalTableRows(familyKey, conditionalGroups)
+          : []),
         ...conditionalTableRows(skillStatKey(skill), conditionalGroups),
       ],
     };
@@ -7327,9 +9026,9 @@ function collectSheet() {
     abilities: {},
     saves: {},
     skills: {},
-    weapons: collectCards("weaponRows"),
-    armor: collectCards("armorRows"),
-    gear: collectCards("gearRows"),
+    weapons: collectPersistedCards("weaponRows"),
+    armor: collectPersistedCards("armorRows"),
+    gear: collectPersistedCards("gearRows"),
   };
   sheet.preferences = { showAppliedBuffs: showCalculations };
   sheet.customSkills = customSkills;
@@ -7374,6 +9073,7 @@ function collectSheet() {
 function restoreSheet(sheet) {
   isRestoringSheet = true;
   const data = sheet || {};
+  const restoredSizeValue = data.fields?.size ?? data.size ?? "";
   showCalculations = Boolean(
     data.preferences?.showAppliedBuffs ?? data.showAppliedBuffs ?? true,
   );
@@ -7400,6 +9100,9 @@ function restoreSheet(sheet) {
       setSelectValuePreservingUnknown(id, value);
     else if (typeof value !== "object" && el(id)) el(id).value = value;
   });
+  if (!isEnemySheetMode && shouldApplyRaceDefaultSize(restoredSizeValue)) {
+    applySelectedRaceDefaults();
+  }
   renderEnemyStructuredSpellFields();
   updateEnemyAutoInputSizes();
   if (
@@ -7465,6 +9168,7 @@ function restoreSheet(sheet) {
   weaponCount = 0;
   armorCount = 0;
   gearCount = 0;
+  generatedEquipmentSignature = "";
   (data.weapons || []).forEach(addWeapon);
   normalizeTwfWeaponChoices();
   (data.armor || []).forEach((item) => {
@@ -7667,7 +9371,24 @@ async function loadCurrentSheet(sheetId = currentSheetId) {
   }
 }
 
+let sheetBridgeRecalculationQueue = Promise.resolve();
+
+function queueSheetBridgeRecalculation(task) {
+  const next = sheetBridgeRecalculationQueue.then(
+    () => task(),
+    () => task(),
+  );
+  sheetBridgeRecalculationQueue = next.catch(() => {});
+  return next;
+}
+
 async function recalculateAndSaveCharacterSheet(contextKey, characterId) {
+  return queueSheetBridgeRecalculation(() =>
+    recalculateAndSaveCharacterSheetNow(contextKey, characterId),
+  );
+}
+
+async function recalculateAndSaveCharacterSheetNow(contextKey, characterId) {
   await characterSheetReady;
   if (!contextKey || !characterId) return null;
   isEnemySheetMode = false;
@@ -7680,24 +9401,26 @@ async function recalculateAndSaveCharacterSheet(contextKey, characterId) {
       sheetContextKey,
     )) || (await PFApp.loadCharacterSheet("", sheetContextKey, characterId));
   if (!saved?.sheet) return null;
-  currentSheetId = saved.id;
+  if (String(saved.id) !== String(characterId)) return null;
+  const targetSheetId = saved.id;
+  currentSheetId = targetSheetId;
   currentSheetOwnerId = saved.user_id || currentUserId;
   activeBuffs =
     (await PFApp.loadCharacterBuffStateForRecalculation?.(
-      currentSheetId,
+      targetSheetId,
       sheetContextKey,
     )) || [];
-  lastBuffRefresh = localStorage.getItem(buffRefreshKey(currentSheetId)) || "";
+  lastBuffRefresh = localStorage.getItem(buffRefreshKey(targetSheetId)) || "";
   restoreSheet(saved.sheet);
   el("characterName").value = saved.character_name;
   recalculateSheet();
   const nextSheet = collectSheet();
   const updated = await PFApp.updateCharacterCalculatedSummary?.(
-    currentSheetId,
+    targetSheetId,
     nextSheet.calculated || {},
     sheetContextKey,
   );
-  if (updated?.id) {
+  if (updated?.id && String(updated.id) === String(targetSheetId)) {
     localStorage.setItem(
       `pf_character_sheet_updated_${sheetContextKey}_${updated.id}`,
       String(Date.now()),
@@ -7708,6 +9431,12 @@ async function recalculateAndSaveCharacterSheet(contextKey, characterId) {
 }
 
 async function recalculateAndSaveEnemySheet(contextKey, enemyId) {
+  return queueSheetBridgeRecalculation(() =>
+    recalculateAndSaveEnemySheetNow(contextKey, enemyId),
+  );
+}
+
+async function recalculateAndSaveEnemySheetNow(contextKey, enemyId) {
   await characterSheetReady;
   if (!contextKey || !enemyId) return null;
   sheetContextKey = contextKey;
@@ -7715,6 +9444,7 @@ async function recalculateAndSaveEnemySheet(contextKey, enemyId) {
     (await PFApp.loadEnemyForEffectApplication?.(enemyId, sheetContextKey)) ||
     (await PFApp.loadEnemy(enemyId, sheetContextKey));
   if (!enemy?.sheet) return null;
+  if (String(enemy.id) !== String(enemyId)) return null;
   isEnemySheetMode = true;
   enemySheetId = enemy.id;
   currentSheetId = enemy.id;
@@ -7951,11 +9681,11 @@ async function initCharacterSheet() {
   });
   el("inventoryItemType").addEventListener(
     "change",
-    toggleInventoryDetailFields,
+    () => toggleInventoryDetailFields(true),
   );
   el("inventoryWeaponType").addEventListener(
     "change",
-    toggleInventoryDetailFields,
+    () => toggleInventoryDetailFields(true),
   );
   el("inventoryWeaponType").innerHTML = optionList(
     WEAPON_TYPES,
@@ -7963,6 +9693,7 @@ async function initCharacterSheet() {
   );
   el("inventoryWeaponEnchantment").innerHTML = optionList(WEAPON_ENCHANTMENTS);
   el("inventoryArmorEnchantment").innerHTML = armorEnchantmentOptions();
+  setupInventoryAttackOptionControls();
   el("inventoryItemForm").addEventListener("submit", submitInventoryItemEdit);
   el("inventoryItemModal").addEventListener("hidden.bs.modal", () =>
     PFItemEditor.resetTabs(inventoryEditorConfig()),

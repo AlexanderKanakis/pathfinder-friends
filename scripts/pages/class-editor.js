@@ -1070,9 +1070,11 @@ function syncPoolAcrossLevels(levelIndex, featureIndex, poolIndex) {
             "effects",
             "damageReduction",
             "spellResistance",
+            "immunities",
             "classSkillGrants",
             "sizeChanges",
             "spellLikeAbilities",
+            "generatedEquipment",
           ].forEach((key) => {
             if (Array.isArray(match[key]) && match[key].length) {
               option[key] = cloneJson(match[key]);

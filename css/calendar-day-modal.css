@@ -1,0 +1,122 @@
+.calendar-day-view-modal .modal-dialog {
+  margin: 0;
+  max-width: none;
+  height: 100%;
+}
+
+.calendar-day-view-modal .modal-content {
+  min-height: 100%;
+  background: #121212;
+  color: #fff;
+  border: 0;
+  border-radius: 0;
+}
+
+.calendar-day-view-modal .modal-header,
+.calendar-day-view-modal .modal-footer {
+  border-color: #333;
+}
+
+.calendar-day-view-modal .modal-title {
+  color: #cfe7f8;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.calendar-day-view-modal .modal-body {
+  display: flex;
+  padding: 10px;
+}
+
+.calendar-day-view-cell {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 70vh;
+  overflow: hidden;
+  isolation: isolate;
+  background: #181818;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 14px;
+}
+
+.calendar-day-view-cell::before {
+  position: absolute;
+  top: 64px;
+  right: 18px;
+  z-index: 0;
+  width: min(42vw, 180px);
+  height: min(42vw, 180px);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  content: "";
+  opacity: 0;
+  pointer-events: none;
+}
+
+.calendar-day-view-cell.has-full-moon::before {
+  background-image: url("../assets/calendar/full-moon.png");
+  opacity: 1;
+}
+
+.calendar-day-view-cell.has-new-moon::before {
+  background-image: url("../assets/calendar/new-moon.png");
+  opacity: 1;
+}
+
+.calendar-day-view-cell.has-semi-moon::before {
+  background-image: url("../assets/calendar/half-moon.png");
+  opacity: 0.95;
+}
+
+.calendar-day-view-number {
+  position: relative;
+  z-index: 1;
+  color: #fff;
+  font-size: 44px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.calendar-day-view-events {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 8px;
+}
+
+.calendar-day-view-event {
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  background: #29506a;
+  border: 1px solid #3d6d8f;
+  border-radius: 6px;
+  color: #fff;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 10px 12px;
+}
+
+.calendar-day-view-event.is-holiday {
+  background: #5b3f20;
+  border-color: #74512d;
+  color: #ffe8ba;
+}
+
+.calendar-day-view-event:disabled {
+  cursor: default;
+  opacity: 0.8;
+}
+
+.calendar-day-view-empty {
+  position: relative;
+  z-index: 1;
+  color: #aaa;
+  font-size: 14px;
+}

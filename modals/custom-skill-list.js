@@ -28,6 +28,9 @@
     if (!skills.some((skill) => /^profession$/i.test(skill.name))) {
       skills.push({ name: "Profession", ability: "wis" });
     }
+    if (!skills.some((skill) => /^perform$/i.test(skill.name))) {
+      skills.push({ name: "Perform", ability: "cha" });
+    }
     return skills.sort((a, b) => a.name.localeCompare(b.name));
   }
 

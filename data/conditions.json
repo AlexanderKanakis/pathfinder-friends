@@ -1,0 +1,679 @@
+[
+  {
+    "id": "condition-bleed",
+    "name": "Bleed",
+    "category": "Condition",
+    "duration": "variable",
+    "durationConfig": {
+      "count": null,
+      "unit": "variable",
+      "factors": []
+    },
+    "bonuses": [],
+    "description": "Ongoing bleed damage until stopped."
+  },
+  {
+    "id": "condition-blinded",
+    "name": "Blinded",
+    "category": "Condition",
+    "duration": "variable",
+    "durationConfig": {
+      "count": null,
+      "unit": "variable",
+      "factors": []
+    },
+    "bonuses": [
+      {
+        "stat": "ac",
+        "value": -2,
+        "type": "penalty",
+        "stacks": true
+      },
+      {
+        "stat": "remove dex bonus to ac",
+        "value": 0,
+        "type": "condition",
+        "stacks": false
+      },
+      {
+        "stat": "strength skill checks",
+        "value": -4,
+        "type": "penalty",
+        "stacks": true
+      },
+      {
+        "stat": "dexterity skill checks",
+        "value": -4,
+        "type": "penalty",
+        "stacks": true
+      },
+      {
+        "stat": "skill:perception",
+        "value": -4,
+        "type": "penalty",
+        "stacks": true,
+        "conditional": true,
+        "appliesWhen": "opposed Perception checks"
+      }
+    ],
+    "description": "Cannot see, loses Dexterity bonus to AC, and takes penalties to AC and many physical checks."
+  },
+  {
+    "id": "condition-confused",
+    "name": "Confused",
+    "category": "Condition",
+    "duration": "variable",
+    "durationConfig": {
+      "count": null,
+      "unit": "variable",
+      "factors": []
+    },
+    "bonuses": [],
+    "description": "Actions are determined randomly each round."
+  },
+  {
+    "id": "condition-cowering",
+    "name": "Cowering",
+    "category": "Condition",
+    "duration": "variable",
+    "durationConfig": {
+      "count": null,
+      "unit": "variable",
+      "factors": []
+    },
+    "bonuses": [
+      {
+        "stat": "ac",
+        "value": -2,
+        "type": "penalty",
+        "stacks": true
+      },
+      {
+        "stat": "remove dex bonus to ac",
+        "value": 0,
+        "type": "condition",
+        "stacks": false
+      }
+    ],
+    "description": "Frozen in fear, with an AC penalty and no Dexterity bonus to AC."
+  },
+  {
+    "id": "condition-dazed",
+    "name": "Dazed",
+    "category": "Condition",
+    "duration": "variable",
+    "durationConfig": {
+      "count": null,
+      "unit": "variable",
+      "factors": []
+    },
+    "bonuses": [],
+    "description": "Can take no actions."
+  },
+  {
+    "id": "condition-dazzled",
+    "name": "Dazzled",
+    "category": "Condition",
+    "duration": "variable",
+    "durationConfig": {
+      "count": null,
+      "unit": "variable",
+      "factors": []
+    },
+    "bonuses": [
+      {
+        "stat": "attack",
+        "value": -1,
+        "type": "penalty",
+        "stacks": true
+      },
+      {
+        "stat": "skill:perception",
+        "value": -1,
+        "type": "penalty",
+        "stacks": true,
+        "conditional": true,
+        "appliesWhen": "sight-based Perception checks"
+      }
+    ],
+    "description": "Penalty on attack rolls and sight-based Perception checks."
+  },
+  {
+    "id": "condition-deafened",
+    "name": "Deafened",
+    "category": "Condition",
+    "duration": "variable",
+    "durationConfig": {
+      "count": null,
+      "unit": "variable",
+      "factors": []
+    },
+    "bonuses": [
+      {
+        "stat": "initiative",
+        "value": -4,
+        "type": "penalty",
+        "stacks": true
+      },
+      {
+        "stat": "skill:perception",
+        "value": -4,
+        "type": "penalty",
+        "stacks": true,
+        "conditional": true,
+        "appliesWhen": "opposed Perception checks"
+      }
+    ],
+    "description": "Penalty to initiative and opposed Perception checks; verbal spellcasting may fail."
+  },
+  {
+    "id": "condition-disabled",
+    "name": "Disabled",
+    "category": "Condition",
+    "duration": "variable",
+    "durationConfig": {
+      "count": null,
+      "unit": "variable",
+      "factors": []
+    },
+    "bonuses": [],
+    "description": "At 0 hit points or otherwise limited to partial actions."
+  },
+  {
+    "id": "condition-dying",
+    "name": "Dying",
+    "category": "Condition",
+    "duration": "variable",
+    "durationConfig": {
+      "count": null,
+      "unit": "variable",
+      "factors": []
+    },
+    "bonuses": [],
+    "description": "Unconscious and near death."
+  },
+  {
+    "id": "condition-entangled",
+    "name": "Entangled",
+    "category": "Condition",
+    "duration": "variable",
+    "durationConfig": {
+      "count": null,
+      "unit": "variable",
+      "factors": []
+    },
+    "bonuses": [
+      {
+        "stat": "dexterity",
+        "value": -4,
+        "type": "penalty",
+        "stacks": true
+      },
+      {
+        "stat": "attack",
+        "value": -2,
+        "type": "penalty",
+        "stacks": true
+      }
+    ],
+    "description": "Penalty to Dexterity and attack rolls; movement may be restricted."
+  },
+  {
+    "id": "condition-exhausted",
+    "name": "Exhausted",
+    "category": "Condition",
+    "duration": "variable",
+    "durationConfig": {
+      "count": null,
+      "unit": "variable",
+      "factors": []
+    },
+    "bonuses": [
+      {
+        "stat": "strength",
+        "value": -6,
+        "type": "penalty",
+        "stacks": true
+      },
+      {
+        "stat": "dexterity",
+        "value": -6,
+        "type": "penalty",
+        "stacks": true
+      }
+    ],
+    "description": "Half speed and heavy Strength and Dexterity penalties."
+  },
+  {
+    "id": "condition-fascinated",
+    "name": "Fascinated",
+    "category": "Condition",
+    "duration": "variable",
+    "durationConfig": {
+      "count": null,
+      "unit": "variable",
+      "factors": []
+    },
+    "bonuses": [
+      {
+        "stat": "skill checks",
+        "value": -4,
+        "type": "penalty",
+        "stacks": true,
+        "conditional": true,
+        "appliesWhen": "skill checks made as reactions"
+      }
+    ],
+    "description": "Focused on an effect and penalized on reactive skill checks."
+  },
+  {
+    "id": "condition-fatigued",
+    "name": "Fatigued",
+    "category": "Condition",
+    "duration": "variable",
+    "durationConfig": {
+      "count": null,
+      "unit": "variable",
+      "factors": []
+    },
+    "bonuses": [
+      {
+        "stat": "strength",
+        "value": -2,
+        "type": "penalty",
+        "stacks": true
+      },
+      {
+        "stat": "dexterity",
+        "value": -2,
+        "type": "penalty",
+        "stacks": true
+      }
+    ],
+    "description": "Cannot run or charge and takes Strength and Dexterity penalties."
+  },
+  {
+    "id": "condition-flat-footed",
+    "name": "Flat-Footed",
+    "category": "Condition",
+    "duration": "variable",
+    "durationConfig": {
+      "count": null,
+      "unit": "variable",
+      "factors": []
+    },
+    "bonuses": [
+      {
+        "stat": "remove dex bonus to ac",
+        "value": 0,
+        "type": "condition",
+        "stacks": false
+      }
+    ],
+    "description": "Loses Dexterity bonus to AC."
+  },
+  {
+    "id": "condition-frightened",
+    "name": "Frightened",
+    "category": "Condition",
+    "duration": "variable",
+    "durationConfig": {
+      "count": null,
+      "unit": "variable",
+      "factors": []
+    },
+    "bonuses": [
+      {
+        "stat": "attack",
+        "value": -2,
+        "type": "penalty",
+        "stacks": true
+      },
+      {
+        "stat": "all saves",
+        "value": -2,
+        "type": "penalty",
+        "stacks": true
+      },
+      {
+        "stat": "skill checks",
+        "value": -2,
+        "type": "penalty",
+        "stacks": true
+      }
+    ],
+    "description": "Flees and takes fear penalties to attacks, saves, and skill checks."
+  },
+  {
+    "id": "condition-grappled",
+    "name": "Grappled",
+    "category": "Condition",
+    "duration": "variable",
+    "durationConfig": {
+      "count": null,
+      "unit": "variable",
+      "factors": []
+    },
+    "bonuses": [
+      {
+        "stat": "dexterity",
+        "value": -4,
+        "type": "penalty",
+        "stacks": true
+      },
+      {
+        "stat": "attack",
+        "value": -2,
+        "type": "penalty",
+        "stacks": true
+      },
+      {
+        "stat": "cmb",
+        "value": -2,
+        "type": "penalty",
+        "stacks": true,
+        "conditional": true,
+        "appliesWhen": "combat maneuver checks other than grapple"
+      }
+    ],
+    "description": "Restrained, with Dexterity and attack penalties and limited actions."
+  },
+  {
+    "id": "condition-helpless",
+    "name": "Helpless",
+    "category": "Condition",
+    "duration": "variable",
+    "durationConfig": {
+      "count": null,
+      "unit": "variable",
+      "factors": []
+    },
+    "bonuses": [
+      {
+        "stat": "dexterity",
+        "value": -10,
+        "type": "penalty",
+        "stacks": true
+      }
+    ],
+    "description": "At opponents' mercy and treated as Dexterity 0 for many purposes."
+  },
+  {
+    "id": "condition-invisible",
+    "name": "Invisible",
+    "category": "Condition",
+    "duration": "variable",
+    "durationConfig": {
+      "count": null,
+      "unit": "variable",
+      "factors": []
+    },
+    "bonuses": [
+      {
+        "stat": "attack",
+        "value": 2,
+        "type": "condition",
+        "stacks": false,
+        "conditional": true,
+        "appliesWhen": "attacking a target that cannot see you"
+      }
+    ],
+    "description": "Cannot be seen without special senses or magic."
+  },
+  {
+    "id": "condition-nauseated",
+    "name": "Nauseated",
+    "category": "Condition",
+    "duration": "variable",
+    "durationConfig": {
+      "count": null,
+      "unit": "variable",
+      "factors": []
+    },
+    "bonuses": [],
+    "description": "Can take only a single move action each turn."
+  },
+  {
+    "id": "condition-panicked",
+    "name": "Panicked",
+    "category": "Condition",
+    "duration": "variable",
+    "durationConfig": {
+      "count": null,
+      "unit": "variable",
+      "factors": []
+    },
+    "bonuses": [
+      {
+        "stat": "all saves",
+        "value": -2,
+        "type": "penalty",
+        "stacks": true
+      },
+      {
+        "stat": "skill checks",
+        "value": -2,
+        "type": "penalty",
+        "stacks": true
+      }
+    ],
+    "description": "Drops held items, flees, and takes fear penalties to saves and skill checks."
+  },
+  {
+    "id": "condition-paralyzed",
+    "name": "Paralyzed",
+    "category": "Condition",
+    "duration": "variable",
+    "durationConfig": {
+      "count": null,
+      "unit": "variable",
+      "factors": []
+    },
+    "bonuses": [
+      {
+        "stat": "dexterity",
+        "value": -10,
+        "type": "penalty",
+        "stacks": true
+      },
+      {
+        "stat": "strength",
+        "value": -10,
+        "type": "penalty",
+        "stacks": true
+      }
+    ],
+    "description": "Frozen in place and treated as helpless."
+  },
+  {
+    "id": "condition-pinned",
+    "name": "Pinned",
+    "category": "Condition",
+    "duration": "variable",
+    "durationConfig": {
+      "count": null,
+      "unit": "variable",
+      "factors": []
+    },
+    "bonuses": [
+      {
+        "stat": "ac",
+        "value": -4,
+        "type": "penalty",
+        "stacks": true
+      },
+      {
+        "stat": "remove dex bonus to ac",
+        "value": 0,
+        "type": "condition",
+        "stacks": false
+      }
+    ],
+    "description": "Tightly restrained, with an AC penalty and no Dexterity bonus to AC."
+  },
+  {
+    "id": "condition-prone",
+    "name": "Prone",
+    "category": "Condition",
+    "duration": "variable",
+    "durationConfig": {
+      "count": null,
+      "unit": "variable",
+      "factors": []
+    },
+    "bonuses": [
+      {
+        "stat": "melee attack",
+        "value": -4,
+        "type": "penalty",
+        "stacks": true
+      },
+      {
+        "stat": "ac",
+        "value": -4,
+        "type": "penalty",
+        "stacks": true,
+        "conditional": true,
+        "appliesWhen": "against melee attacks"
+      },
+      {
+        "stat": "ac",
+        "value": 4,
+        "type": "condition",
+        "stacks": false,
+        "conditional": true,
+        "appliesWhen": "against ranged attacks"
+      }
+    ],
+    "description": "Lying on the ground, affecting melee attacks and AC by attack type."
+  },
+  {
+    "id": "condition-shaken",
+    "name": "Shaken",
+    "category": "Condition",
+    "duration": "variable",
+    "durationConfig": {
+      "count": null,
+      "unit": "variable",
+      "factors": []
+    },
+    "bonuses": [
+      {
+        "stat": "attack",
+        "value": -2,
+        "type": "penalty",
+        "stacks": true
+      },
+      {
+        "stat": "all saves",
+        "value": -2,
+        "type": "penalty",
+        "stacks": true
+      },
+      {
+        "stat": "skill checks",
+        "value": -2,
+        "type": "penalty",
+        "stacks": true
+      }
+    ],
+    "description": "Fear penalties to attacks, saves, and skill checks."
+  },
+  {
+    "id": "condition-sickened",
+    "name": "Sickened",
+    "category": "Condition",
+    "duration": "variable",
+    "durationConfig": {
+      "count": null,
+      "unit": "variable",
+      "factors": []
+    },
+    "bonuses": [
+      {
+        "stat": "attack",
+        "value": -2,
+        "type": "penalty",
+        "stacks": true
+      },
+      {
+        "stat": "damage",
+        "value": -2,
+        "type": "penalty",
+        "stacks": true
+      },
+      {
+        "stat": "all saves",
+        "value": -2,
+        "type": "penalty",
+        "stacks": true
+      },
+      {
+        "stat": "skill checks",
+        "value": -2,
+        "type": "penalty",
+        "stacks": true
+      }
+    ],
+    "description": "Penalties to attacks, weapon damage, saves, and skill checks."
+  },
+  {
+    "id": "condition-staggered",
+    "name": "Staggered",
+    "category": "Condition",
+    "duration": "variable",
+    "durationConfig": {
+      "count": null,
+      "unit": "variable",
+      "factors": []
+    },
+    "bonuses": [],
+    "description": "Can take only a single move action or standard action each turn."
+  },
+  {
+    "id": "condition-stunned",
+    "name": "Stunned",
+    "category": "Condition",
+    "duration": "variable",
+    "durationConfig": {
+      "count": null,
+      "unit": "variable",
+      "factors": []
+    },
+    "bonuses": [
+      {
+        "stat": "ac",
+        "value": -2,
+        "type": "penalty",
+        "stacks": true
+      },
+      {
+        "stat": "remove dex bonus to ac",
+        "value": 0,
+        "type": "condition",
+        "stacks": false
+      }
+    ],
+    "description": "Drops held items, takes an AC penalty, and loses Dexterity bonus to AC."
+  },
+  {
+    "id": "condition-unconscious",
+    "name": "Unconscious",
+    "category": "Condition",
+    "duration": "variable",
+    "durationConfig": {
+      "count": null,
+      "unit": "variable",
+      "factors": []
+    },
+    "bonuses": [
+      {
+        "stat": "dexterity",
+        "value": -10,
+        "type": "penalty",
+        "stacks": true
+      }
+    ],
+    "description": "Knocked out and helpless."
+  }
+]

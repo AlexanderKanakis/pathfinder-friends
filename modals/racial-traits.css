@@ -115,6 +115,20 @@
   color: #b6d4fe;
 }
 
+.racial-trait-choice-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 7px;
+}
+
+.racial-trait-choice-status {
+  color: #adb5bd;
+  font-size: 12px;
+}
+
 .racial-trait-search {
   margin-bottom: 8px;
 }

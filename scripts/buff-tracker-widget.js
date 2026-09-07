@@ -45,8 +45,9 @@
       .shared-dr-row [data-scale-summary], .shared-sr-row [data-scale-summary] { grid-column: 1 / -1; }
       .shared-class-skill-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: end; background: #242424; border: 1px solid #444; border-radius: 8px; padding: 8px; }
       .shared-class-skill-row .shared-named-skill-field { grid-column: 1 / -1; }
-      .shared-spell-like-row { display: grid; grid-template-columns: minmax(72px, 0.35fr) minmax(140px, 0.65fr) minmax(180px, 1.4fr) auto; gap: 8px; align-items: end; background: #242424; border: 1px solid #444; border-radius: 8px; padding: 8px; }
-      .shared-spell-like-picker { display: flex; align-items: center; justify-content: space-between; min-height: 31px; gap: 8px; text-align: left; }
+      .shared-spell-like-row { display: grid; grid-template-columns: minmax(58px, 0.25fr) minmax(105px, 0.5fr) minmax(130px, 0.8fr) minmax(86px, 0.36fr) minmax(64px, 0.28fr) auto; gap: 8px; align-items: end; background: #242424; border: 1px solid #444; border-radius: 8px; padding: 8px; }
+      .shared-spell-like-picker { display: flex; align-items: center; justify-content: space-between; min-width: 0; min-height: 31px; gap: 8px; text-align: left; }
+      .shared-spell-like-row .form-control, .shared-spell-like-row .form-select { min-width: 0; }
       .shared-spell-like-picker span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
       .shared-extra-accordion .accordion-item { background: transparent; border: 0; }
       .shared-extra-accordion .accordion-button { background: #242424; color: #ddd; padding: 8px 10px; font-size: 13px; }
@@ -136,6 +137,8 @@
     "wisdom skill checks": "Skill: WIS Checks",
     "charisma skill checks": "Skill: CHA Checks",
     "craft skill checks": "Skill: Craft Checks",
+    "profession skill checks": "Skill: Profession Checks",
+    "perform skill checks": "Skill: Perform Checks",
     ...Object.fromEntries(
       PF_SKILLS.map((skill) => [
         `skill:${skill.replace(/[^a-z0-9]/gi, "").toLowerCase()}`,
@@ -368,7 +371,29 @@
     const spellName = entry.spellName || entry.spell?.name || "Spell";
     const minimumLevel = Number(entry.minimumLevel ?? entry.level ?? 1) || 1;
     const levelText = minimumLevel > 1 ? `level ${minimumLevel}, ` : "";
-    return `SLA ${levelText}${entry.frequency ? `${entry.frequency}: ` : ""}${spellName}`;
+    const castingAttr = String(
+      entry.castingAttr || entry.castingAbility || entry.ability || "",
+    )
+      .trim()
+      .toUpperCase();
+    const minimumScore = Number(
+      entry.minimumScore ?? entry.minimumAbilityScore ?? entry.score,
+    );
+    const scoreText =
+      castingAttr && Number.isFinite(minimumScore) && minimumScore > 0
+        ? `${castingAttr} ${minimumScore}, `
+        : "";
+    return `SLA ${levelText}${scoreText}${entry.frequency ? `${entry.frequency}: ` : ""}${spellName}`;
+  }
+
+  function immunityText(entry = {}) {
+    const name = String(entry.name || entry.immunity || entry.type || "")
+      .trim()
+      .replace(/^immunit(?:y|ies)\s+(?:to\s+)?/i, "");
+    const label = name || "immunity";
+    const conditional = entry.conditional ?? Boolean(entry.condition);
+    const appliesWhen = entry.appliesWhen || entry.condition || "";
+    return `Immune ${label}${conditional ? ` (${appliesWhen || "conditional"})` : ""}`;
   }
 
   function scaleText(scale) {
@@ -392,9 +417,10 @@
       );
     if (milestoneText.length) parts.push(milestoneText.join(", "));
     const every = scale.every || {};
-    if (every.afterLevel && every.everyLevels && every.increase) {
+    const fromLevel = every.fromLevel || every.afterLevel || every.after;
+    if (fromLevel && every.everyLevels && every.increase) {
       parts.push(
-        `after ${sourceLabel} ${every.afterLevel}, every ${every.everyLevels}: ${fmt(Number(every.increase || 0))}`,
+        `from ${sourceLabel} ${fromLevel}, every ${every.everyLevels}: ${fmt(Number(every.increase || 0))}`,
       );
     }
     if (scale.minimumOne) parts.push("minimum 1");
@@ -407,7 +433,11 @@
       effect.category,
       durationLabel(effect),
       ...(effect.bonuses || []).map(bonusText),
+      ...(effect.immunities || []).map(immunityText),
       ...(effect.spellLikeAbilities || []).map(spellLikeText),
+      ...(effect.generatedEquipment || []).map(
+        (item) => `${item.type || "equipment"} ${item.name || item.item || ""}`,
+      ),
     ]
       .join(" ")
       .toLowerCase();
@@ -617,7 +647,7 @@
       const abilities = Array.isArray(this.options.activatableAbilities)
         ? this.options.activatableAbilities
         : [];
-      this.effects = [...abilities, ...(await PFApp.loadBuffDefinitions())];
+      this.effects = [...abilities, ...(await this.loadLibraryEffects())];
       const saved = this.options.loadActiveEffects
         ? await this.options.loadActiveEffects()
         : await PFApp.loadBuffState(
@@ -633,6 +663,11 @@
     updateSearchVisibility() {
       const hasCharacter = Boolean(this.options.characterId);
       this.addShellEl?.classList.toggle("d-none", !hasCharacter);
+    }
+
+    async loadLibraryEffects() {
+      if (PFApp.loadEffectDefinitions) return PFApp.loadEffectDefinitions();
+      return PFApp.loadBuffDefinitions();
     }
 
     openCustom() {
@@ -656,7 +691,7 @@
 
     openBonusEditor(index) {
       const effect = this.effects[index];
-      if (!this.isAdmin || !effect?.id) return;
+      if (!this.isAdmin || !effect?.id || effect.builtIn) return;
 
       this.editingEffectId = effect.id;
       this.customLabelEl.textContent = `Edit Effect: ${effect.name}`;
@@ -674,9 +709,11 @@
         (!effect.bonuses.length &&
           !effect.damageReduction?.length &&
           !effect.spellResistance?.length &&
+          !effect.immunities?.length &&
           !effect.classSkillGrants?.length &&
           !effect.sizeChanges?.length &&
-          !effect.spellLikeAbilities?.length)
+          !effect.spellLikeAbilities?.length &&
+          !effect.generatedEquipment?.length)
       )
         this.effectsAccordion.addEffect();
       this.saveCustomEl.textContent = "Save Effect";
@@ -775,9 +812,11 @@
         !effect.bonuses.length &&
         !effect.damageReduction?.length &&
         !effect.spellResistance?.length &&
+        !effect.immunities?.length &&
         !effect.classSkillGrants?.length &&
         !effect.sizeChanges?.length &&
-        !effect.spellLikeAbilities?.length
+        !effect.spellLikeAbilities?.length &&
+        !effect.generatedEquipment?.length
       ) {
         this.customStatus("Add at least one effect or extra.", "warning");
         return;
@@ -795,7 +834,10 @@
         );
         return;
       }
-      this.effects = await PFApp.loadBuffDefinitions();
+      const abilities = Array.isArray(this.options.activatableAbilities)
+        ? this.options.activatableAbilities
+        : [];
+      this.effects = [...abilities, ...(await this.loadLibraryEffects())];
       this.renderResults();
       this.customStatus("Effect saved.", "success");
       bootstrap.Modal.getInstance(this.customModalEl)?.hide();
@@ -804,7 +846,7 @@
 
     openDeleteModal(index) {
       const effect = this.effects[index];
-      if (!this.isAdmin || !effect?.id) return;
+      if (!this.isAdmin || !effect?.id || effect.builtIn) return;
       this.deletingEffectId = effect.id;
       this.deleteNameEl.textContent = effect.name || "this effect";
       this.deleteStatus("");
@@ -834,7 +876,10 @@
         );
         return;
       }
-      this.effects = await PFApp.loadBuffDefinitions();
+      const abilities = Array.isArray(this.options.activatableAbilities)
+        ? this.options.activatableAbilities
+        : [];
+      this.effects = [...abilities, ...(await this.loadLibraryEffects())];
       this.renderResults();
       this.deletingEffectId = null;
       bootstrap.Modal.getInstance(this.deleteModalEl)?.hide();
@@ -883,10 +928,17 @@
               (sr) =>
                 `SR ${Number(sr.amount || 0)}${sr.conditional ? ` (${sr.appliesWhen || "conditional"})` : ""}`,
             ),
+            ...(effect.immunities || []).map(immunityText),
             ...(effect.classSkillGrants || []).map((grant) =>
               window.PFEffectEditor.classSkillGrantText(grant, titleCaseStat),
             ),
             ...(effect.spellLikeAbilities || []).map(spellLikeText),
+            ...(effect.generatedEquipment || []).map(
+              (item) =>
+                `Generates ${item.type || "equipment"}: ${
+                  item.name || item.item || "Generated item"
+                }`,
+            ),
           ];
           const chips = allChips.slice(0, 8);
           const bonusHtml = chips.length
@@ -914,7 +966,7 @@
             ${abilitySource}
             <div>${bonusHtml}${more}</div>
             ${
-              this.isAdmin && !effect.fromAbility
+              this.isAdmin && !effect.fromAbility && !effect.builtIn
                 ? `
               <div class="effect-card-admin-actions">
                 <button class="btn btn-outline-warning btn-sm" type="button" data-edit-bonuses="${index}" aria-label="Edit effect" title="Edit effect"><i class="bi bi-pencil-square"></i></button>
@@ -1333,10 +1385,17 @@
             (sr) =>
               `SR ${Number(sr.amount || 0)}${sr.conditional ? ` (${sr.appliesWhen || "conditional"})` : ""}`,
           ),
+          ...(effect.immunities || []).map(immunityText),
           ...(effect.classSkillGrants || []).map((grant) =>
             window.PFEffectEditor.classSkillGrantText(grant, titleCaseStat),
           ),
           ...(effect.spellLikeAbilities || []).map(spellLikeText),
+          ...(effect.generatedEquipment || []).map(
+            (item) =>
+              `Generates ${item.type || "equipment"}: ${
+                item.name || item.item || "Generated item"
+              }`,
+          ),
         ];
         const bonuses = detailLines
           .map((text) => `<div class="small-text">${escapeHtml(text)}</div>`)

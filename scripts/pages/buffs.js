@@ -43,6 +43,8 @@ const STAT_GROUPS = {
     "hit points",
     "skill checks",
     "craft skill checks",
+    "profession skill checks",
+    "perform skill checks",
     "spell resistance",
   ],
 };
@@ -81,6 +83,8 @@ const BUFF_STATS = [
   "hit points",
   "skill checks",
   "craft skill checks",
+  "profession skill checks",
+  "perform skill checks",
   "spell resistance",
 ];
 const BONUS_TYPES = [
@@ -416,7 +420,9 @@ async function saveCustomBuff() {
 }
 
 async function loadBuffDefinitions() {
-  buffs = await PFApp.loadBuffDefinitions();
+  buffs = PFApp.loadEffectDefinitions
+    ? await PFApp.loadEffectDefinitions()
+    : await PFApp.loadBuffDefinitions();
   if (!buffs.length) {
     try {
       const res = await fetch("buffs.json");

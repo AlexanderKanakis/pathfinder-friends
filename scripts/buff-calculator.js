@@ -38,6 +38,10 @@
       "cha skills": "charisma skill checks",
       "craft skills": "craft skill checks",
       "craft checks": "craft skill checks",
+      "profession skills": "profession skill checks",
+      "profession checks": "profession skill checks",
+      "perform skills": "perform skill checks",
+      "perform checks": "perform skill checks",
       "extra attacks": "extra attack",
       "extra attack at highest bab": "extra attack",
       "extra attacks at highest bab": "extra attack",
@@ -66,9 +70,15 @@
       ? rawBonus.skillList.skills
       : [];
     if (!skills.length) return [stat];
-    return skills.map((skill) =>
-      /^craft$/i.test(skill) ? "craft skill checks" : skillStatKey(skill),
-    );
+    return skills.map((skill) => skillFamilyStatKey(skill) || skillStatKey(skill));
+  }
+
+  function skillFamilyStatKey(skill) {
+    const text = String(skill || "").trim();
+    if (/^craft$/i.test(text)) return "craft skill checks";
+    if (/^profession$/i.test(text)) return "profession skill checks";
+    if (/^perform$/i.test(text)) return "perform skill checks";
+    return "";
   }
 
   function stacksByType(type) {
@@ -187,12 +197,15 @@
       });
 
     const every = scale.every || {};
-    const afterLevel = Number(every.afterLevel || every.after || 0);
+    const fromLevel = Number(
+      every.fromLevel || every.afterLevel || every.after || 0,
+    );
     const everyLevels = Number(every.everyLevels || every.every || 0);
     const increase = Number(every.increase || 0);
-    if (afterLevel > 0 && everyLevels > 0 && increase) {
+    if (fromLevel > 0 && everyLevels > 0 && increase) {
       value +=
-        Math.floor(Math.max(0, level - afterLevel) / everyLevels) * increase;
+        Math.floor(Math.max(0, level - fromLevel + 1) / everyLevels) *
+        increase;
     }
 
     // "... minimum +1" is common PF1e phrasing on fractional scaling (DR
@@ -691,6 +704,9 @@
         (abilityMods.constitution - abilityMod(baseline.con)) +
       (direct["hit points"] || 0);
     totals["skill checks"] = direct["skill checks"] || 0;
+    totals["craft skill checks"] = direct["craft skill checks"] || 0;
+    totals["profession skill checks"] = direct["profession skill checks"] || 0;
+    totals["perform skill checks"] = direct["perform skill checks"] || 0;
     totals["spell resistance"] = direct["spell resistance"] || 0;
     bonuses.ac =
       totals.ac -

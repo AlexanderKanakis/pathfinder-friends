@@ -182,18 +182,22 @@
     const contributedEffects = new Map();
     const contributedDr = new Map();
     const contributedSr = new Map();
+    const contributedImmunities = new Map();
     const contributedClassSkillGrants = new Map();
     const contributedSizeChanges = new Map();
     const contributedSpellLikeAbilities = new Map();
+    const contributedGeneratedEquipment = new Map();
     const contributedNames = new Map();
     contributedOptions.forEach((options, targetKey) => {
       const finalOptions = terminalOptions(options);
       const effects = [];
       const dr = [];
       const sr = [];
+      const immunities = [];
       const classSkillGrants = [];
       const sizeChanges = [];
       const spellLikeAbilities = [];
+      const generatedEquipment = [];
       const names = [];
       finalOptions.forEach((option) => {
         if (Array.isArray(option.effects) && option.effects.length)
@@ -208,6 +212,8 @@
           option.spellResistance.length
         )
           sr.push(...option.spellResistance);
+        if (Array.isArray(option.immunities) && option.immunities.length)
+          immunities.push(...option.immunities);
         if (
           Array.isArray(option.classSkillGrants) &&
           option.classSkillGrants.length
@@ -220,17 +226,25 @@
           option.spellLikeAbilities.length
         )
           spellLikeAbilities.push(...option.spellLikeAbilities);
+        if (
+          Array.isArray(option.generatedEquipment) &&
+          option.generatedEquipment.length
+        )
+          generatedEquipment.push(...option.generatedEquipment);
         names.push(option.name);
       });
       if (effects.length) contributedEffects.set(targetKey, effects);
       if (dr.length) contributedDr.set(targetKey, dr);
       if (sr.length) contributedSr.set(targetKey, sr);
+      if (immunities.length) contributedImmunities.set(targetKey, immunities);
       if (classSkillGrants.length)
         contributedClassSkillGrants.set(targetKey, classSkillGrants);
       if (sizeChanges.length)
         contributedSizeChanges.set(targetKey, sizeChanges);
       if (spellLikeAbilities.length)
         contributedSpellLikeAbilities.set(targetKey, spellLikeAbilities);
+      if (generatedEquipment.length)
+        contributedGeneratedEquipment.set(targetKey, generatedEquipment);
       if (names.length) contributedNames.set(targetKey, names);
     });
 
@@ -260,11 +274,14 @@
       const bundled = contributedEffects.get(targetKey) || [];
       const bundledDr = contributedDr.get(targetKey) || [];
       const bundledSr = contributedSr.get(targetKey) || [];
+      const bundledImmunities = contributedImmunities.get(targetKey) || [];
       const bundledClassSkillGrants =
         contributedClassSkillGrants.get(targetKey) || [];
       const bundledSizeChanges = contributedSizeChanges.get(targetKey) || [];
       const bundledSpellLikeAbilities =
         contributedSpellLikeAbilities.get(targetKey) || [];
+      const bundledGeneratedEquipment =
+        contributedGeneratedEquipment.get(targetKey) || [];
       const bundledNames = contributedNames.get(targetKey) || [];
       const durationConfig = feature.durationConfig || {
         count: null,
@@ -283,6 +300,10 @@
           : []),
         ...bundledSr,
       ];
+      const immunities = [
+        ...(Array.isArray(feature.immunities) ? feature.immunities : []),
+        ...bundledImmunities,
+      ];
       const classSkillGrants = [
         ...(Array.isArray(feature.classSkillGrants)
           ? feature.classSkillGrants
@@ -299,6 +320,12 @@
           : []),
         ...bundledSpellLikeAbilities,
       ];
+      const generatedEquipment = [
+        ...(Array.isArray(feature.generatedEquipment)
+          ? feature.generatedEquipment
+          : []),
+        ...bundledGeneratedEquipment,
+      ];
       abilities.set(key, {
         id: `ability:${key}`,
         name: feature.name || "Class Feature",
@@ -312,9 +339,11 @@
         ],
         ...(damageReduction.length ? { damageReduction } : {}),
         ...(spellResistance.length ? { spellResistance } : {}),
+        ...(immunities.length ? { immunities } : {}),
         ...(classSkillGrants.length ? { classSkillGrants } : {}),
         ...(sizeChanges.length ? { sizeChanges } : {}),
         ...(spellLikeAbilities.length ? { spellLikeAbilities } : {}),
+        ...(generatedEquipment.length ? { generatedEquipment } : {}),
         durationConfig,
         duration: window.PFEffectMeta?.durationLabel
           ? window.PFEffectMeta.durationLabel(durationConfig)

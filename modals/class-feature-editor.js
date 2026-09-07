@@ -224,6 +224,7 @@
       classSkillGrants,
       sizeChanges,
       spellLikeAbilities,
+      generatedEquipment,
     } = effectsAccordion.collect();
     if (effects.length) feature.effects = effects;
     if (damageReduction.length) feature.damageReduction = damageReduction;
@@ -232,6 +233,8 @@
     if (sizeChanges.length) feature.sizeChanges = sizeChanges;
     if (spellLikeAbilities.length)
       feature.spellLikeAbilities = spellLikeAbilities;
+    if (generatedEquipment.length)
+      feature.generatedEquipment = generatedEquipment;
     if (activatable) {
       feature.activatable = true;
       if (featureDurationConfig) feature.durationConfig = featureDurationConfig;

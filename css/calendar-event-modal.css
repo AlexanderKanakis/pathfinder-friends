@@ -1,0 +1,38 @@
+.calendar-event-modal .modal-content {
+  background: #1e1e1e;
+  color: #fff;
+  border: 1px solid #444;
+}
+
+.calendar-event-modal .btn-close {
+  filter: invert(1);
+}
+
+.calendar-event-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.calendar-event-grid .grid-column-full {
+  grid-column: 1 / -1;
+}
+
+.calendar-event-modal label {
+  color: #cfe7f8;
+  font-size: 12px;
+}
+
+.calendar-event-modal input,
+.calendar-event-modal select,
+.calendar-event-modal textarea {
+  background-color: #2b2b2b !important;
+  color: #fff !important;
+  border-color: #555 !important;
+}
+
+@media (max-width: 640px) {
+  .calendar-event-grid {
+    grid-template-columns: 1fr;
+  }
+}

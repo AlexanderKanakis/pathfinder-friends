@@ -12,6 +12,7 @@
     { href: "enemies.html", label: "Enemies" },
     { href: "bag-of-holding.html", label: "Bag of Holding" },
     { href: "map.html", label: "Map" },
+    { href: "calendar.html", label: "Calendar" },
     { href: "campaigns.html", label: "Campaigns" },
   ];
 

@@ -181,6 +181,16 @@
       label: "Craft Skills",
       namePrefix: "Craft",
     },
+    {
+      id: "skills-profession",
+      label: "Profession Skills",
+      namePrefix: "Profession",
+    },
+    {
+      id: "skills-perform",
+      label: "Perform Skills",
+      namePrefix: "Perform",
+    },
     { id: "skills-wis", label: "Wisdom Skills", ability: "wis" },
     { id: "skills-cha", label: "Charisma Skills", ability: "cha" },
     {
@@ -378,6 +388,7 @@
     return list.skills.some((skill) => {
       if (/^craft$/i.test(skill)) return /^craft/i.test(skillName);
       if (/^profession$/i.test(skill)) return /^profession/i.test(skillName);
+      if (/^perform$/i.test(skill)) return /^perform/i.test(skillName);
       return normalizeSkillName(skill) === target;
     });
   }
@@ -412,6 +423,12 @@
         if (/^profession$/i.test(skill)) {
           liveSkills
             .filter((entry) => /^profession(?:\s*\(|\b)/i.test(entry.name))
+            .forEach(addSkill);
+          return;
+        }
+        if (/^perform$/i.test(skill)) {
+          liveSkills
+            .filter((entry) => /^perform(?:\s*\(|\b)/i.test(entry.name))
             .forEach(addSkill);
           return;
         }

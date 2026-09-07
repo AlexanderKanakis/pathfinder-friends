@@ -741,6 +741,20 @@ body {
   gap: 8px;
 }
 
+.sheet-full-row {
+  grid-column: 1 / -1;
+}
+
+.sheet-derived-defense-row {
+  grid-column: 1 / -1;
+  background: rgba(143, 209, 158, 0.08);
+  border-left: 3px solid #8fd19e;
+  border-radius: 4px;
+  color: #dceee2;
+  font-size: 0.82rem;
+  padding: 6px 8px;
+}
+
 .enemy-only {
   display: none !important;
 }
@@ -980,6 +994,49 @@ body.enemy-sheet-mode .enemy-field-pair {
   grid-template-columns: repeat(auto-fit, minmax(120px, max-content));
   gap: 12px;
   align-items: end;
+}
+
+.inventory-attack-options {
+  grid-column: 1 / -1;
+  border-top: 1px solid #3a3a3a;
+  padding-top: 10px;
+}
+
+.inventory-attack-options-title {
+  color: #b8cce0;
+  font-size: 0.72rem;
+  letter-spacing: 0.03em;
+  margin: 2px 0 6px;
+  text-transform: uppercase;
+}
+
+.inventory-attack-toggle-grid,
+.inventory-attack-misc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.inventory-attack-toggle {
+  align-items: center;
+  border: 1px solid #4b4b4b;
+  border-radius: 6px;
+  display: flex;
+  gap: 8px;
+  justify-content: space-between;
+  margin: 0;
+  min-height: 32px;
+  padding: 5px 8px;
+}
+
+.inventory-attack-toggle span {
+  color: #e8f0f8;
+  font-size: 0.78rem;
+}
+
+.inventory-attack-toggle input {
+  flex: 0 0 auto;
 }
 
 .weapon-group {
@@ -2022,6 +2079,17 @@ textarea.enemy-header-control.form-control-sm {
   padding: 8px;
 }
 
+.shared-immunity-row {
+  display: grid;
+  grid-template-columns: 0.8fr auto 1fr auto;
+  gap: 8px;
+  align-items: end;
+  background: #242424;
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 8px;
+}
+
 .shared-dr-row [data-scale-summary],
 .shared-sr-row [data-scale-summary] {
   grid-column: 1 / -1;
@@ -2042,7 +2110,7 @@ textarea.enemy-header-control.form-control-sm {
   grid-column: 1 / -1;
 }
 
-/* The "Extra" accordion item (DR/SR/Class Skills, compacted into one
+/* The "Extra" accordion item (DR/Immunity/SR/Class Skills, compacted into one
    collapsed section) mounted by scripts/effect-editor.js's
    mountExtraAccordion -- shared markup/classes across every
    effect-authoring surface in the app. */

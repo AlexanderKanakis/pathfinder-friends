@@ -18,6 +18,7 @@
   let campaignsCache = null;
   let campaignsCacheUserId = "";
   let campaignsPromise = null;
+  let conditionDefinitionsPromise = null;
 
   if (!missingConfig && window.supabase) {
     client = window.supabase.createClient(config.url, config.anonKey);
@@ -554,6 +555,7 @@
       "character-sheet.html",
       "bag-of-holding.html",
       "enemies.html",
+      "calendar.html",
     ].includes(page);
     const availableContexts = requiresGame
       ? contexts.filter((context) => context.gameId)
@@ -1055,16 +1057,24 @@
   function normalizeBuffDefinition(row) {
     const legacyDuration = parseDurationLabel(row.duration);
     const durationCount =
-      row.duration_count === undefined
+      row.durationCount !== undefined
+        ? row.durationCount
+        : row.duration_count === undefined
         ? legacyDuration.count
         : row.duration_count;
     const durationUnit =
-      row.duration_unit === undefined ? legacyDuration.unit : row.duration_unit;
+      row.durationUnit !== undefined
+        ? row.durationUnit
+        : row.duration_unit === undefined
+          ? legacyDuration.unit
+          : row.duration_unit;
     const durationPerLevel =
-      row.duration_per_level === undefined
+      row.durationPerLevel !== undefined
+        ? row.durationPerLevel
+        : row.duration_per_level === undefined
         ? legacyDuration.perLevel
         : row.duration_per_level;
-    const durationConfig = row.duration_config || {
+    const durationConfig = row.durationConfig || row.duration_config || {
       count: durationCount,
       unit: durationUnit || "variable",
       factors: durationPerLevel ? [{ type: "caster" }] : [],
@@ -1083,23 +1093,92 @@
       durationPerLevel: Boolean(durationPerLevel),
       durationConfig,
       bonuses: Array.isArray(row.bonuses) ? row.bonuses : [],
-      damageReduction: Array.isArray(row.damage_reduction)
-        ? row.damage_reduction
+      damageReduction: Array.isArray(row.damageReduction)
+        ? row.damageReduction
+        : Array.isArray(row.damage_reduction)
+          ? row.damage_reduction
+          : [],
+      spellResistance: Array.isArray(row.spellResistance)
+        ? row.spellResistance
+        : Array.isArray(row.spell_resistance)
+          ? row.spell_resistance
+          : [],
+      immunities: Array.isArray(row.immunities) ? row.immunities : [],
+      classSkillGrants: Array.isArray(row.classSkillGrants)
+        ? row.classSkillGrants
+        : Array.isArray(row.class_skill_grants)
+          ? row.class_skill_grants
+          : [],
+      sizeChanges: Array.isArray(row.sizeChanges)
+        ? row.sizeChanges
+        : Array.isArray(row.size_changes)
+          ? row.size_changes
+          : [],
+      spellLikeAbilities: Array.isArray(row.spellLikeAbilities)
+        ? row.spellLikeAbilities
+        : Array.isArray(row.spell_like_abilities)
+          ? row.spell_like_abilities
+          : [],
+      generatedEquipment: Array.isArray(row.generatedEquipment)
+        ? row.generatedEquipment
         : [],
-      spellResistance: Array.isArray(row.spell_resistance)
-        ? row.spell_resistance
-        : [],
-      classSkillGrants: Array.isArray(row.class_skill_grants)
-        ? row.class_skill_grants
-        : [],
-      sizeChanges: Array.isArray(row.size_changes) ? row.size_changes : [],
-      spellLikeAbilities: Array.isArray(row.spell_like_abilities)
-        ? row.spell_like_abilities
-        : [],
+      builtIn: Boolean(row.builtIn || row.builtin || row.built_in),
       source: row.source || "custom",
       contextKey: row.context_key || "general",
       gameId: row.game_id || null,
     };
+  }
+
+  function definitionKey(effect) {
+    return `${String(effect.category || "").toLowerCase().trim()}::${String(effect.name || "").toLowerCase().trim()}`;
+  }
+
+  function mergeEffectDefinitions(databaseDefinitions = [], fileDefinitions = []) {
+    const fileKeys = new Set(fileDefinitions.map(definitionKey));
+    return [
+      ...fileDefinitions,
+      ...databaseDefinitions.filter((effect) => !fileKeys.has(definitionKey(effect))),
+    ].sort((a, b) => {
+      const categoryCompare = String(a.category || "").localeCompare(
+        String(b.category || ""),
+      );
+      return categoryCompare || String(a.name || "").localeCompare(b.name || "");
+    });
+  }
+
+  async function loadConditionDefinitions() {
+    if (!conditionDefinitionsPromise) {
+      conditionDefinitionsPromise = fetch("./data/conditions.json", {
+        cache: "no-cache",
+      })
+        .then((response) => (response.ok ? response.json() : []))
+        .then((data) => (Array.isArray(data) ? data : data.conditions || []))
+        .then((conditions) =>
+          conditions
+            .map((condition) =>
+              normalizeBuffDefinition({
+                ...condition,
+                category: "Condition",
+                source: condition.source || "pf1e-condition",
+                builtIn: true,
+              }),
+            )
+            .filter((condition) => condition.id && condition.name),
+        )
+        .catch((error) => {
+          console.error(error);
+          return [];
+        });
+    }
+    return conditionDefinitionsPromise;
+  }
+
+  async function loadEffectDefinitions() {
+    const [databaseDefinitions, conditionDefinitions] = await Promise.all([
+      loadBuffDefinitions(),
+      loadConditionDefinitions(),
+    ]);
+    return mergeEffectDefinitions(databaseDefinitions, conditionDefinitions);
   }
 
   function parseDurationLabel(duration) {
@@ -2253,6 +2332,218 @@
     return data?.state || null;
   }
 
+  function normalizeCalendarStateRow(row, contextKey = getSelectedContextKey()) {
+    const context = normalizeContext(contextKey);
+    return {
+      id: row?.id || null,
+      contextKey: row?.context_key || context.contextKey,
+      gameId: row?.game_id || context.gameId,
+      currentDay: Math.max(1, Number(row?.current_day || 1) || 1),
+      currentSecond: Math.min(
+        86399,
+        Math.max(0, Number(row?.current_second ?? 28800) || 0),
+      ),
+      calendarConfig:
+        row?.calendar_config && typeof row.calendar_config === "object"
+          ? row.calendar_config
+          : {},
+      updatedAt: row?.updated_at || null,
+      updatedBy: row?.updated_by || null,
+    };
+  }
+
+  function normalizeCalendarEvent(row = {}) {
+    return {
+      id: row.id || "",
+      contextKey: row.context_key || "",
+      gameId: row.game_id || "",
+      title: row.title || "",
+      description: row.description || "",
+      startDay: Math.max(1, Number(row.start_day || 1) || 1),
+      startMinute: Math.min(
+        1439,
+        Math.max(0, Number(row.start_minute || 0) || 0),
+      ),
+      endDay: Math.max(1, Number(row.end_day || row.start_day || 1) || 1),
+      endMinute: Math.min(
+        1439,
+        Math.max(0, Number(row.end_minute || 0) || 0),
+      ),
+      allDay: Boolean(row.all_day),
+      eventType: row.event_type || "custom",
+      visibleToPlayers: row.visible_to_players !== false,
+      createdBy: row.created_by || "",
+      updatedBy: row.updated_by || "",
+      createdAt: row.created_at || "",
+      updatedAt: row.updated_at || "",
+    };
+  }
+
+  async function loadCampaignCalendarState(contextKey = getSelectedContextKey()) {
+    const user = await getUser();
+    if (!client || !user) return null;
+
+    const context = normalizeContext(contextKey);
+    if (!context.gameId) return null;
+
+    const { data, error } = await client
+      .from("campaign_calendar_state")
+      .select("*")
+      .eq("context_key", context.contextKey)
+      .maybeSingle();
+
+    if (error) {
+      console.error(error);
+      return null;
+    }
+
+    return normalizeCalendarStateRow(data, contextKey);
+  }
+
+  async function saveCampaignCalendarState(
+    state,
+    contextKey = getSelectedContextKey(),
+  ) {
+    const user = await getUser();
+    if (!client || !user) return null;
+
+    const context = normalizeContext(contextKey);
+    if (!context.gameId) return null;
+
+    const payload = {
+      context_key: context.contextKey,
+      game_id: context.gameId,
+      current_day: Math.max(1, Number(state?.currentDay || 1) || 1),
+      current_second: Math.min(
+        86399,
+        Math.max(0, Number(state?.currentSecond ?? 28800) || 0),
+      ),
+      calendar_config: state?.calendarConfig || {},
+      updated_by: user.id,
+      updated_at: new Date().toISOString(),
+    };
+
+    const { data, error } = await client
+      .from("campaign_calendar_state")
+      .upsert(payload, { onConflict: "context_key" })
+      .select("*")
+      .single();
+
+    if (error) {
+      console.error(error);
+      return null;
+    }
+
+    return normalizeCalendarStateRow(data, contextKey);
+  }
+
+  async function loadCampaignCalendarEvents(
+    contextKey = getSelectedContextKey(),
+    rangeStartDay = 1,
+    rangeEndDay = rangeStartDay,
+  ) {
+    const user = await getUser();
+    if (!client || !user) return [];
+
+    const context = normalizeContext(contextKey);
+    if (!context.gameId) return [];
+
+    const { data, error } = await client
+      .from("campaign_calendar_events")
+      .select("*")
+      .eq("context_key", context.contextKey)
+      .lte("start_day", Math.max(1, Number(rangeEndDay || 1) || 1))
+      .gte("end_day", Math.max(1, Number(rangeStartDay || 1) || 1))
+      .order("start_day", { ascending: true })
+      .order("start_minute", { ascending: true });
+
+    if (error) {
+      console.error(error);
+      return [];
+    }
+
+    return (data || []).map(normalizeCalendarEvent);
+  }
+
+  async function saveCampaignCalendarEvent(
+    event,
+    contextKey = getSelectedContextKey(),
+  ) {
+    const user = await getUser();
+    if (!client || !user || !event?.title) return null;
+
+    const context = normalizeContext(contextKey);
+    if (!context.gameId) return null;
+
+    const startDay = Math.max(1, Number(event.startDay || 1) || 1);
+    const endDay = Math.max(startDay, Number(event.endDay || startDay) || startDay);
+    const startMinute = Math.min(
+      1439,
+      Math.max(0, Number(event.startMinute || 0) || 0),
+    );
+    const rawEndMinute = Math.min(
+      1439,
+      Math.max(0, Number(event.endMinute || 0) || 0),
+    );
+    const endMinute =
+      endDay === startDay ? Math.max(startMinute, rawEndMinute) : rawEndMinute;
+    const payload = {
+      context_key: context.contextKey,
+      game_id: context.gameId,
+      title: event.title.trim(),
+      description: event.description || "",
+      start_day: startDay,
+      start_minute: startMinute,
+      end_day: endDay,
+      end_minute: endMinute,
+      all_day: Boolean(event.allDay),
+      event_type: event.eventType || "custom",
+      visible_to_players: event.visibleToPlayers !== false,
+      updated_by: user.id,
+      updated_at: new Date().toISOString(),
+    };
+
+    const query = event.id
+      ? client
+          .from("campaign_calendar_events")
+          .update(payload)
+          .eq("id", event.id)
+          .eq("context_key", context.contextKey)
+      : client
+          .from("campaign_calendar_events")
+          .insert({ ...payload, created_by: user.id });
+
+    const { data, error } = await query.select("*").single();
+
+    if (error) {
+      console.error(error);
+      return null;
+    }
+
+    return normalizeCalendarEvent(data);
+  }
+
+  async function deleteCampaignCalendarEvent(
+    eventId,
+    contextKey = getSelectedContextKey(),
+  ) {
+    const user = await getUser();
+    if (!client || !user || !eventId)
+      return { error: new Error("Missing calendar event") };
+
+    const context = normalizeContext(contextKey);
+    if (!context.gameId) return { error: new Error("Missing campaign") };
+
+    const { error } = await client
+      .from("campaign_calendar_events")
+      .delete()
+      .eq("id", eventId)
+      .eq("context_key", context.contextKey);
+
+    if (error) console.error(error);
+    return { error };
+  }
+
   async function saveMapState(
     state,
     contextKey = getSelectedContextKey(),
@@ -2355,6 +2646,8 @@
     updateCharacterEffectState,
     advanceMapEffectTurn,
     loadBuffDefinitions,
+    loadConditionDefinitions,
+    loadEffectDefinitions,
     saveBuffDefinition,
     updateBuffDefinition,
     deleteBuffDefinition,
@@ -2380,6 +2673,11 @@
     loadLootItems,
     saveLootItem,
     deleteLootItem,
+    loadCampaignCalendarState,
+    saveCampaignCalendarState,
+    loadCampaignCalendarEvents,
+    saveCampaignCalendarEvent,
+    deleteCampaignCalendarEvent,
     loadMapState,
     saveMapState,
     loadMapSlotSummaries,

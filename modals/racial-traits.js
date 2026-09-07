@@ -33,6 +33,13 @@
     );
   }
 
+  function claimedStandardTraitKeys(trait = {}) {
+    return new Set([
+      ...relationKeys(trait.replaces),
+      ...relationKeys(trait.modifies),
+    ]);
+  }
+
   function selectedTraits() {
     const selected = new Set((state.selected || []).map(traitKey));
     return (state.race.alternateTraits || []).filter((trait) =>
@@ -53,6 +60,74 @@
 
   function selectedNameSet() {
     return new Set((state.selected || []).map(traitKey));
+  }
+
+  function mechanicChoiceStats(items = []) {
+    return (Array.isArray(items) ? items : []).some((item) =>
+      window.PFEffectStats?.isChoiceStat?.(item?.stat),
+    );
+  }
+
+  function overrideChoiceStats(override = {}) {
+    return Object.entries(override.mechanicOverrides || {}).some(
+      ([key, operations]) =>
+        ["effects", "classSkillGrants"].includes(key) &&
+        (Array.isArray(operations) ? operations : []).some((operation) =>
+          window.PFEffectStats?.isChoiceStat?.(operation?.value?.stat),
+        ),
+    );
+  }
+
+  function traitHasChoiceStats(trait = {}) {
+    return (
+      mechanicChoiceStats(trait.effects) ||
+      mechanicChoiceStats(trait.classSkillGrants) ||
+      (trait.modifiedTraitOverrides || []).some(overrideChoiceStats)
+    );
+  }
+
+  function effectiveStandardTrait(trait = {}) {
+    const key = traitNameKey(trait);
+    return (
+      (state.effectiveStandardTraits || []).find(
+        (candidate) => traitNameKey(candidate) === key,
+      ) || trait
+    );
+  }
+
+  function traitForChoiceKey(key = "") {
+    const normalized = traitKey(key);
+    return (
+      (state.effectiveStandardTraits || []).find(
+        (trait) => traitNameKey(trait) === normalized,
+      ) ||
+      (state.race.alternateTraits || []).find(
+        (trait) => traitNameKey(trait) === normalized,
+      ) ||
+      (state.race.standardTraits || []).find(
+        (trait) => traitNameKey(trait) === normalized,
+      ) ||
+      null
+    );
+  }
+
+  function choiceControls(trait = {}) {
+    if (!traitHasChoiceStats(trait)) return "";
+    const key = traitNameKey(trait);
+    const hasChoice = Boolean(state.choices?.[key]);
+    return `
+      <div class="racial-trait-choice-row">
+        <span class="racial-trait-choice-status">${hasChoice ? "Choices set" : "Target needed"}</span>
+        <button
+          class="btn btn-outline-info btn-sm"
+          type="button"
+          data-racial-trait-choice="${key}"
+        >
+          <i class="bi bi-bullseye"></i>
+          ${hasChoice ? "Change Target" : "Choose Target"}
+        </button>
+      </div>
+    `;
   }
 
   function searchableTrait(trait = {}) {
@@ -84,6 +159,16 @@
         `<span class="racial-trait-pill is-modifies"><i class="bi bi-pencil-square"></i> Modifies ${escapeHtml(trait.modifies.join(", "))}</span>`,
       );
     }
+    if ((trait.modifiedTraitOverrides || []).length) {
+      const names = trait.modifiedTraitOverrides
+        .map((override) => override.trait || override.name || "")
+        .filter(Boolean);
+      if (names.length) {
+        pills.push(
+          `<span class="racial-trait-pill is-modifies"><i class="bi bi-sliders"></i> Overrides ${escapeHtml(names.join(", "))}</span>`,
+        );
+      }
+    }
     return pills.length
       ? `<div class="racial-trait-meta">${pills.join("")}</div>`
       : "";
@@ -113,12 +198,14 @@
           </button>
         </div>
         ${metaPills(trait)}
+        ${choiceControls(trait)}
         ${descriptionAccordion(trait)}
       </article>
     `;
   }
 
   function standardTraitCard(trait = {}, replacedBy = []) {
+    const effectiveTrait = effectiveStandardTrait(trait);
     return `
       <article class="racial-trait-card${replacedBy.length ? " is-replaced" : ""}">
         <div class="racial-trait-topline">
@@ -128,6 +215,7 @@
           </span>
         </div>
         ${metaPills(trait, replacedBy)}
+        ${replacedBy.length ? "" : choiceControls(effectiveTrait)}
         ${descriptionAccordion(trait)}
       </article>
     `;
@@ -233,6 +321,19 @@
           toggleAlternateTrait(trait);
         });
       });
+    document
+      .querySelectorAll("[data-racial-trait-choice]")
+      .forEach((button) => {
+        button.addEventListener("click", async () => {
+          const trait = traitForChoiceKey(button.dataset.racialTraitChoice);
+          if (!trait || !state.onChoose) return;
+          button.disabled = true;
+          const changed = await state.onChoose(trait);
+          state.choices = state.getChoices?.() || state.choices || {};
+          button.disabled = false;
+          if (changed) render();
+        });
+      });
   }
 
   async function toggleAlternateTrait(trait) {
@@ -242,16 +343,18 @@
     if (selected.has(key)) {
       state.selected = state.selected.filter((name) => traitKey(name) !== key);
       state.onRemove?.(trait);
+      state.choices = state.getChoices?.() || state.choices || {};
       state.onChange?.(state.selected.slice());
       render();
       return;
     }
 
-    const incomingReplaces = relationKeys(trait.replaces);
+    const incomingClaims = claimedStandardTraitKeys(trait);
     const canApply = state.onBeforeApply
       ? await state.onBeforeApply(trait)
       : true;
     if (!canApply) return;
+    state.choices = state.getChoices?.() || state.choices || {};
 
     state.selected = state.selected.filter((name) => {
       const existing = (state.race.alternateTraits || []).find(
@@ -259,9 +362,9 @@
       );
       if (!existing) return false;
       if (traitNameKey(existing) === key) return false;
-      const existingReplaces = relationKeys(existing.replaces);
-      for (const replaceKey of incomingReplaces) {
-        if (existingReplaces.has(replaceKey)) {
+      const existingClaims = claimedStandardTraitKeys(existing);
+      for (const claimKey of incomingClaims) {
+        if (existingClaims.has(claimKey)) {
           state.onRemove?.(existing);
           return false;
         }
@@ -328,6 +431,17 @@
           ? config.selectedAlternateTraits.slice()
           : [],
         search: "",
+        effectiveStandardTraits: Array.isArray(config.effectiveStandardTraits)
+          ? config.effectiveStandardTraits.slice()
+          : [],
+        choices:
+          config.choices && typeof config.choices === "object"
+            ? { ...config.choices }
+            : {},
+        getChoices:
+          typeof config.getChoices === "function" ? config.getChoices : null,
+        onChoose:
+          typeof config.onChoose === "function" ? config.onChoose : null,
         onChange:
           typeof config.onChange === "function" ? config.onChange : null,
         onBeforeApply:

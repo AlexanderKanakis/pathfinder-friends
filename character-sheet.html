@@ -20,11 +20,12 @@
       rel="stylesheet"
     />
 
-    <link href="css/character-sheet.css" rel="stylesheet" />
-    <link href="css/effect-editor.css" rel="stylesheet" />
+    <link href="css/character-sheet.css?v=defense-rows-1" rel="stylesheet" />
+    <link href="css/effect-editor.css?v=sla-requirements-1" rel="stylesheet" />
+    <link href="modals/generated-equipment-picker.css?v=effect-labels-white-1" rel="stylesheet" />
     <link href="modals/magic-search.css" rel="stylesheet" />
     <link href="modals/custom-skill-list.css" rel="stylesheet" />
-    <link href="modals/racial-traits.css" rel="stylesheet" />
+    <link href="modals/racial-traits.css?v=racial-trait-choices-1" rel="stylesheet" />
   </head>
 
   <body>
@@ -233,6 +234,13 @@
                     onclick="addNamedSkill('Profession', 'wis')"
                   >
                     Add Profession
+                  </button>
+                  <button
+                    class="btn btn-outline-light btn-sm"
+                    type="button"
+                    onclick="addNamedSkill('Perform', 'cha')"
+                  >
+                    Add Perform
                   </button>
                 </div>
               </div>
@@ -564,6 +572,10 @@
                       readonly
                     />
                   </div>
+                  <div
+                    class="small-text calc-line sheet-full-row hp-calc-row"
+                    data-calc-for="hitPointsTotal"
+                  ></div>
                   <div>
                     <label for="regeneration">Regeneration</label
                     ><textarea
@@ -572,17 +584,18 @@
                       rows="1"
                     ></textarea>
                   </div>
-                  <div>
+                  <div class="sheet-full-row">
                     <label for="damageReduction">DR</label
                     ><input
                       id="damageReduction"
                       class="form-control form-control-sm sheet-input"
-                    /><div
-                      id="damageReductionFromClasses"
-                      class="small-text d-none"
-                    ></div>
+                    />
                   </div>
-                  <div>
+                  <div
+                    id="damageReductionFromClasses"
+                    class="sheet-derived-defense-row d-none"
+                  ></div>
+                  <div class="sheet-full-row">
                     <label for="resistances">Resistances</label
                     ><textarea
                       id="resistances"
@@ -590,7 +603,11 @@
                       rows="1"
                     ></textarea>
                   </div>
-                  <div>
+                  <div
+                    id="resistancesFromEffects"
+                    class="sheet-derived-defense-row d-none"
+                  ></div>
+                  <div class="sheet-full-row">
                     <label for="immunities">Immunities</label
                     ><textarea
                       id="immunities"
@@ -598,17 +615,22 @@
                       rows="1"
                     ></textarea>
                   </div>
-                  <div>
+                  <div
+                    id="immunitiesFromEffects"
+                    class="sheet-derived-defense-row d-none"
+                  ></div>
+                  <div class="sheet-full-row">
                     <label for="spellResistance">SR</label
                     ><input
                       id="spellResistance"
                       class="form-control form-control-sm sheet-input"
-                    /><div
-                      id="spellResistanceFromClasses"
-                      class="small-text d-none"
-                    ></div>
+                    />
                   </div>
-                  <div>
+                  <div
+                    id="spellResistanceFromClasses"
+                    class="sheet-derived-defense-row d-none"
+                  ></div>
+                  <div class="sheet-full-row">
                     <label for="weaknesses">Weakness</label
                     ><textarea
                       id="weaknesses"
@@ -617,10 +639,6 @@
                     ></textarea>
                   </div>
                 </div>
-                <div
-                  class="small-text calc-line"
-                  data-calc-for="hitPointsTotal"
-                ></div>
               </section>
 
               <section class="sheet-section full-order-initiative">
@@ -1656,6 +1674,191 @@
                   class="form-control form-control-sm"
                 />
               </div>
+              <div
+                id="inventoryWeaponAttackOptions"
+                class="inventory-attack-options"
+              >
+                <div class="inventory-attack-options-title">
+                  Attack Options
+                </div>
+                <div class="inventory-attack-toggle-grid">
+                  <label
+                    class="inventory-attack-toggle"
+                    data-inventory-twf-compatible-option
+                  >
+                    <span>Two-Handed</span>
+                    <input
+                      id="inventoryTwoHanded"
+                      class="form-check-input"
+                      type="checkbox"
+                      value="yes"
+                    />
+                  </label>
+                  <label
+                    class="inventory-attack-toggle"
+                    data-inventory-melee-weapon-option
+                  >
+                    <span>Power Attack</span>
+                    <input
+                      id="inventoryPowerAttack"
+                      class="form-check-input"
+                      type="checkbox"
+                      value="yes"
+                    />
+                  </label>
+                  <label
+                    class="inventory-attack-toggle"
+                    data-inventory-ranged-weapon-option
+                  >
+                    <span>Deadly Aim</span>
+                    <input
+                      id="inventoryDeadlyAim"
+                      class="form-check-input"
+                      type="checkbox"
+                      value="yes"
+                    />
+                  </label>
+                  <label
+                    class="inventory-attack-toggle"
+                    data-inventory-ranged-weapon-option
+                  >
+                    <span>Rapid Shot</span>
+                    <input
+                      id="inventoryRapidShot"
+                      class="form-check-input"
+                      type="checkbox"
+                      value="yes"
+                    />
+                  </label>
+                </div>
+                <div class="inventory-attack-misc-grid">
+                  <div>
+                    <label for="inventoryAttackMisc">Attack Misc</label>
+                    <div class="item-number-stepper" data-item-stepper>
+                      <button
+                        class="btn btn-outline-light btn-sm item-stepper-btn"
+                        type="button"
+                        data-item-stepper-delta="-1"
+                        aria-label="Decrease attack misc"
+                      >
+                        -
+                      </button>
+                      <input
+                        id="inventoryAttackMisc"
+                        class="form-control form-control-sm no-spinner"
+                        type="number"
+                        value="0"
+                        inputmode="numeric"
+                      />
+                      <button
+                        class="btn btn-outline-light btn-sm item-stepper-btn"
+                        type="button"
+                        data-item-stepper-delta="1"
+                        aria-label="Increase attack misc"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+                  <div>
+                    <label for="inventoryDamageMisc">Damage Misc</label>
+                    <div class="item-number-stepper" data-item-stepper>
+                      <button
+                        class="btn btn-outline-light btn-sm item-stepper-btn"
+                        type="button"
+                        data-item-stepper-delta="-1"
+                        aria-label="Decrease damage misc"
+                      >
+                        -
+                      </button>
+                      <input
+                        id="inventoryDamageMisc"
+                        class="form-control form-control-sm no-spinner"
+                        type="number"
+                        value="0"
+                        inputmode="numeric"
+                      />
+                      <button
+                        class="btn btn-outline-light btn-sm item-stepper-btn"
+                        type="button"
+                        data-item-stepper-delta="1"
+                        aria-label="Increase damage misc"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div class="inventory-attack-options-title">
+                  Two-Weapon Fighting
+                </div>
+                <div class="inventory-attack-toggle-grid">
+                  <label class="inventory-attack-toggle">
+                    <span>No Feat Primary</span>
+                    <input
+                      id="inventoryTwfNoFeatPrimary"
+                      class="form-check-input"
+                      type="checkbox"
+                      value="yes"
+                      data-inventory-twf-option="twfNoFeatPrimary"
+                    />
+                  </label>
+                  <label class="inventory-attack-toggle">
+                    <span>No Feat Off-hand</span>
+                    <input
+                      id="inventoryTwfNoFeatOff"
+                      class="form-check-input"
+                      type="checkbox"
+                      value="yes"
+                      data-inventory-twf-option="twfNoFeatOff"
+                    />
+                  </label>
+                  <label class="inventory-attack-toggle">
+                    <span>Feat Primary</span>
+                    <input
+                      id="inventoryTwfFeatPrimary"
+                      class="form-check-input"
+                      type="checkbox"
+                      value="yes"
+                      data-inventory-twf-option="twfFeatPrimary"
+                    />
+                  </label>
+                  <label class="inventory-attack-toggle">
+                    <span>Feat Off-hand</span>
+                    <input
+                      id="inventoryTwfFeatOff"
+                      class="form-check-input"
+                      type="checkbox"
+                      value="yes"
+                      data-inventory-twf-option="twfFeatOff"
+                    />
+                  </label>
+                  <label
+                    class="inventory-attack-toggle"
+                    data-inventory-twf-offhand-feat-option
+                  >
+                    <span>Improved TWF</span>
+                    <input
+                      id="inventoryImprovedTwf"
+                      class="form-check-input"
+                      type="checkbox"
+                      value="yes"
+                    />
+                  </label>
+                  <label
+                    class="inventory-attack-toggle"
+                    data-inventory-twf-offhand-feat-option
+                  >
+                    <span>Greater TWF</span>
+                    <input
+                      id="inventoryGreaterTwf"
+                      class="form-check-input"
+                      type="checkbox"
+                      value="yes"
+                    />
+                  </label>
+                </div>
+              </div>
             </div>
             <div
               id="inventoryArmorFields"
@@ -1952,27 +2155,28 @@
     <script src="scripts/navbar.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="scripts/supabase-config.js"></script>
-    <script src="scripts/app-supabase.js"></script>
-    <script src="scripts/buff-calculator.js?v=class-skills-2"></script>
+    <script src="scripts/app-supabase.js?v=conditions-json-1"></script>
+    <script src="scripts/buff-calculator.js?v=skill-groups-1"></script>
     <script src="scripts/class-data.js"></script>
-    <script src="scripts/race-data.js"></script>
-    <script src="scripts/class-feature-abilities.js?v=class-skills-2"></script>
+    <script src="scripts/race-data.js?v=immunities-extra-1"></script>
+    <script src="scripts/class-feature-abilities.js?v=effect-labels-white-1"></script>
     <script src="modals/effect-duration-editor.js"></script>
-    <script src="scripts/effect-stat-options.js?v=fixed-resistance-1"></script>
+    <script src="scripts/effect-stat-options.js?v=skill-groups-1"></script>
     <script src="modals/effect-choice-picker.js?v=sequential-fix-1"></script>
     <script src="modals/magic-search.js"></script>
-    <script src="modals/custom-skill-list.js"></script>
-    <script src="scripts/effect-editor.js?v=unified-bonus-row-1"></script>
+    <script src="modals/custom-skill-list.js?v=skill-groups-1"></script>
+    <script src="scripts/effect-editor.js?v=sla-requirements-1"></script>
+    <script src="modals/generated-equipment-picker.js?v=effect-labels-white-1"></script>
     <script src="modals/pending-effect-choices.js?v=class-skills-2"></script>
     <script src="modals/class-feature-choice-picker.js"></script>
     <script src="modals/spell-picker.js"></script>
     <script src="modals/spellcasting-info.js"></script>
-    <script src="modals/racial-traits.js"></script>
-    <script src="scripts/buff-tracker-widget.js?v=unified-bonus-row-1"></script>
+    <script src="modals/racial-traits.js?v=racial-trait-choices-1"></script>
+    <script src="scripts/buff-tracker-widget.js?v=conditions-json-1"></script>
     <script src="scripts/item-data.js?v=1"></script>
     <script src="scripts/scripts.js"></script>
     <script src="modals/item-editor.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="scripts/pages/character-sheet.js"></script>
+    <script src="scripts/pages/character-sheet.js?v=sla-requirements-1"></script>
   </body>
 </html>

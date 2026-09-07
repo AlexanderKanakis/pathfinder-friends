@@ -1,0 +1,145 @@
+body {
+  background-color: #121212;
+  color: white;
+}
+
+.editor-shell {
+  display: grid;
+  grid-template-columns: minmax(260px, 360px) minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.panel {
+  background: #1e1e1e;
+  border: 1px solid #333;
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.feat-list {
+  display: grid;
+  gap: 6px;
+  max-height: calc(100vh - 360px);
+  overflow: auto;
+}
+
+.feat-list button {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  text-align: left;
+}
+
+.feat-list-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.feat-type {
+  color: #aaa;
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.feat-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.feat-type-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.level-card {
+  background: #242424;
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.feat-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  align-items: end;
+}
+
+.feat-summary-grid .grid-column-half {
+  grid-column: span 2;
+}
+
+.feat-summary-grid .grid-column-full {
+  grid-column: 1 / -1;
+}
+
+.feat-textarea {
+  min-height: 96px;
+  overflow: hidden;
+  resize: vertical;
+}
+
+.feat-textarea-tall {
+  min-height: 150px;
+}
+
+.feat-flags-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.feat-flag {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  background: #202020;
+  border: 1px solid #3d3d3d;
+  border-radius: 6px;
+  padding: 6px 8px;
+}
+
+.feat-flag label {
+  color: #fff;
+  margin: 0;
+}
+
+.small-text {
+  color: #aaa;
+  font-size: 12px;
+}
+
+.dirty-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #ffc107;
+}
+
+@media (max-width: 1000px) {
+  .editor-shell,
+  .feat-summary-grid,
+  .feat-flags-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .feat-summary-grid .grid-column-half {
+    grid-column: 1 / -1;
+  }
+
+  .feat-list {
+    max-height: 280px;
+  }
+}

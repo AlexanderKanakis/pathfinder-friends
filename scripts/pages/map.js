@@ -625,9 +625,10 @@ function scaleText(scale) {
     );
   if (milestoneText.length) parts.push(milestoneText.join(", "));
   const every = scale.every || {};
-  if (every.afterLevel && every.everyLevels && every.increase) {
+  const fromLevel = every.fromLevel || every.afterLevel || every.after;
+  if (fromLevel && every.everyLevels && every.increase) {
     parts.push(
-      `after ${sourceLabel} ${every.afterLevel}, every ${every.everyLevels}: ${fmtSigned(Number(every.increase || 0))}`,
+      `from ${sourceLabel} ${fromLevel}, every ${every.everyLevels}: ${fmtSigned(Number(every.increase || 0))}`,
     );
   }
   return parts.length ? `scales ${parts.join("; ")}` : "";
@@ -652,12 +653,22 @@ function spellLikeText(entry = {}) {
   const levelText = minimumLevel > 1 ? `level ${minimumLevel}, ` : "";
   return `SLA ${levelText}${entry.frequency ? `${entry.frequency}: ` : ""}${spellName}`;
 }
+function immunityText(entry = {}) {
+  const name = String(entry.name || entry.immunity || entry.type || "")
+    .trim()
+    .replace(/^immunit(?:y|ies)\s+(?:to\s+)?/i, "");
+  const label = name || "immunity";
+  const conditional = entry.conditional ?? Boolean(entry.condition);
+  const appliesWhen = entry.appliesWhen || entry.condition || "";
+  return `Immune ${label}${conditional ? ` (${appliesWhen || "conditional"})` : ""}`;
+}
 function effectSearchText(effect) {
   return [
     effect.name,
     effect.category,
     durationLabel(effect),
     ...(effect.bonuses || []).map(effectBonusText),
+    ...(effect.immunities || []).map(immunityText),
     ...(effect.spellLikeAbilities || []).map(spellLikeText),
   ]
     .join(" ")
@@ -1103,7 +1114,7 @@ async function saveMapWeaponOption(tokenId, weaponIndex, field, checked) {
         mapContextKey,
         character.id,
       ));
-    if (!saved) {
+    if (!saved || String(saved.id) !== String(character.id)) {
       await refreshMapTokenSheets({ save: false });
       return;
     }
@@ -1113,7 +1124,8 @@ async function saveMapWeaponOption(tokenId, weaponIndex, field, checked) {
       mapContextKey,
       character.id,
     );
-    if (refreshed?.sheet) character.sheet = refreshed.sheet;
+    if (refreshed?.sheet && String(refreshed.id) === String(character.id))
+      character.sheet = refreshed.sheet;
     syncTokenFromSheet(token, character);
     localStorage.setItem(
       `pf_character_sheet_updated_${mapContextKey}_${character.id}`,
@@ -1494,7 +1506,17 @@ async function hydrateMapCharacterSheets() {
         mapContextKey,
         character.id,
       );
-      if (saved?.sheet) character.sheet = saved.sheet;
+      if (!saved?.sheet) return;
+      if (String(saved.id) !== String(character.id)) {
+        console.warn("Ignored mismatched character sheet load", {
+          expected: character.id,
+          received: saved.id,
+        });
+        return;
+      }
+      character.name = saved.character_name || character.name;
+      character.userId = saved.user_id || character.userId;
+      character.sheet = saved.sheet;
     }),
   );
 }
@@ -1544,7 +1566,11 @@ async function ensureMapCharacterCalculatedSummary(character) {
     return false;
   }
   const saved = await PFApp.loadCharacterSheet("", mapContextKey, character.id);
-  if (saved?.sheet) character.sheet = saved.sheet;
+  if (saved?.sheet && String(saved.id) === String(character.id)) {
+    character.name = saved.character_name || character.name;
+    character.userId = saved.user_id || character.userId;
+    character.sheet = saved.sheet;
+  }
   return true;
 }
 
@@ -1567,6 +1593,20 @@ async function ensureMapEnemyCalculatedSummary(enemy) {
 
 function syncTokenFromSheet(token, source) {
   if (!token || !source?.sheet) return false;
+  if (
+    token.kind === "character" &&
+    source.id &&
+    String(source.id) !== String(token.characterId)
+  ) {
+    return false;
+  }
+  if (
+    token.kind === "enemy" &&
+    source.id &&
+    String(source.id) !== String(token.enemyId)
+  ) {
+    return false;
+  }
   let changed = false;
   const sheet = source.sheet || {};
   const name = source.name || source.character_name || token.name;
@@ -6764,14 +6804,25 @@ async function updateTokenCurrentHp(
     const character = mapCharacters.find(
       (item) => item.id === token.characterId,
     );
-    if (saved?.id && character) {
+    if (
+      saved?.id &&
+      character &&
+      String(saved.id) === String(token.characterId)
+    ) {
       pendingTokenHp.delete(tokenId);
-      character.sheet = {
-        ...(character.sheet || {}),
-        ...(
-          await PFApp.loadCharacterSheet("", mapContextKey, token.characterId)
-        )?.sheet,
-      };
+      const refreshed = await PFApp.loadCharacterSheet(
+        "",
+        mapContextKey,
+        token.characterId,
+      );
+      if (
+        refreshed?.sheet &&
+        String(refreshed.id) === String(token.characterId)
+      )
+        character.sheet = {
+          ...(character.sheet || {}),
+          ...refreshed.sheet,
+        };
       syncTokenFromSheet(token, character);
     }
   }
@@ -6898,7 +6949,8 @@ async function openMapEffects(tokenId) {
             mapContextKey,
             token.characterId,
           );
-          if (saved?.sheet) character.sheet = saved.sheet;
+          if (saved?.sheet && String(saved.id) === String(token.characterId))
+            character.sheet = saved.sheet;
           syncTokenFromSheet(token, character);
           renderAll();
         }
@@ -6999,6 +7051,7 @@ function tokenLevel(token) {
 function effectCardHtml(effect, index, prefix, defaultCl) {
   const chips = [
     ...(effect.bonuses || []).map(effectBonusText),
+    ...(effect.immunities || []).map(immunityText),
     ...(effect.spellLikeAbilities || []).map(spellLikeText),
   ];
   const visibleChips = chips.slice(0, 8);
@@ -7141,7 +7194,9 @@ async function sourceEffectDefinitions(sourceToken) {
   const sourceCharacter =
     sourceToken?.kind === "character" ? tokenCharacter(sourceToken) : null;
   const [library, abilities] = await Promise.all([
-    PFApp.loadBuffDefinitions(),
+    PFApp.loadEffectDefinitions
+      ? PFApp.loadEffectDefinitions()
+      : PFApp.loadBuffDefinitions(),
     sourceCharacter
       ? characterActivatableAbilities(sourceCharacter)
       : Promise.resolve([]),
@@ -7302,7 +7357,8 @@ async function applyQuickEffectToToken(token, appliedEffect) {
         mapContextKey,
         token.characterId,
       );
-      if (saved?.sheet) character.sheet = saved.sheet;
+      if (saved?.sheet && String(saved.id) === String(token.characterId))
+        character.sheet = saved.sheet;
       syncTokenFromSheet(token, character);
     }
     return true;
@@ -7383,7 +7439,8 @@ async function saveTokenActiveEffects(token, effects) {
         mapContextKey,
         token.characterId,
       );
-      if (saved?.sheet) character.sheet = saved.sheet;
+      if (saved?.sheet && String(saved.id) === String(token.characterId))
+        character.sheet = saved.sheet;
       syncTokenFromSheet(token, character);
     }
     return true;
@@ -8578,7 +8635,7 @@ async function characterSheetBridge() {
   if (characterSheetBridgePromise) return characterSheetBridgePromise;
   characterSheetBridgePromise = new Promise((resolve, reject) => {
     characterSheetBridgeFrame = document.createElement("iframe");
-    characterSheetBridgeFrame.src = "character-sheet.html?bridge=1";
+    characterSheetBridgeFrame.src = "character-sheet.html?bridge=1&v=immunities-extra-1";
     characterSheetBridgeFrame.tabIndex = -1;
     characterSheetBridgeFrame.style.cssText =
       "position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;left:-9999px;top:-9999px;";

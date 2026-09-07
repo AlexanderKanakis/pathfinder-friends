@@ -1,28 +1,43 @@
+.shared-bonus-row label,
+.shared-dr-row label,
+.shared-sr-row label,
+.shared-immunity-row label,
+.shared-class-skill-row label,
+.shared-size-change-row label,
+.shared-spell-like-row label,
+.shared-generated-equipment-row label {
+  display: block;
+  color: #fff;
+  font-size: 12px;
+  margin-bottom: 3px;
+}
+
 .shared-spell-like-row {
   display: grid;
   grid-template-columns:
-    minmax(72px, 0.35fr)
-    minmax(140px, 0.65fr)
-    minmax(180px, 1.4fr)
+    minmax(58px, 0.25fr)
+    minmax(105px, 0.5fr)
+    minmax(130px, 0.8fr)
+    minmax(86px, 0.36fr)
+    minmax(64px, 0.28fr)
     auto;
   gap: 8px;
   align-items: end;
-}
-
-.shared-spell-like-row label {
-  display: block;
-  color: #ced4da;
-  font-size: 12px;
-  margin-bottom: 3px;
 }
 
 .shared-spell-like-picker {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  min-width: 0;
   min-height: 31px;
   gap: 8px;
   text-align: left;
+}
+
+.shared-spell-like-row .form-control,
+.shared-spell-like-row .form-select {
+  min-width: 0;
 }
 
 .shared-spell-like-picker span {
@@ -32,13 +47,42 @@
   white-space: nowrap;
 }
 
+.shared-generated-equipment-row {
+  border: 1px solid #495057;
+  border-radius: 6px;
+  padding: 10px;
+}
+
+.shared-generated-equipment-header,
+.shared-generated-equipment-fields {
+  display: grid;
+  grid-template-columns:
+    minmax(120px, 0.5fr)
+    minmax(180px, 1fr)
+    auto
+    auto;
+  gap: 8px;
+  align-items: end;
+}
+
+.shared-generated-equipment-fields {
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  margin-top: 8px;
+}
+
 @media (max-width: 640px) {
   .shared-spell-like-row {
     grid-template-columns: 1fr;
   }
 
+  .shared-generated-equipment-header,
+  .shared-generated-equipment-fields {
+    grid-template-columns: 1fr;
+  }
+
   .shared-spell-like-row .btn-icon,
-  .shared-spell-like-row button[aria-label="Delete spell-like ability"] {
+  .shared-spell-like-row button[aria-label="Delete spell-like ability"],
+  .shared-generated-equipment-row button {
     width: 100%;
   }
 }

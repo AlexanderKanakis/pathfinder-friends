@@ -1,19 +1,17 @@
-// Shared "Damage Reduction / Spell Resistance / Class Skill Grant" row
+// Shared "Damage Reduction / Immunity / Spell Resistance / Class Skill Grant" row
 // builders, plus the Bonus Scale modal they all use to scale by level.
 // Every effect-authoring surface (class features, custom buffs/traits/
-// feats, loot items, inventory items) wants the same three things --
-// this used to mean copy-pasting each one into every file (and DR/SR
-// only ever existed on class features at all). Defining them once here
-// and having each surface call in means a class feature, a trait, a
-// loot item, and a piece of gear can all carry DR, SR, or "X becomes a
-// class skill" the same way, with one place to fix bugs or add fields.
+// feats, loot items, inventory items) wants the same things -- this
+// used to mean copy-pasting each one into every file. Defining them
+// once here and having each surface call in means a class feature, a
+// trait, a loot item, and a piece of gear can all carry DR, immunities,
+// SR, or "X becomes a class skill" the same way, with one place to fix
+// bugs or add fields.
 //
-// The calculation side already reads damageReduction/spellResistance
-// off ANY buff-shaped object (see collectClassFeatureDamageReduction/
-// collectClassFeatureSpellResistance in character-sheet.js, which walk
-// activeBuffs as well as class features) -- classSkillGrants is wired
-// the same way. So none of this needs new calc-engine plumbing, only
-// somewhere to author it.
+// The calculation side already reads these extras off ANY buff-shaped
+// object (see character-sheet.js collectors, which walk activeBuffs as
+// well as class features). So most additions need only one shared
+// authoring row and one sheet collector/display hook.
 (function () {
   function escapeHtml(value) {
     return String(value ?? "")
@@ -72,6 +70,8 @@
     "wisdom skill checks",
     "charisma skill checks",
     "craft skill checks",
+    "profession skill checks",
+    "perform skill checks",
   ];
   const PF_SKILLS = [
     "Acrobatics",
@@ -133,6 +133,29 @@
     "inherit",
   ];
   const SIZE_CHANGE_VALUES = [-2, -1, 1, 2];
+  const GENERATED_EQUIPMENT_TYPES = ["Weapon", "Armor", "Shield"];
+  const GENERATED_WEAPON_TYPES = [
+    "Melee Weapon (Light)",
+    "Melee Weapon (One-Handed)",
+    "Melee Weapon (Two-Handed)",
+    "Ranged Weapon",
+    "Thrown Weapon",
+    "Natural Weapon",
+  ];
+  const GENERATED_SCALE_OPTIONS = ["STR", "DEX", "CON", "INT", "WIS", "CHA", "None"];
+  const SPELL_LIKE_CASTING_ATTR_OPTIONS = ["", "STR", "DEX", "CON", "INT", "WIS", "CHA"];
+  const NATURAL_ATTACK_KINDS = [
+    "Bite",
+    "Claw",
+    "Gore",
+    "Hoof, Tentacle, Wing",
+    "Pincers, Tail Slap",
+    "Slam",
+    "Sting",
+    "Talons",
+    "Other",
+  ];
+  const NATURAL_ATTACK_ROLES = ["Primary", "Secondary"];
 
   // The plain, un-abbreviated formatter every surface used to
   // duplicate. Pass a surface-specific one (options.titleCaseStat) to
@@ -192,6 +215,7 @@
         ${SKILL_STATS.map((stat) => option(stat)).join("")}
         <option value="skill:craft" ${selected === "skill:craft" ? "selected" : ""}>Skill: Craft</option>
         <option value="skill:profession" ${selected === "skill:profession" ? "selected" : ""}>Skill: Profession</option>
+        <option value="skill:perform" ${selected === "skill:perform" ? "selected" : ""}>Skill: Perform</option>
         ${skillListOptions}
         ${specificSkillStats.map((stat) => option(stat)).join("")}
         <option value="${window.PFEffectStats?.CREATE_SKILL_LIST_STAT_VALUE || "__create-custom-skill-list-stat__"}">Create custom skill list...</option>
@@ -274,15 +298,7 @@
     const format = options.titleCaseStat || titleCaseStat;
     const row = document.createElement("div");
     row.className = "shared-bonus-row";
-    const selectedStat = String(data.skillName || "")
-      .toLowerCase()
-      .startsWith("profession")
-      ? "skill:profession"
-      : String(data.skillName || "")
-            .toLowerCase()
-            .startsWith("craft")
-        ? "skill:craft"
-        : data.stat || "";
+    const selectedStat = namedSkillKindForName(data.skillName) || data.stat || "";
     row.innerHTML = `
       <div>
         <label>Stat</label>
@@ -328,12 +344,9 @@
     const namedSkillField = row.querySelector(".shared-named-skill-field");
     const skillNameInput = row.querySelector('[data-effect-field="skillName"]');
     const syncNamedSkill = () => {
-      const named = ["skill:craft", "skill:profession"].includes(
-        statSelect.value,
-      );
+      const named = isNamedSkillKind(statSelect.value);
       namedSkillField.classList.toggle("d-none", !named);
-      skillNameInput.placeholder =
-        statSelect.value === "skill:profession" ? "Sailor" : "Alchemy";
+      skillNameInput.placeholder = namedSkillPlaceholder(statSelect.value);
     };
     wireCustomSkillListSelect(statSelect, {
       skills: options.skills,
@@ -355,7 +368,7 @@
       });
     const collect = () => {
       const selected = statSelect.value;
-      const skillName = ["skill:craft", "skill:profession"].includes(selected)
+      const skillName = isNamedSkillKind(selected)
         ? namedSkill(selected, skillNameInput.value)
         : "";
       const effect = {
@@ -401,9 +414,38 @@
   function namedSkill(kind, value) {
     const text = String(value || "").trim();
     if (!text) return "";
-    const prefix = kind === "skill:profession" ? "Profession" : "Craft";
+    const prefix =
+      {
+        "skill:craft": "Craft",
+        "skill:profession": "Profession",
+        "skill:perform": "Perform",
+      }[kind] || "Craft";
     if (text.toLowerCase().startsWith(`${prefix.toLowerCase()} (`)) return text;
     return `${prefix} (${text})`;
+  }
+
+  function namedSkillKindForName(skillName) {
+    const text = String(skillName || "").toLowerCase();
+    if (text.startsWith("craft")) return "skill:craft";
+    if (text.startsWith("profession")) return "skill:profession";
+    if (text.startsWith("perform")) return "skill:perform";
+    return "";
+  }
+
+  function isNamedSkillKind(value) {
+    return ["skill:craft", "skill:profession", "skill:perform"].includes(
+      value,
+    );
+  }
+
+  function namedSkillPlaceholder(kind) {
+    return (
+      {
+        "skill:craft": "Alchemy",
+        "skill:profession": "Sailor",
+        "skill:perform": "Oratory",
+      }[kind] || "Skill"
+    );
   }
 
   function skillKey(name) {
@@ -428,6 +470,7 @@
         ${list.map((skill) => option(slugifySkillName(skill), skill)).join("")}
         ${option("skill:craft", "Skill: Craft")}
         ${option("skill:profession", "Skill: Profession")}
+        ${option("skill:perform", "Skill: Perform")}
         ${customSkillLists
           .map((customList) =>
             option(
@@ -484,11 +527,11 @@
               <div class="row g-2 mb-1 align-items-end">
                 <div class="col-4">
                   <label for="${SCALE_MODAL_ID}Num">Numerator</label>
-                  <input id="${SCALE_MODAL_ID}Num" class="form-control form-control-sm" type="number" min="0" placeholder="e.g. 1">
+                  <input id="${SCALE_MODAL_ID}Num" class="form-control form-control-sm" type="number" min="0" placeholder="1">
                 </div>
                 <div class="col-4">
                   <label for="${SCALE_MODAL_ID}Den">Denominator</label>
-                  <input id="${SCALE_MODAL_ID}Den" class="form-control form-control-sm" type="number" min="1" placeholder="e.g. 2">
+                  <input id="${SCALE_MODAL_ID}Den" class="form-control form-control-sm" type="number" min="1" placeholder="1">
                 </div>
                 <div class="col-4">
                   <button id="${SCALE_MODAL_ID}ClearMultiplier" class="btn btn-outline-secondary btn-sm w-100" type="button">Clear</button>
@@ -520,7 +563,7 @@
               <div id="${SCALE_MODAL_ID}Rows" class="vstack gap-2 mb-3"></div>
               <div class="row g-2">
                 <div class="col-sm-4">
-                  <label for="${SCALE_MODAL_ID}After">After Level</label>
+                  <label for="${SCALE_MODAL_ID}After">From Level</label>
                   <input id="${SCALE_MODAL_ID}After" class="form-control form-control-sm" type="number" min="1">
                 </div>
                 <div class="col-sm-4">
@@ -597,7 +640,7 @@
         (milestone) => milestone.level > 0 && Number.isFinite(milestone.value),
       )
       .sort((a, b) => a.level - b.level);
-    const afterLevel = Number.parseInt(
+    const fromLevel = Number.parseInt(
       document.getElementById(`${SCALE_MODAL_ID}After`).value,
       10,
     );
@@ -609,18 +652,20 @@
       document.getElementById(`${SCALE_MODAL_ID}Increase`).value,
     );
     const every =
-      afterLevel > 0 &&
+      fromLevel > 0 &&
       everyLevels > 0 &&
       Number.isFinite(increase) &&
       increase !== 0
-        ? { afterLevel, everyLevels, increase }
+        ? { fromLevel, everyLevels, increase }
         : null;
-    const multiplierNumerator = Number(
-      document.getElementById(`${SCALE_MODAL_ID}Num`).value,
-    );
-    const multiplierDenominator = Number(
-      document.getElementById(`${SCALE_MODAL_ID}Den`).value,
-    );
+    const multiplierNumeratorInput = document
+      .getElementById(`${SCALE_MODAL_ID}Num`)
+      .value.trim();
+    const multiplierDenominatorInput = document
+      .getElementById(`${SCALE_MODAL_ID}Den`)
+      .value.trim();
+    const multiplierNumerator = Number(multiplierNumeratorInput);
+    const multiplierDenominator = Number(multiplierDenominatorInput);
     const levelMultiplier =
       multiplierNumerator > 0 && multiplierDenominator > 0
         ? { numerator: multiplierNumerator, denominator: multiplierDenominator }
@@ -656,9 +701,9 @@
             sourceSelect.value = source.type || "caster";
           }
           document.getElementById(`${SCALE_MODAL_ID}Num`).value =
-            scale.levelMultiplier?.numerator ?? "";
+            scale.levelMultiplier?.numerator ?? (existingScale ? "" : "1");
           document.getElementById(`${SCALE_MODAL_ID}Den`).value =
-            scale.levelMultiplier?.denominator ?? "";
+            scale.levelMultiplier?.denominator ?? (existingScale ? "" : "1");
           document.getElementById(`${SCALE_MODAL_ID}MinOne`).checked = Boolean(
             scale.minimumOne,
           );
@@ -671,7 +716,7 @@
           else addScaleMilestoneRow();
           const every = scale.every || {};
           document.getElementById(`${SCALE_MODAL_ID}After`).value =
-            every.afterLevel || "";
+            every.fromLevel || every.afterLevel || every.after || "";
           document.getElementById(`${SCALE_MODAL_ID}Every`).value =
             every.everyLevels || "";
           document.getElementById(`${SCALE_MODAL_ID}Increase`).value =
@@ -750,9 +795,10 @@
       );
     }
     const every = scale.every || {};
-    if (every.afterLevel && every.everyLevels && every.increase) {
+    const fromLevel = every.fromLevel || every.afterLevel || every.after;
+    if (fromLevel && every.everyLevels && every.increase) {
       parts.push(
-        `after ${source} ${every.afterLevel}, every ${every.everyLevels}: ${every.increase >= 0 ? "+" : ""}${every.increase}`,
+        `from ${source} ${fromLevel}, every ${every.everyLevels}: ${every.increase >= 0 ? "+" : ""}${every.increase}`,
       );
     }
     if (scale.minimumOne) parts.push("minimum 1");
@@ -889,6 +935,53 @@
     return { element: row, collect };
   }
 
+  function createImmunityRow(data = {}, { onDelete } = {}) {
+    const row = document.createElement("div");
+    row.className = "shared-immunity-row";
+    const conditional = data.conditional ?? Boolean(data.condition);
+    const appliesWhen = data.appliesWhen || data.condition || "";
+    row.innerHTML = `
+      <div>
+        <label>Immunity</label>
+        <input data-immunity-field="name" class="form-control form-control-sm" value="${escapeHtml(data.name || data.immunity || data.type || "")}" placeholder="fire, poison, sleep">
+      </div>
+      <div>
+        <label>Conditional</label>
+        <div class="form-check form-switch">
+          <input data-immunity-field="conditional" class="form-check-input" type="checkbox" ${conditional ? "checked" : ""}>
+        </div>
+      </div>
+      <div>
+        <label>Applies When</label>
+        <input data-immunity-field="appliesWhen" class="form-control form-control-sm" value="${escapeHtml(appliesWhen)}" placeholder="vs magical sleep">
+      </div>
+      <button class="btn btn-outline-danger btn-sm" type="button" aria-label="Delete immunity"><i class="bi bi-trash"></i></button>
+    `;
+    row.querySelector('button[aria-label="Delete immunity"]').addEventListener(
+      "click",
+      () => {
+        row.remove();
+        onDelete?.();
+      },
+    );
+    const collect = () => {
+      const name = row
+        .querySelector('[data-immunity-field="name"]')
+        .value.trim();
+      if (!name) return null;
+      return {
+        name,
+        conditional: row.querySelector('[data-immunity-field="conditional"]')
+          .checked,
+        appliesWhen: row
+          .querySelector('[data-immunity-field="appliesWhen"]')
+          .value.trim(),
+      };
+    };
+    row._collect = collect;
+    return { element: row, collect };
+  }
+
   // "X becomes a class skill" -- just a skill picker, no amount/type/
   // scale, since class-skill status isn't a number to scale. Can
   // target a fixed skill or a "choose one skill" pool (a trait like
@@ -900,15 +993,7 @@
     const row = document.createElement("div");
     row.className = "shared-class-skill-row";
     const rawStat = String(data.stat || "");
-    const selectedStat = String(data.skillName || "")
-      .toLowerCase()
-      .startsWith("profession")
-      ? "skill:profession"
-      : String(data.skillName || "")
-            .toLowerCase()
-            .startsWith("craft")
-        ? "skill:craft"
-        : rawStat;
+    const selectedStat = namedSkillKindForName(data.skillName) || rawStat;
     row.innerHTML = `
       <div>
         <label>Skill</label>
@@ -928,12 +1013,9 @@
       '[data-class-skill-field="skillName"]',
     );
     const syncNamedSkill = () => {
-      const named = ["skill:craft", "skill:profession"].includes(
-        statSelect.value,
-      );
+      const named = isNamedSkillKind(statSelect.value);
       namedSkillField.classList.toggle("d-none", !named);
-      skillNameInput.placeholder =
-        statSelect.value === "skill:profession" ? "Sailor" : "Alchemy";
+      skillNameInput.placeholder = namedSkillPlaceholder(statSelect.value);
     };
     wireCustomSkillListSelect(statSelect, {
       skills,
@@ -950,7 +1032,7 @@
     const collect = () => {
       const selected = statSelect.value;
       if (!selected) return null;
-      if (["skill:craft", "skill:profession"].includes(selected)) {
+      if (isNamedSkillKind(selected)) {
         const name = namedSkill(selected, skillNameInput.value);
         return name ? { stat: skillKey(name), skillName: name } : null;
       }
@@ -1020,6 +1102,20 @@
     return Math.max(1, Math.floor(value));
   }
 
+  function spellLikeCastingAttr(data = {}) {
+    const value = String(
+      data.castingAttr || data.castingAbility || data.ability || "",
+    ).toUpperCase();
+    return SPELL_LIKE_CASTING_ATTR_OPTIONS.includes(value) ? value : "";
+  }
+
+  function spellLikeMinimumScore(data = {}) {
+    const value = data.minimumScore ?? data.minimumAbilityScore ?? data.score;
+    return value === undefined || value === null || value === ""
+      ? ""
+      : String(Number(value) || "");
+  }
+
   function compactSpellPayload(spell = {}) {
     if (!spell || typeof spell !== "object") return null;
     return {
@@ -1027,6 +1123,430 @@
       details: spell.details || {},
       link: spell.link || "",
     };
+  }
+
+  function generatedEquipmentType(data = {}) {
+    const raw = String(data.type || data.itemType || data.equipmentType || "");
+    return GENERATED_EQUIPMENT_TYPES.includes(raw) ? raw : "Weapon";
+  }
+
+  function generatedEquipmentDetails(data = {}) {
+    return data.details && typeof data.details === "object" ? data.details : data;
+  }
+
+  async function fetchGeneratedEquipmentJson(path) {
+    const response = await fetch(path, { cache: "no-cache" });
+    if (!response.ok) throw new Error(`Could not load ${path}.`);
+    return response.json();
+  }
+
+  let generatedEquipmentCatalogPromise = null;
+
+  function loadGeneratedEquipmentCatalog() {
+    generatedEquipmentCatalogPromise ||= Promise.all([
+      window.PFItemData?.loadWeapons?.() ||
+        fetchGeneratedEquipmentJson("data/weapons.json"),
+      window.PFItemData?.loadArmorShields?.() ||
+        fetchGeneratedEquipmentJson("data/armor-shields.json"),
+    ]).then(([weapons, armor]) =>
+      [
+        ...(Array.isArray(weapons) ? weapons : []),
+        ...(Array.isArray(armor) ? armor : []),
+      ].filter((item) =>
+        GENERATED_EQUIPMENT_TYPES.includes(String(item.type || "")),
+      ),
+    );
+    return generatedEquipmentCatalogPromise;
+  }
+
+  function generatedEquipmentDetailLine(item = {}) {
+    const details = item.details || {};
+    if (item.type === "Weapon") {
+      return [details.weaponGroup, details.damage, details.critical]
+        .filter(Boolean)
+        .join(" | ");
+    }
+    return [details.armorGroup, details.bonus, details.maxDex]
+      .filter(Boolean)
+      .join(" | ");
+  }
+
+  function ensureGeneratedEquipmentPickerModal() {
+    const id = "generatedEquipmentPickerModal";
+    const existing = document.getElementById(id);
+    if (existing) return existing;
+    const wrapper = document.createElement("div");
+    wrapper.innerHTML = `
+      <div class="modal fade" id="${id}" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable generated-equipment-picker-dialog">
+          <div class="modal-content bg-dark text-white border-secondary">
+            <div class="modal-header generated-equipment-picker-header">
+              <h5 class="modal-title">Choose Weapon / Armor</h5>
+            </div>
+            <div class="modal-body">
+              <input class="form-control form-control-sm generated-equipment-picker-search" data-generated-equipment-picker-search placeholder="Search weapons and armor">
+              <div class="generated-equipment-picker-results" data-generated-equipment-picker-results></div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-light btn-sm" data-bs-dismiss="modal">Cancel</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(wrapper.firstElementChild);
+    return document.getElementById(id);
+  }
+
+  async function openGeneratedEquipmentPicker({ types = GENERATED_EQUIPMENT_TYPES } = {}) {
+    const root = ensureGeneratedEquipmentPickerModal();
+    const modal = new bootstrap.Modal(root);
+    const allowed = new Set(types);
+    const search = root.querySelector("[data-generated-equipment-picker-search]");
+    const results = root.querySelector("[data-generated-equipment-picker-results]");
+    const allItems = (await loadGeneratedEquipmentCatalog()).filter((item) =>
+      allowed.has(item.type),
+    );
+    let settled = false;
+
+    return new Promise((resolve) => {
+      const finish = (value = null) => {
+        if (settled) return;
+        settled = true;
+        modal.hide();
+        resolve(value);
+      };
+      const render = () => {
+        const term = search.value.trim().toLowerCase();
+        const visible = allItems
+          .filter((item) => {
+            if (!term) return true;
+            return `${item.name || ""} ${item.type || ""} ${
+              item.details?.summary || ""
+            }`
+              .toLowerCase()
+              .includes(term);
+          })
+          .slice(0, 80);
+        results.innerHTML = visible.length
+          ? visible
+              .map(
+                (item, index) => `
+                  <button class="generated-equipment-picker-card" type="button" data-generated-equipment-picker-index="${index}">
+                    <span>
+                      <strong>${escapeHtml(item.name || "Unnamed item")}</strong>
+                      <small>${escapeHtml(generatedEquipmentDetailLine(item))}</small>
+                    </span>
+                    <span class="generated-equipment-picker-type">${escapeHtml(item.type || "")}</span>
+                  </button>
+                `,
+              )
+              .join("")
+          : `<div class="small-text">No matching equipment.</div>`;
+        results
+          .querySelectorAll("[data-generated-equipment-picker-index]")
+          .forEach((button) => {
+            button.addEventListener("click", () =>
+              finish(visible[Number(button.dataset.generatedEquipmentPickerIndex)]),
+            );
+          });
+      };
+      const onHidden = () => {
+        root.removeEventListener("hidden.bs.modal", onHidden);
+        if (!settled) {
+          settled = true;
+          resolve(null);
+        }
+      };
+      root.addEventListener("hidden.bs.modal", onHidden);
+      search.value = "";
+      search.oninput = render;
+      render();
+      modal.show();
+      setTimeout(() => search.focus(), 150);
+    });
+  }
+
+  function scaleOptionsHtml(selected = "") {
+    return GENERATED_SCALE_OPTIONS.map(
+      (option) =>
+        `<option value="${escapeHtml(option)}" ${selected === option ? "selected" : ""}>${escapeHtml(option)}</option>`,
+    ).join("");
+  }
+
+  function weaponTypeOptionsHtml(selected = "") {
+    return GENERATED_WEAPON_TYPES.map(
+      (option) =>
+        `<option value="${escapeHtml(option)}" ${selected === option ? "selected" : ""}>${escapeHtml(option)}</option>`,
+    ).join("");
+  }
+
+  function simpleOptionsHtml(options = [], selected = "") {
+    return options
+      .map(
+        (option) =>
+          `<option value="${escapeHtml(option)}" ${selected === option ? "selected" : ""}>${escapeHtml(option)}</option>`,
+      )
+      .join("");
+  }
+
+  function fillGeneratedEquipmentRow(row, item = {}) {
+    const details = generatedEquipmentDetails(item);
+    const type = generatedEquipmentType(item);
+    row.querySelector('[data-generated-equipment-field="type"]').value = type;
+    row.querySelector('[data-generated-equipment-field="name"]').value =
+      item.name || item.item || "";
+    row.querySelector('[data-generated-equipment-field="weaponType"]').value =
+      details.weaponType || "Natural Weapon";
+    row.querySelector('[data-generated-equipment-field="naturalAttackKind"]').value =
+      details.naturalAttackKind || details.natural_attack_kind || "Other";
+    row.querySelector('[data-generated-equipment-field="naturalAttackRole"]').value =
+      details.naturalAttackRole || details.natural_attack_role || "Primary";
+    row.querySelector('[data-generated-equipment-field="attackScale"]').value =
+      details.attackScale || "STR";
+    row.querySelector('[data-generated-equipment-field="damageScale"]').value =
+      details.damageScale || "STR";
+    row.querySelector('[data-generated-equipment-field="damage"]').value =
+      details.damage || "";
+    row.querySelector('[data-generated-equipment-field="critical"]').value =
+      details.critical || "";
+    row.querySelector('[data-generated-equipment-field="attackMisc"]').value =
+      details.attackMisc || details.attack_misc || "0";
+    row.querySelector('[data-generated-equipment-field="damageMisc"]').value =
+      details.damageMisc || details.damage_misc || "0";
+    row.querySelector('[data-generated-equipment-field="range"]').value =
+      details.range || "";
+    row.querySelector('[data-generated-equipment-field="armorBonus"]').value =
+      details.bonus || item.bonus || "";
+    row.querySelector('[data-generated-equipment-field="enhancement"]').value =
+      details.enhancement || item.enhancement || "0";
+    row.querySelector('[data-generated-equipment-field="penalty"]').value =
+      details.penalty || item.penalty || "";
+    row.querySelector('[data-generated-equipment-field="failure"]').value =
+      details.failure || item.failure || "";
+    row.querySelector('[data-generated-equipment-field="weight"]').value =
+      details.weight || item.weight || "";
+    row._sourceItem = item.name
+      ? {
+          name: item.name,
+          type,
+          details: { ...details },
+          description: item.description || "",
+        }
+      : null;
+    row.dispatchEvent(new CustomEvent("generated-equipment:typechange"));
+    row.querySelectorAll("input, select").forEach((input) => {
+      input.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+  }
+
+  function createGeneratedEquipmentRow(data = {}, { onDelete } = {}) {
+    const row = document.createElement("div");
+    row.className = "shared-generated-equipment-row";
+    const type = generatedEquipmentType(data);
+    const details = generatedEquipmentDetails(data);
+    row.innerHTML = `
+      <div class="shared-generated-equipment-header">
+        <div>
+          <label>Type</label>
+          <select data-generated-equipment-field="type" class="form-select form-select-sm">
+            ${GENERATED_EQUIPMENT_TYPES.map(
+              (option) =>
+                `<option value="${option}" ${type === option ? "selected" : ""}>${option}</option>`,
+            ).join("")}
+          </select>
+        </div>
+        <div>
+          <label>Name</label>
+          <input data-generated-equipment-field="name" class="form-control form-control-sm" value="${escapeHtml(data.name || data.item || "")}" placeholder="Claw, bite, armor">
+        </div>
+        <button class="btn btn-outline-light btn-sm" type="button" data-generated-equipment-search>
+          <i class="bi bi-search"></i>
+          <span>Search</span>
+        </button>
+        <button class="btn btn-outline-danger btn-sm" type="button" aria-label="Delete generated equipment"><i class="bi bi-trash"></i></button>
+      </div>
+      <div class="shared-generated-equipment-fields" data-generated-equipment-weapon-fields>
+        <div>
+          <label>Weapon Type</label>
+          <select data-generated-equipment-field="weaponType" class="form-select form-select-sm">
+            ${weaponTypeOptionsHtml(details.weaponType || "Natural Weapon")}
+          </select>
+        </div>
+        <div data-generated-equipment-natural-field>
+          <label>Natural Attack</label>
+          <select data-generated-equipment-field="naturalAttackKind" class="form-select form-select-sm">
+            ${simpleOptionsHtml(NATURAL_ATTACK_KINDS, details.naturalAttackKind || details.natural_attack_kind || "Other")}
+          </select>
+        </div>
+        <div data-generated-equipment-natural-field>
+          <label>Attack Type</label>
+          <select data-generated-equipment-field="naturalAttackRole" class="form-select form-select-sm">
+            ${simpleOptionsHtml(NATURAL_ATTACK_ROLES, details.naturalAttackRole || details.natural_attack_role || "Primary")}
+          </select>
+        </div>
+        <div>
+          <label>Damage</label>
+          <input data-generated-equipment-field="damage" class="form-control form-control-sm" value="${escapeHtml(details.damage || "")}" placeholder="1d6">
+        </div>
+        <div>
+          <label>Critical</label>
+          <input data-generated-equipment-field="critical" class="form-control form-control-sm" value="${escapeHtml(details.critical || "")}" placeholder="x2">
+        </div>
+        <div>
+          <label>Attack Scale</label>
+          <select data-generated-equipment-field="attackScale" class="form-select form-select-sm">
+            ${scaleOptionsHtml(details.attackScale || "STR")}
+          </select>
+        </div>
+        <div>
+          <label>Damage Scale</label>
+          <select data-generated-equipment-field="damageScale" class="form-select form-select-sm">
+            ${scaleOptionsHtml(details.damageScale || "STR")}
+          </select>
+        </div>
+        <div>
+          <label>Attack Misc</label>
+          <input data-generated-equipment-field="attackMisc" class="form-control form-control-sm" type="number" value="${details.attackMisc ?? details.attack_misc ?? 0}">
+        </div>
+        <div>
+          <label>Damage Misc</label>
+          <input data-generated-equipment-field="damageMisc" class="form-control form-control-sm" type="number" value="${details.damageMisc ?? details.damage_misc ?? 0}">
+        </div>
+        <div>
+          <label>Range</label>
+          <input data-generated-equipment-field="range" class="form-control form-control-sm" value="${escapeHtml(details.range || "")}">
+        </div>
+      </div>
+      <div class="shared-generated-equipment-fields" data-generated-equipment-armor-fields>
+        <div>
+          <label>Armor Bonus</label>
+          <input data-generated-equipment-field="armorBonus" class="form-control form-control-sm" value="${escapeHtml(details.bonus || data.bonus || "")}" placeholder="+2">
+        </div>
+        <div>
+          <label>Enhancement</label>
+          <input data-generated-equipment-field="enhancement" class="form-control form-control-sm" type="number" value="${details.enhancement ?? data.enhancement ?? 0}">
+        </div>
+        <div>
+          <label>Penalty</label>
+          <input data-generated-equipment-field="penalty" class="form-control form-control-sm" value="${escapeHtml(details.penalty || data.penalty || "")}">
+        </div>
+        <div>
+          <label>Failure</label>
+          <input data-generated-equipment-field="failure" class="form-control form-control-sm" value="${escapeHtml(details.failure || data.failure || "")}">
+        </div>
+        <div>
+          <label>Weight</label>
+          <input data-generated-equipment-field="weight" class="form-control form-control-sm" value="${escapeHtml(details.weight || data.weight || "")}">
+        </div>
+      </div>
+    `;
+    const syncType = () => {
+      const selected = row.querySelector(
+        '[data-generated-equipment-field="type"]',
+      ).value;
+      row
+        .querySelector("[data-generated-equipment-weapon-fields]")
+        .classList.toggle("d-none", selected !== "Weapon");
+      row
+        .querySelector("[data-generated-equipment-armor-fields]")
+        .classList.toggle("d-none", selected === "Weapon");
+      const natural = selected === "Weapon" &&
+        ["Natural", "Natural Weapon"].includes(
+          row.querySelector('[data-generated-equipment-field="weaponType"]').value,
+        );
+      row
+        .querySelectorAll("[data-generated-equipment-natural-field]")
+        .forEach((field) => field.classList.toggle("d-none", !natural));
+    };
+    row.addEventListener("generated-equipment:typechange", syncType);
+    row
+      .querySelector('[data-generated-equipment-field="type"]')
+      .addEventListener("change", syncType);
+    row
+      .querySelector('[data-generated-equipment-field="weaponType"]')
+      .addEventListener("change", syncType);
+    row
+      .querySelector("[data-generated-equipment-search]")
+      .addEventListener("click", async () => {
+        const picker =
+          window.PFGeneratedEquipmentPicker?.open || openGeneratedEquipmentPicker;
+        const selected = await picker({
+          types: ["Weapon", "Armor", "Shield"],
+        });
+        if (selected) fillGeneratedEquipmentRow(row, selected);
+      });
+    row
+      .querySelector('button[aria-label="Delete generated equipment"]')
+      .addEventListener("click", () => {
+        row.remove();
+        onDelete?.();
+      });
+    const collect = () => {
+      const selectedType = row.querySelector(
+        '[data-generated-equipment-field="type"]',
+      ).value;
+      const name = row
+        .querySelector('[data-generated-equipment-field="name"]')
+        .value.trim();
+      if (!name) return null;
+      if (selectedType === "Weapon") {
+        return {
+          type: "Weapon",
+          name,
+          details: {
+            weaponType: row.querySelector(
+              '[data-generated-equipment-field="weaponType"]',
+            ).value,
+            naturalAttackKind: row.querySelector(
+              '[data-generated-equipment-field="naturalAttackKind"]',
+            ).value,
+            naturalAttackRole: row.querySelector(
+              '[data-generated-equipment-field="naturalAttackRole"]',
+            ).value,
+            attackScale: row.querySelector(
+              '[data-generated-equipment-field="attackScale"]',
+            ).value,
+            damageScale: row.querySelector(
+              '[data-generated-equipment-field="damageScale"]',
+            ).value,
+            damage: row.querySelector('[data-generated-equipment-field="damage"]')
+              .value,
+            critical: row.querySelector(
+              '[data-generated-equipment-field="critical"]',
+            ).value,
+            attackMisc: row.querySelector(
+              '[data-generated-equipment-field="attackMisc"]',
+            ).value,
+            damageMisc: row.querySelector(
+              '[data-generated-equipment-field="damageMisc"]',
+            ).value,
+            range: row.querySelector('[data-generated-equipment-field="range"]')
+              .value,
+          },
+        };
+      }
+      return {
+        type: selectedType,
+        name,
+        details: {
+          bonus: row.querySelector('[data-generated-equipment-field="armorBonus"]')
+            .value,
+          enhancement: row.querySelector(
+            '[data-generated-equipment-field="enhancement"]',
+          ).value,
+          penalty: row.querySelector('[data-generated-equipment-field="penalty"]')
+            .value,
+          failure: row.querySelector('[data-generated-equipment-field="failure"]')
+            .value,
+          weight: row.querySelector('[data-generated-equipment-field="weight"]')
+            .value,
+        },
+      };
+    };
+    row._collect = collect;
+    syncType();
+    return { element: row, collect };
   }
 
   function createSpellLikeAbilityRow(data = {}, { onDelete } = {}) {
@@ -1048,6 +1568,19 @@
           <span data-spell-like-name>${escapeHtml(spellLikeAbilityName(data) || "Choose spell")}</span>
           <i class="bi bi-search"></i>
         </button>
+      </div>
+      <div>
+        <label>Casting Attr.</label>
+        <select data-spell-like-field="castingAttr" class="form-select form-select-sm">
+          ${SPELL_LIKE_CASTING_ATTR_OPTIONS.map(
+            (attr) =>
+              `<option value="${escapeHtml(attr)}" ${spellLikeCastingAttr(data) === attr ? "selected" : ""}>${escapeHtml(attr || "-")}</option>`,
+          ).join("")}
+        </select>
+      </div>
+      <div>
+        <label>Score</label>
+        <input data-spell-like-field="minimumScore" class="form-control form-control-sm" type="number" min="1" value="${escapeHtml(spellLikeMinimumScore(data))}">
       </div>
       <button class="btn btn-outline-danger btn-sm" type="button" aria-label="Delete spell-like ability"><i class="bi bi-trash"></i></button>
     `;
@@ -1084,13 +1617,29 @@
           .value.trim(),
         spellName,
         spell: row._spell || { name: spellName },
+        ...(row.querySelector('[data-spell-like-field="castingAttr"]').value
+          ? {
+              castingAttr: row.querySelector(
+                '[data-spell-like-field="castingAttr"]',
+              ).value,
+            }
+          : {}),
+        ...(row.querySelector('[data-spell-like-field="minimumScore"]').value
+          ? {
+              minimumScore: Number(
+                row.querySelector('[data-spell-like-field="minimumScore"]')
+                  .value || 0,
+              ),
+            }
+          : {}),
       };
     };
     row._collect = collect;
     return { element: row, collect };
   }
 
-  // DR, SR, Class Skill grants, Size Changes, and Spell-Like Abilities
+  // DR, Immunities, SR, Class Skill grants, Size Changes, Spell-Like Abilities,
+  // and generated equipped weapons/armor
   // are separate things but they're always authored together and rarely
   // used -- one collapsed "Extra" accordion item holding all of them is
   // what every effect-authoring surface in the app mounts now, built
@@ -1144,6 +1693,13 @@
             </div>
             <div class="shared-extra-subsection">
               <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
+                <div class="small text-secondary">Immunities</div>
+                <button id="${prefix}AddImmunity" class="btn btn-outline-info btn-sm" type="button">Add Immunity</button>
+              </div>
+              <div id="${prefix}ImmunityRows" class="vstack gap-2"></div>
+            </div>
+            <div class="shared-extra-subsection">
+              <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
                 <div class="small text-secondary">Class Skills</div>
                 <button id="${prefix}AddClassSkill" class="btn btn-outline-info btn-sm" type="button">Add Class Skill</button>
               </div>
@@ -1163,6 +1719,13 @@
               </div>
               <div id="${prefix}SpellLikeAbilityRows" class="vstack gap-2"></div>
             </div>
+            <div class="shared-extra-subsection">
+              <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
+                <div class="small text-secondary">Generated Equipment</div>
+                <button id="${prefix}AddGeneratedEquipment" class="btn btn-outline-info btn-sm" type="button">Add Weapon / Armor</button>
+              </div>
+              <div id="${prefix}GeneratedEquipmentRows" class="vstack gap-2"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -1170,18 +1733,24 @@
 
     const drRowsEl = document.getElementById(`${prefix}DrRows`);
     const srRowsEl = document.getElementById(`${prefix}SrRows`);
+    const immunityRowsEl = document.getElementById(`${prefix}ImmunityRows`);
     const csRowsEl = document.getElementById(`${prefix}ClassSkillRows`);
     const sizeRowsEl = document.getElementById(`${prefix}SizeChangeRows`);
     const slaRowsEl = document.getElementById(`${prefix}SpellLikeAbilityRows`);
+    const generatedEquipmentRowsEl = document.getElementById(
+      `${prefix}GeneratedEquipmentRows`,
+    );
     const countBadge = document.getElementById(`${prefix}Count`);
 
     const updateCount = () => {
       const count =
         drRowsEl.children.length +
         srRowsEl.children.length +
+        immunityRowsEl.children.length +
         csRowsEl.children.length +
         sizeRowsEl.children.length +
-        slaRowsEl.children.length;
+        slaRowsEl.children.length +
+        generatedEquipmentRowsEl.children.length;
       if (countBadge) {
         countBadge.textContent = count ? String(count) : "";
         countBadge.classList.toggle("d-none", !count);
@@ -1197,6 +1766,11 @@
     const addSr = (data = {}) => {
       const { element } = createSrRow(data, { onDelete: updateCount });
       srRowsEl.appendChild(element);
+      updateCount();
+    };
+    const addImmunity = (data = {}) => {
+      const { element } = createImmunityRow(data, { onDelete: updateCount });
+      immunityRowsEl.appendChild(element);
       updateCount();
     };
     const addClassSkill = (data = {}) => {
@@ -1221,6 +1795,13 @@
       slaRowsEl.appendChild(element);
       updateCount();
     };
+    const addGeneratedEquipment = (data = {}) => {
+      const { element } = createGeneratedEquipmentRow(data, {
+        onDelete: updateCount,
+      });
+      generatedEquipmentRowsEl.appendChild(element);
+      updateCount();
+    };
 
     document
       .getElementById(`${prefix}AddDr`)
@@ -1228,6 +1809,9 @@
     document
       .getElementById(`${prefix}AddSr`)
       .addEventListener("click", () => addSr());
+    document
+      .getElementById(`${prefix}AddImmunity`)
+      .addEventListener("click", () => addImmunity());
     document
       .getElementById(`${prefix}AddClassSkill`)
       .addEventListener("click", () => addClassSkill());
@@ -1237,6 +1821,9 @@
     document
       .getElementById(`${prefix}AddSpellLikeAbility`)
       .addEventListener("click", () => addSpellLikeAbility());
+    document
+      .getElementById(`${prefix}AddGeneratedEquipment`)
+      .addEventListener("click", () => addGeneratedEquipment());
 
     const collectRows = (rowsEl) =>
       [...rowsEl.querySelectorAll(":scope > *")]
@@ -1246,20 +1833,27 @@
     return {
       addDr,
       addSr,
+      addImmunity,
       addClassSkill,
       addSizeChange,
       addSpellLikeAbility,
+      addGeneratedEquipment,
       reset(item = {}) {
         drRowsEl.innerHTML = "";
         srRowsEl.innerHTML = "";
+        immunityRowsEl.innerHTML = "";
         csRowsEl.innerHTML = "";
         sizeRowsEl.innerHTML = "";
         slaRowsEl.innerHTML = "";
+        generatedEquipmentRowsEl.innerHTML = "";
         (Array.isArray(item.damageReduction) ? item.damageReduction : []).forEach(
           addDr,
         );
         (Array.isArray(item.spellResistance) ? item.spellResistance : []).forEach(
           addSr,
+        );
+        (Array.isArray(item.immunities) ? item.immunities : []).forEach(
+          addImmunity,
         );
         (Array.isArray(item.classSkillGrants) ? item.classSkillGrants : []).forEach(
           addClassSkill,
@@ -1271,15 +1865,21 @@
           ? item.spellLikeAbilities
           : []
         ).forEach(addSpellLikeAbility);
+        (Array.isArray(item.generatedEquipment)
+          ? item.generatedEquipment
+          : []
+        ).forEach(addGeneratedEquipment);
         updateCount();
       },
       collect() {
         return {
           damageReduction: collectRows(drRowsEl),
           spellResistance: collectRows(srRowsEl),
+          immunities: collectRows(immunityRowsEl),
           classSkillGrants: collectRows(csRowsEl),
           sizeChanges: collectRows(sizeRowsEl),
           spellLikeAbilities: collectRows(slaRowsEl),
+          generatedEquipment: collectRows(generatedEquipmentRowsEl),
         };
       },
     };
@@ -1311,11 +1911,10 @@
   // from the "Create Effect" button or from reset() -- so a caller can
   // apply its own defaults to freshly-created rows.
   //
-  // Returns { addEffect, addDr, addSr, addClassSkill, reset(item),
-  // collect() }. reset(item) populates all four lists from
-  // item[effectsKey]/damageReduction/spellResistance/classSkillGrants;
+  // Returns { addEffect, addDr, addSr, addImmunity, addClassSkill,
+  // reset(item), collect() }. reset(item) populates each mechanic list;
   // collect() returns { [effectsKey]: [...], damageReduction,
-  // spellResistance, classSkillGrants }.
+  // spellResistance, immunities, classSkillGrants, ... }.
   function mountEffectsAccordion(container, options = {}) {
     const prefix = options.idPrefix;
     const parentId =
@@ -1384,9 +1983,11 @@
       addEffect,
       addDr: extra.addDr,
       addSr: extra.addSr,
+      addImmunity: extra.addImmunity,
       addClassSkill: extra.addClassSkill,
       addSizeChange: extra.addSizeChange,
       addSpellLikeAbility: extra.addSpellLikeAbility,
+      addGeneratedEquipment: extra.addGeneratedEquipment,
       reset(item = {}) {
         const effectsKey = options.effectsKey || "effects";
         effectRowsEl.innerHTML = "";
@@ -1414,8 +2015,11 @@
     skillKey,
     createDrRow,
     createSrRow,
+    createImmunityRow,
     createClassSkillRow,
+    createSizeChangeRow,
     createSpellLikeAbilityRow,
+    createGeneratedEquipmentRow,
     mountExtraAccordion,
     mountEffectsAccordion,
     classSkillGrantText,

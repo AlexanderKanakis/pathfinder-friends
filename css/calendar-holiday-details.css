@@ -1,0 +1,57 @@
+.calendar-holiday-modal .modal-content {
+  background: #1e1e1e;
+  color: #fff;
+  border: 1px solid #444;
+}
+
+.calendar-holiday-modal .modal-header {
+  border-bottom-color: #333;
+  padding: 10px 14px;
+}
+
+.calendar-holiday-modal .modal-title {
+  color: #fff;
+  font-size: 18px;
+}
+
+.calendar-holiday-modal .modal-body {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+}
+
+.calendar-holiday-modal .modal-footer {
+  border-top-color: #333;
+  padding: 10px 14px;
+}
+
+.calendar-holiday-meta {
+  display: grid;
+  gap: 8px;
+}
+
+.calendar-holiday-meta div {
+  display: grid;
+  gap: 2px;
+}
+
+.calendar-holiday-meta span {
+  color: #cfe7f8;
+  font-size: 12px;
+}
+
+.calendar-holiday-meta strong,
+.calendar-holiday-meta a {
+  color: #fff;
+  font-size: 14px;
+}
+
+.calendar-holiday-description {
+  color: #ddd;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.calendar-holiday-description p {
+  margin: 0;
+}

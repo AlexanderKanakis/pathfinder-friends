@@ -133,6 +133,133 @@
       });
   }
 
+  const TRAIT_MECHANIC_KEYS = [
+    "effects",
+    "damageReduction",
+    "spellResistance",
+    "immunities",
+    "classSkillGrants",
+    "sizeChanges",
+    "spellLikeAbilities",
+    "generatedEquipment",
+  ];
+
+  function hasTraitOverrideMechanics(override = {}) {
+    return TRAIT_MECHANIC_KEYS.some((key) =>
+      normalizedMechanicOperations(override.mechanicOverrides?.[key]).some(
+        (operation) =>
+          operation.action === "remove" ||
+          (["add", "replace"].includes(operation.action) && operation.value),
+      ),
+    );
+  }
+
+  function stableMechanicKey(value) {
+    return JSON.stringify(stableMechanicValue(value));
+  }
+
+  function stableMechanicValue(value) {
+    if (Array.isArray(value)) return value.map(stableMechanicValue);
+    if (!value || typeof value !== "object") return value ?? null;
+    const sorted = {};
+    Object.keys(value)
+      .sort()
+      .forEach((key) => {
+        sorted[key] = stableMechanicValue(value[key]);
+      });
+    return sorted;
+  }
+
+  function normalizedMechanicOperations(operations = []) {
+    const seen = new Set();
+    return (Array.isArray(operations) ? operations : [])
+      .map((operation) => {
+        const action = ["replace", "remove", "add"].includes(operation?.action)
+          ? operation.action
+          : "";
+        if (!action) return null;
+        const normalized = { action };
+        if (action !== "add") {
+          normalized.targetIndex = Number.isFinite(Number(operation.targetIndex))
+            ? Number(operation.targetIndex)
+            : 0;
+          normalized.targetKey = operation.targetKey || "";
+        }
+        if (action !== "remove") normalized.value = operation.value || null;
+        if (action !== "remove" && !normalized.value) return null;
+        return normalized;
+      })
+      .filter(Boolean)
+      .filter((operation) => {
+        const key = [
+          operation.action,
+          operation.targetIndex ?? "",
+          operation.targetKey || "",
+          stableMechanicKey(operation.value),
+        ].join(":");
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+  }
+
+  function legacyCategoryReplacementOperations(
+    key = "",
+    override = {},
+    standardTrait = {},
+  ) {
+    if (!Array.isArray(override[key]) || !override[key].length) return [];
+    const standardRows = Array.isArray(standardTrait[key])
+      ? standardTrait[key]
+      : [];
+    return [
+      ...standardRows.map((row, targetIndex) => ({
+        action: "remove",
+        targetIndex,
+        targetKey: stableMechanicKey(row),
+      })),
+      ...override[key].map((value) => ({
+        action: "add",
+        value,
+      })),
+    ];
+  }
+
+  function canonicalizeModifiedTraitOverrides(
+    overrides = [],
+    standardTraits = [],
+  ) {
+    const seen = new Set();
+    return (Array.isArray(overrides) ? overrides : [])
+      .map((override) => {
+        const trait = canonicalTraitTarget(
+          override?.trait || override?.name || "",
+          standardTraits,
+        );
+        if (!trait) return null;
+        const standardTrait = (standardTraits || []).find(
+          (entry) => traitRelationKey(entry.name || entry.trait || "") === traitRelationKey(trait),
+        );
+        const normalized = { trait, mechanicOverrides: {} };
+        TRAIT_MECHANIC_KEYS.forEach((key) => {
+          const operations = [
+            ...normalizedMechanicOperations(override.mechanicOverrides?.[key]),
+            ...legacyCategoryReplacementOperations(key, override, standardTrait),
+          ];
+          if (operations.length) normalized.mechanicOverrides[key] = operations;
+        });
+        return normalized;
+      })
+      .filter(Boolean)
+      .filter(hasTraitOverrideMechanics)
+      .filter((override) => {
+        const key = traitRelationKey(override.trait);
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+  }
+
   function normalizeTraitRelations(race = {}) {
     const standardTraits = Array.isArray(race.standardTraits)
       ? race.standardTraits
@@ -144,6 +271,10 @@
             strict: true,
           }),
           modifies: canonicalTraitTargets(trait.modifies, standardTraits),
+          modifiedTraitOverrides: canonicalizeModifiedTraitOverrides(
+            trait.modifiedTraitOverrides,
+            standardTraits,
+          ),
         }))
       : [];
     return {
@@ -235,6 +366,7 @@
     dataPath: DATA_PATH,
     compactRaceData,
     canonicalTraitTargets,
+    canonicalizeModifiedTraitOverrides,
     loadRaces,
     normalizeRaceData,
     reset,

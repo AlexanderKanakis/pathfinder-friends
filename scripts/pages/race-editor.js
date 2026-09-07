@@ -6,6 +6,9 @@ let projectDirectoryHandle = null;
 let dataDirectoryHandle = null;
 let dirty = false;
 let traitEffectEditors = new Map();
+let traitModifierOverrideEditors = new Map();
+let traitDurationConfigs = new Map();
+let traitDurationEditor = null;
 
 function el(id) {
   return document.getElementById(id);
@@ -39,7 +42,7 @@ function cloneJson(value) {
 function splitList(value = "") {
   return String(value || "")
     .split(",")
-    .map((part) => part.trim().toLowerCase())
+    .map((part) => part.trim())
     .filter(Boolean);
 }
 
@@ -69,8 +72,12 @@ function normalizeTrait(trait = {}) {
     name: trait.name || "Trait",
     category: trait.category || "",
     description: trait.description || "",
+    activatable: Boolean(trait.activatable),
     replaces: Array.isArray(trait.replaces) ? trait.replaces : [],
     modifies: Array.isArray(trait.modifies) ? trait.modifies : [],
+    modifiedTraitOverrides: Array.isArray(trait.modifiedTraitOverrides)
+      ? trait.modifiedTraitOverrides
+      : [],
     effects: Array.isArray(trait.effects) ? trait.effects : [],
     damageReduction: Array.isArray(trait.damageReduction)
       ? trait.damageReduction
@@ -78,6 +85,7 @@ function normalizeTrait(trait = {}) {
     spellResistance: Array.isArray(trait.spellResistance)
       ? trait.spellResistance
       : [],
+    immunities: Array.isArray(trait.immunities) ? trait.immunities : [],
     classSkillGrants: Array.isArray(trait.classSkillGrants)
       ? trait.classSkillGrants
       : [],
@@ -85,6 +93,13 @@ function normalizeTrait(trait = {}) {
     spellLikeAbilities: Array.isArray(trait.spellLikeAbilities)
       ? trait.spellLikeAbilities
       : [],
+    generatedEquipment: Array.isArray(trait.generatedEquipment)
+      ? trait.generatedEquipment
+      : [],
+    durationConfig:
+      trait.durationConfig && typeof trait.durationConfig === "object"
+        ? trait.durationConfig
+        : null,
   };
 }
 
@@ -215,7 +230,305 @@ function inputBlock(id, label, value, extra = "") {
   `;
 }
 
-function traitCard(kind, trait, index) {
+function traitKey(kind, index) {
+  return `${kind}:${index}`;
+}
+
+function traitDurationLabel(config) {
+  const fallback = {
+    count: null,
+    unit: "variable",
+    factors: [],
+  };
+  if (window.PFEffectMeta?.durationLabel) {
+    return window.PFEffectMeta.durationLabel(config || fallback);
+  }
+  return config?.unit || "variable";
+}
+
+const TRAIT_MECHANIC_KEYS = [
+  "effects",
+  "damageReduction",
+  "spellResistance",
+  "immunities",
+  "classSkillGrants",
+  "sizeChanges",
+  "spellLikeAbilities",
+  "generatedEquipment",
+];
+
+const TRAIT_MECHANIC_LABELS = {
+  effects: "Effects",
+  damageReduction: "DR",
+  spellResistance: "SR",
+  immunities: "Immunities",
+  classSkillGrants: "Class Skills",
+  sizeChanges: "Size",
+  spellLikeAbilities: "SLAs",
+  generatedEquipment: "Gear",
+};
+
+function traitMechanicCount(item = {}, key = "") {
+  return Array.isArray(item[key]) ? item[key].length : 0;
+}
+
+function traitHasAnyMechanics(item = {}) {
+  return TRAIT_MECHANIC_KEYS.some((key) =>
+    mechanicOperations(item, key).some(
+      (operation) =>
+        operation.action === "remove" ||
+        (["add", "replace"].includes(operation.action) && operation.value),
+    ),
+  );
+}
+
+function traitMechanicSummary(item = {}) {
+  const parts = TRAIT_MECHANIC_KEYS.map((key) => {
+    const count = traitMechanicCount(item, key);
+    return count ? `${TRAIT_MECHANIC_LABELS[key]} ${count}` : "";
+  }).filter(Boolean);
+  return parts.length ? parts.join(" · ") : "No mechanics entered.";
+}
+
+function relationKey(value = "") {
+  return slugify(value).replace(/-/g, "");
+}
+
+function stableMechanicKey(value) {
+  return JSON.stringify(stableMechanicValue(value));
+}
+
+function stableMechanicValue(value) {
+  if (Array.isArray(value)) return value.map(stableMechanicValue);
+  if (!value || typeof value !== "object") return value ?? null;
+  const sorted = {};
+  Object.keys(value)
+    .sort()
+    .forEach((key) => {
+      sorted[key] = stableMechanicValue(value[key]);
+    });
+  return sorted;
+}
+
+function mechanicOperations(override = {}, key = "") {
+  const operations = override.mechanicOverrides?.[key];
+  return Array.isArray(operations) ? operations : [];
+}
+
+function mechanicOperationFor(override = {}, key = "", row = {}, index = 0) {
+  return [...mechanicOperations(override, key)]
+    .reverse()
+    .find(
+      (operation) =>
+        operation.action !== "add" &&
+        (operation.targetKey
+          ? operation.targetKey === stableMechanicKey(row)
+          : Number(operation.targetIndex) === index),
+    );
+}
+
+function mechanicAdditions(override = {}) {
+  return Object.fromEntries(
+    TRAIT_MECHANIC_KEYS.map((key) => [
+      key,
+      mechanicOperations(override, key)
+        .filter((operation) => operation.action === "add" && operation.value)
+        .map((operation) => operation.value),
+    ]),
+  );
+}
+
+function mechanicRowSummary(key = "", row = {}) {
+  if (key === "effects") {
+    const stat = row.skillName || row.stat || "effect";
+    const value = Number(row.value || 0);
+    const type = row.type ? ` ${row.type}` : "";
+    return `${stat} ${value > 0 ? "+" : ""}${value}${type}`;
+  }
+  if (key === "damageReduction") {
+    return `DR ${Number(row.amount || 0)}/${row.overcomeType || "-"}`;
+  }
+  if (key === "spellResistance") {
+    return `SR ${Number(row.amount || 0)}${row.appliesWhen ? ` (${row.appliesWhen})` : ""}`;
+  }
+  if (key === "immunities") {
+    const name = row.name || row.immunity || row.type || "Immunity";
+    return `Immune ${name}${row.appliesWhen ? ` (${row.appliesWhen})` : ""}`;
+  }
+  if (key === "classSkillGrants") {
+    return `${row.skillName || row.stat || "Skill"} becomes a class skill`;
+  }
+  if (key === "sizeChanges") {
+    const value = Number(row.value ?? row.steps ?? 0);
+    return `Size ${value > 0 ? "+" : ""}${value}`;
+  }
+  if (key === "spellLikeAbilities") {
+    const level = Number(row.minimumLevel ?? row.level ?? 1) || 1;
+    return `${row.frequency || "1/day"} ${row.spellName || row.name || row.spell?.name || "Spell"}${level > 1 ? ` at level ${level}` : ""}`;
+  }
+  if (key === "generatedEquipment") {
+    return `${row.type || "Equipment"}: ${row.name || row.item || "Generated item"}`;
+  }
+  return JSON.stringify(row);
+}
+
+function mechanicReplacementMountId(kind, traitIndex, overrideIndex, key, rowIndex) {
+  return `raceTraitOverride-${kind}-${traitIndex}-${overrideIndex}-${key}-${rowIndex}`;
+}
+
+function createMechanicEditorRow(key = "", data = {}, options = {}) {
+  if (!window.PFEffectEditor) return null;
+  const rowOptions = {
+    onDelete: () => {},
+    skills: options.skills,
+  };
+  const builders = {
+    effects: () =>
+      window.PFEffectEditor.createBonusRow(data, {
+        ...rowOptions,
+        effectStats: window.PFEffectStats?.allStats?.(),
+      }),
+    damageReduction: () => window.PFEffectEditor.createDrRow(data, rowOptions),
+    spellResistance: () => window.PFEffectEditor.createSrRow(data, rowOptions),
+    immunities: () =>
+      window.PFEffectEditor.createImmunityRow(data, rowOptions),
+    classSkillGrants: () =>
+      window.PFEffectEditor.createClassSkillRow(data, rowOptions),
+    sizeChanges: () =>
+      window.PFEffectEditor.createSizeChangeRow(data, rowOptions),
+    spellLikeAbilities: () =>
+      window.PFEffectEditor.createSpellLikeAbilityRow(data, rowOptions),
+    generatedEquipment: () =>
+      window.PFEffectEditor.createGeneratedEquipmentRow(data, rowOptions),
+  };
+  const row = builders[key]?.();
+  if (!row?.element) return null;
+  row.element.classList.add("trait-mechanic-editor-row");
+  row.element.querySelectorAll("input, select, textarea, button").forEach((input) => {
+    input.addEventListener("input", () => options.onChange?.());
+    input.addEventListener("change", () => options.onChange?.());
+  });
+  return row;
+}
+
+function findStandardTraitByName(race = {}, name = "") {
+  const key = relationKey(name);
+  return (race.standardTraits || []).find(
+    (trait) => relationKey(trait.name || trait.trait || "") === key,
+  );
+}
+
+function modifiedTraitOverrideFor(trait = {}, standardTraitName = "") {
+  const key = relationKey(standardTraitName);
+  return (trait.modifiedTraitOverrides || []).find(
+    (override) => relationKey(override.trait || override.name || "") === key,
+  );
+}
+
+function modifiedTraitOverrideSection(kind, trait, index, race = {}) {
+  if (kind !== "alternateTraits" || !(trait.modifies || []).length) return "";
+  const rows = (trait.modifies || [])
+    .map((name, overrideIndex) => {
+      const standardTrait = findStandardTraitByName(race, name);
+      const traitName = standardTrait?.name || name;
+      if (!traitName) return "";
+      const override = modifiedTraitOverrideFor(trait, traitName) || {};
+      const mechanicRows = TRAIT_MECHANIC_KEYS.map((key) => {
+        const standardRows = Array.isArray(standardTrait?.[key])
+          ? standardTrait[key]
+          : [];
+        if (!standardRows.length) return "";
+        return `
+          <div class="trait-mechanic-group" data-mechanic-group="${key}">
+            <div class="trait-mechanic-group-title">${escapeHtml(TRAIT_MECHANIC_LABELS[key])}</div>
+            ${standardRows
+              .map((row, rowIndex) => {
+                const operation = mechanicOperationFor(override, key, row, rowIndex);
+                const action = operation?.action || "keep";
+                return `
+                  <div
+                    class="trait-mechanic-row"
+                    data-mechanic-key="${key}"
+                    data-mechanic-row-index="${rowIndex}"
+                    data-mechanic-target-key="${escapeHtml(stableMechanicKey(row))}"
+                  >
+                    <div>
+                      <div class="small-text">Standard Row</div>
+                      <div class="trait-mechanic-summary">${escapeHtml(mechanicRowSummary(key, row))}</div>
+                    </div>
+                    <div>
+                      <label>Action</label>
+                      <select class="form-select form-select-sm" data-mechanic-action>
+                        <option value="keep" ${action === "keep" ? "selected" : ""}>Keep</option>
+                        <option value="replace" ${action === "replace" ? "selected" : ""}>Replace</option>
+                        <option value="remove" ${action === "remove" ? "selected" : ""}>Remove</option>
+                      </select>
+                    </div>
+                    <div
+                      class="trait-mechanic-replacement ${action === "replace" ? "" : "d-none"}"
+                      id="${mechanicReplacementMountId(kind, index, overrideIndex, key, rowIndex)}"
+                      data-mechanic-replacement-mount
+                    ></div>
+                  </div>
+                `;
+              })
+              .join("")}
+          </div>
+        `;
+      })
+        .filter(Boolean)
+        .join("");
+      return `
+        <section
+          class="trait-modifier-override-card"
+          data-trait-modifier-override="${escapeHtml(traitName)}"
+          data-trait-modifier-override-index="${overrideIndex}"
+        >
+          <div class="trait-modifier-override-head">
+            <strong>${escapeHtml(traitName)}</strong>
+            <span>Replacement mechanics if filled</span>
+          </div>
+          <div class="small-text">
+            Current standard mechanics: ${escapeHtml(
+              standardTrait ? traitMechanicSummary(standardTrait) : "No matching standard trait found.",
+            )}
+          </div>
+          ${
+            mechanicRows ||
+            `<div class="small-text">This standard trait has no authored mechanics yet. Use additions below.</div>`
+          }
+          <div class="trait-mechanic-additions">
+            <div class="trait-mechanic-group-title">Additions</div>
+            <div class="small-text">Add only mechanics that the modified trait gains beyond kept/replaced rows.</div>
+          </div>
+          <div
+            id="raceTraitOverrideAdditions-${kind}-${index}-${overrideIndex}"
+            class="accordion shared-extra-accordion mt-2"
+            data-trait-modifier-additions-mount
+          ></div>
+          ${
+            traitHasAnyMechanics(override)
+              ? `<div class="small-text mt-1">Row override entered.</div>`
+              : ""
+          }
+        </section>
+      `;
+    })
+    .filter(Boolean)
+    .join("");
+  if (!rows) return "";
+  return `
+    <div class="trait-modifier-overrides grid-column-full">
+      <div class="trait-modifier-overrides-title">Modified Trait Overrides</div>
+      <div class="small-text">
+        Keep standard rows by default. Replace or remove only the rows this alternate changes, and use additions for new rows.
+      </div>
+      ${rows}
+    </div>
+  `;
+}
+
+function traitCard(kind, trait, index, race = {}) {
   const isAlternate = kind === "alternateTraits";
   return `
     <article class="trait-card" data-trait-kind="${kind}" data-trait-index="${index}">
@@ -230,37 +543,69 @@ function traitCard(kind, trait, index) {
           <label>Name</label>
           <input data-trait-field="name" class="form-control form-control-sm" value="${escapeHtml(trait.name || "")}">
         </div>
-        <div>
+        <div class="trait-category-field">
           <label>Category</label>
           <input data-trait-field="category" class="form-control form-control-sm" value="${escapeHtml(trait.category || "")}">
+        </div>
+        <div class="trait-activatable-field">
+          <label>Activatable</label>
+          <div class="form-check form-switch">
+            <input data-trait-field="activatable" class="form-check-input" type="checkbox" ${trait.activatable ? "checked" : ""}>
+          </div>
+        </div>
+        <div class="trait-duration-field ${trait.activatable ? "" : "d-none"}" data-trait-duration-field>
+          <label>Duration</label>
+          <div class="d-flex align-items-center gap-2">
+            <button class="btn btn-outline-light btn-sm" type="button" data-edit-trait-duration>
+              Edit Duration
+            </button>
+            <span class="small-text" data-trait-duration-summary>${escapeHtml(traitDurationLabel(trait.durationConfig))}</span>
+          </div>
         </div>
         ${
           isAlternate
             ? `
-          <div class="trait-relation-grid">
-            <div>
+          <div class="trait-relation-grid grid-column-full">
+            <div class="trait-relation-field" data-trait-relation-field="replaces">
               <label>Replaces</label>
-              <input data-trait-field="replaces" class="form-control form-control-sm" value="${escapeHtml(joinList(trait.replaces))}" placeholder="hatred, stonecunning">
+              <input
+                data-trait-field="replaces"
+                data-trait-relation-input="replaces"
+                class="form-control form-control-sm"
+                value="${escapeHtml(joinList(trait.replaces))}"
+                placeholder="Search standard traits"
+                autocomplete="off"
+              >
+              <div class="trait-relation-suggestions" data-trait-relation-suggestions="replaces"></div>
             </div>
-            <div>
+            <div class="trait-relation-field" data-trait-relation-field="modifies">
               <label>Modifies</label>
-              <input data-trait-field="modifies" class="form-control form-control-sm" value="${escapeHtml(joinList(trait.modifies))}" placeholder="elven magic">
+              <input
+                data-trait-field="modifies"
+                data-trait-relation-input="modifies"
+                class="form-control form-control-sm"
+                value="${escapeHtml(joinList(trait.modifies))}"
+                placeholder="Search standard traits"
+                autocomplete="off"
+              >
+              <div class="trait-relation-suggestions" data-trait-relation-suggestions="modifies"></div>
             </div>
           </div>
         `
-            : `<div></div>`
+            : ``
         }
         <div class="grid-column-full">
           <label>Description</label>
           <textarea data-trait-field="description" class="form-control form-control-sm trait-textarea">${escapeHtml(trait.description || "")}</textarea>
         </div>
+        ${modifiedTraitOverrideSection(kind, trait, index, race)}
       </div>
       <div id="raceTraitEffects-${kind}-${index}" class="accordion shared-extra-accordion mt-2" data-trait-effect-mount></div>
     </article>
   `;
 }
 
-function traitSection(title, kind, traits) {
+function traitSection(title, kind, traits, race = {}) {
   return `
     <section class="level-card mb-3">
       <div class="d-flex justify-content-between align-items-center gap-2 flex-wrap mb-2">
@@ -270,7 +615,7 @@ function traitSection(title, kind, traits) {
         </button>
       </div>
       <div class="trait-list">
-        ${traits.map((trait, index) => traitCard(kind, trait, index)).join("") || `<div class="small-text">No traits recorded.</div>`}
+        ${traits.map((trait, index) => traitCard(kind, trait, index, race)).join("") || `<div class="small-text">No traits recorded.</div>`}
       </div>
     </section>
   `;
@@ -313,8 +658,11 @@ function favoredBonusSection(race) {
 
 function mountTraitEffectEditors(race) {
   traitEffectEditors = new Map();
+  traitModifierOverrideEditors = new Map();
+  traitDurationConfigs = new Map();
   ["standardTraits", "alternateTraits"].forEach((kind) => {
     (race[kind] || []).forEach((trait, index) => {
+      traitDurationConfigs.set(traitKey(kind, index), trait.durationConfig || null);
       const mount = document.getElementById(`raceTraitEffects-${kind}-${index}`);
       if (!mount || !window.PFEffectEditor) return;
       const editor = window.PFEffectEditor.mountEffectsAccordion(mount, {
@@ -324,8 +672,271 @@ function mountTraitEffectEditors(race) {
       });
       editor.reset(trait);
       traitEffectEditors.set(`${kind}:${index}`, editor);
+
+      if (kind !== "alternateTraits") return;
+      (trait.modifies || []).forEach((modifiedTraitName, overrideIndex) => {
+        const traitName =
+          findStandardTraitByName(race, modifiedTraitName)?.name ||
+          modifiedTraitName;
+        const standardTrait = findStandardTraitByName(race, traitName);
+        const override =
+          modifiedTraitOverrideFor(trait, traitName) || { trait: traitName };
+        const editorKey = `${kind}:${index}:${relationKey(traitName)}`;
+        const overrideEditors = {
+          additions: null,
+          replacements: new Map(),
+        };
+        TRAIT_MECHANIC_KEYS.forEach((mechanicKey) => {
+          const standardRows = Array.isArray(standardTrait?.[mechanicKey])
+            ? standardTrait[mechanicKey]
+            : [];
+          standardRows.forEach((standardRow, rowIndex) => {
+            const mount = document.getElementById(
+              mechanicReplacementMountId(
+                kind,
+                index,
+                overrideIndex,
+                mechanicKey,
+                rowIndex,
+              ),
+            );
+            if (!mount || !window.PFEffectEditor) return;
+            const operation = mechanicOperationFor(
+              override,
+              mechanicKey,
+              standardRow,
+              rowIndex,
+            );
+            const replacement = operation?.value || standardRow;
+            const rowController = createMechanicEditorRow(
+              mechanicKey,
+              replacement,
+              {
+                skills: [],
+                onChange: () => setDirty(true),
+              },
+            );
+            if (!rowController) return;
+            mount.innerHTML = "";
+            mount.appendChild(rowController.element);
+            overrideEditors.replacements.set(`${mechanicKey}:${rowIndex}`, {
+              key: mechanicKey,
+              rowIndex,
+              collect: rowController.collect,
+            });
+          });
+        });
+        const additionsMount = document.getElementById(
+          `raceTraitOverrideAdditions-${kind}-${index}-${overrideIndex}`,
+        );
+        if (additionsMount && window.PFEffectEditor) {
+          const additionsEditor = window.PFEffectEditor.mountEffectsAccordion(
+            additionsMount,
+            {
+              idPrefix: `race${selectedIndex}${kind}${index}Override${overrideIndex}Additions`,
+              effectsKey: "effects",
+              onChange: () => setDirty(true),
+            },
+          );
+          additionsEditor.reset(mechanicAdditions(override));
+          overrideEditors.additions = additionsEditor;
+        }
+        traitModifierOverrideEditors.set(editorKey, overrideEditors);
+      });
     });
   });
+  autoSizeTraitTextareas();
+}
+
+function updateTraitDurationVisibility(card) {
+  const activatable = card.querySelector('[data-trait-field="activatable"]')
+    ?.checked;
+  card
+    .querySelector("[data-trait-duration-field]")
+    ?.classList.toggle("d-none", !activatable);
+}
+
+function updateTraitDurationSummary(card) {
+  const key = traitKey(card.dataset.traitKind, Number(card.dataset.traitIndex));
+  const summary = card.querySelector("[data-trait-duration-summary]");
+  if (!summary) return;
+  summary.textContent = traitDurationLabel(traitDurationConfigs.get(key));
+}
+
+function openTraitDurationEditor(card) {
+  if (!window.PFEffectDurationEditor) return;
+  const key = traitKey(card.dataset.traitKind, Number(card.dataset.traitIndex));
+  traitDurationEditor =
+    traitDurationEditor || new window.PFEffectDurationEditor("racialTrait");
+  traitDurationEditor.open(traitDurationConfigs.get(key) || {}, (config) => {
+    traitDurationConfigs.set(key, config);
+    updateTraitDurationSummary(card);
+    setDirty(true);
+  });
+}
+
+function relationTraitOptions(race = {}) {
+  return (race.standardTraits || [])
+    .map((trait) => trait.name || trait.trait || "")
+    .filter(Boolean)
+    .map((name) => ({
+      name,
+      search: `${name} ${slugify(name).replace(/-/g, " ")}`.toLowerCase(),
+    }));
+}
+
+function relationInputParts(input) {
+  return splitList(input.value);
+}
+
+function relationInputQuery(input) {
+  const parts = String(input.value || "").split(",");
+  return (parts[parts.length - 1] || "").trim().toLowerCase();
+}
+
+function setRelationInputParts(input, parts) {
+  input.value = parts.filter(Boolean).join(", ");
+}
+
+function appendRelationTrait(input, name) {
+  const parts = relationInputParts(input);
+  const currentQuery = relationInputQuery(input);
+  const hasTrailingQuery =
+    currentQuery &&
+    parts.length &&
+    parts[parts.length - 1].toLowerCase() === currentQuery;
+  if (hasTrailingQuery) parts.pop();
+  const exists = parts.some(
+    (part) => slugify(part) === slugify(name),
+  );
+  if (!exists) parts.push(name);
+  setRelationInputParts(input, parts);
+  input.dispatchEvent(new Event("input", { bubbles: true }));
+}
+
+function canonicalizeRelationInput(input, race = {}) {
+  const field = input.dataset.traitRelationInput;
+  const options = field === "replaces" ? { strict: true } : {};
+  if (!window.PFRaceData?.canonicalTraitTargets) return;
+  setRelationInputParts(
+    input,
+    window.PFRaceData.canonicalTraitTargets(
+      relationInputParts(input),
+      race.standardTraits || [],
+      options,
+    ),
+  );
+}
+
+function refreshModifierOverridePanels(input) {
+  if (input.dataset.traitRelationInput !== "modifies") return;
+  commitSelectedRace();
+  setDirty(true);
+  renderSelectedRace();
+}
+
+function renderRelationSuggestions(input, race = {}) {
+  const wrapper = input.closest("[data-trait-relation-field]");
+  const suggestions = wrapper?.querySelector("[data-trait-relation-suggestions]");
+  if (!suggestions) return;
+  const query = relationInputQuery(input);
+  const selected = new Set(relationInputParts(input).map(slugify));
+  const matches = relationTraitOptions(race)
+    .filter((option) => !selected.has(slugify(option.name)))
+    .filter((option) => !query || option.search.includes(query))
+    .slice(0, 10);
+  suggestions.innerHTML = matches.length
+    ? matches
+        .map(
+          (option) => `
+            <button class="trait-relation-suggestion" type="button" data-relation-option="${escapeHtml(option.name)}">
+              ${escapeHtml(option.name)}
+            </button>
+          `,
+        )
+        .join("")
+    : query
+      ? `<div class="trait-relation-empty">No standard trait match.</div>`
+      : "";
+  suggestions.classList.toggle("is-open", Boolean(suggestions.innerHTML));
+  suggestions
+    .querySelectorAll("[data-relation-option]")
+    .forEach((button) => {
+      button.addEventListener("mousedown", (event) => {
+        event.preventDefault();
+        appendRelationTrait(input, button.dataset.relationOption);
+        canonicalizeRelationInput(input, race);
+        refreshModifierOverridePanels(input);
+        renderRelationSuggestions(input, race);
+      });
+    });
+}
+
+function hideRelationSuggestions(input) {
+  const suggestions = input
+    .closest("[data-trait-relation-field]")
+    ?.querySelector("[data-trait-relation-suggestions]");
+  if (!suggestions) return;
+  suggestions.classList.remove("is-open");
+}
+
+function mountTraitRelationSearches(race = {}) {
+  el("raceEditorPanel")
+    .querySelectorAll("[data-trait-relation-input]")
+    .forEach((input) => {
+      input.addEventListener("focus", () => renderRelationSuggestions(input, race));
+      input.addEventListener("input", () => renderRelationSuggestions(input, race));
+      input.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+          hideRelationSuggestions(input);
+          return;
+        }
+        if (event.key !== "Enter") return;
+        const first = input
+          .closest("[data-trait-relation-field]")
+          ?.querySelector("[data-relation-option]");
+        if (!first) return;
+        event.preventDefault();
+        appendRelationTrait(input, first.dataset.relationOption);
+        canonicalizeRelationInput(input, race);
+        refreshModifierOverridePanels(input);
+        renderRelationSuggestions(input, race);
+      });
+      input.addEventListener("blur", () => {
+        canonicalizeRelationInput(input, race);
+        refreshModifierOverridePanels(input);
+        setTimeout(() => hideRelationSuggestions(input), 120);
+      });
+    });
+}
+
+function mountModifierOverrideActionControls() {
+  el("raceEditorPanel")
+    .querySelectorAll("[data-mechanic-action]")
+    .forEach((select) => {
+      const sync = () => {
+        const row = select.closest("[data-mechanic-key]");
+        const replacement = row?.querySelector("[data-mechanic-replacement-mount]");
+        replacement?.classList.toggle("d-none", select.value !== "replace");
+      };
+      select.addEventListener("change", () => {
+        sync();
+        setDirty(true);
+      });
+      sync();
+    });
+}
+
+function autoSizeTraitTextarea(textarea) {
+  if (!textarea) return;
+  textarea.style.height = "auto";
+  textarea.style.height = `${textarea.scrollHeight + 2}px`;
+}
+
+function autoSizeTraitTextareas() {
+  el("raceEditorPanel")
+    ?.querySelectorAll(".trait-textarea")
+    .forEach(autoSizeTraitTextarea);
 }
 
 function renderSelectedRace() {
@@ -368,18 +979,40 @@ function renderSelectedRace() {
       </div>
     </section>
 
-    ${traitSection("Standard Racial Traits", "standardTraits", race.standardTraits || [])}
-    ${traitSection("Alternate Racial Traits", "alternateTraits", race.alternateTraits || [])}
+    ${traitSection("Standard Racial Traits", "standardTraits", race.standardTraits || [], race)}
+    ${traitSection("Alternate Racial Traits", "alternateTraits", race.alternateTraits || [], race)}
     ${favoredBonusSection(race)}
   `;
 
   mountTraitEffectEditors(race);
+  mountTraitRelationSearches(race);
+  mountModifierOverrideActionControls();
 
   el("raceEditorPanel")
     .querySelectorAll("input, textarea, select")
     .forEach((input) => {
-      input.addEventListener("input", () => setDirty(true));
-      input.addEventListener("change", () => setDirty(true));
+      input.addEventListener("input", () => {
+        if (input.classList.contains("trait-textarea")) {
+          autoSizeTraitTextarea(input);
+        }
+        setDirty(true);
+      });
+      input.addEventListener("change", () => {
+        const card = input.closest("[data-trait-kind]");
+        if (card && input.dataset.traitField === "activatable") {
+          updateTraitDurationVisibility(card);
+          updateTraitDurationSummary(card);
+        }
+        setDirty(true);
+      });
+    });
+  el("raceEditorPanel")
+    .querySelectorAll("[data-edit-trait-duration]")
+    .forEach((button) => {
+      button.addEventListener("click", () => {
+        const card = button.closest("[data-trait-kind]");
+        if (card) openTraitDurationEditor(card);
+      });
     });
   el("raceEditorPanel")
     .querySelectorAll("[data-add-trait]")
@@ -407,27 +1040,81 @@ function renderSelectedRace() {
     });
 }
 
+function collectModifiedTraitOverrides(card, kind, index) {
+  if (kind !== "alternateTraits") return [];
+  return [...card.querySelectorAll("[data-trait-modifier-override]")]
+    .map((section) => {
+      const trait = section.dataset.traitModifierOverride || "";
+      const editors = traitModifierOverrideEditors.get(
+        `${kind}:${index}:${relationKey(trait)}`,
+      );
+      const mechanicOverrides = Object.fromEntries(
+        TRAIT_MECHANIC_KEYS.map((key) => [key, []]),
+      );
+      section.querySelectorAll("[data-mechanic-key]").forEach((row) => {
+        const mechanicKey = row.dataset.mechanicKey;
+        const rowIndex = Number(row.dataset.mechanicRowIndex || 0);
+        const targetKey = row.dataset.mechanicTargetKey || "";
+        const action =
+          row.querySelector("[data-mechanic-action]")?.value || "keep";
+        if (action === "keep") return;
+        const operation = {
+          action,
+          targetIndex: rowIndex,
+          targetKey,
+        };
+        if (action === "replace") {
+          const replacement = editors?.replacements
+            ?.get(`${mechanicKey}:${rowIndex}`)
+            ?.collect?.();
+          if (!replacement) return;
+          operation.value = replacement;
+        }
+        mechanicOverrides[mechanicKey].push(operation);
+      });
+      const additions = editors?.additions?.collect?.() || {};
+      TRAIT_MECHANIC_KEYS.forEach((key) => {
+        (Array.isArray(additions[key]) ? additions[key] : []).forEach((value) => {
+          mechanicOverrides[key].push({ action: "add", value });
+        });
+      });
+      const override = { trait, mechanicOverrides };
+      return traitHasAnyMechanics(override) ? override : null;
+    })
+    .filter(Boolean);
+}
+
 function collectTrait(card) {
   const kind = card.dataset.traitKind;
   const index = Number(card.dataset.traitIndex);
   const editor = traitEffectEditors.get(`${kind}:${index}`);
   const extras = editor?.collect?.() || {};
   const name = card.querySelector('[data-trait-field="name"]').value.trim();
-  return {
+  const trait = {
     name: name || "Trait",
     category: card.querySelector('[data-trait-field="category"]').value.trim(),
+    activatable: card.querySelector('[data-trait-field="activatable"]')?.checked
+      || false,
     description: card
       .querySelector('[data-trait-field="description"]')
       .value.trim(),
     replaces: splitList(card.querySelector('[data-trait-field="replaces"]')?.value),
     modifies: splitList(card.querySelector('[data-trait-field="modifies"]')?.value),
+    modifiedTraitOverrides: collectModifiedTraitOverrides(card, kind, index),
     effects: extras.effects || [],
     damageReduction: extras.damageReduction || [],
     spellResistance: extras.spellResistance || [],
+    immunities: extras.immunities || [],
     classSkillGrants: extras.classSkillGrants || [],
     sizeChanges: extras.sizeChanges || [],
     spellLikeAbilities: extras.spellLikeAbilities || [],
+    generatedEquipment: extras.generatedEquipment || [],
   };
+  if (trait.activatable) {
+    const durationConfig = traitDurationConfigs.get(traitKey(kind, index));
+    if (durationConfig) trait.durationConfig = durationConfig;
+  }
+  return trait;
 }
 
 function collectFavoredBonus(row) {
@@ -482,6 +1169,12 @@ function commitSelectedRace() {
         trait.modifies,
         race.standardTraits,
       ),
+      modifiedTraitOverrides: window.PFRaceData.canonicalizeModifiedTraitOverrides
+        ? window.PFRaceData.canonicalizeModifiedTraitOverrides(
+            trait.modifiedTraitOverrides,
+            race.standardTraits,
+          )
+        : trait.modifiedTraitOverrides,
     }));
   }
   race.favoredClassBonuses = [
