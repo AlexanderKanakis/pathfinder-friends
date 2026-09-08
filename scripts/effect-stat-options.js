@@ -112,42 +112,48 @@
       .join(" ");
   }
 
-  // The base 30 Pathfinder skills with their key ability, matching every
-  // page's own skill list exactly. Callers with a live character (custom
-  // skills included) should pass their own list into
-  // resolveChoicePoolOptions({ skills }) instead of relying on this.
+  // The Pathfinder skills represented by the sheet, with key ability and
+  // whether the skill can be used untrained. The third slot is reserved by
+  // character-sheet.js for "custom skill", so the untrained flag lives in
+  // the fourth slot for array compatibility.
   const PF_SKILLS_WITH_ABILITY = [
-    ["Acrobatics", "dex"],
-    ["Appraise", "int"],
-    ["Bluff", "cha"],
-    ["Climb", "str"],
-    ["Diplomacy", "cha"],
-    ["Disable Device", "dex"],
-    ["Disguise", "cha"],
-    ["Escape Artist", "dex"],
-    ["Fly", "dex"],
-    ["Heal", "wis"],
-    ["Intimidate", "cha"],
-    ["Knowledge (arcana)", "int"],
-    ["Knowledge (dungeoneering)", "int"],
-    ["Knowledge (engineering)", "int"],
-    ["Knowledge (geography)", "int"],
-    ["Knowledge (history)", "int"],
-    ["Knowledge (local)", "int"],
-    ["Knowledge (nature)", "int"],
-    ["Knowledge (nobility)", "int"],
-    ["Knowledge (planes)", "int"],
-    ["Knowledge (religion)", "int"],
-    ["Linguistics", "int"],
-    ["Perception", "wis"],
-    ["Ride", "dex"],
-    ["Sense Motive", "wis"],
-    ["Sleight of Hand", "dex"],
-    ["Spellcraft", "int"],
-    ["Stealth", "dex"],
-    ["Survival", "wis"],
-    ["Swim", "str"],
-    ["Use Magic Device", "cha"],
+    ["Acrobatics", "dex", false, true],
+    ["Appraise", "int", false, true],
+    ["Bluff", "cha", false, true],
+    ["Climb", "str", false, true],
+    ["Diplomacy", "cha", false, true],
+    ["Disable Device", "dex", false, false],
+    ["Disguise", "cha", false, true],
+    ["Escape Artist", "dex", false, true],
+    ["Fly", "dex", false, true],
+    ["Heal", "wis", false, true],
+    ["Handle Animal", "cha", false, false],
+    ["Intimidate", "cha", false, true],
+    ["Knowledge (arcana)", "int", false, false],
+    ["Knowledge (dungeoneering)", "int", false, false],
+    ["Knowledge (engineering)", "int", false, false],
+    ["Knowledge (geography)", "int", false, false],
+    ["Knowledge (history)", "int", false, false],
+    ["Knowledge (local)", "int", false, false],
+    ["Knowledge (nature)", "int", false, false],
+    ["Knowledge (nobility)", "int", false, false],
+    ["Knowledge (planes)", "int", false, false],
+    ["Knowledge (religion)", "int", false, false],
+    ["Linguistics", "int", false, false],
+    ["Perception", "wis", false, true],
+    ["Ride", "dex", false, true],
+    ["Sense Motive", "wis", false, true],
+    ["Sleight of Hand", "dex", false, false],
+    ["Spellcraft", "int", false, false],
+    ["Stealth", "dex", false, true],
+    ["Survival", "wis", false, true],
+    ["Swim", "str", false, true],
+    ["Use Magic Device", "cha", false, false],
+  ];
+  const SKILL_TRAINING_FAMILY_OPTIONS = [
+    { name: "Craft", ability: "int", untrained: true },
+    { name: "Profession", ability: "wis", untrained: false },
+    { name: "Perform", ability: "cha", untrained: true },
   ];
 
   // From the barbarian's Rage entry: "a barbarian cannot use any
@@ -159,6 +165,8 @@
   const RAGE_USABLE_ABILITIES = ["str", "con", "wis"];
   const RAGE_USABLE_EXCEPTION_NAMES = ["Acrobatics", "Fly", "Intimidate", "Ride"];
   const CUSTOM_SKILL_LIST_STORAGE_KEY = "pf_effect_custom_skill_lists_v1";
+  const CUSTOM_SLA_SPELL_LIST_STORAGE_KEY =
+    "pf_effect_custom_sla_spell_lists_v1";
   const CREATE_SKILL_LIST_STAT_VALUE = "__create-custom-skill-list-stat__";
   const CREATE_SKILL_LIST_CHOICE_VALUE = "__create-custom-skill-list-choice__";
 
@@ -167,6 +175,8 @@
   // list including homebrew custom skills when called from the sheet).
   const SKILL_POOLS = [
     { id: "skills-all", label: "All Skills", ability: null },
+    { id: "skills-trained", label: "Trained Skills", trainedOnly: true },
+    { id: "skills-untrained", label: "Untrained Skills", untrained: true },
     { id: "skills-str", label: "Strength Skills", ability: "str" },
     { id: "skills-dex", label: "Dexterity Skills", ability: "dex" },
     { id: "skills-con", label: "Constitution Skills", ability: "con" },
@@ -190,6 +200,12 @@
       id: "skills-perform",
       label: "Perform Skills",
       namePrefix: "Perform",
+    },
+    {
+      id: "skills-craft-perform-profession",
+      label: "Craft, Perform, or Profession Skills",
+      namePrefixes: ["Craft", "Perform", "Profession"],
+      namedSkillKinds: ["skill:craft", "skill:perform", "skill:profession"],
     },
     { id: "skills-wis", label: "Wisdom Skills", ability: "wis" },
     { id: "skills-cha", label: "Charisma Skills", ability: "cha" },
@@ -223,6 +239,31 @@
     },
   ];
 
+  const CONDITIONAL_VARIABLE_POOLS = [
+    {
+      id: "ranger-favored-enemies",
+      label: "Ranger Favored Enemies",
+      source: "creature-types",
+    },
+    {
+      id: "character-favored-enemies",
+      label: "Character Favored Enemies",
+      source: "character-favored-enemies",
+    },
+  ];
+
+  let creatureTypesPromise = null;
+  async function loadCreatureTypesData() {
+    if (!creatureTypesPromise) {
+      creatureTypesPromise = fetch("./data/creature-types.json", {
+        cache: "no-cache",
+      })
+        .then((response) => (response.ok ? response.json() : {}))
+        .catch(() => ({}));
+    }
+    return creatureTypesPromise;
+  }
+
   // All weapons is the one pool too large to inline -- lazy-loaded and
   // cached from the same data/weapons.json the equipment pickers use.
   let weaponListPromise = null;
@@ -255,19 +296,95 @@
       .toLowerCase();
   }
 
+  function normalizeSkillEntry(entry) {
+    if (Array.isArray(entry)) {
+      return {
+        name: entry[0],
+        ability: entry[1],
+        custom: Boolean(entry[2]),
+        untrained: entry.length >= 4 ? Boolean(entry[3]) : null,
+      };
+    }
+    return {
+      name: entry?.name,
+      ability: entry?.ability,
+      custom: Boolean(entry?.custom),
+      untrained:
+        typeof entry?.untrained === "boolean" ? entry.untrained : null,
+    };
+  }
+
+  function skillTrainingStatus(skillName) {
+    const text = String(skillName || "").trim();
+    const key = normalizeSkillName(text);
+    const base = PF_SKILLS_WITH_ABILITY.map(normalizeSkillEntry).find(
+      (skill) => normalizeSkillName(skill.name) === key,
+    );
+    if (base) return base.untrained ? "untrained" : "trained";
+    if (/^craft(?:\s*\(|\b)/i.test(text)) return "untrained";
+    if (/^perform(?:\s*\(|\b)/i.test(text)) return "untrained";
+    if (/^profession(?:\s*\(|\b)/i.test(text)) return "trained";
+    if (/^knowledge(?:\s*\(|\b)/i.test(text)) return "trained";
+    return "";
+  }
+
+  function normalizeCustomListItem(raw = {}) {
+    const source =
+      raw && typeof raw === "object"
+        ? raw
+        : { value: String(raw || ""), label: String(raw || "") };
+    const value = String(
+      source.value || source.stat || source.key || "",
+    ).trim();
+    if (!value) return null;
+    const label = String(
+      source.label ||
+        source.name ||
+        choiceStatLabel(value) ||
+        value,
+    ).trim();
+    const group = String(source.group || "").trim();
+    return {
+      value,
+      label: label || value,
+      ...(group ? { group } : {}),
+    };
+  }
+
+  function skillFamilyStatValue(skillName = "") {
+    const text = String(skillName || "").trim();
+    if (/^craft(?:\s*\(|\b)/i.test(text)) return "skill:craft";
+    if (/^profession(?:\s*\(|\b)/i.test(text)) return "skill:profession";
+    if (/^perform(?:\s*\(|\b)/i.test(text)) return "skill:perform";
+    return "";
+  }
+
   function normalizeCustomSkillList(raw = {}) {
     const name = String(raw.name || raw.label || "").trim();
     const skills = (Array.isArray(raw.skills) ? raw.skills : [])
       .map((skill) => String(skill || "").trim())
       .filter(Boolean);
-    if (!name || !skills.length) return null;
+    const rawItems = Array.isArray(raw.items)
+      ? raw.items
+      : Array.isArray(raw.stats)
+        ? raw.stats
+        : Array.isArray(raw.entries)
+          ? raw.entries
+          : [];
+    const items = rawItems.map(normalizeCustomListItem).filter(Boolean);
+    if (!name || (!skills.length && !items.length)) return null;
     const id =
       String(raw.id || "")
         .toLowerCase()
         .replace(/[^a-z0-9-]+/g, "-")
         .replace(/^-+|-+$/g, "") ||
       `${slugify(name)}-${Date.now().toString(36)}`;
-    return { id, name, skills };
+    return {
+      id,
+      name,
+      skills,
+      ...(items.length ? { items } : {}),
+    };
   }
 
   function loadCustomSkillLists() {
@@ -313,12 +430,108 @@
     return customSkillLists().find((list) => list.id === id) || null;
   }
 
+  function normalizeSpellLikeListItem(raw = {}) {
+    const source =
+      raw && typeof raw === "object"
+        ? raw
+        : { name: String(raw || ""), label: String(raw || "") };
+    const spell = source.spell && typeof source.spell === "object"
+      ? source.spell
+      : null;
+    const name = String(
+      spell?.name ||
+        source.spellName ||
+        source.name ||
+        source.label ||
+        source.value ||
+        "",
+    ).trim();
+    if (!name) return null;
+    return {
+      name,
+      spellName: name,
+      value: name,
+      label: String(spell ? name : source.label || name).trim() || name,
+      ...(source.group ? { group: source.group } : {}),
+      ...(source.meta ? { meta: source.meta } : {}),
+    };
+  }
+
+  function normalizeSpellLikeList(raw = {}) {
+    const name = String(raw.name || raw.label || "").trim();
+    const rawItems = Array.isArray(raw.items)
+      ? raw.items
+      : Array.isArray(raw.spells)
+        ? raw.spells
+        : Array.isArray(raw.entries)
+          ? raw.entries
+          : [];
+    const items = rawItems.map(normalizeSpellLikeListItem).filter(Boolean);
+    if (!name || !items.length) return null;
+    const id =
+      String(raw.id || "")
+        .toLowerCase()
+        .replace(/[^a-z0-9-]+/g, "-")
+        .replace(/^-+|-+$/g, "") ||
+      `${slugify(name)}-${Date.now().toString(36)}`;
+    return {
+      id,
+      name,
+      items,
+    };
+  }
+
+  function loadCustomSpellLikeLists() {
+    try {
+      const parsed = JSON.parse(
+        localStorage.getItem(CUSTOM_SLA_SPELL_LIST_STORAGE_KEY) || "[]",
+      );
+      return (Array.isArray(parsed) ? parsed : [])
+        .map(normalizeSpellLikeList)
+        .filter(Boolean);
+    } catch {
+      return [];
+    }
+  }
+
+  function saveCustomSpellLikeLists(lists = []) {
+    const normalized = lists.map(normalizeSpellLikeList).filter(Boolean);
+    localStorage.setItem(
+      CUSTOM_SLA_SPELL_LIST_STORAGE_KEY,
+      JSON.stringify(normalized),
+    );
+    window.dispatchEvent(new CustomEvent("pf-custom-sla-lists-updated"));
+    return normalized;
+  }
+
+  function customSpellLikeLists() {
+    return loadCustomSpellLikeLists();
+  }
+
+  function saveCustomSpellLikeList(list = {}) {
+    const normalized = normalizeSpellLikeList(list);
+    if (!normalized) return null;
+    const lists = customSpellLikeLists();
+    const existingIndex = lists.findIndex((item) => item.id === normalized.id);
+    if (existingIndex >= 0) lists[existingIndex] = normalized;
+    else lists.push(normalized);
+    saveCustomSpellLikeLists(lists);
+    return normalized;
+  }
+
+  function customSpellLikeListById(id) {
+    return customSpellLikeLists().find((list) => list.id === id) || null;
+  }
+
   function customPoolFromList(list = {}) {
     return {
       id: `skill-list:${list.id}`,
-      label: list.name,
+      label: customSkillListLabel(list),
       kind: "custom-skill-list",
       skills: [...(list.skills || [])],
+      items: Array.isArray(list.items)
+        ? list.items.map(normalizeCustomListItem).filter(Boolean)
+        : [],
     };
   }
 
@@ -338,6 +551,14 @@
     return ALL_POOLS.find((pool) => pool.id === id) || null;
   }
 
+  function conditionalVariablePoolById(id) {
+    return (
+      CONDITIONAL_VARIABLE_POOLS.find(
+        (pool) => pool.id === String(id || ""),
+      ) || null
+    );
+  }
+
   function isChoiceStat(value) {
     return /^choice:/.test(String(value || ""));
   }
@@ -349,6 +570,21 @@
 
   function skillStatValue(skillName) {
     return `skill:${slugify(skillName).replace(/-/g, "")}`;
+  }
+
+  function skillLabelForStatKey(key) {
+    const target = String(key || "")
+      .toLowerCase()
+      .replace(/^skill:/, "");
+    if (!target) return "";
+    const skill = PF_SKILLS_WITH_ABILITY.map(normalizeSkillEntry).find(
+      (entry) => normalizeSkillName(entry.name) === target,
+    );
+    if (skill?.name) return skill.name;
+    if (target === "craft") return "Craft";
+    if (target === "profession") return "Profession";
+    if (target === "perform") return "Perform";
+    return "";
   }
 
   function skillListStatValue(listOrId) {
@@ -385,12 +621,35 @@
         : normalizeCustomSkillList(listOrStat);
     if (!list) return false;
     const target = normalizeSkillName(skillName);
+    if (Array.isArray(list.items) && list.items.length) {
+      const specific = skillStatValue(skillName);
+      const family = skillFamilyStatValue(skillName);
+      return list.items.some((item) => {
+        const value = String(item?.value || "").trim().toLowerCase();
+        return value === specific || (family && value === family);
+      });
+    }
     return list.skills.some((skill) => {
       if (/^craft$/i.test(skill)) return /^craft/i.test(skillName);
       if (/^profession$/i.test(skill)) return /^profession/i.test(skillName);
       if (/^perform$/i.test(skill)) return /^perform/i.test(skillName);
       return normalizeSkillName(skill) === target;
     });
+  }
+
+  function customSkillListIsSkillOnly(list = {}) {
+    const normalized = normalizeCustomSkillList(list);
+    if (!normalized) return false;
+    if (!Array.isArray(normalized.items) || !normalized.items.length) return true;
+    return normalized.items.every((item) =>
+      String(item.value || "").toLowerCase().startsWith("skill:"),
+    );
+  }
+
+  function customSkillListLabel(list = {}) {
+    const normalized = normalizeCustomSkillList(list) || list;
+    const name = normalized.name || "Custom";
+    return `${name} ${customSkillListIsSkillOnly(normalized) ? "Skills" : "List"}`;
   }
 
   // skills: optional override list of [name, ability] pairs (or {name,
@@ -401,10 +660,11 @@
     const pool = poolById(poolId) || choicePoolFallbackFromOptions(poolId, options);
     if (!pool) return [];
     if (pool.kind === "custom-skill-list") {
-      const liveSkills = (skills || PF_SKILLS_WITH_ABILITY).map((entry) =>
-        Array.isArray(entry)
-          ? { name: entry[0], ability: entry[1] }
-          : { name: entry.name, ability: entry.ability },
+      if (Array.isArray(pool.items) && pool.items.length) {
+        return pool.items.map(normalizeCustomListItem).filter(Boolean);
+      }
+      const liveSkills = (skills || PF_SKILLS_WITH_ABILITY).map(
+        normalizeSkillEntry,
       );
       const options = [];
       const addSkill = (skill) => {
@@ -437,30 +697,54 @@
       return options;
     }
     if (pool.kind === "skill") {
-      const list = (skills || PF_SKILLS_WITH_ABILITY)
-        .map((entry) =>
-          Array.isArray(entry)
-            ? { name: entry[0], ability: entry[1] }
-            : { name: entry.name, ability: entry.ability },
-        )
+      const includeFamilyOptions = pool.trainedOnly || pool.untrained;
+      const sourceSkills = [
+        ...(skills || PF_SKILLS_WITH_ABILITY),
+        ...(includeFamilyOptions ? SKILL_TRAINING_FAMILY_OPTIONS : []),
+      ];
+      const list = sourceSkills
+        .map(normalizeSkillEntry)
         .filter((entry) => {
-          if (pool.usableAbilities || pool.names || pool.namePrefix) {
+          if (pool.trainedOnly)
+            return skillTrainingStatus(entry.name) === "trained";
+          if (pool.untrained)
+            return skillTrainingStatus(entry.name) === "untrained";
+          if (
+            pool.usableAbilities ||
+            pool.names ||
+            pool.namePrefix ||
+            pool.namePrefixes
+          ) {
+            const prefixes = [
+              ...(pool.namePrefix ? [pool.namePrefix] : []),
+              ...(Array.isArray(pool.namePrefixes) ? pool.namePrefixes : []),
+            ];
             return (
               (pool.usableAbilities &&
                 pool.usableAbilities.includes(entry.ability)) ||
               (pool.names && pool.names.includes(entry.name)) ||
-              (pool.namePrefix &&
-                entry.name
-                  .toLowerCase()
-                  .startsWith(pool.namePrefix.toLowerCase()))
+              prefixes.some((prefix) =>
+                entry.name.toLowerCase().startsWith(prefix.toLowerCase()),
+              )
             );
           }
           return !pool.ability || entry.ability === pool.ability;
         });
-      return list.map((entry) => ({
+      const resolved = list.map((entry) => ({
         value: skillStatValue(entry.name),
         label: entry.name,
       }));
+      (pool.namedSkillKinds || []).forEach((kind) => {
+        const label = skillLabelForStatKey(kind);
+        if (!label) return;
+        if (resolved.some((option) => option.value === kind)) return;
+        resolved.push({
+          value: kind,
+          label: `${label} (enter specialty)`,
+          namedSkillKind: kind,
+        });
+      });
+      return resolved;
     }
     if (pool.kind === "weapon") {
       const weapons = await loadWeaponOptions();
@@ -484,6 +768,26 @@
     }));
   }
 
+  async function resolveConditionalVariableOptions(poolId) {
+    const pool = conditionalVariablePoolById(poolId);
+    if (!pool) return [];
+    if (pool.source === "creature-types") {
+      const data = await loadCreatureTypesData();
+      const options = Array.isArray(data.favoredEnemyOptions)
+        ? data.favoredEnemyOptions
+        : [];
+      return options
+        .map((option) => ({
+          value: option.id || option.name,
+          label: option.name || option.id || "",
+          type: option.type || "",
+          subtype: option.subtype || "",
+        }))
+        .filter((option) => option.value && option.label);
+    }
+    return [];
+  }
+
   function energyResistanceOptgroupHtml(selected, escapeHtml) {
     const esc = escapeHtml || ((value) => String(value ?? ""));
     return `
@@ -505,7 +809,7 @@
           (pool) =>
             `<option value="choice:${pool.id}" ${selected === `choice:${pool.id}` ? "selected" : ""}>${esc(pool.label)} (choose one)</option>`,
         ).join("")}
-        <option value="${CREATE_SKILL_LIST_CHOICE_VALUE}">Create custom skill list...</option>
+        <option value="${CREATE_SKILL_LIST_CHOICE_VALUE}">Create custom target list...</option>
       </optgroup>
     `;
   }
@@ -522,9 +826,13 @@
       return `Spell School: ${unslugify(key.slice("spell-school:".length))}`;
     if (key.startsWith("resistance:"))
       return `Resistance: ${unslugify(key.slice("resistance:".length))}`;
+    if (key.startsWith("skill:")) {
+      const skillLabel = skillLabelForStatKey(key);
+      return skillLabel ? `Skill: ${skillLabel}` : "";
+    }
     if (key.startsWith("skill-list:")) {
       const list = skillListForStat(key);
-      return list ? `${list.name} Skills` : "Custom Skill List";
+      return list ? customSkillListLabel(list) : "Custom Target List";
     }
     if (key.startsWith("choice:")) {
       // Unresolved -- the stat is still a pool reference rather than a
@@ -539,26 +847,40 @@
 
   window.PFEffectStats = {
     ALL_POOLS,
+    CONDITIONAL_VARIABLE_POOLS,
     PF_SKILLS_WITH_ABILITY,
     ENERGY_RESISTANCE_STAT_OPTIONS,
     CREATE_SKILL_LIST_STAT_VALUE,
     CREATE_SKILL_LIST_CHOICE_VALUE,
     poolById,
+    conditionalVariablePoolById,
     isChoiceStat,
     choicePoolIdFromStat,
     resolveChoicePoolOptions,
+    resolveConditionalVariableOptions,
     choiceOptgroupHtml,
     energyResistanceOptgroupHtml,
     choiceStatLabel,
     customSkillLists,
+    customSkillListIsSkillOnly,
+    customSkillListLabel,
     saveCustomSkillList,
     saveCustomSkillLists,
     customSkillListById,
+    customSpellLikeLists,
+    saveCustomSpellLikeList,
+    saveCustomSpellLikeLists,
+    customSpellLikeListById,
+    normalizeSpellLikeList,
     skillListStatValue,
     skillListIdFromStat,
     skillListForStat,
     skillListIncludesSkill,
+    skillStatValue,
+    skillLabelForStatKey,
+    normalizeSkillEntry,
     normalizeSkillName,
+    skillTrainingStatus,
     slugify,
     unslugify,
   };

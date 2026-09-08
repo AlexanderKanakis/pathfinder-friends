@@ -42,6 +42,8 @@ const STAT_GROUPS = {
     "initiative",
     "hit points",
     "skill checks",
+    "trained skill checks",
+    "untrained skill checks",
     "craft skill checks",
     "profession skill checks",
     "perform skill checks",
@@ -72,6 +74,8 @@ const BUFF_STATS = [
   "touch ac",
   "flat-footed ac",
   "remove dex bonus to ac",
+  "cannot gain morale bonuses",
+  "cannot gain luck bonuses",
   "natural armor",
   "deflection",
   "fortitude",
@@ -82,6 +86,8 @@ const BUFF_STATS = [
   "cmd",
   "hit points",
   "skill checks",
+  "trained skill checks",
+  "untrained skill checks",
   "craft skill checks",
   "profession skill checks",
   "perform skill checks",
@@ -114,6 +120,8 @@ const STAT_LABELS = {
   "touch ac": "Touch AC",
   "flat-footed ac": "Flat-Footed AC",
   "remove dex bonus to ac": "Remove DEX Bonus to AC",
+  "cannot gain morale bonuses": "Cannot Gain Morale Bonuses",
+  "cannot gain luck bonuses": "Cannot Gain Luck Bonuses",
   "extra attack": "Extra Attack at Highest BAB",
   cmb: "CMB",
   cmd: "CMD",
@@ -149,6 +157,8 @@ function titleCaseStat(value) {
   const key = String(value || "")
     .toLowerCase()
     .trim();
+  const choiceLabel = window.PFEffectStats?.choiceStatLabel?.(key);
+  if (choiceLabel) return choiceLabel;
   if (STAT_LABELS[key]) return STAT_LABELS[key];
   return key
     .split(" ")
@@ -194,8 +204,25 @@ function formatBonusText(bonus) {
     const text = "Removes DEX bonus to AC";
     return bonus.appliesWhen ? `${text} (${bonus.appliesWhen})` : text;
   }
+  if (
+    String(bonus.stat || "")
+      .toLowerCase()
+      .trim() === "cannot gain morale bonuses"
+  ) {
+    const text = "Cannot gain morale bonuses";
+    return bonus.appliesWhen ? `${text} (${bonus.appliesWhen})` : text;
+  }
+  if (
+    String(bonus.stat || "")
+      .toLowerCase()
+      .trim() === "cannot gain luck bonuses"
+  ) {
+    const text = "Cannot gain luck bonuses";
+    return bonus.appliesWhen ? `${text} (${bonus.appliesWhen})` : text;
+  }
   const value = Number(bonus.value || 0);
-  const text = `${fmt(value)} ${bonus.type || "untyped"} ${titleCaseStat(bonus.stat)}`;
+  const requirement = window.PFEffectEditor?.attributeRequirementText?.(bonus);
+  const text = `${fmt(value)} ${bonus.type || "untyped"} ${titleCaseStat(bonus.stat)}${requirement ? `; ${requirement}` : ""}`;
   return bonus.appliesWhen ? `${text} (${bonus.appliesWhen})` : text;
 }
 

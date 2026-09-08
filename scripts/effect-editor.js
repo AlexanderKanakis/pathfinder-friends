@@ -1,12 +1,13 @@
-// Shared "Damage Reduction / Immunity / Spell Resistance / Class Skill Grant" row
-// builders, plus the Bonus Scale modal they all use to scale by level.
+// Shared "Damage Reduction / Immunity / Spell Resistance / Class Skill Grant /
+// Extra Ranks Per Level" row builders, plus the Bonus Scale modal they all use
+// to scale by level.
 // Every effect-authoring surface (class features, custom buffs/traits/
 // feats, loot items, inventory items) wants the same things -- this
 // used to mean copy-pasting each one into every file. Defining them
 // once here and having each surface call in means a class feature, a
 // trait, a loot item, and a piece of gear can all carry DR, immunities,
-// SR, or "X becomes a class skill" the same way, with one place to fix
-// bugs or add fields.
+// SR, "X becomes a class skill", or "+X skill ranks per level" the same
+// way, with one place to fix bugs or add fields.
 //
 // The calculation side already reads these extras off ANY buff-shaped
 // object (see character-sheet.js collectors, which walk activeBuffs as
@@ -49,6 +50,8 @@
     "touch ac",
     "flat-footed ac",
     "remove dex bonus to ac",
+    "cannot gain morale bonuses",
+    "cannot gain luck bonuses",
     "natural armor",
     "deflection",
     "fortitude",
@@ -63,6 +66,11 @@
   ];
   const SKILL_STATS = [
     "skill checks",
+    "trained skill checks",
+    "untrained skill checks",
+    "class skill checks",
+    "class knowledge skill checks",
+    "knowledge skill checks",
     "strength skill checks",
     "dexterity skill checks",
     "constitution skill checks",
@@ -84,6 +92,7 @@
     "Escape Artist",
     "Fly",
     "Heal",
+    "Handle Animal",
     "Intimidate",
     "Knowledge (arcana)",
     "Knowledge (dungeoneering)",
@@ -144,6 +153,37 @@
   ];
   const GENERATED_SCALE_OPTIONS = ["STR", "DEX", "CON", "INT", "WIS", "CHA", "None"];
   const SPELL_LIKE_CASTING_ATTR_OPTIONS = ["", "STR", "DEX", "CON", "INT", "WIS", "CHA"];
+  const ATTRIBUTE_REQUIREMENT_OPTIONS = ["", "STR", "DEX", "CON", "INT", "WIS", "CHA"];
+  const SPELL_SCHOOL_OPTIONS = [
+    "Abjuration",
+    "Conjuration",
+    "Divination",
+    "Enchantment",
+    "Evocation",
+    "Illusion",
+    "Necromancy",
+    "Transmutation",
+    "Universal",
+  ].map((name) => ({ value: slugifyOption(name), label: name }));
+  const MAGIC_TYPE_OPTIONS = ["Arcane", "Divine", "Occult", "Psychic"].map(
+    (name) => ({ value: slugifyOption(name), label: name }),
+  );
+  const SPELL_TARGET_MODES = [
+    { value: "all", label: "All" },
+    { value: "class", label: "Class" },
+    { value: "school", label: "School" },
+    { value: "subschool", label: "School + Subschool" },
+    { value: "descriptor", label: "Descriptor" },
+    { value: "magicType", label: "Type of Magic" },
+    { value: "spell", label: "Specific Spell" },
+  ];
+  const CASTER_LEVEL_APPLY_TO_OPTIONS = [
+    { value: "spell", label: "Whole Spell" },
+    { value: "duration", label: "Duration Only" },
+    { value: "range", label: "Range Only" },
+    { value: "effectScaling", label: "Effect Scaling Only" },
+  ];
+  let spellAdjustmentRowId = 0;
   const NATURAL_ATTACK_KINDS = [
     "Bite",
     "Claw",
@@ -156,6 +196,14 @@
     "Other",
   ];
   const NATURAL_ATTACK_ROLES = ["Primary", "Secondary"];
+
+  function slugifyOption(text) {
+    return String(text || "")
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+  }
 
   // The plain, un-abbreviated formatter every surface used to
   // duplicate. Pass a surface-specific one (options.titleCaseStat) to
@@ -171,16 +219,130 @@
     if (choiceLabel) return choiceLabel;
     if (key === "extra attack") return "Extra Attack at Highest BAB";
     if (key.startsWith("skill:")) {
+      const genericSkillLabels = {
+        "skill:craft": "Craft",
+        "skill:profession": "Profession",
+        "skill:perform": "Perform",
+      };
       const skill = PF_SKILLS.find(
         (entry) =>
           `skill:${entry.replace(/[^a-z0-9]/gi, "").toLowerCase()}` === key,
       );
-      return `Skill: ${skill || key.slice(6)}`;
+      return `Skill: ${skill || genericSkillLabels[key] || key.slice(6)}`;
     }
     return key
       .split(" ")
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(" ");
+  }
+
+  const NON_NUMERIC_CUSTOM_LIST_STATS = new Set([
+    "extra attack",
+    "remove dex bonus to ac",
+    "cannot gain morale bonuses",
+    "cannot gain luck bonuses",
+  ]);
+
+  function customSkillListDisplayLabel(list = {}) {
+    if (window.PFEffectStats?.customSkillListLabel) {
+      return window.PFEffectStats.customSkillListLabel(list);
+    }
+    return `${list.name || "Custom"} Skills`;
+  }
+
+  function customStatListOptions(options = {}) {
+    const format = options.titleCaseStat || titleCaseStat;
+    const stats = (options.effectStats || EFFECT_STATS).filter(
+      (stat) => !NON_NUMERIC_CUSTOM_LIST_STATS.has(String(stat).toLowerCase()),
+    );
+    const skillNames = (
+      options.skills ||
+      window.PFEffectStats?.PF_SKILLS_WITH_ABILITY ||
+      PF_SKILLS.map((skill) => [skill])
+    ).map((entry) => (Array.isArray(entry) ? entry[0] : entry.name));
+    const rows = [];
+    const seen = new Set();
+    const add = (value, label = format(value), group = "Stats") => {
+      const key = String(value || "").trim();
+      if (!key || seen.has(key)) return;
+      seen.add(key);
+      rows.push({ value: key, label, group });
+    };
+    stats.forEach((stat) => add(stat, format(stat), "Stats"));
+    SKILL_STATS.forEach((stat) => add(stat, format(stat), "Skills"));
+    add("skill:craft", "Skill: Craft", "Skills");
+    add("skill:profession", "Skill: Profession", "Skills");
+    add("skill:perform", "Skill: Perform", "Skills");
+    skillNames.forEach((skill) => {
+      if (skill) add(skillKey(skill), format(skillKey(skill)), "Skills");
+    });
+    (window.PFEffectStats?.ENERGY_RESISTANCE_STAT_OPTIONS || []).forEach(
+      (option) => add(option.value, option.label, "Resistances"),
+    );
+    return rows;
+  }
+
+  function normalizeAttributeKey(value = "") {
+    const key = String(value || "")
+      .trim()
+      .toLowerCase();
+    const aliases = {
+      str: "STR",
+      strength: "STR",
+      dex: "DEX",
+      dexterity: "DEX",
+      con: "CON",
+      constitution: "CON",
+      int: "INT",
+      intelligence: "INT",
+      wis: "WIS",
+      wisdom: "WIS",
+      cha: "CHA",
+      charisma: "CHA",
+    };
+    return aliases[key] || "";
+  }
+
+  function normalizeAttributeRequirement(data = {}) {
+    const source =
+      data.attributeRequirement ||
+      data.attributeScoreRequirement ||
+      data.abilityRequirement ||
+      data.requirement?.attributeRequirement ||
+      data.requirements?.attributeRequirement ||
+      {};
+    const attribute = normalizeAttributeKey(
+      source.attribute ||
+        source.ability ||
+        data.requiredAttribute ||
+        data.requiredAbility ||
+        data.attributeRequirementAbility ||
+        "",
+    );
+    const score = Number(
+      source.score ??
+        source.minimumScore ??
+        source.minimumAbilityScore ??
+        data.requiredScore ??
+        data.minimumScore ??
+        "",
+    );
+    return {
+      attribute,
+      score: Number.isFinite(score) && score > 0 ? Math.floor(score) : "",
+    };
+  }
+
+  function hasAttributeRequirement(data = {}) {
+    const requirement = normalizeAttributeRequirement(data);
+    return Boolean(requirement.attribute && requirement.score);
+  }
+
+  function attributeRequirementText(data = {}) {
+    const requirement = normalizeAttributeRequirement(data);
+    return requirement.attribute && requirement.score
+      ? `Requires ${requirement.attribute} ${requirement.score}`
+      : "";
   }
 
   // options.skills: optional [name, ability] list override (a live
@@ -205,7 +367,7 @@
       .map((list) =>
         option(
           window.PFEffectStats.skillListStatValue(list),
-          `${list.name} Skills`,
+          customSkillListDisplayLabel(list),
         ),
       )
       .join("");
@@ -218,7 +380,7 @@
         <option value="skill:perform" ${selected === "skill:perform" ? "selected" : ""}>Skill: Perform</option>
         ${skillListOptions}
         ${specificSkillStats.map((stat) => option(stat)).join("")}
-        <option value="${window.PFEffectStats?.CREATE_SKILL_LIST_STAT_VALUE || "__create-custom-skill-list-stat__"}">Create custom skill list...</option>
+        <option value="${window.PFEffectStats?.CREATE_SKILL_LIST_STAT_VALUE || "__create-custom-skill-list-stat__"}">Create custom target list...</option>
       </optgroup>
       ${window.PFEffectStats?.energyResistanceOptgroupHtml?.(selected, escapeHtml) || ""}
       ${window.PFEffectStats?.choiceOptgroupHtml?.(selected, escapeHtml) || ""}
@@ -233,6 +395,13 @@
           id: list.id,
           name: list.name,
           skills: [...(list.skills || [])],
+          items: Array.isArray(list.items)
+            ? list.items.map((item) => ({
+                value: item.value,
+                label: item.label,
+                ...(item.group ? { group: item.group } : {}),
+              }))
+            : [],
         }
       : null;
   }
@@ -273,6 +442,11 @@
         select.value === window.PFEffectStats?.CREATE_SKILL_LIST_CHOICE_VALUE;
       const list = await window.PFCustomSkillListModal.open({
         skills: options.skills,
+        title: options.customListTitle,
+        options:
+          typeof options.customListOptions === "function"
+            ? options.customListOptions()
+            : options.customListOptions,
       });
       if (!list) {
         select.innerHTML = renderer(previous);
@@ -299,6 +473,8 @@
     const row = document.createElement("div");
     row.className = "shared-bonus-row";
     const selectedStat = namedSkillKindForName(data.skillName) || data.stat || "";
+    const appliesWhen = data.appliesWhen || "";
+    const conditional = Boolean(appliesWhen.trim()) || Boolean(data.conditional);
     row.innerHTML = `
       <div>
         <label>Stat</label>
@@ -329,12 +505,12 @@
         <div>
           <label>Conditional</label>
           <div class="form-check form-switch">
-            <input data-effect-field="conditional" class="form-check-input" type="checkbox" ${data.conditional ? "checked" : ""}>
+            <input data-effect-field="conditional" class="form-check-input" type="checkbox" ${conditional ? "checked" : ""}>
           </div>
         </div>
         <div>
           <label>Applies When</label>
-          <input data-effect-field="appliesWhen" class="form-control form-control-sm" value="${escapeHtml(data.appliesWhen || "")}" placeholder="vs undead">
+          <input data-effect-field="appliesWhen" class="form-control form-control-sm" value="${escapeHtml(appliesWhen)}" placeholder="vs undead">
         </div>
       </div>
       <button class="btn btn-outline-danger btn-sm" type="button" aria-label="Delete effect"><i class="bi bi-trash"></i></button>
@@ -350,6 +526,8 @@
     };
     wireCustomSkillListSelect(statSelect, {
       skills: options.skills,
+      customListTitle: "Custom Target List",
+      customListOptions: () => customStatListOptions(options),
       renderOptions: (selected) => bonusStatOptionsHtml(selected, options),
       sync: syncNamedSkill,
     });
@@ -359,6 +537,11 @@
       data.bonusScale || data.scale || null,
       row.querySelector("[data-scale-summary]"),
       row.querySelector("[data-scale-bonus]"),
+    );
+    wireConditionalFromAppliesWhen(
+      row,
+      '[data-effect-field="conditional"]',
+      '[data-effect-field="appliesWhen"]',
     );
     row
       .querySelector('button[aria-label="Delete effect"]')
@@ -371,6 +554,9 @@
       const skillName = isNamedSkillKind(selected)
         ? namedSkill(selected, skillNameInput.value)
         : "";
+      const appliesWhen = row
+        .querySelector('[data-effect-field="appliesWhen"]')
+        .value.trim();
       const effect = {
         stat: skillName ? skillKey(skillName) : selected,
         value: Number(
@@ -379,11 +565,10 @@
         type:
           row.querySelector('[data-effect-field="type"]').value || "untyped",
         stacks: row.querySelector('[data-effect-field="stacks"]').checked,
-        conditional: row.querySelector('[data-effect-field="conditional"]')
-          .checked,
-        appliesWhen: row
-          .querySelector('[data-effect-field="appliesWhen"]')
-          .value.trim(),
+        conditional:
+          row.querySelector('[data-effect-field="conditional"]').checked ||
+          Boolean(appliesWhen),
+        appliesWhen,
       };
       if (skillName) effect.skillName = skillName;
       const skillList = customSkillListPayloadForStat(effect.stat);
@@ -462,20 +647,30 @@
     const option = (value, label) =>
       `<option value="${escapeHtml(value)}" ${selected === value ? "selected" : ""}>${escapeHtml(label)}</option>`;
     const skillPools = (window.PFEffectStats?.ALL_POOLS || []).filter(
-      (pool) => pool.kind === "skill" || pool.kind === "custom-skill-list",
+      (pool) =>
+        pool.kind === "skill" ||
+        (pool.kind === "custom-skill-list" &&
+          (window.PFEffectStats?.customSkillListIsSkillOnly
+            ? window.PFEffectStats.customSkillListIsSkillOnly(pool)
+            : true)),
     );
     const customSkillLists = window.PFEffectStats?.customSkillLists?.() || [];
+    const skillOnlyCustomLists = customSkillLists.filter((customList) =>
+      window.PFEffectStats?.customSkillListIsSkillOnly
+        ? window.PFEffectStats.customSkillListIsSkillOnly(customList)
+        : true,
+    );
     return `
       <optgroup label="Skills">
         ${list.map((skill) => option(slugifySkillName(skill), skill)).join("")}
         ${option("skill:craft", "Skill: Craft")}
         ${option("skill:profession", "Skill: Profession")}
         ${option("skill:perform", "Skill: Perform")}
-        ${customSkillLists
+        ${skillOnlyCustomLists
           .map((customList) =>
             option(
               window.PFEffectStats.skillListStatValue(customList),
-              `${customList.name} Skills`,
+              customSkillListDisplayLabel(customList),
             ),
           )
           .join("")}
@@ -519,7 +714,7 @@
                 <div class="col-12">
                   <label for="${SCALE_MODAL_ID}Source">Level Source</label>
                   <select id="${SCALE_MODAL_ID}Source" class="form-select form-select-sm">
-                    ${window.PFEffectMeta?.levelSourceOptions?.({ type: "caster" }) || '<option value="caster">Caster level</option><option value="character">Character level</option>'}
+                    ${window.PFEffectMeta?.levelSourceOptions?.({ type: "caster" }, { includeSpecial: true }) || '<option value="caster">Caster level</option><option value="character">Character level</option>'}
                   </select>
                 </div>
               </div>
@@ -696,7 +891,10 @@
           const source = scale.source || { type: "caster" };
           const sourceSelect = document.getElementById(`${SCALE_MODAL_ID}Source`);
           if (sourceSelect && window.PFEffectMeta?.levelSourceOptions) {
-            sourceSelect.innerHTML = window.PFEffectMeta.levelSourceOptions(source);
+            sourceSelect.innerHTML = window.PFEffectMeta.levelSourceOptions(
+              source,
+              { includeSpecial: true },
+            );
           } else if (sourceSelect) {
             sourceSelect.value = source.type || "caster";
           }
@@ -771,6 +969,12 @@
     if (source.type === "character") return "character level";
     if (source.type === "class")
       return source.className ? `${source.className} level` : "class level";
+    if (source.type === "special")
+      return (
+        window.PFEffectMeta?.factorLabel?.(source) ||
+        source.label ||
+        "special value"
+      );
     return "caster level";
   }
 
@@ -823,6 +1027,21 @@
       updateSummary();
     });
     updateSummary();
+  }
+
+  function wireConditionalFromAppliesWhen(
+    row,
+    conditionalSelector,
+    appliesWhenSelector,
+  ) {
+    const conditionalInput = row.querySelector(conditionalSelector);
+    const appliesWhenInput = row.querySelector(appliesWhenSelector);
+    if (!conditionalInput || !appliesWhenInput) return;
+    const sync = () => {
+      if (appliesWhenInput.value.trim()) conditionalInput.checked = true;
+    };
+    sync();
+    appliesWhenInput.addEventListener("input", sync);
   }
 
   // Damage reduction is "N/type" -- a numeric amount plus the type of
@@ -883,8 +1102,9 @@
   function createSrRow(data = {}, { onDelete } = {}) {
     const row = document.createElement("div");
     row.className = "shared-sr-row class-feature-sr-row";
-    const conditional = data.conditional ?? Boolean(data.condition);
     const appliesWhen = data.appliesWhen || data.condition || "";
+    const conditional =
+      Boolean(String(appliesWhen).trim()) || Boolean(data.conditional);
     row.innerHTML = `
       <div>
         <label>Amount</label>
@@ -910,6 +1130,11 @@
       row.querySelector("[data-scale-summary]"),
       row.querySelector("[data-scale-bonus]"),
     );
+    wireConditionalFromAppliesWhen(
+      row,
+      '[data-sr-field="conditional"]',
+      '[data-sr-field="appliesWhen"]',
+    );
     row.querySelector('button[aria-label="Delete SR"]').addEventListener(
       "click",
       () => {
@@ -918,15 +1143,17 @@
       },
     );
     const collect = () => {
+      const appliesWhen = row
+        .querySelector('[data-sr-field="appliesWhen"]')
+        .value.trim();
       const sr = {
         amount: Number(
           row.querySelector('[data-sr-field="amount"]').value || 0,
         ),
-        conditional: row.querySelector('[data-sr-field="conditional"]')
-          .checked,
-        appliesWhen: row
-          .querySelector('[data-sr-field="appliesWhen"]')
-          .value.trim(),
+        conditional:
+          row.querySelector('[data-sr-field="conditional"]').checked ||
+          Boolean(appliesWhen),
+        appliesWhen,
       };
       if (row._bonusScale) sr.bonusScale = row._bonusScale;
       return sr.amount > 0 || sr.bonusScale ? sr : null;
@@ -938,8 +1165,9 @@
   function createImmunityRow(data = {}, { onDelete } = {}) {
     const row = document.createElement("div");
     row.className = "shared-immunity-row";
-    const conditional = data.conditional ?? Boolean(data.condition);
     const appliesWhen = data.appliesWhen || data.condition || "";
+    const conditional =
+      Boolean(String(appliesWhen).trim()) || Boolean(data.conditional);
     row.innerHTML = `
       <div>
         <label>Immunity</label>
@@ -964,18 +1192,25 @@
         onDelete?.();
       },
     );
+    wireConditionalFromAppliesWhen(
+      row,
+      '[data-immunity-field="conditional"]',
+      '[data-immunity-field="appliesWhen"]',
+    );
     const collect = () => {
       const name = row
         .querySelector('[data-immunity-field="name"]')
         .value.trim();
       if (!name) return null;
+      const appliesWhen = row
+        .querySelector('[data-immunity-field="appliesWhen"]')
+        .value.trim();
       return {
         name,
-        conditional: row.querySelector('[data-immunity-field="conditional"]')
-          .checked,
-        appliesWhen: row
-          .querySelector('[data-immunity-field="appliesWhen"]')
-          .value.trim(),
+        conditional:
+          row.querySelector('[data-immunity-field="conditional"]').checked ||
+          Boolean(appliesWhen),
+        appliesWhen,
       };
     };
     row._collect = collect;
@@ -1061,6 +1296,37 @@
     return `${label} becomes a class skill`;
   }
 
+  function createExtraRanksPerLevelRow(data = {}, { onDelete } = {}) {
+    const row = document.createElement("div");
+    row.className = "shared-extra-ranks-row";
+    row.innerHTML = `
+      <div>
+        <label>Extra Ranks / Level</label>
+        <input data-extra-ranks-field="value" class="form-control form-control-sm" type="number" min="0" value="${Number(data.value ?? data.amount ?? data.ranks ?? 0)}">
+      </div>
+      <button class="btn btn-outline-danger btn-sm" type="button" aria-label="Delete extra ranks per level"><i class="bi bi-trash"></i></button>
+    `;
+    row
+      .querySelector('button[aria-label="Delete extra ranks per level"]')
+      .addEventListener("click", () => {
+        row.remove();
+        onDelete?.();
+      });
+    const collect = () => {
+      const value = Number(
+        row.querySelector('[data-extra-ranks-field="value"]').value || 0,
+      );
+      return value > 0 ? { value } : null;
+    };
+    row._collect = collect;
+    return { element: row, collect };
+  }
+
+  function extraRanksPerLevelText(entry = {}) {
+    const value = Number(entry.value ?? entry.amount ?? entry.ranks ?? 0);
+    return `Extra Ranks / Level ${value >= 0 ? "+" : ""}${value}`;
+  }
+
   function createSizeChangeRow(data = {}, { onDelete } = {}) {
     const row = document.createElement("div");
     row.className = "shared-size-change-row";
@@ -1093,7 +1359,14 @@
   }
 
   function spellLikeAbilityName(data = {}) {
-    return data.spellName || data.name || data.spell?.name || "";
+    return (
+      data.spellName ||
+      data.name ||
+      data.spell?.name ||
+      data.spellChoiceList?.name ||
+      data.spellList?.name ||
+      ""
+    );
   }
 
   function spellLikeMinimumLevel(data = {}) {
@@ -1118,11 +1391,381 @@
 
   function compactSpellPayload(spell = {}) {
     if (!spell || typeof spell !== "object") return null;
+    const name = String(spell.name || spell.spellName || "").trim();
+    return name ? { name } : null;
+  }
+
+  let spellLikeSpellOptionsPromise = null;
+
+  function loadSpellLikeSpellOptions() {
+    spellLikeSpellOptionsPromise ||= (window.PFSpellData?.loadSpells
+      ? window.PFSpellData.loadSpells()
+      : fetch("./data/spells.json", { cache: "no-cache" }).then((response) =>
+          response.ok ? response.json() : [],
+        ))
+      .then((spells) =>
+        (Array.isArray(spells) ? spells : [])
+          .filter((spell) => spell?.name)
+          .sort((a, b) => String(a.name).localeCompare(String(b.name)))
+          .map((spell) => ({
+            name: spell.name,
+            spellName: spell.name,
+            value: spell.name,
+            label: spell.name,
+            meta:
+              window.PFSpellData?.schoolWithDescriptors?.(spell) ||
+              spell.details?.school ||
+              "Spell",
+            group: "Spells",
+          })),
+      )
+      .catch(() => []);
+    return spellLikeSpellOptionsPromise;
+  }
+
+  function normalizeSpellLikeChoiceList(list = {}) {
+    if (window.PFEffectStats?.normalizeSpellLikeList) {
+      return window.PFEffectStats.normalizeSpellLikeList(list);
+    }
+    return list && typeof list === "object" ? list : null;
+  }
+
+  function spellLikeChoiceList(data = {}) {
+    return (
+      normalizeSpellLikeChoiceList(
+        data.spellChoiceList || data.spellList || data.choiceList || {},
+      ) ||
+      window.PFEffectStats?.customSpellLikeListById?.(
+        data.spellChoiceListId || data.spellListId || "",
+      ) ||
+      null
+    );
+  }
+
+  function spellLikeChoiceListText(data = {}) {
+    const list = spellLikeChoiceList(data);
+    const name = list?.name || data.spellChoiceListName || data.spellListName;
+    return name ? `Choose from ${name}` : "";
+  }
+
+  async function createSpellLikeChoiceList() {
+    if (!window.PFCustomSkillListModal || !window.PFEffectStats) return null;
+    const options = await loadSpellLikeSpellOptions();
+    return window.PFCustomSkillListModal.open({
+      title: "Create SLA Spell List",
+      label: "Spells",
+      options,
+      saveList: window.PFEffectStats.saveCustomSpellLikeList,
+    });
+  }
+
+  function ensureSpellLikeListPickerModal() {
+    const id = "spellLikeListPickerModal";
+    const existing = document.getElementById(id);
+    if (existing) return existing;
+    const wrapper = document.createElement("div");
+    wrapper.innerHTML = `
+      <div class="modal fade" id="${id}" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+          <div class="modal-content bg-dark text-white border-secondary">
+            <div class="modal-header border-secondary">
+              <h5 class="modal-title">Choose SLA Spell List</h5>
+            </div>
+            <div class="modal-body">
+              <input class="form-control form-control-sm mb-2" data-sla-list-search placeholder="Search lists">
+              <div class="list-group" data-sla-list-results></div>
+              <div class="small text-secondary mt-2" data-sla-list-empty>No SLA spell lists created yet.</div>
+            </div>
+            <div class="modal-footer border-secondary">
+              <button type="button" class="btn btn-outline-info btn-sm" data-sla-list-create>Create List</button>
+              <button type="button" class="btn btn-outline-warning btn-sm" data-sla-list-clear>Clear</button>
+              <button type="button" class="btn btn-outline-light btn-sm" data-bs-dismiss="modal">Cancel</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(wrapper.firstElementChild);
+    return document.getElementById(id);
+  }
+
+  async function openSpellLikeListPicker() {
+    const root = ensureSpellLikeListPickerModal();
+    const modal = bootstrap.Modal.getOrCreateInstance(root);
+    const search = root.querySelector("[data-sla-list-search]");
+    const results = root.querySelector("[data-sla-list-results]");
+    const empty = root.querySelector("[data-sla-list-empty]");
+    let settled = false;
+    return new Promise((resolve) => {
+      const finish = (value = null) => {
+        if (settled) return;
+        settled = true;
+        modal.hide();
+        resolve(value);
+      };
+      const render = () => {
+        const term = search.value.trim().toLowerCase();
+        const lists = window.PFEffectStats?.customSpellLikeLists?.() || [];
+        const visible = lists.filter(
+          (list) =>
+            !term ||
+            String(list.name || "").toLowerCase().includes(term) ||
+            (list.items || []).some((item) =>
+              String(item.label || item.name || "")
+                .toLowerCase()
+                .includes(term),
+            ),
+        );
+        empty.classList.toggle("d-none", visible.length > 0);
+        results.innerHTML = visible
+          .map(
+            (list, index) => `
+          <button type="button" class="list-group-item list-group-item-action bg-dark text-white border-secondary" data-sla-list-index="${index}">
+            <div class="fw-semibold">${escapeHtml(list.name)}</div>
+            <small>${escapeHtml((list.items || []).map((item) => item.label || item.name).filter(Boolean).join(", "))}</small>
+          </button>
+        `,
+          )
+          .join("");
+        results.querySelectorAll("[data-sla-list-index]").forEach((button) => {
+          button.addEventListener("click", () =>
+            finish(visible[Number(button.dataset.slaListIndex)]),
+          );
+        });
+      };
+      const onHidden = () => {
+        root.removeEventListener("hidden.bs.modal", onHidden);
+        finish(null);
+      };
+      root.addEventListener("hidden.bs.modal", onHidden);
+      search.value = "";
+      search.oninput = render;
+      root.querySelector("[data-sla-list-create]").onclick = async () => {
+        const created = await createSpellLikeChoiceList();
+        if (created) finish(created);
+      };
+      root.querySelector("[data-sla-list-clear]").onclick = () => finish({ clear: true });
+      render();
+      modal.show();
+      setTimeout(() => search.focus(), 150);
+    });
+  }
+
+  let conditionCatalogPromise = null;
+
+  function loadConditionCatalog() {
+    conditionCatalogPromise ||= (window.PFApp?.loadConditionDefinitions
+      ? window.PFApp.loadConditionDefinitions()
+      : fetch("data/conditions.json", { cache: "no-cache" }).then((response) =>
+          response.ok ? response.json() : [],
+        )
+    ).then((conditions) =>
+      (Array.isArray(conditions) ? conditions : [])
+        .filter((condition) => condition && condition.name)
+        .sort((a, b) => String(a.name).localeCompare(String(b.name))),
+    );
+    return conditionCatalogPromise;
+  }
+
+  function compactConditionPayload(condition = {}) {
+    if (!condition || typeof condition !== "object") return null;
     return {
-      name: spell.name || "",
-      details: spell.details || {},
-      link: spell.link || "",
+      id: condition.id || "",
+      name: condition.name || "",
+      category: condition.category || "Condition",
+      duration: condition.duration || "",
+      durationConfig: condition.durationConfig || null,
+      bonuses: Array.isArray(condition.bonuses) ? condition.bonuses : [],
+      damageReduction: Array.isArray(condition.damageReduction)
+        ? condition.damageReduction
+        : [],
+      spellResistance: Array.isArray(condition.spellResistance)
+        ? condition.spellResistance
+        : [],
+      immunities: Array.isArray(condition.immunities) ? condition.immunities : [],
+      classSkillGrants: Array.isArray(condition.classSkillGrants)
+        ? condition.classSkillGrants
+        : [],
+      extraRanksPerLevel: Array.isArray(condition.extraRanksPerLevel)
+        ? condition.extraRanksPerLevel
+        : [],
+      sizeChanges: Array.isArray(condition.sizeChanges)
+        ? condition.sizeChanges
+        : [],
+      casterLevelBonuses: Array.isArray(condition.casterLevelBonuses)
+        ? condition.casterLevelBonuses
+        : [],
+      spellDcBonuses: Array.isArray(condition.spellDcBonuses)
+        ? condition.spellDcBonuses
+        : [],
+      spellLikeAbilities: Array.isArray(condition.spellLikeAbilities)
+        ? condition.spellLikeAbilities
+        : [],
+      generatedEquipment: Array.isArray(condition.generatedEquipment)
+        ? condition.generatedEquipment
+        : [],
+      description: condition.description || "",
     };
+  }
+
+  function applyConditionName(entry = {}) {
+    return (
+      entry.name ||
+      entry.conditionName ||
+      entry.condition?.name ||
+      entry.condition?.conditionName ||
+      ""
+    );
+  }
+
+  function applyConditionText(entry = {}) {
+    return `Applies condition: ${applyConditionName(entry) || "Condition"}`;
+  }
+
+  function createApplyConditionRow(data = {}, { onDelete } = {}) {
+    const row = document.createElement("div");
+    row.className = "shared-apply-condition-row";
+    const selectedId = data.conditionId || data.id || data.condition?.id || "";
+    const selectedName = applyConditionName(data);
+    row._condition =
+      data.condition && typeof data.condition === "object" ? data.condition : null;
+    row.innerHTML = `
+      <div>
+        <label>Condition</label>
+        <select data-apply-condition-field="condition" class="form-select form-select-sm">
+          <option value="">Choose condition</option>
+          ${
+            selectedName && !selectedId
+              ? `<option value="${escapeHtml(selectedName)}" selected>${escapeHtml(selectedName)}</option>`
+              : ""
+          }
+        </select>
+      </div>
+      <button class="btn btn-outline-danger btn-sm" type="button" aria-label="Delete applied condition"><i class="bi bi-trash"></i></button>
+    `;
+    const select = row.querySelector('[data-apply-condition-field="condition"]');
+    loadConditionCatalog()
+      .then((conditions) => {
+        const selectedValue = selectedId || selectedName;
+        select.innerHTML =
+          `<option value="">Choose condition</option>` +
+          conditions
+            .map((condition) => {
+              const value = condition.id || condition.name;
+              const selected =
+                selectedValue &&
+                (String(selectedValue) === String(value) ||
+                  String(selectedValue).toLowerCase() ===
+                    String(condition.name).toLowerCase());
+              if (selected) row._condition = condition;
+              return `<option value="${escapeHtml(value)}" ${selected ? "selected" : ""}>${escapeHtml(condition.name)}</option>`;
+            })
+            .join("");
+        if (selectedValue && !row._condition) {
+          select.insertAdjacentHTML(
+            "beforeend",
+            `<option value="${escapeHtml(selectedValue)}" selected>${escapeHtml(selectedName || selectedValue)}</option>`,
+          );
+        }
+      })
+      .catch(() => {});
+    select.addEventListener("change", async () => {
+      const conditions = await loadConditionCatalog().catch(() => []);
+      row._condition =
+        conditions.find(
+          (condition) =>
+            String(condition.id || condition.name) === select.value ||
+            String(condition.name).toLowerCase() ===
+              String(select.value).toLowerCase(),
+        ) || null;
+    });
+    row
+      .querySelector('button[aria-label="Delete applied condition"]')
+      .addEventListener("click", () => {
+        row.remove();
+        onDelete?.();
+      });
+    const collect = () => {
+      const value = select.value;
+      const condition = row._condition;
+      const name = condition?.name || selectedName || value;
+      if (!value && !name) return null;
+      return {
+        conditionId: condition?.id || value || "",
+        name,
+        condition: compactConditionPayload(condition || data.condition || data),
+      };
+    };
+    row._collect = collect;
+    return { element: row, collect };
+  }
+
+  function normalizeConditionalVariableKey(value = "") {
+    return String(value || "")
+      .trim()
+      .toLowerCase()
+      .replace(/[{}]/g, "")
+      .replace(/\s+/g, " ");
+  }
+
+  function conditionalVariablePoolOptionsHtml(selected = "") {
+    const pools = window.PFEffectStats?.CONDITIONAL_VARIABLE_POOLS || [];
+    return pools
+      .map(
+        (pool) =>
+          `<option value="${escapeHtml(pool.id)}" ${selected === pool.id ? "selected" : ""}>${escapeHtml(pool.label)}</option>`,
+      )
+      .join("");
+  }
+
+  function createConditionalVariableRow(data = {}, { onDelete } = {}) {
+    const row = document.createElement("div");
+    row.className = "shared-conditional-variable-row";
+    const key = normalizeConditionalVariableKey(data.key || data.name || "");
+    const poolId =
+      data.poolId || data.pool || data.source || "ranger-favored-enemies";
+    row.innerHTML = `
+      <div>
+        <label>Variable</label>
+        <input data-conditional-variable-field="key" class="form-control form-control-sm" value="${escapeHtml(key || "favored enemy")}" placeholder="favored enemy">
+      </div>
+      <div>
+        <label>Options</label>
+        <select data-conditional-variable-field="poolId" class="form-select form-select-sm">
+          ${conditionalVariablePoolOptionsHtml(poolId)}
+        </select>
+      </div>
+      <button class="btn btn-outline-danger btn-sm" type="button" aria-label="Delete conditional variable"><i class="bi bi-trash"></i></button>
+      <div class="small text-secondary">Use <code>{${escapeHtml(key || "favored enemy")}}</code> in Applies When.</div>
+    `;
+    const keyInput = row.querySelector('[data-conditional-variable-field="key"]');
+    const hint = row.querySelector(".small");
+    keyInput.addEventListener("input", () => {
+      const nextKey = normalizeConditionalVariableKey(keyInput.value);
+      hint.innerHTML = `Use <code>{${escapeHtml(nextKey || "variable")}}</code> in Applies When.`;
+    });
+    row
+      .querySelector('button[aria-label="Delete conditional variable"]')
+      .addEventListener("click", () => {
+        row.remove();
+        onDelete?.();
+      });
+    const collect = () => {
+      const key = normalizeConditionalVariableKey(keyInput.value);
+      if (!key) return null;
+      const poolId = row.querySelector(
+        '[data-conditional-variable-field="poolId"]',
+      ).value;
+      const pool = window.PFEffectStats?.conditionalVariablePoolById?.(poolId);
+      return {
+        key,
+        label: data.label || key.replace(/\b\w/g, (ch) => ch.toUpperCase()),
+        poolId,
+        poolLabel: pool?.label || data.poolLabel || "",
+      };
+    };
+    row._collect = collect;
+    return { element: row, collect };
   }
 
   function generatedEquipmentType(data = {}) {
@@ -1288,6 +1931,319 @@
           `<option value="${escapeHtml(option)}" ${selected === option ? "selected" : ""}>${escapeHtml(option)}</option>`,
       )
       .join("");
+  }
+
+  function optionObjectsHtml(options = [], selected = "") {
+    return options
+      .map(
+        (option) =>
+          `<option value="${escapeHtml(option.value)}" ${selected === option.value ? "selected" : ""}>${escapeHtml(option.label)}</option>`,
+      )
+      .join("");
+  }
+
+  function bonusTypeOptionsHtml(selected = "untyped") {
+    return BONUS_TYPES.map(
+      (type) =>
+        `<option value="${escapeHtml(type)}" ${selected === type ? "selected" : ""}>${escapeHtml(type)}</option>`,
+    ).join("");
+  }
+
+  function commaList(value) {
+    if (Array.isArray(value)) return value.map((entry) => String(entry || "").trim()).filter(Boolean);
+    return String(value || "")
+      .split(",")
+      .map((entry) => entry.trim())
+      .filter(Boolean);
+  }
+
+  function titleFromId(value) {
+    return String(value || "")
+      .split(/[-_\s]+/)
+      .filter(Boolean)
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  }
+
+  let spellDescriptorsPromise = null;
+  function loadSpellDescriptors() {
+    spellDescriptorsPromise ||= fetch("./data/spell-descriptors.json", {
+      cache: "no-cache",
+    })
+      .then((response) => (response.ok ? response.json() : {}))
+      .then((data) => (Array.isArray(data.descriptors) ? data.descriptors : []))
+      .catch(() => []);
+    return spellDescriptorsPromise;
+  }
+
+  let spellSubschoolsPromise = null;
+  function loadSpellSubschools() {
+    spellSubschoolsPromise ||= fetch("./data/spell-subschools.json", {
+      cache: "no-cache",
+    })
+      .then((response) => (response.ok ? response.json() : {}))
+      .then((data) => (Array.isArray(data.subschools) ? data.subschools : []))
+      .catch(() => []);
+    return spellSubschoolsPromise;
+  }
+
+  function spellAdjustmentTargets(data = {}) {
+    return commaList(
+      data.targets ||
+        data.values ||
+        data.names ||
+        data.spellNames ||
+        data.classes ||
+        data.schools ||
+        data.subschools ||
+        data.descriptors ||
+        data.magicTypes ||
+        data.target ||
+        "",
+    );
+  }
+
+  function spellAdjustmentMode(data = {}) {
+    const raw = String(
+      data.targetMode || data.chooseBy || data.by || data.mode || "all",
+    )
+      .trim()
+      .toLowerCase();
+    const aliases = {
+      class: "class",
+      classes: "class",
+      school: "school",
+      schools: "school",
+      subschool: "subschool",
+      subschools: "subschool",
+      "school with subschool": "subschool",
+      descriptor: "descriptor",
+      descriptors: "descriptor",
+      "type of magic": "magicType",
+      magictype: "magicType",
+      magic: "magicType",
+      spell: "spell",
+      spells: "spell",
+      name: "spell",
+      names: "spell",
+      all: "all",
+    };
+    return SPELL_TARGET_MODES.some((mode) => mode.value === aliases[raw])
+      ? aliases[raw]
+      : "all";
+  }
+
+  function spellAdjustmentTargetLabel(mode, value) {
+    if (mode === "subschool") {
+      const [school, subschool] = String(value || "").split(":");
+      return subschool
+        ? `${titleFromId(school)} (${titleFromId(subschool)})`
+        : titleFromId(value);
+    }
+    return mode === "spell" || mode === "class"
+      ? String(value || "")
+      : titleFromId(value);
+  }
+
+  function spellAdjustmentTargetText(mode, targets = []) {
+    if (mode === "all") return "all spells";
+    const label =
+      SPELL_TARGET_MODES.find((entry) => entry.value === mode)?.label || "Target";
+    return `${label}: ${targets.map((target) => spellAdjustmentTargetLabel(mode, target)).join(", ") || "any"}`;
+  }
+
+  async function spellAdjustmentSuggestions(mode) {
+    if (mode === "school") return SPELL_SCHOOL_OPTIONS;
+    if (mode === "magicType") return MAGIC_TYPE_OPTIONS;
+    if (mode === "descriptor") {
+      const descriptors = await loadSpellDescriptors();
+      return descriptors.map((name) => ({
+        value: name,
+        label: titleFromId(name),
+      }));
+    }
+    if (mode === "subschool") {
+      const subschools = await loadSpellSubschools();
+      return subschools.map((entry) => ({
+        value: `${entry.school}:${entry.id}`,
+        label: `${titleFromId(entry.school)} (${entry.name})`,
+      }));
+    }
+    if (mode === "spell") {
+      const spells = await loadSpellLikeSpellOptions();
+      return spells.map((spell) => ({
+        value: spell.name || spell.value,
+        label: spell.label || spell.name || spell.value,
+      }));
+    }
+    return [];
+  }
+
+  function createSpellAdjustmentRow(kind, data = {}, { onDelete } = {}) {
+    const row = document.createElement("div");
+    row.className = "shared-spell-adjustment-row";
+    const isCasterLevel = kind === "casterLevel";
+    const targetMode = spellAdjustmentMode(data);
+    const targets = spellAdjustmentTargets(data);
+    const appliesWhen = data.appliesWhen || data.condition || "";
+    const conditional =
+      Boolean(String(appliesWhen).trim()) || Boolean(data.conditional);
+    const datalistId = `spellAdjustmentTargets${++spellAdjustmentRowId}`;
+    row.innerHTML = `
+      <div>
+        <label>Choose By</label>
+        <select data-spell-adjustment-field="targetMode" class="form-select form-select-sm">
+          ${optionObjectsHtml(SPELL_TARGET_MODES, targetMode)}
+        </select>
+      </div>
+      <div data-spell-adjustment-targets-wrap>
+        <label>Targets</label>
+        <input data-spell-adjustment-field="targets" class="form-control form-control-sm" list="${datalistId}" value="${escapeHtml(targets.join(", "))}" placeholder="comma separated">
+        <datalist id="${datalistId}"></datalist>
+      </div>
+      ${
+        isCasterLevel
+          ? `<div>
+              <label>Applies To</label>
+              <select data-spell-adjustment-field="appliesTo" class="form-select form-select-sm">
+                ${optionObjectsHtml(CASTER_LEVEL_APPLY_TO_OPTIONS, data.appliesTo || data.applyTo || data.part || "spell")}
+              </select>
+            </div>`
+          : ""
+      }
+      <div>
+        <label>Value</label>
+        <input data-spell-adjustment-field="value" class="form-control form-control-sm" type="number" value="${Number(data.value ?? data.amount ?? 0)}">
+      </div>
+      <div>
+        <label>Type</label>
+        <select data-spell-adjustment-field="type" class="form-select form-select-sm">
+          ${bonusTypeOptionsHtml(data.type || "untyped")}
+        </select>
+      </div>
+      <div>
+        <label>Stacks</label>
+        <div class="form-check form-switch">
+          <input data-spell-adjustment-field="stacks" class="form-check-input" type="checkbox" ${data.stacks ? "checked" : ""}>
+        </div>
+      </div>
+      <button class="btn btn-outline-info btn-sm" type="button" data-scale-bonus>Scale</button>
+      <div>
+        <label>Conditional</label>
+        <div class="form-check form-switch">
+          <input data-spell-adjustment-field="conditional" class="form-check-input" type="checkbox" ${conditional ? "checked" : ""}>
+        </div>
+      </div>
+      <div>
+        <label>Applies When</label>
+        <input data-spell-adjustment-field="appliesWhen" class="form-control form-control-sm" value="${escapeHtml(appliesWhen)}" placeholder="only vs undead, only fire damage, etc.">
+      </div>
+      <button class="btn btn-outline-danger btn-sm" type="button" aria-label="Delete spell adjustment"><i class="bi bi-trash"></i></button>
+      <div class="small text-secondary" data-scale-summary></div>
+    `;
+    const modeSelect = row.querySelector('[data-spell-adjustment-field="targetMode"]');
+    const targetsWrap = row.querySelector("[data-spell-adjustment-targets-wrap]");
+    const targetsInput = row.querySelector('[data-spell-adjustment-field="targets"]');
+    const datalist = row.querySelector("datalist");
+    const syncTargets = async () => {
+      const mode = modeSelect.value;
+      targetsWrap.classList.toggle("d-none", mode === "all");
+      const suggestions = await spellAdjustmentSuggestions(mode);
+      datalist.innerHTML = suggestions
+        .map((option) => `<option value="${escapeHtml(option.value)}">${escapeHtml(option.label)}</option>`)
+        .join("");
+      const placeholder = {
+        class: "Wizard, Cleric",
+        school: "evocation, conjuration",
+        subschool: "conjuration:teleportation",
+        descriptor: "fire, mind-affecting",
+        magicType: "arcane, divine",
+        spell: "Fireball, Teleport",
+      }[mode];
+      targetsInput.placeholder = placeholder || "comma separated";
+    };
+    modeSelect.addEventListener("change", syncTargets);
+    wireScaleButton(
+      row,
+      data.bonusScale || data.scale || null,
+      row.querySelector("[data-scale-summary]"),
+      row.querySelector("[data-scale-bonus]"),
+    );
+    wireConditionalFromAppliesWhen(
+      row,
+      '[data-spell-adjustment-field="conditional"]',
+      '[data-spell-adjustment-field="appliesWhen"]',
+    );
+    row
+      .querySelector('button[aria-label="Delete spell adjustment"]')
+      .addEventListener("click", () => {
+        row.remove();
+        onDelete?.();
+      });
+    const collect = () => {
+      const mode = modeSelect.value || "all";
+      const targets = mode === "all" ? [] : commaList(targetsInput.value);
+      if (mode !== "all" && !targets.length) return null;
+      const appliesWhen = row
+        .querySelector('[data-spell-adjustment-field="appliesWhen"]')
+        .value.trim();
+      const entry = {
+        targetMode: mode,
+        targets,
+        value: Number(
+          row.querySelector('[data-spell-adjustment-field="value"]').value || 0,
+        ),
+        type:
+          row.querySelector('[data-spell-adjustment-field="type"]').value ||
+          "untyped",
+        stacks: row.querySelector('[data-spell-adjustment-field="stacks"]')
+          .checked,
+        conditional:
+          row.querySelector('[data-spell-adjustment-field="conditional"]')
+            .checked || Boolean(appliesWhen),
+        appliesWhen,
+      };
+      if (isCasterLevel) {
+        entry.appliesTo =
+          row.querySelector('[data-spell-adjustment-field="appliesTo"]')
+            ?.value || "spell";
+      }
+      if (row._bonusScale) entry.bonusScale = row._bonusScale;
+      return entry.value || entry.bonusScale ? entry : null;
+    };
+    row._collect = collect;
+    syncTargets();
+    return { element: row, collect };
+  }
+
+  function casterLevelBonusText(entry = {}) {
+    const value = Number(entry.value || 0);
+    const scale = scaleText(entry.bonusScale || entry.scale || null);
+    const appliesTo = CASTER_LEVEL_APPLY_TO_OPTIONS.find(
+      (option) => option.value === (entry.appliesTo || entry.applyTo || "spell"),
+    )?.label;
+    return [
+      `Caster Level ${value >= 0 ? "+" : ""}${value}`,
+      scale ? `scales: ${scale}` : "",
+      appliesTo || "Whole Spell",
+      spellAdjustmentTargetText(spellAdjustmentMode(entry), spellAdjustmentTargets(entry)),
+      entry.appliesWhen ? `when ${entry.appliesWhen}` : "",
+    ]
+      .filter(Boolean)
+      .join(" | ");
+  }
+
+  function spellDcBonusText(entry = {}) {
+    const value = Number(entry.value || 0);
+    const scale = scaleText(entry.bonusScale || entry.scale || null);
+    return [
+      `Spell DC ${value >= 0 ? "+" : ""}${value}`,
+      scale ? `scales: ${scale}` : "",
+      spellAdjustmentTargetText(spellAdjustmentMode(entry), spellAdjustmentTargets(entry)),
+      entry.appliesWhen ? `when ${entry.appliesWhen}` : "",
+    ]
+      .filter(Boolean)
+      .join(" | ");
   }
 
   function fillGeneratedEquipmentRow(row, item = {}) {
@@ -1553,6 +2509,7 @@
     const row = document.createElement("div");
     row.className = "shared-spell-like-row";
     row._spell = compactSpellPayload(data.spell) || null;
+    row._spellChoiceList = spellLikeChoiceList(data);
     row.innerHTML = `
       <div>
         <label>Level</label>
@@ -1564,10 +2521,13 @@
       </div>
       <div>
         <label>Spell</label>
-        <button class="btn btn-outline-light btn-sm w-100 shared-spell-like-picker" type="button" data-spell-like-select>
-          <span data-spell-like-name>${escapeHtml(spellLikeAbilityName(data) || "Choose spell")}</span>
-          <i class="bi bi-search"></i>
-        </button>
+        <div class="shared-spell-like-spell-actions">
+          <button class="btn btn-outline-light btn-sm w-100 shared-spell-like-picker" type="button" data-spell-like-select>
+            <span data-spell-like-name>${escapeHtml(spellLikeChoiceListText(data) || spellLikeAbilityName(data) || "Choose spell")}</span>
+            <i class="bi bi-search"></i>
+          </button>
+          <button class="btn btn-outline-info btn-sm btn-icon" type="button" data-spell-like-list-select title="Choose SLA spell list" aria-label="Choose SLA spell list"><i class="bi bi-journal-text"></i></button>
+        </div>
       </div>
       <div>
         <label>Casting Attr.</label>
@@ -1587,7 +2547,20 @@
     const spellLabel = row.querySelector("[data-spell-like-name]");
     const setSpell = (spell) => {
       row._spell = compactSpellPayload(spell);
+      row._spellChoiceList = null;
       spellLabel.textContent = row._spell?.name || "Choose spell";
+    };
+    const setSpellChoiceList = (list) => {
+      if (list?.clear) {
+        row._spellChoiceList = null;
+        spellLabel.textContent = row._spell?.name || "Choose spell";
+        return;
+      }
+      row._spell = null;
+      row._spellChoiceList = normalizeSpellLikeChoiceList(list);
+      spellLabel.textContent = row._spellChoiceList
+        ? `Choose from ${row._spellChoiceList.name}`
+        : "Choose spell";
     };
     row
       .querySelector("[data-spell-like-select]")
@@ -1599,6 +2572,12 @@
         if (spell) setSpell(spell);
       });
     row
+      .querySelector("[data-spell-like-list-select]")
+      .addEventListener("click", async () => {
+        const list = await openSpellLikeListPicker();
+        if (list) setSpellChoiceList(list);
+      });
+    row
       .querySelector('button[aria-label="Delete spell-like ability"]')
       .addEventListener("click", () => {
         row.remove();
@@ -1606,8 +2585,12 @@
       });
     const collect = () => {
       const spellName = row._spell?.name || spellLabel.textContent.trim();
-      if (!spellName || spellName === "Choose spell") return null;
-      return {
+      if (
+        (!spellName || spellName === "Choose spell") &&
+        !row._spellChoiceList
+      )
+        return null;
+      const payload = {
         minimumLevel: spellLikeMinimumLevel({
           minimumLevel: row.querySelector('[data-spell-like-field="minimumLevel"]')
             .value,
@@ -1615,8 +2598,6 @@
         frequency: row
           .querySelector('[data-spell-like-field="frequency"]')
           .value.trim(),
-        spellName,
-        spell: row._spell || { name: spellName },
         ...(row.querySelector('[data-spell-like-field="castingAttr"]').value
           ? {
               castingAttr: row.querySelector(
@@ -1633,22 +2614,29 @@
             }
           : {}),
       };
+      if (row._spellChoiceList) {
+        payload.spellChoiceListId = row._spellChoiceList.id;
+        payload.spellChoiceList = row._spellChoiceList;
+      } else {
+        payload.spellName = spellName;
+      }
+      return payload;
     };
     row._collect = collect;
     return { element: row, collect };
   }
 
-  // DR, Immunities, SR, Class Skill grants, Size Changes, Spell-Like Abilities,
-  // and generated equipped weapons/armor
+  // DR, Immunities, SR, applied conditions, Class Skill grants, Size Changes,
+  // caster level/DC bonuses, Spell-Like Abilities, and generated equipped weapons/armor
   // are separate things but they're always authored together and rarely
   // used -- one collapsed "Extra" accordion item holding all of them is
   // what every effect-authoring surface in the app mounts now, built
   // here once so there's exactly one place defining what "Extra" means.
   //
   // Spell-Like Abilities are stored as spellLikeAbilities:
-  // [{ minimumLevel, frequency, spellName, spell }]. spellName is the
-  // stable display key; spell keeps the selected spell details handy
-  // for later sheet UI. minimumLevel defaults to 1 for old rows.
+  // [{ minimumLevel, frequency, spellName }]. spellName is the stable
+  // display key and resolves to data/spells.json when full details are needed.
+  // minimumLevel defaults to 1 for old rows.
   //
   // container: the element to fill with the accordion-item markup.
   // options.idPrefix: unique id prefix for this mount (required --
@@ -1700,10 +2688,24 @@
             </div>
             <div class="shared-extra-subsection">
               <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
+                <div class="small text-secondary">Apply Condition</div>
+                <button id="${prefix}AddApplyCondition" class="btn btn-outline-info btn-sm" type="button">Add Condition</button>
+              </div>
+              <div id="${prefix}ApplyConditionRows" class="vstack gap-2"></div>
+            </div>
+            <div class="shared-extra-subsection">
+              <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
                 <div class="small text-secondary">Class Skills</div>
                 <button id="${prefix}AddClassSkill" class="btn btn-outline-info btn-sm" type="button">Add Class Skill</button>
               </div>
               <div id="${prefix}ClassSkillRows" class="vstack gap-2"></div>
+            </div>
+            <div class="shared-extra-subsection">
+              <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
+                <div class="small text-secondary">Extra Ranks Per Level</div>
+                <button id="${prefix}AddExtraRanksPerLevel" class="btn btn-outline-info btn-sm" type="button">Add Ranks</button>
+              </div>
+              <div id="${prefix}ExtraRanksPerLevelRows" class="vstack gap-2"></div>
             </div>
             <div class="shared-extra-subsection">
               <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
@@ -1721,10 +2723,31 @@
             </div>
             <div class="shared-extra-subsection">
               <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
+                <div class="small text-secondary">Caster Level Bonuses</div>
+                <button id="${prefix}AddCasterLevelBonus" class="btn btn-outline-info btn-sm" type="button">Add Caster Level</button>
+              </div>
+              <div id="${prefix}CasterLevelBonusRows" class="vstack gap-2"></div>
+            </div>
+            <div class="shared-extra-subsection">
+              <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
+                <div class="small text-secondary">Spell DC Bonuses</div>
+                <button id="${prefix}AddSpellDcBonus" class="btn btn-outline-info btn-sm" type="button">Add Spell DC</button>
+              </div>
+              <div id="${prefix}SpellDcBonusRows" class="vstack gap-2"></div>
+            </div>
+            <div class="shared-extra-subsection">
+              <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
                 <div class="small text-secondary">Generated Equipment</div>
                 <button id="${prefix}AddGeneratedEquipment" class="btn btn-outline-info btn-sm" type="button">Add Weapon / Armor</button>
               </div>
               <div id="${prefix}GeneratedEquipmentRows" class="vstack gap-2"></div>
+            </div>
+            <div class="shared-extra-subsection">
+              <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
+                <div class="small text-secondary">Conditional Variables</div>
+                <button id="${prefix}AddConditionalVariable" class="btn btn-outline-info btn-sm" type="button">Add Variable</button>
+              </div>
+              <div id="${prefix}ConditionalVariableRows" class="vstack gap-2"></div>
             </div>
           </div>
         </div>
@@ -1734,11 +2757,24 @@
     const drRowsEl = document.getElementById(`${prefix}DrRows`);
     const srRowsEl = document.getElementById(`${prefix}SrRows`);
     const immunityRowsEl = document.getElementById(`${prefix}ImmunityRows`);
+    const applyConditionRowsEl = document.getElementById(
+      `${prefix}ApplyConditionRows`,
+    );
     const csRowsEl = document.getElementById(`${prefix}ClassSkillRows`);
+    const extraRanksRowsEl = document.getElementById(
+      `${prefix}ExtraRanksPerLevelRows`,
+    );
     const sizeRowsEl = document.getElementById(`${prefix}SizeChangeRows`);
     const slaRowsEl = document.getElementById(`${prefix}SpellLikeAbilityRows`);
+    const casterLevelRowsEl = document.getElementById(
+      `${prefix}CasterLevelBonusRows`,
+    );
+    const spellDcRowsEl = document.getElementById(`${prefix}SpellDcBonusRows`);
     const generatedEquipmentRowsEl = document.getElementById(
       `${prefix}GeneratedEquipmentRows`,
+    );
+    const conditionalVariableRowsEl = document.getElementById(
+      `${prefix}ConditionalVariableRows`,
     );
     const countBadge = document.getElementById(`${prefix}Count`);
 
@@ -1747,10 +2783,15 @@
         drRowsEl.children.length +
         srRowsEl.children.length +
         immunityRowsEl.children.length +
+        applyConditionRowsEl.children.length +
         csRowsEl.children.length +
+        extraRanksRowsEl.children.length +
         sizeRowsEl.children.length +
         slaRowsEl.children.length +
-        generatedEquipmentRowsEl.children.length;
+        casterLevelRowsEl.children.length +
+        spellDcRowsEl.children.length +
+        generatedEquipmentRowsEl.children.length +
+        conditionalVariableRowsEl.children.length;
       if (countBadge) {
         countBadge.textContent = count ? String(count) : "";
         countBadge.classList.toggle("d-none", !count);
@@ -1773,12 +2814,26 @@
       immunityRowsEl.appendChild(element);
       updateCount();
     };
+    const addApplyCondition = (data = {}) => {
+      const { element } = createApplyConditionRow(data, {
+        onDelete: updateCount,
+      });
+      applyConditionRowsEl.appendChild(element);
+      updateCount();
+    };
     const addClassSkill = (data = {}) => {
       const { element } = createClassSkillRow(data, {
         onDelete: updateCount,
         skills: options.skills,
       });
       csRowsEl.appendChild(element);
+      updateCount();
+    };
+    const addExtraRanksPerLevel = (data = {}) => {
+      const { element } = createExtraRanksPerLevelRow(data, {
+        onDelete: updateCount,
+      });
+      extraRanksRowsEl.appendChild(element);
       updateCount();
     };
     const addSizeChange = (data = {}) => {
@@ -1795,11 +2850,32 @@
       slaRowsEl.appendChild(element);
       updateCount();
     };
+    const addCasterLevelBonus = (data = {}) => {
+      const { element } = createSpellAdjustmentRow("casterLevel", data, {
+        onDelete: updateCount,
+      });
+      casterLevelRowsEl.appendChild(element);
+      updateCount();
+    };
+    const addSpellDcBonus = (data = {}) => {
+      const { element } = createSpellAdjustmentRow("spellDc", data, {
+        onDelete: updateCount,
+      });
+      spellDcRowsEl.appendChild(element);
+      updateCount();
+    };
     const addGeneratedEquipment = (data = {}) => {
       const { element } = createGeneratedEquipmentRow(data, {
         onDelete: updateCount,
       });
       generatedEquipmentRowsEl.appendChild(element);
+      updateCount();
+    };
+    const addConditionalVariable = (data = {}) => {
+      const { element } = createConditionalVariableRow(data, {
+        onDelete: updateCount,
+      });
+      conditionalVariableRowsEl.appendChild(element);
       updateCount();
     };
 
@@ -1813,8 +2889,14 @@
       .getElementById(`${prefix}AddImmunity`)
       .addEventListener("click", () => addImmunity());
     document
+      .getElementById(`${prefix}AddApplyCondition`)
+      .addEventListener("click", () => addApplyCondition());
+    document
       .getElementById(`${prefix}AddClassSkill`)
       .addEventListener("click", () => addClassSkill());
+    document
+      .getElementById(`${prefix}AddExtraRanksPerLevel`)
+      .addEventListener("click", () => addExtraRanksPerLevel());
     document
       .getElementById(`${prefix}AddSizeChange`)
       .addEventListener("click", () => addSizeChange());
@@ -1822,8 +2904,17 @@
       .getElementById(`${prefix}AddSpellLikeAbility`)
       .addEventListener("click", () => addSpellLikeAbility());
     document
+      .getElementById(`${prefix}AddCasterLevelBonus`)
+      .addEventListener("click", () => addCasterLevelBonus());
+    document
+      .getElementById(`${prefix}AddSpellDcBonus`)
+      .addEventListener("click", () => addSpellDcBonus());
+    document
       .getElementById(`${prefix}AddGeneratedEquipment`)
       .addEventListener("click", () => addGeneratedEquipment());
+    document
+      .getElementById(`${prefix}AddConditionalVariable`)
+      .addEventListener("click", () => addConditionalVariable());
 
     const collectRows = (rowsEl) =>
       [...rowsEl.querySelectorAll(":scope > *")]
@@ -1834,18 +2925,28 @@
       addDr,
       addSr,
       addImmunity,
+      addApplyCondition,
       addClassSkill,
+      addExtraRanksPerLevel,
       addSizeChange,
       addSpellLikeAbility,
+      addCasterLevelBonus,
+      addSpellDcBonus,
       addGeneratedEquipment,
+      addConditionalVariable,
       reset(item = {}) {
         drRowsEl.innerHTML = "";
         srRowsEl.innerHTML = "";
         immunityRowsEl.innerHTML = "";
+        applyConditionRowsEl.innerHTML = "";
         csRowsEl.innerHTML = "";
+        extraRanksRowsEl.innerHTML = "";
         sizeRowsEl.innerHTML = "";
         slaRowsEl.innerHTML = "";
+        casterLevelRowsEl.innerHTML = "";
+        spellDcRowsEl.innerHTML = "";
         generatedEquipmentRowsEl.innerHTML = "";
+        conditionalVariableRowsEl.innerHTML = "";
         (Array.isArray(item.damageReduction) ? item.damageReduction : []).forEach(
           addDr,
         );
@@ -1855,9 +2956,17 @@
         (Array.isArray(item.immunities) ? item.immunities : []).forEach(
           addImmunity,
         );
+        (Array.isArray(item.applyConditions)
+          ? item.applyConditions
+          : []
+        ).forEach(addApplyCondition);
         (Array.isArray(item.classSkillGrants) ? item.classSkillGrants : []).forEach(
           addClassSkill,
         );
+        (Array.isArray(item.extraRanksPerLevel)
+          ? item.extraRanksPerLevel
+          : []
+        ).forEach(addExtraRanksPerLevel);
         (Array.isArray(item.sizeChanges) ? item.sizeChanges : []).forEach(
           addSizeChange,
         );
@@ -1865,10 +2974,22 @@
           ? item.spellLikeAbilities
           : []
         ).forEach(addSpellLikeAbility);
+        (Array.isArray(item.casterLevelBonuses)
+          ? item.casterLevelBonuses
+          : []
+        ).forEach(addCasterLevelBonus);
+        (Array.isArray(item.spellDcBonuses)
+          ? item.spellDcBonuses
+          : []
+        ).forEach(addSpellDcBonus);
         (Array.isArray(item.generatedEquipment)
           ? item.generatedEquipment
           : []
         ).forEach(addGeneratedEquipment);
+        (Array.isArray(item.conditionalVariables)
+          ? item.conditionalVariables
+          : []
+        ).forEach(addConditionalVariable);
         updateCount();
       },
       collect() {
@@ -1876,10 +2997,15 @@
           damageReduction: collectRows(drRowsEl),
           spellResistance: collectRows(srRowsEl),
           immunities: collectRows(immunityRowsEl),
+          applyConditions: collectRows(applyConditionRowsEl),
           classSkillGrants: collectRows(csRowsEl),
+          extraRanksPerLevel: collectRows(extraRanksRowsEl),
           sizeChanges: collectRows(sizeRowsEl),
           spellLikeAbilities: collectRows(slaRowsEl),
+          casterLevelBonuses: collectRows(casterLevelRowsEl),
+          spellDcBonuses: collectRows(spellDcRowsEl),
           generatedEquipment: collectRows(generatedEquipmentRowsEl),
+          conditionalVariables: collectRows(conditionalVariableRowsEl),
         };
       },
     };
@@ -1914,7 +3040,7 @@
   // Returns { addEffect, addDr, addSr, addImmunity, addClassSkill,
   // reset(item), collect() }. reset(item) populates each mechanic list;
   // collect() returns { [effectsKey]: [...], damageReduction,
-  // spellResistance, immunities, classSkillGrants, ... }.
+  // spellResistance, immunities, applyConditions, classSkillGrants, ... }.
   function mountEffectsAccordion(container, options = {}) {
     const prefix = options.idPrefix;
     const parentId =
@@ -1984,10 +3110,15 @@
       addDr: extra.addDr,
       addSr: extra.addSr,
       addImmunity: extra.addImmunity,
+      addApplyCondition: extra.addApplyCondition,
       addClassSkill: extra.addClassSkill,
+      addExtraRanksPerLevel: extra.addExtraRanksPerLevel,
       addSizeChange: extra.addSizeChange,
       addSpellLikeAbility: extra.addSpellLikeAbility,
+      addCasterLevelBonus: extra.addCasterLevelBonus,
+      addSpellDcBonus: extra.addSpellDcBonus,
       addGeneratedEquipment: extra.addGeneratedEquipment,
+      addConditionalVariable: extra.addConditionalVariable,
       reset(item = {}) {
         const effectsKey = options.effectsKey || "effects";
         effectRowsEl.innerHTML = "";
@@ -2010,15 +3141,24 @@
     titleCaseStat,
     bonusStatOptionsHtml,
     createBonusRow,
+    attributeRequirementText,
     skillStatOptionsHtml,
     namedSkill,
     skillKey,
     createDrRow,
     createSrRow,
     createImmunityRow,
+    createApplyConditionRow,
+    applyConditionText,
+    createConditionalVariableRow,
     createClassSkillRow,
+    createExtraRanksPerLevelRow,
+    extraRanksPerLevelText,
     createSizeChangeRow,
     createSpellLikeAbilityRow,
+    createSpellAdjustmentRow,
+    casterLevelBonusText,
+    spellDcBonusText,
     createGeneratedEquipmentRow,
     mountExtraAccordion,
     mountEffectsAccordion,

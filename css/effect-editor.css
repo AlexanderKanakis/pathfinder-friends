@@ -2,14 +2,49 @@
 .shared-dr-row label,
 .shared-sr-row label,
 .shared-immunity-row label,
+.shared-apply-condition-row label,
 .shared-class-skill-row label,
+.shared-extra-ranks-row label,
 .shared-size-change-row label,
 .shared-spell-like-row label,
-.shared-generated-equipment-row label {
+.shared-spell-adjustment-row label,
+.shared-generated-equipment-row label,
+.shared-conditional-variable-row label {
   display: block;
   color: #fff;
   font-size: 12px;
   margin-bottom: 3px;
+}
+
+.shared-extra-ranks-row {
+  display: grid;
+  grid-template-columns: minmax(120px, 180px) auto;
+  gap: 8px;
+  align-items: end;
+}
+
+.shared-apply-condition-row {
+  display: grid;
+  grid-template-columns: minmax(150px, 1fr) auto;
+  gap: 8px;
+  align-items: end;
+  border: 1px solid #495057;
+  border-radius: 6px;
+  padding: 10px;
+}
+
+.shared-conditional-variable-row {
+  display: grid;
+  grid-template-columns: minmax(150px, 0.8fr) minmax(180px, 1fr) auto;
+  gap: 8px;
+  align-items: end;
+  border: 1px solid #495057;
+  border-radius: 6px;
+  padding: 10px;
+}
+
+.shared-conditional-variable-row .small {
+  grid-column: 1 / -1;
 }
 
 .shared-spell-like-row {
@@ -35,9 +70,41 @@
   text-align: left;
 }
 
+.shared-spell-like-spell-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 31px;
+  gap: 4px;
+}
+
 .shared-spell-like-row .form-control,
-.shared-spell-like-row .form-select {
+.shared-spell-like-row .form-select,
+.shared-spell-adjustment-row .form-control,
+.shared-spell-adjustment-row .form-select {
   min-width: 0;
+}
+
+.shared-spell-adjustment-row {
+  display: grid;
+  grid-template-columns:
+    minmax(120px, 0.8fr)
+    minmax(180px, 1.4fr)
+    minmax(110px, 0.7fr)
+    minmax(74px, 0.4fr)
+    minmax(104px, 0.65fr)
+    auto
+    auto
+    auto
+    minmax(170px, 1fr)
+    auto;
+  gap: 8px;
+  align-items: end;
+  border: 1px solid #495057;
+  border-radius: 6px;
+  padding: 10px;
+}
+
+.shared-spell-adjustment-row [data-scale-summary] {
+  grid-column: 1 / -1;
 }
 
 .shared-spell-like-picker span {
@@ -75,6 +142,18 @@
     grid-template-columns: 1fr;
   }
 
+  .shared-spell-adjustment-row {
+    grid-template-columns: 1fr;
+  }
+
+  .shared-apply-condition-row {
+    grid-template-columns: 1fr;
+  }
+
+  .shared-conditional-variable-row {
+    grid-template-columns: 1fr;
+  }
+
   .shared-generated-equipment-header,
   .shared-generated-equipment-fields {
     grid-template-columns: 1fr;
@@ -82,6 +161,9 @@
 
   .shared-spell-like-row .btn-icon,
   .shared-spell-like-row button[aria-label="Delete spell-like ability"],
+  .shared-spell-adjustment-row button,
+  .shared-apply-condition-row button,
+  .shared-conditional-variable-row button,
   .shared-generated-equipment-row button {
     width: 100%;
   }

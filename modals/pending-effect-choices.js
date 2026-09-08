@@ -11,6 +11,20 @@
 // shows up in the same panel, answered one at a time.
 (function () {
   const PANEL_ID = "pendingEffectChoicesPanel";
+  const CHOICE_POOL_MECHANIC_KEYS = [
+    "damageReduction",
+    "spellResistance",
+    "immunities",
+    "applyConditions",
+    "classSkillGrants",
+    "extraRanksPerLevel",
+    "sizeChanges",
+    "spellLikeAbilities",
+    "casterLevelBonuses",
+    "spellDcBonuses",
+    "generatedEquipment",
+    "conditionalVariables",
+  ];
   let pollTimer = null;
   let pollOptions = null;
   const resolving = new Set();
@@ -154,9 +168,357 @@
           })
         : null;
       if (!picked) return null;
-      resolved.push({ ...item, stat: picked });
+      resolved.push(
+        typeof picked === "object"
+          ? { ...item, stat: picked.value, skillName: picked.skillName }
+          : { ...item, stat: picked },
+      );
     }
     return resolved;
+  }
+
+  function bonusUsesFavoredEnemyScale(bonus = {}) {
+    const source = (bonus.bonusScale || bonus.scale || {}).source || {};
+    return source.type === "special" && source.special === "favored-enemy-bonus";
+  }
+
+  function favoredEnemyScaleTarget(bonus = {}) {
+    return (
+      bonus.bonusScale?.favoredEnemyTarget ||
+      bonus.bonusScale?.target ||
+      bonus.scale?.favoredEnemyTarget ||
+      bonus.scale?.target ||
+      bonus.favoredEnemyTarget ||
+      bonus.targetFavoredEnemy ||
+      ""
+    );
+  }
+
+  function needsFavoredEnemyScaleChoice(bonus = {}) {
+    if (!bonusUsesFavoredEnemyScale(bonus)) return false;
+    if (favoredEnemyScaleTarget(bonus)) return false;
+    return (
+      !bonus.appliesWhen ||
+      /favou?red enemy|\{[^{}]+\}/i.test(bonus.appliesWhen)
+    );
+  }
+
+  async function resolveFavoredEnemyScaleTargets(items = [], request = {}) {
+    const list = Array.isArray(items) ? items : [];
+    if (!list.some(needsFavoredEnemyScaleChoice)) return list;
+    const options = pollOptions?.favoredEnemyOptionsFor?.(request.character_id) || [];
+    if (!options.length) return null;
+    const resolved = [];
+    for (const item of list) {
+      if (!needsFavoredEnemyScaleChoice(item)) {
+        resolved.push(item);
+        continue;
+      }
+      const picked = window.PFEffectChoicePicker
+        ? await window.PFEffectChoicePicker.open({
+            title: `${request.effect_name || "Effect"}${request.characterName ? ` (${request.characterName})` : ""}: Choose Favored Enemy`,
+            options,
+          })
+        : null;
+      if (!picked) return null;
+      const target =
+        typeof picked === "object"
+          ? picked.favoredEnemyTarget || picked.name || picked.value
+          : String(picked || "");
+      if (!target) return null;
+      const scale = item.bonusScale || item.scale || {};
+      resolved.push({
+        ...item,
+        bonusScale: { ...scale, favoredEnemyTarget: target },
+        favoredEnemyTarget: target,
+        conditional: true,
+        appliesWhen:
+          !item.appliesWhen || /favou?red enemy|\{[^{}]+\}/i.test(item.appliesWhen)
+            ? `against ${target}`
+            : item.appliesWhen,
+      });
+    }
+    return resolved;
+  }
+
+  function spellLikeChoiceList(entry = {}) {
+    return (
+      entry.spellChoiceList ||
+      window.PFEffectStats?.customSpellLikeListById?.(
+        entry.spellChoiceListId || "",
+      ) ||
+      null
+    );
+  }
+
+  async function resolveSpellLikeAbilityChoices(entries, request) {
+    const list = Array.isArray(entries) ? entries : [];
+    if (!list.some(spellLikeChoiceList)) return list;
+    const resolved = [];
+    for (const entry of list) {
+      const choiceList = spellLikeChoiceList(entry);
+      if (!choiceList) {
+        resolved.push(entry);
+        continue;
+      }
+      const spells = (choiceList.items || []).map((item) => ({
+        name: item.name || item.spellName || item.label || item.value,
+        spellName: item.name || item.spellName || item.label || item.value,
+      }));
+      const picked = window.PFMagicSearchModal
+        ? await window.PFMagicSearchModal.open({
+            title: `${request.effect_name || "Effect"}: Choose SLA`,
+            spells,
+          })
+        : null;
+      if (!picked) return null;
+      const { spellChoiceList, spellChoiceListId, ...rest } = entry;
+      resolved.push({
+        ...rest,
+        spellName: picked.name || picked.spellName || "Spell",
+      });
+    }
+    return resolved;
+  }
+
+  function conditionalVariables(effect = {}) {
+    return Array.isArray(effect.conditionalVariables)
+      ? effect.conditionalVariables
+      : [];
+  }
+
+  function normalizeConditionalVariableKey(value = "") {
+    return String(value || "")
+      .trim()
+      .toLowerCase()
+      .replace(/[{}]/g, "")
+      .replace(/\s+/g, " ");
+  }
+
+  function cleanFavoredEnemyLabel(value = "") {
+    return String(value || "")
+      .replace(/\s*\([+-]?\d+\)\s*$/g, "")
+      .trim();
+  }
+
+  function conditionalVariableTokenValue(key = "", choice = {}) {
+    const fallback = choice?.label || choice?.name || choice?.value || "";
+    return normalizeConditionalVariableKey(key).startsWith("favored enemy")
+      ? cleanFavoredEnemyLabel(choice?.value || choice?.name || fallback)
+      : fallback;
+  }
+
+  function conditionalChoiceLabel(choices = {}, key = "") {
+    const wanted = normalizeConditionalVariableKey(key);
+    if (!wanted) return "";
+    const entry = Object.entries(choices || {}).find(
+      ([choiceKey]) => normalizeConditionalVariableKey(choiceKey) === wanted,
+    )?.[1];
+    return normalizeConditionalVariableKey(key).startsWith("favored enemy")
+      ? cleanFavoredEnemyLabel(entry?.value || entry?.name || entry?.label || "")
+      : entry?.label || entry?.name || entry?.value || "";
+  }
+
+  function favoredEnemyOptionsWithTargets(options = [], targets = []) {
+    const byTarget = new Map();
+    const add = (option = {}) => {
+      const target = cleanFavoredEnemyLabel(
+        option.favoredEnemyTarget || option.name || option.value || option.label || "",
+      );
+      if (!target) return;
+      const key = target.toLowerCase().replace(/[^a-z0-9]+/g, "");
+      if (!key || byTarget.has(key)) return;
+      byTarget.set(key, {
+        ...option,
+        value: target,
+        name: target,
+        favoredEnemyTarget: target,
+        label: target,
+      });
+    };
+    (Array.isArray(options) ? options : []).forEach(add);
+    targets.forEach((target) =>
+      add({
+        value: target,
+        label: target,
+        name: target,
+        favoredEnemyTarget: target,
+      }),
+    );
+    return [...byTarget.values()].sort((a, b) =>
+      String(a.name || "").localeCompare(String(b.name || "")),
+    );
+  }
+
+  function replaceConditionalVariableTokens(text = "", choices = {}) {
+    return String(text || "").replace(/\{([^{}]+)\}/g, (match, key) => {
+      const choice = choices[normalizeConditionalVariableKey(key)];
+      return choice ? conditionalVariableTokenValue(key, choice) || match : match;
+    });
+  }
+
+  function interpolateConditionalVariables(value, choices = {}) {
+    if (Array.isArray(value))
+      return value.map((item) => interpolateConditionalVariables(item, choices));
+    if (value && typeof value === "object") {
+      return Object.fromEntries(
+        Object.entries(value).map(([key, entry]) => [
+          key,
+          interpolateConditionalVariables(entry, choices),
+        ]),
+      );
+    }
+    if (typeof value === "string")
+      return replaceConditionalVariableTokens(value, choices);
+    return value;
+  }
+
+  async function resolveConditionalVariables(effect = {}, request = {}) {
+    const variables = conditionalVariables(effect)
+      .map((variable) => ({
+        ...variable,
+        key: normalizeConditionalVariableKey(
+          variable.key || variable.name || variable.label,
+        ),
+        poolId:
+          variable.poolId ||
+          variable.pool ||
+          variable.source ||
+          "ranger-favored-enemies",
+      }))
+      .filter((variable) => variable.key);
+    if (!variables.length) return effect;
+    const choices = { ...(effect.conditionalChoices || {}) };
+    for (const variable of variables) {
+      if (choices[variable.key]) continue;
+      const pool = window.PFEffectStats?.conditionalVariablePoolById?.(
+        variable.poolId,
+      );
+      const additionalTargets = [
+        conditionalChoiceLabel(choices, "favored enemy"),
+      ].filter(Boolean);
+      const options =
+        variable.poolId === "character-favored-enemies"
+          ? favoredEnemyOptionsWithTargets(
+              pollOptions?.favoredEnemyOptionsFor?.(request.character_id) || [],
+              additionalTargets,
+            )
+          : (await window.PFEffectStats?.resolveConditionalVariableOptions?.(
+              variable.poolId,
+            )) || [];
+      const picked = window.PFEffectChoicePicker
+        ? await window.PFEffectChoicePicker.open({
+            title: `${request.effect_name || effect.name || "Effect"}${request.characterName ? ` (${request.characterName})` : ""}: Choose ${variable.label || variable.key}`,
+            options,
+          })
+        : null;
+      if (!picked) return null;
+      const pickedValue =
+        typeof picked === "object" ? picked.value : String(picked || "");
+      const pickedOption =
+        options.find((option) => String(option.value) === pickedValue) ||
+        (typeof picked === "object" ? picked : null);
+      choices[variable.key] = {
+        value: pickedValue,
+        label: pickedOption?.label || pickedValue,
+        poolId: variable.poolId,
+        poolLabel: pool?.label || variable.poolLabel || "",
+      };
+    }
+    return interpolateConditionalVariables(
+      {
+        ...effect,
+        conditionalVariables: variables,
+        conditionalChoices: choices,
+      },
+      choices,
+    );
+  }
+  function choicePools(effect = {}) {
+    return Array.isArray(effect.choicePools)
+      ? effect.choicePools
+      : Array.isArray(effect.pools)
+        ? effect.pools
+        : [];
+  }
+
+  function appendChoicePoolMechanics(target = {}, option = {}) {
+    const effects = Array.isArray(option.effects)
+      ? option.effects
+      : Array.isArray(option.bonuses)
+        ? option.bonuses
+        : [];
+    if (effects.length) {
+      target.bonuses = [
+        ...(Array.isArray(target.bonuses) ? target.bonuses : []),
+        ...effects,
+      ];
+    }
+    CHOICE_POOL_MECHANIC_KEYS.forEach((key) => {
+      const rows = Array.isArray(option[key]) ? option[key] : [];
+      if (!rows.length) return;
+      target[key] = [
+        ...(Array.isArray(target[key]) ? target[key] : []),
+        ...rows,
+      ];
+    });
+  }
+
+  async function resolveChoicePoolOptionMechanics(option = {}, request = {}) {
+    const choiceResolvedEffects = await resolveChoiceStats(
+      option.effects || option.bonuses,
+      request,
+    );
+    if (choiceResolvedEffects === null) return null;
+    const resolvedEffects = await resolveFavoredEnemyScaleTargets(
+      choiceResolvedEffects,
+      request,
+    );
+    if (resolvedEffects === null) return null;
+    const resolvedClassSkillGrants = await resolveChoiceStats(
+      option.classSkillGrants,
+      request,
+    );
+    if (resolvedClassSkillGrants === null) return null;
+    const resolvedSpellLikeAbilities = await resolveSpellLikeAbilityChoices(
+      option.spellLikeAbilities,
+      request,
+    );
+    if (resolvedSpellLikeAbilities === null) return null;
+    return {
+      ...option,
+      effects: resolvedEffects,
+      classSkillGrants: resolvedClassSkillGrants,
+      spellLikeAbilities: resolvedSpellLikeAbilities,
+    };
+  }
+
+  async function resolveChoicePools(effect = {}, request = {}) {
+    const pools = choicePools(effect);
+    if (!pools.length) return {};
+    if (!window.PFClassFeatureChoicePicker) return null;
+    const mechanics = {};
+    for (const [index, pool] of pools.entries()) {
+      const poolKey = pool.name || `Choice ${index + 1}`;
+      const choice = await PFClassFeatureChoicePicker.open({
+        title: `${request.effect_name || effect.name || "Effect"}: ${pool.name || "Choose Feature"}`,
+        poolName: pool.name || "Effect Choice",
+        description: pool.description || "",
+        selected: effect.poolChoices?.[poolKey] || "",
+        options: Array.isArray(pool.options) ? pool.options : [],
+      });
+      if (choice === null) return null;
+      if (!choice) continue;
+      const option = (pool.options || []).find((item) => item.name === choice);
+      if (!option) continue;
+      const resolvedOption = await resolveChoicePoolOptionMechanics(
+        option,
+        request,
+      );
+      if (!resolvedOption) return null;
+      appendChoicePoolMechanics(mechanics, resolvedOption);
+    }
+    return mechanics;
   }
 
   // Then saves the finished effect straight into that character's own
@@ -167,7 +529,12 @@
     resolving.add(request.id);
     try {
       const ability = request.ability || {};
-      const resolved = await resolveChoiceStats(ability.bonuses, request);
+      const choiceResolved = await resolveChoiceStats(ability.bonuses, request);
+      if (choiceResolved === null) return;
+      const resolved = await resolveFavoredEnemyScaleTargets(
+        choiceResolved,
+        request,
+      );
       if (resolved === null) return;
       const resolvedClassSkillGrants = await resolveChoiceStats(
         ability.classSkillGrants,
@@ -175,18 +542,40 @@
       );
       if (resolvedClassSkillGrants === null) return;
 
+      const resolvedSpellLikeAbilities = await resolveSpellLikeAbilityChoices(
+        ability.spellLikeAbilities,
+        request,
+      );
+      if (resolvedSpellLikeAbilities === null) return;
+      const resolvedChoicePools = await resolveChoicePools(ability, request);
+      if (resolvedChoicePools === null) return;
+      const { choicePools: _choicePools, pools: _pools, poolChoices, ...abilityBase } =
+        ability;
+
       const finalized = {
-        ...ability,
+        ...abilityBase,
         bonuses: resolved,
         ...(resolvedClassSkillGrants.length
           ? { classSkillGrants: resolvedClassSkillGrants }
           : {}),
+        ...(resolvedSpellLikeAbilities.length
+          ? { spellLikeAbilities: resolvedSpellLikeAbilities }
+          : {}),
       };
+      appendChoicePoolMechanics(finalized, resolvedChoicePools);
+      const variableResolved = await resolveConditionalVariables(
+        finalized,
+        request,
+      );
+      if (variableResolved === null) return;
       const existing = await window.PFApp.loadBuffState(
         pollOptions.contextKey,
         request.character_id,
       );
-      const nextBuffs = [...(Array.isArray(existing) ? existing : []), finalized];
+      const nextBuffs = [
+        ...(Array.isArray(existing) ? existing : []),
+        variableResolved,
+      ];
       const saved = await window.PFApp.saveBuffState(
         nextBuffs,
         pollOptions.contextKey,
@@ -226,6 +615,8 @@
   //     changes mid-session,
   //   characterNameFor: (id) => string,
   //   choicePoolSkillsFor: (id) => [[name, ability], ...] (optional),
+  //   favoredEnemyOptionsFor: (id) => choice options for that character's
+  //     currently selected favored enemies (optional),
   //   onResolved: (characterId, finalizedEffect) -- called after a
   //     choice is saved, so the page can refresh anything showing that
   //     character's active effects,
@@ -250,3 +641,7 @@
 
   window.PFPendingEffectChoices = { start, stop };
 })();
+
+
+
+

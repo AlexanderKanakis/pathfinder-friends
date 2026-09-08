@@ -16828,5 +16828,18 @@
     ]
   },
   "spellcastingClass": true,
-  "classSkills": []
+  "classSkills": [
+    "Appraise",
+    "Craft",
+    "Disable Device",
+    "Fly",
+    "Knowledge (arcana)",
+    "Knowledge (nature)",
+    "Perception",
+    "Profession",
+    "Sleight of Hand",
+    "Spellcraft",
+    "Survival",
+    "Use Magic Device"
+  ]
 }

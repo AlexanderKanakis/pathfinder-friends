@@ -424,7 +424,10 @@ function itemHasEffects(item) {
       (Array.isArray(item.damageReduction) && item.damageReduction.length) ||
       (Array.isArray(item.spellResistance) && item.spellResistance.length) ||
       (Array.isArray(item.immunities) && item.immunities.length) ||
+      (Array.isArray(item.applyConditions) && item.applyConditions.length) ||
       (Array.isArray(item.classSkillGrants) && item.classSkillGrants.length) ||
+      (Array.isArray(item.extraRanksPerLevel) &&
+        item.extraRanksPerLevel.length) ||
       (Array.isArray(item.sizeChanges) && item.sizeChanges.length) ||
       (Array.isArray(item.spellLikeAbilities) &&
         item.spellLikeAbilities.length) ||
@@ -830,20 +833,26 @@ function commitSelectedItem() {
     damageReduction,
     spellResistance,
     immunities,
+    applyConditions,
     classSkillGrants,
+    extraRanksPerLevel,
     sizeChanges,
     spellLikeAbilities,
     generatedEquipment,
+    conditionalVariables,
   } =
     currentEffectsAccordion.collect();
   item.effects = effects;
   item.damageReduction = damageReduction;
   item.spellResistance = spellResistance;
   item.immunities = immunities;
+  item.applyConditions = applyConditions;
   item.classSkillGrants = classSkillGrants;
+  item.extraRanksPerLevel = extraRanksPerLevel;
   item.sizeChanges = sizeChanges;
   item.spellLikeAbilities = spellLikeAbilities;
   item.generatedEquipment = generatedEquipment;
+  item.conditionalVariables = conditionalVariables;
 }
 
 // ---------------------------------------------------------------

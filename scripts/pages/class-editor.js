@@ -116,6 +116,16 @@ function cloneJson(value) {
   return JSON.parse(JSON.stringify(value || {}));
 }
 
+function classEditorSkillOptions() {
+  const skills = (window.PFEffectStats?.PF_SKILLS_WITH_ABILITY || []).map(
+    ([skill]) => skill,
+  );
+  ["Craft", "Perform", "Profession"].forEach((skill) => {
+    if (!skills.includes(skill)) skills.push(skill);
+  });
+  return skills.sort((a, b) => a.localeCompare(b));
+}
+
 function normalizeLevel(level, index) {
   return {
     level: Number(level?.level || index + 1),
@@ -686,9 +696,9 @@ function renderSelectedClass() {
         <strong>Class Skills</strong>
       </div>
       <div class="class-skills-grid" id="classSkillsGrid">
-        ${(window.PFEffectStats?.PF_SKILLS_WITH_ABILITY || [])
+        ${classEditorSkillOptions()
           .map(
-            ([skill]) => `
+            (skill) => `
           <label class="form-check">
             <input class="form-check-input" type="checkbox" data-class-skill="${escapeHtml(skill)}" ${(cls.classSkills || []).includes(skill) ? "checked" : ""}>
             <span class="form-check-label">${escapeHtml(skill)}</span>
@@ -1072,6 +1082,7 @@ function syncPoolAcrossLevels(levelIndex, featureIndex, poolIndex) {
             "spellResistance",
             "immunities",
             "classSkillGrants",
+            "extraRanksPerLevel",
             "sizeChanges",
             "spellLikeAbilities",
             "generatedEquipment",

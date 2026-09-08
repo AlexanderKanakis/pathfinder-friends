@@ -1,0 +1,264 @@
+{
+  "creatureTypes": [
+    {
+      "id": "aberration",
+      "name": "Aberration"
+    },
+    {
+      "id": "animal",
+      "name": "Animal"
+    },
+    {
+      "id": "construct",
+      "name": "Construct"
+    },
+    {
+      "id": "dragon",
+      "name": "Dragon"
+    },
+    {
+      "id": "fey",
+      "name": "Fey"
+    },
+    {
+      "id": "humanoid",
+      "name": "Humanoid",
+      "favoredEnemySubtypes": [
+        "aquatic",
+        "dwarf",
+        "elf",
+        "giant",
+        "goblinoid",
+        "gnoll",
+        "gnome",
+        "halfling",
+        "human",
+        "orc",
+        "reptilian",
+        "other subtype"
+      ]
+    },
+    {
+      "id": "magical-beast",
+      "name": "Magical Beast"
+    },
+    {
+      "id": "monstrous-humanoid",
+      "name": "Monstrous Humanoid"
+    },
+    {
+      "id": "ooze",
+      "name": "Ooze"
+    },
+    {
+      "id": "outsider",
+      "name": "Outsider",
+      "favoredEnemySubtypes": [
+        "air",
+        "chaotic",
+        "earth",
+        "evil",
+        "fire",
+        "good",
+        "lawful",
+        "native",
+        "water"
+      ]
+    },
+    {
+      "id": "plant",
+      "name": "Plant"
+    },
+    {
+      "id": "undead",
+      "name": "Undead"
+    },
+    {
+      "id": "vermin",
+      "name": "Vermin"
+    }
+  ],
+  "favoredEnemyOptions": [
+    {
+      "id": "aberration",
+      "type": "aberration",
+      "name": "Aberration"
+    },
+    {
+      "id": "animal",
+      "type": "animal",
+      "name": "Animal"
+    },
+    {
+      "id": "construct",
+      "type": "construct",
+      "name": "Construct"
+    },
+    {
+      "id": "dragon",
+      "type": "dragon",
+      "name": "Dragon"
+    },
+    {
+      "id": "fey",
+      "type": "fey",
+      "name": "Fey"
+    },
+    {
+      "id": "humanoid-aquatic",
+      "type": "humanoid",
+      "subtype": "aquatic",
+      "name": "Humanoid (aquatic)"
+    },
+    {
+      "id": "humanoid-dwarf",
+      "type": "humanoid",
+      "subtype": "dwarf",
+      "name": "Humanoid (dwarf)"
+    },
+    {
+      "id": "humanoid-elf",
+      "type": "humanoid",
+      "subtype": "elf",
+      "name": "Humanoid (elf)"
+    },
+    {
+      "id": "humanoid-giant",
+      "type": "humanoid",
+      "subtype": "giant",
+      "name": "Humanoid (giant)"
+    },
+    {
+      "id": "humanoid-goblinoid",
+      "type": "humanoid",
+      "subtype": "goblinoid",
+      "name": "Humanoid (goblinoid)"
+    },
+    {
+      "id": "humanoid-gnoll",
+      "type": "humanoid",
+      "subtype": "gnoll",
+      "name": "Humanoid (gnoll)"
+    },
+    {
+      "id": "humanoid-gnome",
+      "type": "humanoid",
+      "subtype": "gnome",
+      "name": "Humanoid (gnome)"
+    },
+    {
+      "id": "humanoid-halfling",
+      "type": "humanoid",
+      "subtype": "halfling",
+      "name": "Humanoid (halfling)"
+    },
+    {
+      "id": "humanoid-human",
+      "type": "humanoid",
+      "subtype": "human",
+      "name": "Humanoid (human)"
+    },
+    {
+      "id": "humanoid-orc",
+      "type": "humanoid",
+      "subtype": "orc",
+      "name": "Humanoid (orc)"
+    },
+    {
+      "id": "humanoid-reptilian",
+      "type": "humanoid",
+      "subtype": "reptilian",
+      "name": "Humanoid (reptilian)"
+    },
+    {
+      "id": "humanoid-other-subtype",
+      "type": "humanoid",
+      "subtype": "other subtype",
+      "name": "Humanoid (other subtype)"
+    },
+    {
+      "id": "magical-beast",
+      "type": "magical-beast",
+      "name": "Magical Beast"
+    },
+    {
+      "id": "monstrous-humanoid",
+      "type": "monstrous-humanoid",
+      "name": "Monstrous Humanoid"
+    },
+    {
+      "id": "ooze",
+      "type": "ooze",
+      "name": "Ooze"
+    },
+    {
+      "id": "outsider-air",
+      "type": "outsider",
+      "subtype": "air",
+      "name": "Outsider (air)"
+    },
+    {
+      "id": "outsider-chaotic",
+      "type": "outsider",
+      "subtype": "chaotic",
+      "name": "Outsider (chaotic)"
+    },
+    {
+      "id": "outsider-earth",
+      "type": "outsider",
+      "subtype": "earth",
+      "name": "Outsider (earth)"
+    },
+    {
+      "id": "outsider-evil",
+      "type": "outsider",
+      "subtype": "evil",
+      "name": "Outsider (evil)"
+    },
+    {
+      "id": "outsider-fire",
+      "type": "outsider",
+      "subtype": "fire",
+      "name": "Outsider (fire)"
+    },
+    {
+      "id": "outsider-good",
+      "type": "outsider",
+      "subtype": "good",
+      "name": "Outsider (good)"
+    },
+    {
+      "id": "outsider-lawful",
+      "type": "outsider",
+      "subtype": "lawful",
+      "name": "Outsider (lawful)"
+    },
+    {
+      "id": "outsider-native",
+      "type": "outsider",
+      "subtype": "native",
+      "name": "Outsider (native)"
+    },
+    {
+      "id": "outsider-water",
+      "type": "outsider",
+      "subtype": "water",
+      "name": "Outsider (water)"
+    },
+    {
+      "id": "plant",
+      "type": "plant",
+      "name": "Plant"
+    },
+    {
+      "id": "undead",
+      "type": "undead",
+      "name": "Undead"
+    },
+    {
+      "id": "vermin",
+      "type": "vermin",
+      "name": "Vermin"
+    }
+  ]
+}

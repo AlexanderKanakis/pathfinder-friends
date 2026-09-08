@@ -7,6 +7,12 @@ let wondrousItemsCache = [];
   wondrousItemsCache = (await window.PFItemData?.loadWondrousItems()) || [];
 })();
 
+if (window.PFSpellData?.loadSpells) {
+  window.PFSpellData.loadSpells().catch((error) => {
+    console.warn("Could not preload spell data", error);
+  });
+}
+
 //========================================
 // Tensor Flow
 //========================================
@@ -269,7 +275,7 @@ function searchItem() {
             </div>
             <div id="s-item-id-${index}" style="display: none;">
                 <div class="d-flex flex-wrap gap-2 mt-2">
-                    <div class="text-wrap d-flex"><b>School:</b>&nbsp;${filteredItem.details.school}</div>
+                    <div class="text-wrap d-flex"><b>School:</b>&nbsp;${window.PFSpellData?.schoolWithDescriptors?.(filteredItem) || filteredItem.details.school}</div>
                     <div class="text-wrap d-flex"><b>Level:</b>&nbsp;${filteredItem.details.level}</div>
                 </div>
                 <div class="catlabel">

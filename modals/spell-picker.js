@@ -210,12 +210,13 @@
 
   async function loadSpells() {
     if (spellCache) return spellCache;
-    const response = await fetch("./data/spells.js", { cache: "no-cache" });
-    if (!response.ok) throw new Error("Could not load data/spells.js.");
-    const text = await response.text();
-    const match = text.match(/const\s+items\s*=\s*(\[[\s\S]*?\]);?\s*$/);
-    if (!match) throw new Error("Could not parse data/spells.js.");
-    spellCache = Function(`"use strict"; return (${match[1]});`)();
+    if (window.PFSpellData?.loadSpells) {
+      spellCache = await window.PFSpellData.loadSpells();
+      return spellCache;
+    }
+    const response = await fetch("./data/spells.json", { cache: "no-cache" });
+    if (!response.ok) throw new Error("Could not load data/spells.json.");
+    spellCache = await response.json();
     return spellCache;
   }
 
@@ -278,6 +279,7 @@
     return [
       spell.name,
       spell.details?.school,
+      ...(spell.details?.descriptors || []),
       spell.details?.level,
       spell.details?.description,
     ]
@@ -403,7 +405,7 @@
     return `
       <div class="spell-picker-detail-stack">
         <div class="spell-picker-summary-line">
-          ${spellInlineDetail("School", details.school)}
+          ${spellInlineDetail("School", window.PFSpellData?.schoolWithDescriptors?.(spell) || details.school)}
           ${spellInlineDetail("Level", details.level)}
         </div>
         <div class="spell-picker-rule-heading">Casting</div>

@@ -1109,6 +1109,11 @@
         : Array.isArray(row.class_skill_grants)
           ? row.class_skill_grants
           : [],
+      extraRanksPerLevel: Array.isArray(row.extraRanksPerLevel)
+        ? row.extraRanksPerLevel
+        : Array.isArray(row.extra_ranks_per_level)
+          ? row.extra_ranks_per_level
+          : [],
       sizeChanges: Array.isArray(row.sizeChanges)
         ? row.sizeChanges
         : Array.isArray(row.size_changes)
@@ -1213,14 +1218,42 @@
     let { data, error } = await client
       .from("buff_definitions")
       .select(
-        "id,name,category,duration,duration_count,duration_unit,duration_per_level,duration_config,bonuses,damage_reduction,spell_resistance,class_skill_grants,size_changes,spell_like_abilities,source,context_key,game_id",
+        "id,name,category,duration,duration_count,duration_unit,duration_per_level,duration_config,bonuses,damage_reduction,spell_resistance,class_skill_grants,extra_ranks_per_level,size_changes,spell_like_abilities,source,context_key,game_id",
       )
       .order("name", { ascending: true });
 
     if (
       error?.code === "42703" &&
+      String(error.message || "").includes("extra_ranks_per_level")
+    ) {
+      const fallback = await client
+        .from("buff_definitions")
+        .select(
+          "id,name,category,duration,duration_count,duration_unit,duration_per_level,duration_config,bonuses,damage_reduction,spell_resistance,class_skill_grants,size_changes,spell_like_abilities,source,context_key,game_id",
+        )
+        .order("name", { ascending: true });
+      data = fallback.data;
+      error = fallback.error;
+    }
+
+    if (
+      error?.code === "42703" &&
       (String(error.message || "").includes("size_changes") ||
         String(error.message || "").includes("spell_like_abilities"))
+    ) {
+      const fallback = await client
+        .from("buff_definitions")
+        .select(
+          "id,name,category,duration,duration_count,duration_unit,duration_per_level,duration_config,bonuses,damage_reduction,spell_resistance,class_skill_grants,extra_ranks_per_level,source,context_key,game_id",
+        )
+        .order("name", { ascending: true });
+      data = fallback.data;
+      error = fallback.error;
+    }
+
+    if (
+      error?.code === "42703" &&
+      String(error.message || "").includes("extra_ranks_per_level")
     ) {
       const fallback = await client
         .from("buff_definitions")
@@ -1275,6 +1308,7 @@
       damage_reduction: buff.damageReduction || [],
       spell_resistance: buff.spellResistance || [],
       class_skill_grants: buff.classSkillGrants || [],
+      extra_ranks_per_level: buff.extraRanksPerLevel || [],
       size_changes: buff.sizeChanges || [],
       spell_like_abilities: buff.spellLikeAbilities || [],
       source: "custom",
@@ -1302,9 +1336,30 @@
 
     let { data, error } = await query
       .select(
-        "id,name,category,duration,duration_count,duration_unit,duration_per_level,duration_config,bonuses,damage_reduction,spell_resistance,class_skill_grants,size_changes,spell_like_abilities,source,context_key,game_id",
+        "id,name,category,duration,duration_count,duration_unit,duration_per_level,duration_config,bonuses,damage_reduction,spell_resistance,class_skill_grants,extra_ranks_per_level,size_changes,spell_like_abilities,source,context_key,game_id",
       )
       .single();
+
+    if (
+      error?.code === "42703" &&
+      String(error.message || "").includes("extra_ranks_per_level")
+    ) {
+      const fallbackPayload = { ...payload };
+      delete fallbackPayload.extra_ranks_per_level;
+      query = existing?.id
+        ? client
+            .from("buff_definitions")
+            .update(fallbackPayload)
+            .eq("id", existing.id)
+        : client.from("buff_definitions").insert(fallbackPayload);
+      const fallback = await query
+        .select(
+          "id,name,category,duration,duration_count,duration_unit,duration_per_level,duration_config,bonuses,damage_reduction,spell_resistance,class_skill_grants,size_changes,spell_like_abilities,source,context_key,game_id",
+        )
+        .single();
+      data = fallback.data;
+      error = fallback.error;
+    }
 
     if (
       error?.code === "42703" &&
@@ -1312,6 +1367,29 @@
         String(error.message || "").includes("spell_like_abilities"))
     ) {
       const fallbackPayload = { ...payload };
+      delete fallbackPayload.size_changes;
+      delete fallbackPayload.spell_like_abilities;
+      query = existing?.id
+        ? client
+            .from("buff_definitions")
+            .update(fallbackPayload)
+            .eq("id", existing.id)
+        : client.from("buff_definitions").insert(fallbackPayload);
+      const fallback = await query
+        .select(
+          "id,name,category,duration,duration_count,duration_unit,duration_per_level,duration_config,bonuses,damage_reduction,spell_resistance,class_skill_grants,extra_ranks_per_level,source,context_key,game_id",
+        )
+        .single();
+      data = fallback.data;
+      error = fallback.error;
+    }
+
+    if (
+      error?.code === "42703" &&
+      String(error.message || "").includes("extra_ranks_per_level")
+    ) {
+      const fallbackPayload = { ...payload };
+      delete fallbackPayload.extra_ranks_per_level;
       delete fallbackPayload.size_changes;
       delete fallbackPayload.spell_like_abilities;
       query = existing?.id
@@ -1338,6 +1416,7 @@
       delete legacyPayload.damage_reduction;
       delete legacyPayload.spell_resistance;
       delete legacyPayload.class_skill_grants;
+      delete legacyPayload.extra_ranks_per_level;
       delete legacyPayload.size_changes;
       delete legacyPayload.spell_like_abilities;
       query = existing?.id
@@ -1400,6 +1479,9 @@
       new_class_skill_grants: Array.isArray(buff.classSkillGrants)
         ? buff.classSkillGrants
         : [],
+      new_extra_ranks_per_level: Array.isArray(buff.extraRanksPerLevel)
+        ? buff.extraRanksPerLevel
+        : [],
       new_size_changes: Array.isArray(buff.sizeChanges) ? buff.sizeChanges : [],
       new_spell_like_abilities: Array.isArray(buff.spellLikeAbilities)
         ? buff.spellLikeAbilities
@@ -1410,6 +1492,30 @@
       error?.code === "PGRST202" ||
       String(error?.message || "").includes("new_size_changes") ||
       String(error?.message || "").includes("new_spell_like_abilities")
+    ) {
+      const fallback = await client.rpc("admin_update_buff_definition", {
+        ...sharedArgs,
+        new_duration_config: buff.durationConfig || null,
+        new_damage_reduction: Array.isArray(buff.damageReduction)
+          ? buff.damageReduction
+          : [],
+        new_spell_resistance: Array.isArray(buff.spellResistance)
+          ? buff.spellResistance
+          : [],
+        new_class_skill_grants: Array.isArray(buff.classSkillGrants)
+          ? buff.classSkillGrants
+          : [],
+        new_extra_ranks_per_level: Array.isArray(buff.extraRanksPerLevel)
+          ? buff.extraRanksPerLevel
+          : [],
+      });
+      data = fallback.data;
+      error = fallback.error;
+    }
+
+    if (
+      error?.code === "PGRST202" ||
+      String(error?.message || "").includes("new_extra_ranks_per_level")
     ) {
       const fallback = await client.rpc("admin_update_buff_definition", {
         ...sharedArgs,
@@ -2127,6 +2233,9 @@
       classSkillGrants: Array.isArray(row.class_skill_grants)
         ? row.class_skill_grants
         : [],
+      extraRanksPerLevel: Array.isArray(row.extra_ranks_per_level)
+        ? row.extra_ranks_per_level
+        : [],
       sizeChanges: Array.isArray(row.size_changes) ? row.size_changes : [],
       spellLikeAbilities: Array.isArray(row.spell_like_abilities)
         ? row.spell_like_abilities
@@ -2143,8 +2252,12 @@
   // not just the new DR/SR/class-skill fields, so a missing-column
   // error here specifically retries without them instead of giving up.
   const LOOT_COLUMNS =
+    "id,name,description,count,type,assigned_to,assigned_character_id,details,effects,damage_reduction,spell_resistance,class_skill_grants,extra_ranks_per_level,size_changes,spell_like_abilities,created_by,updated_at";
+  const LOOT_COLUMNS_WITHOUT_EXTRA_RANKS =
     "id,name,description,count,type,assigned_to,assigned_character_id,details,effects,damage_reduction,spell_resistance,class_skill_grants,size_changes,spell_like_abilities,created_by,updated_at";
   const LOOT_COLUMNS_WITHOUT_NEW_EXTRAS =
+    "id,name,description,count,type,assigned_to,assigned_character_id,details,effects,damage_reduction,spell_resistance,class_skill_grants,extra_ranks_per_level,created_by,updated_at";
+  const LOOT_COLUMNS_WITHOUT_EXTRA_RANKS_OR_NEW_EXTRAS =
     "id,name,description,count,type,assigned_to,assigned_character_id,details,effects,damage_reduction,spell_resistance,class_skill_grants,created_by,updated_at";
   const LOOT_COLUMNS_LEGACY =
     "id,name,description,count,type,assigned_to,assigned_character_id,details,effects,created_by,updated_at";
@@ -2157,6 +2270,7 @@
       message.includes("damage_reduction") ||
       message.includes("spell_resistance") ||
       message.includes("class_skill_grants") ||
+      message.includes("extra_ranks_per_level") ||
       message.includes("size_changes") ||
       message.includes("spell_like_abilities")
     );
@@ -2172,6 +2286,13 @@
     );
   }
 
+  function isMissingExtraRanksError(error) {
+    return (
+      error?.code === "42703" &&
+      String(error.message || "").includes("extra_ranks_per_level")
+    );
+  }
+
   async function loadLootItems(contextKey = getSelectedContextKey()) {
     const user = await getUser();
     if (!user) return [];
@@ -2183,10 +2304,30 @@
       .eq("context_key", context.contextKey)
       .order("updated_at", { ascending: false });
 
+    if (isMissingExtraRanksError(error)) {
+      const fallback = await client
+        .from("game_loot")
+        .select(LOOT_COLUMNS_WITHOUT_EXTRA_RANKS)
+        .eq("context_key", context.contextKey)
+        .order("updated_at", { ascending: false });
+      data = fallback.data;
+      error = fallback.error;
+    }
+
     if (isMissingNewLootExtrasError(error)) {
       const fallback = await client
         .from("game_loot")
         .select(LOOT_COLUMNS_WITHOUT_NEW_EXTRAS)
+        .eq("context_key", context.contextKey)
+        .order("updated_at", { ascending: false });
+      data = fallback.data;
+      error = fallback.error;
+    }
+
+    if (isMissingExtraRanksError(error)) {
+      const fallback = await client
+        .from("game_loot")
+        .select(LOOT_COLUMNS_WITHOUT_EXTRA_RANKS_OR_NEW_EXTRAS)
         .eq("context_key", context.contextKey)
         .order("updated_at", { ascending: false });
       data = fallback.data;
@@ -2234,6 +2375,9 @@
       class_skill_grants: Array.isArray(item.classSkillGrants)
         ? item.classSkillGrants
         : [],
+      extra_ranks_per_level: Array.isArray(item.extraRanksPerLevel)
+        ? item.extraRanksPerLevel
+        : [],
       size_changes: Array.isArray(item.sizeChanges) ? item.sizeChanges : [],
       spell_like_abilities: Array.isArray(item.spellLikeAbilities)
         ? item.spellLikeAbilities
@@ -2248,6 +2392,21 @@
       : client.from("game_loot").insert({ ...payload, created_by: user.id });
 
     let { data, error } = await query.select(LOOT_COLUMNS).single();
+
+    if (isMissingExtraRanksError(error)) {
+      const fallbackPayload = { ...payload };
+      delete fallbackPayload.extra_ranks_per_level;
+      const fallbackQuery = item.id
+        ? client.from("game_loot").update(fallbackPayload).eq("id", item.id)
+        : client
+            .from("game_loot")
+            .insert({ ...fallbackPayload, created_by: user.id });
+      const fallback = await fallbackQuery
+        .select(LOOT_COLUMNS_WITHOUT_EXTRA_RANKS)
+        .single();
+      data = fallback.data;
+      error = fallback.error;
+    }
 
     if (isMissingNewLootExtrasError(error)) {
       const fallbackPayload = { ...payload };
@@ -2265,11 +2424,29 @@
       error = fallback.error;
     }
 
+    if (isMissingExtraRanksError(error)) {
+      const fallbackPayload = { ...payload };
+      delete fallbackPayload.extra_ranks_per_level;
+      delete fallbackPayload.size_changes;
+      delete fallbackPayload.spell_like_abilities;
+      const fallbackQuery = item.id
+        ? client.from("game_loot").update(fallbackPayload).eq("id", item.id)
+        : client
+            .from("game_loot")
+            .insert({ ...fallbackPayload, created_by: user.id });
+      const fallback = await fallbackQuery
+        .select(LOOT_COLUMNS_WITHOUT_EXTRA_RANKS_OR_NEW_EXTRAS)
+        .single();
+      data = fallback.data;
+      error = fallback.error;
+    }
+
     if (isMissingLootColumnsError(error)) {
       const legacyPayload = { ...payload };
       delete legacyPayload.damage_reduction;
       delete legacyPayload.spell_resistance;
       delete legacyPayload.class_skill_grants;
+      delete legacyPayload.extra_ranks_per_level;
       delete legacyPayload.size_changes;
       delete legacyPayload.spell_like_abilities;
       const legacyQuery = item.id

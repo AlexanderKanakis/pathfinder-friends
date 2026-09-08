@@ -596,6 +596,18 @@ function titleCaseStat(value) {
   if (
     String(value || "")
       .toLowerCase()
+      .trim() === "cannot gain morale bonuses"
+  )
+    return "Cannot Gain Morale Bonuses";
+  if (
+    String(value || "")
+      .toLowerCase()
+      .trim() === "cannot gain luck bonuses"
+  )
+    return "Cannot Gain Luck Bonuses";
+  if (
+    String(value || "")
+      .toLowerCase()
       .trim() === "extra attack"
   )
     return "Extra Attack at Highest BAB";
@@ -610,6 +622,14 @@ function scaleText(scale) {
   const sourceLabel = scale.source
     ? window.PFEffectMeta?.factorLabel?.(scale.source) || "level"
     : "CL";
+  const multiplier = scale.levelMultiplier;
+  if (multiplier && Number(multiplier.denominator) > 0) {
+    const numerator = Number(multiplier.numerator || 0);
+    const denominator = Number(multiplier.denominator || 1);
+    parts.push(
+      `${denominator === 1 ? `${numerator}x` : `${numerator}/${denominator}`} ${sourceLabel} (round down)`,
+    );
+  }
   const milestones = Array.isArray(scale.milestones) ? scale.milestones : [];
   const milestoneText = milestones
     .filter(
@@ -642,9 +662,26 @@ function effectBonusText(bonus) {
     const text = "Removes DEX bonus to AC";
     return bonus.appliesWhen ? `${text} (${bonus.appliesWhen})` : text;
   }
+  if (
+    String(bonus.stat || "")
+      .toLowerCase()
+      .trim() === "cannot gain morale bonuses"
+  ) {
+    const text = "Cannot gain morale bonuses";
+    return bonus.appliesWhen ? `${text} (${bonus.appliesWhen})` : text;
+  }
+  if (
+    String(bonus.stat || "")
+      .toLowerCase()
+      .trim() === "cannot gain luck bonuses"
+  ) {
+    const text = "Cannot gain luck bonuses";
+    return bonus.appliesWhen ? `${text} (${bonus.appliesWhen})` : text;
+  }
   const scale = scaleText(bonus.bonusScale || bonus.scale);
+  const requirement = window.PFEffectEditor?.attributeRequirementText?.(bonus);
   const statLabel = bonus.skillName || titleCaseStat(bonus.stat);
-  const text = `${fmtSigned(bonus.value || 0)} ${bonus.type || "untyped"} ${statLabel}${scale ? `; ${scale}` : ""}`;
+  const text = `${fmtSigned(bonus.value || 0)} ${bonus.type || "untyped"} ${statLabel}${scale ? `; ${scale}` : ""}${requirement ? `; ${requirement}` : ""}`;
   return bonus.appliesWhen ? `${text} (${bonus.appliesWhen})` : text;
 }
 function spellLikeText(entry = {}) {
@@ -652,6 +689,16 @@ function spellLikeText(entry = {}) {
   const minimumLevel = Number(entry.minimumLevel ?? entry.level ?? 1) || 1;
   const levelText = minimumLevel > 1 ? `level ${minimumLevel}, ` : "";
   return `SLA ${levelText}${entry.frequency ? `${entry.frequency}: ` : ""}${spellName}`;
+}
+function casterLevelBonusText(entry = {}) {
+  if (window.PFEffectEditor?.casterLevelBonusText)
+    return window.PFEffectEditor.casterLevelBonusText(entry);
+  return `Caster Level ${fmtSigned(Number(entry.value || 0))}`;
+}
+function spellDcBonusText(entry = {}) {
+  if (window.PFEffectEditor?.spellDcBonusText)
+    return window.PFEffectEditor.spellDcBonusText(entry);
+  return `Spell DC ${fmtSigned(Number(entry.value || 0))}`;
 }
 function immunityText(entry = {}) {
   const name = String(entry.name || entry.immunity || entry.type || "")
@@ -670,6 +717,8 @@ function effectSearchText(effect) {
     ...(effect.bonuses || []).map(effectBonusText),
     ...(effect.immunities || []).map(immunityText),
     ...(effect.spellLikeAbilities || []).map(spellLikeText),
+    ...(effect.casterLevelBonuses || []).map(casterLevelBonusText),
+    ...(effect.spellDcBonuses || []).map(spellDcBonusText),
   ]
     .join(" ")
     .toLowerCase();
@@ -1187,7 +1236,13 @@ function compactInlineConditionals(rows = []) {
         conditional.appliesWhen ||
         conditional.label ||
         "Conditional";
-      return `<div class="mini-sheet-inline-conditional"><span>${escapeHtml(conditional.total || "")}</span>${note ? ` <small>(${escapeHtml(note)})</small>` : ""}</div>`;
+      const value = Number(conditional.value || 0);
+      const total =
+        conditional.displayTotal ||
+        (value !== 0
+          ? `${conditional.total || ""} (${signedNumberText(value)})`
+          : conditional.total || "");
+      return `<div class="mini-sheet-inline-conditional"><span>${escapeHtml(total)}</span>${note ? ` <small>${escapeHtml(note)}</small>` : ""}</div>`;
     })
     .join("");
 }
@@ -1211,7 +1266,8 @@ function compactSaveStat(row) {
 }
 
 function compactConditionalStat(row) {
-  return `<div class="mini-sheet-card mini-sheet-conditional"><div class="mini-sheet-label">${escapeHtml(row.label || "Conditional")}</div><div class="mini-sheet-value">${escapeHtml(row.total || "")}</div>${row.source ? `<div class="small text-secondary">${escapeHtml(row.source)}</div>` : ""}</div>`;
+  const total = row.displayTotal || row.total || "";
+  return `<div class="mini-sheet-card mini-sheet-conditional"><div class="mini-sheet-label">${escapeHtml(row.label || "Conditional")}</div><div class="mini-sheet-value">${escapeHtml(total)}</div>${row.source ? `<div class="small text-secondary">${escapeHtml(row.source)}</div>` : ""}</div>`;
 }
 
 function compactConditionalStats(rows = []) {
@@ -6857,6 +6913,66 @@ function characterSkillOptions(character) {
   return [...base, ...custom];
 }
 
+function mapFavoredEnemyTargetKey(value = "") {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/\s*\([+-]?\d+\)\s*$/g, "")
+    .replace(/[^a-z0-9]+/g, "");
+}
+
+function cleanMapFavoredEnemyLabel(value = "") {
+  return String(value || "")
+    .replace(/\s*\([+-]?\d+\)\s*$/g, "")
+    .trim();
+}
+
+function mapFavoredEnemyChoiceLabel(choices = {}) {
+  const entry = Object.entries(choices || {}).find(
+    ([key]) =>
+      normalizeConditionalVariableKey(key) === "favored enemy",
+  )?.[1];
+  return cleanMapFavoredEnemyLabel(
+    entry?.value || entry?.name || entry?.label || "",
+  );
+}
+
+function characterFavoredEnemyOptions(character, { additionalTargets = [] } = {}) {
+  const byTarget = new Map();
+  const addTarget = (target = "", bonus = null) => {
+    const label = cleanMapFavoredEnemyLabel(target);
+    const key = mapFavoredEnemyTargetKey(label);
+    if (!key) return;
+    byTarget.set(key, {
+      value: label,
+      label,
+      name: label,
+      favoredEnemyTarget: label,
+      bonus: Number(bonus || 0),
+    });
+  };
+  additionalTargets.forEach((target) => addTarget(target));
+  Object.values(character?.sheet?.classFeatureVariableChoices || {}).forEach(
+    (choices) => addTarget(mapFavoredEnemyChoiceLabel(choices)),
+  );
+  (character?.sheet?.activeBuffs || []).forEach((buff) => {
+    (Array.isArray(buff.bonuses) ? buff.bonuses : []).forEach((bonus) => {
+      const sourceText = [buff.name, buff.source, bonus.name, bonus.source]
+        .filter(Boolean)
+        .join(" ");
+      if (!bonus.favoredEnemyBonus && !/\bfavou?red\s+enemy\b/i.test(sourceText))
+        return;
+      addTarget(
+        bonus.favoredEnemyTarget ||
+          bonus.targetFavoredEnemy ||
+          mapFavoredEnemyChoiceLabel(bonus.conditionalChoices) ||
+          mapFavoredEnemyChoiceLabel(buff.conditionalChoices),
+        bonus.value,
+      );
+    });
+  });
+  return [...byTarget.values()].sort((a, b) => a.name.localeCompare(b.name));
+}
+
 // The class features (Rage, its bundled rage powers/totems, ...) a
 // character could activate, computed from their own saved sheet data --
 // used both for self-cast (character sheet) and for casting one
@@ -6914,6 +7030,14 @@ async function openMapEffects(tokenId) {
     contextKey: mapContextKey,
     characterId: effectTargetId,
     isOwnCharacter,
+    choicePoolSkills:
+      token.kind === "character"
+        ? characterSkillOptions(tokenCharacter(token))
+        : undefined,
+    favoredEnemyOptions: () =>
+      token.kind === "character"
+        ? characterFavoredEnemyOptions(tokenCharacter(token))
+        : [],
     loadActiveEffects:
       token.kind === "enemy"
         ? async () => {
@@ -7053,6 +7177,8 @@ function effectCardHtml(effect, index, prefix, defaultCl) {
     ...(effect.bonuses || []).map(effectBonusText),
     ...(effect.immunities || []).map(immunityText),
     ...(effect.spellLikeAbilities || []).map(spellLikeText),
+    ...(effect.casterLevelBonuses || []).map(casterLevelBonusText),
+    ...(effect.spellDcBonuses || []).map(spellDcBonusText),
   ];
   const visibleChips = chips.slice(0, 8);
   const bonusHtml = visibleChips.length
@@ -7501,10 +7627,124 @@ async function removeOutOfRangeAuraEffects() {
 // actually controls the target, not whoever cast the effect.
 // Returns { effect, queued }: effect is null if nothing should be
 // applied right now (cancelled, or queued for later).
+function effectConditionalVariables(effect = {}) {
+  return Array.isArray(effect.conditionalVariables)
+    ? effect.conditionalVariables
+    : [];
+}
+
+function normalizeConditionalVariableKey(value = "") {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[{}]/g, "")
+    .replace(/\s+/g, " ");
+}
+
+function mapConditionalVariableTokenValue(key = "", choice = {}) {
+  const fallback = choice?.label || choice?.name || choice?.value || "";
+  return normalizeConditionalVariableKey(key).startsWith("favored enemy")
+    ? cleanMapFavoredEnemyLabel(choice?.value || choice?.name || fallback)
+    : fallback;
+}
+
+function replaceConditionalVariableTokens(text = "", choices = {}) {
+  return String(text || "").replace(/\{([^{}]+)\}/g, (match, key) => {
+    const choice = choices[normalizeConditionalVariableKey(key)];
+    return choice ? mapConditionalVariableTokenValue(key, choice) || match : match;
+  });
+}
+
+function interpolateConditionalVariables(value, choices = {}) {
+  if (Array.isArray(value))
+    return value.map((item) => interpolateConditionalVariables(item, choices));
+  if (value && typeof value === "object") {
+    return Object.fromEntries(
+      Object.entries(value).map(([key, entry]) => [
+        key,
+        interpolateConditionalVariables(entry, choices),
+      ]),
+    );
+  }
+  if (typeof value === "string")
+    return replaceConditionalVariableTokens(value, choices);
+  return value;
+}
+
+function bonusUsesFavoredEnemyScale(bonus = {}) {
+  const source = (bonus.bonusScale || bonus.scale || {}).source || {};
+  return (
+    source.type === "special" && source.special === "favored-enemy-bonus"
+  );
+}
+
+function needsFavoredEnemyScaleChoice(bonus = {}) {
+  if (!bonusUsesFavoredEnemyScale(bonus)) return false;
+  if (
+    bonus.bonusScale?.favoredEnemyTarget ||
+    bonus.bonusScale?.target ||
+    bonus.scale?.favoredEnemyTarget ||
+    bonus.scale?.target ||
+    bonus.favoredEnemyTarget ||
+    bonus.targetFavoredEnemy
+  )
+    return false;
+  return (
+    !bonus.appliesWhen ||
+    /favou?red enemy|\{[^{}]+\}/i.test(bonus.appliesWhen)
+  );
+}
+
+async function resolveFavoredEnemyScaleTargetsForToken(
+  token,
+  bonuses = [],
+  effect = {},
+) {
+  const list = Array.isArray(bonuses) ? bonuses : [];
+  if (!list.some(needsFavoredEnemyScaleChoice)) return list;
+  const character = token.kind === "character" ? tokenCharacter(token) : null;
+  const options = character ? characterFavoredEnemyOptions(character) : [];
+  if (!options.length) return null;
+  const resolved = [];
+  for (const bonus of list) {
+    if (!needsFavoredEnemyScaleChoice(bonus)) {
+      resolved.push(bonus);
+      continue;
+    }
+    const picked = window.PFEffectChoicePicker
+      ? await window.PFEffectChoicePicker.open({
+          title: `${effect.name || "Effect"}${character ? ` (${character.name})` : ""}: Choose Favored Enemy`,
+          options,
+        })
+      : null;
+    if (!picked) return null;
+    const target =
+      typeof picked === "object"
+        ? picked.favoredEnemyTarget || picked.name || picked.value
+        : String(picked || "");
+    if (!target) return null;
+    const scale = bonus.bonusScale || bonus.scale || {};
+    resolved.push({
+      ...bonus,
+      bonusScale: { ...scale, favoredEnemyTarget: target },
+      favoredEnemyTarget: target,
+      conditional: true,
+      appliesWhen:
+        !bonus.appliesWhen || /favou?red enemy|\{[^{}]+\}/i.test(bonus.appliesWhen)
+          ? `against ${target}`
+          : bonus.appliesWhen,
+    });
+  }
+  return resolved;
+}
+
 async function resolveEffectChoicesForToken(token, effect) {
   const bonuses = Array.isArray(effect.bonuses) ? effect.bonuses : [];
+  const variables = effectConditionalVariables(effect);
   if (
-    !bonuses.some((bonus) => window.PFEffectStats?.isChoiceStat(bonus.stat))
+    !bonuses.some((bonus) => window.PFEffectStats?.isChoiceStat(bonus.stat)) &&
+    !bonuses.some(needsFavoredEnemyScaleChoice) &&
+    !variables.length
   )
     return { effect, queued: false };
 
@@ -7525,6 +7765,47 @@ async function resolveEffectChoicesForToken(token, effect) {
 
   const character = token.kind === "character" ? tokenCharacter(token) : null;
   const skills = character ? characterSkillOptions(character) : undefined;
+  const conditionalChoices = { ...(effect.conditionalChoices || {}) };
+  for (const variable of variables) {
+    const key = normalizeConditionalVariableKey(
+      variable.key || variable.name || variable.label,
+    );
+    if (!key || conditionalChoices[key]) continue;
+    const poolId =
+      variable.poolId ||
+      variable.pool ||
+      variable.source ||
+      "ranger-favored-enemies";
+    const pool = window.PFEffectStats?.conditionalVariablePoolById?.(poolId);
+    const additionalTargets = [
+      mapFavoredEnemyChoiceLabel(conditionalChoices),
+    ].filter(Boolean);
+    const options =
+      poolId === "character-favored-enemies"
+        ? character
+          ? characterFavoredEnemyOptions(character, { additionalTargets })
+          : []
+        : (await window.PFEffectStats?.resolveConditionalVariableOptions?.(poolId)) ||
+          [];
+    const picked = window.PFEffectChoicePicker
+      ? await window.PFEffectChoicePicker.open({
+          title: `${effect.name || "Effect"}${character ? ` (${character.name})` : ""}: Choose ${variable.label || key}`,
+          options,
+        })
+      : null;
+    if (!picked) return { effect: null, queued: false };
+    const pickedValue =
+      typeof picked === "object" ? picked.value : String(picked || "");
+    const pickedOption =
+      options.find((option) => String(option.value) === pickedValue) ||
+      (typeof picked === "object" ? picked : null);
+    conditionalChoices[key] = {
+      value: pickedValue,
+      label: pickedOption?.label || pickedValue,
+      poolId,
+      poolLabel: pool?.label || variable.poolLabel || "",
+    };
+  }
   const resolved = [];
   for (const bonus of bonuses) {
     if (!window.PFEffectStats?.isChoiceStat(bonus.stat)) {
@@ -7544,9 +7825,23 @@ async function resolveEffectChoicesForToken(token, effect) {
         })
       : null;
     if (!picked) return { effect: null, queued: false };
-    resolved.push({ ...bonus, stat: picked });
+    resolved.push(
+      typeof picked === "object"
+        ? { ...bonus, stat: picked.value, skillName: picked.skillName }
+        : { ...bonus, stat: picked },
+    );
   }
-  return { effect: { ...effect, bonuses: resolved }, queued: false };
+  const favoredEnemyResolved = await resolveFavoredEnemyScaleTargetsForToken(
+    token,
+    resolved,
+    effect,
+  );
+  if (favoredEnemyResolved === null) return { effect: null, queued: false };
+  const resolvedEffect = interpolateConditionalVariables(
+    { ...effect, bonuses: favoredEnemyResolved, conditionalChoices },
+    conditionalChoices,
+  );
+  return { effect: resolvedEffect, queued: false };
 }
 
 async function applyAuraEffectToToken(tokenId, auraId) {
@@ -8933,6 +9228,10 @@ function startPendingEffectChoicePolling() {
     choicePoolSkillsFor: (id) => {
       const character = mapCharacters.find((item) => item.id === id);
       return character ? characterSkillOptions(character) : undefined;
+    },
+    favoredEnemyOptionsFor: (id) => {
+      const character = mapCharacters.find((item) => item.id === id);
+      return character ? characterFavoredEnemyOptions(character) : [];
     },
     onResolved: async () => {
       await hydrateMapCharacterSheets();

@@ -22,12 +22,13 @@
 
   async function loadSpells() {
     if (spellCache) return spellCache;
-    const response = await fetch("./data/spells.js", { cache: "no-cache" });
-    if (!response.ok) throw new Error("Could not load data/spells.js.");
-    const text = await response.text();
-    const match = text.match(/const\s+items\s*=\s*(\[[\s\S]*?\]);?\s*$/);
-    if (!match) throw new Error("Could not parse data/spells.js.");
-    spellCache = Function(`"use strict"; return (${match[1]});`)();
+    if (window.PFSpellData?.loadSpells) {
+      spellCache = await window.PFSpellData.loadSpells();
+      return spellCache;
+    }
+    const response = await fetch("./data/spells.json", { cache: "no-cache" });
+    if (!response.ok) throw new Error("Could not load data/spells.json.");
+    spellCache = await response.json();
     return spellCache;
   }
 
@@ -50,12 +51,42 @@
     return [
       spell.name,
       spell.details?.school,
+      ...(spell.details?.descriptors || []),
       spell.details?.level,
       spell.details?.description,
     ]
       .join(" ")
       .toLowerCase();
   }
+
+  function providedSpellName(entry) {
+    if (typeof entry === "string") return entry;
+    return entry?.name || entry?.spellName || entry?.spell?.name || "";
+  }
+
+  function normalizeProvidedSpells(spells, catalog) {
+    if (!Array.isArray(spells)) return null;
+    const catalogByName = new Map(
+      catalog.map((spell) => [String(spell.name || "").toLowerCase(), spell]),
+    );
+    const seen = new Set();
+    return spells
+      .map((entry) => {
+        const name = providedSpellName(entry).trim();
+        if (!name) return null;
+        const key = name.toLowerCase();
+        if (seen.has(key)) return null;
+        seen.add(key);
+        const catalogSpell = catalogByName.get(key);
+        if (catalogSpell) return catalogSpell;
+        if (entry?.spell && typeof entry.spell === "object")
+          return { ...entry.spell, name };
+        if (entry && typeof entry === "object") return { ...entry, name };
+        return { name, details: {}, link: "" };
+      })
+      .filter(Boolean);
+  }
+
   function spellMatches() {
     return true;
   }
@@ -78,7 +109,7 @@
     return `
       <div class="spell-picker-detail-stack">
         <div class="spell-picker-summary-line">
-          ${spellInlineDetail("School", details.school)}
+          ${spellInlineDetail("School", window.PFSpellData?.schoolWithDescriptors?.(spell) || details.school)}
           ${spellInlineDetail("Level", details.level)}
         </div>
         <div class="spell-picker-rule-heading">Casting</div>
@@ -246,9 +277,10 @@
   window.PFMagicSearchModal = {
     async open(config = {}) {
       ensureModal();
-      const spells = await loadSpells();
+      const catalog = await loadSpells();
+      const providedSpells = normalizeProvidedSpells(config.spells, catalog);
       state = {
-        spells,
+        spells: providedSpells || catalog,
         search: "",
         expanded: "",
         scrollToExpanded: false,

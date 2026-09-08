@@ -183,10 +183,15 @@
     const contributedDr = new Map();
     const contributedSr = new Map();
     const contributedImmunities = new Map();
+    const contributedApplyConditions = new Map();
     const contributedClassSkillGrants = new Map();
+    const contributedExtraRanksPerLevel = new Map();
     const contributedSizeChanges = new Map();
     const contributedSpellLikeAbilities = new Map();
+    const contributedCasterLevelBonuses = new Map();
+    const contributedSpellDcBonuses = new Map();
     const contributedGeneratedEquipment = new Map();
+    const contributedConditionalVariables = new Map();
     const contributedNames = new Map();
     contributedOptions.forEach((options, targetKey) => {
       const finalOptions = terminalOptions(options);
@@ -194,10 +199,15 @@
       const dr = [];
       const sr = [];
       const immunities = [];
+      const applyConditions = [];
       const classSkillGrants = [];
+      const extraRanksPerLevel = [];
       const sizeChanges = [];
       const spellLikeAbilities = [];
+      const casterLevelBonuses = [];
+      const spellDcBonuses = [];
       const generatedEquipment = [];
+      const conditionalVariables = [];
       const names = [];
       finalOptions.forEach((option) => {
         if (Array.isArray(option.effects) && option.effects.length)
@@ -215,10 +225,20 @@
         if (Array.isArray(option.immunities) && option.immunities.length)
           immunities.push(...option.immunities);
         if (
+          Array.isArray(option.applyConditions) &&
+          option.applyConditions.length
+        )
+          applyConditions.push(...option.applyConditions);
+        if (
           Array.isArray(option.classSkillGrants) &&
           option.classSkillGrants.length
         )
           classSkillGrants.push(...option.classSkillGrants);
+        if (
+          Array.isArray(option.extraRanksPerLevel) &&
+          option.extraRanksPerLevel.length
+        )
+          extraRanksPerLevel.push(...option.extraRanksPerLevel);
         if (Array.isArray(option.sizeChanges) && option.sizeChanges.length)
           sizeChanges.push(...option.sizeChanges);
         if (
@@ -227,24 +247,49 @@
         )
           spellLikeAbilities.push(...option.spellLikeAbilities);
         if (
+          Array.isArray(option.casterLevelBonuses) &&
+          option.casterLevelBonuses.length
+        )
+          casterLevelBonuses.push(...option.casterLevelBonuses);
+        if (
+          Array.isArray(option.spellDcBonuses) &&
+          option.spellDcBonuses.length
+        )
+          spellDcBonuses.push(...option.spellDcBonuses);
+        if (
           Array.isArray(option.generatedEquipment) &&
           option.generatedEquipment.length
         )
           generatedEquipment.push(...option.generatedEquipment);
+        if (
+          Array.isArray(option.conditionalVariables) &&
+          option.conditionalVariables.length
+        )
+          conditionalVariables.push(...option.conditionalVariables);
         names.push(option.name);
       });
       if (effects.length) contributedEffects.set(targetKey, effects);
       if (dr.length) contributedDr.set(targetKey, dr);
       if (sr.length) contributedSr.set(targetKey, sr);
       if (immunities.length) contributedImmunities.set(targetKey, immunities);
+      if (applyConditions.length)
+        contributedApplyConditions.set(targetKey, applyConditions);
       if (classSkillGrants.length)
         contributedClassSkillGrants.set(targetKey, classSkillGrants);
+      if (extraRanksPerLevel.length)
+        contributedExtraRanksPerLevel.set(targetKey, extraRanksPerLevel);
       if (sizeChanges.length)
         contributedSizeChanges.set(targetKey, sizeChanges);
       if (spellLikeAbilities.length)
         contributedSpellLikeAbilities.set(targetKey, spellLikeAbilities);
+      if (casterLevelBonuses.length)
+        contributedCasterLevelBonuses.set(targetKey, casterLevelBonuses);
+      if (spellDcBonuses.length)
+        contributedSpellDcBonuses.set(targetKey, spellDcBonuses);
       if (generatedEquipment.length)
         contributedGeneratedEquipment.set(targetKey, generatedEquipment);
+      if (conditionalVariables.length)
+        contributedConditionalVariables.set(targetKey, conditionalVariables);
       if (names.length) contributedNames.set(targetKey, names);
     });
 
@@ -275,13 +320,21 @@
       const bundledDr = contributedDr.get(targetKey) || [];
       const bundledSr = contributedSr.get(targetKey) || [];
       const bundledImmunities = contributedImmunities.get(targetKey) || [];
+      const bundledApplyConditions =
+        contributedApplyConditions.get(targetKey) || [];
       const bundledClassSkillGrants =
         contributedClassSkillGrants.get(targetKey) || [];
       const bundledSizeChanges = contributedSizeChanges.get(targetKey) || [];
       const bundledSpellLikeAbilities =
         contributedSpellLikeAbilities.get(targetKey) || [];
+      const bundledCasterLevelBonuses =
+        contributedCasterLevelBonuses.get(targetKey) || [];
+      const bundledSpellDcBonuses =
+        contributedSpellDcBonuses.get(targetKey) || [];
       const bundledGeneratedEquipment =
         contributedGeneratedEquipment.get(targetKey) || [];
+      const bundledConditionalVariables =
+        contributedConditionalVariables.get(targetKey) || [];
       const bundledNames = contributedNames.get(targetKey) || [];
       const durationConfig = feature.durationConfig || {
         count: null,
@@ -304,6 +357,12 @@
         ...(Array.isArray(feature.immunities) ? feature.immunities : []),
         ...bundledImmunities,
       ];
+      const applyConditions = [
+        ...(Array.isArray(feature.applyConditions)
+          ? feature.applyConditions
+          : []),
+        ...bundledApplyConditions,
+      ];
       const classSkillGrants = [
         ...(Array.isArray(feature.classSkillGrants)
           ? feature.classSkillGrants
@@ -314,17 +373,43 @@
         ...(Array.isArray(feature.sizeChanges) ? feature.sizeChanges : []),
         ...bundledSizeChanges,
       ];
+      const bundledExtraRanksPerLevel =
+        contributedExtraRanksPerLevel.get(key) || [];
+      const extraRanksPerLevel = [
+        ...(Array.isArray(feature.extraRanksPerLevel)
+          ? feature.extraRanksPerLevel
+          : []),
+        ...bundledExtraRanksPerLevel,
+      ];
       const spellLikeAbilities = [
         ...(Array.isArray(feature.spellLikeAbilities)
           ? feature.spellLikeAbilities
           : []),
         ...bundledSpellLikeAbilities,
       ];
+      const casterLevelBonuses = [
+        ...(Array.isArray(feature.casterLevelBonuses)
+          ? feature.casterLevelBonuses
+          : []),
+        ...bundledCasterLevelBonuses,
+      ];
+      const spellDcBonuses = [
+        ...(Array.isArray(feature.spellDcBonuses)
+          ? feature.spellDcBonuses
+          : []),
+        ...bundledSpellDcBonuses,
+      ];
       const generatedEquipment = [
         ...(Array.isArray(feature.generatedEquipment)
           ? feature.generatedEquipment
           : []),
         ...bundledGeneratedEquipment,
+      ];
+      const conditionalVariables = [
+        ...(Array.isArray(feature.conditionalVariables)
+          ? feature.conditionalVariables
+          : []),
+        ...bundledConditionalVariables,
       ];
       abilities.set(key, {
         id: `ability:${key}`,
@@ -340,10 +425,15 @@
         ...(damageReduction.length ? { damageReduction } : {}),
         ...(spellResistance.length ? { spellResistance } : {}),
         ...(immunities.length ? { immunities } : {}),
+        ...(applyConditions.length ? { applyConditions } : {}),
         ...(classSkillGrants.length ? { classSkillGrants } : {}),
+        ...(extraRanksPerLevel.length ? { extraRanksPerLevel } : {}),
         ...(sizeChanges.length ? { sizeChanges } : {}),
         ...(spellLikeAbilities.length ? { spellLikeAbilities } : {}),
+        ...(casterLevelBonuses.length ? { casterLevelBonuses } : {}),
+        ...(spellDcBonuses.length ? { spellDcBonuses } : {}),
         ...(generatedEquipment.length ? { generatedEquipment } : {}),
+        ...(conditionalVariables.length ? { conditionalVariables } : {}),
         durationConfig,
         duration: window.PFEffectMeta?.durationLabel
           ? window.PFEffectMeta.durationLabel(durationConfig)

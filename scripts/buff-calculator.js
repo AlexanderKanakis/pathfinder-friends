@@ -24,6 +24,18 @@
       "remove dexterity bonus to ac": "remove dex bonus to ac",
       "deny dex bonus to ac": "remove dex bonus to ac",
       "deny dexterity bonus to ac": "remove dex bonus to ac",
+      "cannot gain luck bonuses": "cannot gain luck bonuses",
+      "can't gain luck bonuses": "cannot gain luck bonuses",
+      "cant gain luck bonuses": "cannot gain luck bonuses",
+      "remove luck bonuses": "cannot gain luck bonuses",
+      "suppress luck bonuses": "cannot gain luck bonuses",
+      "no luck bonuses": "cannot gain luck bonuses",
+      "cannot gain morale bonuses": "cannot gain morale bonuses",
+      "can't gain morale bonuses": "cannot gain morale bonuses",
+      "cant gain morale bonuses": "cannot gain morale bonuses",
+      "remove morale bonuses": "cannot gain morale bonuses",
+      "suppress morale bonuses": "cannot gain morale bonuses",
+      "no morale bonuses": "cannot gain morale bonuses",
       "str skill checks": "strength skill checks",
       "dex skill checks": "dexterity skill checks",
       "con skill checks": "constitution skill checks",
@@ -38,10 +50,32 @@
       "cha skills": "charisma skill checks",
       "craft skills": "craft skill checks",
       "craft checks": "craft skill checks",
+      "skill:craft": "craft skill checks",
       "profession skills": "profession skill checks",
       "profession checks": "profession skill checks",
+      "skill:profession": "profession skill checks",
       "perform skills": "perform skill checks",
       "perform checks": "perform skill checks",
+      "skill:perform": "perform skill checks",
+      "class skills": "class skill checks",
+      "class skill": "class skill checks",
+      "class-skill checks": "class skill checks",
+      "class skill checks": "class skill checks",
+      "class knowledge skills": "class knowledge skill checks",
+      "class knowledge skill": "class knowledge skill checks",
+      "class knowledge checks": "class knowledge skill checks",
+      "class knowledge skill checks": "class knowledge skill checks",
+      "knowledge skills": "knowledge skill checks",
+      "knowledge skill": "knowledge skill checks",
+      "knowledge checks": "knowledge skill checks",
+      "knowledge skill checks": "knowledge skill checks",
+      "trained skills": "trained skill checks",
+      "trained skill": "trained skill checks",
+      "trained checks": "trained skill checks",
+      "trained-only skills": "trained skill checks",
+      "untrained skills": "untrained skill checks",
+      "untrained skill": "untrained skill checks",
+      "untrained checks": "untrained skill checks",
       "extra attacks": "extra attack",
       "extra attack at highest bab": "extra attack",
       "extra attacks at highest bab": "extra attack",
@@ -66,6 +100,15 @@
     const stat = normalizeStat(rawBonus.stat);
     if (stat === "all saves") return ALL_SAVES_STATS;
     if (!stat.startsWith("skill-list:")) return [stat];
+    const items = Array.isArray(rawBonus.skillList?.items)
+      ? rawBonus.skillList.items
+      : [];
+    if (items.length) {
+      return items
+        .map((item) => item?.value || item?.stat || item?.key || "")
+        .map(normalizeStat)
+        .filter(Boolean);
+    }
     const skills = Array.isArray(rawBonus.skillList?.skills)
       ? rawBonus.skillList.skills
       : [];
@@ -85,26 +128,335 @@
     return type === "untyped" || type === "dodge" || type === "circumstance";
   }
 
-  function applyBonuses(bonuses) {
+  const ABILITY_REQUIREMENT_ALIASES = {
+    str: "strength",
+    strength: "strength",
+    dex: "dexterity",
+    dexterity: "dexterity",
+    con: "constitution",
+    constitution: "constitution",
+    int: "intelligence",
+    intelligence: "intelligence",
+    wis: "wisdom",
+    wisdom: "wisdom",
+    cha: "charisma",
+    charisma: "charisma",
+  };
+
+  const ABILITY_REQUIREMENT_LABELS = {
+    strength: "STR",
+    dexterity: "DEX",
+    constitution: "CON",
+    intelligence: "INT",
+    wisdom: "WIS",
+    charisma: "CHA",
+  };
+
+  const BONUS_SUPPRESSION_STATS = {
+    "cannot gain luck bonuses": "luck",
+    "cannot gain morale bonuses": "morale",
+  };
+
+  function normalizeBonusType(type) {
+    return String(type || "untyped")
+      .toLowerCase()
+      .trim();
+  }
+
+  function bonusTypeSuppressionSourceText(suppressors = []) {
+    return suppressors
+      .map((bonus) => bonus.source)
+      .filter(Boolean)
+      .join(", ");
+  }
+
+  function activeBonusTypeSuppressions(buffMap = {}, abilityScores = {}) {
+    const suppressed = new Map();
+    Object.entries(BONUS_SUPPRESSION_STATS).forEach(([stat, type]) => {
+      const activeSuppressors = (buffMap[stat] || []).filter(
+        (bonus) =>
+          !bonus.conditional &&
+          bonusMeetsAttributeRequirement(bonus, abilityScores),
+      );
+      if (activeSuppressors.length) suppressed.set(type, activeSuppressors);
+    });
+    return suppressed;
+  }
+
+  function conditionalBonusTypeSuppressions(buffMap = {}, abilityScores = {}) {
+    const suppressed = new Map();
+    Object.entries(BONUS_SUPPRESSION_STATS).forEach(([stat, type]) => {
+      const conditionalSuppressors = (buffMap[stat] || []).filter(
+        (bonus) =>
+          bonus.conditional &&
+          bonusMeetsAttributeRequirement(bonus, abilityScores),
+      );
+      if (conditionalSuppressors.length)
+        suppressed.set(type, conditionalSuppressors);
+    });
+    return suppressed;
+  }
+
+  function isBonusSuppressionStat(stat) {
+    return Boolean(BONUS_SUPPRESSION_STATS[normalizeStat(stat)]);
+  }
+
+  function normalizeAttributeRequirement(rawBonus = {}) {
+    const source =
+      rawBonus.attributeRequirement ||
+      rawBonus.attributeScoreRequirement ||
+      rawBonus.abilityRequirement ||
+      rawBonus.requirement?.attributeRequirement ||
+      rawBonus.requirements?.attributeRequirement ||
+      {};
+    const rawAttribute = String(
+      source.attribute ||
+        source.ability ||
+        rawBonus.requiredAttribute ||
+        rawBonus.requiredAbility ||
+        rawBonus.attributeRequirementAbility ||
+        "",
+    )
+      .trim()
+      .toLowerCase();
+    const attribute = ABILITY_REQUIREMENT_ALIASES[rawAttribute] || "";
+    const score = Number(
+      source.score ??
+        source.minimumScore ??
+        source.minimumAbilityScore ??
+        rawBonus.requiredScore ??
+        rawBonus.minimumScore ??
+        "",
+    );
+    return {
+      attribute,
+      score: Number.isFinite(score) && score > 0 ? Math.floor(score) : 0,
+    };
+  }
+
+  function attributeRequirementText(rawBonus = {}) {
+    const requirement = normalizeAttributeRequirement(rawBonus);
+    if (!requirement.attribute || !requirement.score) return "";
+    return `requires ${ABILITY_REQUIREMENT_LABELS[requirement.attribute]} ${requirement.score}`;
+  }
+
+  function bonusMeetsAttributeRequirement(rawBonus = {}, abilityScores = {}) {
+    const requirement = normalizeAttributeRequirement(rawBonus);
+    if (!requirement.attribute || !requirement.score) return true;
+    const score = Number(abilityScores[requirement.attribute] || 0);
+    return Number.isFinite(score) && score >= requirement.score;
+  }
+
+  function normalizeFavoredEnemyTarget(value = "") {
+    return String(value || "")
+      .toLowerCase()
+      .replace(/\{[^{}]+\}/g, "")
+      .replace(/\s*\([+-]?\d+\)\s*$/g, "")
+      .replace(/\b(against|versus|vs\.?|creatures?|enemy|enemies|type|subtype)\b/g, " ")
+      .replace(/[^a-z0-9]+/g, " ")
+      .trim()
+      .replace(/\s+/g, " ");
+  }
+
+  function favoredEnemyTargetKey(value = "") {
+    return normalizeFavoredEnemyTarget(value).replace(/\s+/g, "");
+  }
+
+  function conditionalChoiceValue(choices = {}, key = "favored enemy") {
+    const wanted = String(key || "")
+      .toLowerCase()
+      .trim();
+    const entry = Object.entries(choices || {}).find(
+      ([choiceKey]) => String(choiceKey || "").toLowerCase().trim() === wanted,
+    )?.[1];
+    if (!entry) return "";
+    return entry.label || entry.name || entry.value || "";
+  }
+
+  function favoredEnemyConditionalChoice(rawBonus = {}, buff = {}) {
+    return (
+      conditionalChoiceValue(rawBonus.conditionalChoices, "favored enemy") ||
+      conditionalChoiceValue(rawBonus.conditionalChoices, "favored enemy increase") ||
+      conditionalChoiceValue(buff.conditionalChoices, "favored enemy") ||
+      conditionalChoiceValue(buff.conditionalChoices, "favored enemy increase")
+    );
+  }
+
+  function bonusFavoredEnemyTarget(rawBonus = {}, buff = {}) {
+    return (
+      rawBonus.favoredEnemyTarget ||
+      rawBonus.targetFavoredEnemy ||
+      rawBonus.target ||
+      favoredEnemyConditionalChoice(rawBonus, buff) ||
+      rawBonus.appliesWhen ||
+      rawBonus.condition ||
+      buff.appliesWhen ||
+      ""
+    );
+  }
+
+  function scaleUsesFavoredEnemyBonus(rawBonus = {}) {
+    const source = (rawBonus.bonusScale || rawBonus.scale || {}).source || {};
+    return (
+      source.type === "special" && source.special === "favored-enemy-bonus"
+    );
+  }
+
+  function isFavoredEnemyBonus(rawBonus = {}, buff = {}) {
+    if (rawBonus.favoredEnemyBonus || rawBonus.favoredEnemy) return true;
+    const sourceText = [
+      rawBonus.source,
+      rawBonus.name,
+      buff.source,
+      buff.name,
+      buff.category,
+    ]
+      .filter(Boolean)
+      .join(" ");
+    return /\bfavou?red\s+enemy\b/i.test(sourceText);
+  }
+
+  function isFavoredEnemyBonusAmountRow(rawBonus = {}, buff = {}) {
+    if (!isFavoredEnemyBonus(rawBonus, buff)) return false;
+    const stat = normalizeStat(rawBonus.stat);
+    return stat === "attack";
+  }
+
+  function favoredEnemyConditionalMergeKey(rawBonus = {}) {
+    return [
+      normalizeStat(rawBonus.stat),
+      normalizeBonusType(rawBonus.type),
+      normalizeFavoredEnemyTarget(
+        rawBonus.favoredEnemyTarget ||
+          rawBonus.targetFavoredEnemy ||
+          rawBonus.appliesWhen ||
+          rawBonus.condition ||
+          rawBonus.conditionalReason ||
+          "",
+      ),
+    ].join("|");
+  }
+
+  function mergeFavoredEnemyConditionalBonuses(bonuses = []) {
+    const merged = [];
+    const byKey = new Map();
+    bonuses.forEach((bonus) => {
+      if (!isFavoredEnemyBonus(bonus)) {
+        merged.push(bonus);
+        return;
+      }
+      const key = favoredEnemyConditionalMergeKey(bonus);
+      const existing = byKey.get(key);
+      if (!existing) {
+        const next = {
+          ...bonus,
+          value: Number(bonus.value || 0),
+          source: "Favored Enemy",
+          favoredEnemyBonus: true,
+          mergedSources: [bonus.source].filter(Boolean),
+        };
+        byKey.set(key, next);
+        merged.push(next);
+        return;
+      }
+      existing.value += Number(bonus.value || 0);
+      if (bonus.source && !existing.mergedSources.includes(bonus.source)) {
+        existing.mergedSources.push(bonus.source);
+      }
+    });
+    return merged;
+  }
+
+  function favoredEnemyBonusScaleValue(scale = {}, buff = {}, context = {}) {
+    const rawBonus = context.rawBonus || {};
+    const activeBuffs = Array.isArray(context.activeBuffs)
+      ? context.activeBuffs
+      : [];
+    const requested =
+      scale.target ||
+      scale.favoredEnemyTarget ||
+      bonusFavoredEnemyTarget(rawBonus, buff);
+    const requestedKey = favoredEnemyTargetKey(requested);
+    let total = 0;
+
+    activeBuffs.forEach((candidateBuff) => {
+      (candidateBuff.bonuses || []).forEach((candidateBonus) => {
+        if (!isFavoredEnemyBonusAmountRow(candidateBonus, candidateBuff)) return;
+        if (scaleUsesFavoredEnemyBonus(candidateBonus)) return;
+        if (hasUnresolvedConditionalTokens(candidateBonus)) return;
+        const candidateTargetKey = favoredEnemyTargetKey(
+          bonusFavoredEnemyTarget(candidateBonus, candidateBuff),
+        );
+        if (
+          requestedKey &&
+          candidateTargetKey &&
+          requestedKey !== candidateTargetKey
+        )
+          return;
+        const value = scaledBonusValue(candidateBonus, candidateBuff, {
+          ...context,
+          resolvingFavoredEnemyBonus: true,
+        });
+        if (Number.isFinite(value)) total += Number(value || 0);
+      });
+    });
+
+    return total;
+  }
+
+  function applyBonuses(bonuses, options = {}) {
     let total = 0;
     const used = [];
     const ignored = [];
     const conditional = [];
     const grouped = {};
+    const suppressedBonusTypes =
+      options.suppressedBonusTypes instanceof Map
+        ? options.suppressedBonusTypes
+        : new Map();
+    const conditionalSuppressedBonusTypes =
+      options.conditionalSuppressedBonusTypes instanceof Map
+        ? options.conditionalSuppressedBonusTypes
+        : new Map();
+    const eligibleBonuses = [];
 
-    bonuses
-      .filter((bonus) => bonus.conditional)
-      .forEach((bonus) => {
-        conditional.push({
+    (bonuses || []).forEach((bonus) => {
+      if (
+        !options.ignoreAttributeRequirements &&
+        !bonusMeetsAttributeRequirement(bonus, options.abilityScores || {})
+      ) {
+        ignored.push({
           ...bonus,
-          conditionalReason: bonus.appliesWhen || "conditional",
+          ignoredReason: attributeRequirementText(bonus),
         });
-      });
+        return;
+      }
+      const type = normalizeBonusType(bonus.type);
+      const suppressors = suppressedBonusTypes.get(type);
+      if (suppressors?.length && Number(bonus.value || 0) > 0) {
+        const sourceText = bonusTypeSuppressionSourceText(suppressors);
+        ignored.push({
+          ...bonus,
+          ignoredReason: `${type} bonus is blocked${sourceText ? ` by ${sourceText}` : ""}`,
+        });
+        return;
+      }
+      eligibleBonuses.push(bonus);
+    });
 
-    bonuses
+    mergeFavoredEnemyConditionalBonuses(
+      eligibleBonuses.filter((bonus) => bonus.conditional),
+    ).forEach((bonus) => {
+      conditional.push({
+        ...bonus,
+        conditionalReason: bonus.appliesWhen || "conditional",
+      });
+    });
+
+    eligibleBonuses
       .filter((bonus) => !bonus.conditional)
       .forEach((bonus) => {
-        const type = bonus.type || "untyped";
+        const type = normalizeBonusType(bonus.type);
         if (!grouped[type]) grouped[type] = [];
         grouped[type].push(bonus);
       });
@@ -139,10 +491,46 @@
       }
     });
 
+    conditionalSuppressedBonusTypes.forEach((suppressors, type) => {
+      const suppressibleValue = used
+        .filter(
+          (bonus) =>
+            normalizeBonusType(bonus.type) === type &&
+            Number(bonus.value || 0) > 0,
+        )
+        .reduce((sum, bonus) => sum + Number(bonus.value || 0), 0);
+      if (suppressibleValue <= 0) return;
+      suppressors.forEach((suppressor) => {
+        const sourceText = used
+          .filter(
+            (bonus) =>
+              normalizeBonusType(bonus.type) === type &&
+              Number(bonus.value || 0) > 0,
+          )
+          .map((bonus) => bonus.source)
+          .filter(Boolean)
+          .join(", ");
+        conditional.push({
+          ...suppressor,
+          value: -suppressibleValue,
+          type,
+          appliesWhen:
+            suppressor.appliesWhen ||
+            suppressor.conditionalReason ||
+            "conditional",
+          detail: sourceText ? `without ${sourceText}` : "",
+          conditionalReason:
+            suppressor.appliesWhen ||
+            suppressor.conditionalReason ||
+            "conditional",
+        });
+      });
+    });
+
     return { total, used, ignored, conditional };
   }
 
-  function scaleLevelValue(scale, buff) {
+  function scaleLevelValue(scale, buff, context = {}) {
     const source = scale?.source || { type: "caster" };
     if (source.type === "character")
       return Math.max(
@@ -161,14 +549,22 @@
         ) || 1,
       );
     }
+    if (source.type === "special") {
+      if (source.special === "favored-enemy-bonus")
+        return favoredEnemyBonusScaleValue(scale, buff, context);
+      return 0;
+    }
     return Math.max(1, Number(buff.casterLevel || 1) || 1);
   }
 
-  function scaledBonusValue(rawBonus, buff) {
+  function scaledBonusValue(rawBonus, buff, context = {}) {
     const scale = rawBonus.bonusScale || rawBonus.scale;
     const baseValue = Number(rawBonus.value || 0);
-    const level = scaleLevelValue(scale, buff || {});
     if (!scale) return baseValue;
+    const level = scaleLevelValue(scale, buff || {}, {
+      ...context,
+      rawBonus,
+    });
 
     // "DR /lawful equal to 1/2 barbarian level," "+1 per 3 caster
     // levels," etc. -- a straight fraction of the level, not a flat
@@ -176,15 +572,26 @@
     // this stays integer division throughout (never a float
     // multiplier) to avoid the classic 9 * (1/3) = 2.999... trap.
     const multiplier = scale.levelMultiplier;
+    const milestones = Array.isArray(scale.milestones) ? scale.milestones : [];
+    const every = scale.every || {};
+    const hasMilestones = milestones.some(
+      (milestone) =>
+        Number(milestone.level || 0) > 0 || Number(milestone.value || 0) !== 0,
+    );
+    const hasEvery =
+      Number(every.fromLevel || every.afterLevel || every.after || 0) > 0 ||
+      Number(every.everyLevels || every.every || 0) > 0 ||
+      Number(every.increase || 0) !== 0;
     let value =
       multiplier && Number(multiplier.denominator) > 0
         ? Math.floor(
             (level * Number(multiplier.numerator || 0)) /
               Number(multiplier.denominator),
           )
-        : baseValue;
+        : scale.source && !baseValue && !hasMilestones && !hasEvery
+          ? level
+          : baseValue;
 
-    const milestones = Array.isArray(scale.milestones) ? scale.milestones : [];
     milestones
       .map((milestone) => ({
         level: Number(milestone.level || 0),
@@ -196,7 +603,6 @@
         value = milestone.value;
       });
 
-    const every = scale.every || {};
     const fromLevel = Number(
       every.fromLevel || every.afterLevel || every.after || 0,
     );
@@ -204,8 +610,9 @@
     const increase = Number(every.increase || 0);
     if (fromLevel > 0 && everyLevels > 0 && increase) {
       value +=
-        Math.floor(Math.max(0, level - fromLevel + 1) / everyLevels) *
-        increase;
+        level >= fromLevel
+          ? (Math.floor((level - fromLevel) / everyLevels) + 1) * increase
+          : 0;
     }
 
     // "... minimum +1" is common PF1e phrasing on fractional scaling (DR
@@ -227,13 +634,271 @@
       .join(", ");
   }
 
+  function hasUnresolvedConditionalTokens(rawBonus = {}) {
+    return [rawBonus.appliesWhen, rawBonus.condition, rawBonus.favoredEnemyTarget]
+      .filter(Boolean)
+      .some((value) => /\{[^{}]+\}/.test(String(value)));
+  }
+
+  function normalizedSpellTargetMode(entry = {}) {
+    const raw = String(
+      entry.targetMode || entry.chooseBy || entry.by || entry.mode || "all",
+    )
+      .trim()
+      .toLowerCase();
+    const aliases = {
+      all: "all",
+      class: "class",
+      classes: "class",
+      school: "school",
+      schools: "school",
+      subschool: "subschool",
+      subschools: "subschool",
+      "school with subschool": "subschool",
+      descriptor: "descriptor",
+      descriptors: "descriptor",
+      "type of magic": "magicType",
+      magictype: "magicType",
+      magic: "magicType",
+      spell: "spell",
+      spells: "spell",
+      name: "spell",
+      names: "spell",
+    };
+    return aliases[raw] || "all";
+  }
+
+  function normalizedSpellTargetValue(value) {
+    return String(value || "")
+      .trim()
+      .toLowerCase();
+  }
+
+  function normalizedSubschoolTargetValue(value) {
+    const key = normalizedSpellTargetValue(value);
+    const parenthetical = /^([^()]+)\(([^()]+)\)$/.exec(key);
+    if (parenthetical)
+      return `${parenthetical[1].trim()}:${parenthetical[2].trim()}`;
+    return key.replace(/\s*:\s*/g, ":");
+  }
+
+  function normalizedSpellName(value) {
+    return normalizedSpellTargetValue(value).replace(/[^a-z0-9]+/g, "");
+  }
+
+  function listFromValue(value) {
+    if (Array.isArray(value))
+      return value.map((entry) => String(entry || "").trim()).filter(Boolean);
+    return String(value || "")
+      .split(",")
+      .map((entry) => entry.trim())
+      .filter(Boolean);
+  }
+
+  function spellAdjustmentTargets(entry = {}) {
+    return listFromValue(
+      entry.targets ||
+        entry.values ||
+        entry.names ||
+        entry.spellNames ||
+        entry.classes ||
+        entry.schools ||
+        entry.subschools ||
+        entry.descriptors ||
+        entry.magicTypes ||
+        entry.target ||
+        "",
+    );
+  }
+
+  function spellContextValues(context = {}, fields = []) {
+    return fields.flatMap((field) => {
+      const value = context[field];
+      if (value && typeof value === "object" && !Array.isArray(value))
+        return listFromValue(value.name || value.spellName || "");
+      return Array.isArray(value) ? value : listFromValue(value);
+    });
+  }
+
+  function spellAdjustmentMatches(entry = {}, spellContext = {}) {
+    const mode = normalizedSpellTargetMode(entry);
+    if (mode === "all") return true;
+    const targets = spellAdjustmentTargets(entry);
+    if (!targets.length) return false;
+    const targetKeys = targets.map(normalizedSpellTargetValue);
+    if (mode === "spell") {
+      const names = spellContextValues(spellContext, [
+        "name",
+        "spellName",
+        "spell",
+      ]).map(normalizedSpellName);
+      const targetNames = targets.map(normalizedSpellName);
+      return targetNames.some((target) => names.includes(target));
+    }
+    if (mode === "subschool") {
+      const school = normalizedSpellTargetValue(spellContext.school);
+      const subschools = spellContextValues(spellContext, [
+        "subschool",
+        "subschools",
+      ]).map(normalizedSpellTargetValue);
+      const contextPairs = subschools.flatMap((subschool) =>
+        school ? [`${school}:${subschool}`, subschool] : [subschool],
+      );
+      return targets
+        .map(normalizedSubschoolTargetValue)
+        .some((target) => contextPairs.includes(target));
+    }
+    const fieldsByMode = {
+      class: ["className", "castingClass", "spellClass"],
+      school: ["school"],
+      descriptor: ["descriptor", "descriptors"],
+      magicType: ["magicType", "magicTypes", "typeOfMagic"],
+    };
+    const values = spellContextValues(spellContext, fieldsByMode[mode] || []).map(
+      normalizedSpellTargetValue,
+    );
+    return targetKeys.some((target) => values.includes(target));
+  }
+
+  function normalizedCasterLevelPart(value = "spell") {
+    const raw = String(value || "spell")
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "");
+    const aliases = {
+      spell: "spell",
+      wholespell: "spell",
+      all: "spell",
+      duration: "duration",
+      durationonly: "duration",
+      range: "range",
+      rangeonly: "range",
+      effect: "effectScaling",
+      effects: "effectScaling",
+      effectscaling: "effectScaling",
+      scaling: "effectScaling",
+    };
+    return aliases[raw] || "spell";
+  }
+
+  function casterLevelBonusAppliesToPart(entry = {}, part = "spell") {
+    const appliesTo = normalizedCasterLevelPart(
+      entry.appliesTo || entry.applyTo || entry.part || "spell",
+    );
+    const targetPart = normalizedCasterLevelPart(part);
+    return appliesTo === "spell" || appliesTo === targetPart;
+  }
+
+  function collectSpellAdjustmentBonuses(
+    activeBuffs = [],
+    mechanicKey,
+    spellContext = {},
+    options = {},
+  ) {
+    const bonuses = [];
+    const enrichedBuffs = (activeBuffs || []).map((buff) => ({
+      ...buff,
+      characterLevel:
+        buff.characterLevel || options.characterLevel || spellContext.characterLevel,
+      classLevel:
+        buff.classLevel ||
+        options.classLevel ||
+        spellContext.classLevel ||
+        spellContext.casterLevel,
+      casterLevel:
+        buff.casterLevel ||
+        options.casterLevel ||
+        spellContext.casterLevel ||
+        spellContext.classLevel,
+      classLevels: buff.classLevels || options.classLevels || spellContext.classLevels,
+    }));
+    enrichedBuffs.forEach((buff) => {
+      (Array.isArray(buff[mechanicKey]) ? buff[mechanicKey] : []).forEach(
+        (entry) => {
+          if (hasUnresolvedConditionalTokens(entry)) return;
+          if (mechanicKey === "casterLevelBonuses") {
+            const part = options.part || spellContext.part || "spell";
+            if (!casterLevelBonusAppliesToPart(entry, part)) return;
+          }
+          if (!spellAdjustmentMatches(entry, spellContext)) return;
+          const value = scaledBonusValue(entry, buff, {
+            ...options,
+            activeBuffs: enrichedBuffs,
+            spellContext,
+          });
+          if (!value && !(entry.bonusScale || entry.scale)) return;
+          bonuses.push({
+            ...entry,
+            value,
+            type: entry.type || "untyped",
+            source: buff.name || buff.source || "Effect",
+            appliesWhen: entry.appliesWhen || entry.condition || "",
+          });
+        },
+      );
+    });
+    return applyBonuses(bonuses, options);
+  }
+
+  function effectiveCasterLevel(
+    baseClassLevel = 0,
+    activeBuffs = [],
+    spellContext = {},
+    part = "spell",
+    options = {},
+  ) {
+    const base = Number(baseClassLevel || spellContext.casterLevel || 0);
+    const applied = collectSpellAdjustmentBonuses(
+      activeBuffs,
+      "casterLevelBonuses",
+      { ...spellContext, casterLevel: base, part },
+      { ...options, part },
+    );
+    return {
+      base,
+      total: base + applied.total,
+      bonus: applied.total,
+      used: applied.used,
+      ignored: applied.ignored,
+      conditional: applied.conditional,
+    };
+  }
+
+  function baseSpellDc(castingAbilityMod = 0, spellLevel = 0) {
+    return 10 + Number(spellLevel || 0) + Number(castingAbilityMod || 0);
+  }
+
+  function effectiveSpellDc(
+    baseDc = 10,
+    activeBuffs = [],
+    spellContext = {},
+    options = {},
+  ) {
+    const base = Number(baseDc || 0);
+    const applied = collectSpellAdjustmentBonuses(
+      activeBuffs,
+      "spellDcBonuses",
+      spellContext,
+      options,
+    );
+    return {
+      base,
+      total: base + applied.total,
+      bonus: applied.total,
+      used: applied.used,
+      ignored: applied.ignored,
+      conditional: applied.conditional,
+    };
+  }
+
   function collectBuffModifiers(activeBuffs) {
     const map = {};
 
     activeBuffs.forEach((buff) => {
       (buff.bonuses || []).forEach((rawBonus) => {
+        if (hasUnresolvedConditionalTokens(rawBonus)) return;
         const targets = expandedStatsForBonus(rawBonus);
-        const value = scaledBonusValue(rawBonus, buff);
+        const value = scaledBonusValue(rawBonus, buff, { activeBuffs });
         targets.forEach((targetStat) => {
           if (!map[targetStat]) map[targetStat] = [];
           map[targetStat].push({
@@ -326,6 +991,7 @@
   function addConditionalBreakdown(breakdown, stat, bonus) {
     if (!breakdown[stat]) breakdown[stat] = [];
     breakdown[stat].push({
+      ...bonus,
       stat,
       source: bonus.source,
       value: bonus.value,
@@ -345,6 +1011,15 @@
       classLevels: buff.classLevels || baseline.classLevels,
     }));
     const buffMap = collectBuffModifiers(enrichedBuffs);
+    let suppressedBonusTypes = new Map();
+    let conditionalSuppressedBonusTypes = new Map();
+    let requirementAbilityScores = {};
+    const applyActiveBonuses = (bonuses) =>
+      applyBonuses(bonuses, {
+        suppressedBonusTypes,
+        conditionalSuppressedBonusTypes,
+        abilityScores: requirementAbilityScores,
+      });
     const totals = {};
     const bonuses = {};
     const breakdown = {};
@@ -362,8 +1037,42 @@
     const abilityMods = {};
     const abilityCauses = {};
 
+    requirementAbilityScores = Object.fromEntries(
+      Object.entries(abilityKeys).map(([stat, key]) => [
+        stat,
+        Number(baseline[key] || 0),
+      ]),
+    );
+    for (let index = 0; index < 4; index += 1) {
+      const nextSuppressions = activeBonusTypeSuppressions(
+        buffMap,
+        requirementAbilityScores,
+      );
+      const nextScores = {};
+      Object.entries(abilityKeys).forEach(([stat, key]) => {
+        const applied = applyBonuses(buffMap[stat] || [], {
+          suppressedBonusTypes: nextSuppressions,
+          abilityScores: requirementAbilityScores,
+        });
+        nextScores[stat] = Number(baseline[key] || 0) + applied.total;
+      });
+      const unchanged = Object.keys(nextScores).every(
+        (stat) => nextScores[stat] === requirementAbilityScores[stat],
+      );
+      requirementAbilityScores = nextScores;
+      if (unchanged) break;
+    }
+    suppressedBonusTypes = activeBonusTypeSuppressions(
+      buffMap,
+      requirementAbilityScores,
+    );
+    conditionalSuppressedBonusTypes = conditionalBonusTypeSuppressions(
+      buffMap,
+      requirementAbilityScores,
+    );
+
     Object.entries(abilityKeys).forEach(([stat, key]) => {
-      const applied = applyBonuses(buffMap[stat] || []);
+      const applied = applyActiveBonuses(buffMap[stat] || []);
       const score = Number(baseline[key] || 0) + applied.total;
       abilityScores[stat] = score;
       abilityMods[stat] = abilityMod(score);
@@ -396,10 +1105,11 @@
           "natural armor",
           "deflection",
           "remove dex bonus to ac",
-        ].includes(stat)
+        ].includes(stat) ||
+        isBonusSuppressionStat(stat)
       )
         return;
-      const applied = applyBonuses(buffMap[stat]);
+      const applied = applyActiveBonuses(buffMap[stat]);
       direct[stat] = applied.total;
       directCauses[stat] = describeBonuses(applied.used);
       applied.used.forEach((b) =>
@@ -412,18 +1122,18 @@
       bonuses[stat] = applied.total;
     });
 
-    const acSizeApplied = applyBonuses(
+    const acSizeApplied = applyActiveBonuses(
       (buffMap.ac || []).filter((b) => b.type === "size"),
     );
-    const armorApplied = applyBonuses(
+    const armorApplied = applyActiveBonuses(
       (buffMap.ac || []).filter((b) => b.type === "armor"),
     );
-    const shieldApplied = applyBonuses(
+    const shieldApplied = applyActiveBonuses(
       (buffMap.ac || []).filter((b) => b.type === "shield"),
     );
-    const naturalApplied = applyBonuses(buffMap["natural armor"] || []);
-    const deflectionApplied = applyBonuses(buffMap.deflection || []);
-    const acMiscApplied = applyBonuses(
+    const naturalApplied = applyActiveBonuses(buffMap["natural armor"] || []);
+    const deflectionApplied = applyActiveBonuses(buffMap.deflection || []);
+    const acMiscApplied = applyActiveBonuses(
       (buffMap.ac || []).filter(
         (b) => !["armor", "shield", "size"].includes(b.type),
       ),
@@ -460,7 +1170,7 @@
       "racial",
       "sacred",
     ];
-    const cmdAcApplied = applyBonuses(
+    const cmdAcApplied = applyActiveBonuses(
       (buffMap.ac || []).filter(
         (b) =>
           cmdAcTypes.includes(b.type) ||
@@ -472,7 +1182,7 @@
 
     const acDexMod = dexMod + dexDeniedApplied.total;
     const flatDexMod = Math.min(0, dexMod);
-    const dodgeAcBuffs = applyBonuses(
+    const dodgeAcBuffs = applyActiveBonuses(
       (buffMap.ac || []).filter((b) => b.type === "dodge"),
     ).total;
     totals.ac =
@@ -704,6 +1414,11 @@
         (abilityMods.constitution - abilityMod(baseline.con)) +
       (direct["hit points"] || 0);
     totals["skill checks"] = direct["skill checks"] || 0;
+    totals["trained skill checks"] = direct["trained skill checks"] || 0;
+    totals["untrained skill checks"] = direct["untrained skill checks"] || 0;
+    totals["class skill checks"] = direct["class skill checks"] || 0;
+    totals["class knowledge skill checks"] =
+      direct["class knowledge skill checks"] || 0;
     totals["craft skill checks"] = direct["craft skill checks"] || 0;
     totals["profession skill checks"] = direct["profession skill checks"] || 0;
     totals["perform skill checks"] = direct["perform skill checks"] || 0;
@@ -793,5 +1508,10 @@
     calculateStatsDetailed,
     scaledBonusValue,
     scaleLevelValue,
+    baseSpellDc,
+    collectSpellAdjustmentBonuses,
+    effectiveCasterLevel,
+    effectiveSpellDc,
+    spellAdjustmentMatches,
   };
 })();

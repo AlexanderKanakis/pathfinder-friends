@@ -75,6 +75,10 @@
   border-color: #6ea8fe;
 }
 
+.racial-trait-card.is-unavailable {
+  opacity: 0.72;
+}
+
 .racial-trait-topline {
   display: flex;
   align-items: flex-start;
@@ -113,6 +117,16 @@
 .racial-trait-pill.is-modifies {
   border-color: #6ea8fe;
   color: #b6d4fe;
+}
+
+.racial-trait-pill.is-requirement {
+  border-color: #20c997;
+  color: #a6f4d0;
+}
+
+.racial-trait-pill.is-unmet {
+  border-color: #adb5bd;
+  color: #ced4da;
 }
 
 .racial-trait-choice-row {

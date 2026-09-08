@@ -77,6 +77,32 @@ body {
   align-items: end;
 }
 
+.trait-grid-alternate {
+  grid-template-columns:
+    minmax(220px, 1fr)
+    minmax(80px, 140px)
+    minmax(80px, max-content)
+    minmax(180px, 0.75fr)
+    minmax(180px, 0.75fr);
+}
+
+.trait-grid-alternate .trait-duration-field {
+  grid-column: 1 / -1;
+  grid-row: 2;
+}
+
+.trait-grid-alternate
+  .trait-relation-field[data-trait-relation-field="replaces"] {
+  grid-column: 4;
+  grid-row: 1;
+}
+
+.trait-grid-alternate
+  .trait-relation-field[data-trait-relation-field="modifies"] {
+  grid-column: 5;
+  grid-row: 1;
+}
+
 .trait-grid .grid-column-full {
   grid-column: 1 / -1;
 }
@@ -91,8 +117,21 @@ body {
   align-self: end;
 }
 
+.trait-compact-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .trait-duration-field {
   align-self: end;
+}
+
+.trait-attribute-requirement-field {
+  display: grid;
+  grid-template-columns: minmax(120px, 180px) minmax(90px, 130px);
+  gap: 8px;
+  align-items: end;
 }
 
 .trait-category-field input {
@@ -100,9 +139,7 @@ body {
 }
 
 .trait-relation-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
+  display: contents;
 }
 
 .trait-relation-field {
@@ -128,6 +165,46 @@ body {
 .trait-relation-suggestions.is-open {
   display: grid;
   gap: 3px;
+}
+
+@media (max-width: 1199.98px) {
+  .trait-grid-alternate {
+    grid-template-columns:
+      minmax(220px, 1fr)
+      minmax(96px, 140px)
+      minmax(96px, 120px);
+  }
+
+  .trait-grid-alternate .trait-duration-field,
+  .trait-grid-alternate
+    .trait-relation-field[data-trait-relation-field="replaces"],
+  .trait-grid-alternate
+    .trait-relation-field[data-trait-relation-field="modifies"] {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+  .trait-grid-alternate .trait-relation-grid {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .trait-grid,
+  .trait-grid-alternate {
+    grid-template-columns: 1fr;
+  }
+
+  .trait-attribute-requirement-field {
+    grid-template-columns: 1fr;
+  }
+
+  .trait-grid-alternate .trait-relation-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .trait-relation-suggestion {

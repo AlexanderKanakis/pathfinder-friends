@@ -10,6 +10,18 @@ body {
   margin-bottom: 12px;
 }
 
+#sheetInfoTabs {
+  width: 50%;
+  min-width: 520px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#sheetInfoTabs[data-active-panel="spells"] {
+  width: min(100%, 980px);
+  min-width: 0;
+}
+
 .sheet-page-header {
   display: grid;
   gap: 8px;
@@ -357,11 +369,13 @@ body {
 
 .progression-grid {
   display: grid;
-  grid-template-columns: minmax(180px, 360px);
+  grid-template-columns: minmax(0, 1fr);
   gap: 8px;
 }
 
 .progression-card {
+  width: 100%;
+  min-width: 0;
   background: #242424;
   border: 1px solid #444;
   border-radius: 8px;
@@ -407,6 +421,30 @@ body {
   border-color: #555 !important;
 }
 
+.class-feature-description-toggle {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-weight: 700;
+  text-align: left;
+}
+
+.class-feature-description-toggle i {
+  flex: 0 0 auto;
+  color: #aaa;
+  transition: transform 0.15s ease;
+}
+
+.class-feature-description-toggle[aria-expanded="true"] i {
+  transform: rotate(180deg);
+}
+
 .class-feature-effects {
   display: flex;
   flex-wrap: wrap;
@@ -449,14 +487,50 @@ body {
 
 .class-feature-pool {
   padding: 0;
+  display: grid;
+  gap: 4px;
 }
 
 .class-feature-choice-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 70px 34px;
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: 6px;
   align-items: center;
-  max-width: 360px;
+  width: 100%;
+}
+
+.class-feature-choice-select,
+.class-feature-choice-clear {
+  width: 100%;
+}
+
+.class-feature-choice-clear.btn-icon {
+  width: 34px;
+  min-width: 34px;
+  height: 34px;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.class-feature-choice-select {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 34px;
+  text-align: left;
+}
+
+.class-feature-choice-select span,
+.class-feature-choice-select strong {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.class-feature-choice-select strong {
+  color: #fff;
 }
 
 .class-feature-choice-summary {
@@ -542,6 +616,7 @@ body {
   display: grid;
   gap: 4px;
   margin-bottom: 7px;
+  min-width: 0;
 }
 
 .spell-bucket-title {
@@ -598,7 +673,9 @@ body {
 .spell-action-stack {
   display: grid;
   gap: 6px;
-  width: min(320px, 32vw);
+  width: 100%;
+  max-width: 320px;
+  min-width: 0;
 }
 
 .spell-action-stack .btn {
@@ -617,12 +694,14 @@ body {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 34px;
   gap: 6px;
+  min-width: 0;
 }
 
 .spell-action-row > .btn-icon {
   text-align: center;
   padding-left: 0;
   padding-right: 0;
+  width: 34px;
 }
 
 .spell-selection-row {
@@ -630,6 +709,7 @@ body {
   grid-template-columns: minmax(0, 1fr) 34px;
   gap: 6px;
   align-items: center;
+  min-width: 0;
 }
 
 .spell-selection-name {
@@ -667,6 +747,11 @@ body {
 }
 
 @media (max-width: 760px) {
+  #sheetInfoTabs {
+    width: 100%;
+    min-width: 0;
+  }
+
   .spell-row {
     grid-template-columns: 1fr;
   }
@@ -845,6 +930,10 @@ body.enemy-sheet-mode .enemy-field-pair {
   gap: 6px;
 }
 
+.character-spell-like-section {
+  margin-top: 12px;
+}
+
 .enemy-spell-header,
 .enemy-spell-row {
   display: grid;
@@ -872,6 +961,23 @@ body.enemy-sheet-mode .enemy-field-pair {
 .enemy-spell-row.character-spell-like-row textarea {
   min-height: 31px;
   height: 31px;
+}
+
+.character-spell-like-choices {
+  display: grid;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.character-spell-like-choice {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  border: 1px solid #444;
+  border-radius: 6px;
+  padding: 8px;
+  background: #242424;
 }
 
 .enemy-spell-row textarea,
@@ -915,6 +1021,10 @@ body.enemy-sheet-mode .enemy-field-pair {
 
   .enemy-spell-header span:nth-child(2) {
     grid-column: 1;
+  }
+
+  .character-spell-like-choice {
+    grid-template-columns: 1fr;
   }
 
   body.enemy-sheet-mode .enemy-field-pair {
@@ -1536,18 +1646,24 @@ body.enemy-sheet-mode .enemy-field-pair {
   white-space: normal;
 }
 
-.class-skill-cell {
+.skill-table .class-skill-heading,
+.skill-table .class-skill-cell {
   text-align: center;
-  width: 28px;
+  width: 14px;
+  min-width: 14px;
+  max-width: 14px;
+  padding-left: 0 !important;
+  padding-right: 2px !important;
 }
 
 .class-skill-dot {
   display: inline-block;
-  width: 12px;
-  height: 12px;
+  width: 7px;
+  height: 7px;
   border-radius: 999px;
   border: 1px solid #555;
   background: transparent;
+  vertical-align: middle;
 }
 
 .class-skill-dot.is-class-skill {
@@ -1572,27 +1688,38 @@ body.enemy-sheet-mode .enemy-field-pair {
   padding-right: 0.25rem;
 }
 
-.skill-table th:first-child {
+.skill-table th:first-child,
+.skill-table td:first-child {
+  width: 14px;
+}
+
+.skill-table th:nth-child(2),
+.skill-table td:nth-child(2) {
   width: 28%;
 }
 
-.skill-table th:nth-child(2) {
+.skill-table th:nth-child(3),
+.skill-table td:nth-child(3) {
   width: 11%;
 }
 
-.skill-table th:nth-child(3) {
+.skill-table th:nth-child(4),
+.skill-table td:nth-child(4) {
   width: 11%;
 }
 
-.skill-table th:nth-child(4) {
+.skill-table th:nth-child(5),
+.skill-table td:nth-child(5) {
   width: 18%;
 }
 
-.skill-table th:nth-child(5) {
+.skill-table th:nth-child(6),
+.skill-table td:nth-child(6) {
   width: 18%;
 }
 
-.skill-table th:nth-child(6) {
+.skill-table th:nth-child(7),
+.skill-table td:nth-child(7) {
   width: 14%;
 }
 
@@ -1720,7 +1847,13 @@ body.enemy-sheet-mode .enemy-field-pair {
     table-layout: auto;
   }
 
-  .skill-table th:first-child {
+  .skill-table th:first-child,
+  .skill-table td:first-child {
+    width: 14px;
+  }
+
+  .skill-table th:nth-child(2),
+  .skill-table td:nth-child(2) {
     width: 32%;
   }
 
@@ -1729,11 +1862,6 @@ body.enemy-sheet-mode .enemy-field-pair {
   .skill-table th:nth-child(6),
   .skill-table td:nth-child(6) {
     display: none;
-  }
-
-  .skill-table th:nth-child(2),
-  .skill-table td:nth-child(2) {
-    width: 16%;
   }
 
   .skill-table th:nth-child(4),

@@ -34,6 +34,7 @@ const SKILLS = [
   ["Escape Artist", "dex"],
   ["Fly", "dex"],
   ["Heal", "wis"],
+  ["Handle Animal", "cha"],
   ["Intimidate", "cha"],
   ["Knowledge (arcana)", "int"],
   ["Knowledge (dungeoneering)", "int"],
@@ -437,6 +438,8 @@ const LOOT_EFFECT_STATS = [
   "touch ac",
   "flat-footed ac",
   "remove dex bonus to ac",
+  "cannot gain morale bonuses",
+  "cannot gain luck bonuses",
   "natural armor",
   "deflection",
   "fortitude",
@@ -478,14 +481,18 @@ let sheetViewMode = sessionStorage.getItem("pf_character_sheet_view") || "full";
 let customSkills = [];
 let skillSearchTerm = "";
 let classFeatureChoices = {};
+let classFeatureVariableChoices = {};
 let selectedRacialAlternateTraits = [];
 let selectedRacialTraitChoices = {};
 let classFeatureChoicePickerConfigs = new Map();
+let classFeatureVariableChoicePickerConfigs = new Map();
 // Effects + DR/SR/Class Skill grants on an inventory item -- mounted once
 // (see initCharacterSheet below) via the shared scripts/effect-editor.js
 // accordion.
 let inventoryEffectsAccordion = null;
 let characterSpells = {};
+let selectedSpellLikeChoices = {};
+let spellLikeChoiceConfigs = new Map();
 let spellMobilePanels = {};
 let inventoryItemModal = null;
 let deleteInventoryItemModal = null;
@@ -971,6 +978,52 @@ function spellLikeAbilityDisplayName(entry = {}) {
   return entry.spellName || entry.spell?.name || entry.name || "";
 }
 
+function spellLikeChoiceListName(entry = {}) {
+  return (
+    spellLikeChoiceList(entry)?.name ||
+    entry.spellChoiceListName ||
+    entry.spellListName ||
+    ""
+  );
+}
+
+function spellLikeChoiceKey(buff = {}, entry = {}) {
+  const choiceList = spellLikeChoiceList(entry);
+  return [
+    buff.source || buff.name || "effect",
+    buff.id || "",
+    entry.spellChoiceListId || choiceList?.id || choiceList?.name || "",
+    entry.frequency || "",
+    spellLikeMinimumLevel(entry),
+    spellLikeCastingAttrKey(entry),
+    spellLikeMinimumScore(entry),
+  ].join("|");
+}
+
+function spellLikeChoiceSpellOptions(choiceList = {}) {
+  return (choiceList.items || [])
+    .map((item) => ({
+      name: item.name || item.spellName || item.label || item.value,
+      spellName: item.name || item.spellName || item.label || item.value,
+    }))
+    .filter((spell) => spell.name);
+}
+
+async function chooseSheetSpellLikeAbility(choiceKey = "") {
+  const config = spellLikeChoiceConfigs.get(choiceKey);
+  if (!config || !window.PFMagicSearchModal) return;
+  const picked = await window.PFMagicSearchModal.open({
+    title: `${config.source || "Effect"}: Choose SLA`,
+    spells: spellLikeChoiceSpellOptions(config.choiceList),
+  });
+  if (!picked) return;
+  selectedSpellLikeChoices[choiceKey] = {
+    spellName: picked.name || picked.spellName || "Spell",
+  };
+  recalculateSheet();
+  queueSheetSave();
+}
+
 function spellLikeMinimumLevel(entry = {}) {
   const value = Number(entry.minimumLevel ?? entry.level ?? 1);
   if (!Number.isFinite(value)) return 1;
@@ -1029,37 +1082,87 @@ function spellLikeAbilityIsUnlocked(entry = {}) {
 
 function collectCharacterSpellLikeRows() {
   const grouped = new Map();
+  const pendingChoices = [];
+  spellLikeChoiceConfigs = new Map();
   calculationBuffs().forEach((buff) => {
     (Array.isArray(buff.spellLikeAbilities)
       ? buff.spellLikeAbilities
       : []
     ).forEach((entry) => {
       if (!spellLikeAbilityIsUnlocked(entry)) return;
-      const spellName = spellLikeAbilityDisplayName(entry);
+      const choiceList = spellLikeChoiceList(entry);
+      const choiceKey = choiceList ? spellLikeChoiceKey(buff, entry) : "";
+      const chosen = choiceKey ? selectedSpellLikeChoices[choiceKey] : null;
+      if (choiceList && !chosen) {
+        spellLikeChoiceConfigs.set(choiceKey, {
+          source: buff.name || buff.source || "Effect",
+          entry,
+          choiceList,
+        });
+        pendingChoices.push({
+          key: choiceKey,
+          source: buff.name || buff.source || "Effect",
+          listName: choiceList.name || "SLA list",
+          frequency: String(entry.frequency || "At will").trim() || "At will",
+        });
+        return;
+      }
+      const effectiveEntry = chosen
+        ? { ...entry, spellName: chosen.spellName }
+        : entry;
+      const spellName = spellLikeAbilityDisplayName(effectiveEntry);
       if (!spellName) return;
-      const label = String(entry.frequency || "At will").trim() || "At will";
+      const label = String(effectiveEntry.frequency || "At will").trim() || "At will";
       const names = grouped.get(label) || new Set();
       names.add(spellName);
       grouped.set(label, names);
     });
   });
-  return [...grouped.entries()].map(([label, names]) => ({
-    label,
-    spells: [...names].sort((a, b) => a.localeCompare(b)).join(", "),
-  }));
+  return {
+    rows: [...grouped.entries()].map(([label, names]) => ({
+      label,
+      spells: [...names].sort((a, b) => a.localeCompare(b)).join(", "),
+    })),
+    pendingChoices,
+  };
 }
 
 function renderCharacterSpellLikeAbilities() {
-  const section = el("sheetSpellLikeSection");
-  const container = el("spellLikeAbilityRows");
-  if (!section || !container || isEnemySheetMode) return;
-  const rows = collectCharacterSpellLikeRows();
-  section.classList.toggle("d-none", !rows.length);
+  const section = el("characterSpellLikeSection");
+  const container = el("characterSpellLikeRows");
+  if (!section || !container) return;
+  if (isEnemySheetMode) {
+    section.classList.add("d-none");
+    container.innerHTML = "";
+    return;
+  }
+  const { rows, pendingChoices } = collectCharacterSpellLikeRows();
+  section.classList.toggle("d-none", !rows.length && !pendingChoices.length);
+  const pendingHtml = pendingChoices.length
+    ? `<div class="character-spell-like-choices">${pendingChoices
+        .map(
+          (choice) => `
+        <div class="character-spell-like-choice">
+          <div>
+            <div class="fw-semibold">${escapeHtml(choice.frequency)}: ${escapeHtml(choice.listName)}</div>
+            <small>${escapeHtml(choice.source)}</small>
+          </div>
+          <button class="btn btn-outline-info btn-sm" type="button" data-spell-like-choice="${escapeHtml(choice.key)}">Choose SLA</button>
+        </div>
+      `,
+        )
+        .join("")}</div>`
+    : "";
   container.innerHTML = rows.length
     ? `${enemySpellGridHeader({ readonly: true })}${rows
         .map((row) => enemySpellRowMarkup(row, { readonly: true }))
-        .join("")}`
-    : "";
+        .join("")}${pendingHtml}`
+    : pendingHtml;
+  container.querySelectorAll("[data-spell-like-choice]").forEach((button) => {
+    button.addEventListener("click", () =>
+      chooseSheetSpellLikeAbility(button.dataset.spellLikeChoice),
+    );
+  });
   updateEnemyAutoInputSizes(container);
   autosizeEnemyTextareas(container);
 }
@@ -1502,12 +1605,41 @@ function skillFamilyBonusKey(skill) {
   return "";
 }
 
+function isKnowledgeSkill(skill) {
+  return /^knowledge(?:\s*\(|\b)/i.test(String(skill || "").trim());
+}
+
+function genericSkillStatKey(skill) {
+  const name = String(skill || "").trim();
+  if (/^craft(?:\s*\(|\b)/i.test(name)) return "skill:craft";
+  if (/^profession(?:\s*\(|\b)/i.test(name)) return "skill:profession";
+  if (/^perform(?:\s*\(|\b)/i.test(name)) return "skill:perform";
+  return "";
+}
+
+function classSkillSetHasSkill(keys, skill) {
+  const specificKey = skillStatKey(skill);
+  const genericKey = genericSkillStatKey(skill);
+  return keys.has(specificKey) || Boolean(genericKey && keys.has(genericKey));
+}
+
+function skillTrainingBonusKey(skill) {
+  const status = window.PFEffectStats?.skillTrainingStatus?.(skill);
+  if (status === "trained") return "trained skill checks";
+  if (status === "untrained") return "untrained skill checks";
+  return "";
+}
+
 function skillFamilyLabel(stat) {
   return (
     {
       "craft skill checks": "Craft skills",
       "profession skill checks": "Profession skills",
       "perform skill checks": "Perform skills",
+      "class skill checks": "Class skills",
+      "class knowledge skill checks": "Class Knowledge skills",
+      "trained skill checks": "Trained skills",
+      "untrained skill checks": "Untrained skills",
     }[stat] || ""
   );
 }
@@ -1641,9 +1773,18 @@ function racialTraitChoiceKeyForTrait(trait = {}) {
   return racialTraitNameKey(trait);
 }
 
+function racialTraitChoicePools(trait = {}) {
+  return Array.isArray(trait.choicePools)
+    ? trait.choicePools
+    : Array.isArray(trait.pools)
+      ? trait.pools
+      : [];
+}
+
 function resolvedRacialTrait(trait = {}) {
   const hasChoice =
     racialTraitMechanicsHaveChoiceStats(trait) ||
+    racialTraitChoicePools(trait).length ||
     (trait.modifiedTraitOverrides || []).some(racialTraitOverrideHasChoiceStats);
   if (!hasChoice) return trait;
   const choices =
@@ -1652,18 +1793,43 @@ function resolvedRacialTrait(trait = {}) {
   return {
     ...trait,
     effects: Array.isArray(choices.effects) ? choices.effects : trait.effects,
+    damageReduction: Array.isArray(choices.damageReduction)
+      ? choices.damageReduction
+      : trait.damageReduction,
+    spellResistance: Array.isArray(choices.spellResistance)
+      ? choices.spellResistance
+      : trait.spellResistance,
     classSkillGrants: Array.isArray(choices.classSkillGrants)
       ? choices.classSkillGrants
       : trait.classSkillGrants,
+    extraRanksPerLevel: Array.isArray(choices.extraRanksPerLevel)
+      ? choices.extraRanksPerLevel
+      : trait.extraRanksPerLevel,
     immunities: Array.isArray(choices.immunities)
       ? choices.immunities
       : trait.immunities,
+    applyConditions: Array.isArray(choices.applyConditions)
+      ? choices.applyConditions
+      : trait.applyConditions,
     spellLikeAbilities: Array.isArray(choices.spellLikeAbilities)
       ? choices.spellLikeAbilities
       : trait.spellLikeAbilities,
+    casterLevelBonuses: Array.isArray(choices.casterLevelBonuses)
+      ? choices.casterLevelBonuses
+      : trait.casterLevelBonuses,
+    spellDcBonuses: Array.isArray(choices.spellDcBonuses)
+      ? choices.spellDcBonuses
+      : trait.spellDcBonuses,
     generatedEquipment: Array.isArray(choices.generatedEquipment)
       ? choices.generatedEquipment
       : trait.generatedEquipment,
+    conditionalVariables: Array.isArray(choices.conditionalVariables)
+      ? choices.conditionalVariables
+      : trait.conditionalVariables,
+    conditionalChoices:
+      choices.conditionalChoices && typeof choices.conditionalChoices === "object"
+        ? choices.conditionalChoices
+        : trait.conditionalChoices,
     modifiedTraitOverrides: Array.isArray(choices.modifiedTraitOverrides)
       ? choices.modifiedTraitOverrides
       : trait.modifiedTraitOverrides,
@@ -1678,6 +1844,329 @@ function removeRacialTraitChoice(trait = {}) {
   const key = racialTraitChoiceKeyForTrait(trait);
   if (!key) return;
   delete selectedRacialTraitChoices[key];
+}
+
+function selectedRacialTraitChoicesForSave() {
+  const race = selectedRaceDefinition();
+  if (!race) return cloneJson(selectedRacialTraitChoices);
+  const activatableKeys = new Set(
+    [...(race.standardTraits || []), ...(race.alternateTraits || [])]
+      .filter((trait) => trait?.activatable)
+      .map(racialTraitChoiceKeyForTrait)
+      .filter(Boolean),
+  );
+  return Object.fromEntries(
+    Object.entries(selectedRacialTraitChoices || {}).filter(
+      ([key]) => !activatableKeys.has(key),
+    ),
+  );
+}
+
+function abilityForNamedSkillChoice(skillName = "") {
+  if (/^craft(?:\s*\(|\b)/i.test(skillName)) return "int";
+  if (/^perform(?:\s*\(|\b)/i.test(skillName)) return "cha";
+  if (/^profession(?:\s*\(|\b)/i.test(skillName)) return "wis";
+  return "int";
+}
+
+function ensureNamedSkillChoiceVisible(skillName = "") {
+  const name = String(skillName || "").trim();
+  if (!name) return;
+  const key = normalizeSkillName(name);
+  if (allSkills().some(([skill]) => normalizeSkillName(skill) === key)) return;
+  const saved = currentSkillValues();
+  customSkills.push({ name, ability: abilityForNamedSkillChoice(name) });
+  renderSkillRows(saved);
+  renderSkillSummaryRows();
+}
+
+function conditionalVariables(item = {}) {
+  return Array.isArray(item.conditionalVariables)
+    ? item.conditionalVariables
+    : [];
+}
+
+function normalizeConditionalVariableKey(value = "") {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[{}]/g, "")
+    .replace(/\s+/g, " ");
+}
+
+function replaceConditionalVariableTokens(text = "", choices = {}) {
+  return String(text || "").replace(/\{([^{}]+)\}/g, (match, key) => {
+    const choice = choices[normalizeConditionalVariableKey(key)];
+    return choice ? conditionalVariableTokenValue(key, choice) || match : match;
+  });
+}
+
+function interpolateConditionalVariables(value, choices = {}) {
+  if (Array.isArray(value))
+    return value.map((item) => interpolateConditionalVariables(item, choices));
+  if (value && typeof value === "object") {
+    return Object.fromEntries(
+      Object.entries(value).map(([key, entry]) => [
+        key,
+        interpolateConditionalVariables(entry, choices),
+      ]),
+    );
+  }
+  if (typeof value === "string")
+    return replaceConditionalVariableTokens(value, choices);
+  return value;
+}
+
+function bonusUsesFavoredEnemyScale(bonus = {}) {
+  const source = (bonus.bonusScale || bonus.scale || {}).source || {};
+  return (
+    source.type === "special" && source.special === "favored-enemy-bonus"
+  );
+}
+
+function favoredEnemyChoiceLabel(choices = {}) {
+  const entry = Object.entries(choices || {}).find(
+    ([key]) => normalizeConditionalVariableKey(key) === "favored enemy",
+  )?.[1];
+  return cleanFavoredEnemyLabel(
+    entry?.value || entry?.name || entry?.label || "",
+  );
+}
+
+function conditionalChoiceLabel(choices = {}, key = "") {
+  const wanted = normalizeConditionalVariableKey(key);
+  if (!wanted) return "";
+  const entry = Object.entries(choices || {}).find(
+    ([choiceKey]) => normalizeConditionalVariableKey(choiceKey) === wanted,
+  )?.[1];
+  return wanted.startsWith("favored enemy")
+    ? cleanFavoredEnemyLabel(entry?.value || entry?.name || entry?.label || "")
+    : entry?.label || entry?.name || entry?.value || "";
+}
+
+function cleanFavoredEnemyLabel(value = "") {
+  return String(value || "")
+    .replace(/\s*\([+-]?\d+\)\s*$/g, "")
+    .trim();
+}
+
+function conditionalVariableTokenValue(key = "", choice = {}) {
+  const fallback = choice?.label || choice?.name || choice?.value || "";
+  return normalizeConditionalVariableKey(key).startsWith("favored enemy")
+    ? cleanFavoredEnemyLabel(choice?.value || choice?.name || fallback)
+    : fallback;
+}
+
+function favoredEnemyTargetText(value = "") {
+  const text = String(value || "")
+    .replace(/\{[^{}]+\}/g, "")
+    .replace(/\s*\([+-]?\d+\)\s*$/g, "")
+    .replace(/\b(against|versus|vs\.?|creatures?|enemy|enemies|type|subtype)\b/gi, " ")
+    .replace(/[^a-z0-9]+/gi, " ")
+    .trim()
+    .replace(/\s+/g, " ");
+  if (!text || /favou?red enemy/i.test(text)) return "";
+  return text;
+}
+
+function bonusFavoredEnemyTarget(bonus = {}, buff = {}) {
+  return (
+    bonus.bonusScale?.favoredEnemyTarget ||
+    bonus.bonusScale?.target ||
+    bonus.scale?.favoredEnemyTarget ||
+    bonus.scale?.target ||
+    bonus.favoredEnemyTarget ||
+    bonus.targetFavoredEnemy ||
+    favoredEnemyChoiceLabel(bonus.conditionalChoices) ||
+    conditionalChoiceLabel(bonus.conditionalChoices, "favored enemy increase") ||
+    favoredEnemyChoiceLabel(buff.conditionalChoices) ||
+    conditionalChoiceLabel(buff.conditionalChoices, "favored enemy increase") ||
+    favoredEnemyTargetText(bonus.appliesWhen || bonus.condition || "")
+  );
+}
+
+function needsFavoredEnemyScaleChoice(bonus = {}) {
+  if (!bonusUsesFavoredEnemyScale(bonus)) return false;
+  return !bonusFavoredEnemyTarget(bonus);
+}
+
+function itemHasFavoredEnemyScaleChoice(item = {}) {
+  return (Array.isArray(item.effects) ? item.effects : []).some(
+    needsFavoredEnemyScaleChoice,
+  );
+}
+
+function favoredEnemyBonusLooksRelevant(bonus = {}, buff = {}) {
+  if (bonus.favoredEnemyBonus || bonus.favoredEnemy) return true;
+  const sourceText = [
+    bonus.source,
+    bonus.name,
+    buff.source,
+    buff.name,
+    buff.category,
+  ]
+    .filter(Boolean)
+    .join(" ");
+  return /\bfavou?red\s+enemy\b/i.test(sourceText);
+}
+
+function favoredEnemyTargetKey(value = "") {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/\s*\([+-]?\d+\)\s*$/g, "")
+    .replace(/[^a-z0-9]+/g, "");
+}
+
+function favoredEnemyBonusAmountRow(bonus = {}, buff = {}) {
+  if (!favoredEnemyBonusLooksRelevant(bonus, buff)) return false;
+  return String(bonus.stat || "").trim().toLowerCase() === "attack";
+}
+
+function addFavoredEnemyOption(byTarget, target = "", bonus = null) {
+  const label = String(target || "").trim();
+  const key = favoredEnemyTargetKey(label);
+  if (!key) return;
+  const previous = byTarget.get(key);
+  const nextBonus =
+    bonus === null || bonus === undefined || bonus === ""
+      ? previous?.bonus
+      : Number(previous?.bonus || 0) + Number(bonus || 0);
+  byTarget.set(key, {
+    value: label,
+    label,
+    name: label,
+    favoredEnemyTarget: label,
+    bonus: Number.isFinite(nextBonus) ? Number(nextBonus || 0) : null,
+  });
+}
+
+function characterFavoredEnemyOptions({ additionalTargets = [] } = {}) {
+  const buffs = [
+    ...collectClassFeatureBuffs(),
+    ...activeBuffs,
+  ];
+  const byTarget = new Map();
+  additionalTargets.forEach((target) => addFavoredEnemyOption(byTarget, target));
+  buffs.forEach((buff) => {
+    (Array.isArray(buff.bonuses) ? buff.bonuses : []).forEach((bonus) => {
+      if (!favoredEnemyBonusAmountRow(bonus, buff)) return;
+      if (bonusUsesFavoredEnemyScale(bonus)) return;
+      const target = bonusFavoredEnemyTarget(bonus, buff);
+      const value = window.PFBuffs?.scaledBonusValue
+        ? window.PFBuffs.scaledBonusValue(bonus, buff, { activeBuffs: buffs })
+        : Number(bonus.value || 0);
+      addFavoredEnemyOption(byTarget, target, value);
+    });
+  });
+  return [...byTarget.values()].sort((a, b) => a.name.localeCompare(b.name));
+}
+
+async function resolveFavoredEnemyScaleTargets(items = [], title = "Effect") {
+  const list = Array.isArray(items) ? items : [];
+  if (!list.some(needsFavoredEnemyScaleChoice)) return list;
+  const options = characterFavoredEnemyOptions();
+  if (!options.length) {
+    setStatus(
+      "Choose the character's favored enemy first, then apply this favored-enemy-scaled effect.",
+      "warning",
+    );
+    return null;
+  }
+  const resolved = [];
+  for (const item of list) {
+    if (!needsFavoredEnemyScaleChoice(item)) {
+      resolved.push(item);
+      continue;
+    }
+    const picked = window.PFEffectChoicePicker
+      ? await window.PFEffectChoicePicker.open({
+          title: `${title}: Choose Favored Enemy`,
+          options,
+        })
+      : null;
+    if (!picked) return null;
+    const target =
+      typeof picked === "object"
+        ? picked.favoredEnemyTarget || picked.name || picked.value
+        : String(picked || "");
+    if (!target) return null;
+    const scale = item.bonusScale || item.scale || {};
+    const nextScale = {
+      ...scale,
+      favoredEnemyTarget: target,
+    };
+    const genericAppliesWhen =
+      !item.appliesWhen || /favou?red enemy|\{[^{}]+\}/i.test(item.appliesWhen);
+    resolved.push({
+      ...item,
+      bonusScale: nextScale,
+      favoredEnemyTarget: target,
+      conditional: true,
+      appliesWhen: genericAppliesWhen
+        ? `against ${target}`
+        : item.appliesWhen,
+    });
+  }
+  return resolved;
+}
+
+async function resolveConditionalVariablesForItem(item = {}, title = "Effect") {
+  const variables = conditionalVariables(item)
+    .map((variable) => ({
+      ...variable,
+      key: normalizeConditionalVariableKey(
+        variable.key || variable.name || variable.label,
+      ),
+      poolId:
+        variable.poolId ||
+        variable.pool ||
+        variable.source ||
+        "ranger-favored-enemies",
+    }))
+    .filter((variable) => variable.key);
+  if (!variables.length) return item;
+  const choices = { ...(item.conditionalChoices || {}) };
+  for (const variable of variables) {
+    if (choices[variable.key]) continue;
+    const pool = window.PFEffectStats?.conditionalVariablePoolById?.(
+      variable.poolId,
+    );
+    const additionalTargets = [
+      conditionalChoiceLabel(choices, "favored enemy"),
+    ].filter(Boolean);
+    const options =
+      variable.poolId === "character-favored-enemies"
+        ? characterFavoredEnemyOptions({ additionalTargets })
+        : (await window.PFEffectStats?.resolveConditionalVariableOptions?.(
+            variable.poolId,
+          )) || [];
+    const picked = window.PFEffectChoicePicker
+      ? await window.PFEffectChoicePicker.open({
+          title: `${title}: Choose ${variable.label || variable.key}`,
+          options,
+        })
+      : null;
+    if (!picked) return null;
+    const pickedValue =
+      typeof picked === "object" ? picked.value : String(picked || "");
+    const pickedOption =
+      options.find((option) => String(option.value) === pickedValue) ||
+      (typeof picked === "object" ? picked : null);
+    choices[variable.key] = {
+      value: pickedValue,
+      label: pickedOption?.label || pickedValue,
+      poolId: variable.poolId,
+      poolLabel: pool?.label || variable.poolLabel || "",
+    };
+  }
+  return interpolateConditionalVariables(
+    {
+      ...item,
+      conditionalVariables: variables,
+      conditionalChoices: choices,
+    },
+    choices,
+  );
 }
 
 async function resolveRacialTraitChoiceStats(items, trait = {}) {
@@ -1703,15 +2192,69 @@ async function resolveRacialTraitChoiceStats(items, trait = {}) {
         })
       : null;
     if (!picked) return null;
-    resolved.push({ ...item, stat: picked });
+    if (typeof picked === "object") ensureNamedSkillChoiceVisible(picked.skillName);
+    resolved.push(
+      typeof picked === "object"
+        ? { ...item, stat: picked.value, skillName: picked.skillName }
+        : { ...item, stat: picked },
+    );
+  }
+  return resolved;
+}
+
+function spellLikeChoiceList(entry = {}) {
+  return (
+    entry.spellChoiceList ||
+    window.PFEffectStats?.customSpellLikeListById?.(
+      entry.spellChoiceListId || "",
+    ) ||
+    null
+  );
+}
+
+function spellLikeAbilityHasChoiceList(entry = {}) {
+  return Boolean(spellLikeChoiceList(entry));
+}
+
+async function resolveRacialTraitSpellLikeChoices(items, trait = {}) {
+  const list = Array.isArray(items) ? items : [];
+  if (!list.some(spellLikeAbilityHasChoiceList)) return list;
+  const resolved = [];
+  for (const item of list) {
+    const choiceList = spellLikeChoiceList(item);
+    if (!choiceList) {
+      resolved.push(item);
+      continue;
+    }
+    const spells = (choiceList.items || []).map((entry) => ({
+      name: entry.name || entry.spellName || entry.label || entry.value,
+      spellName: entry.name || entry.spellName || entry.label || entry.value,
+    }));
+    const picked = window.PFMagicSearchModal
+      ? await window.PFMagicSearchModal.open({
+          title: `${trait.name || "Racial Trait"}: Choose SLA`,
+          spells,
+        })
+      : null;
+    if (!picked) return null;
+    const { spellChoiceList, spellChoiceListId, ...rest } = item;
+    resolved.push({
+      ...rest,
+      spellName: picked.name || picked.spellName || "Spell",
+    });
   }
   return resolved;
 }
 
 async function resolveRacialTraitMechanicChoices(item = {}, trait = {}) {
-  const resolvedEffects = await resolveRacialTraitChoiceStats(
+  const choiceResolvedEffects = await resolveRacialTraitChoiceStats(
     item.effects,
     trait,
+  );
+  if (!choiceResolvedEffects) return false;
+  const resolvedEffects = await resolveFavoredEnemyScaleTargets(
+    choiceResolvedEffects,
+    trait.name || "Racial Trait",
   );
   if (!resolvedEffects) return false;
   const resolvedClassSkillGrants = await resolveRacialTraitChoiceStats(
@@ -1719,11 +2262,60 @@ async function resolveRacialTraitMechanicChoices(item = {}, trait = {}) {
     trait,
   );
   if (!resolvedClassSkillGrants) return false;
+  const resolvedSpellLikeAbilities = await resolveRacialTraitSpellLikeChoices(
+    item.spellLikeAbilities,
+    trait,
+  );
+  if (!resolvedSpellLikeAbilities) return false;
   return {
     ...item,
     effects: resolvedEffects,
     classSkillGrants: resolvedClassSkillGrants,
+    spellLikeAbilities: resolvedSpellLikeAbilities,
   };
+}
+
+function appendRacialTraitChoiceMechanics(target = {}, option = {}) {
+  RACIAL_TRAIT_MECHANIC_KEYS.forEach((key) => {
+    const rows = Array.isArray(option[key]) ? option[key] : [];
+    if (!rows.length) return;
+    target[key] = [...(Array.isArray(target[key]) ? target[key] : []), ...rows];
+  });
+}
+
+async function resolveRacialTraitChoicePools(trait = {}) {
+  const pools = racialTraitChoicePools(trait);
+  if (!pools.length) {
+    return { poolChoices: {}, poolMechanics: {} };
+  }
+  if (!window.PFClassFeatureChoicePicker) return null;
+  const poolChoices = {};
+  const poolMechanics = {};
+  const saved =
+    selectedRacialTraitChoices[racialTraitChoiceKeyForTrait(trait)] || {};
+  for (const [index, pool] of pools.entries()) {
+    const poolKey = pool.name || `Choice ${index + 1}`;
+    const selected = saved.poolChoices?.[poolKey] || "";
+    const choice = await PFClassFeatureChoicePicker.open({
+      title: `${trait.name || "Racial Trait"}: ${pool.name || "Choose Feature"}`,
+      poolName: pool.name || "Racial Trait",
+      description: pool.description || "",
+      selected,
+      options: Array.isArray(pool.options) ? pool.options : [],
+    });
+    if (choice === null) return null;
+    if (!choice) continue;
+    const option = (pool.options || []).find((item) => item.name === choice);
+    if (!option) continue;
+    const resolvedOption = await resolveRacialTraitMechanicChoices(
+      option,
+      trait,
+    );
+    if (!resolvedOption) return null;
+    poolChoices[poolKey] = choice;
+    appendRacialTraitChoiceMechanics(poolMechanics, resolvedOption);
+  }
+  return { poolChoices, poolMechanics };
 }
 
 async function resolveRacialTraitOperationValueChoice(
@@ -1733,6 +2325,16 @@ async function resolveRacialTraitOperationValueChoice(
 ) {
   if (key === "effects" || key === "classSkillGrants") {
     const resolved = await resolveRacialTraitChoiceStats([value], trait);
+    if (!resolved) return null;
+    if (key !== "effects") return resolved[0];
+    const favoredEnemyResolved = await resolveFavoredEnemyScaleTargets(
+      resolved,
+      trait.name || "Racial Trait",
+    );
+    return favoredEnemyResolved ? favoredEnemyResolved[0] : null;
+  }
+  if (key === "spellLikeAbilities") {
+    const resolved = await resolveRacialTraitSpellLikeChoices([value], trait);
     return resolved ? resolved[0] : null;
   }
   return value;
@@ -1765,30 +2367,52 @@ function racialTraitMechanicsHaveChoiceStats(item = {}) {
   return (
     (Array.isArray(item.effects) &&
       item.effects.some((effect) =>
-        window.PFEffectStats?.isChoiceStat(effect.stat),
+        window.PFEffectStats?.isChoiceStat(effect.stat) ||
+        needsFavoredEnemyScaleChoice(effect),
       )) ||
     (Array.isArray(item.classSkillGrants) &&
       item.classSkillGrants.some((grant) =>
         window.PFEffectStats?.isChoiceStat(grant.stat),
-      ))
+      )) ||
+    (Array.isArray(item.spellLikeAbilities) &&
+      item.spellLikeAbilities.some(spellLikeAbilityHasChoiceList)) ||
+    conditionalVariables(item).length > 0 ||
+    racialTraitChoicePools(item).length > 0
   );
 }
 
 function racialTraitOverrideHasChoiceStats(override = {}) {
   return Object.entries(override.mechanicOverrides || {}).some(
     ([key, operations]) =>
-      ["effects", "classSkillGrants"].includes(key) &&
+      ["effects", "classSkillGrants", "spellLikeAbilities"].includes(key) &&
       (Array.isArray(operations) ? operations : []).some(
         (operation) =>
           operation.value &&
-          window.PFEffectStats?.isChoiceStat(operation.value.stat),
+          (window.PFEffectStats?.isChoiceStat(operation.value.stat) ||
+            spellLikeAbilityHasChoiceList(operation.value) ||
+            needsFavoredEnemyScaleChoice(operation.value)),
       ),
   );
 }
 
 async function resolveRacialTraitChoicesBeforeApply(trait = {}) {
+  if (trait.activatable) {
+    removeRacialTraitChoice(trait);
+    return true;
+  }
   const resolvedTrait = await resolveRacialTraitMechanicChoices(trait, trait);
   if (!resolvedTrait) return false;
+  const resolvedPools = await resolveRacialTraitChoicePools(trait);
+  if (!resolvedPools) return false;
+  appendRacialTraitChoiceMechanics(
+    resolvedTrait,
+    resolvedPools.poolMechanics,
+  );
+  const variableResolvedTrait = await resolveConditionalVariablesForItem(
+    resolvedTrait,
+    trait.name || "Racial Trait",
+  );
+  if (!variableResolvedTrait) return false;
   const resolvedOverrides = [];
   for (const override of trait.modifiedTraitOverrides || []) {
     const resolvedOverride = await resolveRacialTraitOverrideChoices(
@@ -1800,11 +2424,25 @@ async function resolveRacialTraitChoicesBeforeApply(trait = {}) {
   }
   const hasChoice =
     racialTraitMechanicsHaveChoiceStats(trait) ||
+    racialTraitChoicePools(trait).length ||
     (trait.modifiedTraitOverrides || []).some(racialTraitOverrideHasChoiceStats);
   if (hasChoice) {
     selectedRacialTraitChoices[racialTraitChoiceKeyForTrait(trait)] = {
-      effects: cloneJson(resolvedTrait.effects),
-      classSkillGrants: cloneJson(resolvedTrait.classSkillGrants),
+      effects: cloneJson(variableResolvedTrait.effects),
+      damageReduction: cloneJson(variableResolvedTrait.damageReduction),
+      spellResistance: cloneJson(variableResolvedTrait.spellResistance),
+      immunities: cloneJson(variableResolvedTrait.immunities),
+      applyConditions: cloneJson(variableResolvedTrait.applyConditions),
+      classSkillGrants: cloneJson(variableResolvedTrait.classSkillGrants),
+      extraRanksPerLevel: cloneJson(variableResolvedTrait.extraRanksPerLevel),
+      sizeChanges: cloneJson(variableResolvedTrait.sizeChanges),
+      spellLikeAbilities: cloneJson(variableResolvedTrait.spellLikeAbilities),
+      casterLevelBonuses: cloneJson(variableResolvedTrait.casterLevelBonuses),
+      spellDcBonuses: cloneJson(variableResolvedTrait.spellDcBonuses),
+      generatedEquipment: cloneJson(variableResolvedTrait.generatedEquipment),
+      conditionalVariables: cloneJson(variableResolvedTrait.conditionalVariables),
+      conditionalChoices: cloneJson(variableResolvedTrait.conditionalChoices),
+      poolChoices: cloneJson(resolvedPools.poolChoices),
       modifiedTraitOverrides: cloneJson(resolvedOverrides),
     };
   } else {
@@ -1853,10 +2491,15 @@ const RACIAL_TRAIT_MECHANIC_KEYS = [
   "damageReduction",
   "spellResistance",
   "immunities",
+  "applyConditions",
   "classSkillGrants",
+  "extraRanksPerLevel",
   "sizeChanges",
   "spellLikeAbilities",
+  "casterLevelBonuses",
+  "spellDcBonuses",
   "generatedEquipment",
+  "conditionalVariables",
 ];
 
 function racialTraitMechanicArray(item = {}, key = "") {
@@ -1882,6 +2525,25 @@ function stableRacialMechanicKey(value) {
 function stableRacialMechanicValue(value) {
   if (Array.isArray(value)) return value.map(stableRacialMechanicValue);
   if (!value || typeof value !== "object") return value ?? null;
+  const spellName = String(
+    value.spellName || value.spell?.name || value.name || "",
+  ).trim();
+  if (
+    spellName &&
+    !value.stat &&
+    (value.frequency ||
+      value.minimumLevel !== undefined ||
+      value.level !== undefined ||
+      value.castingAttr ||
+      value.minimumScore !== undefined)
+  ) {
+    const minimumLevel = Number(value.minimumLevel ?? value.level ?? 1) || 1;
+    return {
+      frequency: String(value.frequency || "").trim(),
+      minimumLevel,
+      spellName,
+    };
+  }
   const sorted = {};
   Object.keys(value)
     .sort()
@@ -2029,14 +2691,17 @@ function racialAbilityEffectsFromSummary(race = {}) {
 }
 
 function racialAbilityEffects(race = {}, activeTraits = race.standardTraits) {
+  const eligibleActiveTraits = (activeTraits || []).filter(
+    traitAttributeRequirementMet,
+  );
   const hasStandardAbilityTrait = (race.standardTraits || []).some((trait) =>
     /ability score/i.test(trait?.name || ""),
   );
-  const hasActiveAbilityTrait = (activeTraits || []).some((trait) =>
+  const hasActiveAbilityTrait = eligibleActiveTraits.some((trait) =>
     /ability score/i.test(trait?.name || ""),
   );
   if (hasStandardAbilityTrait && !hasActiveAbilityTrait) return [];
-  const exact = racialAbilityEffectsFromTrait(race, activeTraits);
+  const exact = racialAbilityEffectsFromTrait(race, eligibleActiveTraits);
   const source = exact.length ? exact : racialAbilityEffectsFromSummary(race);
   const seen = new Set();
   return source.filter((effect) => {
@@ -2057,6 +2722,66 @@ function racialTraitBuffContext(race = {}) {
     casterLevel: characterLevel,
     permanent: true,
   };
+}
+
+const TRAIT_ATTRIBUTE_REQUIREMENT_ALIASES = {
+  str: "str",
+  strength: "str",
+  dex: "dex",
+  dexterity: "dex",
+  con: "con",
+  constitution: "con",
+  int: "int",
+  intelligence: "int",
+  wis: "wis",
+  wisdom: "wis",
+  cha: "cha",
+  charisma: "cha",
+};
+
+const TRAIT_ATTRIBUTE_REQUIREMENT_LABELS = {
+  str: "STR",
+  dex: "DEX",
+  con: "CON",
+  int: "INT",
+  wis: "WIS",
+  cha: "CHA",
+};
+
+function normalizeTraitAttributeRequirement(trait = {}) {
+  const source =
+    trait.attributeRequirement ||
+    trait.attributeScoreRequirement ||
+    trait.abilityRequirement ||
+    {};
+  const rawAttribute = source.attribute || source.ability || "";
+  const key =
+    TRAIT_ATTRIBUTE_REQUIREMENT_ALIASES[
+      String(rawAttribute || "").trim().toLowerCase()
+    ] || "";
+  const rawScore =
+    source.score ?? source.minimumScore ?? source.minimumAbilityScore ?? "";
+  const score = Number(rawScore);
+  if (!key || !Number.isFinite(score) || score <= 0) return null;
+  return {
+    key,
+    label: TRAIT_ATTRIBUTE_REQUIREMENT_LABELS[key] || key.toUpperCase(),
+    score: Math.floor(score),
+  };
+}
+
+function traitAttributeRequirementText(trait = {}) {
+  const requirement = normalizeTraitAttributeRequirement(trait);
+  return requirement
+    ? `Requires ${requirement.label} ${requirement.score}`
+    : "";
+}
+
+function traitAttributeRequirementMet(trait = {}) {
+  const requirement = normalizeTraitAttributeRequirement(trait);
+  if (!requirement) return true;
+  const score = Number(abilityDisplayValue(requirement.key));
+  return Number.isFinite(score) && score >= requirement.score;
 }
 
 function collectSelectedRaceBuffs() {
@@ -2085,6 +2810,7 @@ function collectSelectedRaceBuffs() {
   const addTraitBuff = (trait, sourceLabel, options = {}) => {
     if (!trait || typeof trait === "string") return;
     if (trait.activatable) return;
+    if (!traitAttributeRequirementMet(trait)) return;
     if (!options.parseAbilityTrait && /ability score/i.test(trait.name || ""))
       return;
     const hasEffects = Array.isArray(trait.effects) && trait.effects.length;
@@ -2100,28 +2826,49 @@ function collectSelectedRaceBuffs() {
       Array.isArray(trait.spellResistance) && trait.spellResistance.length;
     const hasImmunities =
       Array.isArray(trait.immunities) && trait.immunities.length;
+    const hasApplyConditions =
+      Array.isArray(trait.applyConditions) && trait.applyConditions.length;
     const hasClassSkills =
       Array.isArray(trait.classSkillGrants) && trait.classSkillGrants.length;
+    const hasExtraRanks =
+      Array.isArray(trait.extraRanksPerLevel) && trait.extraRanksPerLevel.length;
     const hasSizeChanges =
       Array.isArray(trait.sizeChanges) && trait.sizeChanges.length;
     const spellLikeAbilities = Array.isArray(trait.spellLikeAbilities)
       ? trait.spellLikeAbilities
       : [];
     const hasSpellLikeAbilities = spellLikeAbilities.length;
+    const casterLevelBonuses = Array.isArray(trait.casterLevelBonuses)
+      ? trait.casterLevelBonuses
+      : [];
+    const hasCasterLevelBonuses = casterLevelBonuses.length;
+    const spellDcBonuses = Array.isArray(trait.spellDcBonuses)
+      ? trait.spellDcBonuses
+      : [];
+    const hasSpellDcBonuses = spellDcBonuses.length;
     const generatedEquipment = Array.isArray(trait.generatedEquipment)
       ? trait.generatedEquipment
       : [];
     const hasGeneratedEquipment = generatedEquipment.length;
+    const conditionalVariables = Array.isArray(trait.conditionalVariables)
+      ? trait.conditionalVariables
+      : [];
+    const hasConditionalVariables = conditionalVariables.length;
     if (
       !hasEffects &&
       !parsedAbilityEffects.length &&
       !hasDr &&
       !hasSr &&
       !hasImmunities &&
+      !hasApplyConditions &&
       !hasClassSkills &&
+      !hasExtraRanks &&
       !hasSizeChanges &&
       !hasSpellLikeAbilities &&
-      !hasGeneratedEquipment
+      !hasCasterLevelBonuses &&
+      !hasSpellDcBonuses &&
+      !hasGeneratedEquipment &&
+      !hasConditionalVariables
     )
       return;
     buffs.push({
@@ -2131,10 +2878,15 @@ function collectSelectedRaceBuffs() {
       damageReduction: hasDr ? trait.damageReduction : [],
       spellResistance: hasSr ? trait.spellResistance : [],
       immunities: hasImmunities ? trait.immunities : [],
+      applyConditions: hasApplyConditions ? trait.applyConditions : [],
       classSkillGrants: hasClassSkills ? trait.classSkillGrants : [],
+      extraRanksPerLevel: hasExtraRanks ? trait.extraRanksPerLevel : [],
       sizeChanges: hasSizeChanges ? trait.sizeChanges : [],
       spellLikeAbilities: hasSpellLikeAbilities ? spellLikeAbilities : [],
+      casterLevelBonuses: hasCasterLevelBonuses ? casterLevelBonuses : [],
+      spellDcBonuses: hasSpellDcBonuses ? spellDcBonuses : [],
       generatedEquipment: hasGeneratedEquipment ? generatedEquipment : [],
+      conditionalVariables: hasConditionalVariables ? conditionalVariables : [],
     });
   };
 
@@ -2147,6 +2899,7 @@ function collectSelectedRaceBuffs() {
 
 function racialTraitAbilityFromTrait(trait, race, sourceLabel, options = {}) {
   if (!trait || typeof trait === "string" || !trait.activatable) return null;
+  if (!traitAttributeRequirementMet(trait)) return null;
   if (!options.parseAbilityTrait && /ability score/i.test(trait.name || ""))
     return null;
   const hasEffects = Array.isArray(trait.effects) && trait.effects.length;
@@ -2159,12 +2912,16 @@ function racialTraitAbilityFromTrait(trait, race, sourceLabel, options = {}) {
   const generatedEquipment = Array.isArray(trait.generatedEquipment)
     ? trait.generatedEquipment
     : [];
+  const choicePools = racialTraitChoicePools(trait);
   const ability = {
     ...racialTraitBuffContext(race),
     id: `racial-trait:${race.name || "race"}:${trait.name || "trait"}`,
-    name: `${sourceLabel}: ${race.name || "Race"} ${trait.name || "Trait"}`,
+    name:
+      options.displayName ||
+      `${sourceLabel}: ${race.name || "Race"} ${trait.name || "Trait"}`,
     category: "Race",
     source: race.name || "Race",
+    sourceRacialTraitName: options.sourceRacialTraitName || trait.name || "",
     bonuses: hasEffects ? trait.effects : parsedAbilityEffects,
     damageReduction: Array.isArray(trait.damageReduction)
       ? trait.damageReduction
@@ -2173,14 +2930,30 @@ function racialTraitAbilityFromTrait(trait, race, sourceLabel, options = {}) {
       ? trait.spellResistance
       : [],
     immunities: Array.isArray(trait.immunities) ? trait.immunities : [],
+    applyConditions: Array.isArray(trait.applyConditions)
+      ? trait.applyConditions
+      : [],
     classSkillGrants: Array.isArray(trait.classSkillGrants)
       ? trait.classSkillGrants
+      : [],
+    extraRanksPerLevel: Array.isArray(trait.extraRanksPerLevel)
+      ? trait.extraRanksPerLevel
       : [],
     sizeChanges: Array.isArray(trait.sizeChanges) ? trait.sizeChanges : [],
     spellLikeAbilities: Array.isArray(trait.spellLikeAbilities)
       ? trait.spellLikeAbilities
       : [],
+    casterLevelBonuses: Array.isArray(trait.casterLevelBonuses)
+      ? trait.casterLevelBonuses
+      : [],
+    spellDcBonuses: Array.isArray(trait.spellDcBonuses)
+      ? trait.spellDcBonuses
+      : [],
     generatedEquipment,
+    conditionalVariables: Array.isArray(trait.conditionalVariables)
+      ? trait.conditionalVariables
+      : [],
+    choicePools,
     durationConfig: trait.durationConfig || {
       count: null,
       unit: "variable",
@@ -2202,35 +2975,139 @@ function racialTraitAbilityFromTrait(trait, race, sourceLabel, options = {}) {
     (ability.damageReduction || []).length ||
     (ability.spellResistance || []).length ||
     (ability.immunities || []).length ||
+    (ability.applyConditions || []).length ||
     (ability.classSkillGrants || []).length ||
+    (ability.extraRanksPerLevel || []).length ||
     (ability.sizeChanges || []).length ||
     (ability.spellLikeAbilities || []).length ||
-    (ability.generatedEquipment || []).length;
+    (ability.casterLevelBonuses || []).length ||
+    (ability.spellDcBonuses || []).length ||
+    (ability.generatedEquipment || []).length ||
+    (ability.conditionalVariables || []).length ||
+    (ability.choicePools || []).length;
   return hasAny ? ability : null;
+}
+
+function activatableAbilitiesFromRacialTrait(
+  trait,
+  race,
+  sourceLabel,
+  options = {},
+) {
+  const abilities = Array.isArray(trait?.activatableAbilities)
+    ? trait.activatableAbilities
+    : [];
+  return abilities
+    .map((ability) =>
+      racialTraitAbilityFromTrait(
+        {
+          ...ability,
+          activatable: true,
+          name: ability.name || `${trait.name || "Trait"} Ability`,
+          durationConfig: ability.durationConfig || trait.durationConfig,
+        },
+        race,
+        sourceLabel,
+        {
+          ...options,
+          displayName: ability.name || `${trait.name || "Trait"} Ability`,
+          sourceRacialTraitName: trait.name || "",
+        },
+      ),
+    )
+    .filter(Boolean);
 }
 
 function collectActivatableRacialTraitAbilities() {
   const race = selectedRaceDefinition();
   if (!race) return [];
   const activeStandardTraits = activeStandardRacialTraits(race);
-  const alternateTraits = selectedAlternateRacialTraits(race).map(
-    resolvedRacialAlternateTrait,
-  );
+  const alternateTraits = selectedAlternateRacialTraits(race);
+  const resolvedAlternateTraits = alternateTraits.map(resolvedRacialAlternateTrait);
   const modifiedTraitOverrides =
-    selectedRacialModifiedTraitOverrides(alternateTraits);
+    selectedRacialModifiedTraitOverrides(resolvedAlternateTraits);
   const modifiedActiveStandardTraits = activeStandardTraits
-    .map((trait) => racialTraitWithModifierOverrides(trait, modifiedTraitOverrides))
-    .map(resolvedRacialTrait);
+    .map((trait) => racialTraitWithModifierOverrides(trait, modifiedTraitOverrides));
   return [
     ...modifiedActiveStandardTraits.map((trait) =>
       racialTraitAbilityFromTrait(trait, race, "Race"),
+    ),
+    ...modifiedActiveStandardTraits.flatMap((trait) =>
+      activatableAbilitiesFromRacialTrait(trait, race, "Race"),
     ),
     ...alternateTraits.map((trait) =>
       racialTraitAbilityFromTrait(trait, race, "Alternate Race", {
         parseAbilityTrait: true,
       }),
     ),
+    ...resolvedAlternateTraits.flatMap((trait) =>
+      activatableAbilitiesFromRacialTrait(trait, race, "Alternate Race", {
+        parseAbilityTrait: true,
+      }),
+    ),
   ].filter(Boolean);
+}
+
+function racialTraitActiveEffectId(effect = {}) {
+  const ids = [effect.id, effect.sourceEffectId, effect.parentEffectId]
+    .map((value) => String(value || ""))
+    .filter(Boolean);
+  return ids.find((id) => id.startsWith("racial-trait:")) || "";
+}
+
+function activeRacialTraitAbilityMap() {
+  return new Map(
+    collectActivatableRacialTraitAbilities().map((ability) => [
+      String(ability.id || ""),
+      ability,
+    ]),
+  );
+}
+
+async function persistActiveBuffPrune() {
+  if (!currentSheetId) return;
+  if (isEnemySheetMode) {
+    queueSheetSave();
+    return;
+  }
+  await PFApp.saveBuffState(activeBuffs, sheetContextKey, currentSheetId);
+  localStorage.setItem(buffRefreshKey(), String(Date.now()));
+}
+
+function pruneUnavailableRacialTraitActiveBuffs(options = {}) {
+  if (!Array.isArray(activeBuffs) || !activeBuffs.length) return false;
+  const available = activeRacialTraitAbilityMap();
+  let changed = false;
+  activeBuffs = activeBuffs
+    .map((buff) => {
+      const id = racialTraitActiveEffectId(buff);
+      if (!id || !available.has(id)) return buff;
+      if (!String(buff.id || "").startsWith("racial-trait:")) return buff;
+      const ability = available.get(id);
+      if (!ability?.name || buff.name === ability.name) return buff;
+      changed = true;
+      return {
+        ...buff,
+        name: ability.name,
+        source: ability.source || buff.source,
+        sourceRacialTraitName:
+          ability.sourceRacialTraitName || buff.sourceRacialTraitName,
+      };
+    })
+    .filter((buff) => {
+      const id = racialTraitActiveEffectId(buff);
+      if (!id || available.has(id)) return true;
+      changed = true;
+      return false;
+    });
+  if (!changed) return false;
+  if (effectTrackerInstance) {
+    effectTrackerInstance.active = [...activeBuffs];
+    effectTrackerInstance.renderActive?.();
+  }
+  recalculateSheet();
+  if (options.persist) persistActiveBuffPrune().catch(console.error);
+  return true;
 }
 
 function applySelectedRaceDefaults() {
@@ -2282,6 +3159,7 @@ function updateRacialTraitsButton() {
 function setSelectedRacialAlternateTraits(next = []) {
   selectedRacialAlternateTraits = normalizeSelectedRacialAlternateTraits(next);
   updateRacialTraitsButton();
+  pruneUnavailableRacialTraitActiveBuffs({ persist: true });
   recalculateSheet();
   queueSheetSave();
 }
@@ -2312,10 +3190,15 @@ function openRacialTraitsModal() {
     effectiveStandardTraits,
     choices: cloneJson(selectedRacialTraitChoices),
     getChoices: () => cloneJson(selectedRacialTraitChoices),
+    traitRequirementStatus: (trait) => ({
+      met: traitAttributeRequirementMet(trait),
+      label: traitAttributeRequirementText(trait),
+    }),
     onChoose: chooseRacialTraitMechanicTargets,
     onBeforeApply: resolveRacialTraitChoicesBeforeApply,
     onRemove: (trait) => {
       removeRacialTraitChoice(trait);
+      pruneUnavailableRacialTraitActiveBuffs({ persist: true });
       queueSheetSave();
     },
     onChange: setSelectedRacialAlternateTraits,
@@ -2437,6 +3320,11 @@ function titleCaseStat(value) {
   const key = String(value || "")
     .toLowerCase()
     .trim();
+  const labels = {
+    "cannot gain morale bonuses": "Cannot Gain Morale Bonuses",
+    "cannot gain luck bonuses": "Cannot Gain Luck Bonuses",
+  };
+  if (labels[key]) return labels[key];
   const choiceLabel = window.PFEffectStats?.choiceStatLabel?.(key);
   if (choiceLabel) return choiceLabel;
   if (key.startsWith("skill:")) {
@@ -2750,6 +3638,8 @@ function statDisplayLabel(stat) {
     "touch ac": "Touch AC",
     "flat-footed ac": "Flat-Footed AC",
     "remove dex bonus to ac": "Remove DEX Bonus to AC",
+    "cannot gain morale bonuses": "Cannot Gain Morale Bonuses",
+    "cannot gain luck bonuses": "Cannot Gain Luck Bonuses",
     "extra attack": "Extra Attack at Highest BAB",
     cmb: "CMB",
     cmd: "CMD",
@@ -2768,6 +3658,11 @@ function statDisplayLabel(stat) {
     "craft skill checks": "Craft skills",
     "profession skill checks": "Profession skills",
     "perform skill checks": "Perform skills",
+    "class skill checks": "Class skills",
+    "class knowledge skill checks": "Class Knowledge skills",
+    "knowledge skill checks": "Knowledge skills",
+    "trained skill checks": "Trained skills",
+    "untrained skill checks": "Untrained skills",
   };
   return (
     labels[key] ||
@@ -2808,23 +3703,29 @@ function simpleConditionalsByStat() {
   );
   const groups = {};
   Object.entries(buffed?.breakdown || {}).forEach(([stat, items]) => {
-    items
-      .filter((item) => item.conditional || item.applied === "conditional")
+    mergedConditionalBreakdownItems(
+      items.filter((item) => item.conditional || item.applied === "conditional"),
+    )
       .forEach((item) => {
         const value = Number(item.value || 0);
         const total = totalForStat(stat)
           ? numericTotalText(totalForStat(stat), value, stat)
           : signed(value);
-        const appliesWhen = item.detail ? ` (${item.detail})` : "";
+        const appliesWhen = String(item.detail || "").trim();
+        const totalWithBonus = `${total} (${signed(value)})`;
         if (!groups[stat]) groups[stat] = [];
         groups[stat].push({
-          label: `${statDisplayLabel(stat)}${appliesWhen}`,
+          label: [statDisplayLabel(stat), appliesWhen]
+            .filter(Boolean)
+            .join(" "),
           total,
-          source: `${item.source} ${signed(value)} (${item.type || "untyped"})`,
+          displayTotal: totalWithBonus,
+          source: `${item.source} (${item.type || "untyped"})`,
           value,
           type: item.type || "untyped",
           effect: item.source,
-          appliesWhen: item.detail || "",
+          appliesWhen,
+          rawTotal: total,
         });
       });
   });
@@ -2834,7 +3735,7 @@ function simpleConditionalsByStat() {
 function simpleConditionalStats(stat, groups) {
   return (groups[stat] || [])
     .map((row) =>
-      simpleStat(row.label, row.total).replace(
+      simpleStat(row.label, row.displayTotal || row.total).replace(
         "simple-card",
         "simple-card simple-conditional",
       ),
@@ -2842,22 +3743,47 @@ function simpleConditionalStats(stat, groups) {
     .join("");
 }
 
-function conditionalTableRows(stat, groups) {
+function conditionalTableRows(stat, groups, currentTotal = "") {
   return (groups[stat] || []).map((row) => ({
     conditional: true,
-    cells: [row.label, row.total],
+    cells: [
+      row.label,
+      currentTotal
+        ? conditionalSkillTotal(row, currentTotal, stat)
+        : row.displayTotal || row.total,
+    ],
+    label: row.label,
+    total: currentTotal
+      ? numericTotalText(currentTotal, row.value, stat)
+      : row.total,
+    displayTotal: currentTotal
+      ? conditionalSkillTotal(row, currentTotal, stat)
+      : row.displayTotal || row.total,
+    source: row.source,
+    value: row.value,
+    type: row.type,
+    appliesWhen: row.appliesWhen,
   }));
+}
+
+function conditionalSkillTotal(row, currentTotal, stat) {
+  return `${numericTotalText(currentTotal, row.value, stat)} (${signed(row.value)})`;
 }
 
 function simpleSkillRows(groups) {
   const rows = [];
+  const classSkillEffectSet = characterClassSkillKeys();
   allSkills().forEach(([skill, ability]) => {
     const key = skillStatKey(skill);
+    const hasClassSkillEffect = classSkillSetHasSkill(classSkillEffectSet, skill);
+    const hasClassKnowledgeSkillEffect =
+      hasClassSkillEffect && isKnowledgeSkill(skill);
+    const currentTotal = fieldValue(`${skillId(skill)}Total`);
     rows.push({ main: skill, sub: fieldValue(`${skillId(skill)}Total`) });
     (groups["skill checks"] || []).forEach((row) =>
       rows.push({
         main: row.label,
-        sub: row.total,
+        sub: conditionalSkillTotal(row, currentTotal, "skill checks"),
         detail: row.source,
         conditional: true,
       }),
@@ -2865,17 +3791,66 @@ function simpleSkillRows(groups) {
     (groups[skillBuffKeyForAbility(ability)] || []).forEach((row) =>
       rows.push({
         main: row.label,
-        sub: row.total,
+        sub: conditionalSkillTotal(
+          row,
+          currentTotal,
+          skillBuffKeyForAbility(ability),
+        ),
         detail: row.source,
         conditional: true,
       }),
     );
     const familyKey = skillFamilyBonusKey(skill);
+    const trainingKey = skillTrainingBonusKey(skill);
     if (familyKey) {
       (groups[familyKey] || []).forEach((row) =>
         rows.push({
           main: row.label,
-          sub: row.total,
+          sub: conditionalSkillTotal(row, currentTotal, familyKey),
+          detail: row.source,
+          conditional: true,
+        }),
+      );
+    }
+    if (trainingKey) {
+      (groups[trainingKey] || []).forEach((row) =>
+        rows.push({
+          main: row.label,
+          sub: conditionalSkillTotal(row, currentTotal, trainingKey),
+          detail: row.source,
+          conditional: true,
+        }),
+      );
+    }
+    if (hasClassSkillEffect) {
+      (groups["class skill checks"] || []).forEach((row) =>
+        rows.push({
+          main: row.label,
+          sub: conditionalSkillTotal(row, currentTotal, "class skill checks"),
+          detail: row.source,
+          conditional: true,
+        }),
+      );
+    }
+    if (hasClassKnowledgeSkillEffect) {
+      (groups["class knowledge skill checks"] || []).forEach((row) =>
+        rows.push({
+          main: row.label,
+          sub: conditionalSkillTotal(
+            row,
+            currentTotal,
+            "class knowledge skill checks",
+          ),
+          detail: row.source,
+          conditional: true,
+        }),
+      );
+    }
+    if (isKnowledgeSkill(skill)) {
+      (groups["knowledge skill checks"] || []).forEach((row) =>
+        rows.push({
+          main: row.label,
+          sub: conditionalSkillTotal(row, currentTotal, "knowledge skill checks"),
           detail: row.source,
           conditional: true,
         }),
@@ -2884,7 +3859,7 @@ function simpleSkillRows(groups) {
     (groups[key] || []).forEach((row) =>
       rows.push({
         main: row.label,
-        sub: row.total,
+        sub: conditionalSkillTotal(row, currentTotal, key),
         detail: row.source,
         conditional: true,
       }),
@@ -2896,7 +3871,7 @@ function simpleSkillRows(groups) {
 function simpleConditionalListRows(label, currentTotal, stats, groups) {
   return stats.flatMap((stat) =>
     (groups[stat] || []).map((row) => ({
-      main: `${numericTotalText(currentTotal, row.value, stat)}${row.appliesWhen ? ` (${row.appliesWhen})` : ""}`,
+      main: `${numericTotalText(currentTotal, row.value, stat)} (${signed(row.value)})${row.appliesWhen ? ` ${row.appliesWhen}` : ""}`,
       sub: "",
       detail: row.source,
       conditional: true,
@@ -3082,15 +4057,30 @@ function normalizeWondrousSourceItem(item, index) {
       ? item.spellResistance
       : [],
     immunities: Array.isArray(item.immunities) ? item.immunities : [],
+    applyConditions: Array.isArray(item.applyConditions)
+      ? item.applyConditions
+      : [],
     classSkillGrants: Array.isArray(item.classSkillGrants)
       ? item.classSkillGrants
+      : [],
+    extraRanksPerLevel: Array.isArray(item.extraRanksPerLevel)
+      ? item.extraRanksPerLevel
       : [],
     sizeChanges: Array.isArray(item.sizeChanges) ? item.sizeChanges : [],
     spellLikeAbilities: Array.isArray(item.spellLikeAbilities)
       ? item.spellLikeAbilities
       : [],
+    casterLevelBonuses: Array.isArray(item.casterLevelBonuses)
+      ? item.casterLevelBonuses
+      : [],
+    spellDcBonuses: Array.isArray(item.spellDcBonuses)
+      ? item.spellDcBonuses
+      : [],
     generatedEquipment: Array.isArray(item.generatedEquipment)
       ? item.generatedEquipment
+      : [],
+    conditionalVariables: Array.isArray(item.conditionalVariables)
+      ? item.conditionalVariables
       : [],
   };
 }
@@ -3156,15 +4146,30 @@ function normalizeMundaneSourceItem(item, index) {
       ? item.spellResistance
       : [],
     immunities: Array.isArray(item.immunities) ? item.immunities : [],
+    applyConditions: Array.isArray(item.applyConditions)
+      ? item.applyConditions
+      : [],
     classSkillGrants: Array.isArray(item.classSkillGrants)
       ? item.classSkillGrants
+      : [],
+    extraRanksPerLevel: Array.isArray(item.extraRanksPerLevel)
+      ? item.extraRanksPerLevel
       : [],
     sizeChanges: Array.isArray(item.sizeChanges) ? item.sizeChanges : [],
     spellLikeAbilities: Array.isArray(item.spellLikeAbilities)
       ? item.spellLikeAbilities
       : [],
+    casterLevelBonuses: Array.isArray(item.casterLevelBonuses)
+      ? item.casterLevelBonuses
+      : [],
+    spellDcBonuses: Array.isArray(item.spellDcBonuses)
+      ? item.spellDcBonuses
+      : [],
     generatedEquipment: Array.isArray(item.generatedEquipment)
       ? item.generatedEquipment
+      : [],
+    conditionalVariables: Array.isArray(item.conditionalVariables)
+      ? item.conditionalVariables
       : [],
   };
 }
@@ -3215,15 +4220,30 @@ function normalizeWeaponSourceItem(item, index) {
       ? item.spellResistance
       : [],
     immunities: Array.isArray(item.immunities) ? item.immunities : [],
+    applyConditions: Array.isArray(item.applyConditions)
+      ? item.applyConditions
+      : [],
     classSkillGrants: Array.isArray(item.classSkillGrants)
       ? item.classSkillGrants
+      : [],
+    extraRanksPerLevel: Array.isArray(item.extraRanksPerLevel)
+      ? item.extraRanksPerLevel
       : [],
     sizeChanges: Array.isArray(item.sizeChanges) ? item.sizeChanges : [],
     spellLikeAbilities: Array.isArray(item.spellLikeAbilities)
       ? item.spellLikeAbilities
       : [],
+    casterLevelBonuses: Array.isArray(item.casterLevelBonuses)
+      ? item.casterLevelBonuses
+      : [],
+    spellDcBonuses: Array.isArray(item.spellDcBonuses)
+      ? item.spellDcBonuses
+      : [],
     generatedEquipment: Array.isArray(item.generatedEquipment)
       ? item.generatedEquipment
+      : [],
+    conditionalVariables: Array.isArray(item.conditionalVariables)
+      ? item.conditionalVariables
       : [],
   };
 }
@@ -3277,15 +4297,30 @@ function normalizeArmorShieldSourceItem(item, index) {
       ? item.spellResistance
       : [],
     immunities: Array.isArray(item.immunities) ? item.immunities : [],
+    applyConditions: Array.isArray(item.applyConditions)
+      ? item.applyConditions
+      : [],
     classSkillGrants: Array.isArray(item.classSkillGrants)
       ? item.classSkillGrants
+      : [],
+    extraRanksPerLevel: Array.isArray(item.extraRanksPerLevel)
+      ? item.extraRanksPerLevel
       : [],
     sizeChanges: Array.isArray(item.sizeChanges) ? item.sizeChanges : [],
     spellLikeAbilities: Array.isArray(item.spellLikeAbilities)
       ? item.spellLikeAbilities
       : [],
+    casterLevelBonuses: Array.isArray(item.casterLevelBonuses)
+      ? item.casterLevelBonuses
+      : [],
+    spellDcBonuses: Array.isArray(item.spellDcBonuses)
+      ? item.spellDcBonuses
+      : [],
     generatedEquipment: Array.isArray(item.generatedEquipment)
       ? item.generatedEquipment
+      : [],
+    conditionalVariables: Array.isArray(item.conditionalVariables)
+      ? item.conditionalVariables
       : [],
   };
 }
@@ -3646,26 +4681,43 @@ function collectClassFeatureBuffs() {
         casterLevel: classLevel,
         permanent: true,
       };
+      const variableContext = { className, classLevel, characterLevel: row.level };
+      const resolvedFeature = applyClassFeatureConditionalVariables(
+        feature,
+        variableContext,
+      );
       // Activatable features (Rage, Smite Evil, ...) aren't always-on --
       // their effects only apply once cast, via collectActivatableAbilities.
       if (
-        !feature.activatable &&
-        ((Array.isArray(feature.effects) && feature.effects.length) ||
-          (Array.isArray(feature.sizeChanges) && feature.sizeChanges.length) ||
-          (Array.isArray(feature.immunities) && feature.immunities.length) ||
-          (Array.isArray(feature.spellLikeAbilities) &&
-            feature.spellLikeAbilities.length) ||
-          (Array.isArray(feature.generatedEquipment) &&
-            feature.generatedEquipment.length))
+          !resolvedFeature.activatable &&
+          ((Array.isArray(resolvedFeature.effects) && resolvedFeature.effects.length) ||
+          (Array.isArray(resolvedFeature.extraRanksPerLevel) &&
+            resolvedFeature.extraRanksPerLevel.length) ||
+          (Array.isArray(resolvedFeature.sizeChanges) && resolvedFeature.sizeChanges.length) ||
+          (Array.isArray(resolvedFeature.immunities) && resolvedFeature.immunities.length) ||
+          (Array.isArray(resolvedFeature.applyConditions) &&
+            resolvedFeature.applyConditions.length) ||
+          (Array.isArray(resolvedFeature.spellLikeAbilities) &&
+            resolvedFeature.spellLikeAbilities.length) ||
+          (Array.isArray(resolvedFeature.casterLevelBonuses) &&
+            resolvedFeature.casterLevelBonuses.length) ||
+          (Array.isArray(resolvedFeature.spellDcBonuses) &&
+            resolvedFeature.spellDcBonuses.length) ||
+          (Array.isArray(resolvedFeature.generatedEquipment) &&
+            resolvedFeature.generatedEquipment.length))
       ) {
         buffs.push({
           ...context,
-          name: feature.name || "Class Feature",
-          bonuses: feature.effects,
-          sizeChanges: feature.sizeChanges,
-          immunities: feature.immunities,
-          spellLikeAbilities: feature.spellLikeAbilities,
-          generatedEquipment: feature.generatedEquipment,
+          name: resolvedFeature.name || "Class Feature",
+          bonuses: resolvedFeature.effects,
+          extraRanksPerLevel: resolvedFeature.extraRanksPerLevel,
+          sizeChanges: resolvedFeature.sizeChanges,
+          immunities: resolvedFeature.immunities,
+          applyConditions: resolvedFeature.applyConditions,
+          spellLikeAbilities: resolvedFeature.spellLikeAbilities,
+          casterLevelBonuses: resolvedFeature.casterLevelBonuses,
+          spellDcBonuses: resolvedFeature.spellDcBonuses,
+          generatedEquipment: resolvedFeature.generatedEquipment,
         });
       }
       featurePools(feature).forEach((pool) => {
@@ -3690,10 +4742,18 @@ function collectClassFeatureBuffs() {
         if (
           option &&
           ((Array.isArray(option.effects) && option.effects.length) ||
+            (Array.isArray(option.extraRanksPerLevel) &&
+              option.extraRanksPerLevel.length) ||
             (Array.isArray(option.sizeChanges) && option.sizeChanges.length) ||
             (Array.isArray(option.immunities) && option.immunities.length) ||
+            (Array.isArray(option.applyConditions) &&
+              option.applyConditions.length) ||
             (Array.isArray(option.spellLikeAbilities) &&
               option.spellLikeAbilities.length) ||
+            (Array.isArray(option.casterLevelBonuses) &&
+              option.casterLevelBonuses.length) ||
+            (Array.isArray(option.spellDcBonuses) &&
+              option.spellDcBonuses.length) ||
             (Array.isArray(option.generatedEquipment) &&
               option.generatedEquipment.length))
         ) {
@@ -3701,9 +4761,13 @@ function collectClassFeatureBuffs() {
             ...context,
             name: option.name || pool.name || "Class Feature Choice",
             bonuses: option.effects,
+            extraRanksPerLevel: option.extraRanksPerLevel,
             sizeChanges: option.sizeChanges,
             immunities: option.immunities,
+            applyConditions: option.applyConditions,
             spellLikeAbilities: option.spellLikeAbilities,
+            casterLevelBonuses: option.casterLevelBonuses,
+            spellDcBonuses: option.spellDcBonuses,
             generatedEquipment: option.generatedEquipment,
           });
         }
@@ -4561,12 +5625,118 @@ function collectActivatableAbilities() {
   return [...classFeatureAbilities, ...collectActivatableRacialTraitAbilities()];
 }
 
+function appliedConditionName(entry = {}) {
+  return (
+    entry.name ||
+    entry.conditionName ||
+    entry.condition?.name ||
+    entry.condition?.conditionName ||
+    ""
+  );
+}
+
+function conditionBuffFromApplyCondition(entry = {}, sourceBuff = {}) {
+  const condition =
+    entry.condition && typeof entry.condition === "object"
+      ? entry.condition
+      : entry;
+  const name = condition.name || appliedConditionName(entry);
+  if (!name) return null;
+  return {
+    ...condition,
+    id:
+      condition.id ||
+      entry.conditionId ||
+      `applied-condition:${slugify(name)}`,
+    name,
+    category: condition.category || "Condition",
+    source: sourceBuff.name || sourceBuff.source || "Effect",
+    sourceConditionExtra: true,
+    bonuses: Array.isArray(condition.bonuses) ? condition.bonuses : [],
+    damageReduction: Array.isArray(condition.damageReduction)
+      ? condition.damageReduction
+      : [],
+    spellResistance: Array.isArray(condition.spellResistance)
+      ? condition.spellResistance
+      : [],
+    immunities: Array.isArray(condition.immunities) ? condition.immunities : [],
+    classSkillGrants: Array.isArray(condition.classSkillGrants)
+      ? condition.classSkillGrants
+      : [],
+    extraRanksPerLevel: Array.isArray(condition.extraRanksPerLevel)
+      ? condition.extraRanksPerLevel
+      : [],
+    sizeChanges: Array.isArray(condition.sizeChanges)
+      ? condition.sizeChanges
+      : [],
+    spellLikeAbilities: Array.isArray(condition.spellLikeAbilities)
+      ? condition.spellLikeAbilities
+      : [],
+    casterLevelBonuses: Array.isArray(condition.casterLevelBonuses)
+      ? condition.casterLevelBonuses
+      : [],
+    spellDcBonuses: Array.isArray(condition.spellDcBonuses)
+      ? condition.spellDcBonuses
+      : [],
+    generatedEquipment: Array.isArray(condition.generatedEquipment)
+      ? condition.generatedEquipment
+      : [],
+  };
+}
+
+function expandApplyConditionBuffs(buffs = []) {
+  return (Array.isArray(buffs) ? buffs : []).flatMap((buff) => {
+    const applied = (Array.isArray(buff.applyConditions)
+      ? buff.applyConditions
+      : []
+    )
+      .map((entry) => conditionBuffFromApplyCondition(entry, buff))
+      .filter(Boolean);
+    return applied.length ? [buff, ...applied] : [buff];
+  });
+}
+
 function calculationBuffs() {
-  return [
+  return expandApplyConditionBuffs([
     ...collectSelectedRaceBuffs(),
     ...activeBuffs,
     ...collectClassFeatureBuffs(),
-  ];
+  ]);
+}
+
+function extraRanksPerLevelValue(entry = {}) {
+  const value = Number(entry.value ?? entry.amount ?? entry.ranks ?? 0);
+  return Number.isFinite(value) ? value : 0;
+}
+
+function collectExtraRanksPerLevelEntries() {
+  return calculationBuffs()
+    .flatMap((buff) =>
+      (Array.isArray(buff.extraRanksPerLevel)
+        ? buff.extraRanksPerLevel
+        : []
+      ).map((entry) => ({
+        ...entry,
+        value: extraRanksPerLevelValue(entry),
+        source: buff.name || buff.source || "Effect",
+      })),
+    )
+    .filter((entry) => entry.value);
+}
+
+function extraRanksPerLevelSummary() {
+  const entries = collectExtraRanksPerLevelEntries();
+  const perLevel = entries.reduce(
+    (sum, entry) => sum + extraRanksPerLevelValue(entry),
+    0,
+  );
+  const characterLevel = Math.max(1, num("characterLevel") || 1);
+  return {
+    perLevel,
+    total: perLevel * characterLevel,
+    characterLevel,
+    sources: entries,
+  };
 }
 
 // Every class skill from every class this character has levels in --
@@ -4908,6 +6078,23 @@ function renderClassFeatureImmunities(feature) {
   `;
 }
 
+function renderClassFeatureApplyConditions(feature) {
+  const entries = Array.isArray(feature.applyConditions)
+    ? feature.applyConditions
+    : [];
+  if (!entries.length) return "";
+  return `
+    <div class="class-feature-effects">
+      ${entries
+        .map(
+          (entry) =>
+            `<span class="class-feature-effect-pill">${escapeHtml(window.PFEffectEditor?.applyConditionText ? window.PFEffectEditor.applyConditionText(entry) : `Applies condition: ${appliedConditionName(entry) || "Condition"}`)}</span>`,
+        )
+        .join("")}
+    </div>
+  `;
+}
+
 function renderClassFeatureEffects(feature) {
   const effects = Array.isArray(feature.effects) ? feature.effects : [];
   if (!effects.length) return "";
@@ -4922,13 +6109,22 @@ function renderClassFeatureEffects(feature) {
             String(effect.stat || "").toLowerCase() ===
             "remove dex bonus to ac"
               ? "removes DEX bonus"
+              : String(effect.stat || "").toLowerCase() ===
+                  "cannot gain morale bonuses"
+                ? "blocks morale bonuses"
+              : String(effect.stat || "").toLowerCase() ===
+                  "cannot gain luck bonuses"
+                ? "blocks luck bonuses"
               : `${signed(Number(effect.value || 0))} ${effect.type || "untyped"}`;
           const conditional = effect.conditional
             ? ` (${effect.appliesWhen || "conditional"})`
             : "";
           const stacks = effect.stacks ? "; stacks" : "";
           const scale = classFeatureScaleText(effect.bonusScale || effect.scale);
-          return `<span class="class-feature-effect-pill">${escapeHtml(`${stat}: ${value}${conditional}${stacks}${scale}`)}</span>`;
+          const requirement = window.PFEffectEditor?.attributeRequirementText?.(
+            effect,
+          );
+          return `<span class="class-feature-effect-pill">${escapeHtml(`${stat}: ${value}${conditional}${stacks}${scale}${requirement ? `; ${requirement}` : ""}`)}</span>`;
         })
         .join("")}
     </div>
@@ -4946,6 +6142,23 @@ function renderClassFeatureClassSkillGrants(feature) {
         .map(
           (grant) =>
             `<span class="class-feature-effect-pill">${escapeHtml(window.PFEffectEditor.classSkillGrantText(grant, titleCaseStat))}</span>`,
+        )
+        .join("")}
+    </div>
+  `;
+}
+
+function renderClassFeatureExtraRanksPerLevel(feature) {
+  const entries = Array.isArray(feature.extraRanksPerLevel)
+    ? feature.extraRanksPerLevel
+    : [];
+  if (!entries.length) return "";
+  return `
+    <div class="class-feature-effects">
+      ${entries
+        .map(
+          (entry) =>
+            `<span class="class-feature-effect-pill">${escapeHtml(window.PFEffectEditor.extraRanksPerLevelText(entry))}</span>`,
         )
         .join("")}
     </div>
@@ -4976,7 +6189,11 @@ function renderClassFeatureSpellLikeAbilities(feature) {
     <div class="class-feature-effects">
       ${entries
         .map((entry) => {
-          const spellName = entry.spellName || entry.spell?.name || "Spell";
+          const listName = spellLikeChoiceListName(entry);
+          const spellName =
+            entry.spellName ||
+            entry.spell?.name ||
+            (listName ? `Choose from ${listName}` : "Spell");
           const frequency = entry.frequency ? `${entry.frequency}: ` : "";
           const minimumLevel =
             Number(entry.minimumLevel ?? entry.level ?? 1) || 1;
@@ -5165,6 +6382,82 @@ function classFeatureChoiceKey(feature, pool, context = {}) {
   ].join("|");
 }
 
+function classFeatureConditionalVariableChoiceKey(feature, context = feature) {
+  return [
+    context.className || feature.className || "",
+    context.characterLevel || feature.characterLevel || "",
+    context.classLevel || feature.classLevel || "",
+    feature.name || "Class Feature",
+    "Conditional Variables",
+  ].join("|");
+}
+
+function conditionalVariableChoiceSummary(item = {}, choices = {}) {
+  const variables = conditionalVariables(item);
+  if (!variables.length) return "";
+  return variables
+    .map((variable) => {
+      const key = normalizeConditionalVariableKey(
+        variable.key || variable.name || variable.label,
+      );
+      const label = variable.label || key || "Variable";
+      return `${label}: ${choices[key]?.label || "not selected"}`;
+    })
+    .join(", ");
+}
+
+function applyClassFeatureConditionalVariables(item = {}, context = item) {
+  const key = classFeatureConditionalVariableChoiceKey(item, context);
+  const choices = classFeatureVariableChoices[key];
+  if (!choices || typeof choices !== "object") return item;
+  return interpolateConditionalVariables(
+    {
+      ...item,
+      conditionalChoices: choices,
+    },
+    choices,
+  );
+}
+
+function renderClassFeatureConditionalVariables(feature) {
+  const variables = conditionalVariables(feature);
+  if (!variables.length) return "";
+  const key = classFeatureConditionalVariableChoiceKey(feature, feature);
+  classFeatureVariableChoicePickerConfigs.set(key, { feature });
+  const choices = classFeatureVariableChoices[key] || {};
+  const hasChoices = Object.keys(choices).length > 0;
+  return `
+    <div class="class-feature-pools">
+      ${variables
+        .map((variable) => {
+          const variableKey = normalizeConditionalVariableKey(
+            variable.key || variable.name || variable.label,
+          );
+          const label = variable.label || variableKey || "Choice";
+          const selected = choices[variableKey]?.label || "";
+          return `
+            <div class="class-feature-pool">
+              <div class="class-feature-choice-row">
+                <button class="btn btn-outline-info btn-sm class-feature-choice-select" type="button" data-class-feature-variable-button="${escapeHtml(key)}" title="${escapeHtml(`${label}: ${selected || "not selected"}`)}">
+                  <span>${escapeHtml(label)}</span>
+                  <strong>${escapeHtml(selected || "not selected")}</strong>
+                </button>
+                ${
+                  hasChoices
+                    ? `
+                  <button class="btn btn-outline-danger btn-sm btn-icon class-feature-choice-clear" type="button" data-class-feature-variable-clear="${escapeHtml(key)}" aria-label="Clear conditional selections"><i class="bi bi-trash"></i></button>
+                `
+                    : ""
+                }
+              </div>
+            </div>
+          `;
+        })
+        .join("")}
+    </div>
+  `;
+}
+
 function renderClassFeaturePools(feature) {
   const pools = featurePools(feature);
   if (!pools.length) return "";
@@ -5178,14 +6471,16 @@ function renderClassFeaturePools(feature) {
           return `
           <div class="class-feature-pool">
             <div class="class-feature-choice-row">
-              <div class="class-feature-choice-summary" title="${escapeHtml(selected || "No choice selected")}">${selected ? escapeHtml(selected) : `<span class="text-secondary">No choice selected</span>`}</div>
-              <button class="btn btn-outline-info btn-sm" type="button" data-class-feature-choice-button="${escapeHtml(key)}">Select</button>
+              <button class="btn btn-outline-info btn-sm class-feature-choice-select" type="button" data-class-feature-choice-button="${escapeHtml(key)}" title="${escapeHtml(`${pool.name || "Choice"}: ${selected || "not selected"}`)}">
+                <span>${escapeHtml(pool.name || "Choice")}</span>
+                <strong>${escapeHtml(selected || "not selected")}</strong>
+              </button>
               ${
                 selected
                   ? `
-                <button class="btn btn-outline-danger btn-sm btn-icon" type="button" data-class-feature-choice-clear="${escapeHtml(key)}" aria-label="Clear ${escapeHtml(selected)}"><i class="bi bi-trash"></i></button>
+                <button class="btn btn-outline-danger btn-sm btn-icon class-feature-choice-clear" type="button" data-class-feature-choice-clear="${escapeHtml(key)}" aria-label="Clear ${escapeHtml(selected)}"><i class="bi bi-trash"></i></button>
               `
-                  : `<span></span>`
+                  : ""
               }
             </div>
           </div>
@@ -5196,10 +6491,22 @@ function renderClassFeaturePools(feature) {
   `;
 }
 
+function classFeatureLevelTitle(level, features = []) {
+  const classes = [
+    ...new Set(
+      (features || [])
+        .map((feature) => String(feature.className || "").trim())
+        .filter(Boolean),
+    ),
+  ];
+  return `Level ${level}${classes.length ? ` - ${classes.join(", ")}` : ""}`;
+}
+
 function renderClassFeatures() {
   const root = el("classFeatureList");
   if (!root) return;
   classFeatureChoicePickerConfigs = new Map();
+  classFeatureVariableChoicePickerConfigs = new Map();
   const counts = {};
   const groups = new Map();
   classProgression
@@ -5238,8 +6545,14 @@ function renderClassFeatures() {
                 immunities: Array.isArray(feature.immunities)
                   ? feature.immunities
                   : [],
+                applyConditions: Array.isArray(feature.applyConditions)
+                  ? feature.applyConditions
+                  : [],
                 classSkillGrants: Array.isArray(feature.classSkillGrants)
                   ? feature.classSkillGrants
+                  : [],
+                extraRanksPerLevel: Array.isArray(feature.extraRanksPerLevel)
+                  ? feature.extraRanksPerLevel
                   : [],
                 sizeChanges: Array.isArray(feature.sizeChanges)
                   ? feature.sizeChanges
@@ -5247,8 +6560,17 @@ function renderClassFeatures() {
                 spellLikeAbilities: Array.isArray(feature.spellLikeAbilities)
                   ? feature.spellLikeAbilities
                   : [],
+                casterLevelBonuses: Array.isArray(feature.casterLevelBonuses)
+                  ? feature.casterLevelBonuses
+                  : [],
+                spellDcBonuses: Array.isArray(feature.spellDcBonuses)
+                  ? feature.spellDcBonuses
+                  : [],
                 generatedEquipment: Array.isArray(feature.generatedEquipment)
                   ? feature.generatedEquipment
+                  : [],
+                conditionalVariables: Array.isArray(feature.conditionalVariables)
+                  ? feature.conditionalVariables
                   : [],
                 pools: featurePools(feature),
               };
@@ -5263,25 +6585,18 @@ function renderClassFeatures() {
         .map(
           ([level, features]) => `
     <section class="class-feature-item">
-      <div class="sheet-title mb-2">Level ${escapeHtml(level)}</div>
+      <div class="sheet-title mb-2">${escapeHtml(classFeatureLevelTitle(level, features))}</div>
       <div class="vstack gap-2">
         ${features
           .map((feature, index) => {
             const collapseId = `featureDescription${level}_${index}`;
             return `
             <article class="class-feature-row border rounded p-2">
-              <button class="btn btn-link text-start text-white p-0 text-decoration-none fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#${collapseId}" aria-expanded="false">
-                ${escapeHtml(feature.name)}
+              <button class="class-feature-description-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#${collapseId}" aria-expanded="false">
+                <span>${escapeHtml(feature.name)}</span>
+                <i class="bi bi-chevron-down"></i>
               </button>
-              <div class="small-text">${escapeHtml(feature.className)} ${escapeHtml(feature.classLevel)}</div>
-              ${renderClassFeatureEffects(feature)}
-              ${renderClassFeatureDamageReduction(feature)}
-              ${renderClassFeatureImmunities(feature)}
-              ${renderClassFeatureSpellResistance(feature)}
-              ${renderClassFeatureClassSkillGrants(feature)}
-              ${renderClassFeatureSizeChanges(feature)}
-              ${renderClassFeatureSpellLikeAbilities(feature)}
-              ${renderClassFeatureGeneratedEquipment(feature)}
+              ${renderClassFeatureConditionalVariables(feature)}
               ${renderClassFeaturePools(feature)}
               <div id="${collapseId}" class="collapse small mt-2">${feature.description ? escapeHtml(feature.description) : "No description scraped."}</div>
             </article>
@@ -5322,6 +6637,39 @@ function renderClassFeatures() {
         if (choice) classFeatureChoices[key] = choice;
         else delete classFeatureChoices[key];
         renderClassFeatures();
+        recalculateSheet();
+        queueSheetSave();
+      });
+    });
+  root
+    .querySelectorAll("[data-class-feature-variable-button]")
+    .forEach((button) => {
+      button.addEventListener("click", async () => {
+        const key = button.dataset.classFeatureVariableButton;
+        const config = classFeatureVariableChoicePickerConfigs.get(key);
+        if (!config) return;
+        const resolved = await resolveConditionalVariablesForItem(
+          {
+            conditionalVariables: config.feature.conditionalVariables,
+            conditionalChoices: classFeatureVariableChoices[key] || {},
+          },
+          config.feature.name || "Class Feature",
+        );
+        if (!resolved) return;
+        classFeatureVariableChoices[key] = resolved.conditionalChoices || {};
+        renderClassFeatures();
+        recalculateSheet();
+        queueSheetSave();
+      });
+    });
+  root
+    .querySelectorAll("[data-class-feature-variable-clear]")
+    .forEach((button) => {
+      button.addEventListener("click", () => {
+        const key = button.dataset.classFeatureVariableClear;
+        delete classFeatureVariableChoices[key];
+        renderClassFeatures();
+        recalculateSheet();
         queueSheetSave();
       });
     });
@@ -5332,6 +6680,7 @@ function renderClassFeatures() {
         const key = button.dataset.classFeatureChoiceClear;
         delete classFeatureChoices[key];
         renderClassFeatures();
+        recalculateSheet();
         queueSheetSave();
       });
     });
@@ -5881,7 +7230,9 @@ function updateClassDerivedViews() {
 function setSheetInfoTab(tab) {
   activeSheetInfoTab = tab || "character";
   const isCharacter = activeSheetInfoTab === "character";
-  el("sheetInfoTabs")?.classList.toggle("d-none", isCharacter);
+  const infoTabs = el("sheetInfoTabs");
+  infoTabs?.classList.toggle("d-none", isCharacter);
+  if (infoTabs) infoTabs.dataset.activePanel = activeSheetInfoTab;
   document
     .querySelectorAll("[data-sheet-info-panel]")
     .forEach((panel) =>
@@ -6789,12 +8140,24 @@ function syncEquippedLootBuffFromItem(item) {
     ? item.spellResistance
     : [];
   const immunities = Array.isArray(item.immunities) ? item.immunities : [];
+  const applyConditions = Array.isArray(item.applyConditions)
+    ? item.applyConditions
+    : [];
   const classSkillGrants = Array.isArray(item.classSkillGrants)
     ? item.classSkillGrants
+    : [];
+  const extraRanksPerLevel = Array.isArray(item.extraRanksPerLevel)
+    ? item.extraRanksPerLevel
     : [];
   const sizeChanges = Array.isArray(item.sizeChanges) ? item.sizeChanges : [];
   const spellLikeAbilities = Array.isArray(item.spellLikeAbilities)
     ? item.spellLikeAbilities
+    : [];
+  const casterLevelBonuses = Array.isArray(item.casterLevelBonuses)
+    ? item.casterLevelBonuses
+    : [];
+  const spellDcBonuses = Array.isArray(item.spellDcBonuses)
+    ? item.spellDcBonuses
     : [];
   const generatedEquipment = Array.isArray(item.generatedEquipment)
     ? item.generatedEquipment
@@ -6809,9 +8172,13 @@ function syncEquippedLootBuffFromItem(item) {
     !damageReduction.length &&
     !spellResistance.length &&
     !immunities.length &&
+    !applyConditions.length &&
     !classSkillGrants.length &&
+    !extraRanksPerLevel.length &&
     !sizeChanges.length &&
     !spellLikeAbilities.length &&
+    !casterLevelBonuses.length &&
+    !spellDcBonuses.length &&
     !generatedEquipment.length
   ) {
     if (index >= 0) {
@@ -6841,9 +8208,13 @@ function syncEquippedLootBuffFromItem(item) {
     ...(damageReduction.length ? { damageReduction } : {}),
     ...(spellResistance.length ? { spellResistance } : {}),
     ...(immunities.length ? { immunities } : {}),
+    ...(applyConditions.length ? { applyConditions } : {}),
     ...(classSkillGrants.length ? { classSkillGrants } : {}),
+    ...(extraRanksPerLevel.length ? { extraRanksPerLevel } : {}),
     ...(sizeChanges.length ? { sizeChanges } : {}),
     ...(spellLikeAbilities.length ? { spellLikeAbilities } : {}),
+    ...(casterLevelBonuses.length ? { casterLevelBonuses } : {}),
+    ...(spellDcBonuses.length ? { spellDcBonuses } : {}),
     ...(generatedEquipment.length ? { generatedEquipment } : {}),
   };
   if (index >= 0 && JSON.stringify(activeBuffs[index]) === JSON.stringify(next))
@@ -7433,6 +8804,53 @@ function conciseBreakdownDetail(detail = "") {
   return match ? match[1].trim() : text;
 }
 
+function isFavoredEnemyBreakdownItem(item = {}) {
+  return (
+    item.favoredEnemyBonus ||
+    item.favoredEnemy ||
+    /\bfavou?red\s+enemy\b/i.test(item.source || "")
+  );
+}
+
+function conditionalBreakdownKey(item = {}, index = 0) {
+  if (!isFavoredEnemyBreakdownItem(item)) return `single|${index}`;
+  return [
+    item.stat || "",
+    item.targetLabel || "",
+    item.type || "",
+    conciseBreakdownDetail(item.detail),
+    "favored-enemy",
+  ]
+    .map((part) => String(part || "").trim().toLowerCase())
+    .join("|");
+}
+
+function mergedConditionalBreakdownItems(items = []) {
+  const groups = new Map();
+  items.forEach((item, index) => {
+    const key = conditionalBreakdownKey(item, index);
+    const value = Number(item.value || 0);
+    const existing = groups.get(key);
+    if (!existing) {
+      groups.set(key, {
+        ...item,
+        value,
+        sources: [item.source].filter(Boolean),
+      });
+      return;
+    }
+    existing.value += value;
+    if (item.source && !existing.sources.includes(item.source))
+      existing.sources.push(item.source);
+    existing.source =
+      isFavoredEnemyBreakdownItem(existing) &&
+      existing.sources.length > 1
+        ? "Favored Enemy"
+        : existing.sources.join(", ");
+  });
+  return [...groups.values()];
+}
+
 function formatBreakdown(items = [], currentTotal = "") {
   const buffItems = items.filter((b) => {
     if (["Formula", "Base"].includes(b.source)) return false;
@@ -7446,7 +8864,7 @@ function formatBreakdown(items = [], currentTotal = "") {
   const normalItems = buffItems.filter(
     (b) => !(b.conditional || b.applied === "conditional"),
   );
-  const conditionalRows = conditionalItems
+  const conditionalRows = mergedConditionalBreakdownItems(conditionalItems)
     .map((b) => {
       const target = b.targetLabel
         ? `<span class="badge text-bg-secondary me-1">${escapeHtml(b.targetLabel)}</span>`
@@ -7460,8 +8878,9 @@ function formatBreakdown(items = [], currentTotal = "") {
             : "calc-value-neutral";
       const total = numericTotalText(currentTotal, value, b.stat);
       const detail = conciseBreakdownDetail(b.detail);
-      const appliesWhen = detail ? ` (${escapeHtml(detail)})` : "";
-      return `<div class="calc-conditional">${target}<strong>${escapeHtml(total)}</strong>${appliesWhen}: <span class="calc-buff-name ${valueClass}">${escapeHtml(b.source)}</span> <span class="${valueClass}">${signed(value)}</span> (${escapeHtml(b.type)})</div>`;
+      const appliesWhen = detail ? ` ${escapeHtml(detail)}` : "";
+      const totalWithBonus = `${total} (${signed(value)})`;
+      return `<div class="calc-conditional">${target}<strong>${escapeHtml(totalWithBonus)}</strong>${appliesWhen}: <span class="calc-buff-name ${valueClass}">${escapeHtml(b.source)}</span> (${escapeHtml(b.type)})</div>`;
     })
     .join("");
   const normalRows = normalItems
@@ -7660,6 +9079,7 @@ function recalculateSheet() {
   recalculateWeapons(buffed, buffBonuses);
 
   const classSkillSet = characterClassSkillSet();
+  const classSkillEffectSet = characterClassSkillKeys();
   allSkills().forEach(([skill]) => {
     const id = skillId(skill);
     const abilityKey = el(`${id}Ability`)?.dataset.ability;
@@ -7667,22 +9087,47 @@ function recalculateSheet() {
     const skillAbilityBuffKey = skillBuffKeyForAbility(abilityKey);
     const specificSkillKey = skillStatKey(skill);
     const familyKey = skillFamilyBonusKey(skill);
+    const trainingKey = skillTrainingBonusKey(skill);
     const skillBuff =
       Number(buffBonuses["skill checks"] || 0) +
       Number(buffBonuses[skillAbilityBuffKey] || 0) +
       (familyKey ? Number(buffBonuses[familyKey] || 0) : 0) +
+      (trainingKey ? Number(buffBonuses[trainingKey] || 0) : 0) +
       Number(buffBonuses[specificSkillKey] || 0);
     // +3 for ranking a class skill (from any of your classes, or a "X
     // becomes a class skill" grant) -- only once it actually has ranks
     // in it, and never stacking no matter how many sources call it a
     // class skill (a Set already collapses that).
     const ranks = num(`${id}Ranks`);
-    const isClassSkill = classSkillSet.has(specificSkillKey);
+    const isClassSkill = classSkillSetHasSkill(classSkillSet, skill);
+    const hasClassSkillEffect = classSkillSetHasSkill(
+      classSkillEffectSet,
+      skill,
+    );
+    const hasClassKnowledgeSkillEffect =
+      hasClassSkillEffect && isKnowledgeSkill(skill);
     const classSkillBonus = isClassSkill && ranks > 0 ? 3 : 0;
+    const classSkillEffectBonus = hasClassSkillEffect
+      ? Number(buffBonuses["class skill checks"] || 0)
+      : 0;
+    const classKnowledgeSkillEffectBonus = hasClassKnowledgeSkillEffect
+      ? Number(buffBonuses["class knowledge skill checks"] || 0)
+      : 0;
     el(`${id}Ability`).value = String(abilityValue);
-    el(`${id}Buff`).value = String(skillBuff + classSkillBonus);
+    el(`${id}Buff`).value = String(
+      skillBuff +
+        classSkillEffectBonus +
+        classKnowledgeSkillEffectBonus +
+        classSkillBonus,
+    );
     el(`${id}Total`).value = String(
-      abilityValue + ranks + num(`${id}Misc`) + skillBuff + classSkillBonus,
+      abilityValue +
+        ranks +
+        num(`${id}Misc`) +
+        skillBuff +
+        classSkillEffectBonus +
+        classKnowledgeSkillEffectBonus +
+        classSkillBonus,
     );
     const classSkillEl = el(`${id}ClassSkill`);
     if (classSkillEl) {
@@ -7702,8 +9147,22 @@ function recalculateSheet() {
         stat: skillAbilityBuffKey,
         target: `${abilityKey.toUpperCase()} skills`,
       },
+      ...(hasClassSkillEffect
+        ? [{ stat: "class skill checks", target: "Class skills" }]
+        : []),
+      ...(hasClassKnowledgeSkillEffect
+        ? [
+            {
+              stat: "class knowledge skill checks",
+              target: "Class Knowledge skills",
+            },
+          ]
+        : []),
       ...(familyKey
         ? [{ stat: familyKey, target: skillFamilyLabel(familyKey) }]
+        : []),
+      ...(trainingKey
+        ? [{ stat: trainingKey, target: skillFamilyLabel(trainingKey) }]
         : []),
       { stat: specificSkillKey, target: skill },
     ]);
@@ -7776,12 +9235,14 @@ async function openEffectTrackerModal() {
         }
       }
     : null;
+  pruneUnavailableRacialTraitActiveBuffs({ persist: true });
   const options = {
     contextKey: sheetContextKey,
     characterId: currentSheetId,
     effectStats: LOOT_EFFECT_STATS,
     activatableAbilities: collectActivatableAbilities(),
     choicePoolSkills: allSkills(),
+    favoredEnemyOptions: characterFavoredEnemyOptions,
     // Enemies aren't "controlled" by a separate real person the way a
     // PC is -- only route PC effects-with-a-choice through the request
     // flow when someone other than that character's own owner is the
@@ -7868,12 +9329,24 @@ function renderInventoryEffects(item) {
     ? item.spellResistance
     : [];
   const immunities = Array.isArray(item.immunities) ? item.immunities : [];
+  const applyConditions = Array.isArray(item.applyConditions)
+    ? item.applyConditions
+    : [];
   const classSkillGrants = Array.isArray(item.classSkillGrants)
     ? item.classSkillGrants
+    : [];
+  const extraRanksPerLevel = Array.isArray(item.extraRanksPerLevel)
+    ? item.extraRanksPerLevel
     : [];
   const sizeChanges = Array.isArray(item.sizeChanges) ? item.sizeChanges : [];
   const spellLikeAbilities = Array.isArray(item.spellLikeAbilities)
     ? item.spellLikeAbilities
+    : [];
+  const casterLevelBonuses = Array.isArray(item.casterLevelBonuses)
+    ? item.casterLevelBonuses
+    : [];
+  const spellDcBonuses = Array.isArray(item.spellDcBonuses)
+    ? item.spellDcBonuses
     : [];
   const effectText = (effect) => {
     if (
@@ -7883,7 +9356,22 @@ function renderInventoryEffects(item) {
     ) {
       return `Removes DEX bonus to AC${effect.conditional ? ` (${escapeHtml(effect.appliesWhen || "conditional")})` : ""}${effect.stacks ? " stacks" : ""}`;
     }
-    return `${escapeHtml(titleCaseStat(effect.stat || "effect"))} ${signed(Number(effect.value || 0))} (${escapeHtml(effect.type || "untyped")})${effect.conditional ? ` (${escapeHtml(effect.appliesWhen || "conditional")})` : ""}${effect.stacks ? " stacks" : ""}`;
+    if (
+      String(effect.stat || "")
+        .toLowerCase()
+        .trim() === "cannot gain luck bonuses"
+    ) {
+      return `Cannot gain luck bonuses${effect.conditional ? ` (${escapeHtml(effect.appliesWhen || "conditional")})` : ""}`;
+    }
+    if (
+      String(effect.stat || "")
+        .toLowerCase()
+        .trim() === "cannot gain morale bonuses"
+    ) {
+      return `Cannot gain morale bonuses${effect.conditional ? ` (${escapeHtml(effect.appliesWhen || "conditional")})` : ""}`;
+    }
+    const requirement = window.PFEffectEditor?.attributeRequirementText?.(effect);
+    return `${escapeHtml(titleCaseStat(effect.stat || "effect"))} ${signed(Number(effect.value || 0))} (${escapeHtml(effect.type || "untyped")})${effect.conditional ? ` (${escapeHtml(effect.appliesWhen || "conditional")})` : ""}${effect.stacks ? " stacks" : ""}${requirement ? `; ${escapeHtml(requirement)}` : ""}`;
   };
   const lines = [
     ...effects.map(effectText),
@@ -7899,8 +9387,18 @@ function renderInventoryEffects(item) {
       (immunity) =>
         `Immune ${escapeHtml(immunityEntryText(immunity))}`,
     ),
+    ...applyConditions.map((entry) =>
+      escapeHtml(
+        window.PFEffectEditor?.applyConditionText
+          ? window.PFEffectEditor.applyConditionText(entry)
+          : `Applies condition: ${appliedConditionName(entry) || "Condition"}`,
+      ),
+    ),
     ...classSkillGrants.map((grant) =>
       escapeHtml(window.PFEffectEditor.classSkillGrantText(grant, titleCaseStat)),
+    ),
+    ...extraRanksPerLevel.map((entry) =>
+      escapeHtml(window.PFEffectEditor.extraRanksPerLevelText(entry)),
     ),
     ...sizeChanges.map(
       (entry) =>
@@ -7914,8 +9412,27 @@ function renderInventoryEffects(item) {
           minimumLevel > 1 ? `level ${minimumLevel}, ` : "";
         const requirement = spellLikeRequirementText(entry);
         const requirementText = requirement ? `${escapeHtml(requirement)}, ` : "";
-        return `SLA ${levelText}${requirementText}${entry.frequency ? `${escapeHtml(entry.frequency)}: ` : ""}${escapeHtml(entry.spellName || entry.spell?.name || "Spell")}`;
+        const listName = spellLikeChoiceListName(entry);
+        const spellName =
+          entry.spellName ||
+          entry.spell?.name ||
+          (listName ? `Choose from ${listName}` : "Spell");
+        return `SLA ${levelText}${requirementText}${entry.frequency ? `${escapeHtml(entry.frequency)}: ` : ""}${escapeHtml(spellName)}`;
       },
+    ),
+    ...casterLevelBonuses.map((entry) =>
+      escapeHtml(
+        window.PFEffectEditor?.casterLevelBonusText
+          ? window.PFEffectEditor.casterLevelBonusText(entry)
+          : "Caster Level bonus",
+      ),
+    ),
+    ...spellDcBonuses.map((entry) =>
+      escapeHtml(
+        window.PFEffectEditor?.spellDcBonusText
+          ? window.PFEffectEditor.spellDcBonusText(entry)
+          : "Spell DC bonus",
+      ),
     ),
     ...generatedEquipment.map(
       (entry) =>
@@ -7935,6 +9452,19 @@ function cloneJson(value) {
   return JSON.parse(JSON.stringify(value || {}));
 }
 
+function normalizeSpellLikeChoicesForSave(choices = {}) {
+  return Object.fromEntries(
+    Object.entries(choices || {})
+      .map(([key, choice]) => {
+        const spellName = String(
+          choice?.spellName || choice?.spell?.name || choice?.name || "",
+        ).trim();
+        return spellName ? [key, { spellName }] : null;
+      })
+      .filter(Boolean),
+  );
+}
+
 function makeEnemyInventoryItem(source) {
   return {
     id: `enemy-item-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
@@ -7947,10 +9477,15 @@ function makeEnemyInventoryItem(source) {
     damageReduction: cloneJson(source.damageReduction || []),
     spellResistance: cloneJson(source.spellResistance || []),
     immunities: cloneJson(source.immunities || []),
+    applyConditions: cloneJson(source.applyConditions || []),
     classSkillGrants: cloneJson(source.classSkillGrants || []),
+    extraRanksPerLevel: cloneJson(source.extraRanksPerLevel || []),
     sizeChanges: cloneJson(source.sizeChanges || []),
     spellLikeAbilities: cloneJson(source.spellLikeAbilities || []),
+    casterLevelBonuses: cloneJson(source.casterLevelBonuses || []),
+    spellDcBonuses: cloneJson(source.spellDcBonuses || []),
     generatedEquipment: cloneJson(source.generatedEquipment || []),
+    conditionalVariables: cloneJson(source.conditionalVariables || []),
   };
 }
 
@@ -8738,6 +10273,7 @@ function collectPersistedCards(containerId) {
 
 function collectCalculatedSummary() {
   const conditionalGroups = simpleConditionalsByStat();
+  const classSkillEffectSet = characterClassSkillKeys();
   const abilityRows = ABILITIES.map(([key, label]) => ({
     key,
     label,
@@ -8756,21 +10292,45 @@ function collectCalculatedSummary() {
   }));
   const skillRows = allSkills().map(([skill, ability]) => {
     const id = skillId(skill);
+    const currentTotal = el(`${id}Total`)?.value || "";
     const familyKey = skillFamilyBonusKey(skill);
+    const trainingKey = skillTrainingBonusKey(skill);
+    const skillKey = skillStatKey(skill);
+    const hasClassSkillEffect = classSkillSetHasSkill(classSkillEffectSet, skill);
+    const hasClassKnowledgeSkillEffect =
+      hasClassSkillEffect && isKnowledgeSkill(skill);
     return {
       key: id,
       label: skill,
-      total: el(`${id}Total`)?.value || "",
+      total: currentTotal,
       conditionals: [
-        ...conditionalTableRows("skill checks", conditionalGroups),
+        ...conditionalTableRows("skill checks", conditionalGroups, currentTotal),
         ...conditionalTableRows(
           skillBuffKeyForAbility(ability),
           conditionalGroups,
+          currentTotal,
         ),
         ...(familyKey
-          ? conditionalTableRows(familyKey, conditionalGroups)
+          ? conditionalTableRows(familyKey, conditionalGroups, currentTotal)
           : []),
-        ...conditionalTableRows(skillStatKey(skill), conditionalGroups),
+        ...(trainingKey
+          ? conditionalTableRows(trainingKey, conditionalGroups, currentTotal)
+          : []),
+        ...(hasClassSkillEffect
+          ? conditionalTableRows(
+              "class skill checks",
+              conditionalGroups,
+              currentTotal,
+            )
+          : []),
+        ...(hasClassKnowledgeSkillEffect
+          ? conditionalTableRows(
+              "class knowledge skill checks",
+              conditionalGroups,
+              currentTotal,
+            )
+          : []),
+        ...conditionalTableRows(skillKey, conditionalGroups, currentTotal),
       ],
     };
   });
@@ -8810,6 +10370,7 @@ function collectCalculatedSummary() {
   );
   const finalSize = finalCreatureSize();
   const baseSize = normalizeCreatureSize(el("size")?.value || "Medium");
+  const skillRanks = extraRanksPerLevelSummary();
 
   return {
     size: {
@@ -8848,6 +10409,7 @@ function collectCalculatedSummary() {
     initiativeConditionals: conditionalGroups.initiative || [],
     hpConditionals: conditionalGroups["hit points"] || [],
     saves: saveRows,
+    skillRanks,
     skills: skillRows,
     weapons: weaponRows,
   };
@@ -9033,15 +10595,19 @@ function collectSheet() {
   sheet.preferences = { showAppliedBuffs: showCalculations };
   sheet.customSkills = customSkills;
   sheet.classFeatureChoices = classFeatureChoices;
+  sheet.classFeatureVariableChoices = classFeatureVariableChoices;
   sheet.racialTraits = {
     alternateTraits: selectedRacialAlternateTraits.slice(),
-    choices: cloneJson(selectedRacialTraitChoices),
+    choices: selectedRacialTraitChoicesForSave(),
   };
   sheet.classProgression = classProgression.map((row) => ({
     level: row.level,
     className: row.className,
   }));
   sheet.spells = characterSpells;
+  sheet.spellLikeChoices = normalizeSpellLikeChoicesForSave(
+    selectedSpellLikeChoices,
+  );
   if (isEnemySheetMode)
     sheet.enemyInventory = characterInventoryItems.map((item) => ({
       ...item,
@@ -9125,6 +10691,11 @@ function restoreSheet(sheet) {
     data.classFeatureChoices && typeof data.classFeatureChoices === "object"
       ? data.classFeatureChoices
       : {};
+  classFeatureVariableChoices =
+    data.classFeatureVariableChoices &&
+    typeof data.classFeatureVariableChoices === "object"
+      ? data.classFeatureVariableChoices
+      : {};
   selectedRacialAlternateTraits = normalizeSelectedRacialAlternateTraits(
     data.racialTraits || data.racialAlternateTraits || [],
   );
@@ -9133,6 +10704,11 @@ function restoreSheet(sheet) {
   );
   characterSpells =
     data.spells && typeof data.spells === "object" ? data.spells : {};
+  selectedSpellLikeChoices = normalizeSpellLikeChoicesForSave(
+    data.spellLikeChoices && typeof data.spellLikeChoices === "object"
+      ? data.spellLikeChoices
+      : {},
+  );
   classProgression = normalizeClassProgression(
     data.classProgression || data.classes || [],
     data.fields?.classLevel?.split(/\s+\d+$/)[0] || "",
@@ -9188,6 +10764,7 @@ function restoreSheet(sheet) {
   updateCharacterImagePreview();
   updateRacialTraitsButton();
   updateClassDerivedViews();
+  pruneUnavailableRacialTraitActiveBuffs({ persist: Boolean(currentSheetId) });
   recalculateSheet();
   isRestoringSheet = false;
 }
@@ -9246,6 +10823,7 @@ function attachInputListeners(root = document) {
         selectedRacialTraitChoices = {};
         applySelectedRaceDefaults();
         updateRacialTraitsButton();
+        pruneUnavailableRacialTraitActiveBuffs({ persist: true });
       }
       if (input.matches("[data-enemy-spell-label], [data-enemy-spell-list]"))
         syncEnemyStructuredSpellFields();
@@ -9532,6 +11110,10 @@ async function startPendingEffectChoicePolling() {
       "",
     choicePoolSkillsFor: (id) =>
       !isEnemySheetMode && id === currentSheetId ? allSkills() : undefined,
+    favoredEnemyOptionsFor: (id) =>
+      !isEnemySheetMode && id === currentSheetId
+        ? characterFavoredEnemyOptions()
+        : [],
     onResolved: async (characterId) => {
       if (isEnemySheetMode || characterId !== currentSheetId) return;
       await loadActiveBuffs(currentSheetId);

@@ -38,6 +38,10 @@
 .custom-skill-list-option small {
   color: #9fb4c8;
   font-size: 11px;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 @media (max-width: 640px) {

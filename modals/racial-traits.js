@@ -68,12 +68,50 @@
     );
   }
 
+  function mechanicFavoredEnemyScaleChoices(items = []) {
+    return (Array.isArray(items) ? items : []).some((item) => {
+      const source = (item?.bonusScale || item?.scale || {}).source || {};
+      if (
+        source.type !== "special" ||
+        source.special !== "favored-enemy-bonus"
+      )
+        return false;
+      return !(
+        item?.bonusScale?.favoredEnemyTarget ||
+        item?.bonusScale?.target ||
+        item?.scale?.favoredEnemyTarget ||
+        item?.scale?.target ||
+        item?.favoredEnemyTarget ||
+        item?.targetFavoredEnemy ||
+        (item?.appliesWhen &&
+          !/favou?red enemy|\{[^{}]+\}/i.test(item.appliesWhen))
+      );
+    });
+  }
+
+  function spellLikeChoiceList(entry = {}) {
+    return (
+      entry?.spellChoiceList ||
+      window.PFEffectStats?.customSpellLikeListById?.(
+        entry?.spellChoiceListId || "",
+      ) ||
+      null
+    );
+  }
+
+  function mechanicSpellLikeChoices(items = []) {
+    return (Array.isArray(items) ? items : []).some(spellLikeChoiceList);
+  }
+
   function overrideChoiceStats(override = {}) {
     return Object.entries(override.mechanicOverrides || {}).some(
       ([key, operations]) =>
-        ["effects", "classSkillGrants"].includes(key) &&
-        (Array.isArray(operations) ? operations : []).some((operation) =>
-          window.PFEffectStats?.isChoiceStat?.(operation?.value?.stat),
+        ["effects", "classSkillGrants", "spellLikeAbilities"].includes(key) &&
+        (Array.isArray(operations) ? operations : []).some(
+          (operation) =>
+            window.PFEffectStats?.isChoiceStat?.(operation?.value?.stat) ||
+            mechanicFavoredEnemyScaleChoices([operation?.value]) ||
+            spellLikeChoiceList(operation?.value),
         ),
     );
   }
@@ -81,7 +119,11 @@
   function traitHasChoiceStats(trait = {}) {
     return (
       mechanicChoiceStats(trait.effects) ||
+      mechanicFavoredEnemyScaleChoices(trait.effects) ||
       mechanicChoiceStats(trait.classSkillGrants) ||
+      mechanicSpellLikeChoices(trait.spellLikeAbilities) ||
+      (Array.isArray(trait.choicePools) && trait.choicePools.length > 0) ||
+      (Array.isArray(trait.pools) && trait.pools.length > 0) ||
       (trait.modifiedTraitOverrides || []).some(overrideChoiceStats)
     );
   }
@@ -111,20 +153,31 @@
     );
   }
 
+  function traitRequirementStatus(trait = {}) {
+    if (typeof state.traitRequirementStatus !== "function") {
+      return { met: true, label: "" };
+    }
+    const status = state.traitRequirementStatus(trait) || {};
+    return {
+      met: status.met !== false,
+      label: status.label || "",
+    };
+  }
+
   function choiceControls(trait = {}) {
-    if (!traitHasChoiceStats(trait)) return "";
+    if (trait.activatable || !traitHasChoiceStats(trait)) return "";
     const key = traitNameKey(trait);
     const hasChoice = Boolean(state.choices?.[key]);
     return `
       <div class="racial-trait-choice-row">
-        <span class="racial-trait-choice-status">${hasChoice ? "Choices set" : "Target needed"}</span>
+        <span class="racial-trait-choice-status">${hasChoice ? "Choices set" : "Choices needed"}</span>
         <button
           class="btn btn-outline-info btn-sm"
           type="button"
           data-racial-trait-choice="${key}"
         >
           <i class="bi bi-bullseye"></i>
-          ${hasChoice ? "Change Target" : "Choose Target"}
+          ${hasChoice ? "Change Choices" : "Choose Choices"}
         </button>
       </div>
     `;
@@ -169,6 +222,12 @@
         );
       }
     }
+    const requirement = traitRequirementStatus(trait);
+    if (requirement.label) {
+      pills.push(
+        `<span class="racial-trait-pill ${requirement.met ? "is-requirement" : "is-unmet"}"><i class="bi bi-shield-exclamation"></i> ${escapeHtml(requirement.label)}</span>`,
+      );
+    }
     return pills.length
       ? `<div class="racial-trait-meta">${pills.join("")}</div>`
       : "";
@@ -184,8 +243,9 @@
   }
 
   function selectedAlternateCard(trait = {}) {
+    const requirement = traitRequirementStatus(trait);
     return `
-      <article class="racial-trait-card is-selected">
+      <article class="racial-trait-card is-selected${requirement.met ? "" : " is-unavailable"}">
         <div class="racial-trait-topline">
           <div class="racial-trait-name">${escapeHtml(trait.name || "Trait")}</div>
           <button
@@ -198,7 +258,7 @@
           </button>
         </div>
         ${metaPills(trait)}
-        ${choiceControls(trait)}
+        ${requirement.met ? choiceControls(trait) : ""}
         ${descriptionAccordion(trait)}
       </article>
     `;
@@ -206,16 +266,28 @@
 
   function standardTraitCard(trait = {}, replacedBy = []) {
     const effectiveTrait = effectiveStandardTrait(trait);
+    const requirement = traitRequirementStatus(effectiveTrait);
+    const isUnavailable = !replacedBy.length && !requirement.met;
+    const badgeClass = replacedBy.length
+      ? "text-bg-warning"
+      : isUnavailable
+        ? "text-bg-secondary"
+        : "text-bg-success";
+    const badgeText = replacedBy.length
+      ? "Replaced"
+      : isUnavailable
+        ? "Unavailable"
+        : "Active";
     return `
-      <article class="racial-trait-card${replacedBy.length ? " is-replaced" : ""}">
+      <article class="racial-trait-card${replacedBy.length ? " is-replaced" : ""}${isUnavailable ? " is-unavailable" : ""}">
         <div class="racial-trait-topline">
           <div class="racial-trait-name">${escapeHtml(trait.name || "Trait")}</div>
-          <span class="badge ${replacedBy.length ? "text-bg-warning" : "text-bg-success"}">
-            ${replacedBy.length ? "Replaced" : "Active"}
+          <span class="badge ${badgeClass}">
+            ${badgeText}
           </span>
         </div>
-        ${metaPills(trait, replacedBy)}
-        ${replacedBy.length ? "" : choiceControls(effectiveTrait)}
+        ${metaPills(effectiveTrait, replacedBy)}
+        ${replacedBy.length || !requirement.met ? "" : choiceControls(effectiveTrait)}
         ${descriptionAccordion(trait)}
       </article>
     `;
@@ -274,17 +346,19 @@
         ${traits
           .map((trait) => {
             const modifies = (trait.modifies || []).length;
+            const requirement = traitRequirementStatus(trait);
             return `
-              <article class="racial-trait-card${modifies ? " is-modifier" : ""}">
+              <article class="racial-trait-card${modifies ? " is-modifier" : ""}${requirement.met ? "" : " is-unavailable"}">
                 <div class="racial-trait-topline">
                   <div class="racial-trait-name">${escapeHtml(trait.name || "Trait")}</div>
                   <button
                     class="btn btn-outline-info btn-sm"
                     type="button"
                     data-racial-trait-toggle="${traitNameKey(trait)}"
+                    ${requirement.met ? "" : "disabled"}
                   >
                     <i class="bi bi-check2"></i>
-                    Apply
+                    ${requirement.met ? "Apply" : "Unavailable"}
                   </button>
                 </div>
                 ${metaPills(trait)}
@@ -350,6 +424,7 @@
     }
 
     const incomingClaims = claimedStandardTraitKeys(trait);
+    if (!traitRequirementStatus(trait).met) return;
     const canApply = state.onBeforeApply
       ? await state.onBeforeApply(trait)
       : true;
@@ -450,6 +525,10 @@
             : null,
         onRemove:
           typeof config.onRemove === "function" ? config.onRemove : null,
+        traitRequirementStatus:
+          typeof config.traitRequirementStatus === "function"
+            ? config.traitRequirementStatus
+            : null,
       };
       document.getElementById("racialTraitsSearch").value = "";
       render();

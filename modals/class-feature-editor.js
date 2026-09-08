@@ -221,20 +221,29 @@
       effects,
       damageReduction,
       spellResistance,
+      immunities,
+      applyConditions,
       classSkillGrants,
+      extraRanksPerLevel,
       sizeChanges,
       spellLikeAbilities,
       generatedEquipment,
+      conditionalVariables,
     } = effectsAccordion.collect();
     if (effects.length) feature.effects = effects;
     if (damageReduction.length) feature.damageReduction = damageReduction;
     if (spellResistance.length) feature.spellResistance = spellResistance;
+    if (immunities.length) feature.immunities = immunities;
+    if (applyConditions.length) feature.applyConditions = applyConditions;
     if (classSkillGrants.length) feature.classSkillGrants = classSkillGrants;
+    if (extraRanksPerLevel.length) feature.extraRanksPerLevel = extraRanksPerLevel;
     if (sizeChanges.length) feature.sizeChanges = sizeChanges;
     if (spellLikeAbilities.length)
       feature.spellLikeAbilities = spellLikeAbilities;
     if (generatedEquipment.length)
       feature.generatedEquipment = generatedEquipment;
+    if (conditionalVariables.length)
+      feature.conditionalVariables = conditionalVariables;
     if (activatable) {
       feature.activatable = true;
       if (featureDurationConfig) feature.durationConfig = featureDurationConfig;

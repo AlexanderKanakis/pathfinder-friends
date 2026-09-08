@@ -2,7 +2,8 @@
   const MODAL_ID = "customSkillListModal";
   let modal = null;
   let resolver = null;
-  let currentSkills = [];
+  let currentOptions = [];
+  let currentSaveList = null;
   let selected = new Set();
 
   function escapeHtml(value) {
@@ -17,6 +18,13 @@
   function normalizeSkillEntry(entry) {
     if (Array.isArray(entry)) return { name: entry[0], ability: entry[1] };
     return { name: entry?.name, ability: entry?.ability };
+  }
+
+  function skillStatValue(skillName = "") {
+    if (window.PFEffectStats?.skillStatValue) {
+      return window.PFEffectStats.skillStatValue(skillName);
+    }
+    return `skill:${String(skillName || "").replace(/[^a-z0-9]/gi, "").toLowerCase()}`;
   }
 
   function baseSkills() {
@@ -44,7 +52,57 @@
         if (!map.has(key)) map.set(key, skill);
         return map;
       }, new Map());
-    return [...merged.values()].sort((a, b) => a.name.localeCompare(b.name));
+    return [...merged.values()]
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map((skill) => ({
+        value: skillStatValue(skill.name),
+        label: skill.name,
+        meta: String(skill.ability || "").toUpperCase(),
+        group: "Skills",
+        skillName: skill.name,
+      }));
+  }
+
+  function normalizeOption(option = {}) {
+    const source =
+      option && typeof option === "object"
+        ? option
+        : { value: String(option || ""), label: String(option || "") };
+    const spell =
+      source.spell && typeof source.spell === "object" ? source.spell : null;
+    const spellName = String(source.spellName || spell?.name || "").trim();
+    const value = String(
+      spellName || source.name || source.value || source.stat || source.key || "",
+    ).trim();
+    if (!value) return null;
+    return {
+      value,
+      label: String(spellName || source.label || source.name || value).trim() || value,
+      meta: String(source.meta || source.group || "").trim(),
+      group: String(source.group || "Targets").trim() || "Targets",
+      skillName: source.skillName || "",
+      name: spellName || source.name || "",
+      spellName,
+    };
+  }
+
+  function targetOptions(options = {}) {
+    const hasProvidedOptions = Object.prototype.hasOwnProperty.call(
+      options,
+      "options",
+    );
+    const provided = Array.isArray(options.options)
+      ? options.options.map(normalizeOption).filter(Boolean)
+      : [];
+    if (hasProvidedOptions) return provided;
+    return skillOptions(options.skills);
+  }
+
+  function selectedOptions() {
+    const byValue = new Map(currentOptions.map((option) => [option.value, option]));
+    return [...selected]
+      .map((value) => byValue.get(value))
+      .filter(Boolean);
   }
 
   function ensureModal() {
@@ -55,7 +113,7 @@
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
           <div class="modal-content bg-dark text-white border-secondary">
             <div class="modal-header border-secondary">
-              <h5 class="modal-title">Custom Skill List</h5>
+              <h5 class="modal-title" id="${MODAL_ID}Title">Custom Skill List</h5>
               <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -64,7 +122,7 @@
                 <input id="${MODAL_ID}Name" class="form-control form-control-sm" placeholder="Crafting skills">
               </div>
               <div class="mb-2">
-                <label for="${MODAL_ID}Search">Skills</label>
+                <label for="${MODAL_ID}Search" id="${MODAL_ID}SearchLabel">Skills</label>
                 <input id="${MODAL_ID}Search" class="form-control form-control-sm" placeholder="Search skills">
               </div>
               <div class="custom-skill-list-toolbar">
@@ -89,13 +147,13 @@
     document
       .getElementById(`${MODAL_ID}SelectVisible`)
       .addEventListener("click", () => {
-        visibleSkills().forEach((skill) => selected.add(skill.name));
+        visibleSkills().forEach((option) => selected.add(option.value));
         renderSkills();
       });
     document
       .getElementById(`${MODAL_ID}ClearVisible`)
       .addEventListener("click", () => {
-        visibleSkills().forEach((skill) => selected.delete(skill.name));
+        visibleSkills().forEach((option) => selected.delete(option.value));
         renderSkills();
       });
     document
@@ -113,8 +171,12 @@
         .getElementById(`${MODAL_ID}Search`)
         ?.value.trim()
         .toLowerCase() || "";
-    return currentSkills.filter(
-      (skill) => !term || skill.name.toLowerCase().includes(term),
+    return currentOptions.filter(
+      (option) =>
+        !term ||
+        option.label.toLowerCase().includes(term) ||
+        option.value.toLowerCase().includes(term) ||
+        option.group.toLowerCase().includes(term),
     );
   }
 
@@ -123,11 +185,11 @@
     const rows = visibleSkills();
     list.innerHTML = rows
       .map(
-        (skill) => `
+        (option) => `
       <label class="custom-skill-list-option">
-        <input class="form-check-input" type="checkbox" value="${escapeHtml(skill.name)}" ${selected.has(skill.name) ? "checked" : ""}>
-        <span>${escapeHtml(skill.name)}</span>
-        <small>${escapeHtml(String(skill.ability || "").toUpperCase())}</small>
+        <input class="form-check-input" type="checkbox" value="${escapeHtml(option.value)}" ${selected.has(option.value) ? "checked" : ""}>
+        <span>${escapeHtml(option.label)}</span>
+        <small>${escapeHtml(option.meta || option.group)}</small>
       </label>
     `,
       )
@@ -148,12 +210,29 @@
       return;
     }
     if (!selected.size) {
-      status.textContent = "Choose at least one skill.";
+      status.textContent = "Choose at least one target.";
       return;
     }
-    const saved = window.PFEffectStats?.saveCustomSkillList?.({
+    const picked = selectedOptions();
+    const items = picked.map((option) => ({
+      value: option.value,
+      label: option.label,
+      ...(option.name ? { name: option.name } : {}),
+      ...(option.spellName ? { spellName: option.spellName } : {}),
+      ...(option.meta ? { meta: option.meta } : {}),
+      ...(option.group ? { group: option.group } : {}),
+    }));
+    const skills = picked
+      .map((option) => option.skillName)
+      .filter(Boolean);
+    const saveList =
+      typeof currentSaveList === "function"
+        ? currentSaveList
+        : window.PFEffectStats?.saveCustomSkillList;
+    const saved = saveList?.({
       name,
-      skills: [...selected],
+      skills,
+      items,
     });
     if (!saved) {
       status.textContent = "Could not save this list.";
@@ -167,11 +246,19 @@
 
   function open(options = {}) {
     ensureModal();
-    currentSkills = skillOptions(options.skills);
+    currentOptions = targetOptions(options);
     selected = new Set();
+    const title = options.title || "Custom Skill List";
+    const label = options.label || (options.options ? "Targets" : "Skills");
+    document.getElementById(`${MODAL_ID}Title`).textContent = title;
+    document.getElementById(`${MODAL_ID}SearchLabel`).textContent = label;
     document.getElementById(`${MODAL_ID}Name`).value = "";
     document.getElementById(`${MODAL_ID}Search`).value = "";
+    document.getElementById(`${MODAL_ID}Search`).placeholder =
+      options.options ? "Search targets" : "Search skills";
     document.getElementById(`${MODAL_ID}Status`).textContent = "";
+    currentSaveList =
+      typeof options.saveList === "function" ? options.saveList : null;
     renderSkills();
     const modalEl = document.getElementById(MODAL_ID);
     modal = bootstrap.Modal.getOrCreateInstance(modalEl);

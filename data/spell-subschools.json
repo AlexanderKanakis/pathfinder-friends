@@ -1,0 +1,18 @@
+{
+  "subschools": [
+    { "id": "calling", "name": "Calling", "school": "conjuration" },
+    { "id": "creation", "name": "Creation", "school": "conjuration" },
+    { "id": "healing", "name": "Healing", "school": "conjuration" },
+    { "id": "summoning", "name": "Summoning", "school": "conjuration" },
+    { "id": "teleportation", "name": "Teleportation", "school": "conjuration" },
+    { "id": "scrying", "name": "Scrying", "school": "divination" },
+    { "id": "charm", "name": "Charm", "school": "enchantment" },
+    { "id": "compulsion", "name": "Compulsion", "school": "enchantment" },
+    { "id": "figment", "name": "Figment", "school": "illusion" },
+    { "id": "glamer", "name": "Glamer", "school": "illusion" },
+    { "id": "pattern", "name": "Pattern", "school": "illusion" },
+    { "id": "phantasm", "name": "Phantasm", "school": "illusion" },
+    { "id": "shadow", "name": "Shadow", "school": "illusion" },
+    { "id": "polymorph", "name": "Polymorph", "school": "transmutation" }
+  ]
+}

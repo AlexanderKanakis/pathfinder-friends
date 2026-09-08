@@ -435,6 +435,9 @@ function normalizeWondrousSourceItem(item, index) {
     classSkillGrants: Array.isArray(item.classSkillGrants)
       ? item.classSkillGrants
       : [],
+    extraRanksPerLevel: Array.isArray(item.extraRanksPerLevel)
+      ? item.extraRanksPerLevel
+      : [],
   };
 }
 
@@ -501,6 +504,9 @@ function normalizeMundaneSourceItem(item, index) {
     classSkillGrants: Array.isArray(item.classSkillGrants)
       ? item.classSkillGrants
       : [],
+    extraRanksPerLevel: Array.isArray(item.extraRanksPerLevel)
+      ? item.extraRanksPerLevel
+      : [],
   };
 }
 
@@ -551,6 +557,9 @@ function normalizeWeaponSourceItem(item, index) {
       : [],
     classSkillGrants: Array.isArray(item.classSkillGrants)
       ? item.classSkillGrants
+      : [],
+    extraRanksPerLevel: Array.isArray(item.extraRanksPerLevel)
+      ? item.extraRanksPerLevel
       : [],
   };
 }
@@ -605,6 +614,9 @@ function normalizeArmorShieldSourceItem(item, index) {
       : [],
     classSkillGrants: Array.isArray(item.classSkillGrants)
       ? item.classSkillGrants
+      : [],
+    extraRanksPerLevel: Array.isArray(item.extraRanksPerLevel)
+      ? item.extraRanksPerLevel
       : [],
   };
 }
@@ -1102,6 +1114,9 @@ function renderLootEffects(item) {
   const classSkillGrants = Array.isArray(item.classSkillGrants)
     ? item.classSkillGrants
     : [];
+  const extraRanksPerLevel = Array.isArray(item.extraRanksPerLevel)
+    ? item.extraRanksPerLevel
+    : [];
   const lines = [
     ...effects.map(
       (effect) =>
@@ -1122,6 +1137,9 @@ function renderLootEffects(item) {
           window.PFEffectEditor.titleCaseStat,
         ),
       ),
+    ),
+    ...extraRanksPerLevel.map((entry) =>
+      escapeHtml(window.PFEffectEditor.extraRanksPerLevelText(entry)),
     ),
   ];
   if (!lines.length) return "";
@@ -1240,6 +1258,9 @@ function lootEffectPayload(item = {}) {
       : [],
     classSkillGrants: Array.isArray(item.classSkillGrants)
       ? item.classSkillGrants
+      : [],
+    extraRanksPerLevel: Array.isArray(item.extraRanksPerLevel)
+      ? item.extraRanksPerLevel
       : [],
     sizeChanges: Array.isArray(item.sizeChanges) ? item.sizeChanges : [],
     spellLikeAbilities: Array.isArray(item.spellLikeAbilities)
@@ -1424,6 +1445,7 @@ async function syncEditedLootBuff(item) {
     extras.damageReduction.length ||
     extras.spellResistance.length ||
     extras.classSkillGrants.length ||
+    extras.extraRanksPerLevel.length ||
     extras.sizeChanges.length ||
     extras.spellLikeAbilities.length;
   if (hasExtras) {
@@ -1434,6 +1456,7 @@ async function syncEditedLootBuff(item) {
       damageReduction: extras.damageReduction,
       spellResistance: extras.spellResistance,
       classSkillGrants: extras.classSkillGrants,
+      extraRanksPerLevel: extras.extraRanksPerLevel,
       sizeChanges: extras.sizeChanges,
       spellLikeAbilities: extras.spellLikeAbilities,
     };

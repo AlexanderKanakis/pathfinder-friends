@@ -73,6 +73,10 @@ function normalizeTrait(trait = {}) {
     category: trait.category || "",
     description: trait.description || "",
     activatable: Boolean(trait.activatable),
+    attributeRequirement:
+      trait.attributeRequirement && typeof trait.attributeRequirement === "object"
+        ? trait.attributeRequirement
+        : null,
     replaces: Array.isArray(trait.replaces) ? trait.replaces : [],
     modifies: Array.isArray(trait.modifies) ? trait.modifies : [],
     modifiedTraitOverrides: Array.isArray(trait.modifiedTraitOverrides)
@@ -86,8 +90,14 @@ function normalizeTrait(trait = {}) {
       ? trait.spellResistance
       : [],
     immunities: Array.isArray(trait.immunities) ? trait.immunities : [],
+    applyConditions: Array.isArray(trait.applyConditions)
+      ? trait.applyConditions
+      : [],
     classSkillGrants: Array.isArray(trait.classSkillGrants)
       ? trait.classSkillGrants
+      : [],
+    extraRanksPerLevel: Array.isArray(trait.extraRanksPerLevel)
+      ? trait.extraRanksPerLevel
       : [],
     sizeChanges: Array.isArray(trait.sizeChanges) ? trait.sizeChanges : [],
     spellLikeAbilities: Array.isArray(trait.spellLikeAbilities)
@@ -96,11 +106,68 @@ function normalizeTrait(trait = {}) {
     generatedEquipment: Array.isArray(trait.generatedEquipment)
       ? trait.generatedEquipment
       : [],
+    conditionalVariables: Array.isArray(trait.conditionalVariables)
+      ? trait.conditionalVariables
+      : [],
+    activatableAbilities: Array.isArray(trait.activatableAbilities)
+      ? cloneJson(trait.activatableAbilities)
+      : [],
+    choicePools: Array.isArray(trait.choicePools)
+      ? cloneJson(trait.choicePools)
+      : Array.isArray(trait.pools)
+        ? cloneJson(trait.pools)
+        : [],
     durationConfig:
       trait.durationConfig && typeof trait.durationConfig === "object"
         ? trait.durationConfig
         : null,
   };
+}
+
+const ATTRIBUTE_REQUIREMENT_OPTIONS = ["", "STR", "DEX", "CON", "INT", "WIS", "CHA"];
+
+function normalizeAttributeKey(value = "") {
+  const key = String(value || "")
+    .trim()
+    .toLowerCase();
+  const aliases = {
+    str: "STR",
+    strength: "STR",
+    dex: "DEX",
+    dexterity: "DEX",
+    con: "CON",
+    constitution: "CON",
+    int: "INT",
+    intelligence: "INT",
+    wis: "WIS",
+    wisdom: "WIS",
+    cha: "CHA",
+    charisma: "CHA",
+  };
+  return aliases[key] || "";
+}
+
+function normalizeAttributeRequirement(data = {}) {
+  const source =
+    data.attributeRequirement ||
+    data.attributeScoreRequirement ||
+    data.abilityRequirement ||
+    {};
+  const attribute = normalizeAttributeKey(
+    source.attribute || source.ability || data.requiredAttribute || "",
+  );
+  const score = Number(
+    source.score ?? source.minimumScore ?? source.minimumAbilityScore ?? "",
+  );
+  return {
+    attribute,
+    score: Number.isFinite(score) && score > 0 ? Math.floor(score) : "",
+  };
+}
+
+function hasAttributeRequirement(data = {}) {
+  const requirement = normalizeAttributeRequirement(data);
+  return Boolean(requirement.attribute && requirement.score);
 }
 
 function normalizeFavoredBonus(bonus = {}) {
@@ -251,10 +318,13 @@ const TRAIT_MECHANIC_KEYS = [
   "damageReduction",
   "spellResistance",
   "immunities",
+  "applyConditions",
   "classSkillGrants",
+  "extraRanksPerLevel",
   "sizeChanges",
   "spellLikeAbilities",
   "generatedEquipment",
+  "conditionalVariables",
 ];
 
 const TRAIT_MECHANIC_LABELS = {
@@ -262,10 +332,13 @@ const TRAIT_MECHANIC_LABELS = {
   damageReduction: "DR",
   spellResistance: "SR",
   immunities: "Immunities",
+  applyConditions: "Conditions",
   classSkillGrants: "Class Skills",
+  extraRanksPerLevel: "Ranks",
   sizeChanges: "Size",
   spellLikeAbilities: "SLAs",
   generatedEquipment: "Gear",
+  conditionalVariables: "Vars",
 };
 
 function traitMechanicCount(item = {}, key = "") {
@@ -301,6 +374,25 @@ function stableMechanicKey(value) {
 function stableMechanicValue(value) {
   if (Array.isArray(value)) return value.map(stableMechanicValue);
   if (!value || typeof value !== "object") return value ?? null;
+  const spellName = String(
+    value.spellName || value.spell?.name || value.name || "",
+  ).trim();
+  if (
+    spellName &&
+    !value.stat &&
+    (value.frequency ||
+      value.minimumLevel !== undefined ||
+      value.level !== undefined ||
+      value.castingAttr ||
+      value.minimumScore !== undefined)
+  ) {
+    const minimumLevel = Number(value.minimumLevel ?? value.level ?? 1) || 1;
+    return {
+      frequency: String(value.frequency || "").trim(),
+      minimumLevel,
+      spellName,
+    };
+  }
   const sorted = {};
   Object.keys(value)
     .sort()
@@ -355,8 +447,14 @@ function mechanicRowSummary(key = "", row = {}) {
     const name = row.name || row.immunity || row.type || "Immunity";
     return `Immune ${name}${row.appliesWhen ? ` (${row.appliesWhen})` : ""}`;
   }
+  if (key === "applyConditions") {
+    return window.PFEffectEditor.applyConditionText(row);
+  }
   if (key === "classSkillGrants") {
     return `${row.skillName || row.stat || "Skill"} becomes a class skill`;
+  }
+  if (key === "extraRanksPerLevel") {
+    return window.PFEffectEditor.extraRanksPerLevelText(row);
   }
   if (key === "sizeChanges") {
     const value = Number(row.value ?? row.steps ?? 0);
@@ -364,7 +462,14 @@ function mechanicRowSummary(key = "", row = {}) {
   }
   if (key === "spellLikeAbilities") {
     const level = Number(row.minimumLevel ?? row.level ?? 1) || 1;
-    return `${row.frequency || "1/day"} ${row.spellName || row.name || row.spell?.name || "Spell"}${level > 1 ? ` at level ${level}` : ""}`;
+    const listName =
+      row.spellChoiceList?.name || row.spellList?.name || row.spellChoiceListName;
+    const spellName =
+      row.spellName ||
+      row.name ||
+      row.spell?.name ||
+      (listName ? `Choose from ${listName}` : "Spell");
+    return `${row.frequency || "1/day"} ${spellName}${level > 1 ? ` at level ${level}` : ""}`;
   }
   if (key === "generatedEquipment") {
     return `${row.type || "Equipment"}: ${row.name || row.item || "Generated item"}`;
@@ -392,14 +497,20 @@ function createMechanicEditorRow(key = "", data = {}, options = {}) {
     spellResistance: () => window.PFEffectEditor.createSrRow(data, rowOptions),
     immunities: () =>
       window.PFEffectEditor.createImmunityRow(data, rowOptions),
+    applyConditions: () =>
+      window.PFEffectEditor.createApplyConditionRow(data, rowOptions),
     classSkillGrants: () =>
       window.PFEffectEditor.createClassSkillRow(data, rowOptions),
+    extraRanksPerLevel: () =>
+      window.PFEffectEditor.createExtraRanksPerLevelRow(data, rowOptions),
     sizeChanges: () =>
       window.PFEffectEditor.createSizeChangeRow(data, rowOptions),
     spellLikeAbilities: () =>
       window.PFEffectEditor.createSpellLikeAbilityRow(data, rowOptions),
     generatedEquipment: () =>
       window.PFEffectEditor.createGeneratedEquipmentRow(data, rowOptions),
+    conditionalVariables: () =>
+      window.PFEffectEditor.createConditionalVariableRow(data, rowOptions),
   };
   const row = builders[key]?.();
   if (!row?.element) return null;
@@ -530,6 +641,8 @@ function modifiedTraitOverrideSection(kind, trait, index, race = {}) {
 
 function traitCard(kind, trait, index, race = {}) {
   const isAlternate = kind === "alternateTraits";
+  const attributeRequirement = normalizeAttributeRequirement(trait);
+  const requirementOpen = hasAttributeRequirement(trait);
   return `
     <article class="trait-card" data-trait-kind="${kind}" data-trait-index="${index}">
       <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
@@ -538,7 +651,7 @@ function traitCard(kind, trait, index, race = {}) {
           <i class="bi bi-trash"></i>
         </button>
       </div>
-      <div class="trait-grid">
+      <div class="trait-grid ${isAlternate ? "trait-grid-alternate" : ""}">
         <div>
           <label>Name</label>
           <input data-trait-field="name" class="form-control form-control-sm" value="${escapeHtml(trait.name || "")}">
@@ -549,8 +662,19 @@ function traitCard(kind, trait, index, race = {}) {
         </div>
         <div class="trait-activatable-field">
           <label>Activatable</label>
-          <div class="form-check form-switch">
-            <input data-trait-field="activatable" class="form-check-input" type="checkbox" ${trait.activatable ? "checked" : ""}>
+          <div class="trait-compact-actions">
+            <div class="form-check form-switch">
+              <input data-trait-field="activatable" class="form-check-input" type="checkbox" ${trait.activatable ? "checked" : ""}>
+            </div>
+            <button
+              class="btn btn-outline-secondary btn-sm"
+              type="button"
+              data-toggle-trait-attribute-requirement
+              aria-expanded="${requirementOpen ? "true" : "false"}"
+              title="Attribute score requirement"
+            >
+              Req
+            </button>
           </div>
         </div>
         <div class="trait-duration-field ${trait.activatable ? "" : "d-none"}" data-trait-duration-field>
@@ -562,10 +686,27 @@ function traitCard(kind, trait, index, race = {}) {
             <span class="small-text" data-trait-duration-summary>${escapeHtml(traitDurationLabel(trait.durationConfig))}</span>
           </div>
         </div>
+        <div class="trait-attribute-requirement-field grid-column-full ${requirementOpen ? "" : "d-none"}" data-trait-attribute-requirement>
+          <div>
+            <label>Required Attribute</label>
+            <select data-trait-field="requiredAttribute" class="form-select form-select-sm">
+              ${ATTRIBUTE_REQUIREMENT_OPTIONS.map(
+                (ability) =>
+                  `<option value="${escapeHtml(ability)}" ${
+                    attributeRequirement.attribute === ability ? "selected" : ""
+                  }>${escapeHtml(ability || "None")}</option>`,
+              ).join("")}
+            </select>
+          </div>
+          <div>
+            <label>Minimum Score</label>
+            <input data-trait-field="requiredScore" class="form-control form-control-sm" type="number" min="1" value="${escapeHtml(attributeRequirement.score)}">
+          </div>
+        </div>
         ${
           isAlternate
             ? `
-          <div class="trait-relation-grid grid-column-full">
+          <div class="trait-relation-grid">
             <div class="trait-relation-field" data-trait-relation-field="replaces">
               <label>Replaces</label>
               <input
@@ -761,6 +902,23 @@ function updateTraitDurationSummary(card) {
   const summary = card.querySelector("[data-trait-duration-summary]");
   if (!summary) return;
   summary.textContent = traitDurationLabel(traitDurationConfigs.get(key));
+}
+
+function updateTraitRequirementToggle(card) {
+  const panel = card.querySelector("[data-trait-attribute-requirement]");
+  const button = card.querySelector("[data-toggle-trait-attribute-requirement]");
+  if (!panel || !button) return;
+  const open = !panel.classList.contains("d-none");
+  button.setAttribute("aria-expanded", String(open));
+  button.classList.toggle("btn-outline-info", open);
+  button.classList.toggle("btn-outline-secondary", !open);
+}
+
+function toggleTraitAttributeRequirement(card) {
+  const panel = card.querySelector("[data-trait-attribute-requirement]");
+  if (!panel) return;
+  panel.classList.toggle("d-none");
+  updateTraitRequirementToggle(card);
 }
 
 function openTraitDurationEditor(card) {
@@ -987,6 +1145,9 @@ function renderSelectedRace() {
   mountTraitEffectEditors(race);
   mountTraitRelationSearches(race);
   mountModifierOverrideActionControls();
+  el("raceEditorPanel")
+    .querySelectorAll("[data-trait-kind]")
+    .forEach(updateTraitRequirementToggle);
 
   el("raceEditorPanel")
     .querySelectorAll("input, textarea, select")
@@ -1012,6 +1173,14 @@ function renderSelectedRace() {
       button.addEventListener("click", () => {
         const card = button.closest("[data-trait-kind]");
         if (card) openTraitDurationEditor(card);
+      });
+    });
+  el("raceEditorPanel")
+    .querySelectorAll("[data-toggle-trait-attribute-requirement]")
+    .forEach((button) => {
+      button.addEventListener("click", () => {
+        const card = button.closest("[data-trait-kind]");
+        if (card) toggleTraitAttributeRequirement(card);
       });
     });
   el("raceEditorPanel")
@@ -1087,6 +1256,7 @@ function collectModifiedTraitOverrides(card, kind, index) {
 function collectTrait(card) {
   const kind = card.dataset.traitKind;
   const index = Number(card.dataset.traitIndex);
+  const sourceTrait = raceData.races[selectedIndex]?.[kind]?.[index] || {};
   const editor = traitEffectEditors.get(`${kind}:${index}`);
   const extras = editor?.collect?.() || {};
   const name = card.querySelector('[data-trait-field="name"]').value.trim();
@@ -1105,11 +1275,38 @@ function collectTrait(card) {
     damageReduction: extras.damageReduction || [],
     spellResistance: extras.spellResistance || [],
     immunities: extras.immunities || [],
+    applyConditions: extras.applyConditions || [],
     classSkillGrants: extras.classSkillGrants || [],
+    extraRanksPerLevel: extras.extraRanksPerLevel || [],
     sizeChanges: extras.sizeChanges || [],
     spellLikeAbilities: extras.spellLikeAbilities || [],
     generatedEquipment: extras.generatedEquipment || [],
+    conditionalVariables: extras.conditionalVariables || [],
+    activatableAbilities: Array.isArray(sourceTrait.activatableAbilities)
+      ? cloneJson(sourceTrait.activatableAbilities)
+      : [],
+    choicePools: Array.isArray(sourceTrait.choicePools)
+      ? cloneJson(sourceTrait.choicePools)
+      : Array.isArray(sourceTrait.pools)
+        ? cloneJson(sourceTrait.pools)
+        : [],
   };
+  const requiredAttribute = card.querySelector(
+    '[data-trait-field="requiredAttribute"]',
+  )?.value;
+  const requiredScore = Number(
+    card.querySelector('[data-trait-field="requiredScore"]')?.value || 0,
+  );
+  if (
+    requiredAttribute &&
+    Number.isFinite(requiredScore) &&
+    requiredScore > 0
+  ) {
+    trait.attributeRequirement = {
+      attribute: requiredAttribute,
+      score: Math.floor(requiredScore),
+    };
+  }
   if (trait.activatable) {
     const durationConfig = traitDurationConfigs.get(traitKey(kind, index));
     if (durationConfig) trait.durationConfig = durationConfig;

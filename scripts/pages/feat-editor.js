@@ -397,10 +397,13 @@ function commitSelectedFeat() {
     damageReduction: extras.damageReduction || [],
     spellResistance: extras.spellResistance || [],
     immunities: extras.immunities || [],
+    applyConditions: extras.applyConditions || [],
     classSkillGrants: extras.classSkillGrants || [],
+    extraRanksPerLevel: extras.extraRanksPerLevel || [],
     sizeChanges: extras.sizeChanges || [],
     spellLikeAbilities: extras.spellLikeAbilities || [],
     generatedEquipment: extras.generatedEquipment || [],
+    conditionalVariables: extras.conditionalVariables || [],
   });
 
   featData.feats[selectedIndex] = next;

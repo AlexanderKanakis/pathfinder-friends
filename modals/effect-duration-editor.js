@@ -192,6 +192,11 @@
     if (factor.type === "character") return "character level";
     if (factor.type === "class")
       return factor.className ? `${factor.className} level` : "class level";
+    if (factor.type === "special") {
+      if (factor.special === "favored-enemy-bonus")
+        return "favored enemy bonus";
+      return factor.label || "special value";
+    }
     if (factor.type === "ability") return `${factor.ability || "CON"} modifier`;
     return "";
   }
@@ -256,9 +261,12 @@
     return null;
   }
 
-  function levelSourceOptions(selected = {}) {
+  function levelSourceOptions(selected = {}, options = {}) {
     const selectedType = selected.type || "caster";
     const selectedClass = selected.className || "";
+    const selectedSpecial = selected.special || "";
+    const includeSpecial =
+      Boolean(options.includeSpecial) || selectedType === "special";
     return `
       <option value="caster" ${selectedType === "caster" ? "selected" : ""}>Caster level</option>
       <option value="character" ${selectedType === "character" ? "selected" : ""}>Character level</option>
@@ -272,11 +280,22 @@
       <optgroup label="Prestige class level">
         ${PRESTIGE_CLASSES.map((name) => `<option class="text-warning" value="prestige:${escapeHtml(name)}" ${selectedType === "class" && selectedClass === name ? "selected" : ""}>${escapeHtml(name)}</option>`).join("")}
       </optgroup>
+      ${
+        includeSpecial
+          ? `
+      <optgroup label="Special">
+        <option value="special:favored-enemy-bonus" ${selectedType === "special" && selectedSpecial === "favored-enemy-bonus" ? "selected" : ""}>Favored enemy bonus</option>
+      </optgroup>
+      `
+          : ""
+      }
     `;
   }
 
   function sourceFromSelect(value) {
     if (value === "character") return { type: "character" };
+    if (String(value).startsWith("special:"))
+      return { type: "special", special: value.slice(8) };
     if (String(value).startsWith("class:"))
       return { type: "class", className: value.slice(6), prestige: false };
     if (String(value).startsWith("prestige:"))
