@@ -36,7 +36,8 @@ const WEAPON_TYPES = [
   "Ranged Weapon",
   "Firearm (One-Handed)",
   "Firearm (Two-Handed)",
-  "Natural",
+  "Natural Weapon",
+  "Improvised",
 ];
 const ITEM_SLOTS = PFItemEditor.DEFAULT_SLOTS;
 const WEAPON_ENCHANTMENTS = [
@@ -435,9 +436,11 @@ function normalizeWondrousSourceItem(item, index) {
     classSkillGrants: Array.isArray(item.classSkillGrants)
       ? item.classSkillGrants
       : [],
+    bonusRanks: Array.isArray(item.bonusRanks) ? item.bonusRanks : [],
     extraRanksPerLevel: Array.isArray(item.extraRanksPerLevel)
       ? item.extraRanksPerLevel
       : [],
+    ...lootEffectPayload(item),
   };
 }
 
@@ -471,7 +474,7 @@ function normalizeAlchemicalSourceItem(item, index) {
       subtype: item.type || "",
       link: item.link || "",
     },
-    effects: [],
+    ...lootEffectPayload(item),
   };
 }
 
@@ -504,9 +507,11 @@ function normalizeMundaneSourceItem(item, index) {
     classSkillGrants: Array.isArray(item.classSkillGrants)
       ? item.classSkillGrants
       : [],
+    bonusRanks: Array.isArray(item.bonusRanks) ? item.bonusRanks : [],
     extraRanksPerLevel: Array.isArray(item.extraRanksPerLevel)
       ? item.extraRanksPerLevel
       : [],
+    ...lootEffectPayload(item),
   };
 }
 
@@ -535,6 +540,7 @@ function normalizeWeaponSourceItem(item, index) {
       weaponType: details.weaponType || "Melee Weapon (One-Handed)",
       attackScale: details.attackScale || "STR",
       damage: details.damage || "",
+      extraDamage: details.extraDamage || [],
       damageSmall: details.damageSmall || "",
       critical: details.critical || "",
       damageScale: details.damageScale || "STR",
@@ -558,9 +564,11 @@ function normalizeWeaponSourceItem(item, index) {
     classSkillGrants: Array.isArray(item.classSkillGrants)
       ? item.classSkillGrants
       : [],
+    bonusRanks: Array.isArray(item.bonusRanks) ? item.bonusRanks : [],
     extraRanksPerLevel: Array.isArray(item.extraRanksPerLevel)
       ? item.extraRanksPerLevel
       : [],
+    ...lootEffectPayload(item),
   };
 }
 
@@ -615,9 +623,11 @@ function normalizeArmorShieldSourceItem(item, index) {
     classSkillGrants: Array.isArray(item.classSkillGrants)
       ? item.classSkillGrants
       : [],
+    bonusRanks: Array.isArray(item.bonusRanks) ? item.bonusRanks : [],
     extraRanksPerLevel: Array.isArray(item.extraRanksPerLevel)
       ? item.extraRanksPerLevel
       : [],
+    ...lootEffectPayload(item),
   };
 }
 
@@ -815,9 +825,13 @@ function populateLootForm(item, selectedCharacterId = "") {
   updateLootSlotPreview();
   PFItemEditor.refreshDescription(lootEditorConfig());
   el("lootWeaponType").value =
-    details.weaponType || "Melee Weapon (One-Handed)";
+    details.weaponType === "Natural"
+      ? "Natural Weapon"
+      : details.weaponType || "Melee Weapon (One-Handed)";
   setLootAttackScale(details.attackScale || "STR");
   el("lootDamageDice").value = details.damage || "";
+  el("lootDamageType").value = details.damageType || "";
+  PFWeaponDamage.mount(el("lootExtraDamage"), details.extraDamage);
   el("lootWeaponCritical").value = details.critical || "";
   el("lootWeaponCapacity").value = details.capacity || "";
   el("lootWeaponMisfire").value = details.misfire || "";
@@ -1036,6 +1050,8 @@ function collectLootDetails() {
       weaponType,
       attackScale: el("lootAttackScale").value.trim() || "STR",
       damage: el("lootDamageDice").value.trim(),
+      damageType: el("lootDamageType").value.trim(),
+      extraDamage: PFWeaponDamage.collect(el("lootExtraDamage")),
       critical: el("lootWeaponCritical").value.trim(),
       damageScale: el("lootDamageScale").value.trim() || "STR",
       enhancement: el("lootWeaponEnhancement").value || "0",
@@ -1077,7 +1093,7 @@ function renderLootAttributes(item) {
     if (details.specialMaterial)
       rows.push(["Material", details.specialMaterial]);
     rows.push(["Attack Scales", details.attackScale || "STR"]);
-    if (details.damage) rows.push(["Damage", details.damage]);
+    if (details.damage) rows.push(["Damage", `${details.damage}${details.damageType ? ` ${details.damageType}` : ""}${PFWeaponDamage.format(details.extraDamage)}`]);
     if (details.critical) rows.push(["Critical", details.critical]);
     if (isFirearmWeaponType(details.weaponType) && details.capacity)
       rows.push(["Capacity", details.capacity]);
@@ -1114,6 +1130,7 @@ function renderLootEffects(item) {
   const classSkillGrants = Array.isArray(item.classSkillGrants)
     ? item.classSkillGrants
     : [];
+  const bonusRanks = Array.isArray(item.bonusRanks) ? item.bonusRanks : [];
   const extraRanksPerLevel = Array.isArray(item.extraRanksPerLevel)
     ? item.extraRanksPerLevel
     : [];
@@ -1137,6 +1154,9 @@ function renderLootEffects(item) {
           window.PFEffectEditor.titleCaseStat,
         ),
       ),
+    ),
+    ...bonusRanks.map((entry) =>
+      escapeHtml(window.PFEffectEditor.bonusRanksText(entry)),
     ),
     ...extraRanksPerLevel.map((entry) =>
       escapeHtml(window.PFEffectEditor.extraRanksPerLevelText(entry)),
@@ -1191,7 +1211,6 @@ function renderFullLootCard(item) {
         <span class="loot-icon">${icon}</span>
         <div class="loot-title flex-grow-1">
           <div class="loot-name">${escapeHtml(item.name)}</div>
-          <div class="loot-meta">${escapeHtml(item.type)}${itemSlotLabel(item) ? ` | Slot: ${escapeHtml(itemSlotLabel(item))}` : ""}</div>
         </div>
         <span class="loot-count-actions">
           <span class="loot-count">x${escapeHtml(item.count)}</span>
@@ -1201,8 +1220,7 @@ function renderFullLootCard(item) {
         </span>
       </div>
       <div class="mt-2">
-        <label for="assign-${escapeHtml(item.id)}">Give to</label>
-        <select id="assign-${escapeHtml(item.id)}" class="form-select form-select-sm w-100" data-loot-assign="${escapeHtml(item.id)}">
+        <select id="assign-${escapeHtml(item.id)}" class="form-select form-select-sm w-100" data-loot-assign="${escapeHtml(item.id)}" aria-label="Assign ${escapeHtml(item.name)} to character">
           ${options}
         </select>
       </div>
@@ -1248,25 +1266,46 @@ function renderLootTypeSections(items) {
 }
 
 function lootEffectPayload(item = {}) {
-  return {
-    effects: Array.isArray(item.effects) ? item.effects : [],
-    damageReduction: Array.isArray(item.damageReduction)
-      ? item.damageReduction
-      : [],
-    spellResistance: Array.isArray(item.spellResistance)
-      ? item.spellResistance
-      : [],
-    classSkillGrants: Array.isArray(item.classSkillGrants)
-      ? item.classSkillGrants
-      : [],
-    extraRanksPerLevel: Array.isArray(item.extraRanksPerLevel)
-      ? item.extraRanksPerLevel
-      : [],
-    sizeChanges: Array.isArray(item.sizeChanges) ? item.sizeChanges : [],
-    spellLikeAbilities: Array.isArray(item.spellLikeAbilities)
-      ? item.spellLikeAbilities
-      : [],
+  const mechanics = window.PFEffectMechanics;
+  if (mechanics?.mechanicPayload) return mechanics.mechanicPayload(item);
+  const passive =
+    mechanics?.passiveMechanics?.(item) || (item.activatable ? {} : item);
+  const payload = {
+    effects: Array.isArray(passive.effects) ? passive.effects : [],
   };
+  const keys = window.PFEffectMechanics?.extraKeys?.() || [
+    "damageReduction",
+    "spellResistance",
+    "immunities",
+    "applyConditions",
+    "classSkillGrants",
+    "bonusRanks",
+    "extraRanksPerLevel",
+    "featGrants",
+    "sizeChanges",
+    "spellLikeAbilities",
+    "casterLevelBonuses",
+    "spellDcBonuses",
+    "effectiveAttributeBonuses",
+    "grantDomains",
+    "generatedEquipment",
+    "conditionalVariables",
+  ];
+  keys.forEach((key) => {
+    payload[key] = Array.isArray(passive[key]) ? passive[key] : [];
+  });
+  const active =
+    mechanics?.activeMechanics?.(item) ||
+    (item.activatable ? item : item.activeMechanics || {});
+  const hasActive = mechanics?.hasAnyMechanics
+    ? mechanics.hasAnyMechanics(active)
+    : ["effects", ...keys].some(
+        (key) => Array.isArray(active[key]) && active[key].length,
+      );
+  if (hasActive || active.durationConfig) {
+    payload.activeMechanics = active;
+  }
+  return payload;
 }
 
 async function assignLoot(itemId, assignedTo) {
@@ -1410,6 +1449,8 @@ function resetLootForm() {
   setLootAttackScale("STR");
   setLootDamageScale("STR");
   el("lootWeaponType").value = "Melee Weapon (One-Handed)";
+  el("lootDamageType").value = "";
+  PFWeaponDamage.mount(el("lootExtraDamage"));
   el("lootWeaponCritical").value = "";
   el("lootWeaponCapacity").value = "";
   el("lootWeaponMisfire").value = "";
@@ -1442,24 +1483,51 @@ async function syncEditedLootBuff(item) {
   const extras = lootEffectPayload(item);
   const hasExtras =
     extras.effects.length ||
-    extras.damageReduction.length ||
-    extras.spellResistance.length ||
-    extras.classSkillGrants.length ||
-    extras.extraRanksPerLevel.length ||
-    extras.sizeChanges.length ||
-    extras.spellLikeAbilities.length;
+    (window.PFEffectMechanics?.extraKeys?.() || [
+      "damageReduction",
+      "spellResistance",
+      "immunities",
+      "applyConditions",
+      "classSkillGrants",
+      "bonusRanks",
+      "extraRanksPerLevel",
+      "featGrants",
+      "sizeChanges",
+      "spellLikeAbilities",
+      "casterLevelBonuses",
+      "spellDcBonuses",
+      "effectiveAttributeBonuses",
+      "grantDomains",
+      "generatedEquipment",
+      "conditionalVariables",
+    ]).some((key) => extras[key]?.length);
   if (hasExtras) {
-    buffs[index] = {
+    const nextBuff = {
       ...buffs[index],
       name: item.name,
       bonuses: extras.effects,
-      damageReduction: extras.damageReduction,
-      spellResistance: extras.spellResistance,
-      classSkillGrants: extras.classSkillGrants,
-      extraRanksPerLevel: extras.extraRanksPerLevel,
-      sizeChanges: extras.sizeChanges,
-      spellLikeAbilities: extras.spellLikeAbilities,
     };
+    (window.PFEffectMechanics?.extraKeys?.() || [
+      "damageReduction",
+      "spellResistance",
+      "immunities",
+      "applyConditions",
+      "classSkillGrants",
+      "bonusRanks",
+      "extraRanksPerLevel",
+      "featGrants",
+      "sizeChanges",
+      "spellLikeAbilities",
+      "casterLevelBonuses",
+      "spellDcBonuses",
+      "effectiveAttributeBonuses",
+      "grantDomains",
+      "generatedEquipment",
+      "conditionalVariables",
+    ]).forEach((key) => {
+      nextBuff[key] = extras[key] || [];
+    });
+    buffs[index] = nextBuff;
   } else {
     buffs.splice(index, 1);
   }
@@ -1689,7 +1757,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   el("lootType").addEventListener("change", toggleLootDetailFields);
   el("lootWeaponType").addEventListener("change", toggleLootDetailFields);
   setupLootScalingControls();
-  lootEffectsAccordion = window.PFEffectEditor.mountEffectsAccordion(
+  lootEffectsAccordion = window.PFEffectEditor.mountMechanicGroups(
     el("lootEffectsAccordion"),
     { idPrefix: "lootEffects" },
   );

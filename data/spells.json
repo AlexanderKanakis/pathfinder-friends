@@ -14,7 +14,8 @@
       "description": "</h3>This spell functions identically to the spell <i>zone of truth</i>, except as noted above. The target momentarily takes on the semblance of a being of perfect order, like an archon or inevitable, so that all who can see the target know it is affected by the spell. This divine guise flickers over the target for only an instant and does not allow it to pass as a member of a different race.",
       "descriptors": [
         "mind-affecting"
-      ]
+      ],
+      "area": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Abadar's Truthtelling"
   },
@@ -10452,9 +10453,20 @@
       "saving_throw": "Will negates (harmless);",
       "spell_resistance": "yes (harmless)",
       "description": "</h3>The target is struck by inspiration and gains a +5 luck bonus on its next Craft skill check.",
-      "descriptors": []
+      "descriptors": [],
+      "area": ""
     },
-    "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Crafter's Fortune"
+    "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Crafter's Fortune",
+    "effects": [
+      {
+        "stat": "craft skill checks",
+        "value": 5,
+        "type": "luck",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      }
+    ]
   },
   {
     "name": "Crafter's Nightmare",
@@ -44986,7 +44998,7 @@
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Summon Instrument"
   },
   {
-    "name": "Summon Nature's Ally 1",
+    "name": "Summon Nature's Ally I",
     "details": {
       "level": "druid 1, hunter 1, ranger 1, shaman 1",
       "school": "conjuration",
@@ -45018,7 +45030,7 @@
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Summon Kami"
   },
   {
-    "name": "Summon Nature's Ally 2",
+    "name": "Summon Nature's Ally II",
     "details": {
       "level": "druid 2, hunter 2, ranger 2, shaman 2",
       "school": "conjuration",
@@ -45034,7 +45046,7 @@
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Summon Kami"
   },
   {
-    "name": "Summon Nature's Ally 3",
+    "name": "Summon Nature's Ally III",
     "details": {
       "level": "druid 3, hunter 3, ranger 3, shaman 3",
       "school": "conjuration",
@@ -45050,7 +45062,7 @@
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Summon Kami"
   },
   {
-    "name": "Summon Nature's Ally 4",
+    "name": "Summon Nature's Ally IV",
     "details": {
       "level": "druid 4, hunter 4, ranger 4, shaman 4",
       "school": "conjuration",
@@ -45066,7 +45078,7 @@
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Summon Kami"
   },
   {
-    "name": "Summon Nature's Ally 5",
+    "name": "Summon Nature's Ally V",
     "details": {
       "level": "druid 5, hunter 5, shaman 5",
       "school": "conjuration",
@@ -45082,7 +45094,7 @@
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Summon Kami"
   },
   {
-    "name": "Summon Nature's Ally 6",
+    "name": "Summon Nature's Ally VI",
     "details": {
       "level": "druid 6, hunter 6, shaman 6",
       "school": "conjuration",
@@ -45098,7 +45110,7 @@
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Summon Kami"
   },
   {
-    "name": "Summon Nature's Ally 7",
+    "name": "Summon Nature's Ally VII",
     "details": {
       "level": "druid 7, shaman 7",
       "school": "conjuration",
@@ -45114,7 +45126,7 @@
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Summon Kami"
   },
   {
-    "name": "Summon Nature's Ally 8",
+    "name": "Summon Nature's Ally VIII",
     "details": {
       "level": "druid 8, shaman 8",
       "school": "conjuration",
@@ -45130,7 +45142,7 @@
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Summon Kami"
   },
   {
-    "name": "Summon Nature's Ally 9",
+    "name": "Summon Nature's Ally IX",
     "details": {
       "level": "druid 9, shaman 9",
       "school": "conjuration",

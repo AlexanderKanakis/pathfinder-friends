@@ -19,7 +19,7 @@
       rel="stylesheet"
     />
     <link href="css/feat-editor.css?v=1" rel="stylesheet" />
-    <link href="css/effect-editor.css?v=spell-cl-dc-extras-1" rel="stylesheet" />
+    <link href="css/effect-editor.css?v=bonus-ranks-1" rel="stylesheet" />
     <link
       href="modals/generated-equipment-picker.css?v=effect-labels-white-1"
       rel="stylesheet"
@@ -89,23 +89,64 @@
           <div class="small-text">Choose a feat to edit.</div>
         </section>
       </div>
+
+      <section id="customFeatPoolPanel" class="panel custom-feat-pool-panel mt-3">
+        <div class="d-flex justify-content-between align-items-center gap-2 flex-wrap mb-2">
+          <div>
+            <strong>Custom Feat Pools</strong>
+            <div class="small-text">Create named feat lists for Gain Feat effects.</div>
+          </div>
+          <div class="d-flex gap-2 flex-wrap">
+            <select id="customFeatPoolSelect" class="form-select form-select-sm custom-feat-pool-select"></select>
+            <button id="newCustomFeatPoolBtn" class="btn btn-outline-info btn-sm" type="button">
+              <i class="bi bi-plus-lg"></i> Pool
+            </button>
+            <button id="deleteCustomFeatPoolBtn" class="btn btn-outline-danger btn-sm" type="button">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+        </div>
+        <div class="custom-feat-pool-grid">
+          <div>
+            <label for="customFeatPoolName">Pool Name</label>
+            <input id="customFeatPoolName" class="form-control form-control-sm" placeholder="Bonus Combat Feats">
+          </div>
+          <div>
+            <label for="customFeatPoolSearch">Add Feats</label>
+            <input id="customFeatPoolSearch" class="form-control form-control-sm" placeholder="Search feat names">
+          </div>
+          <div>
+            <label>Search Results</label>
+            <div id="customFeatPoolResults" class="custom-feat-pool-list"></div>
+          </div>
+          <div>
+            <label>Pool Feats</label>
+            <div id="customFeatPoolItems" class="custom-feat-pool-list"></div>
+          </div>
+        </div>
+        <div class="d-flex justify-content-end mt-2">
+          <button id="saveCustomFeatPoolBtn" class="btn btn-primary btn-sm" type="button">
+            <i class="bi bi-save"></i> Save Pool
+          </button>
+        </div>
+      </section>
     </main>
 
     <script src="scripts/navbar.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="scripts/supabase-config.js"></script>
-    <script src="scripts/app-supabase.js"></script>
-    <script src="scripts/feat-data.js?v=1"></script>
-    <script src="modals/effect-duration-editor.js?v=favored-enemy-scale-1"></script>
-    <script src="scripts/effect-stat-options.js?v=favored-enemy-increase-1"></script>
+    <script src="scripts/app-supabase.js?v=bonus-ranks-1"></script>
+    <script src="scripts/effect-mechanics.js?v=bonus-ranks-1"></script>
+    <script src="scripts/feat-data.js?v=gain-feat-1"></script>
+    <script src="modals/effect-duration-editor.js?v=duration-editor-reuse-1"></script>
+    <script src="scripts/effect-stat-options.js?v=improvised-1"></script>
     <script src="modals/effect-choice-picker.js?v=named-skill-choice-1"></script>
     <script src="scripts/spell-data.js?v=spells-json-1"></script>
     <script src="modals/magic-search.js?v=sla-spell-list-1"></script>
-    <script src="modals/custom-skill-list.js?v=custom-target-lists-1"></script>
-    <script src="scripts/effect-editor.js?v=spell-cl-dc-extras-1"></script>
+    <script src="modals/custom-skill-list.js?v=skill-list-options-1"></script>
+    <script src="scripts/effect-editor.js?v=improvised-1"></script>
     <script src="modals/generated-equipment-picker.js?v=effect-labels-white-1"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="scripts/pages/feat-editor.js?v=conditional-vars-1"></script>
+    <script src="scripts/pages/feat-editor.js?v=bonus-ranks-1"></script>
   </body>
 </html>
-

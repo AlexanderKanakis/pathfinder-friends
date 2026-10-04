@@ -103,15 +103,47 @@
     return (Array.isArray(items) ? items : []).some(spellLikeChoiceList);
   }
 
+  function mechanicSpellAdjustmentChoices(items = []) {
+    return (Array.isArray(items) ? items : []).some((item) =>
+      window.PFEffectEditor?.spellAdjustmentEntryNeedsChoice?.(item),
+    );
+  }
+
+  function mechanicGrantDomainChoices(items = []) {
+    return (Array.isArray(items) ? items : []).some((item) =>
+      window.PFEffectEditor?.grantDomainEntryNeedsChoice?.(item),
+    );
+  }
+
+  function operationNeedsChoice(key = "", value = {}) {
+    return (
+      ((key === "bonusRanks" || key === "effects" || key === "classSkillGrants") &&
+        window.PFEffectStats?.isChoiceStat?.(value?.stat)) ||
+      mechanicFavoredEnemyScaleChoices([value]) ||
+      (key === "spellLikeAbilities" && spellLikeChoiceList(value)) ||
+      ((key === "casterLevelBonuses" ||
+        key === "spellDcBonuses" ||
+        key === "effectiveAttributeBonuses") &&
+        mechanicSpellAdjustmentChoices([value])) ||
+      (key === "grantDomains" && mechanicGrantDomainChoices([value]))
+    );
+  }
+
   function overrideChoiceStats(override = {}) {
     return Object.entries(override.mechanicOverrides || {}).some(
       ([key, operations]) =>
-        ["effects", "classSkillGrants", "spellLikeAbilities"].includes(key) &&
-        (Array.isArray(operations) ? operations : []).some(
-          (operation) =>
-            window.PFEffectStats?.isChoiceStat?.(operation?.value?.stat) ||
-            mechanicFavoredEnemyScaleChoices([operation?.value]) ||
-            spellLikeChoiceList(operation?.value),
+        [
+          "effects",
+          "classSkillGrants",
+          "bonusRanks",
+          "spellLikeAbilities",
+          "casterLevelBonuses",
+          "spellDcBonuses",
+          "effectiveAttributeBonuses",
+          "grantDomains",
+        ].includes(key) &&
+        (Array.isArray(operations) ? operations : []).some((operation) =>
+          operationNeedsChoice(key, operation?.value),
         ),
     );
   }
@@ -121,7 +153,14 @@
       mechanicChoiceStats(trait.effects) ||
       mechanicFavoredEnemyScaleChoices(trait.effects) ||
       mechanicChoiceStats(trait.classSkillGrants) ||
+      mechanicChoiceStats(trait.bonusRanks) ||
       mechanicSpellLikeChoices(trait.spellLikeAbilities) ||
+      mechanicSpellAdjustmentChoices(trait.casterLevelBonuses) ||
+      mechanicSpellAdjustmentChoices(trait.spellDcBonuses) ||
+      mechanicSpellAdjustmentChoices(trait.effectiveAttributeBonuses) ||
+      mechanicGrantDomainChoices(trait.grantDomains) ||
+      (Array.isArray(trait.conditionalVariables) &&
+        trait.conditionalVariables.length > 0) ||
       (Array.isArray(trait.choicePools) && trait.choicePools.length > 0) ||
       (Array.isArray(trait.pools) && trait.pools.length > 0) ||
       (trait.modifiedTraitOverrides || []).some(overrideChoiceStats)
@@ -167,17 +206,22 @@
   function choiceControls(trait = {}) {
     if (trait.activatable || !traitHasChoiceStats(trait)) return "";
     const key = traitNameKey(trait);
-    const hasChoice = Boolean(state.choices?.[key]);
+    const choice = state.choices?.[key];
+    const hasChoice = Boolean(choice);
+    const summary =
+      typeof state.choiceSummary === "function"
+        ? state.choiceSummary(choice, trait)
+        : "";
+    const status = summary || (hasChoice ? "Selected" : "not selected");
     return `
       <div class="racial-trait-choice-row">
-        <span class="racial-trait-choice-status">${hasChoice ? "Choices set" : "Choices needed"}</span>
         <button
-          class="btn btn-outline-info btn-sm"
+          class="btn btn-outline-info btn-sm racial-trait-choice-button"
           type="button"
           data-racial-trait-choice="${key}"
+          title="${escapeHtml(status)}"
         >
-          <i class="bi bi-bullseye"></i>
-          ${hasChoice ? "Change Choices" : "Choose Choices"}
+          <span>${escapeHtml(status)}</span>
         </button>
       </div>
     `;
@@ -525,6 +569,8 @@
             : null,
         onRemove:
           typeof config.onRemove === "function" ? config.onRemove : null,
+        choiceSummary:
+          typeof config.choiceSummary === "function" ? config.choiceSummary : null,
         traitRequirementStatus:
           typeof config.traitRequirementStatus === "function"
             ? config.traitRequirementStatus

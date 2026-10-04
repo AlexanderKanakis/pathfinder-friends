@@ -515,7 +515,7 @@ body {
 .class-feature-choice-select {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 8px;
   min-height: 34px;
   text-align: left;
@@ -963,6 +963,33 @@ body.enemy-sheet-mode .enemy-field-pair {
   height: 31px;
 }
 
+.character-spell-like-list {
+  min-height: 31px;
+  height: auto;
+  color: var(--bs-body-color);
+}
+
+.character-spell-like-link {
+  appearance: none;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--bs-info);
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+}
+
+.character-spell-like-link:hover,
+.character-spell-like-link:focus-visible {
+  color: #8be6ff;
+  text-decoration: underline;
+}
+
+.character-spell-like-separator {
+  color: var(--bs-body-color);
+}
+
 .character-spell-like-choices {
   display: grid;
   gap: 8px;
@@ -1241,6 +1268,13 @@ body.enemy-sheet-mode .enemy-field-pair {
 
 .weapon-summary > div {
   min-width: 0;
+  align-self: start;
+}
+
+.weapon-extra-damage-results {
+  display: grid;
+  gap: 6px;
+  margin-top: 6px;
 }
 
 .weapon-attack-summary input {
@@ -2144,139 +2178,9 @@ textarea.enemy-header-control.form-control-sm {
   gap: 8px;
 }
 
-.shared-bonus-row {
-  position: relative;
-  display: grid;
-  grid-template-columns: 1.5fr 0.7fr 1fr 0.7fr auto;
-  gap: 8px;
-  align-items: end;
-  background: #242424;
-  border: 1px solid #444;
-  border-radius: 8px;
-  padding: 10px 48px 10px 10px;
-}
-
-.shared-bonus-row .shared-named-skill-field {
+.inventory-edit-grid .weapon-extra-damage {
   grid-column: 1 / -1;
-  max-width: 280px;
-}
-
-.shared-bonus-row button[aria-label="Delete effect"] {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 30px;
-  height: 30px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-}
-
-.shared-bonus-condition-inline {
-  grid-column: 1 / -1;
-  display: grid;
-  grid-template-columns: auto minmax(160px, 260px);
-  gap: 8px;
-  align-items: end;
-}
-
-.shared-bonus-row [data-scale-summary] {
-  grid-column: 1 / -1;
-}
-
-.shared-dr-row {
-  display: grid;
-  grid-template-columns: 0.7fr 1.3fr auto auto;
-  gap: 8px;
-  align-items: end;
-  background: #242424;
-  border: 1px solid #444;
-  border-radius: 8px;
-  padding: 8px;
-}
-
-.shared-sr-row {
-  display: grid;
-  grid-template-columns: 0.5fr auto 0.9fr auto auto;
-  gap: 8px;
-  align-items: end;
-  background: #242424;
-  border: 1px solid #444;
-  border-radius: 8px;
-  padding: 8px;
-}
-
-.shared-immunity-row {
-  display: grid;
-  grid-template-columns: 0.8fr auto 1fr auto;
-  gap: 8px;
-  align-items: end;
-  background: #242424;
-  border: 1px solid #444;
-  border-radius: 8px;
-  padding: 8px;
-}
-
-.shared-dr-row [data-scale-summary],
-.shared-sr-row [data-scale-summary] {
-  grid-column: 1 / -1;
-}
-
-.shared-class-skill-row {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 8px;
-  align-items: end;
-  background: #242424;
-  border: 1px solid #444;
-  border-radius: 8px;
-  padding: 8px;
-}
-
-.shared-class-skill-row .shared-named-skill-field {
-  grid-column: 1 / -1;
-}
-
-/* The "Extra" accordion item (DR/Immunity/SR/Class Skills, compacted into one
-   collapsed section) mounted by scripts/effect-editor.js's
-   mountExtraAccordion -- shared markup/classes across every
-   effect-authoring surface in the app. */
-.shared-extra-accordion .accordion-item {
-  background: transparent;
-  border: 0;
-}
-
-.shared-extra-accordion .accordion-button {
-  background: #242424;
-  color: #ddd;
-  padding: 8px 10px;
-  font-size: 13px;
-}
-
-.shared-extra-accordion .accordion-button:not(.collapsed) {
-  background: #2b2b2b;
-  color: #fff;
-  box-shadow: none;
-}
-
-.shared-extra-accordion .accordion-button::after {
-  filter: invert(1) grayscale(1) brightness(1.6);
-}
-
-.shared-extra-accordion .accordion-body {
-  background: #1e1e1e;
-  border: 1px solid #333;
-  border-top: 0;
-  padding: 10px;
-}
-
-.shared-extra-subsection {
-  margin-bottom: 14px;
-}
-
-.shared-extra-subsection:last-child {
-  margin-bottom: 0;
+  min-width: 0;
 }
 
 .slot-field {
@@ -2374,6 +2278,45 @@ textarea.enemy-header-control.form-control-sm {
   box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.25);
 }
 
+.spell-cast-target-list {
+  display: grid;
+  gap: 14px;
+  max-height: 55vh;
+  overflow: auto;
+  padding-right: 2px;
+}
+
+.spell-cast-target-group {
+  display: grid;
+  gap: 8px;
+}
+
+.spell-cast-target-group-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #fff;
+  font-weight: 700;
+}
+
+.spell-cast-target-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 8px;
+}
+
+.spell-cast-target-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  border: 1px solid #444;
+  border-radius: 8px;
+  background: #242424;
+  color: #fff;
+  padding: 8px 10px;
+  min-height: 64px;
+}
+
 .source-result-icon {
   position: absolute;
   top: 10px;
@@ -2411,14 +2354,8 @@ textarea.enemy-header-control.form-control-sm {
     grid-template-columns: 1fr;
   }
 
-  .inventory-edit-grid,
-  .shared-bonus-row,
-  .shared-bonus-condition-inline {
+  .inventory-edit-grid {
     grid-template-columns: 1fr;
-  }
-
-  .shared-bonus-condition-inline {
-    grid-column: auto;
   }
 
   .source-results-grid {

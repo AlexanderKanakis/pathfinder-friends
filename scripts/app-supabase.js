@@ -1054,103 +1054,6 @@
     return { ok: true, changes: Array.isArray(data) ? data : [] };
   }
 
-  function normalizeBuffDefinition(row) {
-    const legacyDuration = parseDurationLabel(row.duration);
-    const durationCount =
-      row.durationCount !== undefined
-        ? row.durationCount
-        : row.duration_count === undefined
-        ? legacyDuration.count
-        : row.duration_count;
-    const durationUnit =
-      row.durationUnit !== undefined
-        ? row.durationUnit
-        : row.duration_unit === undefined
-          ? legacyDuration.unit
-          : row.duration_unit;
-    const durationPerLevel =
-      row.durationPerLevel !== undefined
-        ? row.durationPerLevel
-        : row.duration_per_level === undefined
-        ? legacyDuration.perLevel
-        : row.duration_per_level;
-    const durationConfig = row.durationConfig || row.duration_config || {
-      count: durationCount,
-      unit: durationUnit || "variable",
-      factors: durationPerLevel ? [{ type: "caster" }] : [],
-    };
-    return {
-      id: row.id,
-      name: row.name,
-      category: row.category || "Custom",
-      duration: formatDurationLabel(
-        durationCount,
-        durationUnit,
-        durationPerLevel,
-      ),
-      durationCount,
-      durationUnit: durationUnit || "variable",
-      durationPerLevel: Boolean(durationPerLevel),
-      durationConfig,
-      bonuses: Array.isArray(row.bonuses) ? row.bonuses : [],
-      damageReduction: Array.isArray(row.damageReduction)
-        ? row.damageReduction
-        : Array.isArray(row.damage_reduction)
-          ? row.damage_reduction
-          : [],
-      spellResistance: Array.isArray(row.spellResistance)
-        ? row.spellResistance
-        : Array.isArray(row.spell_resistance)
-          ? row.spell_resistance
-          : [],
-      immunities: Array.isArray(row.immunities) ? row.immunities : [],
-      classSkillGrants: Array.isArray(row.classSkillGrants)
-        ? row.classSkillGrants
-        : Array.isArray(row.class_skill_grants)
-          ? row.class_skill_grants
-          : [],
-      extraRanksPerLevel: Array.isArray(row.extraRanksPerLevel)
-        ? row.extraRanksPerLevel
-        : Array.isArray(row.extra_ranks_per_level)
-          ? row.extra_ranks_per_level
-          : [],
-      sizeChanges: Array.isArray(row.sizeChanges)
-        ? row.sizeChanges
-        : Array.isArray(row.size_changes)
-          ? row.size_changes
-          : [],
-      spellLikeAbilities: Array.isArray(row.spellLikeAbilities)
-        ? row.spellLikeAbilities
-        : Array.isArray(row.spell_like_abilities)
-          ? row.spell_like_abilities
-          : [],
-      generatedEquipment: Array.isArray(row.generatedEquipment)
-        ? row.generatedEquipment
-        : [],
-      builtIn: Boolean(row.builtIn || row.builtin || row.built_in),
-      source: row.source || "custom",
-      contextKey: row.context_key || "general",
-      gameId: row.game_id || null,
-    };
-  }
-
-  function definitionKey(effect) {
-    return `${String(effect.category || "").toLowerCase().trim()}::${String(effect.name || "").toLowerCase().trim()}`;
-  }
-
-  function mergeEffectDefinitions(databaseDefinitions = [], fileDefinitions = []) {
-    const fileKeys = new Set(fileDefinitions.map(definitionKey));
-    return [
-      ...fileDefinitions,
-      ...databaseDefinitions.filter((effect) => !fileKeys.has(definitionKey(effect))),
-    ].sort((a, b) => {
-      const categoryCompare = String(a.category || "").localeCompare(
-        String(b.category || ""),
-      );
-      return categoryCompare || String(a.name || "").localeCompare(b.name || "");
-    });
-  }
-
   async function loadConditionDefinitions() {
     if (!conditionDefinitionsPromise) {
       conditionDefinitionsPromise = fetch("./data/conditions.json", {
@@ -1160,14 +1063,17 @@
         .then((data) => (Array.isArray(data) ? data : data.conditions || []))
         .then((conditions) =>
           conditions
-            .map((condition) =>
-              normalizeBuffDefinition({
-                ...condition,
-                category: "Condition",
-                source: condition.source || "pf1e-condition",
-                builtIn: true,
-              }),
-            )
+            .map((condition) => ({
+              ...condition,
+              category: "Condition",
+              durationConfig: condition.durationConfig || {
+                count: null,
+                unit: "variable",
+                factors: [],
+              },
+              source: condition.source || "pf1e-condition",
+              builtIn: true,
+            }))
             .filter((condition) => condition.id && condition.name),
         )
         .catch((error) => {
@@ -1176,417 +1082,6 @@
         });
     }
     return conditionDefinitionsPromise;
-  }
-
-  async function loadEffectDefinitions() {
-    const [databaseDefinitions, conditionDefinitions] = await Promise.all([
-      loadBuffDefinitions(),
-      loadConditionDefinitions(),
-    ]);
-    return mergeEffectDefinitions(databaseDefinitions, conditionDefinitions);
-  }
-
-  function parseDurationLabel(duration) {
-    const text = String(duration || "")
-      .toLowerCase()
-      .trim();
-    if (!text || text === "variable" || text === "permanent") {
-      return { count: null, unit: "variable", perLevel: false };
-    }
-
-    const count = Number((text.match(/(\d+)/) || [null, 1])[1]) || 1;
-    const units = ["turn", "round", "minute", "hour", "day"];
-    const unit = units.find((value) => text.includes(value)) || "variable";
-    const perLevel = text.includes("/level") || text.includes("per level");
-    return {
-      count: unit === "variable" ? null : count,
-      unit,
-      perLevel: unit !== "variable" && perLevel,
-    };
-  }
-
-  function formatDurationLabel(count, unit, perLevel) {
-    const amount = Number(count || 0);
-    if (!amount || !unit || unit === "variable") return "variable";
-    return `${amount} ${unit}${amount === 1 ? "" : "s"}${perLevel ? " / level" : ""}`;
-  }
-
-  async function loadBuffDefinitions() {
-    const user = await getUser();
-    if (!user) return [];
-
-    let { data, error } = await client
-      .from("buff_definitions")
-      .select(
-        "id,name,category,duration,duration_count,duration_unit,duration_per_level,duration_config,bonuses,damage_reduction,spell_resistance,class_skill_grants,extra_ranks_per_level,size_changes,spell_like_abilities,source,context_key,game_id",
-      )
-      .order("name", { ascending: true });
-
-    if (
-      error?.code === "42703" &&
-      String(error.message || "").includes("extra_ranks_per_level")
-    ) {
-      const fallback = await client
-        .from("buff_definitions")
-        .select(
-          "id,name,category,duration,duration_count,duration_unit,duration_per_level,duration_config,bonuses,damage_reduction,spell_resistance,class_skill_grants,size_changes,spell_like_abilities,source,context_key,game_id",
-        )
-        .order("name", { ascending: true });
-      data = fallback.data;
-      error = fallback.error;
-    }
-
-    if (
-      error?.code === "42703" &&
-      (String(error.message || "").includes("size_changes") ||
-        String(error.message || "").includes("spell_like_abilities"))
-    ) {
-      const fallback = await client
-        .from("buff_definitions")
-        .select(
-          "id,name,category,duration,duration_count,duration_unit,duration_per_level,duration_config,bonuses,damage_reduction,spell_resistance,class_skill_grants,extra_ranks_per_level,source,context_key,game_id",
-        )
-        .order("name", { ascending: true });
-      data = fallback.data;
-      error = fallback.error;
-    }
-
-    if (
-      error?.code === "42703" &&
-      String(error.message || "").includes("extra_ranks_per_level")
-    ) {
-      const fallback = await client
-        .from("buff_definitions")
-        .select(
-          "id,name,category,duration,duration_count,duration_unit,duration_per_level,duration_config,bonuses,damage_reduction,spell_resistance,class_skill_grants,source,context_key,game_id",
-        )
-        .order("name", { ascending: true });
-      data = fallback.data;
-      error = fallback.error;
-    }
-
-    if (error?.code === "42703") {
-      const fallback = await client
-        .from("buff_definitions")
-        .select("id,name,category,duration,bonuses,source")
-        .order("name", { ascending: true });
-      data = fallback.data;
-      error = fallback.error;
-    }
-
-    if (error) {
-      console.error(error);
-      return [];
-    }
-
-    return (data || []).map(normalizeBuffDefinition);
-  }
-
-  async function saveBuffDefinition(buff) {
-    const user = await getUser();
-    if (!client || !user) return null;
-    const context = normalizeContext(
-      buff.contextKey || getSelectedContextKey(),
-    );
-
-    const payload = {
-      user_id: user.id,
-      name: buff.name,
-      category: buff.category || "Custom",
-      duration:
-        buff.duration ||
-        formatDurationLabel(
-          buff.durationCount,
-          buff.durationUnit,
-          buff.durationPerLevel,
-        ),
-      duration_count: buff.durationCount || null,
-      duration_unit: buff.durationUnit || "variable",
-      duration_per_level: Boolean(buff.durationPerLevel),
-      duration_config: buff.durationConfig || null,
-      bonuses: buff.bonuses || [],
-      damage_reduction: buff.damageReduction || [],
-      spell_resistance: buff.spellResistance || [],
-      class_skill_grants: buff.classSkillGrants || [],
-      extra_ranks_per_level: buff.extraRanksPerLevel || [],
-      size_changes: buff.sizeChanges || [],
-      spell_like_abilities: buff.spellLikeAbilities || [],
-      source: "custom",
-      context_key: context.contextKey,
-      game_id: context.gameId,
-      updated_at: new Date().toISOString(),
-    };
-
-    const { data: existing, error: existingError } = await client
-      .from("buff_definitions")
-      .select("id")
-      .eq("user_id", user.id)
-      .ilike("name", buff.name)
-      .eq("source", "custom")
-      .maybeSingle();
-
-    if (existingError) {
-      console.error(existingError);
-      return null;
-    }
-
-    let query = existing?.id
-      ? client.from("buff_definitions").update(payload).eq("id", existing.id)
-      : client.from("buff_definitions").insert(payload);
-
-    let { data, error } = await query
-      .select(
-        "id,name,category,duration,duration_count,duration_unit,duration_per_level,duration_config,bonuses,damage_reduction,spell_resistance,class_skill_grants,extra_ranks_per_level,size_changes,spell_like_abilities,source,context_key,game_id",
-      )
-      .single();
-
-    if (
-      error?.code === "42703" &&
-      String(error.message || "").includes("extra_ranks_per_level")
-    ) {
-      const fallbackPayload = { ...payload };
-      delete fallbackPayload.extra_ranks_per_level;
-      query = existing?.id
-        ? client
-            .from("buff_definitions")
-            .update(fallbackPayload)
-            .eq("id", existing.id)
-        : client.from("buff_definitions").insert(fallbackPayload);
-      const fallback = await query
-        .select(
-          "id,name,category,duration,duration_count,duration_unit,duration_per_level,duration_config,bonuses,damage_reduction,spell_resistance,class_skill_grants,size_changes,spell_like_abilities,source,context_key,game_id",
-        )
-        .single();
-      data = fallback.data;
-      error = fallback.error;
-    }
-
-    if (
-      error?.code === "42703" &&
-      (String(error.message || "").includes("size_changes") ||
-        String(error.message || "").includes("spell_like_abilities"))
-    ) {
-      const fallbackPayload = { ...payload };
-      delete fallbackPayload.size_changes;
-      delete fallbackPayload.spell_like_abilities;
-      query = existing?.id
-        ? client
-            .from("buff_definitions")
-            .update(fallbackPayload)
-            .eq("id", existing.id)
-        : client.from("buff_definitions").insert(fallbackPayload);
-      const fallback = await query
-        .select(
-          "id,name,category,duration,duration_count,duration_unit,duration_per_level,duration_config,bonuses,damage_reduction,spell_resistance,class_skill_grants,extra_ranks_per_level,source,context_key,game_id",
-        )
-        .single();
-      data = fallback.data;
-      error = fallback.error;
-    }
-
-    if (
-      error?.code === "42703" &&
-      String(error.message || "").includes("extra_ranks_per_level")
-    ) {
-      const fallbackPayload = { ...payload };
-      delete fallbackPayload.extra_ranks_per_level;
-      delete fallbackPayload.size_changes;
-      delete fallbackPayload.spell_like_abilities;
-      query = existing?.id
-        ? client
-            .from("buff_definitions")
-            .update(fallbackPayload)
-            .eq("id", existing.id)
-        : client.from("buff_definitions").insert(fallbackPayload);
-      const fallback = await query
-        .select(
-          "id,name,category,duration,duration_count,duration_unit,duration_per_level,duration_config,bonuses,damage_reduction,spell_resistance,class_skill_grants,source,context_key,game_id",
-        )
-        .single();
-      data = fallback.data;
-      error = fallback.error;
-    }
-
-    if (error?.code === "42703") {
-      const legacyPayload = { ...payload };
-      delete legacyPayload.duration_count;
-      delete legacyPayload.duration_unit;
-      delete legacyPayload.duration_per_level;
-      delete legacyPayload.duration_config;
-      delete legacyPayload.damage_reduction;
-      delete legacyPayload.spell_resistance;
-      delete legacyPayload.class_skill_grants;
-      delete legacyPayload.extra_ranks_per_level;
-      delete legacyPayload.size_changes;
-      delete legacyPayload.spell_like_abilities;
-      query = existing?.id
-        ? client
-            .from("buff_definitions")
-            .update(legacyPayload)
-            .eq("id", existing.id)
-        : client.from("buff_definitions").insert(legacyPayload);
-      const fallback = await query
-        .select("id,name,category,duration,bonuses,source,context_key,game_id")
-        .single();
-      data = fallback.data;
-      error = fallback.error;
-    }
-
-    if (error) {
-      console.error(error);
-      return null;
-    }
-
-    return normalizeBuffDefinition(data);
-  }
-
-  async function updateBuffDefinition(buffId, buff) {
-    const user = await getUser();
-    if (!client || !user || !buffId) return null;
-
-    const sharedArgs = {
-      target_buff_id: buffId,
-      new_name: buff.name,
-      new_category: buff.category || "Custom",
-      new_duration:
-        buff.duration ||
-        formatDurationLabel(
-          buff.durationCount,
-          buff.durationUnit,
-          buff.durationPerLevel,
-        ),
-      new_duration_count: buff.durationCount || null,
-      new_duration_unit: buff.durationUnit || "variable",
-      new_duration_per_level: Boolean(buff.durationPerLevel),
-      new_bonuses: Array.isArray(buff.bonuses) ? buff.bonuses : [],
-    };
-
-    // Each RPC call below targets a different vintage of
-    // admin_update_buff_definition's signature -- PostgREST resolves
-    // RPCs by exact argument set, so a repo whose migrations haven't
-    // caught up yet 404s (PGRST202) on the newest call and needs to
-    // fall back to whatever the deployed function actually accepts,
-    // oldest last.
-    let { data, error } = await client.rpc("admin_update_buff_definition", {
-      ...sharedArgs,
-      new_duration_config: buff.durationConfig || null,
-      new_damage_reduction: Array.isArray(buff.damageReduction)
-        ? buff.damageReduction
-        : [],
-      new_spell_resistance: Array.isArray(buff.spellResistance)
-        ? buff.spellResistance
-        : [],
-      new_class_skill_grants: Array.isArray(buff.classSkillGrants)
-        ? buff.classSkillGrants
-        : [],
-      new_extra_ranks_per_level: Array.isArray(buff.extraRanksPerLevel)
-        ? buff.extraRanksPerLevel
-        : [],
-      new_size_changes: Array.isArray(buff.sizeChanges) ? buff.sizeChanges : [],
-      new_spell_like_abilities: Array.isArray(buff.spellLikeAbilities)
-        ? buff.spellLikeAbilities
-        : [],
-    });
-
-    if (
-      error?.code === "PGRST202" ||
-      String(error?.message || "").includes("new_size_changes") ||
-      String(error?.message || "").includes("new_spell_like_abilities")
-    ) {
-      const fallback = await client.rpc("admin_update_buff_definition", {
-        ...sharedArgs,
-        new_duration_config: buff.durationConfig || null,
-        new_damage_reduction: Array.isArray(buff.damageReduction)
-          ? buff.damageReduction
-          : [],
-        new_spell_resistance: Array.isArray(buff.spellResistance)
-          ? buff.spellResistance
-          : [],
-        new_class_skill_grants: Array.isArray(buff.classSkillGrants)
-          ? buff.classSkillGrants
-          : [],
-        new_extra_ranks_per_level: Array.isArray(buff.extraRanksPerLevel)
-          ? buff.extraRanksPerLevel
-          : [],
-      });
-      data = fallback.data;
-      error = fallback.error;
-    }
-
-    if (
-      error?.code === "PGRST202" ||
-      String(error?.message || "").includes("new_extra_ranks_per_level")
-    ) {
-      const fallback = await client.rpc("admin_update_buff_definition", {
-        ...sharedArgs,
-        new_duration_config: buff.durationConfig || null,
-        new_damage_reduction: Array.isArray(buff.damageReduction)
-          ? buff.damageReduction
-          : [],
-        new_spell_resistance: Array.isArray(buff.spellResistance)
-          ? buff.spellResistance
-          : [],
-        new_class_skill_grants: Array.isArray(buff.classSkillGrants)
-          ? buff.classSkillGrants
-          : [],
-      });
-      data = fallback.data;
-      error = fallback.error;
-    }
-
-    if (
-      error?.code === "PGRST202" ||
-      String(error?.message || "").includes("new_damage_reduction") ||
-      String(error?.message || "").includes("new_spell_resistance") ||
-      String(error?.message || "").includes("new_class_skill_grants")
-    ) {
-      const fallback = await client.rpc("admin_update_buff_definition", {
-        ...sharedArgs,
-        new_duration_config: buff.durationConfig || null,
-      });
-      data = fallback.data;
-      error = fallback.error;
-    }
-
-    if (
-      error?.code === "PGRST202" ||
-      String(error?.message || "").includes("new_duration_config")
-    ) {
-      const fallback = await client.rpc(
-        "admin_update_buff_definition",
-        sharedArgs,
-      );
-      data = fallback.data;
-      error = fallback.error;
-    }
-
-    if (error) {
-      console.error(error);
-      return null;
-    }
-
-    return normalizeBuffDefinition(data);
-  }
-
-  async function deleteBuffDefinition(buffId) {
-    const user = await getUser();
-    if (!client || !user || !buffId) {
-      return {
-        ok: false,
-        error: new Error("Not signed in or missing effect id"),
-      };
-    }
-
-    const { error } = await client.rpc("admin_delete_buff_definition", {
-      target_buff_id: buffId,
-    });
-
-    if (error) {
-      console.error(error);
-      return { ok: false, error };
-    }
-
-    return { ok: true };
   }
 
   async function loadCharacterSheets(
@@ -2214,32 +1709,70 @@
     return results;
   }
 
-  // game_loot is otherwise a raw pass-through (no normalize step, unlike
-  // buff_definitions) -- but damageReduction/spellResistance/
+  const LOOT_MECHANIC_KEYS = [
+    "effects",
+    "damageReduction",
+    "spellResistance",
+    "immunities",
+    "applyConditions",
+    "classSkillGrants",
+    "bonusRanks",
+    "extraRanksPerLevel",
+    "featGrants",
+    "sizeChanges",
+    "spellLikeAbilities",
+    "casterLevelBonuses",
+    "spellDcBonuses",
+    "effectiveAttributeBonuses",
+    "grantDomains",
+    "generatedEquipment",
+    "conditionalVariables",
+  ];
+
+  function storedLootMechanics(row = {}) {
+    const stored =
+      row.details?.effectMechanics &&
+      typeof row.details.effectMechanics === "object"
+        ? row.details.effectMechanics
+        : {};
+    const columnValues = {
+      effects: row.effects,
+      damageReduction: row.damage_reduction,
+      spellResistance: row.spell_resistance,
+      classSkillGrants: row.class_skill_grants,
+      bonusRanks: row.bonus_ranks,
+      extraRanksPerLevel: row.extra_ranks_per_level,
+      sizeChanges: row.size_changes,
+      spellLikeAbilities: row.spell_like_abilities,
+    };
+    return Object.fromEntries(
+      LOOT_MECHANIC_KEYS.map((key) => [
+        key,
+        Array.isArray(stored[key])
+          ? stored[key]
+          : Array.isArray(columnValues[key])
+            ? columnValues[key]
+            : [],
+      ]),
+    );
+  }
+
+  // game_loot is otherwise a raw pass-through, but damageReduction/spellResistance/
   // classSkillGrants/spellLikeAbilities have to come back camelCase,
   // matching every other
   // buff-shaped object (see syncEquippedLootBuffFromItem in
   // character-sheet.js, which reads item.damageReduction etc. straight
   // off the loaded item), so those extras specifically get mapped here.
   function normalizeLootItem(row) {
+    const mechanics = storedLootMechanics(row);
     return {
       ...row,
-      damageReduction: Array.isArray(row.damage_reduction)
-        ? row.damage_reduction
-        : [],
-      spellResistance: Array.isArray(row.spell_resistance)
-        ? row.spell_resistance
-        : [],
-      classSkillGrants: Array.isArray(row.class_skill_grants)
-        ? row.class_skill_grants
-        : [],
-      extraRanksPerLevel: Array.isArray(row.extra_ranks_per_level)
-        ? row.extra_ranks_per_level
-        : [],
-      sizeChanges: Array.isArray(row.size_changes) ? row.size_changes : [],
-      spellLikeAbilities: Array.isArray(row.spell_like_abilities)
-        ? row.spell_like_abilities
-        : [],
+      activeMechanics:
+        row.activeMechanics ||
+        row.details?.effectMechanics?.activeMechanics ||
+        row.details?.activeMechanics ||
+        null,
+      ...mechanics,
     };
   }
 
@@ -2252,6 +1785,8 @@
   // not just the new DR/SR/class-skill fields, so a missing-column
   // error here specifically retries without them instead of giving up.
   const LOOT_COLUMNS =
+    "id,name,description,count,type,assigned_to,assigned_character_id,details,effects,damage_reduction,spell_resistance,class_skill_grants,bonus_ranks,extra_ranks_per_level,size_changes,spell_like_abilities,created_by,updated_at";
+  const LOOT_COLUMNS_WITHOUT_BONUS_RANKS =
     "id,name,description,count,type,assigned_to,assigned_character_id,details,effects,damage_reduction,spell_resistance,class_skill_grants,extra_ranks_per_level,size_changes,spell_like_abilities,created_by,updated_at";
   const LOOT_COLUMNS_WITHOUT_EXTRA_RANKS =
     "id,name,description,count,type,assigned_to,assigned_character_id,details,effects,damage_reduction,spell_resistance,class_skill_grants,size_changes,spell_like_abilities,created_by,updated_at";
@@ -2270,6 +1805,7 @@
       message.includes("damage_reduction") ||
       message.includes("spell_resistance") ||
       message.includes("class_skill_grants") ||
+      message.includes("bonus_ranks") ||
       message.includes("extra_ranks_per_level") ||
       message.includes("size_changes") ||
       message.includes("spell_like_abilities")
@@ -2293,6 +1829,13 @@
     );
   }
 
+  function isMissingBonusRanksError(error) {
+    return (
+      error?.code === "42703" &&
+      String(error.message || "").includes("bonus_ranks")
+    );
+  }
+
   async function loadLootItems(contextKey = getSelectedContextKey()) {
     const user = await getUser();
     if (!user) return [];
@@ -2303,6 +1846,16 @@
       .select(LOOT_COLUMNS)
       .eq("context_key", context.contextKey)
       .order("updated_at", { ascending: false });
+
+    if (isMissingBonusRanksError(error)) {
+      const fallback = await client
+        .from("game_loot")
+        .select(LOOT_COLUMNS_WITHOUT_BONUS_RANKS)
+        .eq("context_key", context.contextKey)
+        .order("updated_at", { ascending: false });
+      data = fallback.data;
+      error = fallback.error;
+    }
 
     if (isMissingExtraRanksError(error)) {
       const fallback = await client
@@ -2357,6 +1910,30 @@
     if (!client || !user) return null;
 
     const context = normalizeContext(contextKey);
+    const itemDetails = { ...(item.details || {}) };
+    const previousMechanics =
+      itemDetails.effectMechanics &&
+      typeof itemDetails.effectMechanics === "object"
+        ? itemDetails.effectMechanics
+        : {};
+    const effectMechanics = Object.fromEntries(
+      LOOT_MECHANIC_KEYS.map((key) => [
+        key,
+        Array.isArray(item[key])
+          ? item[key]
+          : Array.isArray(previousMechanics[key])
+            ? previousMechanics[key]
+            : [],
+      ]),
+    );
+    if (item.activeMechanics) {
+      effectMechanics.activeMechanics = item.activeMechanics;
+      itemDetails.activeMechanics = item.activeMechanics;
+    } else {
+      delete effectMechanics.activeMechanics;
+      delete itemDetails.activeMechanics;
+    }
+    itemDetails.effectMechanics = effectMechanics;
     const payload = {
       name: item.name,
       description: item.description || "",
@@ -2364,24 +1941,15 @@
       type: item.type || "Item",
       assigned_to: item.assignedTo || null,
       assigned_character_id: item.assignedCharacterId || null,
-      details: item.details || {},
-      effects: Array.isArray(item.effects) ? item.effects : [],
-      damage_reduction: Array.isArray(item.damageReduction)
-        ? item.damageReduction
-        : [],
-      spell_resistance: Array.isArray(item.spellResistance)
-        ? item.spellResistance
-        : [],
-      class_skill_grants: Array.isArray(item.classSkillGrants)
-        ? item.classSkillGrants
-        : [],
-      extra_ranks_per_level: Array.isArray(item.extraRanksPerLevel)
-        ? item.extraRanksPerLevel
-        : [],
-      size_changes: Array.isArray(item.sizeChanges) ? item.sizeChanges : [],
-      spell_like_abilities: Array.isArray(item.spellLikeAbilities)
-        ? item.spellLikeAbilities
-        : [],
+      details: itemDetails,
+      effects: effectMechanics.effects,
+      damage_reduction: effectMechanics.damageReduction,
+      spell_resistance: effectMechanics.spellResistance,
+      class_skill_grants: effectMechanics.classSkillGrants,
+      bonus_ranks: effectMechanics.bonusRanks,
+      extra_ranks_per_level: effectMechanics.extraRanksPerLevel,
+      size_changes: effectMechanics.sizeChanges,
+      spell_like_abilities: effectMechanics.spellLikeAbilities,
       context_key: context.contextKey,
       game_id: context.gameId,
       updated_at: new Date().toISOString(),
@@ -2392,6 +1960,19 @@
       : client.from("game_loot").insert({ ...payload, created_by: user.id });
 
     let { data, error } = await query.select(LOOT_COLUMNS).single();
+
+    if (isMissingBonusRanksError(error)) {
+      const fallbackPayload = { ...payload };
+      delete fallbackPayload.bonus_ranks;
+      const fallbackQuery = item.id
+        ? client.from("game_loot").update(fallbackPayload).eq("id", item.id)
+        : client.from("game_loot").insert({ ...fallbackPayload, created_by: user.id });
+      const fallback = await fallbackQuery
+        .select(LOOT_COLUMNS_WITHOUT_BONUS_RANKS)
+        .single();
+      data = fallback.data;
+      error = fallback.error;
+    }
 
     if (isMissingExtraRanksError(error)) {
       const fallbackPayload = { ...payload };
@@ -2446,6 +2027,7 @@
       delete legacyPayload.damage_reduction;
       delete legacyPayload.spell_resistance;
       delete legacyPayload.class_skill_grants;
+      delete legacyPayload.bonus_ranks;
       delete legacyPayload.extra_ranks_per_level;
       delete legacyPayload.size_changes;
       delete legacyPayload.spell_like_abilities;
@@ -2822,12 +2404,7 @@
     applyCharacterMapEffect,
     updateCharacterEffectState,
     advanceMapEffectTurn,
-    loadBuffDefinitions,
     loadConditionDefinitions,
-    loadEffectDefinitions,
-    saveBuffDefinition,
-    updateBuffDefinition,
-    deleteBuffDefinition,
     loadCharacterSheets,
     loadCharacterSheet,
     loadCharacterSheetForRecalculation,

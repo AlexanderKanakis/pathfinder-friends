@@ -142,6 +142,9 @@
     const factors = Array.isArray(raw?.factors)
       ? raw.factors
       : fallback.factors;
+    const durationScale = normalizeDurationScale(
+      raw?.durationScale || raw?.scale || null,
+    );
     return {
       count:
         unit === "variable" ||
@@ -159,21 +162,82 @@
       // per-level scale. Defaulting to "multiply" keeps every duration
       // already configured the old way behaving identically.
       factorMode: raw?.factorMode === "add" ? "add" : "multiply",
+      ...(unit !== "variable" && durationScale ? { durationScale } : {}),
+    };
+  }
+
+  function normalizeDurationScale(scale) {
+    if (!scale || typeof scale !== "object") return null;
+    const source = normalizeFactor(scale.source || { type: "caster" });
+    const milestones = (Array.isArray(scale.milestones)
+      ? scale.milestones
+      : []
+    )
+      .map((milestone) => ({
+        level: Math.max(0, Number.parseInt(milestone.level, 10) || 0),
+        value: Number(milestone.value),
+      }))
+      .filter(
+        (milestone) =>
+          milestone.level > 0 && Number.isFinite(milestone.value),
+      )
+      .sort((a, b) => a.level - b.level);
+    const rawEvery = scale.every || {};
+    const every = {
+      fromLevel: Math.max(
+        0,
+        Number.parseInt(
+          rawEvery.fromLevel || rawEvery.afterLevel || rawEvery.after,
+          10,
+        ) || 0,
+      ),
+      everyLevels: Math.max(
+        0,
+        Number.parseInt(rawEvery.everyLevels || rawEvery.every, 10) || 0,
+      ),
+      increase: Number(rawEvery.increase || 0),
+    };
+    const hasEvery =
+      every.fromLevel > 0 &&
+      every.everyLevels > 0 &&
+      Number.isFinite(every.increase) &&
+      every.increase !== 0;
+    if (!milestones.length && !hasEvery) return null;
+    return {
+      source,
+      milestones,
+      every: hasEvery ? every : null,
     };
   }
 
   function normalizeFactor(factor) {
     const type = factor?.type || factor?.source || "caster";
-    if (type === "character") return { type: "character" };
+    const ratio = {
+      numerator: Math.max(1, Number(factor?.numerator ?? 1) || 1),
+      denominator: Math.max(1, Number(factor?.denominator ?? 1) || 1),
+    };
+    if (type === "character") return { type: "character", ...ratio };
     if (type === "class")
       return {
         type: "class",
         className: factor.className || factor.class || "",
         prestige: Boolean(factor.prestige),
+        ...ratio,
       };
     if (type === "ability")
-      return { type: "ability", ability: factor.ability || "CON" };
-    return { type: "caster" };
+      return {
+        type: "ability",
+        ability: factor.ability || "CON",
+        ...ratio,
+      };
+    if (type === "special")
+      return {
+        type: "special",
+        special: factor.special || "",
+        label: factor.label || "",
+        ...ratio,
+      };
+    return { type: "caster", ...ratio };
   }
 
   function durationLabel(effectOrConfig) {
@@ -181,39 +245,66 @@
     if (!config.count || config.unit === "variable") return "variable";
     const unit = `${config.unit}${config.count === 1 ? "" : "s"}`;
     const factors = config.factors.map(factorLabel).filter(Boolean);
-    if (!factors.length) return `${config.count} ${unit}`;
-    return config.factorMode === "add"
+    const baseLabel = !factors.length
+      ? `${config.count} ${unit}`
+      : config.factorMode === "add"
       ? `${config.count} ${unit} + ${factors.join(" + ")}`
       : `${config.count} ${unit} / ${factors.join(" + ")}`;
+    const scaleLabel = durationScaleLabel(config.durationScale);
+    return scaleLabel ? `${baseLabel}; ${scaleLabel}` : baseLabel;
+  }
+
+  function durationScaleLabel(scale) {
+    const normalized = normalizeDurationScale(scale);
+    if (!normalized) return "";
+    const source = factorLabel(normalized.source) || "level";
+    const parts = normalized.milestones.map(
+      (milestone) =>
+        `${source} ${milestone.level}: ${milestone.value}`,
+    );
+    const every = normalized.every;
+    if (every) {
+      parts.push(
+        `from ${source} ${every.fromLevel}, every ${every.everyLevels}: ${every.increase >= 0 ? "+" : ""}${every.increase}`,
+      );
+    }
+    return parts.join("; ");
   }
 
   function factorLabel(factor) {
-    if (factor.type === "caster") return "caster level";
-    if (factor.type === "character") return "character level";
+    let label = "";
+    if (factor.type === "caster") label = "caster level";
+    if (factor.type === "character") label = "character level";
     if (factor.type === "class")
-      return factor.className ? `${factor.className} level` : "class level";
+      label = factor.className ? `${factor.className} level` : "class level";
     if (factor.type === "special") {
       if (factor.special === "favored-enemy-bonus")
-        return "favored enemy bonus";
-      return factor.label || "special value";
+        label = "favored enemy bonus";
+      else label = factor.label || "special value";
     }
-    if (factor.type === "ability") return `${factor.ability || "CON"} modifier`;
-    return "";
+    if (factor.type === "ability") label = `${factor.ability || "CON"} modifier`;
+    if (!label) return "";
+    const numerator = Math.max(1, Number(factor.numerator ?? 1) || 1);
+    const denominator = Math.max(1, Number(factor.denominator ?? 1) || 1);
+    return numerator === 1 && denominator === 1
+      ? label
+      : `${label} x ${numerator}/${denominator}`;
   }
 
   function factorValue(factor, context = {}) {
+    let value = 1;
     if (factor.type === "caster")
-      return Math.max(1, Number(context.casterLevel || 1) || 1);
-    if (factor.type === "character")
-      return Math.max(
+      value = Math.max(1, Number(context.casterLevel || 1) || 1);
+    else if (factor.type === "character")
+      value = Math.max(
         1,
         Number(
           context.characterLevel || context.level || context.casterLevel || 1,
         ) || 1,
       );
-    if (factor.type === "class") {
+    else if (factor.type === "class") {
       const classLevels = context.classLevels || {};
-      return Math.max(
+      value = Math.max(
         1,
         Number(
           classLevels[factor.className] ||
@@ -222,21 +313,44 @@
             1,
         ) || 1,
       );
-    }
-    if (factor.type === "ability") {
+    } else if (factor.type === "ability") {
       const mods = context.abilityMods || {};
-      return Number(
+      value = Number(
         mods[factor.ability] ||
           mods[String(factor.ability || "").toLowerCase()] ||
           0,
       );
+    } else if (factor.type === "special") {
+      const specialValues = context.specialValues || {};
+      value = Number(specialValues[factor.special] || 0);
     }
-    return 1;
+    const numerator = Math.max(1, Number(factor.numerator ?? 1) || 1);
+    const denominator = Math.max(1, Number(factor.denominator ?? 1) || 1);
+    return Math.floor((value * numerator) / denominator);
   }
 
   function factorsSum(config, context = {}) {
     const factors = normalizeDurationConfig(config).factors;
     return factors.reduce((sum, factor) => sum + factorValue(factor, context), 0);
+  }
+
+  function applyDurationScale(amount, scale, context = {}) {
+    const normalized = normalizeDurationScale(scale);
+    if (!normalized) return amount;
+    const level = factorValue(normalized.source, context);
+    let value = amount;
+    normalized.milestones
+      .filter((milestone) => milestone.level <= level)
+      .forEach((milestone) => {
+        value = milestone.value;
+      });
+    const every = normalized.every;
+    if (every && level >= every.fromLevel) {
+      value +=
+        (Math.floor((level - every.fromLevel) / every.everyLevels) + 1) *
+        every.increase;
+    }
+    return value;
   }
 
   // Kept for compatibility with existing callers/exports -- this is the
@@ -250,10 +364,15 @@
   function parseDuration(effect, context = {}) {
     const config = normalizeDurationConfig(effect);
     if (!config.count || config.unit === "variable") return null;
-    const amount =
+    const baseAmount =
       config.factorMode === "add"
         ? config.count + factorsSum(config, context)
         : config.count * durationMultiplier(config, context);
+    const amount = applyDurationScale(
+      baseAmount,
+      config.durationScale,
+      context,
+    );
     if (config.unit === "turn" || config.unit === "round") return amount;
     if (config.unit === "minute") return amount * 10;
     if (config.unit === "hour") return amount * 600;
@@ -303,12 +422,18 @@
     return { type: "caster" };
   }
 
+  const durationEditorInstances = new Map();
+
   class DurationEditor {
     constructor(prefix) {
-      this.prefix = `${prefix}DurationEditor`;
+      const editorPrefix = `${prefix}DurationEditor`;
+      const existing = durationEditorInstances.get(editorPrefix);
+      if (existing) return existing;
+      this.prefix = editorPrefix;
       this.config = normalizeDurationConfig({});
       this.onSave = null;
       this.ensureModal();
+      durationEditorInstances.set(this.prefix, this);
     }
 
     ensureModal() {
@@ -351,7 +476,37 @@
                   </div>
                 </div>
                 <div class="small-text mb-2" data-duration-factor-hint></div>
-                <div class="vstack gap-2" data-duration-factors></div>
+                <div class="vstack gap-2 mb-3" data-duration-factors></div>
+                <div class="border-top border-secondary pt-3" data-duration-scaling>
+                  <div class="row g-2 mb-3">
+                    <div class="col-sm-8">
+                      <label class="small">Scaling Level Source</label>
+                      <select class="form-select form-select-sm" data-duration-scale-source>
+                        ${levelSourceOptions({ type: "caster" }, { includeSpecial: true })}
+                      </select>
+                    </div>
+                    <div class="col-sm-4 d-flex align-items-end">
+                      <button class="btn btn-outline-info btn-sm w-100" type="button" data-duration-add-milestone>Add Milestone</button>
+                    </div>
+                  </div>
+                  <div class="small text-secondary mb-2">Milestones</div>
+                  <div class="vstack gap-2 mb-3" data-duration-milestones></div>
+                  <div class="small text-secondary mb-2">Repeater</div>
+                  <div class="row g-2">
+                    <div class="col-sm-4">
+                      <label class="small">From Level</label>
+                      <input class="form-control form-control-sm" type="number" min="1" data-duration-repeat-from>
+                    </div>
+                    <div class="col-sm-4">
+                      <label class="small">Every Levels</label>
+                      <input class="form-control form-control-sm" type="number" min="1" data-duration-repeat-every>
+                    </div>
+                    <div class="col-sm-4">
+                      <label class="small">Duration Increase</label>
+                      <input class="form-control form-control-sm" type="number" data-duration-repeat-increase>
+                    </div>
+                  </div>
+                </div>
               </div>
               <div class="modal-footer">
                 <button class="btn btn-outline-light btn-sm" type="button" data-bs-dismiss="modal">Cancel</button>
@@ -372,6 +527,22 @@
       this.factorHintEl = this.modal.querySelector(
         "[data-duration-factor-hint]",
       );
+      this.scalingEl = this.modal.querySelector("[data-duration-scaling]");
+      this.scaleSourceEl = this.modal.querySelector(
+        "[data-duration-scale-source]",
+      );
+      this.milestonesEl = this.modal.querySelector(
+        "[data-duration-milestones]",
+      );
+      this.repeatFromEl = this.modal.querySelector(
+        "[data-duration-repeat-from]",
+      );
+      this.repeatEveryEl = this.modal.querySelector(
+        "[data-duration-repeat-every]",
+      );
+      this.repeatIncreaseEl = this.modal.querySelector(
+        "[data-duration-repeat-increase]",
+      );
       this.modal
         .querySelector("[data-duration-add-level]")
         .addEventListener("click", () => this.addFactor({ type: "caster" }));
@@ -380,6 +551,9 @@
         .addEventListener("click", () =>
           this.addFactor({ type: "ability", ability: "CON" }),
         );
+      this.modal
+        .querySelector("[data-duration-add-milestone]")
+        .addEventListener("click", () => this.addMilestone());
       this.modal
         .querySelector("[data-duration-save]")
         .addEventListener("click", () => this.save());
@@ -399,6 +573,18 @@
       this.factorModeEl.value = this.config.factorMode || "multiply";
       this.factorsEl.innerHTML = "";
       this.config.factors.forEach((factor) => this.addFactor(factor));
+      const scale = this.config.durationScale || {};
+      this.scaleSourceEl.innerHTML = levelSourceOptions(
+        scale.source || { type: "caster" },
+        { includeSpecial: true },
+      );
+      this.milestonesEl.innerHTML = "";
+      (scale.milestones || []).forEach((milestone) =>
+        this.addMilestone(milestone),
+      );
+      this.repeatFromEl.value = scale.every?.fromLevel || "";
+      this.repeatEveryEl.value = scale.every?.everyLevels || "";
+      this.repeatIncreaseEl.value = scale.every?.increase ?? "";
       this.sync();
       this.syncFactorHint();
       bootstrap.Modal.getOrCreateInstance(this.modal).show();
@@ -414,6 +600,7 @@
         .forEach((button) => (button.disabled = variable));
       this.factorModeEl.disabled = variable;
       this.factorsEl.classList.toggle("d-none", variable);
+      this.scalingEl.classList.toggle("d-none", variable);
       if (variable) this.countEl.value = "";
     }
 
@@ -429,25 +616,60 @@
       row.className = "row g-2 align-items-end";
       if (factor.type === "ability") {
         row.innerHTML = `
-          <div class="col-sm-10">
+          <div class="col-sm-6">
             <label class="small">Attribute Bonus</label>
             <select class="form-select form-select-sm" data-factor-ability>
               ${ABILITIES.map((ability) => `<option value="${ability}" ${factor.ability === ability ? "selected" : ""}>${ability}</option>`).join("")}
             </select>
           </div>
+          <div class="col-sm-2">
+            <label class="small">Numerator</label>
+            <input class="form-control form-control-sm" type="number" min="1" value="${factor.numerator ?? 1}" data-factor-numerator>
+          </div>
+          <div class="col-sm-2">
+            <label class="small">Denominator</label>
+            <input class="form-control form-control-sm" type="number" min="1" value="${factor.denominator ?? 1}" data-factor-denominator>
+          </div>
           <div class="col-sm-2"><button class="btn btn-danger btn-sm w-100" type="button">Delete</button></div>
         `;
       } else {
         row.innerHTML = `
-          <div class="col-sm-10">
+          <div class="col-sm-6">
             <label class="small">Level Source</label>
             <select class="form-select form-select-sm" data-factor-level>${levelSourceOptions(factor)}</select>
+          </div>
+          <div class="col-sm-2">
+            <label class="small">Numerator</label>
+            <input class="form-control form-control-sm" type="number" min="1" value="${factor.numerator ?? 1}" data-factor-numerator>
+          </div>
+          <div class="col-sm-2">
+            <label class="small">Denominator</label>
+            <input class="form-control form-control-sm" type="number" min="1" value="${factor.denominator ?? 1}" data-factor-denominator>
           </div>
           <div class="col-sm-2"><button class="btn btn-danger btn-sm w-100" type="button">Delete</button></div>
         `;
       }
       row.querySelector("button").addEventListener("click", () => row.remove());
       this.factorsEl.appendChild(row);
+    }
+
+    addMilestone(milestone = {}) {
+      const row = document.createElement("div");
+      row.className = "row g-2 align-items-end";
+      row.innerHTML = `
+        <div class="col-sm-5">
+          <label class="small">Level</label>
+          <input class="form-control form-control-sm" type="number" min="1" value="${milestone.level || ""}" data-duration-milestone-level>
+        </div>
+        <div class="col-sm-5">
+          <label class="small">Duration</label>
+          <input class="form-control form-control-sm" type="number" min="1" value="${milestone.value ?? ""}" data-duration-milestone-value>
+        </div>
+        <div class="col-sm-2">
+          <button class="btn btn-outline-danger btn-sm w-100" type="button" aria-label="Delete duration milestone"><i class="bi bi-trash"></i></button>
+        </div>`;
+      row.querySelector("button").addEventListener("click", () => row.remove());
+      this.milestonesEl.appendChild(row);
     }
 
     collect() {
@@ -458,17 +680,65 @@
         .map((row) => {
           const level = row.querySelector("[data-factor-level]");
           const ability = row.querySelector("[data-factor-ability]");
-          if (level) return sourceFromSelect(level.value);
+          const ratio = {
+            numerator: Math.max(
+              1,
+              Number(row.querySelector("[data-factor-numerator]")?.value || 1),
+            ),
+            denominator: Math.max(
+              1,
+              Number(row.querySelector("[data-factor-denominator]")?.value || 1),
+            ),
+          };
+          if (level) return { ...sourceFromSelect(level.value), ...ratio };
           if (ability)
-            return { type: "ability", ability: ability.value || "CON" };
+            return {
+              type: "ability",
+              ability: ability.value || "CON",
+              ...ratio,
+            };
           return null;
         })
         .filter(Boolean);
+      const milestones = [...this.milestonesEl.children]
+        .map((row) => ({
+          level: Number.parseInt(
+            row.querySelector("[data-duration-milestone-level]").value,
+            10,
+          ),
+          value: Number(
+            row.querySelector("[data-duration-milestone-value]").value,
+          ),
+        }))
+        .filter(
+          (milestone) =>
+            milestone.level > 0 && Number.isFinite(milestone.value),
+        )
+        .sort((a, b) => a.level - b.level);
+      const fromLevel = Number.parseInt(this.repeatFromEl.value, 10);
+      const everyLevels = Number.parseInt(this.repeatEveryEl.value, 10);
+      const increase = Number(this.repeatIncreaseEl.value);
+      const every =
+        fromLevel > 0 &&
+        everyLevels > 0 &&
+        Number.isFinite(increase) &&
+        increase !== 0
+          ? { fromLevel, everyLevels, increase }
+          : null;
+      const durationScale =
+        milestones.length || every
+          ? {
+              source: sourceFromSelect(this.scaleSourceEl.value),
+              milestones,
+              every,
+            }
+          : null;
       return {
         count: Math.max(1, Number.parseInt(this.countEl.value, 10) || 1),
         unit,
         factors,
         factorMode: this.factorModeEl.value === "add" ? "add" : "multiply",
+        ...(durationScale ? { durationScale } : {}),
       };
     }
 
@@ -485,6 +755,7 @@
     PRESTIGE_CLASSES,
     ABILITIES,
     normalizeDurationConfig,
+    normalizeDurationScale,
     legacyDurationConfig,
     durationLabel,
     parseDuration,
@@ -492,6 +763,8 @@
     sourceFromSelect,
     factorLabel,
     durationMultiplier,
+    applyDurationScale,
+    durationScaleLabel,
   };
   window.PFEffectDurationEditor = DurationEditor;
 })();

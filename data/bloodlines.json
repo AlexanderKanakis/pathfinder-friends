@@ -1,0 +1,1001 @@
+{
+  "sources": [
+    {
+      "className": "Sorcerer",
+      "url": "https://www.aonprd.com/SorcererBloodlines.aspx"
+    },
+    {
+      "className": "Bloodrager",
+      "url": "https://www.aonprd.com/BloodragerBloodlines.aspx"
+    }
+  ],
+  "scrapedAt": "2026-09-20T16:49:19.606Z",
+  "bloodlines": [
+    {
+      "id": "aberrant",
+      "name": "Aberrant",
+      "classes": [
+        "Bloodrager",
+        "Sorcerer"
+      ],
+      "classDetails": [
+        {
+          "className": "Bloodrager",
+          "summary": "There is a taint in your blood that is both alien and bizarre. When you bloodrage, this manifests in peculiar and terrifying ways.",
+          "url": "https://www.aonprd.com/BloodragerBloodlineDisplay.aspx?ItemName=Aberrant"
+        },
+        {
+          "className": "Sorcerer",
+          "summary": "There is a taint in your blood, one that is alien and bizarre.",
+          "url": "https://www.aonprd.com/BloodlineDisplay.aspx?ItemName=Aberrant"
+        }
+      ]
+    },
+    {
+      "id": "abyssal",
+      "name": "Abyssal",
+      "classes": [
+        "Bloodrager",
+        "Sorcerer"
+      ],
+      "classDetails": [
+        {
+          "className": "Bloodrager",
+          "summary": "Generations ago, a demon spread its filth into the essence of your bloodline. While it doesn’t manifest in all of your kin, in those moments when you’re bloodraging, you embody its terrifying presence.",
+          "url": "https://www.aonprd.com/BloodragerBloodlineDisplay.aspx?ItemName=Abyssal"
+        },
+        {
+          "className": "Sorcerer",
+          "summary": "Generations ago, a demon spread its filth into your heritage.",
+          "url": "https://www.aonprd.com/BloodlineDisplay.aspx?ItemName=Abyssal"
+        }
+      ]
+    },
+    {
+      "id": "accursed",
+      "name": "Accursed",
+      "classes": [
+        "Sorcerer"
+      ],
+      "classDetails": [
+        {
+          "className": "Sorcerer",
+          "summary": "Misfortune, pestilence, and nightmares follow your family like vermin drawn to carrion.",
+          "url": "https://www.aonprd.com/BloodlineDisplay.aspx?ItemName=Accursed"
+        }
+      ]
+    },
+    {
+      "id": "aquatic",
+      "name": "Aquatic",
+      "classes": [
+        "Bloodrager",
+        "Sorcerer"
+      ],
+      "classDetails": [
+        {
+          "className": "Bloodrager",
+          "summary": "The anger in your blood rises from the ocean depths, seeded by descent from undersea empires, creeping ichthyic infiltrators into remote seaside villages, or something deeper still.",
+          "url": "https://www.aonprd.com/BloodragerBloodlineDisplay.aspx?ItemName=Aquatic"
+        },
+        {
+          "className": "Sorcerer",
+          "summary": "Your family traces its heritage back to the ocean depths, whether scions of undersea empires left in the wake of nomadic sea-tribes, or the spawn of creeping ichthyic infiltrators into remote seaside villages.",
+          "url": "https://www.aonprd.com/BloodlineDisplay.aspx?ItemName=Aquatic"
+        }
+      ]
+    },
+    {
+      "id": "arcane",
+      "name": "Arcane",
+      "classes": [
+        "Bloodrager",
+        "Sorcerer"
+      ],
+      "classDetails": [
+        {
+          "className": "Bloodrager",
+          "summary": "While others of your kin may be powerful wizards and sorcerers, the eldritch nature of the blood coursing through your veins transforms you into a spell-breaking terror.",
+          "url": "https://www.aonprd.com/BloodragerBloodlineDisplay.aspx?ItemName=Arcane"
+        },
+        {
+          "className": "Sorcerer",
+          "summary": "Your family has always been skilled in the eldritch art of magic.",
+          "url": "https://www.aonprd.com/BloodlineDisplay.aspx?ItemName=Arcane"
+        }
+      ]
+    },
+    {
+      "id": "astral",
+      "name": "Astral",
+      "classes": [
+        "Sorcerer"
+      ],
+      "classDetails": [
+        {
+          "className": "Sorcerer",
+          "summary": "Whether you were raised on the Astral Plane, had an ancestor with a strong connection to the Astral, or simply had a freak brush with an astral conduit in your youth, you have an unusual connection to both time and space. Your senses extend through the Astral Plane to the far reaches of the multiverse, allowing you to perceive and manipulate the timeless potential that binds the multiverse together. Your ancestors may have also held a connection to one of the astral isles or conduits, or like you, may have plied this cosmic ocean—and some may even survive there to this day.",
+          "url": "https://www.aonprd.com/BloodlineDisplay.aspx?ItemName=Astral"
+        }
+      ]
+    },
+    {
+      "id": "black-blood",
+      "name": "Black Blood",
+      "classes": [
+        "Bloodrager"
+      ],
+      "classDetails": [
+        {
+          "className": "Bloodrager",
+          "summary": "Contact with the black blood of Orv—by you or one of your ancestors—transformed your bloodline.",
+          "url": "https://www.aonprd.com/BloodragerBloodlineDisplay.aspx?ItemName=Black%20Blood"
+        }
+      ]
+    },
+    {
+      "id": "boreal",
+      "name": "Boreal",
+      "classes": [
+        "Sorcerer"
+      ],
+      "classDetails": [
+        {
+          "className": "Sorcerer",
+          "summary": "Descended from inhabitants of the lands of ice and snow, you count among your ancestors giant-kin, troll-born, and frost-rimed spirits.",
+          "url": "https://www.aonprd.com/BloodlineDisplay.aspx?ItemName=Boreal"
+        }
+      ]
+    },
+    {
+      "id": "celestial",
+      "name": "Celestial",
+      "classes": [
+        "Bloodrager",
+        "Sorcerer"
+      ],
+      "classDetails": [
+        {
+          "className": "Bloodrager",
+          "summary": "By way of a celestial ancestor or divine intervention, the blood of angels fills your body with a holy potency, granting you a majestic visage and angelic powers when you enter your bloodrage.",
+          "url": "https://www.aonprd.com/BloodragerBloodlineDisplay.aspx?ItemName=Celestial"
+        },
+        {
+          "className": "Sorcerer",
+          "summary": "Your bloodline is blessed by a celestial power, either from a celestial ancestor or through divine intervention.",
+          "url": "https://www.aonprd.com/BloodlineDisplay.aspx?ItemName=Celestial"
+        }
+      ]
+    },
+    {
+      "id": "daemon",
+      "name": "Daemon",
+      "classes": [
+        "Sorcerer"
+      ],
+      "classDetails": [
+        {
+          "className": "Sorcerer",
+          "summary": "Your powers derive from daemons, who take pleasure and gain power from manipulating mortal frailties like aging, pestilence, famine, and the horrors of war.",
+          "url": "https://www.aonprd.com/BloodlineDisplay.aspx?ItemName=Daemon"
+        }
+      ]
+    },
+    {
+      "id": "deep-earth",
+      "name": "Deep Earth",
+      "classes": [
+        "Sorcerer"
+      ],
+      "classDetails": [
+        {
+          "className": "Sorcerer",
+          "summary": "The echoing cave-songs and the rumble and creak of primal spirits deep below the ground thrum in your soul and in all your family line.",
+          "url": "https://www.aonprd.com/BloodlineDisplay.aspx?ItemName=Deep%20Earth"
+        }
+      ]
+    },
+    {
+      "id": "destined",
+      "name": "Destined",
+      "classes": [
+        "Bloodrager",
+        "Sorcerer"
+      ],
+      "classDetails": [
+        {
+          "className": "Bloodrager",
+          "summary": "Your bloodline is destined for great things. When you bloodrage, you exude a greatness that makes all but the most legendary creatures seem lesser.",
+          "url": "https://www.aonprd.com/BloodragerBloodlineDisplay.aspx?ItemName=Destined"
+        },
+        {
+          "className": "Sorcerer",
+          "summary": "Your family is destined for greatness in some way.",
+          "url": "https://www.aonprd.com/BloodlineDisplay.aspx?ItemName=Destined"
+        }
+      ]
+    },
+    {
+      "id": "div",
+      "name": "Div",
+      "classes": [
+        "Sorcerer"
+      ],
+      "classDetails": [
+        {
+          "className": "Sorcerer",
+          "summary": "You can trace your ancestry to one of the foul, corrupted genies known as divs.",
+          "url": "https://www.aonprd.com/BloodlineDisplay.aspx?ItemName=Div"
+        }
+      ]
+    },
+    {
+      "id": "djinni",
+      "name": "Djinni",
+      "classes": [
+        "Sorcerer"
+      ],
+      "classDetails": [
+        {
+          "className": "Sorcerer",
+          "summary": "You were born with the power of air genies, and the magic of the djinn is strong in you.",
+          "url": "https://www.aonprd.com/BloodlineDisplay.aspx?ItemName=Djinni"
+        }
+      ]
+    },
+    {
+      "id": "draconic",
+      "name": "Draconic",
+      "classes": [
+        "Bloodrager",
+        "Sorcerer"
+      ],
+      "classDetails": [
+        {
+          "className": "Bloodrager",
+          "summary": "At some point in your family’s history, a dragon interbred with your bloodline. Now, the sublime monster’s ancient power fuels your bloodrage.",
+          "url": "https://www.aonprd.com/BloodragerBloodlineDisplay.aspx?ItemName=Draconic"
+        },
+        {
+          "className": "Sorcerer",
+          "summary": "At some point in your family's history, a dragon interbred with your bloodline, and now its ancient power flows through your veins.",
+          "url": "https://www.aonprd.com/BloodlineDisplay.aspx?ItemName=Draconic"
+        }
+      ]
+    },
+    {
+      "id": "dreamspun",
+      "name": "Dreamspun",
+      "classes": [
+        "Sorcerer"
+      ],
+      "classDetails": [
+        {
+          "className": "Sorcerer",
+          "summary": "Your family is a long line of dreamers, who dream not as ordinary mortals do but rather as those who reach through and touch the supernal realm of dreams and the farthest shores of night.",
+          "url": "https://www.aonprd.com/BloodlineDisplay.aspx?ItemName=Dreamspun"
+        }
+      ]
+    },
+    {
+      "id": "ectoplasm",
+      "name": "Ectoplasm",
+      "classes": [
+        "Sorcerer"
+      ],
+      "classDetails": [
+        {
+          "className": "Sorcerer",
+          "summary": "The power of the Ethereal Plane thrums in your mind and pulls at your flesh.",
+          "url": "https://www.aonprd.com/BloodlineDisplay.aspx?ItemName=Ectoplasm"
+        }
+      ]
+    },
+    {
+      "id": "efreeti",
+      "name": "Efreeti",
+      "classes": [
+        "Sorcerer"
+      ],
+      "classDetails": [
+        {
+          "className": "Sorcerer",
+          "summary": "You were born with the power of fire genies, and the magic of the efreet is strong in you.",
+          "url": "https://www.aonprd.com/BloodlineDisplay.aspx?ItemName=Efreeti"
+        }
+      ]
+    },
+    {
+      "id": "elemental-air",
+      "name": "Elemental (Air)",
+      "parentBloodlineId": "elemental",
+      "element": "Air",
+      "energyType": "Electricity",
+      "elementalMovement": {
+        "Bloodrager": "Fly 60 feet (good)",
+        "Sorcerer": "Fly 60 feet (average)"
+      },
+      "classes": [
+        "Bloodrager",
+        "Sorcerer"
+      ],
+      "classDetails": [
+        {
+          "className": "Bloodrager",
+          "summary": "The power of the elements resides in you, and at times you can hardly control its fury. This influence comes either from an elemental outsider in your family history or from a moment when you or your ancestors were exposed to a powerful elemental force or cataclysm.",
+          "url": "https://www.aonprd.com/BloodragerBloodlineDisplay.aspx?ItemName=Elemental"
+        },
+        {
+          "className": "Sorcerer",
+          "summary": "The power of the elements resides in you, and at times you can hardly control its fury.",
+          "url": "https://www.aonprd.com/BloodlineDisplay.aspx?ItemName=Elemental"
+        }
+      ]
+    },
+    {
+      "id": "elemental-earth",
+      "name": "Elemental (Earth)",
+      "parentBloodlineId": "elemental",
+      "element": "Earth",
+      "energyType": "Acid",
+      "elementalMovement": {
+        "Bloodrager": "Burrow 30 feet",
+        "Sorcerer": "Burrow 30 feet"
+      },
+      "classes": [
+        "Bloodrager",
+        "Sorcerer"
+      ],
+      "classDetails": [
+        {
+          "className": "Bloodrager",
+          "summary": "The power of the elements resides in you, and at times you can hardly control its fury. This influence comes either from an elemental outsider in your family history or from a moment when you or your ancestors were exposed to a powerful elemental force or cataclysm.",
+          "url": "https://www.aonprd.com/BloodragerBloodlineDisplay.aspx?ItemName=Elemental"
+        },
+        {
+          "className": "Sorcerer",
+          "summary": "The power of the elements resides in you, and at times you can hardly control its fury.",
+          "url": "https://www.aonprd.com/BloodlineDisplay.aspx?ItemName=Elemental"
+        }
+      ]
+    },
+    {
+      "id": "elemental-fire",
+      "name": "Elemental (Fire)",
+      "parentBloodlineId": "elemental",
+      "element": "Fire",
+      "energyType": "Fire",
+      "elementalMovement": {
+        "Bloodrager": "+30 feet base land speed",
+        "Sorcerer": "+30 feet base speed"
+      },
+      "classes": [
+        "Bloodrager",
+        "Sorcerer"
+      ],
+      "classDetails": [
+        {
+          "className": "Bloodrager",
+          "summary": "The power of the elements resides in you, and at times you can hardly control its fury. This influence comes either from an elemental outsider in your family history or from a moment when you or your ancestors were exposed to a powerful elemental force or cataclysm.",
+          "url": "https://www.aonprd.com/BloodragerBloodlineDisplay.aspx?ItemName=Elemental"
+        },
+        {
+          "className": "Sorcerer",
+          "summary": "The power of the elements resides in you, and at times you can hardly control its fury.",
+          "url": "https://www.aonprd.com/BloodlineDisplay.aspx?ItemName=Elemental"
+        }
+      ]
+    },
+    {
+      "id": "elemental-water",
+      "name": "Elemental (Water)",
+      "parentBloodlineId": "elemental",
+      "element": "Water",
+      "energyType": "Cold",
+      "elementalMovement": {
+        "Bloodrager": "Swim 60 feet",
+        "Sorcerer": "Swim 60 feet"
+      },
+      "classes": [
+        "Bloodrager",
+        "Sorcerer"
+      ],
+      "classDetails": [
+        {
+          "className": "Bloodrager",
+          "summary": "The power of the elements resides in you, and at times you can hardly control its fury. This influence comes either from an elemental outsider in your family history or from a moment when you or your ancestors were exposed to a powerful elemental force or cataclysm.",
+          "url": "https://www.aonprd.com/BloodragerBloodlineDisplay.aspx?ItemName=Elemental"
+        },
+        {
+          "className": "Sorcerer",
+          "summary": "The power of the elements resides in you, and at times you can hardly control its fury.",
+          "url": "https://www.aonprd.com/BloodlineDisplay.aspx?ItemName=Elemental"
+        }
+      ]
+    },
+    {
+      "id": "fey",
+      "name": "Fey",
+      "classes": [
+        "Bloodrager",
+        "Sorcerer"
+      ],
+      "classDetails": [
+        {
+          "className": "Bloodrager",
+          "summary": "One of your ancestors was fey, or the fey realm somehow intermixed with your bloodline. It affects your bloodrage in tricky and surprising ways.",
+          "url": "https://www.aonprd.com/BloodragerBloodlineDisplay.aspx?ItemName=Fey"
+        },
+        {
+          "className": "Sorcerer",
+          "summary": "The capricious nature of the fey runs in your family due to some intermingling of fey blood or magic.",
+          "url": "https://www.aonprd.com/BloodlineDisplay.aspx?ItemName=Fey"
+        }
+      ]
+    },
+    {
+      "id": "ghoul",
+      "name": "Ghoul",
+      "classes": [
+        "Sorcerer"
+      ],
+      "classDetails": [
+        {
+          "className": "Sorcerer",
+          "summary": "Your connection to the hungering undead shapes your magic.",
+          "url": "https://www.aonprd.com/BloodlineDisplay.aspx?ItemName=Ghoul"
+        }
+      ]
+    },
+    {
+      "id": "hag",
+      "name": "Hag",
+      "classes": [
+        "Bloodrager"
+      ],
+      "classDetails": [
+        {
+          "className": "Bloodrager",
+          "summary": "Hags interbreed with other races frequently, and those children who escape their grasp may pass their heritage on to later generations before it reemerges.",
+          "url": "https://www.aonprd.com/BloodragerBloodlineDisplay.aspx?ItemName=Hag"
+        }
+      ]
+    },
+    {
+      "id": "harrow",
+      "name": "Harrow",
+      "classes": [
+        "Sorcerer"
+      ],
+      "classDetails": [
+        {
+          "className": "Sorcerer",
+          "summary": "Just as knowledge of the harrow has passed from generation to generation since time immemorial, so too has a deep spiritual connection to the otherworldly forces bound by the harrow passed through the ages.",
+          "url": "https://www.aonprd.com/BloodlineDisplay.aspx?ItemName=Harrow"
+        }
+      ]
+    },
+    {
+      "id": "imperious",
+      "name": "Imperious",
+      "classes": [
+        "Sorcerer"
+      ],
+      "classDetails": [
+        {
+          "className": "Sorcerer",
+          "summary": "(Human Only) A scion of forgotten kings, with a lineage rich with the dust of ancient empires spanning every golden age of humanity's history, an imperious embodies the apex of human potential, as well as human temerity and uninhibited hubris.",
+          "url": "https://www.aonprd.com/BloodlineDisplay.aspx?ItemName=Imperious"
+        }
+      ]
+    },
+    {
+      "id": "impossible",
+      "name": "Impossible",
+      "classes": [
+        "Sorcerer"
+      ],
+      "classDetails": [
+        {
+          "className": "Sorcerer",
+          "summary": "You can see beyond the mundane, and are capable of visualizing the improbable, and even the impossible.",
+          "url": "https://www.aonprd.com/BloodlineDisplay.aspx?ItemName=Impossible"
+        }
+      ]
+    },
+    {
+      "id": "infernal",
+      "name": "Infernal",
+      "classes": [
+        "Bloodrager",
+        "Sorcerer"
+      ],
+      "classDetails": [
+        {
+          "className": "Bloodrager",
+          "summary": "The Pit lives in your blood. Maybe one of your ancestors was seduced by the powers of Hell or made a deal with a devil. Either way, its corruption seethes within your lineage.",
+          "url": "https://www.aonprd.com/BloodragerBloodlineDisplay.aspx?ItemName=Infernal"
+        },
+        {
+          "className": "Sorcerer",
+          "summary": "Somewhere in your family's history, a relative made a deal with a devil, and that pact has influenced your family line ever since.",
+          "url": "https://www.aonprd.com/BloodlineDisplay.aspx?ItemName=Infernal"
+        }
+      ]
+    },
+    {
+      "id": "kobold-sorcerer",
+      "name": "Kobold Sorcerer",
+      "classes": [
+        "Sorcerer"
+      ],
+      "classDetails": [
+        {
+          "className": "Sorcerer",
+          "summary": "(Kobold Only) While many kobold sorcerers tout their purely draconic bloodline, over generations of eldritch training, some such spellcasters have created a bloodline that, while tinged with some draconic magic, is the embodiment of the race's virtue distilled into arcane form.",
+          "url": "https://www.aonprd.com/BloodlineDisplay.aspx?ItemName=Kobold%20Sorcerer"
+        }
+      ]
+    },
+    {
+      "id": "kyton",
+      "name": "Kyton",
+      "classes": [
+        "Bloodrager"
+      ],
+      "classDetails": [
+        {
+          "className": "Bloodrager",
+          "summary": "In the shadowy land of Nidal, the influence of Zon-Kuthon and the Midnight Lord’s favored servants—the kytons— taints the land and its inhabitants. Just as an eclipse drives animals wild, so too does the darkness unleash a madness from deep within you.",
+          "url": "https://www.aonprd.com/BloodragerBloodlineDisplay.aspx?ItemName=Kyton"
+        }
+      ]
+    },
+    {
+      "id": "maestro",
+      "name": "Maestro",
+      "classes": [
+        "Sorcerer"
+      ],
+      "classDetails": [
+        {
+          "className": "Sorcerer",
+          "summary": "The spiritual power of art and song runs strongly through your family line.",
+          "url": "https://www.aonprd.com/BloodlineDisplay.aspx?ItemName=Maestro"
+        }
+      ]
+    },
+    {
+      "id": "marid",
+      "name": "Marid",
+      "classes": [
+        "Sorcerer"
+      ],
+      "classDetails": [
+        {
+          "className": "Sorcerer",
+          "summary": "You were born with the power of water genies, and the magic of the marids is strong in you.",
+          "url": "https://www.aonprd.com/BloodlineDisplay.aspx?ItemName=Marid"
+        }
+      ]
+    },
+    {
+      "id": "martyred",
+      "name": "Martyred",
+      "classes": [
+        "Bloodrager",
+        "Sorcerer"
+      ],
+      "classDetails": [
+        {
+          "className": "Bloodrager",
+          "summary": "One of your ancestors paid the ultimate price for her beliefs. This distant relative martyred herself out of a devout dedication to some specific cause, and that sacrifice has infused you with power that you can use for good—or for ill. When you bloodrage, an inspiring fury conjures echoes of your forebear’s incredible determination and selfless dedication, both offering you protection and amplifying your ability to punish any who dare incur your wrath.",
+          "url": "https://www.aonprd.com/BloodragerBloodlineDisplay.aspx?ItemName=Martyred"
+        },
+        {
+          "className": "Sorcerer",
+          "summary": "One of your ancestors paid the ultimate price for your beliefs.",
+          "url": "https://www.aonprd.com/BloodlineDisplay.aspx?ItemName=Martyred"
+        }
+      ]
+    },
+    {
+      "id": "medusa",
+      "name": "Medusa",
+      "classes": [
+        "Bloodrager"
+      ],
+      "classDetails": [
+        {
+          "className": "Bloodrager",
+          "summary": "No magical creature is more iconic in Iblydan lore than the medusa . Perhaps your lineage traces back to a medusa, or an ancestor survived a medusa’s petrifying gaze and was forever changed by the experience. However the medusa’s influence entered your bloodline, when you bloodrage, you gain fearsome and ancient powers.",
+          "url": "https://www.aonprd.com/BloodragerBloodlineDisplay.aspx?ItemName=Medusa"
+        }
+      ]
+    },
+    {
+      "id": "naga",
+      "name": "Naga",
+      "classes": [
+        "Bloodrager",
+        "Sorcerer"
+      ],
+      "classDetails": [
+        {
+          "className": "Bloodrager",
+          "summary": "The blood of the powerful, serpentine aberrations known as nagas runs through your veins, fueling your bloodrage.",
+          "url": "https://www.aonprd.com/BloodragerBloodlineDisplay.aspx?ItemName=Naga"
+        },
+        {
+          "className": "Sorcerer",
+          "summary": "Naga blood flows within your veins. Perhaps a curious naga experimented upon one of your ancestors in an attempt to create the perfect servant, or maybe one of your ancestors was a shapeshifting naga. Either way, you boast powers similar to those of true nagas.",
+          "url": "https://www.aonprd.com/BloodlineDisplay.aspx?ItemName=Naga"
+        }
+      ]
+    },
+    {
+      "id": "nanite",
+      "name": "Nanite",
+      "classes": [
+        "Sorcerer"
+      ],
+      "classDetails": [
+        {
+          "className": "Sorcerer",
+          "summary": "Either you were born from one of the forgewombs scattered throughout the wastelands, or you were infected by nanites, which now course through your blood.",
+          "url": "https://www.aonprd.com/BloodlineDisplay.aspx?ItemName=Nanite"
+        }
+      ]
+    },
+    {
+      "id": "oni",
+      "name": "Oni",
+      "classes": [
+        "Sorcerer"
+      ],
+      "classDetails": [
+        {
+          "className": "Sorcerer",
+          "summary": "As slaves of capricious oni lords, your ancestors were forced to yield to their masters’ hedonistic desires, inevitably tainting their descendents with oni blood.",
+          "url": "https://www.aonprd.com/BloodlineDisplay.aspx?ItemName=Oni"
+        }
+      ]
+    },
+    {
+      "id": "orc",
+      "name": "Orc",
+      "classes": [
+        "Sorcerer"
+      ],
+      "classDetails": [
+        {
+          "className": "Sorcerer",
+          "summary": "The rage of your ancestors burns within you, and the taint of savage orc blood flows through your veins.",
+          "url": "https://www.aonprd.com/BloodlineDisplay.aspx?ItemName=Orc"
+        }
+      ]
+    },
+    {
+      "id": "pestilence",
+      "name": "Pestilence",
+      "classes": [
+        "Sorcerer"
+      ],
+      "classDetails": [
+        {
+          "className": "Sorcerer",
+          "summary": "You were born during the height of a great magical plague, to a mother suffering from an eldritch disease, or you suffered an eldritch pox as a child, such that your very soul now carries a blight of pestilence within it.",
+          "url": "https://www.aonprd.com/BloodlineDisplay.aspx?ItemName=Pestilence"
+        }
+      ]
+    },
+    {
+      "id": "phoenix",
+      "name": "Phoenix",
+      "classes": [
+        "Bloodrager",
+        "Sorcerer"
+      ],
+      "classDetails": [
+        {
+          "className": "Bloodrager",
+          "summary": "The flames of the phoenix burn brightly within your soul, filling you with an inextinguishable vitality that can withstand the most harrowing of assaults",
+          "url": "https://www.aonprd.com/BloodragerBloodlineDisplay.aspx?ItemName=Phoenix"
+        },
+        {
+          "className": "Sorcerer",
+          "summary": "One of your ancestors bore witness to a phoenix’s resurrection and formed a bond with the magical creature. The resurrecting flames still course through your veins, surging with power.",
+          "url": "https://www.aonprd.com/BloodlineDisplay.aspx?ItemName=Phoenix"
+        }
+      ]
+    },
+    {
+      "id": "possessed",
+      "name": "Possessed",
+      "classes": [
+        "Sorcerer"
+      ],
+      "classDetails": [
+        {
+          "className": "Sorcerer",
+          "summary": "The mystical connection with your possessing spirit allows you to gain more control over your body and mind.",
+          "url": "https://www.aonprd.com/BloodlineDisplay.aspx?ItemName=Possessed"
+        }
+      ]
+    },
+    {
+      "id": "protean",
+      "name": "Protean",
+      "classes": [
+        "Sorcerer"
+      ],
+      "classDetails": [
+        {
+          "className": "Sorcerer",
+          "summary": "You have in your veins the ever-changing wildness of primal chaos, the raw essence of unbound creation.",
+          "url": "https://www.aonprd.com/BloodlineDisplay.aspx?ItemName=Protean"
+        }
+      ]
+    },
+    {
+      "id": "psychic",
+      "name": "Psychic",
+      "classes": [
+        "Sorcerer"
+      ],
+      "classDetails": [
+        {
+          "className": "Sorcerer",
+          "summary": "Psychic power runs thorough your blood, whether it be from a familial predisposition to psychic power or exposure to a powerful psychic phenomenon. Whatever the source of this power, your mind is a dangerous weapon.",
+          "url": "https://www.aonprd.com/BloodlineDisplay.aspx?ItemName=Psychic"
+        }
+      ]
+    },
+    {
+      "id": "rakshasa",
+      "name": "Rakshasa",
+      "classes": [
+        "Sorcerer"
+      ],
+      "classDetails": [
+        {
+          "className": "Sorcerer",
+          "summary": "At some point in your family's history, one of your ancestors was tainted by the influence of a rakshasa.",
+          "url": "https://www.aonprd.com/BloodlineDisplay.aspx?ItemName=Rakshasa"
+        }
+      ]
+    },
+    {
+      "id": "salamander",
+      "name": "Salamander",
+      "classes": [
+        "Bloodrager",
+        "Sorcerer"
+      ],
+      "classDetails": [
+        {
+          "className": "Bloodrager",
+          "summary": "Salamanders are fierce warriors and master smiths, and you wield their might and mastery of metal by birthright.",
+          "url": "https://www.aonprd.com/BloodragerBloodlineDisplay.aspx?ItemName=Salamander"
+        },
+        {
+          "className": "Sorcerer",
+          "summary": "You are descended from the elemental outsiders known as salamanders. You wield flame as a weapon and a tool, and your smithing skills are unrivaled.",
+          "url": "https://www.aonprd.com/BloodlineDisplay.aspx?ItemName=Salamander"
+        }
+      ]
+    },
+    {
+      "id": "scorpion",
+      "name": "Scorpion",
+      "classes": [
+        "Sorcerer"
+      ],
+      "classDetails": [
+        {
+          "className": "Sorcerer",
+          "summary": "Whether your ancestors served a scorpion goddess or simply worked closely with more mundane members of the species, the venom from these arachnids has seeped down through generations into your blood.",
+          "url": "https://www.aonprd.com/BloodlineDisplay.aspx?ItemName=Scorpion"
+        }
+      ]
+    },
+    {
+      "id": "serpentine",
+      "name": "Serpentine",
+      "classes": [
+        "Sorcerer"
+      ],
+      "classDetails": [
+        {
+          "className": "Sorcerer",
+          "summary": "Your bloodline carries the lingering stain of ancient serpent races that ruled when the world was young.",
+          "url": "https://www.aonprd.com/BloodlineDisplay.aspx?ItemName=Serpentine"
+        }
+      ]
+    },
+    {
+      "id": "shadow",
+      "name": "Shadow",
+      "classes": [
+        "Bloodrager",
+        "Sorcerer"
+      ],
+      "classDetails": [
+        {
+          "className": "Bloodrager",
+          "summary": "Because of your heritage, you can move and see through shadows as if you are part of them. Your fury absorbs light, warmth, and strength.",
+          "url": "https://www.aonprd.com/BloodragerBloodlineDisplay.aspx?ItemName=Shadow"
+        },
+        {
+          "className": "Sorcerer",
+          "summary": "Spirits from the shadow plane dally at times in the world of light, and such as these lay with your ancestors once upon a time, imparting the mystery of shadow-stuff into your lineage.",
+          "url": "https://www.aonprd.com/BloodlineDisplay.aspx?ItemName=Shadow"
+        }
+      ]
+    },
+    {
+      "id": "shaitan",
+      "name": "Shaitan",
+      "classes": [
+        "Sorcerer"
+      ],
+      "classDetails": [
+        {
+          "className": "Sorcerer",
+          "summary": "You were born with the power of earth genies, and the magic of the shaitans is strong in you.",
+          "url": "https://www.aonprd.com/BloodlineDisplay.aspx?ItemName=Shaitan"
+        }
+      ]
+    },
+    {
+      "id": "shapechanger",
+      "name": "Shapechanger",
+      "classes": [
+        "Bloodrager",
+        "Sorcerer"
+      ],
+      "classDetails": [
+        {
+          "className": "Bloodrager",
+          "summary": "The blood of doppelgangers, faceless stalkers, lycanthropes, or other shapechangers courses through your veins.",
+          "url": "https://www.aonprd.com/BloodragerBloodlineDisplay.aspx?ItemName=Shapechanger"
+        },
+        {
+          "className": "Sorcerer",
+          "summary": "Channeling the power of your shapeshifting ancestors that you carry in your blood, you gain powers that allow you to change your shape and alter your appearance and physical abilities.",
+          "url": "https://www.aonprd.com/BloodlineDisplay.aspx?ItemName=Shapechanger"
+        }
+      ]
+    },
+    {
+      "id": "solar",
+      "name": "Solar",
+      "classes": [
+        "Sorcerer"
+      ],
+      "classDetails": [
+        {
+          "className": "Sorcerer",
+          "summary": "Sorcerers who serve in the sun goddess’s court display powers infused with the glory of the sun itself.",
+          "url": "https://www.aonprd.com/BloodlineDisplay.aspx?ItemName=Solar"
+        }
+      ]
+    },
+    {
+      "id": "sphinx",
+      "name": "Sphinx",
+      "classes": [
+        "Bloodrager"
+      ],
+      "classDetails": [
+        {
+          "className": "Bloodrager",
+          "summary": "Those who successfully traded riddles with sphinxes sometimes find themselves or their descendants exhibiting both arcane power and violent fury. These bloodragers find being outwitted or outmaneuvered especially infuriating; though they are usually scholarly and erudite, their fits of frenzied rage are all the more terrifying in comparison.",
+          "url": "https://www.aonprd.com/BloodragerBloodlineDisplay.aspx?ItemName=Sphinx"
+        }
+      ]
+    },
+    {
+      "id": "starsoul",
+      "name": "Starsoul",
+      "classes": [
+        "Sorcerer"
+      ],
+      "classDetails": [
+        {
+          "className": "Sorcerer",
+          "summary": "You come from a line of stargazers and explorers who delved deeply into the darkness beyond the stars.",
+          "url": "https://www.aonprd.com/BloodlineDisplay.aspx?ItemName=Starsoul"
+        }
+      ]
+    },
+    {
+      "id": "stormborn",
+      "name": "Stormborn",
+      "classes": [
+        "Sorcerer"
+      ],
+      "classDetails": [
+        {
+          "className": "Sorcerer",
+          "summary": "You trace your heritage to fierce and proud spirits of storm and sky, and living lightning sings in your veins.",
+          "url": "https://www.aonprd.com/BloodlineDisplay.aspx?ItemName=Stormborn"
+        }
+      ]
+    },
+    {
+      "id": "undead",
+      "name": "Undead",
+      "classes": [
+        "Bloodrager",
+        "Sorcerer"
+      ],
+      "classDetails": [
+        {
+          "className": "Bloodrager",
+          "summary": "The foul corruption of undeath is a part of you. Somewhere in the past, death became infused with your lineage. Your connection to the attributes of the undead bestows frightening power when your bloodrage.",
+          "url": "https://www.aonprd.com/BloodragerBloodlineDisplay.aspx?ItemName=Undead"
+        },
+        {
+          "className": "Sorcerer",
+          "summary": "The taint of the grave runs through your family.",
+          "url": "https://www.aonprd.com/BloodlineDisplay.aspx?ItemName=Undead"
+        }
+      ]
+    },
+    {
+      "id": "unicorn",
+      "name": "Unicorn",
+      "classes": [
+        "Sorcerer"
+      ],
+      "classDetails": [
+        {
+          "className": "Sorcerer",
+          "summary": "The deep forests of Avistan, such as those found in Molthune and Nirmathas, are a haven for one of Golarion’s most fabled creatures: unicorns . Deeply empathetic and fiercely protective, unicorns on occasion form close bonds with humans, often young and noble-hearted women. When the two have a particularly strong bond, the unicorn’s magic can become a part of the bonded human, and sometimes is even passed on to her children. These children, blessed by their parent’s connection to that force of true good, grow up to become sorcerers of the unicorn bloodline.",
+          "url": "https://www.aonprd.com/BloodlineDisplay.aspx?ItemName=Unicorn"
+        }
+      ]
+    },
+    {
+      "id": "verdant",
+      "name": "Verdant",
+      "classes": [
+        "Bloodrager",
+        "Sorcerer"
+      ],
+      "classDetails": [
+        {
+          "className": "Bloodrager",
+          "summary": "Your body is suffused with raw plant life. When you bloodrage, your plantlike characteristics bolster your durability and grant you some control over vegetation.",
+          "url": "https://www.aonprd.com/BloodragerBloodlineDisplay.aspx?ItemName=Verdant"
+        },
+        {
+          "className": "Sorcerer",
+          "summary": "Your progenitors infused themselves with raw plant life, binding it into their own tissue and passing it down to their literal seed, giving you innate communion with nature.",
+          "url": "https://www.aonprd.com/BloodlineDisplay.aspx?ItemName=Verdant"
+        }
+      ]
+    },
+    {
+      "id": "vestige",
+      "name": "Vestige",
+      "classes": [
+        "Bloodrager",
+        "Sorcerer"
+      ],
+      "classDetails": [
+        {
+          "className": "Bloodrager",
+          "summary": "You are the descendant of great heroes from a lost civilization.",
+          "url": "https://www.aonprd.com/BloodragerBloodlineDisplay.aspx?ItemName=Vestige"
+        },
+        {
+          "className": "Sorcerer",
+          "summary": "You trace your ancestry to a bygone civilization and can call upon its forgotten people or places for power.",
+          "url": "https://www.aonprd.com/BloodlineDisplay.aspx?ItemName=Vestige"
+        }
+      ]
+    }
+  ]
+}

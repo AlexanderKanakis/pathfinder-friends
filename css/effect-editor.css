@@ -4,8 +4,11 @@
 .shared-immunity-row label,
 .shared-apply-condition-row label,
 .shared-class-skill-row label,
+.shared-bonus-ranks-row label,
 .shared-extra-ranks-row label,
+.shared-feat-grant-row label,
 .shared-size-change-row label,
+.shared-special-toggle-row label,
 .shared-spell-like-row label,
 .shared-spell-adjustment-row label,
 .shared-generated-equipment-row label,
@@ -16,11 +19,263 @@
   margin-bottom: 3px;
 }
 
-.shared-extra-ranks-row {
+.shared-bonus-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
+  gap: 8px;
+  align-items: end;
+  background: #242424;
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 10px 48px 10px 10px;
+}
+
+.shared-bonus-row > div {
+  min-width: 0;
+}
+
+.shared-bonus-row > div:first-child {
+  grid-column: span 2;
+}
+
+.shared-bonus-row .shared-named-skill-field {
+  grid-column: 1 / -1;
+  max-width: 280px;
+}
+
+.shared-bonus-row .shared-weapon-restrictions {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  max-width: 648px;
+}
+
+@media (max-width: 560px) {
+  .shared-bonus-row .shared-weapon-restrictions {
+    grid-template-columns: 1fr;
+  }
+}
+
+.shared-bonus-row button[aria-label="Delete effect"] {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.shared-bonus-condition-inline {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: auto minmax(160px, 260px);
+  gap: 8px;
+  align-items: end;
+}
+
+.shared-bonus-row [data-scale-summary] {
+  grid-column: 1 / -1;
+}
+
+.shared-dr-row {
+  display: grid;
+  grid-template-columns: 0.7fr 1.3fr auto auto;
+  gap: 8px;
+  align-items: end;
+  background: #242424;
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.shared-sr-row {
+  display: grid;
+  grid-template-columns: 0.5fr auto 0.9fr auto auto;
+  gap: 8px;
+  align-items: end;
+  background: #242424;
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.shared-immunity-row {
+  display: grid;
+  grid-template-columns: 0.8fr auto 1fr auto;
+  gap: 8px;
+  align-items: end;
+  background: #242424;
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.shared-dr-row [data-scale-summary],
+.shared-sr-row [data-scale-summary] {
+  grid-column: 1 / -1;
+}
+
+.shared-class-skill-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: end;
+  background: #242424;
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.shared-bonus-ranks-row {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(100px, 160px) auto;
+  gap: 8px;
+  align-items: end;
+  background: #242424;
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.shared-bonus-ranks-row .shared-named-skill-field {
+  grid-column: 1 / -1;
+}
+
+.shared-class-skill-row .shared-named-skill-field {
+  grid-column: 1 / -1;
+}
+
+.shared-grant-domain-row {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) minmax(150px, auto) auto;
+  gap: 8px;
+  align-items: end;
+  background: #242424;
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.shared-grant-domain-choice {
+  min-height: 31px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-left: 2.5em;
+}
+
+.shared-grant-domain-choice .form-check-label {
+  color: #fff;
+  font-size: 12px;
+}
+
+.shared-extra-accordion .accordion-item {
+  background: transparent;
+  border: 0;
+}
+
+.shared-extra-accordion .accordion-button {
+  background: #242424;
+  color: #ddd;
+  padding: 8px 10px;
+  font-size: 13px;
+}
+
+.shared-extra-accordion .accordion-button:not(.collapsed) {
+  background: #2b2b2b;
+  color: #fff;
+  box-shadow: none;
+}
+
+.shared-extra-accordion .accordion-button::after {
+  filter: invert(1) grayscale(1) brightness(1.6);
+}
+
+.shared-extra-accordion .accordion-body {
+  background: #1e1e1e;
+  border: 1px solid #333;
+  border-top: 0;
+  padding: 10px;
+}
+
+.shared-extra-subsection {
+  margin-bottom: 14px;
+}
+
+.shared-extra-subsection:last-child {
+  margin-bottom: 0;
+}
+
+.shared-extra-ranks-row,
+.shared-feat-grant-row,
+.shared-size-change-row {
   display: grid;
   grid-template-columns: minmax(120px, 180px) auto;
   gap: 8px;
   align-items: end;
+}
+
+.shared-feat-grant-row {
+  grid-template-columns: minmax(140px, 0.8fr) minmax(120px, 0.6fr) minmax(180px, 1fr) auto;
+  background: #242424;
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.shared-special-toggle-row {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.shared-special-toggle-row .shared-special-toggle-check {
+  align-items: center;
+  display: flex;
+  min-height: 31px;
+  margin: 0;
+}
+
+.shared-special-toggle-controls {
+  align-items: center;
+  display: inline-flex;
+  gap: 8px;
+  justify-self: end;
+}
+
+.shared-special-toggle-condition {
+  grid-column: 1 / -1;
+}
+
+.shared-special-toggle-row button[data-special-toggle-condition-toggle] {
+  align-items: center;
+  display: inline-flex;
+  height: 31px;
+  justify-content: center;
+  justify-self: start;
+  padding: 0;
+  width: 31px;
+}
+
+.shared-extra-ranks-row button[aria-label="Delete extra ranks per level"],
+.shared-bonus-ranks-row button[aria-label="Delete bonus ranks"],
+.shared-feat-grant-row button[aria-label="Delete feat grant"],
+.shared-grant-domain-row button[aria-label="Delete domain grant"],
+.shared-size-change-row button[aria-label="Delete size change"],
+.shared-spell-adjustment-target-row button[aria-label="Delete spell target group"] {
+  align-items: center;
+  display: inline-flex;
+  height: 31px;
+  justify-content: center;
+  justify-self: start;
+  padding: 0;
+  width: 31px;
 }
 
 .shared-apply-condition-row {
@@ -84,23 +339,70 @@
 }
 
 .shared-spell-adjustment-row {
-  display: grid;
-  grid-template-columns:
-    minmax(120px, 0.8fr)
-    minmax(180px, 1.4fr)
-    minmax(110px, 0.7fr)
-    minmax(74px, 0.4fr)
-    minmax(104px, 0.65fr)
-    auto
-    auto
-    auto
-    minmax(170px, 1fr)
-    auto;
-  gap: 8px;
-  align-items: end;
   border: 1px solid #495057;
   border-radius: 6px;
   padding: 10px;
+}
+
+.shared-spell-adjustment-source {
+  max-width: none;
+}
+
+.shared-effective-attribute-field {
+  max-width: 120px;
+}
+
+.shared-spell-adjustment-target-row,
+.shared-spell-adjustment-increase-row,
+.shared-spell-adjustment-condition {
+  display: grid;
+  gap: 8px;
+  align-items: end;
+}
+
+.shared-spell-adjustment-target-row {
+  grid-template-columns: minmax(140px, 0.7fr) minmax(220px, 1fr) auto auto;
+}
+
+.shared-spell-adjustment-target-row.has-bloodline {
+  grid-template-columns:
+    minmax(140px, 0.7fr) minmax(220px, 1fr) minmax(180px, 0.7fr) auto auto;
+}
+
+.shared-spell-adjustment-increase-row {
+  grid-template-columns:
+    minmax(210px, 1.1fr)
+    minmax(80px, 0.35fr)
+    minmax(110px, 0.6fr)
+    auto
+    auto
+    auto;
+}
+
+.shared-spell-adjustment-nested {
+  margin-top: 10px;
+}
+
+.shared-spell-adjustment-nested > .vstack {
+  margin-top: 6px;
+}
+
+.shared-spell-adjustment-condition {
+  grid-template-columns: auto minmax(220px, 1fr) auto;
+  margin-top: 10px;
+}
+
+.shared-spell-adjustment-checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  min-height: 31px;
+  align-items: center;
+}
+
+.shared-spell-adjustment-checks .form-check-label {
+  color: #fff;
+  font-size: 12px;
 }
 
 .shared-spell-adjustment-row [data-scale-summary] {
@@ -138,12 +440,39 @@
 }
 
 @media (max-width: 640px) {
+  .shared-bonus-row,
+  .shared-bonus-condition-inline {
+    grid-template-columns: 1fr;
+  }
+
+  .shared-bonus-row > div:first-child {
+    grid-column: auto;
+  }
+
+  .shared-bonus-condition-inline {
+    grid-column: auto;
+  }
+
   .shared-spell-like-row {
     grid-template-columns: 1fr;
   }
 
   .shared-spell-adjustment-row {
     grid-template-columns: 1fr;
+  }
+
+  .shared-spell-adjustment-target-row,
+  .shared-spell-adjustment-increase-row,
+  .shared-spell-adjustment-condition,
+  .shared-bonus-ranks-row,
+  .shared-feat-grant-row,
+  .shared-grant-domain-row,
+  .shared-special-toggle-row {
+    grid-template-columns: 1fr;
+  }
+
+  .shared-special-toggle-controls {
+    justify-self: start;
   }
 
   .shared-apply-condition-row {
@@ -167,4 +496,44 @@
   .shared-generated-equipment-row button {
     width: 100%;
   }
+
+  .shared-extra-ranks-row button[aria-label="Delete extra ranks per level"],
+  .shared-bonus-ranks-row button[aria-label="Delete bonus ranks"],
+  .shared-feat-grant-row button[aria-label="Delete feat grant"],
+  .shared-grant-domain-row button[aria-label="Delete domain grant"],
+  .shared-size-change-row button[aria-label="Delete size change"],
+  .shared-spell-adjustment-target-row button[aria-label="Delete spell target group"] {
+    width: 31px;
+  }
+}
+.shared-mechanic-group {
+  width: 100%;
+  margin-bottom: 12px;
+  padding: 10px;
+  overflow: hidden;
+  color: #ddd;
+  border: 1px solid #333;
+  border-radius: 6px;
+  background: #1e1e1e;
+}
+
+.shared-mechanic-group:last-child {
+  margin-bottom: 0;
+}
+
+.shared-mechanic-group > strong,
+.shared-mechanic-group > .d-flex:first-child {
+  margin: -10px -10px 10px !important;
+  padding: 8px 10px;
+  color: #fff;
+  border-bottom: 1px solid #333;
+  background: #242424;
+}
+
+.shared-mechanic-group .accordion,
+.shared-mechanic-group .accordion-item,
+.shared-mechanic-group .accordion-collapse {
+  --bs-accordion-bg: transparent;
+  --bs-accordion-color: #ddd;
+  background-color: transparent;
 }

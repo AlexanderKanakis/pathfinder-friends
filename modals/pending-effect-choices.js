@@ -11,20 +11,25 @@
 // shows up in the same panel, answered one at a time.
 (function () {
   const PANEL_ID = "pendingEffectChoicesPanel";
-  const CHOICE_POOL_MECHANIC_KEYS = [
-    "damageReduction",
-    "spellResistance",
-    "immunities",
-    "applyConditions",
-    "classSkillGrants",
-    "extraRanksPerLevel",
-    "sizeChanges",
-    "spellLikeAbilities",
-    "casterLevelBonuses",
-    "spellDcBonuses",
-    "generatedEquipment",
-    "conditionalVariables",
-  ];
+  const CHOICE_POOL_MECHANIC_KEYS =
+    window.PFEffectMechanics?.extraKeys?.() || [
+      "damageReduction",
+      "spellResistance",
+      "immunities",
+      "applyConditions",
+      "classSkillGrants",
+      "bonusRanks",
+      "extraRanksPerLevel",
+      "featGrants",
+      "sizeChanges",
+      "spellLikeAbilities",
+      "casterLevelBonuses",
+      "spellDcBonuses",
+      "effectiveAttributeBonuses",
+      "grantDomains",
+      "generatedEquipment",
+      "conditionalVariables",
+    ];
   let pollTimer = null;
   let pollOptions = null;
   const resolving = new Set();
@@ -281,6 +286,36 @@
     return resolved;
   }
 
+  function spellAdjustmentEntriesNeedChoice(entries = []) {
+    return (Array.isArray(entries) ? entries : []).some((entry) =>
+      window.PFEffectEditor?.spellAdjustmentEntryNeedsChoice?.(entry),
+    );
+  }
+
+  async function resolveSpellAdjustmentChoices(entries = [], request = {}) {
+    const list = Array.isArray(entries) ? entries : [];
+    if (!spellAdjustmentEntriesNeedChoice(list)) return list;
+    if (!window.PFEffectEditor?.resolveSpellAdjustmentChoices) return null;
+    return window.PFEffectEditor.resolveSpellAdjustmentChoices(list, {
+      title: `${request.effect_name || "Effect"}${request.characterName ? ` (${request.characterName})` : ""}`,
+    });
+  }
+
+  function grantDomainEntriesNeedChoice(entries = []) {
+    return (Array.isArray(entries) ? entries : []).some((entry) =>
+      window.PFEffectEditor?.grantDomainEntryNeedsChoice?.(entry),
+    );
+  }
+
+  async function resolveGrantDomainChoices(entries = [], request = {}) {
+    const list = Array.isArray(entries) ? entries : [];
+    if (!grantDomainEntriesNeedChoice(list)) return list;
+    if (!window.PFEffectEditor?.resolveGrantDomainChoices) return null;
+    return window.PFEffectEditor.resolveGrantDomainChoices(list, {
+      title: `${request.effect_name || "Effect"}${request.characterName ? ` (${request.characterName})` : ""}`,
+    });
+  }
+
   function conditionalVariables(effect = {}) {
     return Array.isArray(effect.conditionalVariables)
       ? effect.conditionalVariables
@@ -480,16 +515,47 @@
       request,
     );
     if (resolvedClassSkillGrants === null) return null;
+    const resolvedBonusRanks = await resolveChoiceStats(
+      option.bonusRanks,
+      request,
+    );
+    if (resolvedBonusRanks === null) return null;
     const resolvedSpellLikeAbilities = await resolveSpellLikeAbilityChoices(
       option.spellLikeAbilities,
       request,
     );
     if (resolvedSpellLikeAbilities === null) return null;
+    const resolvedCasterLevelBonuses = await resolveSpellAdjustmentChoices(
+      option.casterLevelBonuses,
+      request,
+    );
+    if (resolvedCasterLevelBonuses === null) return null;
+    const resolvedSpellDcBonuses = await resolveSpellAdjustmentChoices(
+      option.spellDcBonuses,
+      request,
+    );
+    if (resolvedSpellDcBonuses === null) return null;
+    const resolvedEffectiveAttributeBonuses =
+      await resolveSpellAdjustmentChoices(
+        option.effectiveAttributeBonuses,
+        request,
+      );
+    if (resolvedEffectiveAttributeBonuses === null) return null;
+    const resolvedGrantDomains = await resolveGrantDomainChoices(
+      option.grantDomains,
+      request,
+    );
+    if (resolvedGrantDomains === null) return null;
     return {
       ...option,
       effects: resolvedEffects,
       classSkillGrants: resolvedClassSkillGrants,
+      bonusRanks: resolvedBonusRanks,
       spellLikeAbilities: resolvedSpellLikeAbilities,
+      casterLevelBonuses: resolvedCasterLevelBonuses,
+      spellDcBonuses: resolvedSpellDcBonuses,
+      effectiveAttributeBonuses: resolvedEffectiveAttributeBonuses,
+      grantDomains: resolvedGrantDomains,
     };
   }
 
@@ -541,12 +607,38 @@
         request,
       );
       if (resolvedClassSkillGrants === null) return;
+      const resolvedBonusRanks = await resolveChoiceStats(
+        ability.bonusRanks,
+        request,
+      );
+      if (resolvedBonusRanks === null) return;
 
       const resolvedSpellLikeAbilities = await resolveSpellLikeAbilityChoices(
         ability.spellLikeAbilities,
         request,
       );
       if (resolvedSpellLikeAbilities === null) return;
+      const resolvedCasterLevelBonuses = await resolveSpellAdjustmentChoices(
+        ability.casterLevelBonuses,
+        request,
+      );
+      if (resolvedCasterLevelBonuses === null) return;
+      const resolvedSpellDcBonuses = await resolveSpellAdjustmentChoices(
+        ability.spellDcBonuses,
+        request,
+      );
+      if (resolvedSpellDcBonuses === null) return;
+      const resolvedEffectiveAttributeBonuses =
+        await resolveSpellAdjustmentChoices(
+          ability.effectiveAttributeBonuses,
+          request,
+        );
+      if (resolvedEffectiveAttributeBonuses === null) return;
+      const resolvedGrantDomains = await resolveGrantDomainChoices(
+        ability.grantDomains,
+        request,
+      );
+      if (resolvedGrantDomains === null) return;
       const resolvedChoicePools = await resolveChoicePools(ability, request);
       if (resolvedChoicePools === null) return;
       const { choicePools: _choicePools, pools: _pools, poolChoices, ...abilityBase } =
@@ -558,8 +650,21 @@
         ...(resolvedClassSkillGrants.length
           ? { classSkillGrants: resolvedClassSkillGrants }
           : {}),
+        ...(resolvedBonusRanks.length ? { bonusRanks: resolvedBonusRanks } : {}),
         ...(resolvedSpellLikeAbilities.length
           ? { spellLikeAbilities: resolvedSpellLikeAbilities }
+          : {}),
+        ...(resolvedCasterLevelBonuses.length
+          ? { casterLevelBonuses: resolvedCasterLevelBonuses }
+          : {}),
+        ...(resolvedSpellDcBonuses.length
+          ? { spellDcBonuses: resolvedSpellDcBonuses }
+          : {}),
+        ...(resolvedEffectiveAttributeBonuses.length
+          ? { effectiveAttributeBonuses: resolvedEffectiveAttributeBonuses }
+          : {}),
+        ...(resolvedGrantDomains.length
+          ? { grantDomains: resolvedGrantDomains }
           : {}),
       };
       appendChoicePoolMechanics(finalized, resolvedChoicePools);

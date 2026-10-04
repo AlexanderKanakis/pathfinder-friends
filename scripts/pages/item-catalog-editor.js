@@ -26,7 +26,8 @@ const WEAPON_TYPES = [
   "Ranged Weapon",
   "Firearm (One-Handed)",
   "Firearm (Two-Handed)",
-  "Natural",
+  "Natural Weapon",
+  "Improvised",
 ];
 const WEAPON_ENCHANTMENTS = [
   "",
@@ -426,11 +427,19 @@ function itemHasEffects(item) {
       (Array.isArray(item.immunities) && item.immunities.length) ||
       (Array.isArray(item.applyConditions) && item.applyConditions.length) ||
       (Array.isArray(item.classSkillGrants) && item.classSkillGrants.length) ||
+      (Array.isArray(item.bonusRanks) && item.bonusRanks.length) ||
       (Array.isArray(item.extraRanksPerLevel) &&
         item.extraRanksPerLevel.length) ||
+      (Array.isArray(item.featGrants) && item.featGrants.length) ||
       (Array.isArray(item.sizeChanges) && item.sizeChanges.length) ||
       (Array.isArray(item.spellLikeAbilities) &&
         item.spellLikeAbilities.length) ||
+      (Array.isArray(item.casterLevelBonuses) &&
+        item.casterLevelBonuses.length) ||
+      (Array.isArray(item.spellDcBonuses) && item.spellDcBonuses.length) ||
+      (Array.isArray(item.effectiveAttributeBonuses) &&
+        item.effectiveAttributeBonuses.length) ||
+      (Array.isArray(item.grantDomains) && item.grantDomains.length) ||
       (Array.isArray(item.generatedEquipment) && item.generatedEquipment.length),
   );
 }
@@ -532,13 +541,14 @@ function weaponDetailFieldsHtml(item) {
     ${selectFieldHtml("type", "Type", ["Weapon", "Item"], item.type || "Weapon", "Weapon")}
     <div>
       <label>Weapon Type</label>
-      <select data-detail-field="weaponType" id="itemDetailWeaponType" class="form-select form-select-sm">${optionListHtml(WEAPON_TYPES, details.weaponType || "Melee Weapon (One-Handed)")}</select>
+      <select data-detail-field="weaponType" id="itemDetailWeaponType" class="form-select form-select-sm">${optionListHtml(WEAPON_TYPES, details.weaponType === "Natural" ? "Natural Weapon" : details.weaponType || "Melee Weapon (One-Handed)")}</select>
     </div>
     <div>
       <label>Attack Scales With</label>
       ${scaleButtonsHtml("attackScale", details.attackScale)}
     </div>
     ${textFieldHtml("damage", "Damage Dice", details.damage, { placeholder: "1d8" })}
+    <div class="grid-column-full" id="itemExtraDamage"></div>
     ${textFieldHtml("damageSmall", "Damage (Small)", details.damageSmall, { placeholder: "1d6" })}
     ${textFieldHtml("critical", "Critical", details.critical, { placeholder: "20/x2" })}
     <div>
@@ -578,6 +588,7 @@ function collectWeaponDetails(item, container) {
     weaponType: detailValue(container, "weaponType") || "Melee Weapon (One-Handed)",
     attackScale: detailValue(container, "attackScale") || "STR",
     damage: detailValue(container, "damage").trim(),
+    extraDamage: PFWeaponDamage.collect(container.querySelector("#itemExtraDamage")),
     damageSmall: detailValue(container, "damageSmall").trim(),
     critical: detailValue(container, "critical").trim(),
     damageScale: detailValue(container, "damageScale") || "STR",
@@ -793,12 +804,14 @@ function renderSelectedItem() {
     <div id="itemEffectsAccordion"></div>
   `;
 
-  currentEffectsAccordion = window.PFEffectEditor.mountEffectsAccordion(
+  currentEffectsAccordion = window.PFEffectEditor.mountMechanicGroups(
     el("itemEffectsAccordion"),
     { idPrefix: "itemEffects", onChange: () => setDirty(true) },
   );
   currentEffectsAccordion.reset(item);
   wireDetailFields(activeCatalogKey, el("itemEditorPanel"));
+  if (activeCatalogKey === "weapons")
+    PFWeaponDamage.mount(el("itemExtraDamage"), item.details?.extraDamage);
   el("duplicateItemBtn").addEventListener("click", () => duplicateSelectedItem());
 
   // The panel element itself persists across renders (only its
@@ -835,11 +848,18 @@ function commitSelectedItem() {
     immunities,
     applyConditions,
     classSkillGrants,
+    bonusRanks,
     extraRanksPerLevel,
+    featGrants,
     sizeChanges,
     spellLikeAbilities,
+    casterLevelBonuses,
+    spellDcBonuses,
+    effectiveAttributeBonuses,
+    grantDomains,
     generatedEquipment,
     conditionalVariables,
+    activeMechanics,
   } =
     currentEffectsAccordion.collect();
   item.effects = effects;
@@ -848,11 +868,19 @@ function commitSelectedItem() {
   item.immunities = immunities;
   item.applyConditions = applyConditions;
   item.classSkillGrants = classSkillGrants;
+  item.bonusRanks = bonusRanks;
   item.extraRanksPerLevel = extraRanksPerLevel;
+  item.featGrants = featGrants;
   item.sizeChanges = sizeChanges;
   item.spellLikeAbilities = spellLikeAbilities;
+  item.casterLevelBonuses = casterLevelBonuses;
+  item.spellDcBonuses = spellDcBonuses;
+  item.effectiveAttributeBonuses = effectiveAttributeBonuses;
+  item.grantDomains = grantDomains;
   item.generatedEquipment = generatedEquipment;
   item.conditionalVariables = conditionalVariables;
+  if (activeMechanics) item.activeMechanics = activeMechanics;
+  else delete item.activeMechanics;
 }
 
 // ---------------------------------------------------------------

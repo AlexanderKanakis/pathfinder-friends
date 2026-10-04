@@ -1,19 +1,24 @@
 (function () {
   const STYLE_ID = "pf-effect-tracker-style";
-  const CHOICE_POOL_MECHANIC_KEYS = [
-    "damageReduction",
-    "spellResistance",
-    "immunities",
-    "applyConditions",
-    "classSkillGrants",
-    "extraRanksPerLevel",
-    "sizeChanges",
-    "spellLikeAbilities",
-    "casterLevelBonuses",
-    "spellDcBonuses",
-    "generatedEquipment",
-    "conditionalVariables",
-  ];
+  const CHOICE_POOL_MECHANIC_KEYS =
+    window.PFEffectMechanics?.extraKeys?.() || [
+      "damageReduction",
+      "spellResistance",
+      "immunities",
+      "applyConditions",
+      "classSkillGrants",
+      "bonusRanks",
+      "extraRanksPerLevel",
+      "featGrants",
+      "sizeChanges",
+      "spellLikeAbilities",
+      "casterLevelBonuses",
+      "spellDcBonuses",
+      "effectiveAttributeBonuses",
+      "grantDomains",
+      "generatedEquipment",
+      "conditionalVariables",
+    ];
 
   function injectStyles() {
     if (document.getElementById(STYLE_ID)) return;
@@ -32,8 +37,6 @@
       .effect-tracker-card-ability:hover, .effect-tracker-card-ability:focus { border-color: #8fd19e; box-shadow: 0 0 0 2px rgba(143, 209, 158, .25); }
       .effect-tracker-ability-badge { display: inline-block; background: rgba(143, 209, 158, .16); border: 1px solid rgba(143, 209, 158, .4); color: #d9f5df; border-radius: 999px; padding: 1px 7px; font-size: 11px; margin-bottom: 4px; }
       .effect-tracker-icon { position: absolute; top: 10px; right: 10px; width: 28px; height: 28px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; background: #151515; border: 1px solid #555; color: #9ec5fe; }
-      .effect-card-admin-actions { position: absolute; top: 44px; right: 10px; display: grid; gap: 4px; }
-      .effect-card-admin-actions .btn { width: 28px; height: 28px; min-width: 0; display: inline-flex; align-items: center; justify-content: center; padding: 0; }
       .effect-tracker-controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 10px; }
       .effect-tracker-inline { display: inline-flex; align-items: center; gap: 4px; }
       .effect-tracker-inline input[type="number"] { width: 62px; }
@@ -59,7 +62,16 @@
       .shared-dr-row [data-scale-summary], .shared-sr-row [data-scale-summary], .shared-spell-adjustment-row [data-scale-summary] { grid-column: 1 / -1; }
       .shared-class-skill-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: end; background: #242424; border: 1px solid #444; border-radius: 8px; padding: 8px; }
       .shared-class-skill-row .shared-named-skill-field { grid-column: 1 / -1; }
-      .shared-extra-ranks-row { display: grid; grid-template-columns: minmax(120px, 180px) auto; gap: 8px; align-items: end; background: #242424; border: 1px solid #444; border-radius: 8px; padding: 8px; }
+      .shared-grant-domain-row { display: grid; grid-template-columns: minmax(180px, 1fr) minmax(150px, auto) auto; gap: 8px; align-items: end; background: #242424; border: 1px solid #444; border-radius: 8px; padding: 8px; }
+      .shared-grant-domain-choice { min-height: 31px; display: flex; align-items: center; gap: 8px; padding-left: 2.5em; }
+      .shared-grant-domain-choice .form-check-label { color: #fff; font-size: 12px; }
+      .shared-extra-ranks-row, .shared-size-change-row { display: grid; grid-template-columns: minmax(120px, 180px) auto; gap: 8px; align-items: end; background: #242424; border: 1px solid #444; border-radius: 8px; padding: 8px; }
+      .shared-special-toggle-row { display: grid; grid-template-columns: minmax(220px, 1fr) auto; gap: 8px; align-items: center; background: #242424; border: 1px solid #444; border-radius: 8px; padding: 8px; }
+      .shared-special-toggle-row .shared-special-toggle-check { align-items: center; display: flex; min-height: 31px; margin: 0; }
+      .shared-special-toggle-controls { align-items: center; display: inline-flex; gap: 8px; justify-self: end; }
+      .shared-special-toggle-condition { grid-column: 1 / -1; }
+      .shared-special-toggle-row button[data-special-toggle-condition-toggle] { align-items: center; display: inline-flex; height: 31px; justify-content: center; justify-self: start; padding: 0; width: 31px; }
+      .shared-extra-ranks-row button[aria-label="Delete extra ranks per level"], .shared-grant-domain-row button[aria-label="Delete domain grant"], .shared-size-change-row button[aria-label="Delete size change"], .shared-spell-adjustment-target-row button[aria-label="Delete spell target group"] { align-items: center; display: inline-flex; height: 31px; justify-content: center; justify-self: start; padding: 0; width: 31px; }
       .shared-apply-condition-row { display: grid; grid-template-columns: minmax(150px, 1fr) auto; gap: 8px; align-items: end; background: #242424; border: 1px solid #444; border-radius: 8px; padding: 8px; }
       .shared-conditional-variable-row { display: grid; grid-template-columns: minmax(150px, 0.8fr) minmax(180px, 1fr) auto; gap: 8px; align-items: end; background: #242424; border: 1px solid #444; border-radius: 8px; padding: 8px; }
       .shared-conditional-variable-row .small { grid-column: 1 / -1; }
@@ -67,7 +79,17 @@
       .shared-spell-like-picker { display: flex; align-items: center; justify-content: space-between; min-width: 0; min-height: 31px; gap: 8px; text-align: left; }
       .shared-spell-like-row .form-control, .shared-spell-like-row .form-select { min-width: 0; }
       .shared-spell-like-picker span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-      .shared-spell-adjustment-row { display: grid; grid-template-columns: minmax(120px, 0.8fr) minmax(180px, 1.4fr) minmax(110px, 0.7fr) minmax(74px, 0.4fr) minmax(104px, 0.65fr) auto auto auto minmax(170px, 1fr) auto; gap: 8px; align-items: end; background: #242424; border: 1px solid #444; border-radius: 8px; padding: 8px; }
+      .shared-spell-adjustment-row { background: #242424; border: 1px solid #444; border-radius: 8px; padding: 8px; }
+      .shared-spell-adjustment-source { max-width: 280px; }
+      .shared-effective-attribute-field { max-width: 120px; }
+      .shared-spell-adjustment-target-row, .shared-spell-adjustment-increase-row, .shared-spell-adjustment-condition { display: grid; gap: 8px; align-items: end; }
+      .shared-spell-adjustment-target-row { grid-template-columns: minmax(140px, 0.7fr) minmax(220px, 1fr) auto auto; }
+      .shared-spell-adjustment-increase-row { grid-template-columns: minmax(210px, 1.1fr) minmax(80px, 0.35fr) minmax(110px, 0.6fr) auto auto auto; }
+      .shared-spell-adjustment-nested { margin-top: 10px; }
+      .shared-spell-adjustment-nested > .vstack { margin-top: 6px; }
+      .shared-spell-adjustment-condition { grid-template-columns: auto minmax(220px, 1fr) auto; margin-top: 10px; }
+      .shared-spell-adjustment-checks { display: flex; flex-wrap: wrap; gap: 6px 10px; min-height: 31px; align-items: center; }
+      .shared-spell-adjustment-checks .form-check-label { color: #fff; font-size: 12px; }
       .shared-spell-adjustment-row .form-control, .shared-spell-adjustment-row .form-select { min-width: 0; }
       .shared-extra-accordion .accordion-item { background: transparent; border: 0; }
       .shared-extra-accordion .accordion-button { background: #242424; color: #ddd; padding: 8px 10px; font-size: 13px; }
@@ -77,7 +99,7 @@
       .shared-extra-subsection { margin-bottom: 14px; }
       .shared-extra-subsection:last-child { margin-bottom: 0; }
       @media (max-width: 700px) { .effect-duration-grid { grid-template-columns: 1fr 1fr; } }
-      @media (max-width: 700px) { .shared-bonus-row, .shared-bonus-condition-inline { grid-template-columns: 1fr 1fr; } .shared-bonus-condition-inline { grid-column: auto; } .shared-spell-adjustment-row { grid-template-columns: 1fr; } }
+      @media (max-width: 700px) { .shared-bonus-row, .shared-bonus-condition-inline { grid-template-columns: 1fr 1fr; } .shared-bonus-condition-inline { grid-column: auto; } .shared-spell-adjustment-target-row, .shared-spell-adjustment-increase-row, .shared-spell-adjustment-condition, .shared-grant-domain-row, .shared-special-toggle-row { grid-template-columns: 1fr; } .shared-special-toggle-controls { justify-self: start; } .shared-extra-ranks-row button[aria-label="Delete extra ranks per level"], .shared-grant-domain-row button[aria-label="Delete domain grant"], .shared-size-change-row button[aria-label="Delete size change"], .shared-spell-adjustment-target-row button[aria-label="Delete spell target group"] { width: 31px; } }
       @media (max-width: 700px) {
         .effect-search-modal-dialog { min-width: 0; }
         .effect-tracker-grid,
@@ -177,13 +199,6 @@
     ),
   };
   const DURATION_UNITS = ["variable", "turn", "round", "minute", "hour", "day"];
-  const EFFECT_CATEGORIES = [
-    "Spell",
-    "Special Ability",
-    "Feat",
-    "Debuff",
-    "Condition",
-  ];
   const ACTIVE_CATEGORY_PRIORITY = [
     "Spell",
     "Special Ability",
@@ -274,7 +289,9 @@
       return {
         count: config.count,
         unit: config.unit,
-        perLevel: config.factors.some((factor) => factor.type === "caster"),
+        perLevel:
+          config.factors.some((factor) => factor.type === "caster") ||
+          config.durationScale?.source?.type === "caster",
         config,
       };
     }
@@ -301,7 +318,8 @@
   function durationUsesCasterLevel(effect) {
     const config = durationParts(effect).config;
     return config
-      ? config.factors.some((factor) => factor.type === "caster")
+      ? config.factors.some((factor) => factor.type === "caster") ||
+        config.durationScale?.source?.type === "caster"
       : durationParts(effect).perLevel;
   }
 
@@ -443,7 +461,13 @@
     const scale = scaleText(bonus.bonusScale || bonus.scale);
     const requirement = window.PFEffectEditor?.attributeRequirementText?.(bonus);
     const statLabel = bonus.skillName || titleCaseStat(bonus.stat);
-    const text = `${fmt(value)} ${bonus.type || "untyped"} ${statLabel}${scale ? `; ${scale}` : ""}${requirement ? `; ${requirement}` : ""}`;
+    const weaponRestriction =
+      bonus.weaponTypeRestriction && bonus.weaponTypeRestriction !== "all"
+        ? `; ${window.PFEffectStats?.weaponTypeRestrictionLabel?.(bonus.weaponTypeRestriction) || bonus.weaponTypeRestriction} only`
+        : "";
+    const weaponNameRestriction = bonus.weaponNameRestriction && bonus.weaponNameRestriction !== "all"
+      ? `; ${bonus.weaponNameRestriction} only` : "";
+    const text = `${fmt(value)} ${bonus.type || "untyped"} ${statLabel}${weaponRestriction}${weaponNameRestriction}${scale ? `; ${scale}` : ""}${requirement ? `; ${requirement}` : ""}`;
     return bonus.appliesWhen ? `${text} (${bonus.appliesWhen})` : text;
   }
 
@@ -480,6 +504,12 @@
     return `Extra Ranks / Level ${value >= 0 ? "+" : ""}${value}`;
   }
 
+  function featGrantText(entry = {}) {
+    if (window.PFEffectEditor?.featGrantText)
+      return window.PFEffectEditor.featGrantText(entry);
+    return `Gain feat: ${entry.featName || entry.featId || entry.featType || entry.featPoolId || "Feat"}`;
+  }
+
   function casterLevelBonusText(entry = {}) {
     if (window.PFEffectEditor?.casterLevelBonusText)
       return window.PFEffectEditor.casterLevelBonusText(entry);
@@ -492,6 +522,19 @@
       return window.PFEffectEditor.spellDcBonusText(entry);
     const value = Number(entry.value ?? entry.amount ?? 0);
     return `Spell DC ${value >= 0 ? "+" : ""}${value}`;
+  }
+
+  function effectiveAttributeBonusText(entry = {}) {
+    if (window.PFEffectEditor?.effectiveAttributeBonusText)
+      return window.PFEffectEditor.effectiveAttributeBonusText(entry);
+    const value = Number(entry.value ?? entry.amount ?? 0);
+    return `Effective Attribute ${value >= 0 ? "+" : ""}${value}`;
+  }
+
+  function grantDomainText(entry = {}) {
+    if (window.PFEffectEditor?.grantDomainText)
+      return window.PFEffectEditor.grantDomainText(entry);
+    return `Grant Domain: ${entry.domainName || entry.domainId || "Domain"}`;
   }
 
   function immunityText(entry = {}) {
@@ -558,9 +601,14 @@
       ...(effect.immunities || []).map(immunityText),
       ...(effect.applyConditions || []).map(applyConditionText),
       ...(effect.extraRanksPerLevel || []).map(extraRanksPerLevelText),
+      ...(effect.featGrants || []).map(featGrantText),
       ...(effect.spellLikeAbilities || []).map(spellLikeText),
       ...(effect.casterLevelBonuses || []).map(casterLevelBonusText),
       ...(effect.spellDcBonuses || []).map(spellDcBonusText),
+      ...(effect.effectiveAttributeBonuses || []).map(
+        effectiveAttributeBonusText,
+      ),
+      ...(effect.grantDomains || []).map(grantDomainText),
       ...(effect.generatedEquipment || []).map(
         (item) => `${item.type || "equipment"} ${item.name || item.item || ""}`,
       ),
@@ -587,9 +635,6 @@
       this.active = [];
       this.prefix = `effectTracker${Math.random().toString(36).slice(2)}`;
       this.saveTimer = null;
-      this.isAdmin = false;
-      this.editingEffectId = null;
-      this.deletingEffectId = null;
       this.activeTypeFilter = "all";
     }
 
@@ -597,11 +642,10 @@
       injectStyles();
       this.container.innerHTML = `
         <div id="${this.prefix}AddShell" class="mb-3">
-          <label class="small" for="${this.prefix}OpenSearch">Add Effect</label>
+          <label class="small" for="${this.prefix}OpenSearch">Activate</label>
           <div class="d-flex gap-2">
-            <input id="${this.prefix}OpenSearch" class="form-control form-control-sm effect-tracker-search-trigger" placeholder="Search and add..." readonly>
-            <button id="${this.prefix}OpenButton" class="btn btn-outline-success btn-sm" type="button">Add</button>
-            <button id="${this.prefix}CreateButton" class="btn btn-outline-info btn-sm" type="button">Create</button>
+            <input id="${this.prefix}OpenSearch" class="form-control form-control-sm effect-tracker-search-trigger" placeholder="Search available abilities..." readonly>
+            <button id="${this.prefix}OpenButton" class="btn btn-outline-success btn-sm" type="button">Select</button>
           </div>
         </div>
         <div id="${this.prefix}RequestStatus" class="small-text mb-2 d-none"></div>
@@ -611,7 +655,7 @@
           <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable effect-search-modal-dialog">
             <div class="modal-content bg-dark text-white border-secondary">
               <div class="modal-header">
-                <h5 class="modal-title" id="${this.prefix}PickerLabel">Add Effect</h5>
+                <h5 class="modal-title" id="${this.prefix}PickerLabel">Activate Effect</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
               <div class="modal-body effect-search-modal-body">
@@ -624,140 +668,24 @@
             </div>
           </div>
         </div>
-        <div class="modal fade" id="${this.prefix}CustomModal" tabindex="-1" aria-labelledby="${this.prefix}CustomLabel" aria-hidden="true">
-          <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-            <div class="modal-content bg-dark text-white border-secondary">
-              <div class="modal-header">
-                <h5 class="modal-title" id="${this.prefix}CustomLabel">Create Effect</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div class="modal-body">
-                <div class="row g-2 mb-2">
-                  <div class="col-md-4">
-                    <label class="small" for="${this.prefix}CustomName">Name</label>
-                    <input id="${this.prefix}CustomName" class="form-control form-control-sm" placeholder="Effect name">
-                  </div>
-                  <div class="col-md-4">
-                    <label class="small" for="${this.prefix}CustomCategory">Type</label>
-                    <select id="${this.prefix}CustomCategory" class="form-select form-select-sm">
-                      ${EFFECT_CATEGORIES.map((category) => `<option value="${category}" ${category === "Spell" ? "selected" : ""}>${category}</option>`).join("")}
-                    </select>
-                  </div>
-                  <div class="col-md-4">
-                    <label class="small">Duration</label>
-                    <div class="d-flex gap-2 align-items-center">
-                      <button id="${this.prefix}EditDuration" class="btn btn-outline-light btn-sm" type="button">Edit Duration</button>
-                      <span id="${this.prefix}DurationSummary" class="small-text"></span>
-                    </div>
-                  </div>
-                </div>
-                <div class="accordion accordion-flush shared-extra-accordion mb-3" id="${this.prefix}EffectsAccordion"></div>
-                <div id="${this.prefix}CustomStatus" class="small-text mt-2"></div>
-              </div>
-              <div class="modal-footer">
-                <button id="${this.prefix}SaveCustom" class="btn btn-primary btn-sm" type="button">Save Effect</button>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="modal fade" id="${this.prefix}DeleteModal" tabindex="-1" aria-labelledby="${this.prefix}DeleteLabel" aria-hidden="true">
-          <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content bg-dark text-white border-secondary">
-              <div class="modal-header">
-                <h5 class="modal-title" id="${this.prefix}DeleteLabel">Delete Effect</h5>
-                <button type="button" class="btn-close btn-close-white d-none" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div class="modal-body">
-                <p class="mb-2">Delete <strong id="${this.prefix}DeleteName"></strong>?</p>
-                <div class="small-text">This removes the effect definition from the database. Active copies already applied to characters may remain until removed.</div>
-                <div id="${this.prefix}DeleteStatus" class="small-text mt-2"></div>
-              </div>
-              <div class="modal-footer">
-                <button class="btn btn-outline-light btn-sm" type="button" data-bs-dismiss="modal">Cancel</button>
-                <button id="${this.prefix}ConfirmDelete" class="btn btn-danger btn-sm" type="button"><i class="bi bi-trash"></i> Delete</button>
-              </div>
-            </div>
-          </div>
-        </div>
       `;
       this.addShellEl = document.getElementById(`${this.prefix}AddShell`);
       this.openSearchEl = document.getElementById(`${this.prefix}OpenSearch`);
       this.openButtonEl = document.getElementById(`${this.prefix}OpenButton`);
-      this.createButtonEl = document.getElementById(
-        `${this.prefix}CreateButton`,
-      );
       this.pickerModalEl = document.getElementById(`${this.prefix}PickerModal`);
-      this.customModalEl = document.getElementById(`${this.prefix}CustomModal`);
-      this.deleteModalEl = document.getElementById(`${this.prefix}DeleteModal`);
-      this.customNameEl = document.getElementById(`${this.prefix}CustomName`);
-      this.editDurationEl = document.getElementById(
-        `${this.prefix}EditDuration`,
-      );
-      this.durationSummaryEl = document.getElementById(
-        `${this.prefix}DurationSummary`,
-      );
-      this.customLabelEl = document.getElementById(`${this.prefix}CustomLabel`);
-      this.effectsAccordion = window.PFEffectEditor.mountEffectsAccordion(
-        document.getElementById(`${this.prefix}EffectsAccordion`),
-        {
-          idPrefix: `${this.prefix}Effects`,
-          skills: this.options.choicePoolSkills,
-          effectStats: this.options.effectStats,
-          titleCaseStat,
-          effectsKey: "bonuses",
-          // Debuff/Condition effects default new bonus rows to a
-          // stacking penalty -- but only while creating a brand-new
-          // effect, never overriding an existing one's saved values.
-          onEffectAdded: (row) => {
-            if (!this.editingEffectId) this.applyCustomDefaults(row);
-          },
-        },
-      );
-      this.customCategoryEl = document.getElementById(
-        `${this.prefix}CustomCategory`,
-      );
-      this.customStatusEl = document.getElementById(
-        `${this.prefix}CustomStatus`,
-      );
-      this.saveCustomEl = document.getElementById(`${this.prefix}SaveCustom`);
       this.searchEl = document.getElementById(`${this.prefix}Search`);
       this.resultsEl = document.getElementById(`${this.prefix}Results`);
       this.activeEl = document.getElementById(`${this.prefix}Active`);
-      this.deleteNameEl = document.getElementById(`${this.prefix}DeleteName`);
-      this.deleteStatusEl = document.getElementById(
-        `${this.prefix}DeleteStatus`,
-      );
-      this.durationEditor = window.PFEffectDurationEditor
-        ? new window.PFEffectDurationEditor(this.prefix)
-        : null;
-      [this.pickerModalEl, this.customModalEl, this.deleteModalEl].forEach(
-        (modal) => {
-          if (modal && modal.parentElement !== document.body)
-            document.body.appendChild(modal);
-        },
-      );
+      if (this.pickerModalEl.parentElement !== document.body)
+        document.body.appendChild(this.pickerModalEl);
       this.searchEl.addEventListener("input", () => this.renderResults());
       this.openSearchEl.addEventListener("click", () => this.openPicker());
       this.openButtonEl.addEventListener("click", () => this.openPicker());
-      this.createButtonEl.addEventListener("click", () => this.openCustom());
-      document
-        .getElementById(`${this.prefix}SaveCustom`)
-        .addEventListener("click", () => this.saveCustomEffect());
-      document
-        .getElementById(`${this.prefix}ConfirmDelete`)
-        .addEventListener("click", () => this.deleteEffect());
-      this.customCategoryEl.addEventListener("change", () =>
-        this.applyCustomDefaults(),
-      );
-      this.editDurationEl.addEventListener("click", () =>
-        this.openDurationEditor(),
-      );
       await this.refresh(this.options);
     }
 
     async refresh(options = this.options) {
       this.options = { ...this.options, ...options };
-      this.isAdmin = (await PFApp.isAppAdmin?.()) || false;
       if (!this.options.characterId) {
         this.effects = [];
         this.active = [];
@@ -766,14 +694,10 @@
         this.renderActive();
         return;
       }
-      // Abilities from the character's own build (activatable class
-      // features, with any linked pool choices already bundled in) are
-      // listed ahead of the general library, since they're what this
-      // character actually has rather than everything anyone's authored.
       const abilities = Array.isArray(this.options.activatableAbilities)
         ? this.options.activatableAbilities
         : [];
-      this.effects = [...abilities, ...(await this.loadLibraryEffects())];
+      this.effects = abilities;
       const saved = this.options.loadActiveEffects
         ? await this.options.loadActiveEffects()
         : await PFApp.loadBuffState(
@@ -787,236 +711,16 @@
     }
 
     updateSearchVisibility() {
-      const hasCharacter = Boolean(this.options.characterId);
-      this.addShellEl?.classList.toggle("d-none", !hasCharacter);
+      const hasActivations = Boolean(this.options.characterId && this.effects.length);
+      this.addShellEl?.classList.toggle("d-none", !hasActivations);
     }
 
-    async loadLibraryEffects() {
-      if (PFApp.loadEffectDefinitions) return PFApp.loadEffectDefinitions();
-      return PFApp.loadBuffDefinitions();
-    }
-
-    openCustom() {
-      if (!this.options.characterId) return;
-      this.editingEffectId = null;
-      this.customLabelEl.textContent = "Create Effect";
-      this.customNameEl.value = "";
-      this.customNameEl.disabled = false;
-      this.customCategoryEl.value = "Spell";
-      this.customCategoryEl.disabled = false;
-      this.setDurationFields(
-        { count: null, unit: "variable", factors: [] },
-        false,
-      );
-      this.effectsAccordion.reset({});
-      this.effectsAccordion.addEffect();
-      this.saveCustomEl.textContent = "Save Effect";
-      this.customStatus("");
-      bootstrap.Modal.getOrCreateInstance(this.customModalEl).show();
-    }
-
-    openBonusEditor(index) {
-      const effect = this.effects[index];
-      if (!this.isAdmin || !effect?.id || effect.builtIn) return;
-
-      this.editingEffectId = effect.id;
-      this.customLabelEl.textContent = `Edit Effect: ${effect.name}`;
-      this.customNameEl.value = effect.name || "";
-      this.customNameEl.disabled = false;
-      this.customCategoryEl.value = effect.category || "Spell";
-      this.customCategoryEl.disabled = false;
-      this.setDurationFields(
-        effect.durationConfig || durationParts(effect),
-        false,
-      );
-      this.effectsAccordion.reset(effect);
-      if (
-        !Array.isArray(effect.bonuses) ||
-        (!effect.bonuses.length &&
-          !effect.damageReduction?.length &&
-          !effect.spellResistance?.length &&
-          !effect.immunities?.length &&
-          !effect.applyConditions?.length &&
-          !effect.classSkillGrants?.length &&
-          !effect.extraRanksPerLevel?.length &&
-          !effect.sizeChanges?.length &&
-          !effect.spellLikeAbilities?.length &&
-          !effect.casterLevelBonuses?.length &&
-          !effect.spellDcBonuses?.length &&
-          !effect.generatedEquipment?.length)
-      )
-        this.effectsAccordion.addEffect();
-      this.saveCustomEl.textContent = "Save Effect";
-      this.customStatus("");
-
-      bootstrap.Modal.getOrCreateInstance(this.customModalEl).show();
-    }
-
-    setDurationFields(parts, disabled) {
-      this.durationConfig = window.PFEffectMeta?.normalizeDurationConfig
-        ? window.PFEffectMeta.normalizeDurationConfig(parts)
-        : {
-            count: parts?.count || null,
-            unit: parts?.unit || "variable",
-            factors: parts?.perLevel ? [{ type: "caster" }] : [],
-          };
-      if (this.durationSummaryEl)
-        this.durationSummaryEl.textContent = durationLabel({
-          durationConfig: this.durationConfig,
-        });
-      if (this.editDurationEl) this.editDurationEl.disabled = disabled;
-    }
-
-    openDurationEditor() {
-      if (!this.durationEditor) return;
-      this.durationEditor.open(this.durationConfig, (config) => {
-        this.setDurationFields(config, false);
-      });
-    }
-
-    // With no row given, re-applies to every existing Effects row (used
-    // when the category dropdown itself changes to Debuff/Condition).
-    // With a row given, applies to just that freshly-added one.
-    applyCustomDefaults(row) {
-      const category = this.customCategoryEl.value;
-      if (!["Debuff", "Condition"].includes(category)) return;
-      const rows = row
-        ? [row]
-        : [
-            ...(document
-              .getElementById(`${this.prefix}EffectsAccordion`)
-              ?.querySelectorAll(".shared-bonus-row") || []),
-          ];
-      rows.forEach((r) => {
-        const type = r.querySelector('[data-effect-field="type"]');
-        const stacks = r.querySelector('[data-effect-field="stacks"]');
-        if (type && type.value === "untyped") type.value = "penalty";
-        if (stacks) stacks.checked = true;
-      });
-    }
-
-    collectCustomEffect() {
-      const durationConfig = window.PFEffectMeta?.normalizeDurationConfig
-        ? window.PFEffectMeta.normalizeDurationConfig(this.durationConfig)
-        : this.durationConfig || { count: null, unit: "variable", factors: [] };
-      const durationUnit = durationConfig.unit || "variable";
-      const durationCount = durationConfig.count || null;
-      const durationPerLevel =
-        durationConfig.factors?.some((factor) => factor.type === "caster") ||
-        false;
-      const duration = durationLabel({
-        durationCount,
-        durationUnit,
-        durationPerLevel,
-      });
-      return {
-        name: this.customNameEl.value.trim(),
-        category: this.customCategoryEl.value || "Spell",
-        duration,
-        durationCount,
-        durationUnit,
-        durationPerLevel,
-        durationConfig,
-        contextKey: this.options.contextKey,
-        ...this.effectsAccordion.collect(),
-      };
-    }
-
-    customStatus(message, type = "muted") {
-      if (!this.customStatusEl) return;
-      this.customStatusEl.className = `small mt-2 text-${type}`;
-      this.customStatusEl.textContent = message;
-    }
-
-    async saveCustomEffect() {
-      const effect = this.collectCustomEffect();
-      if (this.editingEffectId && !this.isAdmin) {
-        this.customStatus("Only admins can edit bonuses.", "danger");
-        return;
-      }
-      if (!effect.name) {
-        this.customStatus("Name is required.", "warning");
-        return;
-      }
-      if (
-        !effect.bonuses.length &&
-        !effect.damageReduction?.length &&
-        !effect.spellResistance?.length &&
-        !effect.immunities?.length &&
-        !effect.applyConditions?.length &&
-        !effect.classSkillGrants?.length &&
-        !effect.extraRanksPerLevel?.length &&
-        !effect.sizeChanges?.length &&
-        !effect.spellLikeAbilities?.length &&
-        !effect.casterLevelBonuses?.length &&
-        !effect.spellDcBonuses?.length &&
-        !effect.generatedEquipment?.length
-      ) {
-        this.customStatus("Add at least one effect or extra.", "warning");
-        return;
-      }
-
-      const saved = this.editingEffectId
-        ? await PFApp.updateBuffDefinition?.(this.editingEffectId, effect)
-        : await PFApp.saveBuffDefinition(effect);
-      if (!saved) {
-        this.customStatus(
-          this.editingEffectId
-            ? "Could not update effect."
-            : "Could not save effect.",
-          "danger",
-        );
-        return;
-      }
-      const abilities = Array.isArray(this.options.activatableAbilities)
-        ? this.options.activatableAbilities
-        : [];
-      this.effects = [...abilities, ...(await this.loadLibraryEffects())];
-      this.renderResults();
-      this.customStatus("Effect saved.", "success");
-      bootstrap.Modal.getInstance(this.customModalEl)?.hide();
-      this.editingEffectId = null;
-    }
-
-    openDeleteModal(index) {
-      const effect = this.effects[index];
-      if (!this.isAdmin || !effect?.id || effect.builtIn) return;
-      this.deletingEffectId = effect.id;
-      this.deleteNameEl.textContent = effect.name || "this effect";
-      this.deleteStatus("");
-      bootstrap.Modal.getOrCreateInstance(this.deleteModalEl).show();
-    }
-
-    deleteStatus(message, type = "muted") {
-      if (!this.deleteStatusEl) return;
-      this.deleteStatusEl.className = `small mt-2 text-${type}`;
-      this.deleteStatusEl.textContent = message;
-    }
-
-    async deleteEffect() {
-      if (!this.isAdmin || !this.deletingEffectId) return;
-      const result = await PFApp.deleteBuffDefinition?.(this.deletingEffectId);
-      if (result !== true && !result?.ok) {
-        const message =
-          result?.error?.message ||
-          result?.error?.details ||
-          result?.error?.hint ||
-          JSON.stringify(result?.error || {});
-        this.deleteStatus(
-          message && message !== "{}"
-            ? message
-            : "Could not delete effect. Refresh the page and try again.",
-          "danger",
-        );
-        return;
-      }
-      const abilities = Array.isArray(this.options.activatableAbilities)
-        ? this.options.activatableAbilities
-        : [];
-      this.effects = [...abilities, ...(await this.loadLibraryEffects())];
-      this.renderResults();
-      this.deletingEffectId = null;
-      bootstrap.Modal.getInstance(this.deleteModalEl)?.hide();
+    showStatus(message, type = "muted") {
+      const status = document.getElementById(`${this.prefix}RequestStatus`);
+      if (!status) return;
+      status.className = `small mb-2 text-${type}`;
+      status.textContent = message;
+      status.classList.toggle("d-none", !message);
     }
 
     openPicker() {
@@ -1067,10 +771,18 @@
             ...(effect.classSkillGrants || []).map((grant) =>
               window.PFEffectEditor.classSkillGrantText(grant, titleCaseStat),
             ),
+            ...(effect.bonusRanks || []).map((entry) =>
+              window.PFEffectEditor.bonusRanksText(entry),
+            ),
             ...(effect.extraRanksPerLevel || []).map(extraRanksPerLevelText),
+            ...(effect.featGrants || []).map(featGrantText),
             ...(effect.spellLikeAbilities || []).map(spellLikeText),
             ...(effect.casterLevelBonuses || []).map(casterLevelBonusText),
             ...(effect.spellDcBonuses || []).map(spellDcBonusText),
+            ...(effect.effectiveAttributeBonuses || []).map(
+              effectiveAttributeBonusText,
+            ),
+            ...(effect.grantDomains || []).map(grantDomainText),
             ...(effect.generatedEquipment || []).map(
               (item) =>
                 `Generates ${item.type || "equipment"}: ${
@@ -1109,16 +821,6 @@
             <div class="small-text mb-2">${escapeHtml(effect.category || "Effect")} | ${escapeHtml(durationLabel(effect))}</div>
             ${abilitySource}
             <div>${bonusHtml}${more}</div>
-            ${
-              this.isAdmin && !effect.fromAbility && !effect.builtIn
-                ? `
-              <div class="effect-card-admin-actions">
-                <button class="btn btn-outline-warning btn-sm" type="button" data-edit-bonuses="${index}" aria-label="Edit effect" title="Edit effect"><i class="bi bi-pencil-square"></i></button>
-                <button class="btn btn-outline-danger btn-sm" type="button" data-delete-effect="${index}" aria-label="Delete effect" title="Delete effect"><i class="bi bi-trash"></i></button>
-              </div>
-            `
-                : ""
-            }
             ${this.controls(effect, index)}
           </article>
         `;
@@ -1128,18 +830,14 @@
       this.resultsEl.querySelectorAll("[data-effect-index]").forEach((card) => {
         card.addEventListener("click", (event) => {
           if (
-            event.target.closest(
-              ".effect-tracker-controls, .effect-card-admin-actions",
-            )
+            event.target.closest(".effect-tracker-controls")
           )
             return;
           this.addEffect(Number(card.dataset.effectIndex));
         });
         card.addEventListener("keydown", (event) => {
           if (
-            event.target.closest(
-              ".effect-tracker-controls, .effect-card-admin-actions",
-            )
+            event.target.closest(".effect-tracker-controls")
           )
             return;
           if (event.key !== "Enter" && event.key !== " ") return;
@@ -1147,22 +845,6 @@
           this.addEffect(Number(card.dataset.effectIndex));
         });
       });
-      this.resultsEl
-        .querySelectorAll("[data-edit-bonuses]")
-        .forEach((button) => {
-          button.addEventListener("click", (event) => {
-            event.stopPropagation();
-            this.openBonusEditor(Number(button.dataset.editBonuses));
-          });
-        });
-      this.resultsEl
-        .querySelectorAll("[data-delete-effect]")
-        .forEach((button) => {
-          button.addEventListener("click", (event) => {
-            event.stopPropagation();
-            this.openDeleteModal(Number(button.dataset.deleteEffect));
-          });
-        });
     }
 
     controls(effect, index) {
@@ -1337,7 +1019,7 @@
         return list;
       const options = this.favoredEnemyOptions();
       if (!options.length) {
-        this.customStatus(
+        this.showStatus(
           "Choose this character's favored enemy first, then apply this favored-enemy-scaled effect.",
           "warning",
         );
@@ -1533,6 +1215,36 @@
       return resolved;
     }
 
+    spellAdjustmentEntriesNeedChoice(entries = []) {
+      return (Array.isArray(entries) ? entries : []).some((entry) =>
+        window.PFEffectEditor?.spellAdjustmentEntryNeedsChoice?.(entry),
+      );
+    }
+
+    async resolveSpellAdjustmentChoices(entries = [], effect = {}) {
+      const list = Array.isArray(entries) ? entries : [];
+      if (!this.spellAdjustmentEntriesNeedChoice(list)) return list;
+      if (!window.PFEffectEditor?.resolveSpellAdjustmentChoices) return null;
+      return window.PFEffectEditor.resolveSpellAdjustmentChoices(list, {
+        title: effect.name || "Effect",
+      });
+    }
+
+    grantDomainEntriesNeedChoice(entries = []) {
+      return (Array.isArray(entries) ? entries : []).some((entry) =>
+        window.PFEffectEditor?.grantDomainEntryNeedsChoice?.(entry),
+      );
+    }
+
+    async resolveGrantDomainChoices(entries = [], effect = {}) {
+      const list = Array.isArray(entries) ? entries : [];
+      if (!this.grantDomainEntriesNeedChoice(list)) return list;
+      if (!window.PFEffectEditor?.resolveGrantDomainChoices) return null;
+      return window.PFEffectEditor.resolveGrantDomainChoices(list, {
+        title: effect.name || "Effect",
+      });
+    }
+
     choicePools(effect = {}) {
       return Array.isArray(effect.choicePools)
         ? effect.choicePools
@@ -1579,17 +1291,48 @@
         effect,
       );
       if (resolvedClassSkillGrants === null) return null;
+      const resolvedBonusRanks = await this.resolveChoiceStats(
+        option.bonusRanks,
+        effect,
+      );
+      if (resolvedBonusRanks === null) return null;
       const resolvedSpellLikeAbilities =
         await this.resolveSpellLikeAbilityChoices(
           option.spellLikeAbilities,
           effect,
         );
       if (resolvedSpellLikeAbilities === null) return null;
+      const resolvedCasterLevelBonuses = await this.resolveSpellAdjustmentChoices(
+        option.casterLevelBonuses,
+        effect,
+      );
+      if (resolvedCasterLevelBonuses === null) return null;
+      const resolvedSpellDcBonuses = await this.resolveSpellAdjustmentChoices(
+        option.spellDcBonuses,
+        effect,
+      );
+      if (resolvedSpellDcBonuses === null) return null;
+      const resolvedEffectiveAttributeBonuses =
+        await this.resolveSpellAdjustmentChoices(
+          option.effectiveAttributeBonuses,
+          effect,
+        );
+      if (resolvedEffectiveAttributeBonuses === null) return null;
+      const resolvedGrantDomains = await this.resolveGrantDomainChoices(
+        option.grantDomains,
+        effect,
+      );
+      if (resolvedGrantDomains === null) return null;
       return {
         ...option,
         effects: resolvedEffects,
         classSkillGrants: resolvedClassSkillGrants,
+        bonusRanks: resolvedBonusRanks,
         spellLikeAbilities: resolvedSpellLikeAbilities,
+        casterLevelBonuses: resolvedCasterLevelBonuses,
+        spellDcBonuses: resolvedSpellDcBonuses,
+        effectiveAttributeBonuses: resolvedEffectiveAttributeBonuses,
+        grantDomains: resolvedGrantDomains,
       };
     }
 
@@ -1633,8 +1376,11 @@
           (Array.isArray(effect.immunities) && effect.immunities.length) ||
           (Array.isArray(effect.classSkillGrants) &&
             effect.classSkillGrants.length) ||
+          (Array.isArray(effect.bonusRanks) && effect.bonusRanks.length) ||
           (Array.isArray(effect.extraRanksPerLevel) &&
             effect.extraRanksPerLevel.length) ||
+          (Array.isArray(effect.featGrants) &&
+            effect.featGrants.length) ||
           (Array.isArray(effect.sizeChanges) && effect.sizeChanges.length) ||
           (Array.isArray(effect.spellLikeAbilities) &&
             effect.spellLikeAbilities.length) ||
@@ -1642,6 +1388,10 @@
             effect.casterLevelBonuses.length) ||
           (Array.isArray(effect.spellDcBonuses) &&
             effect.spellDcBonuses.length) ||
+          (Array.isArray(effect.effectiveAttributeBonuses) &&
+            effect.effectiveAttributeBonuses.length) ||
+          (Array.isArray(effect.grantDomains) &&
+            effect.grantDomains.length) ||
           (Array.isArray(effect.generatedEquipment) &&
             effect.generatedEquipment.length) ||
           this.conditionalVariables(effect).length ||
@@ -1801,12 +1551,19 @@
       const needsChoice = [
         ...(finalizedEffect.bonuses || []),
         ...(finalizedEffect.classSkillGrants || []),
+        ...(finalizedEffect.bonusRanks || []),
       ].some((item) => window.PFEffectStats?.isChoiceStat(item.stat)) ||
         this.conditionalVariables(finalizedEffect).length > 0 ||
         this.effectNeedsFavoredEnemyScaleChoice(finalizedEffect) ||
         (finalizedEffect.spellLikeAbilities || []).some((entry) =>
           this.spellLikeChoiceList(entry),
         ) ||
+        this.spellAdjustmentEntriesNeedChoice(finalizedEffect.casterLevelBonuses) ||
+        this.spellAdjustmentEntriesNeedChoice(finalizedEffect.spellDcBonuses) ||
+        this.spellAdjustmentEntriesNeedChoice(
+          finalizedEffect.effectiveAttributeBonuses,
+        ) ||
+        this.grantDomainEntriesNeedChoice(finalizedEffect.grantDomains) ||
         this.choicePools(finalizedEffect).length > 0;
       if (needsChoice && this.options.isOwnCharacter === false) {
         await this.requestEffectChoice(finalizedEffect);
@@ -1828,12 +1585,38 @@
         finalizedEffect,
       );
       if (resolvedClassSkillGrants === null) return;
+      const resolvedBonusRanks = await this.resolveChoiceStats(
+        finalizedEffect.bonusRanks,
+        finalizedEffect,
+      );
+      if (resolvedBonusRanks === null) return;
       const resolvedSpellLikeAbilities =
         await this.resolveSpellLikeAbilityChoices(
           finalizedEffect.spellLikeAbilities,
           finalizedEffect,
         );
       if (resolvedSpellLikeAbilities === null) return;
+      const resolvedCasterLevelBonuses = await this.resolveSpellAdjustmentChoices(
+        finalizedEffect.casterLevelBonuses,
+        finalizedEffect,
+      );
+      if (resolvedCasterLevelBonuses === null) return;
+      const resolvedSpellDcBonuses = await this.resolveSpellAdjustmentChoices(
+        finalizedEffect.spellDcBonuses,
+        finalizedEffect,
+      );
+      if (resolvedSpellDcBonuses === null) return;
+      const resolvedEffectiveAttributeBonuses =
+        await this.resolveSpellAdjustmentChoices(
+          finalizedEffect.effectiveAttributeBonuses,
+          finalizedEffect,
+        );
+      if (resolvedEffectiveAttributeBonuses === null) return;
+      const resolvedGrantDomains = await this.resolveGrantDomainChoices(
+        finalizedEffect.grantDomains,
+        finalizedEffect,
+      );
+      if (resolvedGrantDomains === null) return;
       const resolvedChoicePools = await this.resolveChoicePools(finalizedEffect);
       if (resolvedChoicePools === null) return;
       const { choicePools, pools, poolChoices, ...choiceResolvedEffect } =
@@ -1844,8 +1627,21 @@
         ...(resolvedClassSkillGrants.length
           ? { classSkillGrants: resolvedClassSkillGrants }
           : {}),
+        ...(resolvedBonusRanks.length ? { bonusRanks: resolvedBonusRanks } : {}),
         ...(resolvedSpellLikeAbilities.length
           ? { spellLikeAbilities: resolvedSpellLikeAbilities }
+          : {}),
+        ...(resolvedCasterLevelBonuses.length
+          ? { casterLevelBonuses: resolvedCasterLevelBonuses }
+          : {}),
+        ...(resolvedSpellDcBonuses.length
+          ? { spellDcBonuses: resolvedSpellDcBonuses }
+          : {}),
+        ...(resolvedEffectiveAttributeBonuses.length
+          ? { effectiveAttributeBonuses: resolvedEffectiveAttributeBonuses }
+          : {}),
+        ...(resolvedGrantDomains.length
+          ? { grantDomains: resolvedGrantDomains }
           : {}),
       };
       this.appendChoicePoolMechanics(
@@ -2079,10 +1875,18 @@
           ...(effect.classSkillGrants || []).map((grant) =>
             window.PFEffectEditor.classSkillGrantText(grant, titleCaseStat),
           ),
+          ...(effect.bonusRanks || []).map((entry) =>
+            window.PFEffectEditor.bonusRanksText(entry),
+          ),
           ...(effect.extraRanksPerLevel || []).map(extraRanksPerLevelText),
+          ...(effect.featGrants || []).map(featGrantText),
           ...(effect.spellLikeAbilities || []).map(spellLikeText),
           ...(effect.casterLevelBonuses || []).map(casterLevelBonusText),
           ...(effect.spellDcBonuses || []).map(spellDcBonusText),
+          ...(effect.effectiveAttributeBonuses || []).map(
+            effectiveAttributeBonusText,
+          ),
+          ...(effect.grantDomains || []).map(grantDomainText),
           ...(effect.generatedEquipment || []).map(
             (item) =>
               `Generates ${item.type || "equipment"}: ${

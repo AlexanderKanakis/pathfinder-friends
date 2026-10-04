@@ -1,16 +1,23 @@
 (function () {
   const DATA_PATH = "data/feats.json";
-  const MECHANIC_KEYS = [
+  const MECHANIC_KEYS = window.PFEffectMechanics?.mechanicKeys?.() || [
     "effects",
     "damageReduction",
     "spellResistance",
     "immunities",
     "applyConditions",
     "classSkillGrants",
+    "bonusRanks",
     "extraRanksPerLevel",
+    "featGrants",
     "sizeChanges",
     "spellLikeAbilities",
+    "casterLevelBonuses",
+    "spellDcBonuses",
+    "effectiveAttributeBonuses",
+    "grantDomains",
     "generatedEquipment",
+    "conditionalVariables",
   ];
 
   let featDataCache = null;

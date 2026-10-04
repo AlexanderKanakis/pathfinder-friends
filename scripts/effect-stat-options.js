@@ -59,6 +59,81 @@
     "Thrown",
   ].map((label) => ({ value: slugify(label), label }));
 
+  const WEAPON_RESTRICTION_OPTIONS = [
+    { value: "all", label: "All" },
+    { value: "melee-light", label: "Melee Weapon (Light)" },
+    { value: "melee-one-handed", label: "Melee Weapon (One-Handed)" },
+    { value: "melee-two-handed", label: "Melee Weapon (Two-Handed)" },
+    { value: "ranged", label: "Ranged Weapon" },
+    { value: "firearm-one-handed", label: "Firearm (One-Handed)" },
+    { value: "firearm-two-handed", label: "Firearm (Two-Handed)" },
+    { value: "natural", label: "Natural Weapon" },
+    { value: "improvised", label: "Improvised" },
+    { value: "unarmed-strike", label: "Unarmed Strike" },
+  ];
+  const NATURAL_WEAPON_NAME_OPTIONS = [
+    "Bite", "Claw", "Gore", "Hoof", "Pincers", "Slam", "Sting",
+    "Tail Slap", "Talons", "Tentacle", "Unarmed Strike", "Wing",
+  ];
+
+  function normalizeWeaponTypeRestriction(value = "all") {
+    const key = slugify(value || "all");
+    const aliases = {
+      all: "all",
+      "melee-weapon-light": "melee-light",
+      "melee-weapon-one-handed": "melee-one-handed",
+      "melee-weapon-two-handed": "melee-two-handed",
+      "ranged-weapon": "ranged",
+      "firearm-one-handed": "firearm-one-handed",
+      "firearm-two-handed": "firearm-two-handed",
+      natural: "natural",
+      "natural-weapon": "natural",
+    };
+    return aliases[key] || key;
+  }
+
+  function weaponTypeRestrictionMatches(
+    restriction = "all",
+    weaponType = "",
+    weaponName = "",
+  ) {
+    const normalizedRestriction = normalizeWeaponTypeRestriction(restriction);
+    if (normalizedRestriction === "unarmed-strike") {
+      return slugify(weaponName) === "unarmed-strike";
+    }
+    return (
+      normalizedRestriction === "all" ||
+      normalizedRestriction === normalizeWeaponTypeRestriction(weaponType)
+    );
+  }
+
+  function weaponNameRestrictionMatches(restriction = "all", weaponName = "") {
+    const target = slugify(restriction || "all");
+    if (target === "all") return true;
+    let name = slugify(weaponName);
+    name = name.replace(/^\d+-/, "").replace(/-attacks?$/, "");
+    const aliases = target === "hoof" ? ["hoof", "hooves"]
+      : target === "pincers" ? ["pincers", "pincer"]
+      : target === "talons" ? ["talons", "talon"]
+      : [target, `${target}s`];
+    return aliases.some((alias) => name === alias || name.endsWith(`-${alias}`));
+  }
+
+  function weaponTypeRestrictionLabel(value = "all") {
+    const normalized = normalizeWeaponTypeRestriction(value);
+    return (
+      WEAPON_RESTRICTION_OPTIONS.find(
+        (option) => option.value === normalized,
+      )?.label || unslugify(normalized)
+    );
+  }
+
+  function isAttackOrDamageStat(stat = "") {
+    return /^(?:(?:melee|ranged) )?(?:attack|damage)$/i.test(
+      String(stat || "").trim(),
+    );
+  }
+
   const SPELL_SCHOOL_OPTIONS = [
     "Abjuration",
     "Conjuration",
@@ -167,6 +242,7 @@
   const CUSTOM_SKILL_LIST_STORAGE_KEY = "pf_effect_custom_skill_lists_v1";
   const CUSTOM_SLA_SPELL_LIST_STORAGE_KEY =
     "pf_effect_custom_sla_spell_lists_v1";
+  const CUSTOM_FEAT_LIST_STORAGE_KEY = "pf_effect_custom_feat_lists_v1";
   const CREATE_SKILL_LIST_STAT_VALUE = "__create-custom-skill-list-stat__";
   const CREATE_SKILL_LIST_CHOICE_VALUE = "__create-custom-skill-list-choice__";
 
@@ -206,6 +282,12 @@
       label: "Craft, Perform, or Profession Skills",
       namePrefixes: ["Craft", "Perform", "Profession"],
       namedSkillKinds: ["skill:craft", "skill:perform", "skill:profession"],
+    },
+    {
+      id: "skills-craft-profession",
+      label: "Craft or Profession Skills",
+      namePrefixes: ["Craft", "Profession"],
+      namedSkillKinds: ["skill:craft", "skill:profession"],
     },
     { id: "skills-wis", label: "Wisdom Skills", ability: "wis" },
     { id: "skills-cha", label: "Charisma Skills", ability: "cha" },
@@ -360,6 +442,7 @@
   }
 
   function normalizeCustomSkillList(raw = {}) {
+    if (!raw || typeof raw !== "object") return null;
     const name = String(raw.name || raw.label || "").trim();
     const skills = (Array.isArray(raw.skills) ? raw.skills : [])
       .map((skill) => String(skill || "").trim())
@@ -521,6 +604,85 @@
 
   function customSpellLikeListById(id) {
     return customSpellLikeLists().find((list) => list.id === id) || null;
+  }
+
+  function normalizeFeatListItem(raw = {}) {
+    const source =
+      raw && typeof raw === "object"
+        ? raw
+        : { featId: String(raw || ""), label: String(raw || "") };
+    const featId = String(
+      source.featId || source.id || source.slug || source.value || "",
+    ).trim();
+    const name = String(source.name || source.label || featId).trim();
+    if (!featId && !name) return null;
+    return {
+      featId: featId || name,
+      label: name || featId,
+      ...(source.type ? { type: source.type } : {}),
+    };
+  }
+
+  function normalizeFeatList(raw = {}) {
+    const name = String(raw.name || raw.label || "").trim();
+    const rawItems = Array.isArray(raw.items)
+      ? raw.items
+      : Array.isArray(raw.feats)
+        ? raw.feats
+        : Array.isArray(raw.entries)
+          ? raw.entries
+          : [];
+    const items = rawItems.map(normalizeFeatListItem).filter(Boolean);
+    if (!name || !items.length) return null;
+    const id =
+      String(raw.id || "")
+        .toLowerCase()
+        .replace(/[^a-z0-9-]+/g, "-")
+        .replace(/^-+|-+$/g, "") ||
+      `${slugify(name)}-${Date.now().toString(36)}`;
+    return { id, name, items };
+  }
+
+  function loadCustomFeatLists() {
+    try {
+      const parsed = JSON.parse(
+        localStorage.getItem(CUSTOM_FEAT_LIST_STORAGE_KEY) || "[]",
+      );
+      return (Array.isArray(parsed) ? parsed : [])
+        .map(normalizeFeatList)
+        .filter(Boolean);
+    } catch {
+      return [];
+    }
+  }
+
+  function saveCustomFeatLists(lists = []) {
+    const normalized = lists.map(normalizeFeatList).filter(Boolean);
+    localStorage.setItem(
+      CUSTOM_FEAT_LIST_STORAGE_KEY,
+      JSON.stringify(normalized),
+    );
+    window.dispatchEvent(new CustomEvent("pf-custom-feat-lists-updated"));
+    return normalized;
+  }
+
+  function customFeatLists() {
+    return loadCustomFeatLists();
+  }
+
+  function saveCustomFeatList(list = {}) {
+    const normalized = normalizeFeatList(list);
+    if (!normalized) return null;
+    const lists = customFeatLists();
+    const existingIndex = lists.findIndex((item) => item.id === normalized.id);
+    if (existingIndex >= 0) lists[existingIndex] = normalized;
+    else lists.push(normalized);
+    saveCustomFeatLists(lists);
+    return normalized;
+  }
+
+  function customFeatListById(id) {
+    return customFeatLists().find((list) => list.id === id) || null;
   }
 
   function customPoolFromList(list = {}) {
@@ -850,6 +1012,8 @@
     CONDITIONAL_VARIABLE_POOLS,
     PF_SKILLS_WITH_ABILITY,
     ENERGY_RESISTANCE_STAT_OPTIONS,
+    WEAPON_RESTRICTION_OPTIONS,
+    NATURAL_WEAPON_NAME_OPTIONS,
     CREATE_SKILL_LIST_STAT_VALUE,
     CREATE_SKILL_LIST_CHOICE_VALUE,
     poolById,
@@ -872,6 +1036,11 @@
     saveCustomSpellLikeLists,
     customSpellLikeListById,
     normalizeSpellLikeList,
+    customFeatLists,
+    saveCustomFeatList,
+    saveCustomFeatLists,
+    customFeatListById,
+    normalizeFeatList,
     skillListStatValue,
     skillListIdFromStat,
     skillListForStat,
@@ -883,5 +1052,10 @@
     skillTrainingStatus,
     slugify,
     unslugify,
+    normalizeWeaponTypeRestriction,
+    weaponTypeRestrictionMatches,
+    weaponNameRestrictionMatches,
+    weaponTypeRestrictionLabel,
+    isAttackOrDamageStat,
   };
 })();

@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>PathFriends Race Editor</title>
+    <title>PathFriends Spell Editor</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       http-equiv="Cache-Control"
@@ -18,9 +18,12 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
       rel="stylesheet"
     />
-    <link href="css/race-editor.css?v=trait-requirements-1" rel="stylesheet" />
+    <link href="css/spell-editor.css?v=2" rel="stylesheet" />
     <link href="css/effect-editor.css?v=bonus-ranks-1" rel="stylesheet" />
-    <link href="modals/generated-equipment-picker.css?v=effect-labels-white-1" rel="stylesheet" />
+    <link
+      href="modals/generated-equipment-picker.css?v=effect-labels-white-1"
+      rel="stylesheet"
+    />
     <link href="modals/magic-search.css" rel="stylesheet" />
     <link href="modals/custom-skill-list.css?v=custom-target-lists-1" rel="stylesheet" />
   </head>
@@ -32,9 +35,10 @@
         class="d-flex justify-content-between align-items-start gap-2 flex-wrap mb-3"
       >
         <div>
-          <h3 class="mb-0">PathFriends Race Editor</h3>
+          <h3 class="mb-0">PathFriends Spell Editor</h3>
           <div class="small-text">
-            Local static-data editor for <code>data/races.json</code>.
+            Local static-data editor for <code>data/spells.json</code>.
+            Add and correct spell effects here.
           </div>
         </div>
         <div class="d-flex gap-2 flex-wrap justify-content-end">
@@ -46,36 +50,44 @@
             <i class="bi bi-folder2-open"></i> Open Project Folder
           </button>
           <button
-            id="exportSelectedRaceBtn"
+            id="exportSelectedSpellBtn"
             class="btn btn-outline-light btn-sm"
             type="button"
           >
-            <i class="bi bi-filetype-json"></i> Export Selected Race
+            <i class="bi bi-filetype-json"></i> Export Selected Spell
           </button>
-          <button id="saveRacesFileBtn" class="btn btn-primary btn-sm" type="button">
+          <button id="saveSpellsFileBtn" class="btn btn-primary btn-sm" type="button">
             <i class="bi bi-save"></i> Save to Project
           </button>
         </div>
       </div>
 
-      <div id="raceEditorStatus" class="alert d-none py-2"></div>
+      <div id="spellEditorStatus" class="alert d-none py-2"></div>
 
       <div class="editor-shell">
         <aside class="panel">
-          <label for="raceSearch">Search Races</label>
+          <label for="spellSearch">Search Spells</label>
           <input
-            id="raceSearch"
+            id="spellSearch"
             class="form-control form-control-sm mb-2"
-            placeholder="Race name"
+            placeholder="Spell name, descriptor, class, text"
           />
-          <label for="raceGroupFilter">Group</label>
-          <select id="raceGroupFilter" class="form-select form-select-sm mb-2"></select>
-          <div id="raceCount" class="small-text mb-2"></div>
-          <div id="raceList" class="race-list"></div>
+          <div class="spell-filter-grid mb-2">
+            <div>
+              <label for="spellSchoolFilter">School</label>
+              <select id="spellSchoolFilter" class="form-select form-select-sm"></select>
+            </div>
+            <div>
+              <label for="spellLevelFilter">Level</label>
+              <select id="spellLevelFilter" class="form-select form-select-sm"></select>
+            </div>
+          </div>
+          <div id="spellCount" class="small-text mb-2"></div>
+          <div id="spellList" class="spell-list"></div>
         </aside>
 
-        <section id="raceEditorPanel" class="panel">
-          <div class="small-text">Choose a race to edit.</div>
+        <section id="spellEditorPanel" class="panel">
+          <div class="small-text">Choose a spell to edit.</div>
         </section>
       </div>
     </main>
@@ -85,7 +97,6 @@
     <script src="scripts/supabase-config.js"></script>
     <script src="scripts/app-supabase.js?v=bonus-ranks-1"></script>
     <script src="scripts/effect-mechanics.js?v=bonus-ranks-1"></script>
-    <script src="scripts/race-data.js?v=active-passive-overrides-1"></script>
     <script src="modals/effect-duration-editor.js?v=duration-editor-reuse-1"></script>
     <script src="scripts/effect-stat-options.js?v=improvised-1"></script>
     <script src="modals/effect-choice-picker.js?v=named-skill-choice-1"></script>
@@ -95,6 +106,6 @@
     <script src="scripts/effect-editor.js?v=improvised-1"></script>
     <script src="modals/generated-equipment-picker.js?v=effect-labels-white-1"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="scripts/pages/race-editor.js?v=bonus-ranks-1"></script>
+    <script src="scripts/pages/spell-editor.js?v=bonus-ranks-1"></script>
   </body>
 </html>

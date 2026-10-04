@@ -87,10 +87,9 @@
   }
 
   function targetOptions(options = {}) {
-    const hasProvidedOptions = Object.prototype.hasOwnProperty.call(
-      options,
-      "options",
-    );
+    // Shared skill-only callers may pass `options: undefined`. Only an actual
+    // array means the caller is replacing the normal skill catalog.
+    const hasProvidedOptions = Array.isArray(options.options);
     const provided = Array.isArray(options.options)
       ? options.options.map(normalizeOption).filter(Boolean)
       : [];

@@ -2,13 +2,11 @@
   let modal = null;
   let resolver = null;
   let initialized = false;
-  let durationEditor = null;
-  let featureDurationConfig = null;
   let editingMode = "feature";
   // Effects/DR/SR/Class Skill grants -- mounted once by ensureModal()
   // via the shared scripts/effect-editor.js accordion, reset/collected
   // on open()/collectFeature() below.
-  let effectsAccordion = null;
+  let mechanicGroups = null;
 
   function escapeHtml(value) {
     return String(value ?? "")
@@ -68,19 +66,6 @@
                   <textarea id="classFeatureReqText" class="form-control form-control-sm" rows="2"></textarea>
                 </div>
               </div>
-              <div class="mb-3 class-feature-activatable-row">
-                <div class="form-check form-switch">
-                  <input id="classFeatureActivatable" class="form-check-input" type="checkbox">
-                  <label class="form-check-label" for="classFeatureActivatable">Activatable (not always on)</label>
-                </div>
-                <div id="classFeatureActivatableHint" class="small-text mb-2 d-none">
-                  These effects only apply when a player activates this feature (e.g. Rage) -- they won't be added to always-on class bonuses, and the feature becomes selectable in the Effects tab and the map's effect pickers.
-                </div>
-                <div id="classFeatureDurationField" class="d-flex align-items-center gap-2 d-none">
-                  <button id="classFeatureEditDuration" class="btn btn-outline-light btn-sm" type="button">Edit Duration</button>
-                  <span id="classFeatureDurationSummary" class="small-text"></span>
-                </div>
-              </div>
               <div class="accordion accordion-flush class-feature-stat-accordion" id="classFeatureStatAccordion">
                 <div id="classFeatureEffectsMount"></div>
               </div>
@@ -99,7 +84,7 @@
     // (scripts/effect-editor.js) -- every effect-authoring surface in
     // the app mounts the same one instead of each building its own
     // Effects list plus its own Extra accordion separately.
-    effectsAccordion = window.PFEffectEditor.mountEffectsAccordion(
+    mechanicGroups = window.PFEffectEditor.mountMechanicGroups(
       document.getElementById("classFeatureEffectsMount"),
       {
         idPrefix: "classFeatureEffects",
@@ -107,20 +92,6 @@
       },
     );
 
-    document
-      .getElementById("classFeatureActivatable")
-      .addEventListener("change", updateActivatableVisibility);
-    document
-      .getElementById("classFeatureEditDuration")
-      .addEventListener("click", () => {
-        if (!window.PFEffectDurationEditor) return;
-        durationEditor =
-          durationEditor || new window.PFEffectDurationEditor("classFeature");
-        durationEditor.open(featureDurationConfig || {}, (config) => {
-          featureDurationConfig = config;
-          updateDurationSummary();
-        });
-      });
     document
       .getElementById("classFeatureEditorForm")
       .addEventListener("submit", (event) => {
@@ -136,27 +107,6 @@
         resolver?.(null);
         resolver = null;
       });
-  }
-
-  // Activatable features aren't always-on: their effects only apply once a
-  // player triggers them (Rage, Smite Evil, etc.), so they need a duration
-  // like any other cast effect. Reuses the same duration editor buffs use.
-  function updateActivatableVisibility() {
-    const active = document.getElementById("classFeatureActivatable").checked;
-    document
-      .getElementById("classFeatureActivatableHint")
-      .classList.toggle("d-none", !active);
-    document
-      .getElementById("classFeatureDurationField")
-      .classList.toggle("d-none", !active);
-  }
-
-  function updateDurationSummary() {
-    const summary = document.getElementById("classFeatureDurationSummary");
-    if (!summary) return;
-    summary.textContent = window.PFEffectMeta?.durationLabel
-      ? window.PFEffectMeta.durationLabel(featureDurationConfig || {})
-      : "";
   }
 
   // Pool choices (rage powers, rogue talents, ...) have prerequisites a
@@ -209,8 +159,6 @@
   }
 
   function collectFeature() {
-    const activatable = document.getElementById("classFeatureActivatable")
-      .checked;
     const feature = {
       name: document.getElementById("classFeatureName").value.trim(),
       description: document
@@ -224,30 +172,42 @@
       immunities,
       applyConditions,
       classSkillGrants,
+      bonusRanks,
       extraRanksPerLevel,
+      featGrants,
       sizeChanges,
       spellLikeAbilities,
+      casterLevelBonuses,
+      spellDcBonuses,
+      effectiveAttributeBonuses,
+      grantDomains,
       generatedEquipment,
       conditionalVariables,
-    } = effectsAccordion.collect();
+      activeMechanics,
+    } = mechanicGroups.collect();
     if (effects.length) feature.effects = effects;
     if (damageReduction.length) feature.damageReduction = damageReduction;
     if (spellResistance.length) feature.spellResistance = spellResistance;
     if (immunities.length) feature.immunities = immunities;
     if (applyConditions.length) feature.applyConditions = applyConditions;
     if (classSkillGrants.length) feature.classSkillGrants = classSkillGrants;
+    if (bonusRanks.length) feature.bonusRanks = bonusRanks;
     if (extraRanksPerLevel.length) feature.extraRanksPerLevel = extraRanksPerLevel;
+    if (featGrants.length) feature.featGrants = featGrants;
     if (sizeChanges.length) feature.sizeChanges = sizeChanges;
     if (spellLikeAbilities.length)
       feature.spellLikeAbilities = spellLikeAbilities;
+    if (casterLevelBonuses.length)
+      feature.casterLevelBonuses = casterLevelBonuses;
+    if (spellDcBonuses.length) feature.spellDcBonuses = spellDcBonuses;
+    if (effectiveAttributeBonuses.length)
+      feature.effectiveAttributeBonuses = effectiveAttributeBonuses;
+    if (grantDomains.length) feature.grantDomains = grantDomains;
     if (generatedEquipment.length)
       feature.generatedEquipment = generatedEquipment;
     if (conditionalVariables.length)
       feature.conditionalVariables = conditionalVariables;
-    if (activatable) {
-      feature.activatable = true;
-      if (featureDurationConfig) feature.durationConfig = featureDurationConfig;
-    }
+    if (activeMechanics) feature.activeMechanics = activeMechanics;
     if (editingMode === "option") {
       const requirements = collectRequirements();
       if (Object.keys(requirements).length) feature.requirements = requirements;
@@ -271,13 +231,7 @@
     document.getElementById("classFeatureName").value = feature.name || "";
     document.getElementById("classFeatureDescription").value =
       feature.description || "";
-    document.getElementById("classFeatureActivatable").checked = Boolean(
-      feature.activatable,
-    );
-    featureDurationConfig = feature.durationConfig || null;
-    updateActivatableVisibility();
-    updateDurationSummary();
-    effectsAccordion.reset(feature);
+    mechanicGroups.reset(feature);
     modal = bootstrap.Modal.getOrCreateInstance(
       document.getElementById("classFeatureEditorModal"),
     );

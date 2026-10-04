@@ -157,6 +157,27 @@
       });
     });
 
+    const optionEntries = [];
+    entries.forEach(({ feature, context }) => {
+      featurePools(feature).forEach((pool) => {
+        if (pool.contributesToAbility) return;
+        const key = classFeatureChoiceKey(
+          { ...feature, ...context },
+          pool,
+          context,
+        );
+        const selected = classFeatureChoices[key];
+        const option = (pool.options || []).find((item) => item.name === selected);
+        if (
+          option &&
+          window.PFEffectMechanics?.hasActiveMechanics?.(option)
+        ) {
+          optionEntries.push({ feature: option, context });
+        }
+      });
+    });
+    entries.push(...optionEntries);
+
     const contributedOptions = new Map();
     entries.forEach(({ feature, context }) => {
       featurePools(feature).forEach((pool) => {
@@ -186,10 +207,13 @@
     const contributedApplyConditions = new Map();
     const contributedClassSkillGrants = new Map();
     const contributedExtraRanksPerLevel = new Map();
+    const contributedFeatGrants = new Map();
     const contributedSizeChanges = new Map();
     const contributedSpellLikeAbilities = new Map();
     const contributedCasterLevelBonuses = new Map();
     const contributedSpellDcBonuses = new Map();
+    const contributedEffectiveAttributeBonuses = new Map();
+    const contributedGrantDomains = new Map();
     const contributedGeneratedEquipment = new Map();
     const contributedConditionalVariables = new Map();
     const contributedNames = new Map();
@@ -202,10 +226,13 @@
       const applyConditions = [];
       const classSkillGrants = [];
       const extraRanksPerLevel = [];
+      const featGrants = [];
       const sizeChanges = [];
       const spellLikeAbilities = [];
       const casterLevelBonuses = [];
       const spellDcBonuses = [];
+      const effectiveAttributeBonuses = [];
+      const grantDomains = [];
       const generatedEquipment = [];
       const conditionalVariables = [];
       const names = [];
@@ -239,6 +266,8 @@
           option.extraRanksPerLevel.length
         )
           extraRanksPerLevel.push(...option.extraRanksPerLevel);
+        if (Array.isArray(option.featGrants) && option.featGrants.length)
+          featGrants.push(...option.featGrants);
         if (Array.isArray(option.sizeChanges) && option.sizeChanges.length)
           sizeChanges.push(...option.sizeChanges);
         if (
@@ -256,6 +285,13 @@
           option.spellDcBonuses.length
         )
           spellDcBonuses.push(...option.spellDcBonuses);
+        if (
+          Array.isArray(option.effectiveAttributeBonuses) &&
+          option.effectiveAttributeBonuses.length
+        )
+          effectiveAttributeBonuses.push(...option.effectiveAttributeBonuses);
+        if (Array.isArray(option.grantDomains) && option.grantDomains.length)
+          grantDomains.push(...option.grantDomains);
         if (
           Array.isArray(option.generatedEquipment) &&
           option.generatedEquipment.length
@@ -278,6 +314,8 @@
         contributedClassSkillGrants.set(targetKey, classSkillGrants);
       if (extraRanksPerLevel.length)
         contributedExtraRanksPerLevel.set(targetKey, extraRanksPerLevel);
+      if (featGrants.length)
+        contributedFeatGrants.set(targetKey, featGrants);
       if (sizeChanges.length)
         contributedSizeChanges.set(targetKey, sizeChanges);
       if (spellLikeAbilities.length)
@@ -286,6 +324,13 @@
         contributedCasterLevelBonuses.set(targetKey, casterLevelBonuses);
       if (spellDcBonuses.length)
         contributedSpellDcBonuses.set(targetKey, spellDcBonuses);
+      if (effectiveAttributeBonuses.length)
+        contributedEffectiveAttributeBonuses.set(
+          targetKey,
+          effectiveAttributeBonuses,
+        );
+      if (grantDomains.length)
+        contributedGrantDomains.set(targetKey, grantDomains);
       if (generatedEquipment.length)
         contributedGeneratedEquipment.set(targetKey, generatedEquipment);
       if (conditionalVariables.length)
@@ -310,7 +355,10 @@
 
     const abilities = new Map();
     entries.forEach(({ feature, context }) => {
-      if (!feature.activatable) return;
+      const activeFeature =
+        window.PFEffectMechanics?.activeMechanics?.(feature) ||
+        (feature.activatable ? feature : {});
+      if (!feature.activatable && !feature.activeMechanics) return;
       const key = `${context.className}:${feature.name}`;
       if (abilities.has(key)) return;
       const targetKey = String(feature.name || "")
@@ -331,83 +379,104 @@
         contributedCasterLevelBonuses.get(targetKey) || [];
       const bundledSpellDcBonuses =
         contributedSpellDcBonuses.get(targetKey) || [];
+      const bundledEffectiveAttributeBonuses =
+        contributedEffectiveAttributeBonuses.get(targetKey) || [];
+      const bundledGrantDomains =
+        contributedGrantDomains.get(targetKey) || [];
       const bundledGeneratedEquipment =
         contributedGeneratedEquipment.get(targetKey) || [];
       const bundledConditionalVariables =
         contributedConditionalVariables.get(targetKey) || [];
       const bundledNames = contributedNames.get(targetKey) || [];
-      const durationConfig = feature.durationConfig || {
+      const durationConfig = activeFeature.durationConfig || feature.durationConfig || {
         count: null,
         unit: "variable",
         factors: [],
       };
       const damageReduction = [
-        ...(Array.isArray(feature.damageReduction)
-          ? feature.damageReduction
+        ...(Array.isArray(activeFeature.damageReduction)
+          ? activeFeature.damageReduction
           : []),
         ...bundledDr,
       ];
       const spellResistance = [
-        ...(Array.isArray(feature.spellResistance)
-          ? feature.spellResistance
+        ...(Array.isArray(activeFeature.spellResistance)
+          ? activeFeature.spellResistance
           : []),
         ...bundledSr,
       ];
       const immunities = [
-        ...(Array.isArray(feature.immunities) ? feature.immunities : []),
+        ...(Array.isArray(activeFeature.immunities) ? activeFeature.immunities : []),
         ...bundledImmunities,
       ];
       const applyConditions = [
-        ...(Array.isArray(feature.applyConditions)
-          ? feature.applyConditions
+        ...(Array.isArray(activeFeature.applyConditions)
+          ? activeFeature.applyConditions
           : []),
         ...bundledApplyConditions,
       ];
       const classSkillGrants = [
-        ...(Array.isArray(feature.classSkillGrants)
-          ? feature.classSkillGrants
+        ...(Array.isArray(activeFeature.classSkillGrants)
+          ? activeFeature.classSkillGrants
           : []),
         ...bundledClassSkillGrants,
       ];
       const sizeChanges = [
-        ...(Array.isArray(feature.sizeChanges) ? feature.sizeChanges : []),
+        ...(Array.isArray(activeFeature.sizeChanges) ? activeFeature.sizeChanges : []),
         ...bundledSizeChanges,
       ];
       const bundledExtraRanksPerLevel =
         contributedExtraRanksPerLevel.get(key) || [];
       const extraRanksPerLevel = [
-        ...(Array.isArray(feature.extraRanksPerLevel)
-          ? feature.extraRanksPerLevel
+        ...(Array.isArray(activeFeature.extraRanksPerLevel)
+          ? activeFeature.extraRanksPerLevel
           : []),
         ...bundledExtraRanksPerLevel,
       ];
+      const bundledFeatGrants = contributedFeatGrants.get(key) || [];
+      const featGrants = [
+        ...(Array.isArray(activeFeature.featGrants) ? activeFeature.featGrants : []),
+        ...bundledFeatGrants,
+      ];
       const spellLikeAbilities = [
-        ...(Array.isArray(feature.spellLikeAbilities)
-          ? feature.spellLikeAbilities
+        ...(Array.isArray(activeFeature.spellLikeAbilities)
+          ? activeFeature.spellLikeAbilities
           : []),
         ...bundledSpellLikeAbilities,
       ];
       const casterLevelBonuses = [
-        ...(Array.isArray(feature.casterLevelBonuses)
-          ? feature.casterLevelBonuses
+        ...(Array.isArray(activeFeature.casterLevelBonuses)
+          ? activeFeature.casterLevelBonuses
           : []),
         ...bundledCasterLevelBonuses,
       ];
       const spellDcBonuses = [
-        ...(Array.isArray(feature.spellDcBonuses)
-          ? feature.spellDcBonuses
+        ...(Array.isArray(activeFeature.spellDcBonuses)
+          ? activeFeature.spellDcBonuses
           : []),
         ...bundledSpellDcBonuses,
       ];
+      const effectiveAttributeBonuses = [
+        ...(Array.isArray(activeFeature.effectiveAttributeBonuses)
+          ? activeFeature.effectiveAttributeBonuses
+          : []),
+        ...bundledEffectiveAttributeBonuses,
+      ];
+      const grantDomains = [
+        ...(Array.isArray(activeFeature.grantDomains)
+          ? activeFeature.grantDomains
+          : []),
+        ...bundledGrantDomains,
+      ];
       const generatedEquipment = [
-        ...(Array.isArray(feature.generatedEquipment)
-          ? feature.generatedEquipment
+        ...(Array.isArray(activeFeature.generatedEquipment)
+          ? activeFeature.generatedEquipment
           : []),
         ...bundledGeneratedEquipment,
       ];
       const conditionalVariables = [
-        ...(Array.isArray(feature.conditionalVariables)
-          ? feature.conditionalVariables
+        ...(Array.isArray(activeFeature.conditionalVariables)
+          ? activeFeature.conditionalVariables
           : []),
         ...bundledConditionalVariables,
       ];
@@ -418,8 +487,16 @@
         source: bundledNames.length
           ? `${context.className} -- with ${bundledNames.join(", ")}`
           : context.className,
+        description: feature.description || feature.desc || "",
+        detailUrl:
+          feature.url || feature.link || feature.sourceUrl || feature.sourceURL || "",
+        detailData: {
+          type: "Class Feature",
+          class: context.className,
+          description: feature.description || feature.desc || "",
+        },
         bonuses: [
-          ...(Array.isArray(feature.effects) ? feature.effects : []),
+          ...(Array.isArray(activeFeature.effects) ? activeFeature.effects : []),
           ...bundled,
         ],
         ...(damageReduction.length ? { damageReduction } : {}),
@@ -428,10 +505,15 @@
         ...(applyConditions.length ? { applyConditions } : {}),
         ...(classSkillGrants.length ? { classSkillGrants } : {}),
         ...(extraRanksPerLevel.length ? { extraRanksPerLevel } : {}),
+        ...(featGrants.length ? { featGrants } : {}),
         ...(sizeChanges.length ? { sizeChanges } : {}),
         ...(spellLikeAbilities.length ? { spellLikeAbilities } : {}),
         ...(casterLevelBonuses.length ? { casterLevelBonuses } : {}),
         ...(spellDcBonuses.length ? { spellDcBonuses } : {}),
+        ...(effectiveAttributeBonuses.length
+          ? { effectiveAttributeBonuses }
+          : {}),
+        ...(grantDomains.length ? { grantDomains } : {}),
         ...(generatedEquipment.length ? { generatedEquipment } : {}),
         ...(conditionalVariables.length ? { conditionalVariables } : {}),
         durationConfig,

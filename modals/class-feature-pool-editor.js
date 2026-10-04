@@ -70,9 +70,9 @@
                 <input id="classFeaturePoolRequiredChoices" class="form-control form-control-sm" placeholder="Mutagen, Greater Mutagen">
               </div>
               <div class="mb-2">
-                <label for="classFeaturePoolContributesTo">Contributes To Activatable Feature</label>
+                <label for="classFeaturePoolContributesTo">Contributes To Active Feature</label>
                 <input id="classFeaturePoolContributesTo" class="form-control form-control-sm" placeholder="Rage">
-                <div class="small-text">If set, a selected choice's effects are bundled into that activatable feature when it's cast (e.g. rage powers into Rage) instead of applying on their own.</div>
+                <div class="small-text">If set, a selected choice's effects are bundled into that active feature when it's used (e.g. rage powers into Rage) instead of applying on their own.</div>
               </div>
               <div class="mb-3">
                 <label for="classFeaturePoolRequirementText">Requirement Notes</label>
@@ -190,7 +190,11 @@
     if (req.race) parts.push(req.race);
     if (req.requiredChoices.length)
       parts.push(`requires ${req.requiredChoices.join(", ")}`);
-    if (option.activatable) parts.push("Activatable");
+    if (
+      option.activatable ||
+      window.PFEffectMechanics?.hasActiveMechanics?.(option)
+    )
+      parts.push("Active");
     const effectCount = Array.isArray(option.effects)
       ? option.effects.length
       : 0;
@@ -240,16 +244,19 @@
         // (name, description, effects, DR, activatable, requirements)
         // is fully replaced so clearing a field in the editor actually
         // clears it here too.
-        const {
-          name,
-          description,
-          effects,
-          damageReduction,
-          activatable,
-          durationConfig,
-          requirements,
-          ...preserved
-        } = row.__poolOption;
+        const preserved = { ...row.__poolOption };
+        [
+          "name",
+          "description",
+          "activatable",
+          "durationConfig",
+          "activeMechanics",
+          "requirements",
+          ...(window.PFEffectMechanics?.mechanicKeys?.() || [
+            "effects",
+            "damageReduction",
+          ]),
+        ].forEach((key) => delete preserved[key]);
         row.__poolOption = { ...preserved, ...edited };
         renderOptionRowContent(row);
         filterOptionRows();

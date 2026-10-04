@@ -324,7 +324,7 @@ function monsterWeaponsForSheet(template = {}) {
     name: weapon.characterSheet?.name || weapon.name || "Attack",
     type: "Weapon",
     weaponType:
-      weapon.characterSheet?.weaponType || weapon.weaponType || "Natural",
+      weapon.characterSheet?.weaponType || weapon.weaponType || "Natural Weapon",
     attackScale:
       weapon.characterSheet?.attackScale || weapon.attackScale || "STR",
     damageScale: "",
@@ -334,13 +334,10 @@ function monsterWeaponsForSheet(template = {}) {
       weapon.attackBonus ||
       "",
     damage: weapon.damage?.dice || "",
+    damageType: weapon.damageType || "",
+    extraDamage: PFWeaponDamage.normalize(weapon.extraDamage || weapon.damage?.extra),
     critical: weapon.characterSheet?.critical || weapon.critical || "20/x2",
-    details: [
-      weapon.characterSheet?.details || weapon.raw || "",
-      ...(weapon.extraDamage || []),
-    ]
-      .filter(Boolean)
-      .join("; "),
+    details: weapon.characterSheet?.details || weapon.raw || "",
     attackMisc: "0",
     damageMisc: String(weapon.damage?.staticModifier ?? 0),
   }));

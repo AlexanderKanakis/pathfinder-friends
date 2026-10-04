@@ -73,6 +73,10 @@ function normalizeTrait(trait = {}) {
     category: trait.category || "",
     description: trait.description || "",
     activatable: Boolean(trait.activatable),
+    activeMechanics:
+      trait.activeMechanics && typeof trait.activeMechanics === "object"
+        ? cloneJson(trait.activeMechanics)
+        : null,
     attributeRequirement:
       trait.attributeRequirement && typeof trait.attributeRequirement === "object"
         ? trait.attributeRequirement
@@ -96,13 +100,25 @@ function normalizeTrait(trait = {}) {
     classSkillGrants: Array.isArray(trait.classSkillGrants)
       ? trait.classSkillGrants
       : [],
+    bonusRanks: Array.isArray(trait.bonusRanks) ? trait.bonusRanks : [],
     extraRanksPerLevel: Array.isArray(trait.extraRanksPerLevel)
       ? trait.extraRanksPerLevel
       : [],
+    featGrants: Array.isArray(trait.featGrants) ? trait.featGrants : [],
     sizeChanges: Array.isArray(trait.sizeChanges) ? trait.sizeChanges : [],
     spellLikeAbilities: Array.isArray(trait.spellLikeAbilities)
       ? trait.spellLikeAbilities
       : [],
+    casterLevelBonuses: Array.isArray(trait.casterLevelBonuses)
+      ? trait.casterLevelBonuses
+      : [],
+    spellDcBonuses: Array.isArray(trait.spellDcBonuses)
+      ? trait.spellDcBonuses
+      : [],
+    effectiveAttributeBonuses: Array.isArray(trait.effectiveAttributeBonuses)
+      ? trait.effectiveAttributeBonuses
+      : [],
+    grantDomains: Array.isArray(trait.grantDomains) ? trait.grantDomains : [],
     generatedEquipment: Array.isArray(trait.generatedEquipment)
       ? trait.generatedEquipment
       : [],
@@ -313,16 +329,22 @@ function traitDurationLabel(config) {
   return config?.unit || "variable";
 }
 
-const TRAIT_MECHANIC_KEYS = [
+const TRAIT_MECHANIC_KEYS = window.PFEffectMechanics?.mechanicKeys?.() || [
   "effects",
   "damageReduction",
   "spellResistance",
   "immunities",
   "applyConditions",
   "classSkillGrants",
+  "bonusRanks",
   "extraRanksPerLevel",
+  "featGrants",
   "sizeChanges",
   "spellLikeAbilities",
+  "casterLevelBonuses",
+  "spellDcBonuses",
+  "effectiveAttributeBonuses",
+  "grantDomains",
   "generatedEquipment",
   "conditionalVariables",
 ];
@@ -334,9 +356,15 @@ const TRAIT_MECHANIC_LABELS = {
   immunities: "Immunities",
   applyConditions: "Conditions",
   classSkillGrants: "Class Skills",
+  bonusRanks: "Bonus Ranks",
   extraRanksPerLevel: "Ranks",
+  featGrants: "Feats",
   sizeChanges: "Size",
   spellLikeAbilities: "SLAs",
+  casterLevelBonuses: "CL",
+  spellDcBonuses: "DC",
+  effectiveAttributeBonuses: "Attr",
+  grantDomains: "Domains",
   generatedEquipment: "Gear",
   conditionalVariables: "Vars",
 };
@@ -346,20 +374,29 @@ function traitMechanicCount(item = {}, key = "") {
 }
 
 function traitHasAnyMechanics(item = {}) {
-  return TRAIT_MECHANIC_KEYS.some((key) =>
-    mechanicOperations(item, key).some(
-      (operation) =>
-        operation.action === "remove" ||
-        (["add", "replace"].includes(operation.action) && operation.value),
-    ),
+  return (
+    ["passive", "active"].some((group) =>
+      TRAIT_MECHANIC_KEYS.some((key) =>
+        mechanicOperations(item, key, group).some(
+          (operation) =>
+            operation.action === "remove" ||
+            (["add", "replace"].includes(operation.action) && operation.value),
+        ),
+      ),
+    ) || Boolean(item.activeDurationConfig)
   );
 }
 
 function traitMechanicSummary(item = {}) {
-  const parts = TRAIT_MECHANIC_KEYS.map((key) => {
-    const count = traitMechanicCount(item, key);
-    return count ? `${TRAIT_MECHANIC_LABELS[key]} ${count}` : "";
-  }).filter(Boolean);
+  const parts = ["passive", "active"].flatMap((group) => {
+    const mechanics = traitMechanicGroup(item, group);
+    return TRAIT_MECHANIC_KEYS.map((key) => {
+      const count = traitMechanicCount(mechanics, key);
+      return count
+        ? `${group === "active" ? "Active " : ""}${TRAIT_MECHANIC_LABELS[key]} ${count}`
+        : "";
+    }).filter(Boolean);
+  });
   return parts.length ? parts.join(" · ") : "No mechanics entered.";
 }
 
@@ -402,13 +439,23 @@ function stableMechanicValue(value) {
   return sorted;
 }
 
-function mechanicOperations(override = {}, key = "") {
-  const operations = override.mechanicOverrides?.[key];
+function mechanicOperations(override = {}, key = "", group = "passive") {
+  const operationMap =
+    group === "active"
+      ? override.activeMechanicOverrides
+      : override.mechanicOverrides;
+  const operations = operationMap?.[key];
   return Array.isArray(operations) ? operations : [];
 }
 
-function mechanicOperationFor(override = {}, key = "", row = {}, index = 0) {
-  return [...mechanicOperations(override, key)]
+function mechanicOperationFor(
+  override = {},
+  key = "",
+  row = {},
+  index = 0,
+  group = "passive",
+) {
+  return [...mechanicOperations(override, key, group)]
     .reverse()
     .find(
       (operation) =>
@@ -419,11 +466,11 @@ function mechanicOperationFor(override = {}, key = "", row = {}, index = 0) {
     );
 }
 
-function mechanicAdditions(override = {}) {
+function mechanicAdditions(override = {}, group = "passive") {
   return Object.fromEntries(
     TRAIT_MECHANIC_KEYS.map((key) => [
       key,
-      mechanicOperations(override, key)
+      mechanicOperations(override, key, group)
         .filter((operation) => operation.action === "add" && operation.value)
         .map((operation) => operation.value),
     ]),
@@ -453,8 +500,14 @@ function mechanicRowSummary(key = "", row = {}) {
   if (key === "classSkillGrants") {
     return `${row.skillName || row.stat || "Skill"} becomes a class skill`;
   }
+  if (key === "bonusRanks") {
+    return window.PFEffectEditor.bonusRanksText(row);
+  }
   if (key === "extraRanksPerLevel") {
     return window.PFEffectEditor.extraRanksPerLevelText(row);
+  }
+  if (key === "featGrants") {
+    return window.PFEffectEditor.featGrantText(row);
   }
   if (key === "sizeChanges") {
     const value = Number(row.value ?? row.steps ?? 0);
@@ -471,14 +524,47 @@ function mechanicRowSummary(key = "", row = {}) {
       (listName ? `Choose from ${listName}` : "Spell");
     return `${row.frequency || "1/day"} ${spellName}${level > 1 ? ` at level ${level}` : ""}`;
   }
+  if (key === "casterLevelBonuses") {
+    return window.PFEffectEditor.casterLevelBonusText(row);
+  }
+  if (key === "spellDcBonuses") {
+    return window.PFEffectEditor.spellDcBonusText(row);
+  }
+  if (key === "effectiveAttributeBonuses") {
+    return window.PFEffectEditor.effectiveAttributeBonusText(row);
+  }
+  if (key === "grantDomains") {
+    return window.PFEffectEditor.grantDomainText(row);
+  }
   if (key === "generatedEquipment") {
     return `${row.type || "Equipment"}: ${row.name || row.item || "Generated item"}`;
   }
   return JSON.stringify(row);
 }
 
-function mechanicReplacementMountId(kind, traitIndex, overrideIndex, key, rowIndex) {
-  return `raceTraitOverride-${kind}-${traitIndex}-${overrideIndex}-${key}-${rowIndex}`;
+function mechanicReplacementMountId(
+  kind,
+  traitIndex,
+  overrideIndex,
+  group,
+  key,
+  rowIndex,
+) {
+  return `raceTraitOverride-${kind}-${traitIndex}-${overrideIndex}-${group}-${key}-${rowIndex}`;
+}
+
+function traitMechanicGroup(trait = {}, group = "passive") {
+  const mechanics = window.PFEffectMechanics;
+  if (group === "active") {
+    return (
+      mechanics?.activeMechanics?.(trait) ||
+      (trait.activatable ? trait : trait.activeMechanics || {})
+    );
+  }
+  return (
+    mechanics?.passiveMechanics?.(trait) ||
+    (trait.activatable ? {} : trait)
+  );
 }
 
 function createMechanicEditorRow(key = "", data = {}, options = {}) {
@@ -501,12 +587,32 @@ function createMechanicEditorRow(key = "", data = {}, options = {}) {
       window.PFEffectEditor.createApplyConditionRow(data, rowOptions),
     classSkillGrants: () =>
       window.PFEffectEditor.createClassSkillRow(data, rowOptions),
+    bonusRanks: () =>
+      window.PFEffectEditor.createBonusRanksRow(data, rowOptions),
     extraRanksPerLevel: () =>
       window.PFEffectEditor.createExtraRanksPerLevelRow(data, rowOptions),
+    featGrants: () =>
+      window.PFEffectEditor.createFeatGrantRow(data, rowOptions),
     sizeChanges: () =>
       window.PFEffectEditor.createSizeChangeRow(data, rowOptions),
     spellLikeAbilities: () =>
       window.PFEffectEditor.createSpellLikeAbilityRow(data, rowOptions),
+    casterLevelBonuses: () =>
+      window.PFEffectEditor.createSpellAdjustmentRow(
+        "casterLevel",
+        data,
+        rowOptions,
+      ),
+    spellDcBonuses: () =>
+      window.PFEffectEditor.createSpellAdjustmentRow(
+        "spellDc",
+        data,
+        rowOptions,
+      ),
+    effectiveAttributeBonuses: () =>
+      window.PFEffectEditor.createEffectiveAttributeBonusRow(data, rowOptions),
+    grantDomains: () =>
+      window.PFEffectEditor.createGrantDomainRow(data, rowOptions),
     generatedEquipment: () =>
       window.PFEffectEditor.createGeneratedEquipmentRow(data, rowOptions),
     conditionalVariables: () =>
@@ -544,49 +650,65 @@ function modifiedTraitOverrideSection(kind, trait, index, race = {}) {
       const traitName = standardTrait?.name || name;
       if (!traitName) return "";
       const override = modifiedTraitOverrideFor(trait, traitName) || {};
-      const mechanicRows = TRAIT_MECHANIC_KEYS.map((key) => {
-        const standardRows = Array.isArray(standardTrait?.[key])
-          ? standardTrait[key]
-          : [];
-        if (!standardRows.length) return "";
-        return `
-          <div class="trait-mechanic-group" data-mechanic-group="${key}">
-            <div class="trait-mechanic-group-title">${escapeHtml(TRAIT_MECHANIC_LABELS[key])}</div>
-            ${standardRows
-              .map((row, rowIndex) => {
-                const operation = mechanicOperationFor(override, key, row, rowIndex);
-                const action = operation?.action || "keep";
-                return `
-                  <div
-                    class="trait-mechanic-row"
-                    data-mechanic-key="${key}"
-                    data-mechanic-row-index="${rowIndex}"
-                    data-mechanic-target-key="${escapeHtml(stableMechanicKey(row))}"
-                  >
-                    <div>
-                      <div class="small-text">Standard Row</div>
-                      <div class="trait-mechanic-summary">${escapeHtml(mechanicRowSummary(key, row))}</div>
-                    </div>
-                    <div>
-                      <label>Action</label>
-                      <select class="form-select form-select-sm" data-mechanic-action>
-                        <option value="keep" ${action === "keep" ? "selected" : ""}>Keep</option>
-                        <option value="replace" ${action === "replace" ? "selected" : ""}>Replace</option>
-                        <option value="remove" ${action === "remove" ? "selected" : ""}>Remove</option>
-                      </select>
-                    </div>
-                    <div
-                      class="trait-mechanic-replacement ${action === "replace" ? "" : "d-none"}"
-                      id="${mechanicReplacementMountId(kind, index, overrideIndex, key, rowIndex)}"
-                      data-mechanic-replacement-mount
-                    ></div>
-                  </div>
-                `;
-              })
-              .join("")}
-          </div>
-        `;
-      })
+      const mechanicRows = ["passive", "active"]
+        .map((group) => {
+          const standardMechanics = traitMechanicGroup(standardTrait, group);
+          const rows = TRAIT_MECHANIC_KEYS.map((key) => {
+            const standardRows = Array.isArray(standardMechanics?.[key])
+              ? standardMechanics[key]
+              : [];
+            if (!standardRows.length) return "";
+            return `
+              <div class="trait-mechanic-group" data-mechanic-group="${key}">
+                <div class="trait-mechanic-group-title">${escapeHtml(TRAIT_MECHANIC_LABELS[key])}</div>
+                ${standardRows
+                  .map((row, rowIndex) => {
+                    const operation = mechanicOperationFor(
+                      override,
+                      key,
+                      row,
+                      rowIndex,
+                      group,
+                    );
+                    const action = operation?.action || "keep";
+                    return `
+                      <div
+                        class="trait-mechanic-row"
+                        data-mechanic-scope="${group}"
+                        data-mechanic-key="${key}"
+                        data-mechanic-row-index="${rowIndex}"
+                        data-mechanic-target-key="${escapeHtml(stableMechanicKey(row))}"
+                      >
+                        <div>
+                          <div class="small-text">Standard Row</div>
+                          <div class="trait-mechanic-summary">${escapeHtml(mechanicRowSummary(key, row))}</div>
+                        </div>
+                        <div>
+                          <label>Action</label>
+                          <select class="form-select form-select-sm" data-mechanic-action>
+                            <option value="keep" ${action === "keep" ? "selected" : ""}>Keep</option>
+                            <option value="replace" ${action === "replace" ? "selected" : ""}>Replace</option>
+                            <option value="remove" ${action === "remove" ? "selected" : ""}>Remove</option>
+                          </select>
+                        </div>
+                        <div
+                          class="trait-mechanic-replacement ${action === "replace" ? "" : "d-none"}"
+                          id="${mechanicReplacementMountId(kind, index, overrideIndex, group, key, rowIndex)}"
+                          data-mechanic-replacement-mount
+                        ></div>
+                      </div>
+                    `;
+                  })
+                  .join("")}
+              </div>
+            `;
+          })
+            .filter(Boolean)
+            .join("");
+          return rows
+            ? `<div class="trait-mechanic-scope"><strong>${group === "active" ? "Active" : "Passive"}</strong>${rows}</div>`
+            : "";
+        })
         .filter(Boolean)
         .join("");
       return `
@@ -614,7 +736,7 @@ function modifiedTraitOverrideSection(kind, trait, index, race = {}) {
           </div>
           <div
             id="raceTraitOverrideAdditions-${kind}-${index}-${overrideIndex}"
-            class="accordion shared-extra-accordion mt-2"
+            class="mt-2"
             data-trait-modifier-additions-mount
           ></div>
           ${
@@ -661,30 +783,14 @@ function traitCard(kind, trait, index, race = {}) {
           <input data-trait-field="category" class="form-control form-control-sm" value="${escapeHtml(trait.category || "")}">
         </div>
         <div class="trait-activatable-field">
-          <label>Activatable</label>
-          <div class="trait-compact-actions">
-            <div class="form-check form-switch">
-              <input data-trait-field="activatable" class="form-check-input" type="checkbox" ${trait.activatable ? "checked" : ""}>
-            </div>
-            <button
-              class="btn btn-outline-secondary btn-sm"
-              type="button"
-              data-toggle-trait-attribute-requirement
-              aria-expanded="${requirementOpen ? "true" : "false"}"
-              title="Attribute score requirement"
-            >
-              Req
-            </button>
-          </div>
-        </div>
-        <div class="trait-duration-field ${trait.activatable ? "" : "d-none"}" data-trait-duration-field>
-          <label>Duration</label>
-          <div class="d-flex align-items-center gap-2">
-            <button class="btn btn-outline-light btn-sm" type="button" data-edit-trait-duration>
-              Edit Duration
-            </button>
-            <span class="small-text" data-trait-duration-summary>${escapeHtml(traitDurationLabel(trait.durationConfig))}</span>
-          </div>
+          <label>Requirements</label>
+          <button
+            class="btn btn-outline-secondary btn-sm"
+            type="button"
+            data-toggle-trait-attribute-requirement
+            aria-expanded="${requirementOpen ? "true" : "false"}"
+            title="Attribute score requirement"
+          >Req</button>
         </div>
         <div class="trait-attribute-requirement-field grid-column-full ${requirementOpen ? "" : "d-none"}" data-trait-attribute-requirement>
           <div>
@@ -806,7 +912,7 @@ function mountTraitEffectEditors(race) {
       traitDurationConfigs.set(traitKey(kind, index), trait.durationConfig || null);
       const mount = document.getElementById(`raceTraitEffects-${kind}-${index}`);
       if (!mount || !window.PFEffectEditor) return;
-      const editor = window.PFEffectEditor.mountEffectsAccordion(mount, {
+      const editor = window.PFEffectEditor.mountMechanicGroups(mount, {
         idPrefix: `race${selectedIndex}${kind}${index}`,
         effectsKey: "effects",
         onChange: () => setDirty(true),
@@ -827,43 +933,51 @@ function mountTraitEffectEditors(race) {
           additions: null,
           replacements: new Map(),
         };
-        TRAIT_MECHANIC_KEYS.forEach((mechanicKey) => {
-          const standardRows = Array.isArray(standardTrait?.[mechanicKey])
-            ? standardTrait[mechanicKey]
-            : [];
-          standardRows.forEach((standardRow, rowIndex) => {
-            const mount = document.getElementById(
-              mechanicReplacementMountId(
-                kind,
-                index,
-                overrideIndex,
+        ["passive", "active"].forEach((group) => {
+          const standardMechanics = traitMechanicGroup(standardTrait, group);
+          TRAIT_MECHANIC_KEYS.forEach((mechanicKey) => {
+            const standardRows = Array.isArray(standardMechanics?.[mechanicKey])
+              ? standardMechanics[mechanicKey]
+              : [];
+            standardRows.forEach((standardRow, rowIndex) => {
+              const mount = document.getElementById(
+                mechanicReplacementMountId(
+                  kind,
+                  index,
+                  overrideIndex,
+                  group,
+                  mechanicKey,
+                  rowIndex,
+                ),
+              );
+              if (!mount || !window.PFEffectEditor) return;
+              const operation = mechanicOperationFor(
+                override,
                 mechanicKey,
+                standardRow,
                 rowIndex,
-              ),
-            );
-            if (!mount || !window.PFEffectEditor) return;
-            const operation = mechanicOperationFor(
-              override,
-              mechanicKey,
-              standardRow,
-              rowIndex,
-            );
-            const replacement = operation?.value || standardRow;
-            const rowController = createMechanicEditorRow(
-              mechanicKey,
-              replacement,
-              {
-                skills: [],
-                onChange: () => setDirty(true),
-              },
-            );
-            if (!rowController) return;
-            mount.innerHTML = "";
-            mount.appendChild(rowController.element);
-            overrideEditors.replacements.set(`${mechanicKey}:${rowIndex}`, {
-              key: mechanicKey,
-              rowIndex,
-              collect: rowController.collect,
+                group,
+              );
+              const replacement = operation?.value || standardRow;
+              const rowController = createMechanicEditorRow(
+                mechanicKey,
+                replacement,
+                {
+                  skills: [],
+                  onChange: () => setDirty(true),
+                },
+              );
+              if (!rowController) return;
+              mount.innerHTML = "";
+              mount.appendChild(rowController.element);
+              overrideEditors.replacements.set(
+                `${group}:${mechanicKey}:${rowIndex}`,
+                {
+                  key: mechanicKey,
+                  rowIndex,
+                  collect: rowController.collect,
+                },
+              );
             });
           });
         });
@@ -871,7 +985,7 @@ function mountTraitEffectEditors(race) {
           `raceTraitOverrideAdditions-${kind}-${index}-${overrideIndex}`,
         );
         if (additionsMount && window.PFEffectEditor) {
-          const additionsEditor = window.PFEffectEditor.mountEffectsAccordion(
+          const additionsEditor = window.PFEffectEditor.mountMechanicGroups(
             additionsMount,
             {
               idPrefix: `race${selectedIndex}${kind}${index}Override${overrideIndex}Additions`,
@@ -879,7 +993,15 @@ function mountTraitEffectEditors(race) {
               onChange: () => setDirty(true),
             },
           );
-          additionsEditor.reset(mechanicAdditions(override));
+          additionsEditor.reset({
+            ...mechanicAdditions(override, "passive"),
+            activeMechanics: {
+              ...mechanicAdditions(override, "active"),
+              ...(override.activeDurationConfig
+                ? { durationConfig: override.activeDurationConfig }
+                : {}),
+            },
+          });
           overrideEditors.additions = additionsEditor;
         }
         traitModifierOverrideEditors.set(editorKey, overrideEditors);
@@ -887,21 +1009,6 @@ function mountTraitEffectEditors(race) {
     });
   });
   autoSizeTraitTextareas();
-}
-
-function updateTraitDurationVisibility(card) {
-  const activatable = card.querySelector('[data-trait-field="activatable"]')
-    ?.checked;
-  card
-    .querySelector("[data-trait-duration-field]")
-    ?.classList.toggle("d-none", !activatable);
-}
-
-function updateTraitDurationSummary(card) {
-  const key = traitKey(card.dataset.traitKind, Number(card.dataset.traitIndex));
-  const summary = card.querySelector("[data-trait-duration-summary]");
-  if (!summary) return;
-  summary.textContent = traitDurationLabel(traitDurationConfigs.get(key));
 }
 
 function updateTraitRequirementToggle(card) {
@@ -1158,22 +1265,7 @@ function renderSelectedRace() {
         }
         setDirty(true);
       });
-      input.addEventListener("change", () => {
-        const card = input.closest("[data-trait-kind]");
-        if (card && input.dataset.traitField === "activatable") {
-          updateTraitDurationVisibility(card);
-          updateTraitDurationSummary(card);
-        }
-        setDirty(true);
-      });
-    });
-  el("raceEditorPanel")
-    .querySelectorAll("[data-edit-trait-duration]")
-    .forEach((button) => {
-      button.addEventListener("click", () => {
-        const card = button.closest("[data-trait-kind]");
-        if (card) openTraitDurationEditor(card);
-      });
+      input.addEventListener("change", () => setDirty(true));
     });
   el("raceEditorPanel")
     .querySelectorAll("[data-toggle-trait-attribute-requirement]")
@@ -1220,7 +1312,11 @@ function collectModifiedTraitOverrides(card, kind, index) {
       const mechanicOverrides = Object.fromEntries(
         TRAIT_MECHANIC_KEYS.map((key) => [key, []]),
       );
+      const activeMechanicOverrides = Object.fromEntries(
+        TRAIT_MECHANIC_KEYS.map((key) => [key, []]),
+      );
       section.querySelectorAll("[data-mechanic-key]").forEach((row) => {
+        const group = row.dataset.mechanicScope || "passive";
         const mechanicKey = row.dataset.mechanicKey;
         const rowIndex = Number(row.dataset.mechanicRowIndex || 0);
         const targetKey = row.dataset.mechanicTargetKey || "";
@@ -1234,20 +1330,43 @@ function collectModifiedTraitOverrides(card, kind, index) {
         };
         if (action === "replace") {
           const replacement = editors?.replacements
-            ?.get(`${mechanicKey}:${rowIndex}`)
+            ?.get(`${group}:${mechanicKey}:${rowIndex}`)
             ?.collect?.();
           if (!replacement) return;
           operation.value = replacement;
         }
-        mechanicOverrides[mechanicKey].push(operation);
+        const operationMap =
+          group === "active" ? activeMechanicOverrides : mechanicOverrides;
+        operationMap[mechanicKey].push(operation);
       });
       const additions = editors?.additions?.collect?.() || {};
       TRAIT_MECHANIC_KEYS.forEach((key) => {
         (Array.isArray(additions[key]) ? additions[key] : []).forEach((value) => {
-          mechanicOverrides[key].push({ action: "add", value });
+          mechanicOverrides[key].push({
+            action: "add",
+            value,
+            preserveAsAddition: true,
+          });
         });
+        const activeAdditions = additions.activeMechanics?.[key];
+        (Array.isArray(activeAdditions) ? activeAdditions : []).forEach(
+          (value) => {
+            activeMechanicOverrides[key].push({
+              action: "add",
+              value,
+              preserveAsAddition: true,
+            });
+          },
+        );
       });
-      const override = { trait, mechanicOverrides };
+      const override = {
+        trait,
+        mechanicOverrides,
+        activeMechanicOverrides,
+        ...(additions.activeMechanics?.durationConfig
+          ? { activeDurationConfig: additions.activeMechanics.durationConfig }
+          : {}),
+      };
       return traitHasAnyMechanics(override) ? override : null;
     })
     .filter(Boolean);
@@ -1263,8 +1382,6 @@ function collectTrait(card) {
   const trait = {
     name: name || "Trait",
     category: card.querySelector('[data-trait-field="category"]').value.trim(),
-    activatable: card.querySelector('[data-trait-field="activatable"]')?.checked
-      || false,
     description: card
       .querySelector('[data-trait-field="description"]')
       .value.trim(),
@@ -1277,11 +1394,18 @@ function collectTrait(card) {
     immunities: extras.immunities || [],
     applyConditions: extras.applyConditions || [],
     classSkillGrants: extras.classSkillGrants || [],
+    bonusRanks: extras.bonusRanks || [],
     extraRanksPerLevel: extras.extraRanksPerLevel || [],
+    featGrants: extras.featGrants || [],
     sizeChanges: extras.sizeChanges || [],
     spellLikeAbilities: extras.spellLikeAbilities || [],
+    casterLevelBonuses: extras.casterLevelBonuses || [],
+    spellDcBonuses: extras.spellDcBonuses || [],
+    effectiveAttributeBonuses: extras.effectiveAttributeBonuses || [],
+    grantDomains: extras.grantDomains || [],
     generatedEquipment: extras.generatedEquipment || [],
     conditionalVariables: extras.conditionalVariables || [],
+    activeMechanics: extras.activeMechanics,
     activatableAbilities: Array.isArray(sourceTrait.activatableAbilities)
       ? cloneJson(sourceTrait.activatableAbilities)
       : [],
@@ -1306,10 +1430,6 @@ function collectTrait(card) {
       attribute: requiredAttribute,
       score: Math.floor(requiredScore),
     };
-  }
-  if (trait.activatable) {
-    const durationConfig = traitDurationConfigs.get(traitKey(kind, index));
-    if (durationConfig) trait.durationConfig = durationConfig;
   }
   return trait;
 }

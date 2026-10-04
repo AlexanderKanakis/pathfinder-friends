@@ -11,6 +11,11 @@
       "will": 2,
       "classFeatures": [
         {
+          "name": "Bloodline",
+          "choiceSource": "sorcerer-bloodlines",
+          "description": "Choose the source of the sorcerer's inherited magic. This choice determines the sorcerer's bloodline powers, bonus spells, and bonus feats."
+        },
+        {
           "name": "Bloodline Power",
           "description": ""
         },

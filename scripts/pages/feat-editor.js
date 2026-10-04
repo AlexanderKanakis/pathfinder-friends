@@ -7,6 +7,8 @@ let dataDirectoryHandle = null;
 let dirty = false;
 let suppressDirty = false;
 let currentEffectsAccordion = null;
+let customFeatPoolDraft = null;
+let customFeatPoolSearch = "";
 
 const FEAT_FLAGS = [
   ["teamwork", "Teamwork"],
@@ -38,6 +40,10 @@ function slugify(text = "") {
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/^-+|-+$/g, "") || "feat";
+}
+
+function cloneJson(value) {
+  return JSON.parse(JSON.stringify(value || {}));
 }
 
 function splitCommaList(value = "") {
@@ -77,6 +83,177 @@ function setDirty(value = true) {
   dirty = value;
   document.title = `${dirty ? "* " : ""}PathFriends Feat Editor`;
   renderFeatList();
+}
+
+function featRef(feat = {}) {
+  return {
+    featId: feat.id || feat.slug || feat.name || "",
+    label: feat.name || feat.id || "Feat",
+    type: feat.type || (feat.types || [])[0] || "General",
+  };
+}
+
+function customFeatPoolLists() {
+  return window.PFEffectStats?.customFeatLists?.() || [];
+}
+
+function startCustomFeatPoolDraft(list = null) {
+  customFeatPoolDraft = list
+    ? cloneJson(list)
+    : {
+        id: "",
+        name: "New Feat Pool",
+        items: [],
+      };
+  customFeatPoolSearch = "";
+  renderCustomFeatPools();
+}
+
+function customFeatPoolItemKey(item = {}) {
+  return String(item.featId || item.id || item.slug || item.label || "")
+    .trim()
+    .toLowerCase();
+}
+
+function renderCustomFeatPoolSelect() {
+  const select = el("customFeatPoolSelect");
+  if (!select) return;
+  const lists = customFeatPoolLists();
+  const selected = customFeatPoolDraft?.id || "";
+  select.innerHTML = [
+    `<option value="">New Pool</option>`,
+    ...lists.map(
+      (list) =>
+        `<option value="${escapeHtml(list.id)}" ${list.id === selected ? "selected" : ""}>${escapeHtml(list.name)}</option>`,
+    ),
+  ].join("");
+}
+
+function renderCustomFeatPoolItems() {
+  const root = el("customFeatPoolItems");
+  if (!root) return;
+  const items = customFeatPoolDraft?.items || [];
+  root.innerHTML =
+    items
+      .map(
+        (item) => `
+        <div class="custom-feat-pool-row">
+          <span title="${escapeHtml(item.label || item.featId || "Feat")}">${escapeHtml(item.label || item.featId || "Feat")}</span>
+          <button class="btn btn-outline-danger btn-sm btn-icon" type="button" data-remove-pool-feat="${escapeHtml(customFeatPoolItemKey(item))}" aria-label="Remove ${escapeHtml(item.label || item.featId || "feat")}"><i class="bi bi-trash"></i></button>
+        </div>
+      `,
+      )
+      .join("") || `<div class="small-text">No feats in this pool yet.</div>`;
+  root.querySelectorAll("[data-remove-pool-feat]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const key = button.dataset.removePoolFeat || "";
+      customFeatPoolDraft.items = (customFeatPoolDraft.items || []).filter(
+        (item) => customFeatPoolItemKey(item) !== key,
+      );
+      renderCustomFeatPools();
+    });
+  });
+}
+
+function renderCustomFeatPoolResults() {
+  const root = el("customFeatPoolResults");
+  if (!root) return;
+  const selected = new Set(
+    (customFeatPoolDraft?.items || []).map(customFeatPoolItemKey),
+  );
+  const term = customFeatPoolSearch.trim().toLowerCase();
+  const matches = (featData.feats || [])
+    .filter((feat) => {
+      const key = customFeatPoolItemKey(featRef(feat));
+      if (!key || selected.has(key)) return false;
+      if (!term) return false;
+      return String(feat.name || "").toLowerCase().includes(term);
+    })
+    .sort((left, right) =>
+      String(left.name || "").localeCompare(String(right.name || "")),
+    )
+    .slice(0, 50);
+  root.innerHTML =
+    matches
+      .map((feat) => {
+        const ref = featRef(feat);
+        return `
+          <div class="custom-feat-pool-row">
+            <strong title="${escapeHtml(ref.label)}">${escapeHtml(ref.label)}</strong>
+            <button class="btn btn-outline-info btn-sm btn-icon" type="button" data-add-pool-feat="${escapeHtml(ref.featId)}" aria-label="Add ${escapeHtml(ref.label)}"><i class="bi bi-plus-lg"></i></button>
+          </div>
+        `;
+      })
+      .join("") ||
+    `<div class="small-text">${term ? "No matching feats." : "Search by feat name to add."}</div>`;
+  root.querySelectorAll("[data-add-pool-feat]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const feat = featData.feats.find(
+        (item) => String(item.id || item.slug || item.name || "") === button.dataset.addPoolFeat,
+      );
+      if (!feat) return;
+      customFeatPoolDraft.items = [
+        ...(customFeatPoolDraft.items || []),
+        featRef(feat),
+      ];
+      customFeatPoolSearch = "";
+      renderCustomFeatPools();
+    });
+  });
+}
+
+function renderCustomFeatPools() {
+  if (!el("customFeatPoolPanel")) return;
+  if (!customFeatPoolDraft) {
+    const first = customFeatPoolLists()[0] || null;
+    customFeatPoolDraft = first
+      ? cloneJson(first)
+      : { id: "", name: "New Feat Pool", items: [] };
+  }
+  renderCustomFeatPoolSelect();
+  if (el("customFeatPoolName"))
+    el("customFeatPoolName").value = customFeatPoolDraft.name || "";
+  if (el("customFeatPoolSearch"))
+    el("customFeatPoolSearch").value = customFeatPoolSearch;
+  renderCustomFeatPoolResults();
+  renderCustomFeatPoolItems();
+}
+
+function saveCustomFeatPool() {
+  const name = el("customFeatPoolName")?.value.trim() || "";
+  const items = customFeatPoolDraft?.items || [];
+  if (!name || !items.length) {
+    setStatus("Custom feat pools need a name and at least one feat.", "warning");
+    return;
+  }
+  const saved = window.PFEffectStats?.saveCustomFeatList?.({
+    ...customFeatPoolDraft,
+    name,
+    items,
+  });
+  if (!saved) {
+    setStatus("Could not save custom feat pool.", "danger");
+    return;
+  }
+  customFeatPoolDraft = cloneJson(saved);
+  renderCustomFeatPools();
+  setStatus(`Saved custom feat pool: ${saved.name}.`, "success");
+}
+
+function deleteCustomFeatPool() {
+  if (!customFeatPoolDraft?.id) {
+    startCustomFeatPoolDraft(null);
+    return;
+  }
+  if (!confirm(`Delete ${customFeatPoolDraft.name || "this custom feat pool"}?`))
+    return;
+  const lists = customFeatPoolLists().filter(
+    (list) => list.id !== customFeatPoolDraft.id,
+  );
+  window.PFEffectStats?.saveCustomFeatLists?.(lists);
+  customFeatPoolDraft = null;
+  renderCustomFeatPools();
+  setStatus("Deleted custom feat pool.", "success");
 }
 
 function normalizeFeat(feat = {}) {
@@ -240,7 +417,7 @@ function mountFeatEffects(feat) {
   const mount = el("featEffectsAccordion");
   currentEffectsAccordion = null;
   if (!mount || !window.PFEffectEditor) return;
-  currentEffectsAccordion = window.PFEffectEditor.mountEffectsAccordion(mount, {
+  currentEffectsAccordion = window.PFEffectEditor.mountMechanicGroups(mount, {
     idPrefix: `feat${selectedIndex}Effects`,
     effectsKey: "effects",
     onChange: () => {
@@ -399,11 +576,18 @@ function commitSelectedFeat() {
     immunities: extras.immunities || [],
     applyConditions: extras.applyConditions || [],
     classSkillGrants: extras.classSkillGrants || [],
+    bonusRanks: extras.bonusRanks || [],
     extraRanksPerLevel: extras.extraRanksPerLevel || [],
+    featGrants: extras.featGrants || [],
     sizeChanges: extras.sizeChanges || [],
     spellLikeAbilities: extras.spellLikeAbilities || [],
+    casterLevelBonuses: extras.casterLevelBonuses || [],
+    spellDcBonuses: extras.spellDcBonuses || [],
+    effectiveAttributeBonuses: extras.effectiveAttributeBonuses || [],
+    grantDomains: extras.grantDomains || [],
     generatedEquipment: extras.generatedEquipment || [],
     conditionalVariables: extras.conditionalVariables || [],
+    activeMechanics: extras.activeMechanics,
   });
 
   featData.feats[selectedIndex] = next;
@@ -450,6 +634,7 @@ async function loadDefaultFeats() {
   renderTypeFilter();
   renderFeatList();
   renderSelectedFeat();
+  renderCustomFeatPools();
   setStatus(
     "Loaded feat data from data/feats.json. Use Open Project Folder to save directly into this project.",
     "info",
@@ -470,6 +655,7 @@ async function readFeatsFromProjectDirectory(handle) {
   renderTypeFilter();
   renderFeatList();
   renderSelectedFeat();
+  renderCustomFeatPools();
   setStatus("Opened feat data from the selected project folder.", "success");
 }
 
@@ -601,6 +787,32 @@ el("exportSelectedFeatBtn").addEventListener("click", () => {
     setStatus(error.message || "Could not export the selected feat.", "danger");
   }
 });
+
+el("customFeatPoolSelect")?.addEventListener("change", (event) => {
+  const list =
+    customFeatPoolLists().find((item) => item.id === event.target.value) ||
+    null;
+  startCustomFeatPoolDraft(list);
+});
+
+el("newCustomFeatPoolBtn")?.addEventListener("click", () =>
+  startCustomFeatPoolDraft(null),
+);
+
+el("deleteCustomFeatPoolBtn")?.addEventListener("click", deleteCustomFeatPool);
+
+el("customFeatPoolName")?.addEventListener("input", (event) => {
+  if (!customFeatPoolDraft)
+    customFeatPoolDraft = { id: "", name: "", items: [] };
+  customFeatPoolDraft.name = event.target.value;
+});
+
+el("customFeatPoolSearch")?.addEventListener("input", (event) => {
+  customFeatPoolSearch = event.target.value || "";
+  renderCustomFeatPoolResults();
+});
+
+el("saveCustomFeatPoolBtn")?.addEventListener("click", saveCustomFeatPool);
 
 window.addEventListener("beforeunload", (event) => {
   if (!dirty) return;

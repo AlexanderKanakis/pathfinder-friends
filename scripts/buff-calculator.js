@@ -530,6 +530,70 @@
     return { total, used, ignored, conditional };
   }
 
+  function normalizeWeaponTypeRestriction(value = "all") {
+    if (window.PFEffectStats?.normalizeWeaponTypeRestriction) {
+      return window.PFEffectStats.normalizeWeaponTypeRestriction(value);
+    }
+    const key = String(value || "all")
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+    const aliases = {
+      all: "all",
+      "melee-weapon-light": "melee-light",
+      "melee-weapon-one-handed": "melee-one-handed",
+      "melee-weapon-two-handed": "melee-two-handed",
+      "ranged-weapon": "ranged",
+      natural: "natural",
+      "natural-weapon": "natural",
+    };
+    return aliases[key] || key;
+  }
+
+  function hasSpecificWeaponRestriction(bonus = {}) {
+    return (
+      (bonus.weaponTypeRestriction &&
+        normalizeWeaponTypeRestriction(bonus.weaponTypeRestriction) !== "all") ||
+      (bonus.weaponNameRestriction &&
+        String(bonus.weaponNameRestriction).toLowerCase() !== "all")
+    );
+  }
+
+  function weaponRestrictionMatches(
+    bonus = {},
+    weaponType = "",
+    weaponName = "",
+  ) {
+    if (!hasSpecificWeaponRestriction(bonus)) return true;
+    const nameMatches = window.PFEffectStats?.weaponNameRestrictionMatches
+      ? window.PFEffectStats.weaponNameRestrictionMatches(
+          bonus.weaponNameRestriction || "all", weaponName,
+        )
+      : !bonus.weaponNameRestriction ||
+        String(bonus.weaponNameRestriction).toLowerCase() === "all" ||
+        normalizeWeaponTypeRestriction(bonus.weaponNameRestriction) ===
+          normalizeWeaponTypeRestriction(weaponName);
+    if (!nameMatches) return false;
+    if (window.PFEffectStats?.weaponTypeRestrictionMatches) {
+      return window.PFEffectStats.weaponTypeRestrictionMatches(
+        bonus.weaponTypeRestriction,
+        weaponType,
+        weaponName,
+      );
+    }
+    if (
+      normalizeWeaponTypeRestriction(bonus.weaponTypeRestriction) ===
+      "unarmed-strike"
+    ) {
+      return normalizeWeaponTypeRestriction(weaponName) === "unarmed-strike";
+    }
+    return (
+      normalizeWeaponTypeRestriction(bonus.weaponTypeRestriction) ===
+      normalizeWeaponTypeRestriction(weaponType)
+    );
+  }
+
   function scaleLevelValue(scale, buff, context = {}) {
     const source = scale?.source || { type: "caster" };
     if (source.type === "character")
@@ -557,6 +621,25 @@
     return Math.max(1, Number(buff.casterLevel || 1) || 1);
   }
 
+  function skillRankKeyForStat(stat = "") {
+    const normalized = normalizeStat(stat);
+    if (normalized.startsWith("skill:")) return normalized;
+    if (normalized === "craft skill checks") return "skill:craft";
+    if (normalized === "profession skill checks") return "skill:profession";
+    if (normalized === "perform skill checks") return "skill:perform";
+    return "";
+  }
+
+  function skillRanksForBonus(rawBonus = {}, context = {}) {
+    const rankKey = skillRankKeyForStat(context.targetStat || rawBonus.stat);
+    if (!rankKey) return 0;
+    const ranks = context.skillRanks || context.baseline?.skillRanks || {};
+    const direct = Number(ranks[rankKey] || 0);
+    if (direct) return direct;
+    const compact = rankKey.slice("skill:".length).replace(/[^a-z0-9]/g, "");
+    return Number(ranks[`skill:${compact}`] || 0);
+  }
+
   function scaledBonusValue(rawBonus, buff, context = {}) {
     const scale = rawBonus.bonusScale || rawBonus.scale;
     const baseValue = Number(rawBonus.value || 0);
@@ -582,13 +665,34 @@
       Number(every.fromLevel || every.afterLevel || every.after || 0) > 0 ||
       Number(every.everyLevels || every.every || 0) > 0 ||
       Number(every.increase || 0) !== 0;
+    const skillRankThresholds = Array.isArray(scale.skillRankThresholds)
+      ? scale.skillRankThresholds
+      : [];
+    const hasSkillRankThresholds = skillRankThresholds.some(
+      (threshold) =>
+        Number(threshold.ranks ?? threshold.rank ?? 0) > 0 &&
+        Number.isFinite(Number(threshold.value || 0)),
+    );
+    const multiplierNumerator = Number(multiplier?.numerator || 0);
+    const multiplierDenominator = Number(multiplier?.denominator || 0);
+    const hasLevelMultiplier =
+      multiplierDenominator > 0 &&
+      !(
+        multiplierNumerator === 1 &&
+        multiplierDenominator === 1 &&
+        (hasMilestones || hasEvery || hasSkillRankThresholds)
+      );
     let value =
-      multiplier && Number(multiplier.denominator) > 0
-        ? Math.floor(
-            (level * Number(multiplier.numerator || 0)) /
-              Number(multiplier.denominator),
+      hasLevelMultiplier
+        ? baseValue +
+          Math.floor(
+            (level * multiplierNumerator) / multiplierDenominator,
           )
-        : scale.source && !baseValue && !hasMilestones && !hasEvery
+        : scale.source &&
+            !baseValue &&
+            !hasMilestones &&
+            !hasEvery &&
+            !hasSkillRankThresholds
           ? level
           : baseValue;
 
@@ -601,6 +705,23 @@
       .sort((a, b) => a.level - b.level)
       .forEach((milestone) => {
         value = milestone.value;
+      });
+
+    const skillRanks = skillRanksForBonus(rawBonus, context);
+    skillRankThresholds
+      .map((threshold) => ({
+        ranks: Number(threshold.ranks ?? threshold.rank ?? 0),
+        value: Number(threshold.value || 0),
+      }))
+      .filter(
+        (threshold) =>
+          threshold.ranks > 0 &&
+          threshold.ranks <= skillRanks &&
+          Number.isFinite(threshold.value),
+      )
+      .sort((a, b) => a.ranks - b.ranks)
+      .forEach((threshold) => {
+        value = threshold.value;
       });
 
     const fromLevel = Number(
@@ -650,6 +771,8 @@
       all: "all",
       class: "class",
       classes: "class",
+      domain: "domain",
+      domains: "domain",
       school: "school",
       schools: "school",
       subschool: "subschool",
@@ -672,6 +795,26 @@
     return String(value || "")
       .trim()
       .toLowerCase();
+  }
+
+  function normalizedDomainTargetValue(value) {
+    return normalizedSpellTargetValue(value)
+      .replace(/\s+(?:subdomain|domain)$/i, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+  }
+
+  function normalizedBloodlineTargetValue(value) {
+    return normalizedSpellTargetValue(value)
+      .replace(/\s+bloodline$/i, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+  }
+
+  function spellAdjustmentBloodline(entry = {}) {
+    return normalizedBloodlineTargetValue(
+      entry.bloodlineId || entry.bloodline || entry.bloodlineName || "any",
+    );
   }
 
   function normalizedSubschoolTargetValue(value) {
@@ -711,6 +854,216 @@
     );
   }
 
+  function spellAdjustmentChooseOnApply(entry = {}) {
+    return Boolean(
+      entry.chooseOnApply ||
+        entry.pickOne ||
+        entry.pickWhenApplied ||
+        entry.choice ||
+        entry.choose,
+    );
+  }
+
+  function normalizedSpellAdjustmentSource(value = "strict-spells") {
+    const raw = String(value || "strict-spells")
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "");
+    const aliases = {
+      all: "all",
+      any: "all",
+      everything: "all",
+      strictspell: "strict-spells",
+      strictspells: "strict-spells",
+      spell: "strict-spells",
+      spells: "strict-spells",
+      castspell: "strict-spells",
+      castspells: "strict-spells",
+      spelllikeability: "spell-like-abilities",
+      spelllikeabilities: "spell-like-abilities",
+      spelllike: "spell-like-abilities",
+      sla: "spell-like-abilities",
+      slas: "spell-like-abilities",
+      extract: "extracts",
+      extracts: "extracts",
+      formula: "extracts",
+      formulae: "extracts",
+      draught: "draughts",
+      draughts: "draughts",
+      draft: "draughts",
+      drafts: "draughts",
+      classability: "class-abilities",
+      classabilities: "class-abilities",
+      classpower: "class-abilities",
+      classpowers: "class-abilities",
+      domainpower: "class-abilities",
+      domainpowers: "class-abilities",
+      bomb: "class-abilities",
+      bombs: "class-abilities",
+      alchemistbomb: "class-abilities",
+      alchemistbombs: "class-abilities",
+      talent: "class-abilities",
+      talents: "class-abilities",
+      wildtalent: "class-abilities",
+      wildtalents: "class-abilities",
+      kineticwildtalent: "class-abilities",
+      kineticwildtalents: "class-abilities",
+    };
+    return (
+      aliases[raw] ||
+      ([
+        "all",
+        "strict-spells",
+        "spell-like-abilities",
+        "extracts",
+        "draughts",
+        "class-abilities",
+      ].includes(value)
+        ? value
+        : "strict-spells")
+    );
+  }
+
+  function spellAdjustmentSource(entry = {}) {
+    return spellAdjustmentSources(entry)[0] || "strict-spells";
+  }
+
+  function spellAdjustmentSources(entry = {}) {
+    const raw =
+      entry.spellSources ||
+      entry.appliesToSources ||
+      entry.sourceKinds ||
+      entry.appliesToKinds ||
+      entry.spellSource ||
+      entry.appliesToSource ||
+      entry.appliesToKind ||
+      entry.sourceKind ||
+      entry.effectKind ||
+      entry.spellKind ||
+      "strict-spells";
+    const sources = listFromValue(raw).map(normalizedSpellAdjustmentSource);
+    const unique = [...new Set(sources.filter(Boolean))];
+    if (unique.includes("all")) return ["all"];
+    return unique.length ? unique : ["strict-spells"];
+  }
+
+  function spellContextSource(context = {}) {
+    return normalizedSpellAdjustmentSource(
+      context.spellSource ||
+        context.appliesToSource ||
+        context.sourceKind ||
+        context.effectKind ||
+        context.spellKind ||
+        context.magicSource ||
+        "strict-spells",
+    );
+  }
+
+  function spellAdjustmentAppliesToSource(entry = {}, spellContext = {}) {
+    const sources = spellAdjustmentSources(entry);
+    return (
+      sources.includes("all") ||
+      sources.includes(spellContextSource(spellContext))
+    );
+  }
+
+  function spellAdjustmentTargetFilters(entry = {}) {
+    const rawFilters = Array.isArray(entry.targetFilters)
+      ? entry.targetFilters
+      : Array.isArray(entry.filters)
+        ? entry.filters
+        : [];
+    const filters = rawFilters
+      .map((filter) => ({
+        targetMode: normalizedSpellTargetMode(filter),
+        targets:
+          normalizedSpellTargetMode(filter) === "all"
+            ? []
+            : spellAdjustmentTargets(filter),
+        ...(spellAdjustmentChooseOnApply(filter) ? { chooseOnApply: true } : {}),
+        ...(normalizedSpellTargetMode(filter) === "class" &&
+        spellAdjustmentBloodline(filter) !== "any"
+          ? { bloodline: spellAdjustmentBloodline(filter) }
+          : {}),
+      }))
+      .filter(
+        (filter) =>
+          filter.targetMode === "all" ||
+          filter.targets.length ||
+          filter.chooseOnApply,
+      );
+    const specificFilters = filters.filter(
+      (filter) => filter.targetMode !== "all",
+    );
+    if (specificFilters.length) return specificFilters;
+    if (filters.length) return filters;
+    const targetMode = normalizedSpellTargetMode(entry);
+    return [
+      {
+        targetMode,
+        targets: targetMode === "all" ? [] : spellAdjustmentTargets(entry),
+        ...(spellAdjustmentChooseOnApply(entry) ? { chooseOnApply: true } : {}),
+        ...(targetMode === "class" && spellAdjustmentBloodline(entry) !== "any"
+          ? { bloodline: spellAdjustmentBloodline(entry) }
+          : {}),
+      },
+    ];
+  }
+
+  function spellAdjustmentIncreases(entry = {}, isCasterLevel = false) {
+    const raw = Array.isArray(entry.adjustments)
+      ? entry.adjustments
+      : Array.isArray(entry.increases)
+        ? entry.increases
+        : [];
+    const increases = raw
+      .map((increase) => ({
+        ...increase,
+        value: Number(increase.value ?? increase.amount ?? 0),
+        type: increase.type || entry.type || "untyped",
+        stacks: Boolean(increase.stacks ?? entry.stacks),
+        conditional: Boolean(increase.conditional || entry.conditional),
+        appliesWhen:
+          increase.appliesWhen || increase.condition || entry.appliesWhen || "",
+        ...(isCasterLevel
+          ? {
+              appliesTo:
+                increase.appliesTo ||
+                increase.applyTo ||
+                increase.part ||
+                entry.appliesTo ||
+                entry.applyTo ||
+                entry.part ||
+                "spell",
+            }
+          : {}),
+        ...(increase.bonusScale || increase.scale || entry.bonusScale || entry.scale
+          ? {
+              bonusScale:
+                increase.bonusScale ||
+                increase.scale ||
+                entry.bonusScale ||
+                entry.scale,
+            }
+          : {}),
+      }))
+      .filter((increase) => increase.value || increase.bonusScale);
+    if (increases.length) return increases;
+    return [
+      {
+        ...entry,
+        value: Number(entry.value ?? entry.amount ?? 0),
+        type: entry.type || "untyped",
+        stacks: Boolean(entry.stacks),
+        conditional: Boolean(entry.conditional),
+        appliesWhen: entry.appliesWhen || entry.condition || "",
+        ...(isCasterLevel
+          ? { appliesTo: entry.appliesTo || entry.applyTo || entry.part || "spell" }
+          : {}),
+      },
+    ].filter((increase) => increase.value || increase.bonusScale || increase.scale);
+  }
+
   function spellContextValues(context = {}, fields = []) {
     return fields.flatMap((field) => {
       const value = context[field];
@@ -720,9 +1073,10 @@
     });
   }
 
-  function spellAdjustmentMatches(entry = {}, spellContext = {}) {
+  function spellAdjustmentFilterMatches(entry = {}, spellContext = {}) {
     const mode = normalizedSpellTargetMode(entry);
     if (mode === "all") return true;
+    if (spellAdjustmentChooseOnApply(entry)) return false;
     const targets = spellAdjustmentTargets(entry);
     if (!targets.length) return false;
     const targetKeys = targets.map(normalizedSpellTargetValue);
@@ -748,8 +1102,50 @@
         .map(normalizedSubschoolTargetValue)
         .some((target) => contextPairs.includes(target));
     }
+    if (mode === "domain") {
+      const matchingValues = spellContextValues(spellContext, [
+        "matchingDomainIds",
+        "matchingDomainNames",
+      ]).map(normalizedDomainTargetValue);
+      const characterValues = spellContextValues(spellContext, [
+        "characterDomainIds",
+        "characterDomains",
+        "characterDomainNames",
+      ]).map(normalizedDomainTargetValue);
+      const spellValues = spellContextValues(spellContext, [
+        "spellDomainIds",
+        "spellDomains",
+        "spellDomainNames",
+      ]).map(normalizedDomainTargetValue);
+      const values = matchingValues.length
+        ? matchingValues
+        : characterValues.length
+          ? []
+          : spellValues;
+      return targets
+        .map(normalizedDomainTargetValue)
+        .some((target) => values.includes(target));
+    }
+    if (mode === "class") {
+      const classes = spellContextValues(spellContext, [
+        "className",
+        "castingClass",
+        "spellClass",
+      ]).map(normalizedSpellTargetValue);
+      if (!targetKeys.some((target) => classes.includes(target))) return false;
+      const bloodline = spellAdjustmentBloodline(entry);
+      if (!bloodline || bloodline === "any") return true;
+      const characterBloodlines = spellContextValues(spellContext, [
+        "bloodlineId",
+        "bloodline",
+        "bloodlineName",
+        "classBloodlineId",
+        "classBloodline",
+        "classBloodlines",
+      ]).map(normalizedBloodlineTargetValue);
+      return characterBloodlines.includes(bloodline);
+    }
     const fieldsByMode = {
-      class: ["className", "castingClass", "spellClass"],
       school: ["school"],
       descriptor: ["descriptor", "descriptors"],
       magicType: ["magicType", "magicTypes", "typeOfMagic"],
@@ -758,6 +1154,14 @@
       normalizedSpellTargetValue,
     );
     return targetKeys.some((target) => values.includes(target));
+  }
+
+  function spellAdjustmentMatches(entry = {}, spellContext = {}) {
+    const filters = spellAdjustmentTargetFilters(entry);
+    if (!filters.length) return true;
+    if (filters.every((filter) => filter.targetMode === "all")) return true;
+    const matches = (filter) => spellAdjustmentFilterMatches(filter, spellContext);
+    return filters.some(matches);
   }
 
   function normalizedCasterLevelPart(value = "spell") {
@@ -782,11 +1186,13 @@
   }
 
   function casterLevelBonusAppliesToPart(entry = {}, part = "spell") {
-    const appliesTo = normalizedCasterLevelPart(
-      entry.appliesTo || entry.applyTo || entry.part || "spell",
-    );
+    const rawAppliesTo =
+      entry.appliesTo || entry.applyTo || entry.part || "spell";
+    const appliesTo = Array.isArray(rawAppliesTo)
+      ? rawAppliesTo.map(normalizedCasterLevelPart)
+      : listFromValue(rawAppliesTo).map(normalizedCasterLevelPart);
     const targetPart = normalizedCasterLevelPart(part);
-    return appliesTo === "spell" || appliesTo === targetPart;
+    return appliesTo.includes("spell") || appliesTo.includes(targetPart);
   }
 
   function collectSpellAdjustmentBonuses(
@@ -816,23 +1222,36 @@
       (Array.isArray(buff[mechanicKey]) ? buff[mechanicKey] : []).forEach(
         (entry) => {
           if (hasUnresolvedConditionalTokens(entry)) return;
-          if (mechanicKey === "casterLevelBonuses") {
-            const part = options.part || spellContext.part || "spell";
-            if (!casterLevelBonusAppliesToPart(entry, part)) return;
-          }
+          if (!spellAdjustmentAppliesToSource(entry, spellContext)) return;
           if (!spellAdjustmentMatches(entry, spellContext)) return;
-          const value = scaledBonusValue(entry, buff, {
-            ...options,
-            activeBuffs: enrichedBuffs,
-            spellContext,
-          });
-          if (!value && !(entry.bonusScale || entry.scale)) return;
-          bonuses.push({
-            ...entry,
-            value,
-            type: entry.type || "untyped",
-            source: buff.name || buff.source || "Effect",
-            appliesWhen: entry.appliesWhen || entry.condition || "",
+          const isCasterLevel = mechanicKey === "casterLevelBonuses";
+          spellAdjustmentIncreases(entry, isCasterLevel).forEach((increase) => {
+            if (hasUnresolvedConditionalTokens(increase)) return;
+            if (isCasterLevel) {
+              const part = options.part || spellContext.part || "spell";
+              if (!casterLevelBonusAppliesToPart(increase, part)) return;
+            }
+            const value = scaledBonusValue(increase, buff, {
+              ...options,
+              activeBuffs: enrichedBuffs,
+              spellContext,
+            });
+            if (!value && !(increase.bonusScale || increase.scale)) return;
+            bonuses.push({
+              ...entry,
+              ...increase,
+              value,
+              type: increase.type || entry.type || "untyped",
+              spellSource: spellAdjustmentSource(entry),
+              source: buff.name || buff.source || "Effect",
+              conditional: Boolean(entry.conditional || increase.conditional),
+              appliesWhen:
+                increase.appliesWhen ||
+                increase.condition ||
+                entry.appliesWhen ||
+                entry.condition ||
+                "",
+            });
           });
         },
       );
@@ -891,15 +1310,94 @@
     };
   }
 
-  function collectBuffModifiers(activeBuffs) {
+  function normalizedEffectiveAttribute(entry = {}) {
+    const raw = String(entry.attribute || entry.ability || entry.stat || "")
+      .trim()
+      .toLowerCase();
+    const aliases = {
+      str: "strength",
+      strength: "strength",
+      dex: "dexterity",
+      dexterity: "dexterity",
+      con: "constitution",
+      constitution: "constitution",
+      int: "intelligence",
+      intelligence: "intelligence",
+      wis: "wisdom",
+      wisdom: "wisdom",
+      cha: "charisma",
+      charisma: "charisma",
+    };
+    return aliases[raw] || "";
+  }
+
+  function collectEffectiveAttributeBonuses(
+    activeBuffs = [],
+    attribute = "",
+    spellContext = {},
+    options = {},
+  ) {
+    const targetAttribute = normalizedEffectiveAttribute({ attribute });
+    if (!targetAttribute) return applyBonuses([], options);
+    const bonuses = [];
+    const enrichedBuffs = (activeBuffs || []).map((buff) => ({
+      ...buff,
+      characterLevel:
+        buff.characterLevel || options.characterLevel || spellContext.characterLevel,
+      classLevel:
+        buff.classLevel ||
+        options.classLevel ||
+        spellContext.classLevel ||
+        spellContext.casterLevel,
+      casterLevel:
+        buff.casterLevel ||
+        options.casterLevel ||
+        spellContext.casterLevel ||
+        spellContext.classLevel,
+      classLevels: buff.classLevels || options.classLevels || spellContext.classLevels,
+    }));
+    enrichedBuffs.forEach((buff) => {
+      (Array.isArray(buff.effectiveAttributeBonuses)
+        ? buff.effectiveAttributeBonuses
+        : []
+      ).forEach((entry) => {
+        if (hasUnresolvedConditionalTokens(entry)) return;
+        if (normalizedEffectiveAttribute(entry) !== targetAttribute) return;
+        if (!spellAdjustmentAppliesToSource(entry, spellContext)) return;
+        if (!spellAdjustmentMatches(entry, spellContext)) return;
+        const value = scaledBonusValue(entry, buff, {
+          ...options,
+          activeBuffs: enrichedBuffs,
+          spellContext,
+        });
+        if (!value && !(entry.bonusScale || entry.scale)) return;
+        bonuses.push({
+          ...entry,
+          value,
+          type: entry.type || "untyped",
+          source: buff.name || buff.source || "Effect",
+          spellSource: spellAdjustmentSource(entry),
+          conditional: Boolean(entry.conditional),
+          appliesWhen: entry.appliesWhen || entry.condition || "",
+        });
+      });
+    });
+    return applyBonuses(bonuses, options);
+  }
+
+  function collectBuffModifiers(activeBuffs, context = {}) {
     const map = {};
 
     activeBuffs.forEach((buff) => {
       (buff.bonuses || []).forEach((rawBonus) => {
         if (hasUnresolvedConditionalTokens(rawBonus)) return;
         const targets = expandedStatsForBonus(rawBonus);
-        const value = scaledBonusValue(rawBonus, buff, { activeBuffs });
         targets.forEach((targetStat) => {
+          const value = scaledBonusValue(rawBonus, buff, {
+            ...context,
+            activeBuffs,
+            targetStat,
+          });
           if (!map[targetStat]) map[targetStat] = [];
           map[targetStat].push({
             ...rawBonus,
@@ -1010,12 +1508,15 @@
       classLevel: buff.classLevel || baseline.classLevel,
       classLevels: buff.classLevels || baseline.classLevels,
     }));
-    const buffMap = collectBuffModifiers(enrichedBuffs);
+    const buffMap = collectBuffModifiers(enrichedBuffs, {
+      baseline,
+      skillRanks: baseline?.skillRanks || {},
+    });
     let suppressedBonusTypes = new Map();
     let conditionalSuppressedBonusTypes = new Map();
     let requirementAbilityScores = {};
     const applyActiveBonuses = (bonuses) =>
-      applyBonuses(bonuses, {
+      applyBonuses((bonuses || []).filter((bonus) => !hasSpecificWeaponRestriction(bonus)), {
         suppressedBonusTypes,
         conditionalSuppressedBonusTypes,
         abilityScores: requirementAbilityScores,
@@ -1499,7 +2000,73 @@
       ),
     );
 
-    return { totals, bonuses, breakdown, abilityScores, abilityMods, buffMap };
+    return {
+      totals,
+      bonuses,
+      breakdown,
+      abilityScores,
+      abilityMods,
+      buffMap,
+      bonusContext: {
+        suppressedBonusTypes,
+        conditionalSuppressedBonusTypes,
+        abilityScores: requirementAbilityScores,
+      },
+    };
+  }
+
+  function weaponBonusesForStats(
+    calculation = {},
+    statNames = [],
+    weaponType = "",
+    weaponName = "",
+  ) {
+    const context = calculation.bonusContext || {};
+    const byStat = {};
+    const breakdown = [];
+    let total = 0;
+    [...new Set(statNames.filter(Boolean))].forEach((stat) => {
+      const bonuses = (calculation.buffMap?.[stat] || []).filter((bonus) =>
+        weaponRestrictionMatches(bonus, weaponType, weaponName),
+      );
+      const applied = applyBonuses(bonuses, context);
+      byStat[stat] = applied;
+      total += applied.total;
+      applied.used.forEach((bonus) =>
+        breakdown.push({
+          ...bonus,
+          stat,
+          source: bonus.source,
+          value: bonus.value,
+          type: bonus.type || "untyped",
+          applied: true,
+        }),
+      );
+      applied.ignored.forEach((bonus) =>
+        breakdown.push({
+          ...bonus,
+          stat,
+          source: bonus.source,
+          value: bonus.value,
+          type: bonus.type || "untyped",
+          detail: bonus.ignoredReason || "not applied",
+          applied: false,
+        }),
+      );
+      applied.conditional.forEach((bonus) =>
+        breakdown.push({
+          ...bonus,
+          stat,
+          source: bonus.source,
+          value: bonus.value,
+          type: bonus.type || "untyped",
+          detail: bonus.appliesWhen || bonus.conditionalReason || "conditional",
+          applied: "conditional",
+          conditional: true,
+        }),
+      );
+    });
+    return { total, byStat, breakdown };
   }
 
   window.PFBuffs = {
@@ -1512,6 +2079,8 @@
     collectSpellAdjustmentBonuses,
     effectiveCasterLevel,
     effectiveSpellDc,
+    collectEffectiveAttributeBonuses,
     spellAdjustmentMatches,
+    weaponBonusesForStats,
   };
 })();

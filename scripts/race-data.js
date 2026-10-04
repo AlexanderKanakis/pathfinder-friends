@@ -133,26 +133,53 @@
       });
   }
 
-  const TRAIT_MECHANIC_KEYS = [
-    "effects",
-    "damageReduction",
-    "spellResistance",
-    "immunities",
-    "applyConditions",
-    "classSkillGrants",
-    "extraRanksPerLevel",
-    "sizeChanges",
-    "spellLikeAbilities",
-    "generatedEquipment",
-  ];
+  const TRAIT_MECHANIC_KEYS =
+    window.PFEffectMechanics?.mechanicKeys?.() || [
+      "effects",
+      "damageReduction",
+      "spellResistance",
+      "immunities",
+      "applyConditions",
+      "classSkillGrants",
+      "extraRanksPerLevel",
+      "featGrants",
+      "sizeChanges",
+      "spellLikeAbilities",
+      "casterLevelBonuses",
+      "spellDcBonuses",
+      "effectiveAttributeBonuses",
+      "grantDomains",
+      "generatedEquipment",
+      "conditionalVariables",
+    ];
 
   function hasTraitOverrideMechanics(override = {}) {
-    return TRAIT_MECHANIC_KEYS.some((key) =>
-      normalizedMechanicOperations(override.mechanicOverrides?.[key]).some(
-        (operation) =>
-          operation.action === "remove" ||
-          (["add", "replace"].includes(operation.action) && operation.value),
-      ),
+    return (
+      [override.mechanicOverrides, override.activeMechanicOverrides].some(
+        (group) =>
+          TRAIT_MECHANIC_KEYS.some((key) =>
+            normalizedMechanicOperations(group?.[key]).some(
+              (operation) =>
+                operation.action === "remove" ||
+                (["add", "replace"].includes(operation.action) &&
+                  operation.value),
+            ),
+          ),
+      ) || Boolean(override.activeDurationConfig)
+    );
+  }
+
+  function traitMechanicGroup(trait = {}, group = "passive") {
+    const mechanics = window.PFEffectMechanics;
+    if (group === "active") {
+      return (
+        mechanics?.activeMechanics?.(trait) ||
+        (trait.activatable ? trait : trait.activeMechanics || {})
+      );
+    }
+    return (
+      mechanics?.passiveMechanics?.(trait) ||
+      (trait.activatable ? {} : trait)
     );
   }
 
@@ -188,6 +215,8 @@
           normalized.targetKey = operation.targetKey || "";
         }
         if (action !== "remove") normalized.value = operation.value || null;
+        if (action === "add" && operation.preserveAsAddition)
+          normalized.preserveAsAddition = true;
         if (action !== "remove" && !normalized.value) return null;
         return normalized;
       })
@@ -203,6 +232,36 @@
         seen.add(key);
         return true;
       });
+  }
+
+  function promoteLegacyAdditionsToReplacements(
+    operations = [],
+    standardRows = [],
+  ) {
+    if (!standardRows.length) return operations;
+    if (
+      operations.some(
+        (operation) =>
+          operation.action === "replace" || operation.action === "remove",
+      )
+    )
+      return operations;
+    let targetIndex = 0;
+    return operations.map((operation) => {
+      if (
+        operation.action !== "add" ||
+        operation.preserveAsAddition ||
+        targetIndex >= standardRows.length
+      )
+        return operation;
+      const index = targetIndex++;
+      return {
+        action: "replace",
+        targetIndex: index,
+        targetKey: stableMechanicKey(standardRows[index]),
+        value: operation.value,
+      };
+    });
   }
 
   function legacyCategoryReplacementOperations(
@@ -242,14 +301,52 @@
         const standardTrait = (standardTraits || []).find(
           (entry) => traitRelationKey(entry.name || entry.trait || "") === traitRelationKey(trait),
         );
-        const normalized = { trait, mechanicOverrides: {} };
+        const normalized = {
+          trait,
+          mechanicOverrides: {},
+          activeMechanicOverrides: {},
+        };
+        const passiveMechanics = traitMechanicGroup(standardTrait, "passive");
+        const activeMechanics = traitMechanicGroup(standardTrait, "active");
         TRAIT_MECHANIC_KEYS.forEach((key) => {
-          const operations = [
+          const passiveRows = Array.isArray(passiveMechanics?.[key])
+            ? passiveMechanics[key]
+            : [];
+          const activeRows = Array.isArray(activeMechanics?.[key])
+            ? activeMechanics[key]
+            : [];
+          const legacyOperations = [
             ...normalizedMechanicOperations(override.mechanicOverrides?.[key]),
             ...legacyCategoryReplacementOperations(key, override, standardTrait),
           ];
-          if (operations.length) normalized.mechanicOverrides[key] = operations;
+          const legacyTargetsActive =
+            standardTrait?.activatable === true &&
+            !standardTrait?.activeMechanics &&
+            !passiveRows.length &&
+            activeRows.length;
+          const passiveOperations = promoteLegacyAdditionsToReplacements(
+            legacyTargetsActive ? [] : legacyOperations,
+            passiveRows,
+          );
+          const activeOperations = promoteLegacyAdditionsToReplacements(
+            [
+              ...normalizedMechanicOperations(
+                override.activeMechanicOverrides?.[key],
+              ),
+              ...(legacyTargetsActive ? legacyOperations : []),
+            ],
+            activeRows,
+          );
+          if (passiveOperations.length)
+            normalized.mechanicOverrides[key] = passiveOperations;
+          if (activeOperations.length)
+            normalized.activeMechanicOverrides[key] = activeOperations;
         });
+        if (override.activeDurationConfig) {
+          normalized.activeDurationConfig = cloneJson(
+            override.activeDurationConfig,
+          );
+        }
         return normalized;
       })
       .filter(Boolean)
@@ -295,6 +392,71 @@
       slug: race.slug || slugify(name),
       group: race.group || "Other Races",
     });
+  }
+
+  function operationMatchesRow(operation = {}, row = {}, index = 0) {
+    return operation.targetKey
+      ? operation.targetKey === stableMechanicKey(row)
+      : Number(operation.targetIndex) === index;
+  }
+
+  function applyMechanicOperations(baseRows = [], operations = []) {
+    const rows = (Array.isArray(baseRows) ? baseRows : [])
+      .map((row, index) => {
+        const operation = [...(Array.isArray(operations) ? operations : [])]
+          .reverse()
+          .find((entry) => operationMatchesRow(entry, row, index));
+        if (!operation || operation.action === "keep") return row;
+        if (operation.action === "remove") return null;
+        return operation.action === "replace" && operation.value
+          ? operation.value
+          : row;
+      })
+      .filter(Boolean);
+    const additions = (Array.isArray(operations) ? operations : [])
+      .filter((operation) => operation.action === "add" && operation.value)
+      .map((operation) => operation.value);
+    return [...rows, ...additions];
+  }
+
+  function applyModifiedTraitOverride(trait = {}, override = {}) {
+    if (!hasTraitOverrideMechanics(override)) return trait;
+    const passiveSource = traitMechanicGroup(trait, "passive");
+    const activeSource = { ...traitMechanicGroup(trait, "active") };
+    const merged = { ...trait };
+    TRAIT_MECHANIC_KEYS.forEach((key) => {
+      const passiveOperations = normalizedMechanicOperations(
+        override.mechanicOverrides?.[key],
+      );
+      merged[key] = passiveOperations.length
+        ? applyMechanicOperations(passiveSource[key], passiveOperations)
+        : Array.isArray(passiveSource[key])
+          ? passiveSource[key]
+          : [];
+
+      const activeOperations = normalizedMechanicOperations(
+        override.activeMechanicOverrides?.[key],
+      );
+      activeSource[key] = activeOperations.length
+        ? applyMechanicOperations(activeSource[key], activeOperations)
+        : Array.isArray(activeSource[key])
+          ? activeSource[key]
+          : [];
+    });
+    const durationConfig =
+      override.activeDurationConfig || activeSource.durationConfig || null;
+    const hasActive = window.PFEffectMechanics?.hasAnyMechanics
+      ? window.PFEffectMechanics.hasAnyMechanics(activeSource)
+      : TRAIT_MECHANIC_KEYS.some((key) => activeSource[key]?.length);
+    if (hasActive || durationConfig) {
+      merged.activeMechanics = {
+        ...activeSource,
+        ...(durationConfig ? { durationConfig } : {}),
+      };
+    } else {
+      delete merged.activeMechanics;
+    }
+    return merged;
   }
 
   function compactGroupRaceRef(entry = {}) {
@@ -365,6 +527,7 @@
   }
 
   window.PFRaceData = {
+    applyModifiedTraitOverride,
     dataPath: DATA_PATH,
     compactRaceData,
     canonicalTraitTargets,

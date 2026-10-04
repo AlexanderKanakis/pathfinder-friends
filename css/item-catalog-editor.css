@@ -99,130 +99,6 @@ body {
   margin-bottom: 12px;
 }
 
-.shared-bonus-row {
-  position: relative;
-  display: grid;
-  grid-template-columns: 1.5fr 0.7fr 1fr 0.7fr auto;
-  gap: 8px;
-  align-items: end;
-  background: #242424;
-  border: 1px solid #444;
-  border-radius: 8px;
-  padding: 10px 48px 10px 10px;
-}
-
-.shared-bonus-row .shared-named-skill-field {
-  grid-column: 1 / -1;
-  max-width: 280px;
-}
-
-.shared-bonus-row button[aria-label="Delete effect"] {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 30px;
-  height: 30px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-}
-
-.shared-bonus-condition-inline {
-  grid-column: 1 / -1;
-  display: grid;
-  grid-template-columns: auto minmax(160px, 260px);
-  gap: 8px;
-  align-items: end;
-}
-
-.shared-bonus-row [data-scale-summary] {
-  grid-column: 1 / -1;
-}
-
-.shared-dr-row {
-  display: grid;
-  grid-template-columns: 0.7fr 1.3fr auto auto;
-  gap: 8px;
-  align-items: end;
-  background: #242424;
-  border: 1px solid #444;
-  border-radius: 8px;
-  padding: 8px;
-}
-
-.shared-sr-row {
-  display: grid;
-  grid-template-columns: 0.5fr auto 0.9fr auto auto;
-  gap: 8px;
-  align-items: end;
-  background: #242424;
-  border: 1px solid #444;
-  border-radius: 8px;
-  padding: 8px;
-}
-
-.shared-dr-row [data-scale-summary],
-.shared-sr-row [data-scale-summary] {
-  grid-column: 1 / -1;
-}
-
-.shared-class-skill-row {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 8px;
-  align-items: end;
-  background: #242424;
-  border: 1px solid #444;
-  border-radius: 8px;
-  padding: 8px;
-}
-
-.shared-class-skill-row .shared-named-skill-field {
-  grid-column: 1 / -1;
-}
-
-/* The "Extra" accordion item (DR/SR/Class Skills, compacted into one
-   collapsed section) mounted by scripts/effect-editor.js's
-   mountExtraAccordion -- shared markup/classes across every
-   effect-authoring surface in the app. */
-.shared-extra-accordion .accordion-item {
-  background: transparent;
-  border: 0;
-}
-
-.shared-extra-accordion .accordion-button {
-  background: #242424;
-  color: #ddd;
-  padding: 8px 10px;
-  font-size: 13px;
-}
-
-.shared-extra-accordion .accordion-button:not(.collapsed) {
-  background: #2b2b2b;
-  color: #fff;
-  box-shadow: none;
-}
-
-.shared-extra-accordion .accordion-button::after {
-  filter: invert(1) grayscale(1) brightness(1.6);
-}
-
-.shared-extra-accordion .accordion-body {
-  background: #1e1e1e;
-  border: 1px solid #333;
-  border-top: 0;
-  padding: 10px;
-}
-
-.shared-extra-subsection {
-  margin-bottom: 14px;
-}
-
-.shared-extra-subsection:last-child {
-  margin-bottom: 0;
-}
-
 .small-text {
   color: #aaa;
   font-size: 12px;
@@ -243,8 +119,6 @@ body {
   .item-list {
     max-height: 280px;
   }
-  .shared-bonus-row,
-  .shared-bonus-condition-inline,
   .item-detail-grid {
     grid-template-columns: 1fr 1fr;
   }

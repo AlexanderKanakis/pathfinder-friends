@@ -1,0 +1,149 @@
+body {
+  background-color: #121212;
+  color: white;
+}
+
+.editor-shell {
+  display: grid;
+  grid-template-columns: minmax(280px, 390px) minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.panel {
+  background: #1e1e1e;
+  border: 1px solid #333;
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.spell-filter-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 96px;
+  gap: 8px;
+}
+
+.spell-list {
+  display: grid;
+  gap: 8px;
+  max-height: calc(100vh - 355px);
+  overflow: auto;
+  padding-right: 2px;
+}
+
+.spell-group {
+  display: grid;
+  gap: 4px;
+}
+
+.spell-group-heading {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: #1e1e1e;
+  color: #9fb0bf;
+  border-bottom: 1px solid #3d3d3d;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0;
+  padding: 4px 0;
+  text-transform: uppercase;
+}
+
+.spell-list button {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  text-align: left;
+}
+
+.spell-list-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.spell-list-meta {
+  color: #aaa;
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.spell-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.spell-detail-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.level-card {
+  background: #242424;
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.spell-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  align-items: end;
+}
+
+.spell-summary-grid .grid-column-half {
+  grid-column: span 2;
+}
+
+.spell-summary-grid .grid-column-full {
+  grid-column: 1 / -1;
+}
+
+.spell-textarea {
+  min-height: 96px;
+  overflow: hidden;
+  resize: vertical;
+}
+
+.spell-textarea-tall {
+  min-height: 190px;
+}
+
+.small-text {
+  color: #aaa;
+  font-size: 12px;
+}
+
+.dirty-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #ffc107;
+}
+
+@media (max-width: 1000px) {
+  .editor-shell,
+  .spell-summary-grid,
+  .spell-filter-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .spell-summary-grid .grid-column-half {
+    grid-column: 1 / -1;
+  }
+
+  .spell-list {
+    max-height: 280px;
+  }
+}
