@@ -29,6 +29,10 @@ Thumbs.db
 .vscode/
 .idea/
 
+# Local-only project documentation and database migrations
+*.md
+supabase/migrations/
+
 supabase-schema.sql
 
 # Local data scrapers / extraction utilities
