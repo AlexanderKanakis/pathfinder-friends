@@ -94,7 +94,8 @@ const SIMPLE_FIELDS = [
   "speedBase",
   "speedArmor",
   "flySpeed",
-  "acNatural",
+  "acNaturalBase",
+  "acNaturalMisc",
   "acDeflection",
   "acMisc",
   "cmbMisc",
@@ -458,6 +459,8 @@ let showCalculations = true;
 let currentSheetId = null;
 let isRestoringSheet = false;
 let activeBuffs = [];
+let equipmentEnhancementCache = new WeakMap();
+let equipmentEnhancementBuffCache = null;
 let lastBuffRefresh = "";
 let effectTrackerInstance = null;
 let effectTrackerModal = null;
@@ -545,7 +548,8 @@ const PDF_SAMPLE = {
   bab: 6,
   acArmor: 8,
   acShield: 0,
-  acNatural: 0,
+  acNaturalBase: 0,
+  acNaturalMisc: 0,
   acDeflection: 0,
   acMisc: 0,
   fortBase: 6,
@@ -590,6 +594,32 @@ function abilityMod(key) {
 }
 function abilityModFor(key, buffed) {
   return buffed?.abilityMods?.[ABILITY_STAT_NAMES[key]] ?? abilityMod(key);
+}
+
+function currentAttributeScaleContext() {
+  const baseline = sheetToBaseline();
+  const buffed = window.PFBuffs?.calculateStatsDetailed?.(
+    calculationBuffs(),
+    baseline,
+  );
+  const abilityScores = {};
+  const abilityMods = {};
+  ABILITIES.forEach(([key]) => {
+    const name = ABILITY_STAT_NAMES[key];
+    abilityScores[key] = Number(buffed?.totals?.[name] ?? num(`${key}Score`));
+    abilityMods[key] = Number(
+      buffed?.abilityMods?.[name] ?? Math.floor((abilityScores[key] - 10) / 2),
+    );
+  });
+  const characterLevel = Math.max(1, num("characterLevel") || 1);
+  return {
+    characterLevel,
+    casterLevel: characterLevel,
+    classLevels: progressionClassCounts(),
+    skillRanks: baseline.skillRanks || {},
+    abilityScores,
+    abilityMods,
+  };
 }
 
 const ENEMY_SPELL_METADATA_KEYS = new Set([
@@ -1299,7 +1329,7 @@ function isFirearmWeaponType(type) {
 }
 
 function isNaturalWeaponType(type) {
-  return ["Natural", "Natural Weapon"].includes(String(type || ""));
+  return String(type || "") === "Natural Weapon";
 }
 
 function isMeleeWeaponType(type) {
@@ -1311,7 +1341,7 @@ function isTwoHandedWeaponType(type) {
 }
 
 function isLightOffHandWeaponType(type) {
-  return ["Melee Weapon (Light)", "Natural", "Natural Weapon"].includes(type);
+  return ["Melee Weapon (Light)", "Natural Weapon"].includes(type);
 }
 
 function naturalAttackKindFromName(name = "") {
@@ -1978,6 +2008,11 @@ function resolvedRacialTrait(trait = {}) {
       ? choices.modifiedTraitOverrides
       : trait.modifiedTraitOverrides,
   };
+  if (choices.selectedBranchId) {
+    delete resolved.branches;
+    resolved.selectedBranchId = choices.selectedBranchId;
+    resolved.selectedBranchName = choices.selectedBranchName || "";
+  }
   return normalizeResolvedRacialTraitMechanics(resolved, trait);
 }
 
@@ -2130,7 +2165,7 @@ function bonusFavoredEnemyTarget(bonus = {}, buff = {}) {
     conditionalChoiceLabel(bonus.conditionalChoices, "favored enemy increase") ||
     favoredEnemyChoiceLabel(buff.conditionalChoices) ||
     conditionalChoiceLabel(buff.conditionalChoices, "favored enemy increase") ||
-    favoredEnemyTargetText(bonus.appliesWhen || bonus.condition || "")
+    favoredEnemyTargetText(bonus.appliesWhen || "")
   );
 }
 
@@ -2332,7 +2367,11 @@ async function resolveRacialTraitChoiceStats(items, trait = {}) {
     const pool = window.PFEffectStats.poolById(poolId);
     const options = await window.PFEffectStats.resolveChoicePoolOptions(
       poolId,
-      { skills: allSkills(), choicePool: item.choicePool },
+      {
+        skills: allSkills(),
+        equipment: currentEffectChoiceEquipment(),
+        choicePool: item.choicePool,
+      },
     );
     const picked = window.PFEffectChoicePicker
       ? await window.PFEffectChoicePicker.open({
@@ -2341,12 +2380,13 @@ async function resolveRacialTraitChoiceStats(items, trait = {}) {
         })
       : null;
     if (!picked) return null;
-    if (typeof picked === "object") ensureNamedSkillChoiceVisible(picked.skillName);
-    resolved.push(
-      typeof picked === "object"
-        ? { ...item, stat: picked.value, skillName: picked.skillName }
-        : { ...item, stat: picked },
+    const resolvedItem = window.PFEffectStats.resolveChoiceStatItem(
+      item,
+      picked,
+      options,
     );
+    ensureNamedSkillChoiceVisible(resolvedItem.skillName);
+    resolved.push(resolvedItem);
   }
   return resolved;
 }
@@ -2425,7 +2465,23 @@ async function resolveRacialTraitGrantDomainChoices(items, trait = {}) {
   });
 }
 
-async function resolveRacialTraitMechanicChoices(item = {}, trait = {}) {
+async function resolveMechanicBranchChoice(item = {}, title = "Effect") {
+  if (!window.PFEffectMechanics?.hasBranches?.(item)) return item;
+  return window.PFEffectMechanics.chooseBranch(item, { title });
+}
+
+async function resolveRacialTraitMechanicChoices(
+  item = {},
+  trait = {},
+  { resolveBranch = true } = {},
+) {
+  if (resolveBranch) {
+    item = await resolveMechanicBranchChoice(
+      item,
+      trait.name || item.name || "Effect",
+    );
+    if (!item) return false;
+  }
   const choiceResolvedEffects = await resolveRacialTraitChoiceStats(
     item.effects,
     trait,
@@ -2598,6 +2654,7 @@ async function resolveRacialTraitOverrideChoices(override = {}, trait = {}) {
 function racialTraitMechanicsHaveChoiceStats(item = {}) {
   const activeMechanics = item.activeMechanics;
   return (
+    window.PFEffectMechanics?.hasBranches?.(item) ||
     (Array.isArray(item.effects) &&
       item.effects.some((effect) =>
         window.PFEffectStats?.isChoiceStat(effect.stat) ||
@@ -2663,6 +2720,7 @@ async function resolveRacialTraitChoicesBeforeApply(trait = {}) {
     const resolvedActiveMechanics = await resolveRacialTraitMechanicChoices(
       trait.activeMechanics,
       trait,
+      { resolveBranch: false },
     );
     if (!resolvedActiveMechanics) return false;
     resolvedTrait.activeMechanics = resolvedActiveMechanics;
@@ -2694,6 +2752,8 @@ async function resolveRacialTraitChoicesBeforeApply(trait = {}) {
   if (hasChoice) {
     selectedRacialTraitChoices[racialTraitChoiceKeyForTrait(trait)] = {
       effects: cloneJson(variableResolvedTrait.effects),
+      selectedBranchId: variableResolvedTrait.selectedBranchId || "",
+      selectedBranchName: variableResolvedTrait.selectedBranchName || "",
       damageReduction: cloneJson(variableResolvedTrait.damageReduction),
       spellResistance: cloneJson(variableResolvedTrait.spellResistance),
       immunities: cloneJson(variableResolvedTrait.immunities),
@@ -3243,6 +3303,7 @@ function collectSelectedRaceBuffs() {
       grantDomains: hasGrantDomains ? grantDomains : [],
       generatedEquipment: hasGeneratedEquipment ? generatedEquipment : [],
       conditionalVariables: hasConditionalVariables ? conditionalVariables : [],
+      auraConfig: trait.auraConfig || null,
     });
   };
 
@@ -3320,6 +3381,7 @@ function racialTraitAbilityFromTrait(trait, race, sourceLabel, options = {}) {
       ? trait.conditionalVariables
       : [],
     choicePools,
+    auraConfig: activeMechanics.auraConfig || trait.auraConfig || null,
     durationConfig: activeMechanics.durationConfig || trait.durationConfig || {
       count: null,
       unit: "variable",
@@ -3361,6 +3423,7 @@ function racialTraitAbilityFromTrait(trait, race, sourceLabel, options = {}) {
     (ability.grantDomains || []).length ||
     (ability.generatedEquipment || []).length ||
     (ability.conditionalVariables || []).length ||
+    (ability.damageRolls || []).length ||
     (ability.choicePools || []).length;
   return hasAny ? ability : null;
 }
@@ -4676,12 +4739,12 @@ function normalizeArmorShieldSourceItem(item, index) {
     details: {
       source: details.source || "d20pfsrd armor",
       armorGroup: details.armorGroup || type,
-      bonus: details.bonus || "0",
-      enhancement: details.enhancement || "0",
+      bonus: details.bonus ?? 0,
+      enhancement: details.enhancement ?? 0,
       enchantment: details.enchantment || "",
-      maxDex: details.maxDex || "",
-      penalty: details.penalty || "",
-      failure: details.failure || "",
+      maxDex: details.maxDex ?? null,
+      penalty: details.penalty ?? null,
+      failure: details.failure ?? null,
       speed30: details.speed30 || "",
       speed20: details.speed20 || "",
       cost: details.cost || "",
@@ -5091,8 +5154,7 @@ function classDefinitionByName(name) {
   );
 }
 
-function normalizeClassProgression(raw = [], fallbackClass = "") {
-  const fallback = fallbackClass || "";
+function normalizeClassProgression(raw = []) {
   const byLevel = new Map(
     (Array.isArray(raw) ? raw : []).map((row) => [
       Number(row.level),
@@ -5101,7 +5163,7 @@ function normalizeClassProgression(raw = [], fallbackClass = "") {
   );
   return Array.from({ length: 20 }, (_, index) => ({
     level: index + 1,
-    className: byLevel.get(index + 1) || fallback,
+    className: byLevel.get(index + 1) || "",
   }));
 }
 
@@ -5187,6 +5249,7 @@ function collectClassFeatureBuffs() {
           effectiveAttributeBonuses: passiveFeature.effectiveAttributeBonuses,
           grantDomains: passiveFeature.grantDomains,
           generatedEquipment: passiveFeature.generatedEquipment,
+          auraConfig: passiveFeature.auraConfig || null,
         });
       }
       featurePools(feature).forEach((pool) => {
@@ -5269,6 +5332,7 @@ function collectClassFeatureBuffs() {
             effectiveAttributeBonuses: option.effectiveAttributeBonuses,
             grantDomains: option.grantDomains,
             generatedEquipment: option.generatedEquipment,
+            auraConfig: option.auraConfig || null,
           });
         }
       });
@@ -5395,7 +5459,7 @@ function collectCustomDamageReduction() {
 }
 
 function defenseConditionKey(entry = {}) {
-  return String(entry.appliesWhen || entry.condition || "").trim().toLowerCase();
+  return String(entry.appliesWhen || "").trim().toLowerCase();
 }
 
 function defenseSourceText(entry = {}) {
@@ -5511,8 +5575,8 @@ function resistanceTypeText(value = "") {
 
 function resistanceEntryText(entry = {}) {
   const type = resistanceTypeText(entry.type || entry.resistanceType);
-  const isConditional = entry.conditional ?? Boolean(entry.condition);
-  const appliesWhen = entry.appliesWhen || entry.condition || "";
+  const isConditional = entry.conditional ?? Boolean(entry.appliesWhen);
+  const appliesWhen = entry.appliesWhen || "";
   return `${type || "Resistance"} resistance ${Number(entry.amount || 0)}${
     isConditional ? ` (${appliesWhen || "conditional"})` : ""
   }`;
@@ -5655,15 +5719,15 @@ function normalizeImmunityName(value = "") {
 function immunityKey(entry = {}) {
   return [
     normalizeImmunityName(entry.name || entry.immunity || entry.type).toLowerCase(),
-    String(entry.appliesWhen || entry.condition || "").trim().toLowerCase(),
+    String(entry.appliesWhen || "").trim().toLowerCase(),
   ].join("|");
 }
 
 function immunityEntryText(entry = {}) {
   const name =
     normalizeImmunityName(entry.name || entry.immunity || entry.type) || "-";
-  const isConditional = entry.conditional ?? Boolean(entry.condition);
-  const appliesWhen = entry.appliesWhen || entry.condition || "";
+  const isConditional = entry.conditional ?? Boolean(entry.appliesWhen);
+  const appliesWhen = entry.appliesWhen || "";
   return `${name}${isConditional ? ` (${appliesWhen || "conditional"})` : ""}`;
 }
 
@@ -6115,20 +6179,14 @@ function updateClassFeatureSpellResistanceSummary() {
 // folded into the matching ability's bonuses (e.g. rage powers into Rage)
 // rather than applying on its own.
 function collectActivatableAbilities() {
+  const attributeScaleContext = currentAttributeScaleContext();
   const classFeatureAbilities =
     window.PFClassFeatureAbilities?.collectActivatableAbilities({
       classDefinitions,
       classProgression,
       classFeatureChoices,
       characterLevel: num("characterLevel"),
-      abilityScores: {
-        str: num("strScore"),
-        dex: num("dexScore"),
-        con: num("conScore"),
-        int: num("intScore"),
-        wis: num("wisScore"),
-        cha: num("chaScore"),
-      },
+      abilityScores: attributeScaleContext.abilityScores,
     }) || [];
   const mechanicAbility = (source, mechanics, category, sourceLabel, id) => {
     if (!window.PFEffectMechanics?.hasAnyMechanics?.(mechanics)) return null;
@@ -6139,10 +6197,15 @@ function collectActivatableAbilities() {
       source: sourceLabel,
       bonuses: mechanics.effects || [],
       durationConfig: mechanics.durationConfig || null,
+      auraConfig: mechanics.auraConfig || null,
+      ...(window.PFEffectMechanics?.hasBranches?.(mechanics)
+        ? { branches: mechanics.branches }
+        : {}),
       duration: window.PFEffectMeta?.durationLabel
         ? window.PFEffectMeta.durationLabel(mechanics.durationConfig || {})
         : "variable",
       fromAbility: true,
+      abilityContext: attributeScaleContext,
       description:
         source.description || source.desc || source.details?.description || "",
       detailUrl:
@@ -6201,7 +6264,10 @@ function collectActivatableAbilities() {
     ...collectActivatableRacialTraitAbilities(),
     ...featAbilities,
     ...itemAbilities,
-  ];
+  ].map((ability) => ({
+    ...ability,
+    abilityContext: ability.abilityContext || attributeScaleContext,
+  }));
 }
 
 function appliedConditionName(entry = {}) {
@@ -6870,8 +6936,8 @@ function srEntryText(sr) {
   // conditional/appliesWhen matches how every other effect authors a
   // condition; sr.condition is a fallback for entries saved before this
   // switched over from its own one-off free-text field.
-  const isConditional = sr.conditional ?? Boolean(sr.condition);
-  const appliesWhen = sr.appliesWhen || sr.condition || "";
+  const isConditional = sr.conditional ?? Boolean(sr.appliesWhen);
+  const appliesWhen = sr.appliesWhen || "";
   return `SR ${Number(sr.amount || 0)}${isConditional ? ` (${appliesWhen || "conditional"})` : ""}`;
 }
 
@@ -7335,6 +7401,7 @@ function applyClassFeatureConditionalVariables(item = {}, context = item) {
 
 function classFeatureMechanicsNeedChoice(item = {}) {
   return (
+    window.PFEffectMechanics?.hasBranches?.(item) ||
     (Array.isArray(item.effects) &&
       item.effects.some((effect) =>
         window.PFEffectStats?.isChoiceStat(effect.stat) ||
@@ -7372,11 +7439,18 @@ function classFeatureMechanicsForKey(key = "") {
     : null;
 }
 
+function mergeResolvedMechanics(item = {}, mechanics = null) {
+  if (!mechanics || typeof mechanics !== "object") return item;
+  const resolved = { ...item, ...mechanics };
+  if (mechanics.selectedBranchId) delete resolved.branches;
+  return resolved;
+}
+
 function applyClassFeatureMechanicChoices(item = {}, context = item) {
-  const mechanics = classFeatureMechanicChoices(item, context);
-  return mechanics && typeof mechanics === "object"
-    ? { ...item, ...mechanics }
-    : item;
+  return mergeResolvedMechanics(
+    item,
+    classFeatureMechanicChoices(item, context),
+  );
 }
 
 function applyClassFeaturePoolOptionMechanicChoices(
@@ -7392,9 +7466,7 @@ function applyClassFeaturePoolOptionMechanicChoices(
     context,
   );
   const mechanics = classFeatureMechanicsForKey(key);
-  return mechanics && typeof mechanics === "object"
-    ? { ...option, ...mechanics }
-    : option;
+  return mergeResolvedMechanics(option, mechanics);
 }
 
 function titleFromChoiceId(value = "") {
@@ -7458,6 +7530,7 @@ function spellAdjustmentChoiceSummary(entries = []) {
 function mechanicsChoiceSummary(mechanics = {}) {
   if (!mechanics || typeof mechanics !== "object") return "";
   const labels = [];
+  if (mechanics.selectedBranchName) labels.push(mechanics.selectedBranchName);
   Object.values(mechanics.poolChoices || {}).forEach((choice) => {
     const label = firstChoiceLabel(choice);
     if (label) labels.push(label);
@@ -7671,30 +7744,15 @@ function normalizeCharacterFeats(raw = {}) {
     if (!key || !selection) return;
     effect[String(key)] = selection;
   };
-  if (Array.isArray(raw)) {
-    raw.forEach((entry) => readEntry(entry?.level, entry));
-  } else if (
-    (raw?.normal && typeof raw.normal === "object") ||
-    (raw?.granted && typeof raw.granted === "object")
-  ) {
-    if (raw?.normal && typeof raw.normal === "object") {
-      Object.entries(raw.normal).forEach(([level, value]) =>
-        readEntry(level, value),
-      );
-    }
-    if (raw?.granted && typeof raw.granted === "object") {
-      Object.entries(raw.granted).forEach(([key, value]) =>
-        readGrantedEntry(key, value),
-      );
-    }
-    if (raw?.effect && typeof raw.effect === "object") {
-      Object.entries(raw.effect).forEach(([key, value]) =>
-        readEffectEntry(key, value),
-      );
-    }
-  } else if (raw && typeof raw === "object") {
-    Object.entries(raw).forEach(([level, value]) => readEntry(level, value));
-  }
+  Object.entries(raw?.normal || {}).forEach(([level, value]) =>
+    readEntry(level, value),
+  );
+  Object.entries(raw?.granted || {}).forEach(([key, value]) =>
+    readGrantedEntry(key, value),
+  );
+  Object.entries(raw?.effect || {}).forEach(([key, value]) =>
+    readEffectEntry(key, value),
+  );
   return { normal, granted, effect };
 }
 
@@ -8037,6 +8095,9 @@ function compactFeatMechanics(source = {}) {
     if (Array.isArray(source[key]) && source[key].length)
       mechanics[key] = cloneJson(source[key]);
   });
+  if (source.selectedBranchId) mechanics.selectedBranchId = source.selectedBranchId;
+  if (source.selectedBranchName)
+    mechanics.selectedBranchName = source.selectedBranchName;
   if (source.conditionalChoices && typeof source.conditionalChoices === "object")
     mechanics.conditionalChoices = cloneJson(source.conditionalChoices);
   return mechanics;
@@ -8264,6 +8325,7 @@ function featHasChoiceBearingMechanics(feat = {}) {
       window.PFEffectStats?.isChoiceStat?.(item.stat),
     );
   return (
+    window.PFEffectMechanics?.hasBranches?.(feat) ||
     hasChoiceStats(feat.effects) ||
     hasChoiceStats(feat.classSkillGrants) ||
     hasChoiceStats(feat.bonusRanks) ||
@@ -8340,7 +8402,7 @@ function collectSelectedFeatBuffs() {
       const mechanics = featSelectionMechanics(selection);
       return {
         sourceName: source,
-        feat: mechanics ? { ...feat, ...mechanics } : feat,
+        feat: mergeResolvedMechanics(feat, mechanics),
       };
     })
     .filter(Boolean)
@@ -8409,6 +8471,7 @@ function collectSelectedFeatBuffs() {
       conditionalVariables: Array.isArray(feat.conditionalVariables)
         ? feat.conditionalVariables
         : [],
+      auraConfig: feat.auraConfig || null,
     }));
 }
 
@@ -8445,7 +8508,7 @@ function renderFeatProgression() {
     const safeKey = escapeHtml(key);
     const collapseId = `featDescription${kind}${String(key).replace(/[^a-z0-9]/gi, "_")}`;
     return `
-      <article class="class-feature-row border rounded p-2">
+      <article class="feat-choice-entry">
         <div class="class-feature-choice-row">
           <button class="btn btn-outline-info btn-sm class-feature-choice-select" type="button" data-character-feat-pick="${safeKey}" data-character-feat-kind="${escapeHtml(kind)}" data-character-feat-level="${level}" data-character-feat-label="${escapeHtml(label)}" title="${escapeHtml(`${label}: ${selectedName || "not selected"}`)}">
             <span>${escapeHtml(selectedName || "not selected")}</span>
@@ -9396,21 +9459,22 @@ function spellDetailCalculations(
       : Number(options.casterLevel);
   const effectiveCasterLevel = Math.max(
     1,
-    Math.min(
-      calculatedCasterLevel,
-      Number.isFinite(requestedCasterLevel)
-        ? requestedCasterLevel
-        : calculatedCasterLevel,
-    ),
+    Number.isFinite(requestedCasterLevel)
+      ? requestedCasterLevel
+      : calculatedCasterLevel,
   );
   const withEffectiveCasterLevel = (result = {}) => {
     const base = Number(result.base || 0);
     if (effectiveCasterLevel === Number(result.total ?? base)) return result;
+    const calculatedTotal = Number(result.total ?? base);
     return {
       ...result,
       total: effectiveCasterLevel,
       bonus: effectiveCasterLevel - base,
-      downcastBy: calculatedCasterLevel - effectiveCasterLevel,
+      calculatedTotal,
+      calculatedBonus: calculatedTotal - base,
+      miscCasterLevelBonus: Math.max(0, effectiveCasterLevel - calculatedCasterLevel),
+      downcastBy: Math.max(0, calculatedCasterLevel - effectiveCasterLevel),
       downcastFrom: calculatedCasterLevel,
     };
   };
@@ -9477,12 +9541,9 @@ function baselineSpellDetailCalculations(
       : Number(options.casterLevel);
   const effectiveCasterLevel = Math.max(
     1,
-    Math.min(
-      calculatedCasterLevel,
-      Number.isFinite(requestedCasterLevel)
-        ? requestedCasterLevel
-        : calculatedCasterLevel,
-    ),
+    Number.isFinite(requestedCasterLevel)
+      ? requestedCasterLevel
+      : calculatedCasterLevel,
   );
   const casterLevel = {
     base: classLevel,
@@ -9491,6 +9552,9 @@ function baselineSpellDetailCalculations(
     used: [],
     ignored: [],
     conditional: [],
+    calculatedTotal: calculatedCasterLevel,
+    calculatedBonus: 0,
+    miscCasterLevelBonus: Math.max(0, effectiveCasterLevel - calculatedCasterLevel),
     ...(effectiveCasterLevel < calculatedCasterLevel
       ? {
           downcastBy: calculatedCasterLevel - effectiveCasterLevel,
@@ -9539,12 +9603,32 @@ function safeSpellDetailCalculations(
   slotLevel = 0,
   options = {},
 ) {
+  let calculations;
   try {
-    return spellDetailCalculations(spell, className, slotLevel, options);
+    calculations = spellDetailCalculations(spell, className, slotLevel, options);
   } catch (error) {
     console.error("Could not calculate spell details.", error);
-    return baselineSpellDetailCalculations(spell, className, slotLevel, options);
+    calculations = baselineSpellDetailCalculations(
+      spell,
+      className,
+      slotLevel,
+      options,
+    );
   }
+  const definition = classDefinitionByName(className);
+  const magicType = spellcastingMagicType(
+    className,
+    definition?.spellcasting || {},
+  );
+  const armor = window.PFArmorRules?.arcaneSpellFailure?.({
+    className,
+    classLevel: progressionClassCounts()[className] || 0,
+    magicType,
+    sourceKind: calculations.spellSource || options.spellSource,
+    components: spell.details?.components || spell.components || "",
+    equipment: calculateGearAc().items,
+  }) || { chance: 0, applies: false };
+  return { ...calculations, arcaneSpellFailure: armor };
 }
 
 async function openSpellPicker(config = {}) {
@@ -9610,21 +9694,77 @@ function spellEffectPayloads(spell = {}) {
     : Array.isArray(mechanics.bonuses)
       ? mechanics.bonuses
       : [];
-  const hasInlineEffect = keys.some(
+  const targetKeys = keys.filter((key) => key !== "damageRolls");
+  const hasInlineEffect = targetKeys.some(
     (key) => Array.isArray(mechanics[key]) && mechanics[key].length,
   );
-  if (!bonusRows.length && !hasInlineEffect) return [];
+  const hasBranches = window.PFEffectMechanics?.hasBranches?.(mechanics);
+  if (!bonusRows.length && !hasInlineEffect && !hasBranches) return [];
   const payload = {
     name: spell.name || "Spell Effect",
     description: spell.details?.description || spell.description || "",
     bonuses: bonusRows,
     durationConfig: mechanics.durationConfig || spell.durationConfig || null,
+    auraConfig: mechanics.auraConfig || spell.auraConfig || null,
     duration: spell.duration || spell.details?.duration || "",
+    ...(window.PFEffectMechanics?.hasBranches?.(mechanics)
+      ? { branches: mechanics.branches }
+      : {}),
   };
-  keys.forEach((key) => {
+  targetKeys.forEach((key) => {
     payload[key] = Array.isArray(mechanics[key]) ? mechanics[key] : [];
   });
   return [payload];
+}
+
+function spellDamageRolls(spell = {}) {
+  const mechanics = window.PFEffectMechanics?.activeMechanics?.(spell, {
+    activeOnly: true,
+  }) || spell;
+  return window.PFDamageRolls?.normalizeRolls?.(mechanics.damageRolls || []) || [];
+}
+
+async function recordSpellDamageTimeline(spell = {}, results = []) {
+  if (!results.length || !window.PFDamageRolls) return;
+  await spellCastTargetsFromCurrentMap();
+  const actor = el("characterName")?.value?.trim() || (isEnemySheetMode ? "Enemy" : "Character");
+  const text = `${actor} casts ${spell.name || "a spell"}: ${window.PFDamageRolls.summary(results)}.`;
+  if (!Array.isArray(spellCastTargetMapState.timeline))
+    spellCastTargetMapState.timeline = [];
+  spellCastTargetMapState.timeline.push({
+    id: globalThis.crypto?.randomUUID?.() || `spell-damage-${Date.now()}`,
+    text,
+    time: new Date().toLocaleString(),
+  });
+  spellCastTargetMapState.timeline = spellCastTargetMapState.timeline.slice(-20);
+  await PFApp.saveMapState?.(
+    spellCastTargetMapState,
+    sheetContextKey,
+    spellCastTargetMapSlot,
+  );
+}
+
+async function rollSpellDamageFromDetails(
+  spell = {},
+  casterLevel = 1,
+  authoredRolls = null,
+) {
+  const damageRolls = authoredRolls
+    ? window.PFDamageRolls?.normalizeRolls?.(authoredRolls) || []
+    : spellDamageRolls(spell);
+  if (!damageRolls.length) return [];
+  const context = {
+    ...currentAttributeScaleContext(),
+    casterLevel,
+    classLevel: casterLevel,
+  };
+  const results = await window.PFDamageRolls?.open?.({
+    title: `${spell.name || "Spell"} Damage`,
+    rolls: damageRolls,
+    context,
+  });
+  if (results) await recordSpellDamageTimeline(spell, results);
+  return results;
 }
 
 function spellCastDurationLabel(effect = {}) {
@@ -9643,13 +9783,18 @@ function spellCastDurationUsesCasterLevel(effect = {}) {
   return /\/\s*level|per\s+level/i.test(String(effect.duration || ""));
 }
 
-function spellCastParseDuration(effect = {}, casterLevel = 1) {
+function spellCastParseDuration(
+  effect = {},
+  casterLevel = 1,
+  targetCount = 1,
+) {
   if (window.PFEffectMeta?.parseDuration)
     return window.PFEffectMeta.parseDuration(effect, {
       casterLevel,
       characterLevel: num("characterLevel"),
       classLevel: casterLevel,
       classLevels: progressionClassCounts(),
+      targetCount,
     });
   return null;
 }
@@ -9664,7 +9809,18 @@ function spellCastFormatDuration(rounds) {
   return `${rounds} round${rounds === 1 ? "" : "s"}`;
 }
 
-async function resolveSpellCastEffectChoices(effect = {}, spell = {}) {
+async function resolveSpellCastEffectChoices(
+  effect = {},
+  spell = {},
+  { resolveBranch = true } = {},
+) {
+  if (resolveBranch) {
+    effect = await resolveMechanicBranchChoice(
+      effect,
+      spell.name || effect.name || "Spell",
+    );
+    if (!effect) return null;
+  }
   const resolvedGrantDomains = await resolveRacialTraitGrantDomainChoices(
     effect.grantDomains,
     { name: spell.name || effect.name || "Spell" },
@@ -9717,26 +9873,45 @@ function spellDurationConfigFromText(duration = "") {
   };
 }
 
-function appliedSpellEffect(effect = {}, spell = {}, casterLevel = 1, index = 0) {
-  const cloned = cloneJson(effect);
+function appliedSpellEffect(
+  effect = {},
+  spell = {},
+  casterLevel = 1,
+  index = 0,
+  targetCount = 1,
+) {
+  const cloned =
+    window.PFEffectMechanics?.resolveCasterAttributeScales?.(
+      effect,
+      currentAttributeScaleContext(),
+    ) || cloneJson(effect);
   const hasOwnDuration =
     cloned.durationConfig ||
-    cloned.duration ||
-    cloned.durationCount !== undefined ||
-    cloned.durationUnit;
+    cloned.duration;
   if (!hasOwnDuration && spell.details?.duration) {
     const durationConfig = spellDurationConfigFromText(spell.details.duration);
     if (durationConfig) cloned.durationConfig = durationConfig;
     else cloned.duration = spell.details.duration;
   }
   const baseDurationLabel = spellCastDurationLabel(cloned);
-  const computedDuration = spellCastParseDuration(cloned, casterLevel);
+  const computedDuration = spellCastParseDuration(
+    cloned,
+    casterLevel,
+    targetCount,
+  );
+  const splitAmongTargets = Boolean(
+    window.PFEffectMeta?.normalizeDurationConfig?.(cloned)?.splitAmongTargets &&
+      targetCount > 1,
+  );
+  const computedDurationLabel = splitAmongTargets
+    ? `${targetCount} targets: ${spellCastFormatDuration(computedDuration)} each`
+    : spellCastFormatDuration(computedDuration);
   const appliedDurationLabel =
     computedDuration === null || computedDuration === undefined
       ? baseDurationLabel
       : spellCastDurationUsesCasterLevel(cloned)
-        ? `${baseDurationLabel} | CL ${casterLevel}: ${spellCastFormatDuration(computedDuration)}`
-        : `${baseDurationLabel} | ${spellCastFormatDuration(computedDuration)}`;
+        ? `${baseDurationLabel} | CL ${casterLevel}: ${computedDurationLabel}`
+        : `${baseDurationLabel} | ${computedDurationLabel}`;
   return {
     ...cloned,
     id:
@@ -9753,7 +9928,10 @@ function appliedSpellEffect(effect = {}, spell = {}, casterLevel = 1, index = 0)
     permanent: Boolean(cloned.permanent),
     remaining: cloned.permanent ? null : computedDuration,
     computedDuration,
-    durationLabel: cloned.durationLabel || appliedDurationLabel,
+    durationTargetCount: splitAmongTargets ? targetCount : undefined,
+    durationLabel: splitAmongTargets
+      ? appliedDurationLabel
+      : cloned.durationLabel || appliedDurationLabel,
   };
 }
 
@@ -9767,7 +9945,6 @@ function ensureSpellCastTargetModal() {
         <div class="modal-content bg-dark text-white border-secondary">
           <div class="modal-header border-secondary">
             <h5 class="modal-title" id="spellCastTargetModalLabel">Choose Targets</h5>
-            <button type="button" class="btn-close btn-close-white d-none" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
             <div id="spellCastTargetHint" class="small text-secondary mb-3"></div>
@@ -9803,8 +9980,12 @@ function ensureSpellCastTargetModal() {
       }
       const next = spellCastTargetResolver;
       spellCastTargetResolver = null;
+      modalEl.addEventListener(
+        "hidden.bs.modal",
+        () => next?.(selected),
+        { once: true },
+      );
       bootstrap.Modal.getOrCreateInstance(modalEl).hide();
-      next?.(selected);
     });
   modalEl.addEventListener("change", (event) => {
     const group = event.target.closest("[data-spell-cast-group]");
@@ -9915,6 +10096,10 @@ async function spellCastTargetsFromCurrentMap() {
           ? `Enemy${token.visible === false ? " | hidden" : ""}`
           : "Character",
       targetId: token.kind === "enemy" ? token.enemyId : token.characterId,
+      ownerId:
+        token.kind === "character"
+          ? characterMap.get(token.characterId)?.userId || ""
+          : "",
     }))
     .filter((entry) => entry.targetId)
     .sort((a, b) => a.name.localeCompare(b.name));
@@ -10067,6 +10252,26 @@ async function refreshSpellCastTargetOnMap(target) {
   );
 }
 
+async function resolveSpellCastEffectForTarget(target, effect, spell) {
+  const branchNeeded =
+    window.PFEffectMechanics?.hasBranches?.(effect) || false;
+  const remoteCharacter =
+    target.group === "ally" &&
+    target.ownerId &&
+    target.ownerId !== currentUserId;
+  if (branchNeeded && remoteCharacter) {
+    const result = await PFApp.createEffectChoiceRequest?.({
+      contextKey: sheetContextKey,
+      characterId: target.targetId,
+      ability: effect,
+    });
+    if (!result?.ok) console.error(result?.error || "Could not queue effect choice.");
+    return { effect: null, queued: Boolean(result?.ok) };
+  }
+  const resolved = await resolveSpellCastEffectChoices(effect, spell);
+  return { effect: resolved, queued: false };
+}
+
 async function applySpellEffectToTarget(target, effect) {
   if (target.group === "ally") {
     if (!PFApp.applyCharacterMapEffect) return false;
@@ -10090,38 +10295,214 @@ async function applySpellEffectToTarget(target, effect) {
   return Boolean(saved);
 }
 
+function spellAuraRecord(sourceToken = {}, effect = {}) {
+  const config = effect.auraConfig || {};
+  const auraEffect = cloneJson(effect);
+  delete auraEffect.auraConfig;
+  return {
+    id: `spell-aura-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    kind: "active",
+    visible: true,
+    radius: Math.max(1, Math.ceil(Number(config.rangeFeet || 5) / 5)),
+    rangeFeet: Math.max(5, Number(config.rangeFeet || 5)),
+    color: sourceToken.kind === "enemy" ? "#b02a37" : "#8fd19e",
+    effect: auraEffect,
+    removeWhenOutOfRange: true,
+    permanent: Boolean(effect.permanent),
+    remaining: effect.remaining ?? null,
+    durationAnchorTokenId: sourceToken.id,
+  };
+}
+
+async function createAuraOnCurrentMap(effect) {
+  await spellCastTargetsFromCurrentMap();
+  const sourceToken = (spellCastTargetMapState?.tokens || []).find((token) =>
+    isEnemySheetMode
+      ? token.kind === "enemy" && String(token.enemyId) === String(enemySheetId)
+      : token.kind === "character" && String(token.characterId) === String(currentSheetId),
+  );
+  if (!sourceToken) return false;
+  const current = Array.isArray(sourceToken.automaticAuras)
+    ? sourceToken.automaticAuras
+    : [];
+  sourceToken.automaticAuras = [
+    ...current,
+    spellAuraRecord(sourceToken, effect),
+  ];
+  return Boolean(
+    await PFApp.saveMapState?.(
+      spellCastTargetMapState,
+      sheetContextKey,
+      spellCastTargetMapSlot,
+    ),
+  );
+}
+
+async function createSpellAurasOnCurrentMap(spell, payloads, casterLevel) {
+  await spellCastTargetsFromCurrentMap();
+  const sourceToken = (spellCastTargetMapState?.tokens || []).find((token) =>
+    isEnemySheetMode
+      ? token.kind === "enemy" && String(token.enemyId) === String(enemySheetId)
+      : token.kind === "character" && String(token.characterId) === String(currentSheetId),
+  );
+  if (!sourceToken) return false;
+  const current = Array.isArray(sourceToken.automaticAuras)
+    ? sourceToken.automaticAuras
+    : [];
+  const additions = payloads.map((payload, index) =>
+    spellAuraRecord(
+      sourceToken,
+      appliedSpellEffect(payload, spell, casterLevel, index),
+    ),
+  );
+  sourceToken.automaticAuras = [...current, ...additions];
+  return Boolean(
+    await PFApp.saveMapState?.(
+      spellCastTargetMapState,
+      sheetContextKey,
+      spellCastTargetMapSlot,
+    ),
+  );
+}
+
 async function castSpellFromDetails({
   spell,
   casterLevel = 1,
+  calculations = null,
   closeDetails,
 } = {}) {
   const effectPayloads = spellEffectPayloads(spell);
-  if (!effectPayloads.length)
+  let damageRolls = spellDamageRolls(spell);
+  if (!effectPayloads.length && !damageRolls.length)
     return {
       close: false,
-      message: `${spell?.name || "This spell"} has no configured effects.`,
+      message: `${spell?.name || "This spell"} has no configured effects or damage.`,
     };
-  const resolvedPayloads = [];
+  const failureChance = Number(
+    calculations?.arcaneSpellFailure?.chance || 0,
+  );
+  if (failureChance > 0) {
+    closeDetails?.();
+    await new Promise((resolve) => setTimeout(resolve, 180));
+    const castContinues = await window.PFArcaneSpellFailure?.check?.({
+      chance: failureChance,
+      spellName: spell?.name || "Spell",
+    });
+    if (!castContinues) return { close: true };
+  }
+  let resolvedPayloads = [];
   for (const payload of effectPayloads) {
+    if (window.PFEffectMechanics?.hasBranches?.(payload)) {
+      resolvedPayloads.push(payload);
+      continue;
+    }
     const resolved = await resolveSpellCastEffectChoices(payload, spell);
     if (!resolved) return { close: false };
     resolvedPayloads.push(resolved);
   }
-  closeDetails?.();
+  damageRolls = [
+    ...damageRolls,
+    ...resolvedPayloads.flatMap((payload) =>
+      window.PFEffectMechanics?.hasBranches?.(payload)
+        ? []
+        : Array.isArray(payload.damageRolls)
+          ? payload.damageRolls
+          : [],
+    ),
+  ];
+  resolvedPayloads = resolvedPayloads
+    .map((payload) => {
+      if (window.PFEffectMechanics?.hasBranches?.(payload)) return payload;
+      const { damageRolls: _damageRolls, ...effectPayload } = payload;
+      return effectPayload;
+    })
+    .filter(
+      (payload) =>
+        payload.auraConfig?.enabled ||
+        window.PFEffectMechanics?.hasBranches?.(payload) ||
+        window.PFEffectMechanics?.hasAnyMechanics?.(payload),
+    );
+  if (!failureChance) {
+    closeDetails?.();
+    await new Promise((resolve) => setTimeout(resolve, 180));
+  }
+  if (damageRolls.length) {
+    const damageResults = await rollSpellDamageFromDetails(
+      spell,
+      casterLevel,
+      damageRolls,
+    );
+    if (!damageResults) return { close: true };
+    if (!resolvedPayloads.length) {
+      setStatus(`${spell.name || "Spell"} damage rolled.`, "success");
+      return { close: true };
+    }
+  }
+  const auraPayloads = resolvedPayloads.filter(
+    (payload) => payload.auraConfig?.enabled,
+  );
+  if (auraPayloads.length) {
+    const created = await createSpellAurasOnCurrentMap(
+      spell,
+      auraPayloads,
+      casterLevel,
+    );
+    if (!created) {
+      setStatus(
+        `Place ${isEnemySheetMode ? "this enemy" : "this character"} on the current map before casting an aura.`,
+        "warning",
+      );
+      return { close: true };
+    }
+    resolvedPayloads = resolvedPayloads.filter(
+      (payload) => !payload.auraConfig?.enabled,
+    );
+    if (!resolvedPayloads.length) {
+      setStatus(`${spell.name || "Spell"} aura activated.`, "success");
+      return { close: true };
+    }
+  }
   const targets = await openSpellCastTargetModal(spell);
   if (!targets) return { close: true };
   let appliedCount = 0;
+  let queuedCount = 0;
+  const locallyAppliedTargets = new Set();
   for (const target of targets) {
     for (let index = 0; index < resolvedPayloads.length; index += 1) {
-      const effect = appliedSpellEffect(
+      const unresolvedEffect = appliedSpellEffect(
         resolvedPayloads[index],
         spell,
         casterLevel,
         index,
+        targets.length,
       );
-      if (await applySpellEffectToTarget(target, effect)) appliedCount += 1;
+      const { effect: resolvedEffect, queued } =
+        await resolveSpellCastEffectForTarget(target, unresolvedEffect, spell);
+      if (queued) {
+        queuedCount += 1;
+        continue;
+      }
+      if (!resolvedEffect) continue;
+      const branchDamageRolls = Array.isArray(resolvedEffect.damageRolls)
+        ? resolvedEffect.damageRolls
+        : [];
+      if (branchDamageRolls.length) {
+        const damageResults = await rollSpellDamageFromDetails(
+          spell,
+          casterLevel,
+          branchDamageRolls,
+        );
+        if (!damageResults) continue;
+      }
+      const { damageRolls: _damageRolls, ...effect } = resolvedEffect;
+      if (!window.PFEffectMechanics?.hasAnyMechanics?.(effect)) continue;
+      if (await applySpellEffectToTarget(target, effect)) {
+        appliedCount += 1;
+        locallyAppliedTargets.add(target.key);
+      }
     }
-    await refreshSpellCastTargetOnMap(target);
+    if (locallyAppliedTargets.has(target.key))
+      await refreshSpellCastTargetOnMap(target);
   }
   if (spellCastTargetMapState?.tokens && PFApp.saveMapState)
     await PFApp.saveMapState(
@@ -10150,15 +10531,17 @@ async function castSpellFromDetails({
   } else if (targetedCurrentEnemy) {
     await loadEnemySheet(enemySheetId);
   }
+  const completedCount = appliedCount + queuedCount;
   setStatus(
-    appliedCount
-      ? `${spell.name || "Spell"} applied to ${targets.length} target${targets.length === 1 ? "" : "s"}.`
+    completedCount
+      ? queuedCount
+        ? `${spell.name || "Spell"} applied locally; ${queuedCount} choice${queuedCount === 1 ? "" : "s"} sent to the selected player${queuedCount === 1 ? "" : "s"}.`
+        : `${spell.name || "Spell"} applied to ${targets.length} target${targets.length === 1 ? "" : "s"}.`
       : `Could not apply ${spell.name || "spell"}.`,
-    appliedCount ? "success" : "warning",
+    completedCount ? "success" : "warning",
   );
   return { close: true };
 }
-
 function spellExtraSlots(className, bucket, spellLevel) {
   const key = spellcastingStateKey(className);
   return Number(
@@ -10719,8 +11102,8 @@ function setSheetInfoTab(tab) {
   }
 }
 
-function sheetToBaseline() {
-  const gearAc = calculateGearAc();
+function sheetToBaseline(gearAcOverride = null) {
+  const gearAc = gearAcOverride || calculateGearAc();
   const classLevels = progressionClassCounts(
     Math.max(1, num("characterLevel") || 1),
   );
@@ -10747,7 +11130,8 @@ function sheetToBaseline() {
     hitDice: Math.max(1, num("characterLevel")),
     armor: gearAc.armor,
     shield: gearAc.shield,
-    naturalArmor: num("acNatural"),
+    maxDex: gearAc.maxDex,
+    naturalArmor: num("acNaturalBase") + num("acNaturalMisc"),
     deflection: num("acDeflection"),
     acMisc: num("acMisc"),
     cmbMisc: num("cmbMisc"),
@@ -10966,47 +11350,43 @@ function addWeapon(data = {}) {
   const card = document.createElement("div");
   card.className = "sheet-card";
   card.dataset.weaponIndex = i;
-  const sourceLootId = data.sourceLootId || data.source_loot_id || "";
+  const sourceLootId = data.sourceLootId || "";
   const name = data.name || `Weapon ${i + 1}`;
-  const attackScale = data.attackScale || data.attack_scale || "STR";
-  const damageScale = data.damageScale || data.damage_scale || "STR";
-  const twoHanded = isYes(data.twoHanded || data.two_handed) ? "yes" : "no";
-  const powerAttack = isYes(data.powerAttack || data.power_attack)
+  const attackScale = data.attackScale || "STR";
+  const damageScale = data.damageScale || "STR";
+  const twoHanded = isYes(data.twoHanded) ? "yes" : "no";
+  const powerAttack = isYes(data.powerAttack)
     ? "yes"
     : "no";
-  const deadlyAim = isYes(data.deadlyAim || data.deadly_aim) ? "yes" : "no";
-  const rapidShot = isYes(data.rapidShot || data.rapid_shot) ? "yes" : "no";
+  const deadlyAim = isYes(data.deadlyAim) ? "yes" : "no";
+  const rapidShot = isYes(data.rapidShot) ? "yes" : "no";
   const twfNoFeatPrimary = isYes(
-    data.twfNoFeatPrimary || data.twf_no_feat_primary,
+    data.twfNoFeatPrimary,
   )
     ? "yes"
     : "no";
-  const twfNoFeatOff = isYes(data.twfNoFeatOff || data.twf_no_feat_off)
+  const twfNoFeatOff = isYes(data.twfNoFeatOff)
     ? "yes"
     : "no";
-  const twfFeatPrimary = isYes(data.twfFeatPrimary || data.twf_feat_primary)
+  const twfFeatPrimary = isYes(data.twfFeatPrimary)
     ? "yes"
     : "no";
-  const twfFeatOff = isYes(data.twfFeatOff || data.twf_feat_off) ? "yes" : "no";
-  const improvedTwf = isYes(data.improvedTwf || data.improved_twf)
+  const twfFeatOff = isYes(data.twfFeatOff) ? "yes" : "no";
+  const improvedTwf = isYes(data.improvedTwf)
     ? "yes"
     : "no";
-  const greaterTwf = isYes(data.greaterTwf || data.greater_twf) ? "yes" : "no";
-  const weaponType =
-    data.weaponType || data.weapon_type || "Melee Weapon (One-Handed)";
+  const greaterTwf = isYes(data.greaterTwf) ? "yes" : "no";
+  const weaponType = data.weaponType || "Melee Weapon (One-Handed)";
   const naturalAttackKind =
-    data.naturalAttackKind ||
-    data.natural_attack_kind ||
-    naturalAttackKindFromName(name);
-  const naturalAttackRole =
-    data.naturalAttackRole || data.natural_attack_role || "";
+    data.naturalAttackKind || naturalAttackKindFromName(name);
+  const naturalAttackRole = data.naturalAttackRole || "";
   const enhancement = data.enhancement || "0";
   const enchantment = data.enchantment || "";
-  const specialMaterial = data.specialMaterial || data.special_material || "";
+  const specialMaterial = data.specialMaterial || "";
   const detailsText = data.details || data.type || "";
   const generatedEquipmentId =
-    data.generatedEquipmentId || data.generated_equipment_id || "";
-  const generatedSource = data.generatedSource || data.generated_source || "";
+    data.generatedEquipmentId || "";
+  const generatedSource = data.generatedSource || "";
   const generatedLocked = Boolean(generatedEquipmentId);
   const sourceLocked = Boolean(sourceLootId || generatedLocked);
   if (generatedLocked) card.dataset.generatedEquipment = "true";
@@ -11028,7 +11408,7 @@ function addWeapon(data = {}) {
     <input data-field="sourceLootId" class="sheet-input" type="hidden" value="${sourceLootId}">
     <input data-field="generatedEquipmentId" class="sheet-input" type="hidden" value="${escapeHtml(generatedEquipmentId)}">
     <input data-field="generatedSource" class="sheet-input" type="hidden" value="${escapeHtml(generatedSource)}">
-    <input data-field="templateAttack" class="sheet-input" type="hidden" value="${escapeHtml(data.templateAttack || data.template_attack || "")}">
+    <input data-field="templateAttack" class="sheet-input" type="hidden" value="${escapeHtml(data.templateAttack || "")}">
     <div class="weapon-summary">
       <div class="weapon-attack-summary"><label>Attack Bonus</label><input data-attack-total class="form-control form-control-sm" readonly></div>
       <div><label>Damage</label><input data-damage-total class="form-control form-control-sm" readonly><div class="weapon-extra-damage-results" data-extra-damage-results></div></div>
@@ -11043,12 +11423,12 @@ function addWeapon(data = {}) {
     <input data-field="naturalAttackKind" class="sheet-input" type="hidden" value="${escapeHtml(naturalAttackKind)}">
     <input data-field="naturalAttackRole" class="sheet-input" type="hidden" value="${escapeHtml(naturalAttackRole)}">
     <input data-field="attackScale" class="sheet-input" type="hidden" value="${escapeHtml(attackScale)}">
-    <input data-field="attackMisc" class="sheet-input" type="hidden" value="${data.attackMisc || data.attack_misc || "0"}">
+    <input data-field="attackMisc" class="sheet-input" type="hidden" value="${data.attackMisc || "0"}">
     <input data-field="damage" class="sheet-input" type="hidden" value="${escapeHtml(data.damage || "")}">
     <input data-field="damageType" class="sheet-input" type="hidden" value="${escapeHtml(data.damageType || "")}">
     <input data-field="extraDamage" class="sheet-input" type="hidden" value="${escapeHtml(JSON.stringify(PFWeaponDamage.normalize(data.extraDamage)))}">
     <input data-field="damageScale" class="sheet-input" type="hidden" value="${escapeHtml(damageScale)}">
-    <input data-field="damageMisc" class="sheet-input" type="hidden" value="${data.damageMisc || data.damage_misc || "0"}">
+    <input data-field="damageMisc" class="sheet-input" type="hidden" value="${data.damageMisc || "0"}">
     <input data-field="details" class="sheet-input" type="hidden" value="${escapeHtml(detailsText)}">
     <input data-field="range" class="sheet-input" type="hidden" value="${escapeHtml(data.range || "")}">
     <input data-field="capacity" class="sheet-input" type="hidden" value="${escapeHtml(data.capacity || "")}">
@@ -11079,13 +11459,13 @@ function addArmor(data = {}) {
   card.dataset.armorIndex = i;
   const type = data.type === "Shield" ? "Shield" : "Armor";
   const itemName = data.item || `Armor / Shield ${i + 1}`;
-  const enhancement = data.enhancement || "0";
+  const enhancement = data.enhancement ?? 0;
   const enchantment = data.enchantment || "";
-  const specialMaterial = data.specialMaterial || data.special_material || "";
-  const sourceLootId = data.sourceLootId || data.source_loot_id || "";
+  const specialMaterial = data.specialMaterial || "";
+  const sourceLootId = data.sourceLootId || "";
   const generatedEquipmentId =
-    data.generatedEquipmentId || data.generated_equipment_id || "";
-  const generatedSource = data.generatedSource || data.generated_source || "";
+    data.generatedEquipmentId || "";
+  const generatedSource = data.generatedSource || "";
   const generatedLocked = Boolean(generatedEquipmentId);
   const sourceLocked = Boolean(sourceLootId || generatedLocked);
   if (generatedLocked) card.dataset.generatedEquipment = "true";
@@ -11111,12 +11491,14 @@ function addArmor(data = {}) {
     <input data-field="generatedEquipmentId" class="sheet-input" type="hidden" value="${escapeHtml(generatedEquipmentId)}">
     <input data-field="generatedSource" class="sheet-input" type="hidden" value="${escapeHtml(generatedSource)}">
     <input data-field="type" class="sheet-input" type="hidden" value="${type}">
-    <input data-field="bonus" class="sheet-input" type="hidden" value="${data.bonus || ""}">
+    <input data-field="bonus" class="sheet-input" type="hidden" value="${data.bonus ?? ""}">
     <input data-field="enhancement" class="sheet-input" type="hidden" value="${enhancement}">
     <input data-field="enchantment" class="sheet-input" type="hidden" value="${escapeHtml(enchantment)}">
     <input data-field="specialMaterial" class="sheet-input" type="hidden" value="${escapeHtml(specialMaterial)}">
-    <input data-field="penalty" class="sheet-input" type="hidden" value="${data.penalty || ""}">
-    <input data-field="failure" class="sheet-input" type="hidden" value="${data.failure || ""}">
+    <input data-field="armorGroup" class="sheet-input" type="hidden" value="${escapeHtml(data.armorGroup || type)}">
+    <input data-field="maxDex" class="sheet-input" type="hidden" value="${data.maxDex ?? ""}">
+    <input data-field="penalty" class="sheet-input" type="hidden" value="${data.penalty ?? ""}">
+    <input data-field="failure" class="sheet-input" type="hidden" value="${data.failure ?? ""}">
     <input data-field="weight" class="sheet-input" type="hidden" value="${data.weight || ""}">
   `;
   el("armorRows").appendChild(card);
@@ -11131,7 +11513,7 @@ function addGear(data = {}) {
   card.dataset.gearIndex = i;
   const itemName = data.item || data.name || `Gear ${i + 1}`;
   const slot = data.slot || "";
-  const sourceLootId = data.sourceLootId || data.source_loot_id || "";
+  const sourceLootId = data.sourceLootId || "";
   const sourceLocked = Boolean(sourceLootId);
   card.innerHTML = `
     <div class="equipment-card-header">
@@ -11176,23 +11558,19 @@ function generatedEquipmentCardData(entry = {}, buff = {}, index = 0) {
         generatedSource: source,
         weaponType: details.weaponType || "Natural Weapon",
         naturalAttackKind:
-          details.naturalAttackKind ||
-          details.natural_attack_kind ||
-          naturalAttackKindFromName(name),
+          details.naturalAttackKind || naturalAttackKindFromName(name),
         naturalAttackRole:
           details.naturalAttackRole ||
-          details.natural_attack_role ||
           NATURAL_ATTACK_DAMAGE_BY_SIZE[
             details.naturalAttackKind ||
-              details.natural_attack_kind ||
               naturalAttackKindFromName(name)
           ]?.attackRole ||
           "",
         attackScale: details.attackScale || "STR",
-        attackMisc: details.attackMisc || details.attack_misc || "0",
+        attackMisc: details.attackMisc || "0",
         damage: details.damage || "",
         damageScale: details.damageScale || "STR",
-        damageMisc: details.damageMisc || details.damage_misc || "0",
+        damageMisc: details.damageMisc || "0",
         enhancement: details.enhancement || "0",
         enchantment: details.enchantment || "",
         specialMaterial: details.specialMaterial || "",
@@ -11201,10 +11579,10 @@ function generatedEquipmentCardData(entry = {}, buff = {}, index = 0) {
         critical: details.critical || "",
         capacity: details.capacity || "",
         misfire: details.misfire || "",
-        twoHanded: details.twoHanded || details.two_handed || "no",
-        powerAttack: details.powerAttack || details.power_attack || "no",
-        deadlyAim: details.deadlyAim || details.deadly_aim || "no",
-        rapidShot: details.rapidShot || details.rapid_shot || "no",
+        twoHanded: details.twoHanded || "no",
+        powerAttack: details.powerAttack || "no",
+        deadlyAim: details.deadlyAim || "no",
+        rapidShot: details.rapidShot || "no",
       },
     };
   }
@@ -11215,12 +11593,14 @@ function generatedEquipmentCardData(entry = {}, buff = {}, index = 0) {
       generatedEquipmentId,
       generatedSource: source,
       type,
-      bonus: details.bonus || "0",
-      enhancement: details.enhancement || "0",
+      bonus: details.bonus ?? 0,
+      enhancement: details.enhancement ?? 0,
       enchantment: details.enchantment || "",
       specialMaterial: details.specialMaterial || "",
-      penalty: details.penalty || "",
-      failure: details.failure || "",
+      armorGroup: details.armorGroup || type,
+      maxDex: details.maxDex ?? null,
+      penalty: details.penalty ?? null,
+      failure: details.failure ?? null,
       weight: details.weight || "",
     },
   };
@@ -11430,6 +11810,7 @@ async function removeWornLootEffect(sourceLootId) {
 }
 
 function removeEquippedLoot(sourceLootId) {
+  let changed = false;
   ["weaponRows", "armorRows", "gearRows"].forEach((containerId) => {
     el(containerId)
       .querySelectorAll(".sheet-card")
@@ -11437,13 +11818,17 @@ function removeEquippedLoot(sourceLootId) {
         if (
           card.querySelector('[data-field="sourceLootId"]')?.value ===
           sourceLootId
-        )
+        ) {
           card.remove();
+          changed = true;
+        }
       });
   });
+  const before = activeBuffs.length;
   activeBuffs = activeBuffs.filter(
     (buff) => buff.sourceLootId !== sourceLootId,
   );
+  return changed || activeBuffs.length !== before;
 }
 
 function setCardScaling(card, name, value = "STR") {
@@ -11531,13 +11916,21 @@ function updateWornCardFromLoot(item) {
           ? "Armor"
           : "Gear";
     armorCard.querySelector('[data-field="bonus"]').value =
-      details.bonus || "0";
+      details.bonus ?? 0;
     armorCard.querySelector('[data-field="enhancement"]').value =
-      details.enhancement || "0";
+      details.enhancement ?? 0;
     armorCard.querySelector('[data-field="enchantment"]').value =
       details.enchantment || "";
     armorCard.querySelector('[data-field="specialMaterial"]').value =
       details.specialMaterial || "";
+    armorCard.querySelector('[data-field="armorGroup"]').value =
+      details.armorGroup || item.type;
+    armorCard.querySelector('[data-field="maxDex"]').value =
+      details.maxDex ?? "";
+    armorCard.querySelector('[data-field="penalty"]').value =
+      details.penalty ?? "";
+    armorCard.querySelector('[data-field="failure"]').value =
+      details.failure ?? "";
     syncArmorCardDisplay(armorCard);
   }
 
@@ -11558,12 +11951,12 @@ function updateWornCardFromLoot(item) {
       sourceLootId: item.id,
       weaponType: details.weaponType || "Melee Weapon (One-Handed)",
       attackScale: details.attackScale || "STR",
-      attackMisc: details.attackMisc || details.attack_misc || "0",
+      attackMisc: details.attackMisc || "0",
       damage: details.damage || "",
       damageType: details.damageType || "",
       extraDamage: details.extraDamage || [],
       damageScale: details.damageScale || "STR",
-      damageMisc: details.damageMisc || details.damage_misc || "0",
+      damageMisc: details.damageMisc || "0",
       enhancement: details.enhancement || "0",
       enchantment: details.enchantment || "",
       specialMaterial: details.specialMaterial || "",
@@ -11572,18 +11965,16 @@ function updateWornCardFromLoot(item) {
       critical: details.critical || "",
       capacity: details.capacity || "",
       misfire: details.misfire || "",
-      twoHanded: details.twoHanded || details.two_handed || "no",
-      powerAttack: details.powerAttack || details.power_attack || "no",
-      deadlyAim: details.deadlyAim || details.deadly_aim || "no",
-      rapidShot: details.rapidShot || details.rapid_shot || "no",
-      twfNoFeatPrimary:
-        details.twfNoFeatPrimary || details.twf_no_feat_primary || "no",
-      twfNoFeatOff: details.twfNoFeatOff || details.twf_no_feat_off || "no",
-      twfFeatPrimary:
-        details.twfFeatPrimary || details.twf_feat_primary || "no",
-      twfFeatOff: details.twfFeatOff || details.twf_feat_off || "no",
-      improvedTwf: details.improvedTwf || details.improved_twf || "no",
-      greaterTwf: details.greaterTwf || details.greater_twf || "no",
+      twoHanded: details.twoHanded || "no",
+      powerAttack: details.powerAttack || "no",
+      deadlyAim: details.deadlyAim || "no",
+      rapidShot: details.rapidShot || "no",
+      twfNoFeatPrimary: details.twfNoFeatPrimary || "no",
+      twfNoFeatOff: details.twfNoFeatOff || "no",
+      twfFeatPrimary: details.twfFeatPrimary || "no",
+      twfFeatOff: details.twfFeatOff || "no",
+      improvedTwf: details.improvedTwf || "no",
+      greaterTwf: details.greaterTwf || "no",
     });
   } else if (["Armor", "Shield"].includes(item.type) && !armorCard) {
     weaponCard?.remove();
@@ -11592,10 +11983,14 @@ function updateWornCardFromLoot(item) {
       item: item.name,
       sourceLootId: item.id,
       type: item.type,
-      bonus: details.bonus || "0",
-      enhancement: details.enhancement || "0",
+      bonus: details.bonus ?? 0,
+      enhancement: details.enhancement ?? 0,
       enchantment: details.enchantment || "",
       specialMaterial: details.specialMaterial || "",
+      armorGroup: details.armorGroup || item.type,
+      maxDex: details.maxDex ?? null,
+      penalty: details.penalty ?? null,
+      failure: details.failure ?? null,
     });
   } else if (!["Weapon", "Armor", "Shield"].includes(item.type) && !gearCard) {
     weaponCard?.remove();
@@ -11610,11 +12005,16 @@ function updateWornCardFromLoot(item) {
 }
 
 function syncEquippedLootBuffFromItem(item) {
-  item = {
-    ...item,
-    ...(window.PFEffectMechanics?.passiveMechanics?.(item) || item),
-  };
   const index = activeBuffs.findIndex((buff) => buff.sourceLootId === item.id);
+  let passiveMechanics =
+    window.PFEffectMechanics?.passiveMechanics?.(item) || item;
+  const savedBranchId = activeBuffs[index]?.selectedBranchId;
+  if (savedBranchId && window.PFEffectMechanics?.hasBranches?.(passiveMechanics)) {
+    passiveMechanics =
+      window.PFEffectMechanics.resolveBranch(passiveMechanics, savedBranchId) ||
+      passiveMechanics;
+  }
+  item = { ...item, ...passiveMechanics };
   const effects = Array.isArray(item.effects) ? item.effects : [];
   const damageReduction = Array.isArray(item.damageReduction)
     ? item.damageReduction
@@ -11698,6 +12098,8 @@ function syncEquippedLootBuffFromItem(item) {
     permanent: true,
     durationLabel: "Equipped",
     bonuses: effects,
+    ...(item.selectedBranchId ? { selectedBranchId: item.selectedBranchId } : {}),
+    ...(item.selectedBranchName ? { selectedBranchName: item.selectedBranchName } : {}),
     ...(damageReduction.length ? { damageReduction } : {}),
     ...(spellResistance.length ? { spellResistance } : {}),
     ...(immunities.length ? { immunities } : {}),
@@ -11750,18 +12152,121 @@ async function openEquipmentItemEditor(btn) {
   openInventoryItemEditor(saved.id);
 }
 
+function equipmentCardData(card) {
+  const data = {};
+  card?.querySelectorAll("[data-field]").forEach((input) => {
+    data[input.dataset.field] =
+      input.type === "checkbox" ? (input.checked ? "yes" : "no") : input.value;
+  });
+  return data;
+}
+
+function equipmentEnhancementBuffs() {
+  if (equipmentEnhancementBuffCache) return equipmentEnhancementBuffCache;
+  const characterLevel = Math.max(1, num("characterLevel") || 1);
+  const classLevels = progressionClassCounts(characterLevel);
+  const abilityScores = {
+    strength: num("strScore"),
+    dexterity: num("dexScore"),
+    constitution: num("conScore"),
+    intelligence: num("intScore"),
+    wisdom: num("wisScore"),
+    charisma: num("chaScore"),
+  };
+  const baseline = {
+    str: abilityScores.strength,
+    dex: abilityScores.dexterity,
+    con: abilityScores.constitution,
+    int: abilityScores.intelligence,
+    wis: abilityScores.wisdom,
+    cha: abilityScores.charisma,
+    level: characterLevel,
+    characterLevel,
+    classLevels,
+  };
+  const buffs = calculationBuffs().map((buff) => ({
+    ...buff,
+    characterLevel: buff.characterLevel || characterLevel,
+    classLevels: buff.classLevels || classLevels,
+  }));
+  equipmentEnhancementBuffCache = { buffs, abilityScores, baseline };
+  return equipmentEnhancementBuffCache;
+}
+
+function equipmentEnhancementForCard(card) {
+  if (!card) return { base: 0, effect: 0, value: 0, breakdown: [] };
+  const cached = equipmentEnhancementCache.get(card);
+  if (cached) return cached;
+  const weapon = Boolean(card.closest("#weaponRows"));
+  const container = card.parentElement;
+  const index = container
+    ? [...container.querySelectorAll(":scope > .sheet-card")].indexOf(card)
+    : 0;
+  const item = equipmentCardData(card);
+  const context = equipmentEnhancementBuffs();
+  const result = window.PFEffectStats?.resolveEquipmentEnhancement
+    ? window.PFEffectStats.resolveEquipmentEnhancement({
+        item,
+        fallbackKind: weapon ? "weapon" : "armor",
+        index: Math.max(0, index),
+        baseEnhancement: item.enhancement,
+        buffs: context.buffs,
+        normalizeValue: enhancementValue,
+        valueForBonus: (bonus, buff) =>
+          window.PFBuffs?.scaledBonusValue
+            ? window.PFBuffs.scaledBonusValue(bonus, buff, {
+                activeBuffs: context.buffs,
+                abilityScores: context.abilityScores,
+                baseline: context.baseline,
+              })
+            : Number(bonus.value || 0),
+      })
+    : {
+        base: enhancementValue(item.enhancement),
+        effect: 0,
+        value: enhancementValue(item.enhancement),
+        breakdown: [],
+      };
+  equipmentEnhancementCache.set(card, result);
+  return result;
+}
+
+function equipmentEnhancementBreakdown(result = {}, targetLabel = "Enhancement") {
+  return (result.breakdown || []).map((entry) => ({ ...entry, targetLabel }));
+}
+
 function calculateGearAc() {
-  return collectCards("armorRows").reduce(
-    (totals, item) => {
-      const bonus =
-        Number(item.bonus || 0) + enhancementValue(item.enhancement);
-      if (item.type === "Armor") totals.armor = Math.max(totals.armor, bonus);
-      if (item.type === "Shield")
-        totals.shield = Math.max(totals.shield, bonus);
-      return totals;
-    },
-    { armor: 0, shield: 0 },
-  );
+  const totals = {
+    armor: 0,
+    shield: 0,
+    maxDex: null,
+    spellFailure: 0,
+    items: [],
+    breakdown: [],
+  };
+  const winningBreakdown = { armor: [], shield: [] };
+  el("armorRows")
+    .querySelectorAll(":scope > .sheet-card")
+    .forEach((card) => {
+      const item = equipmentCardData(card);
+      totals.items.push(item);
+      const key = item.type === "Shield" ? "shield" : "armor";
+      const enhancement = equipmentEnhancementForCard(card);
+      const total = Number(item.bonus || 0) + enhancement.value;
+      if (total < totals[key]) return;
+      totals[key] = total;
+      winningBreakdown[key] = equipmentEnhancementBreakdown(
+        enhancement,
+        `${item.type || "Armor"} enhancement`,
+      );
+    });
+  const armorRules = window.PFArmorRules?.summarizeEquipment?.(totals.items);
+  if (armorRules) {
+    totals.maxDex = armorRules.maxDex;
+    totals.spellFailure = armorRules.spellFailure;
+  }
+  totals.breakdown = [...winningBreakdown.armor, ...winningBreakdown.shield];
+  return totals;
 }
 
 function syncArmorCardDisplay(card) {
@@ -11771,10 +12276,8 @@ function syncArmorCardDisplay(card) {
       ? "Shield"
       : "Armor";
   const bonus = Number(card.querySelector('[data-field="bonus"]')?.value || 0);
-  const enhancement = enhancementValue(
-    card.querySelector('[data-field="enhancement"]')?.value || 0,
-  );
-  const total = bonus + enhancement;
+  const enhancement = equipmentEnhancementForCard(card);
+  const total = bonus + enhancement.value;
   const label = card.querySelector("[data-armor-bonus-label]");
   const totalInput = card.querySelector("[data-armor-total]");
   if (label)
@@ -11883,7 +12386,8 @@ function calculateWeaponDamage(card, buffed, buffBonuses) {
   const twoHanded =
     !naturalData &&
     (isTwoHandedWeaponType(weaponType) || isYes(field("twoHanded")));
-  const enhancement = enhancementValue(field("enhancement"));
+  const enhancementResult = equipmentEnhancementForCard(card);
+  const enhancement = enhancementResult.value;
   const miscBonus = Number(field("damageMisc") || 0);
   const feat = weaponFeatAdjustments(card);
   const scalingBonus = scalingTerms.reduce((total, term) => {
@@ -11921,6 +12425,10 @@ function calculateWeaponDamage(card, buffed, buffBonuses) {
     ).map((item) => ({ ...item, targetLabel: "Damage scaling" }));
   });
   const directItems = [
+    ...equipmentEnhancementBreakdown(
+      enhancementResult,
+      "Weapon enhancement",
+    ),
     ...weaponBuffBreakdown(weaponBuffs, "damage"),
     ...feat.breakdown.filter((item) => item.targetLabel === "Damage"),
   ];
@@ -11961,13 +12469,22 @@ function calculateWeaponAttack(card, buffed, buffBonuses) {
     weaponName,
   );
   const buffBonus = weaponBuffs.total;
+  const enhancementResult = equipmentEnhancementForCard(card);
+  const enhancement = enhancementResult.value;
+  const enhancementDelta = enhancement - enhancementResult.base;
   const templateAttack = field("templateAttack");
   if (templateAttack) {
     const attackValues =
       String(templateAttack)
         .match(/[+\-]?\d+/g)
         ?.map((value) =>
-          signed(Number(value) + sizeAttack + miscBonus + buffBonus),
+          signed(
+            Number(value) +
+              enhancementDelta +
+              sizeAttack +
+              miscBonus +
+              buffBonus,
+          ),
         ) || [];
     const directItems = [
       ...(sizeAttack
@@ -11981,9 +12498,13 @@ function calculateWeaponAttack(card, buffed, buffBonuses) {
             },
           ]
         : []),
+      ...equipmentEnhancementBreakdown(
+        enhancementResult,
+        "Weapon enhancement",
+      ),
       ...weaponBuffBreakdown(weaponBuffs, "attack"),
     ];
-    const formula = `template ${templateAttack} + size ${signed(sizeAttack)} + misc ${signed(miscBonus)} + buffs ${signed(buffBonus)}`;
+    const formula = `template ${templateAttack} + enhancement override ${signed(enhancementDelta)} + size ${signed(sizeAttack)} + misc ${signed(miscBonus)} + buffs ${signed(buffBonus)}`;
     return {
       buffBonus,
       attacks: attackValues.join("/"),
@@ -12000,7 +12521,6 @@ function calculateWeaponAttack(card, buffed, buffBonuses) {
       total + Math.floor(abilityModFor(term.key, buffed) * term.multiplier),
     0,
   );
-  const enhancement = enhancementValue(field("enhancement"));
   const feat = weaponFeatAdjustments(card);
   const naturalData = naturalAttackData(card);
   if (naturalData) {
@@ -12037,6 +12557,10 @@ function calculateWeaponAttack(card, buffed, buffBonuses) {
             },
           ]
         : []),
+      ...equipmentEnhancementBreakdown(
+        enhancementResult,
+        "Weapon enhancement",
+      ),
       ...weaponBuffBreakdown(weaponBuffs, "attack"),
       ...feat.breakdown.filter((item) => item.targetLabel === "Attack"),
     ];
@@ -12134,6 +12658,10 @@ function calculateWeaponAttack(card, buffed, buffBonuses) {
           },
         ]
       : []),
+    ...equipmentEnhancementBreakdown(
+      enhancementResult,
+      "Weapon enhancement",
+    ),
     ...weaponBuffBreakdown(weaponBuffs, "attack"),
     ...(effectExtraAttacks
       ? breakdownForStat(buffed, "extra attack").map((item) => ({
@@ -12408,6 +12936,8 @@ function toggleAppliedBuffs() {
 }
 
 function recalculateSheet() {
+  equipmentEnhancementCache = new WeakMap();
+  equipmentEnhancementBuffCache = null;
   updateClassDerivedViews();
   updateCreatureSizeFields();
   syncGeneratedEquipmentCards();
@@ -12422,11 +12952,16 @@ function recalculateSheet() {
   el("acShield").value = gearAc.shield;
   const buffed = window.PFBuffs?.calculateStatsDetailed(
     calculationBuffs(),
-    sheetToBaseline(),
+    sheetToBaseline(gearAc),
   );
   const buffTotals = buffed?.totals || {};
   const buffBonuses = buffed?.bonuses || {};
   const buffBreakdown = buffed?.breakdown || {};
+  const naturalArmorBase = num("acNaturalBase");
+  const naturalArmorMisc = num("acNaturalMisc");
+  const naturalArmorTotal =
+    buffTotals["natural armor"] ?? naturalArmorBase + naturalArmorMisc;
+  el("acNatural").value = naturalArmorTotal;
   ABILITIES.forEach(([key]) => {
     const score = num(`${key}Score`);
     const statName = ABILITY_STAT_NAMES[key];
@@ -12442,6 +12977,9 @@ function recalculateSheet() {
 
   const str = abilityModFor("str", buffed);
   const dex = abilityModFor("dex", buffed);
+  const acDex = window.PFArmorRules?.dexterityForArmorClass
+    ? window.PFArmorRules.dexterityForArmorClass(dex, gearAc.maxDex)
+    : dex;
   const con = abilityModFor("con", buffed);
   const wis = abilityModFor("wis", buffed);
   el("hitPointsBuff").value = signed(buffBonuses["hit points"] || 0);
@@ -12468,28 +13006,28 @@ function recalculateSheet() {
       "initiative",
     ]),
   );
-  el("acDex").value = signed(dex);
+  el("acDex").value = signed(acDex);
   el("acTotal").value =
     buffTotals.ac ??
     10 +
       num("acArmor") +
       num("acShield") +
-      dex +
-      num("acNatural") +
+      acDex +
+      naturalArmorTotal +
       num("acDeflection") +
       num("acMisc");
   el("acBuff").value = signed(buffBonuses.ac || 0);
   el("acTouch").value =
-    buffTotals["touch ac"] ?? 10 + dex + num("acDeflection") + num("acMisc");
+    buffTotals["touch ac"] ?? 10 + acDex + num("acDeflection") + num("acMisc");
   el("acTouchBuff").value = signed(buffBonuses["touch ac"] || 0);
   el("acFlat").value =
     buffTotals["flat-footed ac"] ??
-    Number(el("acTotal").value) - Math.max(0, dex);
+    Number(el("acTotal").value) - Math.max(0, acDex);
   el("acFlatBuff").value = signed(buffBonuses["flat-footed ac"] || 0);
   setCalc(
     "acTotal",
-    `10 + armor ${gearAc.armor} + shield ${gearAc.shield} + DEX ${signed(dex)} + natural ${num("acNatural")} + deflection ${num("acDeflection")} + misc ${num("acMisc")}`,
-    buffBreakdown.ac,
+    `10 + armor ${gearAc.armor} + shield ${gearAc.shield} + DEX ${signed(acDex)}${gearAc.maxDex !== null && dex > gearAc.maxDex ? ` (capped from ${signed(dex)} by Max Dex ${signed(gearAc.maxDex)})` : ""} + natural ${naturalArmorTotal} (base ${naturalArmorBase} + misc ${naturalArmorMisc}) + deflection ${num("acDeflection")} + misc ${num("acMisc")}`,
+    [...(buffBreakdown.ac || []), ...gearAc.breakdown],
   );
 
   [
@@ -12742,8 +13280,40 @@ async function openEffectTrackerModal() {
     characterId: currentSheetId,
     effectStats: LOOT_EFFECT_STATS,
     activatableAbilities: collectActivatableAbilities(),
+    recalculateSpell: async (effect, casterLevel) => {
+      const detail = await spellDetailsForCharacter(
+        sheetContextKey,
+        currentSheetId,
+        effect.spellMeta || { name: effect.name },
+        casterLevel,
+      );
+      return detail?.calculations || effect.spellCalculations || null;
+    },
+    effectPickerEffects: async () => {
+      const [spells, catalog] = await Promise.all([
+        collectBridgeOwnedSpellEffects(),
+        window.PFEffectCatalog?.load?.() || [],
+      ]);
+      return [
+        ...collectActivatableAbilities(),
+        ...spells,
+        ...catalog,
+        ...collectBridgePassiveEffectSources(),
+      ];
+    },
     choicePoolSkills: allSkills(),
+    choicePoolEquipment: currentEffectChoiceEquipment,
     favoredEnemyOptions: characterFavoredEnemyOptions,
+    onAuraActivate: async (effect) => {
+      const created = await createAuraOnCurrentMap(effect);
+      setStatus(
+        created
+          ? `${effect.name || "Aura"} activated on the current map.`
+          : `Place ${isEnemySheetMode ? "this enemy" : "this character"} on the current map before activating an aura.`,
+        created ? "success" : "warning",
+      );
+      return created;
+    },
     // Enemies aren't "controlled" by a separate real person the way a
     // PC is -- only route PC effects-with-a-choice through the request
     // flow when someone other than that character's own owner is the
@@ -12790,9 +13360,7 @@ function renderInventoryAttributes(item) {
   if (item.type === "Weapon") {
     rows.push([
       "Weapon Type",
-      details.weaponType === "Natural"
-        ? "Natural Weapon"
-        : details.weaponType || "Melee Weapon (One-Handed)",
+      details.weaponType || "Melee Weapon (One-Handed)",
     ]);
     if (details.specialMaterial)
       rows.push(["Material", details.specialMaterial]);
@@ -13038,6 +13606,7 @@ function makeEnemyInventoryItem(source) {
     grantDomains: cloneJson(source.grantDomains || []),
     generatedEquipment: cloneJson(source.generatedEquipment || []),
     conditionalVariables: cloneJson(source.conditionalVariables || []),
+    damageRolls: cloneJson(source.damageRolls || []),
     activeMechanics: cloneJson(source.activeMechanics || null),
   };
 }
@@ -13224,7 +13793,7 @@ function syncInventoryWeaponAttackOptions(weaponType, resetInvalid = false) {
   const twoHandedCompatible =
     isWeapon &&
     melee &&
-    !["Natural", "Natural Weapon", "Melee Weapon (Light)"].includes(weaponType);
+    !["Natural Weapon", "Melee Weapon (Light)"].includes(weaponType);
   el("inventoryWeaponAttackOptions")?.classList.toggle("d-none", !isWeapon);
   document
     .querySelectorAll("[data-inventory-melee-weapon-option]")
@@ -13318,8 +13887,8 @@ function collectInventoryDetails() {
   if (["Armor", "Shield"].includes(type)) {
     return {
       ...slotDetails,
-      bonus: el("inventoryArmorBonus").value || "0",
-      enhancement: el("inventoryArmorEnhancement").value || "0",
+      bonus: Number(el("inventoryArmorBonus").value || 0),
+      enhancement: Number(el("inventoryArmorEnhancement").value || 0),
       enchantment: el("inventoryArmorEnchantment").value.trim(),
       specialMaterial: el("inventorySpecialMaterial").value,
     };
@@ -13344,9 +13913,7 @@ function openInventoryItemEditor(itemId) {
   updateInventorySlotPreview();
   PFItemEditor.refreshDescription(inventoryEditorConfig());
   el("inventoryWeaponType").value =
-    details.weaponType === "Natural"
-      ? "Natural Weapon"
-      : details.weaponType || "Melee Weapon (One-Handed)";
+    details.weaponType || "Melee Weapon (One-Handed)";
   setInventoryAttackScale(details.attackScale || "STR");
   el("inventoryDamageDice").value = details.damage || "";
   el("inventoryDamageType").value = details.damageType || "";
@@ -13359,8 +13926,8 @@ function openInventoryItemEditor(itemId) {
   el("inventoryWeaponEnchantment").value = details.enchantment || "";
   el("inventoryWeaponDetails").value = details.details || "";
   setInventoryWeaponAttackOptions(details);
-  el("inventoryArmorBonus").value = details.bonus || "0";
-  el("inventoryArmorEnhancement").value = details.enhancement || "0";
+  el("inventoryArmorBonus").value = details.bonus ?? 0;
+  el("inventoryArmorEnhancement").value = details.enhancement ?? 0;
   el("inventoryArmorEnchantment").value = details.enchantment || "";
   PFItemEditor.syncSpecialMaterialForType(
     inventoryEditorConfig(),
@@ -13469,6 +14036,11 @@ async function deleteInventoryItemAmount(itemId, amountOverride = null) {
     Number.parseInt(el("deleteInventoryItemCount").value, 10) || 1;
   const amount = Math.max(1, Math.min(total, amountOverride ?? parsedAmount));
   if (isEnemySheetMode) {
+    if (amount >= total) {
+      removeEquippedLoot(item.id);
+      recalculateSheet();
+      queueSheetSave();
+    }
     characterInventoryItems =
       amount >= total
         ? characterInventoryItems.filter((entry) => entry.id !== itemId)
@@ -13483,9 +14055,9 @@ async function deleteInventoryItemAmount(itemId, amountOverride = null) {
   let ok = false;
 
   if (amount >= total) {
-    removeEquippedLoot(item.id);
     ok = await PFApp.deleteLootItem(item.id);
     if (ok) {
+      removeEquippedLoot(item.id);
       await PFApp.saveBuffState(activeBuffs, sheetContextKey, currentSheetId);
       localStorage.setItem(buffRefreshKey(), String(Date.now()));
       recalculateSheet();
@@ -13650,6 +14222,17 @@ function renderCharacterInventory(items = []) {
 
 async function wearLootItem(item) {
   if (!item) return;
+  if (!isLootEquipped(item.id)) {
+    const passive = window.PFEffectMechanics?.passiveMechanics?.(item) || item;
+    if (window.PFEffectMechanics?.hasBranches?.(passive)) {
+      const resolved = await resolveMechanicBranchChoice(
+        { ...item, ...passive },
+        item.name || "Item",
+      );
+      if (!resolved) return;
+      item = resolved;
+    }
+  }
   const details = item.details || {};
   if (isLootEquipped(item.id)) {
     removeEquippedLoot(item.id);
@@ -13700,10 +14283,14 @@ async function wearLootItem(item) {
           : item.type === "Armor"
             ? "Armor"
             : "Gear",
-      bonus: details.bonus || "0",
-      enhancement: details.enhancement || "0",
+      bonus: details.bonus ?? 0,
+      enhancement: details.enhancement ?? 0,
       enchantment: details.enchantment || "",
       specialMaterial: details.specialMaterial || "",
+      armorGroup: details.armorGroup || item.type,
+      maxDex: details.maxDex ?? null,
+      penalty: details.penalty ?? null,
+      failure: details.failure ?? null,
     });
   } else {
     addGear({
@@ -13733,20 +14320,16 @@ async function wearLootItem(item) {
   if (sheetViewMode === "simplified") renderSimplifiedSheet();
 }
 
-async function loadCharacterInventory() {
+async function syncCharacterInventoryWithEquipment() {
   if (isEnemySheetMode) {
     characterInventoryItems = characterInventoryItems.map((item) => ({
       ...item,
       assigned_character_id: currentSheetId,
     }));
-    renderCharacterInventory(characterInventoryItems);
-    if (sheetViewMode === "simplified") renderSimplifiedSheet();
     return;
   }
   if (!currentSheetId) {
     characterInventoryItems = [];
-    renderCharacterInventory([]);
-    if (sheetViewMode === "simplified") renderSimplifiedSheet();
     return;
   }
 
@@ -13754,7 +14337,11 @@ async function loadCharacterInventory() {
   characterInventoryItems = loot.filter(
     (item) => item.assigned_character_id === currentSheetId,
   );
-  reconcileEquippedLoot(loot);
+  await reconcileEquippedLoot(loot);
+}
+
+async function loadCharacterInventory() {
+  await syncCharacterInventoryWithEquipment();
   renderCharacterInventory(characterInventoryItems);
   if (sheetViewMode === "simplified") renderSimplifiedSheet();
 }
@@ -13777,10 +14364,8 @@ async function reconcileEquippedLoot(allLoot = []) {
       .forEach((card) => {
         const sourceLootId =
           card.querySelector('[data-field="sourceLootId"]')?.value || "";
-        if (sourceLootId && !validIds.has(sourceLootId)) {
-          card.remove();
-          changed = true;
-        }
+        if (sourceLootId && !validIds.has(sourceLootId))
+          changed = removeEquippedLoot(sourceLootId) || changed;
       });
   });
   const nextBuffs = activeBuffs.filter(
@@ -13815,6 +14400,13 @@ function collectCards(containerId) {
   });
 }
 
+function currentEffectChoiceEquipment() {
+  return {
+    weapons: collectCards("weaponRows"),
+    armor: collectCards("armorRows"),
+  };
+}
+
 function collectPersistedCards(containerId) {
   return [...el(containerId).querySelectorAll(".sheet-card")]
     .filter((card) => card.dataset.generatedEquipment !== "true")
@@ -13835,6 +14427,7 @@ function collectPersistedCards(containerId) {
 }
 
 function collectCalculatedSummary() {
+  const gearAc = calculateGearAc();
   const conditionalGroups = simpleConditionalsByStat();
   const classSkillEffectSet = characterClassSkillKeys();
   const abilityRows = ABILITIES.map(([key, label]) => ({
@@ -13955,6 +14548,8 @@ function collectCalculatedSummary() {
       ac: el("acTotal")?.value || "",
       touch: el("acTouch")?.value || "",
       flat: el("acFlat")?.value || "",
+      maxDex: gearAc.maxDex,
+      spellFailure: gearAc.spellFailure,
       conditionals: {
         ac: conditionalGroups.ac || [],
         touch: conditionalGroups["touch ac"] || [],
@@ -14204,46 +14799,36 @@ function collectSheet() {
 function restoreSheet(sheet) {
   isRestoringSheet = true;
   const data = sheet || {};
-  const restoredSizeValue = data.fields?.size ?? data.size ?? "";
+  const restoredSizeValue = data.fields?.size ?? "";
   showCalculations = Boolean(
-    data.preferences?.showAppliedBuffs ?? data.showAppliedBuffs ?? true,
+    data.preferences?.showAppliedBuffs ?? true,
   );
   updateAppliedBuffsToggle();
   SIMPLE_FIELDS.forEach((id) => {
     if (el(id)) el(id).value = el(id).defaultValue || "";
   });
-  setSelectValuePreservingUnknown("race", data.fields?.race || data.race || "");
+  setSelectValuePreservingUnknown("race", data.fields?.race || "");
   setSelectValuePreservingUnknown(
     "alignment",
-    data.fields?.alignment || data.alignment || "",
+    data.fields?.alignment || "",
   );
   setSelectValuePreservingUnknown(
     "size",
-    data.fields?.size || data.size || "Medium",
+    data.fields?.size || "Medium",
   );
   Object.entries(data.fields || {}).forEach(([id, value]) => {
     if (id === "race" || id === "alignment" || id === "size")
       setSelectValuePreservingUnknown(id, value);
     else if (el(id)) el(id).value = value;
   });
-  Object.entries(data).forEach(([id, value]) => {
-    if (id === "race" || id === "alignment" || id === "size")
-      setSelectValuePreservingUnknown(id, value);
-    else if (typeof value !== "object" && el(id)) el(id).value = value;
-  });
+  if (el("acNaturalBase")) {
+    el("acNaturalBase").value = data.fields?.acNaturalBase ?? 0;
+  }
   if (!isEnemySheetMode && shouldApplyRaceDefaultSize(restoredSizeValue)) {
     applySelectedRaceDefaults();
   }
   renderEnemyStructuredSpellFields();
   updateEnemyAutoInputSizes();
-  if (
-    el("currentHitPoints") &&
-    data.fields?.currentHitPoints === undefined &&
-    data.currentHitPoints === undefined
-  ) {
-    el("currentHitPoints").value =
-      data.fields?.hitPointsTotal || data.fields?.hitPoints || 0;
-  }
   Object.entries(data.abilities || {}).forEach(([key, value]) => {
     if (el(`${key}Score`)) el(`${key}Score`).value = value.score || 10;
   });
@@ -14262,10 +14847,10 @@ function restoreSheet(sheet) {
       ? data.classFeatureVariableChoices
       : {};
   selectedRacialAlternateTraits = normalizeSelectedRacialAlternateTraits(
-    data.racialTraits || data.racialAlternateTraits || [],
+    data.racialTraits?.alternateTraits || [],
   );
   selectedRacialTraitChoices = normalizeSelectedRacialTraitChoices(
-    data.racialTraits?.choices || data.racialTraitChoices || {},
+    data.racialTraits?.choices || {},
   );
   characterSpells =
     data.spells && typeof data.spells === "object" ? data.spells : {};
@@ -14274,20 +14859,11 @@ function restoreSheet(sheet) {
       ? data.spellLikeChoices
       : {},
   );
-  characterFeats = normalizeCharacterFeats(data.feats || data.characterFeats || {});
+  characterFeats = normalizeCharacterFeats(data.feats || {});
   classProgression = normalizeClassProgression(
-    data.classProgression || data.classes || [],
-    data.fields?.classLevel?.split(/\s+\d+$/)[0] || "",
+    data.classProgression || [],
   );
-  if (!Array.isArray(data.classProgression)) {
-    if (data.fields?.bab !== undefined && el("babMisc"))
-      el("babMisc").value = data.fields.bab;
-    Object.entries(data.saves || {}).forEach(([key, value]) => {
-      if (el(`${key}Misc`) && value?.misc === undefined)
-        el(`${key}Misc`).value = value.base || 0;
-    });
-  }
-  ["babMisc", "initMisc", "acMisc", "cmbMisc", "cmdMisc"].forEach((id) => {
+  ["babMisc", "initMisc", "acNaturalMisc", "acMisc", "cmbMisc", "cmdMisc"].forEach((id) => {
     if (el(id) && el(id).value === "") el(id).value = "0";
   });
   characterInventoryItems =
@@ -14319,14 +14895,6 @@ function restoreSheet(sheet) {
     else addArmor(item);
   });
   (data.gear || []).forEach(addGear);
-  if (!data.armor?.length) {
-    const armorBonus = data.fields?.acArmor || data.acArmor;
-    const shieldBonus = data.fields?.acShield || data.acShield;
-    if (Number(armorBonus || 0))
-      addArmor({ item: "Saved armor", bonus: armorBonus, type: "Armor" });
-    if (Number(shieldBonus || 0))
-      addArmor({ item: "Saved shield", bonus: shieldBonus, type: "Shield" });
-  }
   updateCharacterImagePreview();
   updateRacialTraitsButton();
   updateClassDerivedViews();
@@ -14516,6 +15084,7 @@ async function loadCurrentSheet(sheetId = currentSheetId) {
 }
 
 let sheetBridgeRecalculationQueue = Promise.resolve();
+let sheetBridgeSummarySaveQueue = Promise.resolve();
 
 function bridgeSpellEffectDefinition(spell = {}, metadata = {}) {
   const mechanics = window.PFEffectMechanics?.activeMechanics?.(spell, {
@@ -14531,12 +15100,17 @@ function bridgeSpellEffectDefinition(spell = {}, metadata = {}) {
         : metadata.className || "Spell",
     bonuses: mechanics.effects || [],
     durationConfig: mechanics.durationConfig || null,
+    auraConfig: mechanics.auraConfig || null,
+    ...(window.PFEffectMechanics?.hasBranches?.(mechanics)
+      ? { branches: mechanics.branches }
+      : {}),
     duration: window.PFEffectMeta?.durationLabel
       ? window.PFEffectMeta.durationLabel(mechanics.durationConfig || {})
       : "variable",
     ownedSpell: true,
     spellMeta: metadata,
     spell,
+    attributeScaleContext: currentAttributeScaleContext(),
   };
   (window.PFEffectMechanics?.extraKeys?.() || []).forEach((key) => {
     if (Array.isArray(mechanics[key]) && mechanics[key].length) {
@@ -14695,23 +15269,45 @@ function collectBridgePassiveEffectSources() {
   return results;
 }
 
+async function prepareBridgeCharacterSheet(
+  contextKey,
+  characterId,
+  { inventory = false } = {},
+) {
+  await characterSheetReady;
+  if (!contextKey || !characterId) return null;
+  isEnemySheetMode = false;
+  enemySheetId = "";
+  el("enemySourceItemButton")?.classList.add("d-none");
+  sheetContextKey = contextKey;
+  const saved =
+    (await PFApp.loadCharacterSheetForRecalculation?.(
+      characterId,
+      sheetContextKey,
+    )) || (await PFApp.loadCharacterSheet("", sheetContextKey, characterId));
+  if (!saved?.sheet || String(saved.id) !== String(characterId)) return null;
+  currentSheetId = saved.id;
+  currentSheetOwnerId = saved.user_id || currentUserId;
+  activeBuffs =
+    (await PFApp.loadCharacterBuffStateForRecalculation?.(
+      saved.id,
+      sheetContextKey,
+    )) || [];
+  lastBuffRefresh = localStorage.getItem(buffRefreshKey(saved.id)) || "";
+  restoreSheet(saved.sheet);
+  el("characterName").value = saved.character_name;
+  await syncCharacterInventoryWithEquipment();
+  if (inventory) renderCharacterInventory(characterInventoryItems);
+  recalculateSheet();
+  return saved;
+}
+
 async function passiveEffectSourcesForCharacter(contextKey, characterId) {
   return queueSheetBridgeRecalculation(async () => {
-    await characterSheetReady;
-    if (!contextKey || !characterId) return [];
-    sheetContextKey = contextKey;
-    const saved =
-      (await PFApp.loadCharacterSheetForRecalculation?.(characterId, sheetContextKey)) ||
-      (await PFApp.loadCharacterSheet("", sheetContextKey, characterId));
-    if (!saved?.sheet || String(saved.id) !== String(characterId)) return [];
-    currentSheetId = saved.id;
-    currentSheetOwnerId = saved.user_id || currentUserId;
-    activeBuffs =
-      (await PFApp.loadCharacterBuffStateForRecalculation?.(saved.id, sheetContextKey)) || [];
-    restoreSheet(saved.sheet);
-    el("characterName").value = saved.character_name;
-    await loadCharacterInventory();
-    recalculateSheet();
+    const saved = await prepareBridgeCharacterSheet(contextKey, characterId, {
+      inventory: true,
+    });
+    if (!saved) return [];
     return collectBridgePassiveEffectSources();
   });
 }
@@ -14736,6 +15332,7 @@ async function spellDetailsForCharacter(
       (await PFApp.loadCharacterBuffStateForRecalculation?.(saved.id, sheetContextKey)) || [];
     restoreSheet(saved.sheet);
     el("characterName").value = saved.character_name;
+    await syncCharacterInventoryWithEquipment();
     recalculateSheet();
     const isSla = spellMeta.kind === "sla";
     const className = isSla ? "" : spellMeta.className || "";
@@ -14768,52 +15365,33 @@ async function spellDetailsForCharacter(
 
 async function spellEffectSourcesForCharacter(contextKey, characterId) {
   return queueSheetBridgeRecalculation(async () => {
-    await characterSheetReady;
-    if (!contextKey || !characterId) return [];
-    sheetContextKey = contextKey;
-    const saved =
-      (await PFApp.loadCharacterSheetForRecalculation?.(
-        characterId,
-        sheetContextKey,
-      )) || (await PFApp.loadCharacterSheet("", sheetContextKey, characterId));
-    if (!saved?.sheet || String(saved.id) !== String(characterId)) return [];
-    currentSheetId = saved.id;
-    currentSheetOwnerId = saved.user_id || currentUserId;
-    activeBuffs =
-      (await PFApp.loadCharacterBuffStateForRecalculation?.(
-        saved.id,
-        sheetContextKey,
-      )) || [];
-    restoreSheet(saved.sheet);
-    el("characterName").value = saved.character_name;
-    recalculateSheet();
+    const saved = await prepareBridgeCharacterSheet(contextKey, characterId);
+    if (!saved) return [];
     return collectBridgeOwnedSpellEffects();
   });
 }
 
 async function activatableEffectSourcesForCharacter(contextKey, characterId) {
   return queueSheetBridgeRecalculation(async () => {
-    await characterSheetReady;
-    if (!contextKey || !characterId) return [];
-    sheetContextKey = contextKey;
-    const saved =
-      (await PFApp.loadCharacterSheetForRecalculation?.(
-        characterId,
-        sheetContextKey,
-      )) || (await PFApp.loadCharacterSheet("", sheetContextKey, characterId));
-    if (!saved?.sheet || String(saved.id) !== String(characterId)) return [];
-    currentSheetId = saved.id;
-    currentSheetOwnerId = saved.user_id || currentUserId;
-    activeBuffs =
-      (await PFApp.loadCharacterBuffStateForRecalculation?.(
-        saved.id,
-        sheetContextKey,
-      )) || [];
-    restoreSheet(saved.sheet);
-    el("characterName").value = saved.character_name;
-    await loadCharacterInventory();
-    recalculateSheet();
+    const saved = await prepareBridgeCharacterSheet(contextKey, characterId, {
+      inventory: true,
+    });
+    if (!saved) return [];
     return collectActivatableAbilities();
+  });
+}
+
+async function mapEffectSourcesForCharacter(contextKey, characterId) {
+  return queueSheetBridgeRecalculation(async () => {
+    const saved = await prepareBridgeCharacterSheet(contextKey, characterId, {
+      inventory: true,
+    });
+    if (!saved) return { activatable: [], spells: [], passives: [] };
+    return {
+      activatable: collectActivatableAbilities(),
+      spells: await collectBridgeOwnedSpellEffects(),
+      passives: collectBridgePassiveEffectSources(),
+    };
   });
 }
 
@@ -14824,6 +15402,92 @@ function queueSheetBridgeRecalculation(task) {
   );
   sheetBridgeRecalculationQueue = next.catch(() => {});
   return next;
+}
+
+function queueSheetBridgeSummarySave(task) {
+  const next = sheetBridgeSummarySaveQueue.then(
+    () => task(),
+    () => task(),
+  );
+  sheetBridgeSummarySaveQueue = next.catch((error) => console.error(error));
+  return next;
+}
+
+async function recalculateAndSaveCharacterSnapshot(
+  contextKey,
+  character,
+  nextActiveBuffs = [],
+) {
+  return queueSheetBridgeRecalculation(async () => {
+    await characterSheetReady;
+    if (!contextKey || !character?.id || !character?.sheet) return null;
+    isEnemySheetMode = false;
+    enemySheetId = "";
+    el("enemySourceItemButton")?.classList.add("d-none");
+    sheetContextKey = contextKey;
+    currentSheetId = character.id;
+    currentSheetOwnerId = character.userId || character.user_id || currentUserId;
+    activeBuffs = Array.isArray(nextActiveBuffs) ? nextActiveBuffs : [];
+    restoreSheet(character.sheet);
+    el("characterName").value =
+      character.name || character.character_name || "Character";
+    await syncCharacterInventoryWithEquipment();
+    recalculateSheet();
+    const calculated = collectCalculatedSummary();
+    const targetId = character.id;
+    const targetContext = sheetContextKey;
+    const summary = structuredClone(calculated);
+    void queueSheetBridgeSummarySave(async () => {
+      const updated = await PFApp.updateCharacterCalculatedSummary?.(
+        targetId,
+        summary,
+        targetContext,
+      );
+      if (!updated?.id || String(updated.id) !== String(targetId)) return;
+      localStorage.setItem(
+        `pf_character_sheet_updated_${targetContext}_${updated.id}`,
+        String(Date.now()),
+      );
+    });
+    return calculated;
+  });
+}
+
+async function recalculateAndSaveEnemySnapshot(contextKey, enemy) {
+  return queueSheetBridgeRecalculation(async () => {
+    await characterSheetReady;
+    if (!contextKey || !enemy?.id || !enemy?.sheet) return null;
+    sheetContextKey = contextKey;
+    isEnemySheetMode = true;
+    enemySheetId = enemy.id;
+    currentSheetId = enemy.id;
+    currentSheetOwnerId = currentUserId;
+    activeBuffs = Array.isArray(enemy.sheet.activeBuffs)
+      ? enemy.sheet.activeBuffs
+      : [];
+    restoreSheet(enemy.sheet);
+    el("characterName").value = enemy.name || "Enemy";
+    recalculateSheet();
+    const calculated = collectCalculatedSummary();
+    const targetId = enemy.id;
+    const targetContext = sheetContextKey;
+    const buffs = structuredClone(activeBuffs);
+    const summary = structuredClone(calculated);
+    void queueSheetBridgeSummarySave(async () => {
+      const savedEnemy = await PFApp.updateEnemyEffectSummary?.(
+        targetId,
+        buffs,
+        summary,
+        targetContext,
+      );
+      if (!savedEnemy?.id) return;
+      localStorage.setItem(
+        `pf_enemy_sheet_updated_${targetContext}_${savedEnemy.id}`,
+        String(Date.now()),
+      );
+    });
+    return calculated;
+  });
 }
 
 async function recalculateAndSaveCharacterSheet(contextKey, characterId) {
@@ -14857,6 +15521,7 @@ async function recalculateAndSaveCharacterSheetNow(contextKey, characterId) {
   lastBuffRefresh = localStorage.getItem(buffRefreshKey(targetSheetId)) || "";
   restoreSheet(saved.sheet);
   el("characterName").value = saved.character_name;
+  await syncCharacterInventoryWithEquipment();
   recalculateSheet();
   const nextSheet = collectSheet();
   const updated = await PFApp.updateCharacterCalculatedSummary?.(
@@ -14930,9 +15595,12 @@ async function recalculateAndSaveEnemySheetNow(contextKey, enemyId) {
 window.PFCharacterSheetBridge = {
   recalculateAndSaveCharacter: recalculateAndSaveCharacterSheet,
   recalculateAndSaveEnemy: recalculateAndSaveEnemySheet,
+  recalculateCharacterSnapshot: recalculateAndSaveCharacterSnapshot,
+  recalculateEnemySnapshot: recalculateAndSaveEnemySnapshot,
   spellEffectSourcesForCharacter,
   activatableEffectSourcesForCharacter,
   passiveEffectSourcesForCharacter,
+  mapEffectSourcesForCharacter,
   spellDetailsForCharacter,
 };
 
@@ -14980,6 +15648,11 @@ async function startPendingEffectChoicePolling() {
       "",
     choicePoolSkillsFor: (id) =>
       !isEnemySheetMode && id === currentSheetId ? allSkills() : undefined,
+    choicePoolEquipmentFor: async (id) => {
+      if (id === currentSheetId) return currentEffectChoiceEquipment();
+      const saved = await PFApp.loadCharacterSheet("", sheetContextKey, id);
+      return saved?.sheet || {};
+    },
     favoredEnemyOptionsFor: (id) =>
       !isEnemySheetMode && id === currentSheetId
         ? characterFavoredEnemyOptions()
@@ -15112,6 +15785,7 @@ async function initCharacterSheet() {
     applySkillSearchFilter();
   });
   el("racialTraitsButton")?.addEventListener("click", openRacialTraitsModal);
+  el("showAppliedBuffsToggle")?.addEventListener("click", toggleAppliedBuffs);
   effectTrackerModal = bootstrap.Modal.getOrCreateInstance(
     el("effectTrackerModal"),
   );

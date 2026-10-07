@@ -125,6 +125,7 @@ function normalizeTrait(trait = {}) {
     conditionalVariables: Array.isArray(trait.conditionalVariables)
       ? trait.conditionalVariables
       : [],
+    damageRolls: Array.isArray(trait.damageRolls) ? trait.damageRolls : [],
     activatableAbilities: Array.isArray(trait.activatableAbilities)
       ? cloneJson(trait.activatableAbilities)
       : [],
@@ -347,6 +348,7 @@ const TRAIT_MECHANIC_KEYS = window.PFEffectMechanics?.mechanicKeys?.() || [
   "grantDomains",
   "generatedEquipment",
   "conditionalVariables",
+  "damageRolls",
 ];
 
 const TRAIT_MECHANIC_LABELS = {
@@ -367,6 +369,7 @@ const TRAIT_MECHANIC_LABELS = {
   grantDomains: "Domains",
   generatedEquipment: "Gear",
   conditionalVariables: "Vars",
+  damageRolls: "Damage",
 };
 
 function traitMechanicCount(item = {}, key = "") {
@@ -617,6 +620,8 @@ function createMechanicEditorRow(key = "", data = {}, options = {}) {
       window.PFEffectEditor.createGeneratedEquipmentRow(data, rowOptions),
     conditionalVariables: () =>
       window.PFEffectEditor.createConditionalVariableRow(data, rowOptions),
+    damageRolls: () =>
+      window.PFEffectEditor.createDamageRollRow(data, rowOptions),
   };
   const row = builders[key]?.();
   if (!row?.element) return null;
@@ -990,6 +995,7 @@ function mountTraitEffectEditors(race) {
             {
               idPrefix: `race${selectedIndex}${kind}${index}Override${overrideIndex}Additions`,
               effectsKey: "effects",
+              allowBranches: false,
               onChange: () => setDirty(true),
             },
           );
@@ -1389,6 +1395,7 @@ function collectTrait(card) {
     modifies: splitList(card.querySelector('[data-trait-field="modifies"]')?.value),
     modifiedTraitOverrides: collectModifiedTraitOverrides(card, kind, index),
     effects: extras.effects || [],
+    ...(extras.branches?.length ? { branches: extras.branches } : {}),
     damageReduction: extras.damageReduction || [],
     spellResistance: extras.spellResistance || [],
     immunities: extras.immunities || [],
@@ -1405,6 +1412,7 @@ function collectTrait(card) {
     grantDomains: extras.grantDomains || [],
     generatedEquipment: extras.generatedEquipment || [],
     conditionalVariables: extras.conditionalVariables || [],
+    damageRolls: extras.damageRolls || [],
     activeMechanics: extras.activeMechanics,
     activatableAbilities: Array.isArray(sourceTrait.activatableAbilities)
       ? cloneJson(sourceTrait.activatableAbilities)

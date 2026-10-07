@@ -64,7 +64,6 @@
           <form id="calendarEventForm" class="modal-content">
             <div class="modal-header">
               <h5 id="calendarEventModalTitle" class="modal-title">Calendar Event</h5>
-              <button type="button" class="btn-close btn-close-white d-none" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
               <div class="calendar-event-grid">

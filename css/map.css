@@ -1352,23 +1352,7 @@ body {
   background: rgba(24, 24, 24, 0.8);
 }
 
-/* #mapMobileMenuModal has no .modal-header (see its own comment in
-   map.html) -- this anchors a single floating close button over the
-   relocated #mapSide content instead, and drops modal-body's default
-   padding so #mapSide's own internal spacing (.side-tabs/.side-scroll
-   already pad themselves) is the only padding, not a second layer of
-   it stacked on top. */
-.map-mobile-menu-modal-content {
-  position: relative;
-}
-
-.map-mobile-menu-modal-close {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  z-index: 5;
-}
-
+/* The relocated map sidebar already owns its internal spacing. */
 #mapMobileMenuModalBody {
   padding: 0;
 }
@@ -1958,6 +1942,26 @@ body {
   flex: 1 1 auto;
   font-weight: 600;
   overflow-wrap: anywhere;
+}
+
+.quick-condition-card {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.quick-condition-description {
+  color: #dee2e6;
+  line-height: 1.5;
+  white-space: pre-line;
+}
+
+.quick-condition-turns-field {
+  margin-top: 1.25rem;
+}
+
+.quick-condition-turns {
+  width: min(190px, 100%);
+  margin-top: 0.35rem;
 }
 
 .quick-effect-info {
@@ -3250,10 +3254,4 @@ textarea {
     display: none;
   }
 
-  /* Redundant on mobile once the list is already compact -- the footer
-     still has its own Close button, plus backdrop-tap and Escape both
-     already dismiss the modal regardless. */
-  #rollResultModal .modal-header .btn-close {
-    display: none;
-  }
 }

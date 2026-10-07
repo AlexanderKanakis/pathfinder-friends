@@ -25,7 +25,6 @@
           <div class="modal-content bg-dark text-white border-secondary">
             <div class="modal-header border-secondary">
               <h5 class="modal-title" id="${MODAL_ID}Label">Enemy Templates</h5>
-              <button type="button" class="btn-close btn-close-white d-none" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
               <input id="enemyTemplateSearch" class="form-control form-control-sm mb-3" placeholder="Search enemy name">

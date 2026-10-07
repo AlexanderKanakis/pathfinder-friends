@@ -517,6 +517,10 @@
         ...(generatedEquipment.length ? { generatedEquipment } : {}),
         ...(conditionalVariables.length ? { conditionalVariables } : {}),
         durationConfig,
+        auraConfig: activeFeature.auraConfig || null,
+        ...(window.PFEffectMechanics?.hasBranches?.(activeFeature)
+          ? { branches: activeFeature.branches }
+          : {}),
         duration: window.PFEffectMeta?.durationLabel
           ? window.PFEffectMeta.durationLabel(durationConfig)
           : "variable",

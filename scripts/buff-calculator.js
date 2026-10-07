@@ -289,7 +289,6 @@
       rawBonus.target ||
       favoredEnemyConditionalChoice(rawBonus, buff) ||
       rawBonus.appliesWhen ||
-      rawBonus.condition ||
       buff.appliesWhen ||
       ""
     );
@@ -330,7 +329,6 @@
         rawBonus.favoredEnemyTarget ||
           rawBonus.targetFavoredEnemy ||
           rawBonus.appliesWhen ||
-          rawBonus.condition ||
           rawBonus.conditionalReason ||
           "",
       ),
@@ -365,6 +363,57 @@
       }
     });
     return merged;
+  }
+
+  function conditionalBonusAgainstActiveBonus(bonus, usedBonuses = []) {
+    const type = normalizeBonusType(bonus.type);
+    const value = Number(bonus.value || 0);
+    const conditionalReason =
+      bonus.appliesWhen || bonus.conditionalReason || "conditional";
+
+    if (stacksByType(type) || bonus.stacks || value <= 0) {
+      return {
+        ...bonus,
+        conditionalReason,
+      };
+    }
+
+    const activeBonus = usedBonuses.find(
+      (candidate) =>
+        normalizeBonusType(candidate.type) === type &&
+        !stacksByType(type) &&
+        !candidate.stacks &&
+        Number(candidate.value || 0) > 0,
+    );
+    if (!activeBonus) {
+      return {
+        ...bonus,
+        conditionalReason,
+      };
+    }
+
+    const activeValue = Number(activeBonus.value || 0);
+    const difference = Math.max(0, value - activeValue);
+    const activeSource = activeBonus.source || "active effect";
+    const existingDetail = String(bonus.detail || "").trim();
+    const reasonDetail = String(conditionalReason || "").trim();
+    const context = [...new Set([reasonDetail, existingDetail].filter(Boolean))];
+    const stackingDetail =
+      difference > 0
+        ? `${type} bonus ${fmt(value)} replaces ${activeSource} ${fmt(activeValue)}; only the ${fmt(difference)} difference applies`
+        : `${type} bonus ${fmt(value)} is overwritten by ${activeSource} ${fmt(activeValue)}`;
+
+    return {
+      ...bonus,
+      value: difference,
+      originalValue: value,
+      overwritten: difference === 0,
+      partiallyOverwritten: difference > 0,
+      overwrittenBy: activeSource,
+      overwrittenValue: activeValue,
+      conditionalReason,
+      detail: [...context, stackingDetail].join("; "),
+    };
   }
 
   function favoredEnemyBonusScaleValue(scale = {}, buff = {}, context = {}) {
@@ -444,15 +493,6 @@
       eligibleBonuses.push(bonus);
     });
 
-    mergeFavoredEnemyConditionalBonuses(
-      eligibleBonuses.filter((bonus) => bonus.conditional),
-    ).forEach((bonus) => {
-      conditional.push({
-        ...bonus,
-        conditionalReason: bonus.appliesWhen || "conditional",
-      });
-    });
-
     eligibleBonuses
       .filter((bonus) => !bonus.conditional)
       .forEach((bonus) => {
@@ -489,6 +529,12 @@
             }),
           );
       }
+    });
+
+    mergeFavoredEnemyConditionalBonuses(
+      eligibleBonuses.filter((bonus) => bonus.conditional),
+    ).forEach((bonus) => {
+      conditional.push(conditionalBonusAgainstActiveBonus(bonus, used));
     });
 
     conditionalSuppressedBonusTypes.forEach((suppressors, type) => {
@@ -621,6 +667,53 @@
     return Math.max(1, Number(buff.casterLevel || 1) || 1);
   }
 
+  const SCALE_ABILITY_ALIASES = {
+    str: "strength",
+    strength: "strength",
+    dex: "dexterity",
+    dexterity: "dexterity",
+    con: "constitution",
+    constitution: "constitution",
+    int: "intelligence",
+    intelligence: "intelligence",
+    wis: "wisdom",
+    wisdom: "wisdom",
+    cha: "charisma",
+    charisma: "charisma",
+  };
+  const SCALE_ABILITY_BASELINE_KEYS = {
+    strength: "str",
+    dexterity: "dex",
+    constitution: "con",
+    intelligence: "int",
+    wisdom: "wis",
+    charisma: "cha",
+  };
+
+  function scaleAttributeBonuses(scale = {}) {
+    if (Array.isArray(scale.attributeBonuses)) return scale.attributeBonuses;
+    if (scale.attributeBonus) return [scale.attributeBonus];
+    return [];
+  }
+
+  function scaleAttributeModifier(entry = {}, context = {}) {
+    if (entry.resolvedModifier !== undefined)
+      return Number(entry.resolvedModifier || 0);
+    const raw = String(entry.ability || entry.attribute || "").toLowerCase();
+    const ability = SCALE_ABILITY_ALIASES[raw];
+    if (!ability) return 0;
+    const shortKey = SCALE_ABILITY_BASELINE_KEYS[ability];
+    const explicitModifier =
+      context.abilityMods?.[ability] ?? context.abilityMods?.[shortKey];
+    if (explicitModifier !== undefined) return Number(explicitModifier || 0);
+    const score =
+      context.abilityScores?.[ability] ??
+      context.abilityScores?.[shortKey] ??
+      context.baseline?.[shortKey] ??
+      10;
+    return abilityMod(Number(score || 0));
+  }
+
   function skillRankKeyForStat(stat = "") {
     const normalized = normalizeStat(stat);
     if (normalized.startsWith("skill:")) return normalized;
@@ -643,7 +736,14 @@
   function scaledBonusValue(rawBonus, buff, context = {}) {
     const scale = rawBonus.bonusScale || rawBonus.scale;
     const baseValue = Number(rawBonus.value || 0);
-    if (!scale) return baseValue;
+    const maximumRaw = rawBonus.maximum ?? rawBonus.max;
+    const maximum =
+      maximumRaw === null || maximumRaw === undefined || maximumRaw === ""
+        ? null
+        : Number(maximumRaw);
+    const cap = (value) =>
+      Number.isFinite(maximum) ? Math.min(Number(value || 0), maximum) : value;
+    if (!scale) return cap(baseValue);
     const level = scaleLevelValue(scale, buff || {}, {
       ...context,
       rawBonus,
@@ -665,6 +765,7 @@
       Number(every.fromLevel || every.afterLevel || every.after || 0) > 0 ||
       Number(every.everyLevels || every.every || 0) > 0 ||
       Number(every.increase || 0) !== 0;
+    const attributeBonuses = scaleAttributeBonuses(scale);
     const skillRankThresholds = Array.isArray(scale.skillRankThresholds)
       ? scale.skillRankThresholds
       : [];
@@ -690,6 +791,7 @@
           )
         : scale.source &&
             !baseValue &&
+            !attributeBonuses.length &&
             !hasMilestones &&
             !hasEvery &&
             !hasSkillRankThresholds
@@ -736,13 +838,24 @@
           : 0;
     }
 
+    value += attributeBonuses.reduce((sum, entry) => {
+      const numerator = Math.max(1, Number(entry.numerator ?? 1) || 1);
+      const denominator = Math.max(1, Number(entry.denominator ?? 1) || 1);
+      return (
+        sum +
+        Math.floor(
+          (scaleAttributeModifier(entry, context) * numerator) / denominator,
+        )
+      );
+    }, 0);
+
     // "... minimum +1" is common PF1e phrasing on fractional scaling (DR
     // 1/2 level, minimum 1, etc.) -- round-down math above can floor a
     // low level's share to 0, so this floor is applied last, after
     // milestones/every have already had their say.
     if (scale.minimumOne && value < 1) value = 1;
 
-    return value;
+    return cap(value);
   }
 
   function describeBonuses(bonuses) {
@@ -756,7 +869,7 @@
   }
 
   function hasUnresolvedConditionalTokens(rawBonus = {}) {
-    return [rawBonus.appliesWhen, rawBonus.condition, rawBonus.favoredEnemyTarget]
+    return [rawBonus.appliesWhen, rawBonus.favoredEnemyTarget]
       .filter(Boolean)
       .some((value) => /\{[^{}]+\}/.test(String(value)));
   }
@@ -1024,7 +1137,7 @@
         stacks: Boolean(increase.stacks ?? entry.stacks),
         conditional: Boolean(increase.conditional || entry.conditional),
         appliesWhen:
-          increase.appliesWhen || increase.condition || entry.appliesWhen || "",
+          increase.appliesWhen || entry.appliesWhen || "",
         ...(isCasterLevel
           ? {
               appliesTo:
@@ -1056,7 +1169,7 @@
         type: entry.type || "untyped",
         stacks: Boolean(entry.stacks),
         conditional: Boolean(entry.conditional),
-        appliesWhen: entry.appliesWhen || entry.condition || "",
+        appliesWhen: entry.appliesWhen || "",
         ...(isCasterLevel
           ? { appliesTo: entry.appliesTo || entry.applyTo || entry.part || "spell" }
           : {}),
@@ -1247,9 +1360,7 @@
               conditional: Boolean(entry.conditional || increase.conditional),
               appliesWhen:
                 increase.appliesWhen ||
-                increase.condition ||
                 entry.appliesWhen ||
-                entry.condition ||
                 "",
             });
           });
@@ -1378,7 +1489,7 @@
           source: buff.name || buff.source || "Effect",
           spellSource: spellAdjustmentSource(entry),
           conditional: Boolean(entry.conditional),
-          appliesWhen: entry.appliesWhen || entry.condition || "",
+          appliesWhen: entry.appliesWhen || "",
         });
       });
     });
@@ -1494,7 +1605,11 @@
       source: bonus.source,
       value: bonus.value,
       type: bonus.type || "untyped",
-      detail: bonus.appliesWhen || bonus.conditionalReason || "conditional",
+      detail:
+        bonus.detail ||
+        bonus.appliesWhen ||
+        bonus.conditionalReason ||
+        "conditional",
       applied: "conditional",
       conditional: true,
     });
@@ -1508,7 +1623,7 @@
       classLevel: buff.classLevel || baseline.classLevel,
       classLevels: buff.classLevels || baseline.classLevels,
     }));
-    const buffMap = collectBuffModifiers(enrichedBuffs, {
+    let buffMap = collectBuffModifiers(enrichedBuffs, {
       baseline,
       skillRanks: baseline?.skillRanks || {},
     });
@@ -1545,6 +1660,11 @@
       ]),
     );
     for (let index = 0; index < 4; index += 1) {
+      buffMap = collectBuffModifiers(enrichedBuffs, {
+        baseline,
+        skillRanks: baseline?.skillRanks || {},
+        abilityScores: requirementAbilityScores,
+      });
       const nextSuppressions = activeBonusTypeSuppressions(
         buffMap,
         requirementAbilityScores,
@@ -1563,6 +1683,11 @@
       requirementAbilityScores = nextScores;
       if (unchanged) break;
     }
+    buffMap = collectBuffModifiers(enrichedBuffs, {
+      baseline,
+      skillRanks: baseline?.skillRanks || {},
+      abilityScores: requirementAbilityScores,
+    });
     suppressedBonusTypes = activeBonusTypeSuppressions(
       buffMap,
       requirementAbilityScores,
@@ -1632,11 +1757,14 @@
     const shieldApplied = applyActiveBonuses(
       (buffMap.ac || []).filter((b) => b.type === "shield"),
     );
-    const naturalApplied = applyActiveBonuses(buffMap["natural armor"] || []);
+    const naturalApplied = applyActiveBonuses([
+      ...(buffMap["natural armor"] || []),
+      ...(buffMap.ac || []).filter((b) => b.type === "natural armor"),
+    ]);
     const deflectionApplied = applyActiveBonuses(buffMap.deflection || []);
     const acMiscApplied = applyActiveBonuses(
       (buffMap.ac || []).filter(
-        (b) => !["armor", "shield", "size"].includes(b.type),
+        (b) => !["armor", "shield", "natural armor", "size"].includes(b.type),
       ),
     );
     const acSizeFromBuffs = acSizeApplied.total;
@@ -1651,11 +1779,21 @@
     const shield = Math.max(Number(baseline.shield || 0), shieldFromAcBuffs);
     const naturalArmor =
       Number(baseline.naturalArmor || 0) + naturalFromDedicated;
+    totals["natural armor"] = naturalArmor;
+    bonuses["natural armor"] = naturalFromDedicated;
     const deflection =
       Number(baseline.deflection || 0) + deflectionFromDedicated;
     const acMisc = Number(baseline.acMisc || 0) + acMiscBuffs;
     const dexMod = abilityMods.dexterity;
-    const positiveDex = Math.max(0, dexMod);
+    const maxDex =
+      baseline.maxDex === null || baseline.maxDex === undefined || baseline.maxDex === ""
+        ? null
+        : Number(baseline.maxDex);
+    const armorDexMod =
+      maxDex === null || !Number.isFinite(maxDex) || dexMod <= 0
+        ? dexMod
+        : Math.min(dexMod, maxDex);
+    const positiveDex = Math.max(0, armorDexMod);
     const dexDeniedApplied = applyDexDenialToAc(
       buffMap["remove dex bonus to ac"] || [],
       positiveDex,
@@ -1681,7 +1819,7 @@
     );
     const cmdAcBonus = cmdAcApplied.total + deflectionFromDedicated;
 
-    const acDexMod = dexMod + dexDeniedApplied.total;
+    const acDexMod = armorDexMod + dexDeniedApplied.total;
     const flatDexMod = Math.min(0, dexMod);
     const dodgeAcBuffs = applyActiveBonuses(
       (buffMap.ac || []).filter((b) => b.type === "dodge"),
@@ -1712,7 +1850,7 @@
       "Formula",
       totals.ac,
       "10 + armor + shield + Dex + size + natural + deflection + misc",
-      `DEX ${abilityScores.dexterity} (${fmt(dexMod)}): ${abilityCauses.dexterity}`,
+      `DEX ${abilityScores.dexterity} (${fmt(acDexMod)}${armorDexMod !== dexMod ? `; Max Dex ${fmt(maxDex)}` : ""}): ${abilityCauses.dexterity}`,
     );
     acSizeApplied.used.forEach((b) =>
       addBreakdown(
@@ -2060,7 +2198,11 @@
           source: bonus.source,
           value: bonus.value,
           type: bonus.type || "untyped",
-          detail: bonus.appliesWhen || bonus.conditionalReason || "conditional",
+          detail:
+            bonus.detail ||
+            bonus.appliesWhen ||
+            bonus.conditionalReason ||
+            "conditional",
           applied: "conditional",
           conditional: true,
         }),
@@ -2072,6 +2214,7 @@
   window.PFBuffs = {
     abilityMod,
     fmt,
+    applyBonuses,
     calculateStatsDetailed,
     scaledBonusValue,
     scaleLevelValue,

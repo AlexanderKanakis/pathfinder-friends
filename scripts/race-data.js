@@ -234,58 +234,6 @@
       });
   }
 
-  function promoteLegacyAdditionsToReplacements(
-    operations = [],
-    standardRows = [],
-  ) {
-    if (!standardRows.length) return operations;
-    if (
-      operations.some(
-        (operation) =>
-          operation.action === "replace" || operation.action === "remove",
-      )
-    )
-      return operations;
-    let targetIndex = 0;
-    return operations.map((operation) => {
-      if (
-        operation.action !== "add" ||
-        operation.preserveAsAddition ||
-        targetIndex >= standardRows.length
-      )
-        return operation;
-      const index = targetIndex++;
-      return {
-        action: "replace",
-        targetIndex: index,
-        targetKey: stableMechanicKey(standardRows[index]),
-        value: operation.value,
-      };
-    });
-  }
-
-  function legacyCategoryReplacementOperations(
-    key = "",
-    override = {},
-    standardTrait = {},
-  ) {
-    if (!Array.isArray(override[key]) || !override[key].length) return [];
-    const standardRows = Array.isArray(standardTrait[key])
-      ? standardTrait[key]
-      : [];
-    return [
-      ...standardRows.map((row, targetIndex) => ({
-        action: "remove",
-        targetIndex,
-        targetKey: stableMechanicKey(row),
-      })),
-      ...override[key].map((value) => ({
-        action: "add",
-        value,
-      })),
-    ];
-  }
-
   function canonicalizeModifiedTraitOverrides(
     overrides = [],
     standardTraits = [],
@@ -306,36 +254,12 @@
           mechanicOverrides: {},
           activeMechanicOverrides: {},
         };
-        const passiveMechanics = traitMechanicGroup(standardTrait, "passive");
-        const activeMechanics = traitMechanicGroup(standardTrait, "active");
         TRAIT_MECHANIC_KEYS.forEach((key) => {
-          const passiveRows = Array.isArray(passiveMechanics?.[key])
-            ? passiveMechanics[key]
-            : [];
-          const activeRows = Array.isArray(activeMechanics?.[key])
-            ? activeMechanics[key]
-            : [];
-          const legacyOperations = [
-            ...normalizedMechanicOperations(override.mechanicOverrides?.[key]),
-            ...legacyCategoryReplacementOperations(key, override, standardTrait),
-          ];
-          const legacyTargetsActive =
-            standardTrait?.activatable === true &&
-            !standardTrait?.activeMechanics &&
-            !passiveRows.length &&
-            activeRows.length;
-          const passiveOperations = promoteLegacyAdditionsToReplacements(
-            legacyTargetsActive ? [] : legacyOperations,
-            passiveRows,
+          const passiveOperations = normalizedMechanicOperations(
+            override.mechanicOverrides?.[key],
           );
-          const activeOperations = promoteLegacyAdditionsToReplacements(
-            [
-              ...normalizedMechanicOperations(
-                override.activeMechanicOverrides?.[key],
-              ),
-              ...(legacyTargetsActive ? legacyOperations : []),
-            ],
-            activeRows,
+          const activeOperations = normalizedMechanicOperations(
+            override.activeMechanicOverrides?.[key],
           );
           if (passiveOperations.length)
             normalized.mechanicOverrides[key] = passiveOperations;

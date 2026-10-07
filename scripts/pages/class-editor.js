@@ -1094,6 +1094,7 @@ function syncPoolAcrossLevels(levelIndex, featureIndex, poolIndex) {
             "grantDomains",
             "generatedEquipment",
             "conditionalVariables",
+            "damageRolls",
           ].forEach((key) => {
             if (Array.isArray(match[key]) && match[key].length) {
               option[key] = cloneJson(match[key]);

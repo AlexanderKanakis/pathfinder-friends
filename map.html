@@ -12,12 +12,14 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
       rel="stylesheet"
     />
-    <link href="css/map.css?v=effect-groups-5" rel="stylesheet" />
-    <link href="css/effect-editor.css?v=bonus-ranks-1" rel="stylesheet" />
+    <link href="css/map.css?v=condition-picker-1" rel="stylesheet" />
+    <link href="css/effect-editor.css?v=effect-branches-1" rel="stylesheet" />
+    <link href="css/damage-rolls.css?v=4" rel="stylesheet" />
     <link href="modals/generated-equipment-picker.css?v=effect-labels-white-1" rel="stylesheet" />
     <link href="modals/magic-search.css" rel="stylesheet" />
     <link href="modals/map-hp-editor.css" rel="stylesheet" />
     <link href="modals/custom-skill-list.css?v=custom-target-lists-1" rel="stylesheet" />
+    <link href="css/modal-rules.css?v=1" rel="stylesheet" />
   </head>
   <body>
     <div id="appNavbar"></div>
@@ -563,12 +565,9 @@
          viewport widens back past the mobile breakpoint. Nothing here
          is ever duplicated -- same DOM nodes, same ids, same
          listeners, just a different parent. No modal-header/title bar
-         on purpose -- #mapSide already opens on its own "Map" heading,
-         so a second header here was just doubled-up chrome. A single
-         floating close button stands in for it instead (dismissing
-         still works via backdrop-tap/Escape too either way); the
-         title below stays for screen readers even though it's not
-         shown on screen. -->
+         is needed because #mapSide already provides its own "Map"
+         heading. The title below remains available to screen readers,
+         and the persistent footer provides the modal exit. -->
     <div
       class="modal fade"
       id="mapMobileMenuModal"
@@ -579,13 +578,16 @@
       <div class="modal-dialog modal-fullscreen modal-dialog-scrollable">
         <div class="modal-content bg-dark text-white border-secondary map-mobile-menu-modal-content">
           <h2 id="mapMobileMenuModalLabel" class="visually-hidden">Map Menu</h2>
-          <button
-            type="button"
-            class="btn-close btn-close-white map-mobile-menu-modal-close"
-            data-bs-dismiss="modal"
-            aria-label="Close"
-          ></button>
           <div class="modal-body" id="mapMobileMenuModalBody"></div>
+          <div class="modal-footer border-secondary">
+            <button
+              type="button"
+              class="btn btn-outline-light btn-sm"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -601,12 +603,6 @@
         <div class="modal-content bg-dark text-white border-secondary">
           <div class="modal-header border-secondary">
             <h5 id="rollModalLabel" class="modal-title">Roll</h5>
-            <button
-              type="button"
-              class="btn-close btn-close-white"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
           </div>
           <div class="modal-body">
             <div id="rollWeaponWrap" class="mb-3 d-none">
@@ -693,6 +689,15 @@
             </div>
             <div id="rollModalStatus" class="small text-secondary mt-3"></div>
           </div>
+          <div class="modal-footer border-secondary">
+            <button
+              type="button"
+              class="btn btn-outline-light btn-sm"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -708,12 +713,6 @@
         <div class="modal-content bg-dark text-white border-secondary">
           <div class="modal-header border-secondary">
             <h5 id="rollResultModalLabel" class="modal-title">Roll Result</h5>
-            <button
-              type="button"
-              class="btn-close btn-close-white"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
           </div>
           <div class="modal-body">
             <div id="rollResultList" class="roll-result-list"></div>
@@ -731,7 +730,7 @@
               class="btn btn-outline-light btn-sm"
               data-bs-dismiss="modal"
             >
-              Close
+              Cancel
             </button>
           </div>
         </div>
@@ -751,12 +750,6 @@
         <div class="modal-content bg-dark text-white border-secondary">
           <div class="modal-header border-secondary">
             <h5 class="modal-title" id="quickEffectModalLabel">Apply Effect</h5>
-            <button
-              type="button"
-              class="btn-close btn-close-white"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
           </div>
           <div class="modal-body">
             <nav
@@ -830,6 +823,75 @@
               class="quick-effect-grid search-modal-results"
             ></div>
           </div>
+          <div class="modal-footer border-secondary">
+            <button
+              type="button"
+              class="btn btn-outline-light btn-sm"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="modal fade"
+      id="quickConditionModal"
+      tabindex="-1"
+      aria-labelledby="quickConditionModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark text-white border-secondary">
+          <div class="modal-header border-secondary">
+            <h5 class="modal-title" id="quickConditionModalLabel">Condition</h5>
+          </div>
+          <div class="modal-body">
+            <div id="quickConditionDescription" class="quick-condition-description"></div>
+            <div class="quick-condition-turns-field">
+              <label for="quickConditionTurns">Turns</label>
+              <div class="item-number-stepper quick-condition-turns" data-item-stepper>
+                <button
+                  type="button"
+                  class="btn btn-outline-light btn-sm item-stepper-btn"
+                  data-item-stepper-delta="-1"
+                  aria-label="Decrease turns"
+                >
+                  -
+                </button>
+                <input
+                  id="quickConditionTurns"
+                  class="form-control form-control-sm no-spinner"
+                  type="number"
+                  min="1"
+                  value="1"
+                  inputmode="numeric"
+                />
+                <button
+                  type="button"
+                  class="btn btn-outline-light btn-sm item-stepper-btn"
+                  data-item-stepper-delta="1"
+                  aria-label="Increase turns"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer border-secondary">
+            <button
+              type="button"
+              class="btn btn-outline-light btn-sm"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
+            <button id="confirmQuickCondition" class="btn btn-success btn-sm" type="button">
+              Apply Condition
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -849,12 +911,6 @@
             <h5 class="modal-title" id="quickEffectTargetsModalLabel">
               Choose Targets
             </h5>
-            <button
-              type="button"
-              class="btn-close btn-close-white d-none"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
           </div>
           <div class="modal-body">
             <div
@@ -898,11 +954,10 @@
         <div class="modal-content bg-dark text-white border-secondary">
           <div class="modal-header border-secondary">
             <h5 class="modal-title" id="quickEffectInfoModalLabel">Effect Details</h5>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body" id="quickEffectInfoBody"></div>
           <div class="modal-footer border-secondary">
-            <button type="button" class="btn btn-outline-light btn-sm" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-outline-light btn-sm" data-bs-dismiss="modal">Cancel</button>
           </div>
         </div>
       </div>
@@ -925,12 +980,6 @@
             <h5 id="backgroundOptionsTitle" class="modal-title">
               Map Settings
             </h5>
-            <button
-              type="button"
-              class="btn-close btn-close-white d-none"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
           </div>
           <div class="modal-body">
             <div id="mapNameWrap" class="mb-3 d-none">
@@ -1113,12 +1162,6 @@
             <h5 class="modal-title" id="mapDocumentationModalLabel">
               Map Documentation
             </h5>
-            <button
-              type="button"
-              class="btn-close btn-close-white"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
           </div>
           <div class="modal-body map-docs-modal-body p-0">
             <div id="mapDocsLayout" class="map-docs-layout">
@@ -1139,6 +1182,15 @@
               </article>
             </div>
           </div>
+          <div class="modal-footer border-secondary">
+            <button
+              type="button"
+              class="btn btn-outline-light btn-sm"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -1157,12 +1209,6 @@
         >
           <div class="modal-header border-secondary">
             <h5 class="modal-title" id="genericTokenModalLabel">Add Token</h5>
-            <button
-              type="button"
-              class="btn-close btn-close-white d-none"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
           </div>
           <div class="modal-body">
             <label for="genericTokenName">Name</label>
@@ -1211,12 +1257,6 @@
         <div class="modal-content bg-dark text-white border-secondary">
           <div class="modal-header border-secondary">
             <h5 class="modal-title">Add Enemy</h5>
-            <button
-              type="button"
-              class="btn-close btn-close-white d-none"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
           </div>
           <div class="modal-body">
             <input
@@ -1278,12 +1318,6 @@
         <div class="modal-content bg-dark text-white border-secondary">
           <div class="modal-header border-secondary">
             <h5 class="modal-title">Add Character</h5>
-            <button
-              type="button"
-              class="btn-close btn-close-white d-none"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
           </div>
           <div class="modal-body">
             <input
@@ -1327,12 +1361,6 @@
             <h5 id="auraOptionsModalTitle" class="modal-title">
               Aura Options
             </h5>
-            <button
-              type="button"
-              class="btn-close btn-close-white d-none"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
           </div>
           <div class="modal-body">
             <div class="form-check form-switch mb-3">
@@ -1414,6 +1442,10 @@
                 >
               </div>
             </div>
+            <div id="automaticAuraSection" class="border-top border-secondary mt-3 pt-3">
+              <div class="small text-secondary mb-2">Automatic Auras</div>
+              <div id="automaticAuraList" class="vstack gap-2"></div>
+            </div>
           </div>
           <div class="modal-footer border-secondary">
             <button
@@ -1444,45 +1476,54 @@
         <div class="modal-content bg-dark text-white border-secondary">
           <div class="modal-header border-secondary">
             <h5 class="modal-title" id="mapEffectsModalLabel">Effects</h5>
-            <button
-              type="button"
-              class="btn-close btn-close-white"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
           </div>
           <div class="modal-body">
             <div id="mapEffectTracker"></div>
+          </div>
+          <div class="modal-footer border-secondary">
+            <button
+              type="button"
+              class="btn btn-outline-light btn-sm"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
           </div>
         </div>
       </div>
     </div>
 
-    <script src="scripts/navbar.js"></script>
+    <script src="scripts/navbar.js?v=responsive-navbar-1"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="scripts/supabase-config.js"></script>
-    <script src="scripts/app-supabase.js?v=loot-mechanics-1"></script>
-    <script src="scripts/effect-mechanics.js?v=bonus-ranks-1"></script>
+    <script src="scripts/app-supabase.js?v=canonical-data-1"></script>
+    <script src="scripts/effect-mechanics.js?v=canonical-data-1"></script>
+    <script src="scripts/buff-calculator.js?v=canonical-data-1"></script>
+    <script src="scripts/damage-rolls.js?v=5"></script>
+    <script src="scripts/armor-rules.js?v=1"></script>
     <script src="scripts/class-data.js"></script>
     <script src="scripts/race-data.js?v=grant-domain-2"></script>
     <script src="scripts/feat-data.js?v=feat-choices-2"></script>
     <script src="scripts/item-data.js?v=catalog-effects-1"></script>
-    <script src="scripts/class-feature-abilities.js?v=effect-details-1"></script>
-    <script src="modals/effect-duration-editor.js?v=duration-editor-reuse-1"></script>
-    <script src="scripts/effect-stat-options.js?v=improvised-1"></script>
+    <script src="scripts/class-feature-abilities.js?v=aura-mechanics-1"></script>
+    <script src="modals/effect-duration-editor.js?v=canonical-data-1"></script>
+    <script src="scripts/effect-stat-options.js?v=equipment-enhancement-1"></script>
     <script src="modals/effect-choice-picker.js?v=named-skill-choice-1"></script>
     <script src="scripts/spell-data.js?v=spells-json-1"></script>
-    <script src="modals/spell-picker.js?v=map-spell-details-1"></script>
+    <script src="modals/spell-picker.js?v=damage-rolls-1"></script>
+    <script src="modals/arcane-spell-failure.js?v=1"></script>
     <script src="modals/magic-search.js?v=sla-spell-list-1"></script>
     <script src="modals/class-feature-choice-picker.js"></script>
     <script src="modals/custom-skill-list.js?v=skill-list-options-1"></script>
-    <script src="scripts/effect-editor.js?v=improvised-1"></script>
+    <script src="scripts/effect-editor.js?v=canonical-data-1"></script>
     <script src="modals/generated-equipment-picker.js?v=effect-labels-white-1"></script>
-    <script src="modals/pending-effect-choices.js?v=spell-target-choices-1"></script>
-    <script src="scripts/buff-tracker-widget.js?v=weapon-name-1"></script>
+    <script src="modals/pending-effect-choices.js?v=effect-branches-1"></script>
+    <script src="scripts/effect-catalog.js?v=effect-browser-1"></script>
+    <script src="scripts/buff-tracker-widget.js?v=conditional-damage-map-1"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="modals/map-hp-editor.js"></script>
     <script src="scripts/wall-patterns.js"></script>
-    <script src="scripts/pages/map.js?v=authored-effects-1"></script>
+    <script src="scripts/pages/map.js?v=canonical-data-1"></script>
+    <script src="scripts/modal-rules.js?v=1"></script>
   </body>
 </html>

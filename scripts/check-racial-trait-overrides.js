@@ -56,23 +56,25 @@ assert.equal(mixedTrait.activeMechanics.effects[0].value, 2);
 const normalized = normalizeRaceData({
   races: [
     {
-      name: "Legacy Race",
+      name: "Canonical Race",
       standardTraits: [
         {
-          name: "Legacy Active",
-          activatable: true,
-          effects: [{ stat: "damage", value: 2 }],
-          durationConfig: { count: 1, unit: "rounds" },
+          name: "Canonical Active",
+          effects: [],
+          activeMechanics: {
+            effects: [{ stat: "damage", value: 2 }],
+            durationConfig: { count: 1, unit: "rounds" },
+          },
         },
       ],
       alternateTraits: [
         {
-          name: "Legacy Modifier",
-          modifies: ["Legacy Active"],
+          name: "Canonical Modifier",
+          modifies: ["Canonical Active"],
           modifiedTraitOverrides: [
             {
-              trait: "Legacy Active",
-              mechanicOverrides: {
+              trait: "Canonical Active",
+              activeMechanicOverrides: {
                 effects: [
                   {
                     action: "replace",
@@ -88,10 +90,10 @@ const normalized = normalizeRaceData({
     },
   ],
 });
-const legacyOverride =
+const activeOverride =
   normalized.races[0].alternateTraits[0].modifiedTraitOverrides[0];
-assert.equal(legacyOverride.mechanicOverrides.effects, undefined);
-assert.equal(legacyOverride.activeMechanicOverrides.effects.length, 1);
-assert.equal(legacyOverride.activeMechanicOverrides.effects[0].value.value, 4);
+assert.equal(activeOverride.mechanicOverrides.effects, undefined);
+assert.equal(activeOverride.activeMechanicOverrides.effects.length, 1);
+assert.equal(activeOverride.activeMechanicOverrides.effects[0].value.value, 4);
 
 console.log("Racial trait Passive/Active override checks passed.");

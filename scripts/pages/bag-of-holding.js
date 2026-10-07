@@ -599,12 +599,12 @@ function normalizeArmorShieldSourceItem(item, index) {
     details: {
       source: details.source || "d20pfsrd armor",
       armorGroup: details.armorGroup || type,
-      bonus: details.bonus || "0",
-      enhancement: details.enhancement || "0",
+      bonus: details.bonus ?? 0,
+      enhancement: details.enhancement ?? 0,
       enchantment: details.enchantment || "",
-      maxDex: details.maxDex || "",
-      penalty: details.penalty || "",
-      failure: details.failure || "",
+      maxDex: details.maxDex ?? null,
+      penalty: details.penalty ?? null,
+      failure: details.failure ?? null,
       speed30: details.speed30 || "",
       speed20: details.speed20 || "",
       cost: details.cost || "",
@@ -840,8 +840,8 @@ function populateLootForm(item, selectedCharacterId = "") {
   el("lootWeaponEnchantment").value = details.enchantment || "";
   el("lootWeaponDetails").value =
     details.details || details.summary || details.special || "";
-  el("lootArmorBonus").value = details.bonus || "0";
-  el("lootArmorEnhancement").value = details.enhancement || "0";
+  el("lootArmorBonus").value = details.bonus ?? 0;
+  el("lootArmorEnhancement").value = details.enhancement ?? 0;
   el("lootArmorEnchantment").value = details.enchantment || "";
   PFItemEditor.syncSpecialMaterialForType(
     lootEditorConfig(),
@@ -1068,8 +1068,8 @@ function collectLootDetails() {
   if (["Armor", "Shield"].includes(type)) {
     return {
       ...slotDetails,
-      bonus: el("lootArmorBonus").value || "0",
-      enhancement: el("lootArmorEnhancement").value || "0",
+      bonus: Number(el("lootArmorBonus").value || 0),
+      enhancement: Number(el("lootArmorEnhancement").value || 0),
       enchantment: el("lootArmorEnchantment").value.trim(),
       specialMaterial: el("lootSpecialMaterial").value,
     };
@@ -1272,6 +1272,7 @@ function lootEffectPayload(item = {}) {
     mechanics?.passiveMechanics?.(item) || (item.activatable ? {} : item);
   const payload = {
     effects: Array.isArray(passive.effects) ? passive.effects : [],
+    auraConfig: passive.auraConfig || null,
   };
   const keys = window.PFEffectMechanics?.extraKeys?.() || [
     "damageReduction",
@@ -1290,6 +1291,7 @@ function lootEffectPayload(item = {}) {
     "grantDomains",
     "generatedEquipment",
     "conditionalVariables",
+      "damageRolls",
   ];
   keys.forEach((key) => {
     payload[key] = Array.isArray(passive[key]) ? passive[key] : [];
@@ -1302,7 +1304,7 @@ function lootEffectPayload(item = {}) {
     : ["effects", ...keys].some(
         (key) => Array.isArray(active[key]) && active[key].length,
       );
-  if (hasActive || active.durationConfig) {
+  if (hasActive || active.durationConfig || active.auraConfig?.enabled) {
     payload.activeMechanics = active;
   }
   return payload;
@@ -1347,6 +1349,12 @@ async function assignLoot(itemId, assignedTo) {
     return;
   }
 
+  if (previous) {
+    await removeLootBuff({
+      ...item,
+      assigned_character_id: previous,
+    });
+  }
   clearLootStatus();
   notifyLootUpdated({ ...item, assigned_character_id: previous || null });
   notifyLootUpdated(saved);
@@ -1395,6 +1403,12 @@ async function submitLootMove(event) {
       bagContextKey,
     );
     if (saved) {
+      if (pendingLootMove.previous) {
+        await removeLootBuff({
+          ...item,
+          assigned_character_id: pendingLootMove.previous,
+        });
+      }
       notifyLootUpdated({
         ...item,
         assigned_character_id: pendingLootMove.previous || null,
@@ -1500,6 +1514,7 @@ async function syncEditedLootBuff(item) {
       "grantDomains",
       "generatedEquipment",
       "conditionalVariables",
+      "damageRolls",
     ]).some((key) => extras[key]?.length);
   if (hasExtras) {
     const nextBuff = {
@@ -1524,6 +1539,7 @@ async function syncEditedLootBuff(item) {
       "grantDomains",
       "generatedEquipment",
       "conditionalVariables",
+      "damageRolls",
     ]).forEach((key) => {
       nextBuff[key] = extras[key] || [];
     });
@@ -1576,8 +1592,8 @@ async function deleteLootAmount(itemId, amountOverride = null) {
   let ok = false;
 
   if (amount >= total) {
-    await removeLootBuff(item);
     ok = await PFApp.deleteLootItem(item.id);
+    if (ok) await removeLootBuff(item);
   } else {
     ok = Boolean(
       await PFApp.saveLootItem(

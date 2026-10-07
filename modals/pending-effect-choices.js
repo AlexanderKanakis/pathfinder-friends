@@ -29,6 +29,7 @@
       "grantDomains",
       "generatedEquipment",
       "conditionalVariables",
+      "damageRolls",
     ];
   let pollTimer = null;
   let pollOptions = null;
@@ -152,6 +153,8 @@
   async function resolveChoiceStats(items, request) {
     const list = Array.isArray(items) ? items : [];
     const resolved = [];
+    let equipment;
+    let equipmentLoaded = false;
     for (const item of list) {
       if (!window.PFEffectStats?.isChoiceStat(item.stat)) {
         resolved.push(item);
@@ -159,10 +162,17 @@
       }
       const poolId = window.PFEffectStats.choicePoolIdFromStat(item.stat);
       const pool = window.PFEffectStats.poolById(poolId);
+      if (pool?.kind === "equipment" && !equipmentLoaded) {
+        equipment = await pollOptions?.choicePoolEquipmentFor?.(
+          request.character_id,
+        );
+        equipmentLoaded = true;
+      }
       const options = await window.PFEffectStats.resolveChoicePoolOptions(
         poolId,
         {
           skills: pollOptions?.choicePoolSkillsFor?.(request.character_id),
+          equipment,
           choicePool: item.choicePool,
         },
       );
@@ -174,9 +184,7 @@
         : null;
       if (!picked) return null;
       resolved.push(
-        typeof picked === "object"
-          ? { ...item, stat: picked.value, skillName: picked.skillName }
-          : { ...item, stat: picked },
+        window.PFEffectStats.resolveChoiceStatItem(item, picked, options),
       );
     }
     return resolved;
@@ -594,7 +602,13 @@
     if (resolving.has(request.id)) return;
     resolving.add(request.id);
     try {
-      const ability = request.ability || {};
+      let ability = request.ability || {};
+      if (window.PFEffectMechanics?.hasBranches?.(ability)) {
+        ability = await window.PFEffectMechanics.chooseBranch(ability, {
+          title: ability.name || request.effect_name || "Effect",
+        });
+        if (!ability) return;
+      }
       const choiceResolved = await resolveChoiceStats(ability.bonuses, request);
       if (choiceResolved === null) return;
       const resolved = await resolveFavoredEnemyScaleTargets(
@@ -720,6 +734,7 @@
   //     changes mid-session,
   //   characterNameFor: (id) => string,
   //   choicePoolSkillsFor: (id) => [[name, ability], ...] (optional),
+  //   choicePoolEquipmentFor: async (id) => { weapons, armor } (optional),
   //   favoredEnemyOptionsFor: (id) => choice options for that character's
   //     currently selected favored enemies (optional),
   //   onResolved: (characterId, finalizedEffect) -- called after a

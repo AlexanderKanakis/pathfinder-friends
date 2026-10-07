@@ -537,3 +537,131 @@
   --bs-accordion-color: #ddd;
   background-color: transparent;
 }
+
+.shared-damage-roll-row {
+  border: 1px solid #495057;
+  border-radius: 6px;
+  background: #222;
+  padding: 10px;
+}
+
+.shared-damage-roll-row label {
+  display: block;
+  margin-bottom: 3px;
+  color: #fff;
+  font-size: 12px;
+}
+
+.shared-damage-roll-heading,
+.shared-damage-condition-heading {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) auto;
+  gap: 8px;
+  align-items: end;
+}
+
+.shared-damage-condition-heading {
+  grid-template-columns: minmax(140px, 0.7fr) minmax(220px, 1.3fr) auto;
+}
+
+.shared-damage-profile {
+  margin-top: 10px;
+  border-top: 1px solid #3d4349;
+  padding-top: 10px;
+}
+
+.shared-damage-profile.is-conditional {
+  margin-top: 0;
+  border: 1px solid #444;
+  border-radius: 6px;
+  background: #1d1d1d;
+  padding: 10px;
+}
+
+.shared-damage-profile-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(105px, 1fr));
+  gap: 8px;
+}
+
+.shared-damage-scale-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.shared-damage-scale-row > div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.shared-damage-conditionals {
+  margin-top: 12px;
+}
+
+@media (max-width: 900px) {
+  .shared-damage-profile-grid {
+    grid-template-columns: repeat(3, minmax(100px, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .shared-damage-roll-heading,
+  .shared-damage-condition-heading,
+  .shared-damage-profile-grid,
+  .shared-damage-scale-row {
+    grid-template-columns: 1fr;
+  }
+
+  .shared-damage-scale-row > div {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+
+.shared-mechanic-branch {
+  padding: 10px 0;
+  border-top: 1px solid #3d4349;
+}
+
+.shared-mechanic-branch:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.shared-mechanic-branch-header {
+  display: grid;
+  grid-template-columns: auto minmax(180px, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.shared-mechanic-branch-header label {
+  color: #fff;
+  font-size: 12px;
+}
+
+@media (max-width: 640px) {
+  .shared-mechanic-group > .d-flex:first-child {
+    align-items: flex-start !important;
+    flex-direction: column;
+  }
+
+  .shared-mechanic-group > .d-flex:first-child > .d-flex {
+    width: 100%;
+    justify-content: flex-start !important;
+  }
+
+  .shared-mechanic-branch-header {
+    grid-template-columns: 1fr auto;
+  }
+
+  .shared-mechanic-branch-header label {
+    grid-column: 1 / -1;
+  }
+}

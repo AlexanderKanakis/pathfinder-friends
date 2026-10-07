@@ -15,6 +15,7 @@
     />
 
     <link href="css/characters.css" rel="stylesheet" />
+    <link href="css/modal-rules.css?v=1" rel="stylesheet" />
   </head>
   <body>
     <div id="appNavbar"></div>
@@ -61,12 +62,6 @@
             <h5 class="modal-title" id="newCharacterModalLabel">
               Add Character
             </h5>
-            <button
-              type="button"
-              class="btn-close btn-close-white d-none"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
           </div>
           <div class="modal-body">
             <div class="mb-2">
@@ -127,12 +122,6 @@
             <h5 class="modal-title" id="deleteCharacterModalLabel">
               Delete Character
             </h5>
-            <button
-              type="button"
-              class="btn-close btn-close-white d-none"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
           </div>
           <div class="modal-body">
             <p class="mb-1">
@@ -167,13 +156,14 @@
       </div>
     </div>
 
-    <script src="scripts/navbar.js"></script>
+    <script src="scripts/navbar.js?v=responsive-navbar-1"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="scripts/supabase-config.js"></script>
     <script src="scripts/app-supabase.js"></script>
     <script src="scripts/class-data.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="scripts/pages/characters.js"></script>
+    <script src="scripts/modal-rules.js?v=1"></script>
   </body>
 </html>
 

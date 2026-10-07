@@ -113,7 +113,6 @@
           <div class="modal-content bg-dark text-white border-secondary">
             <div class="modal-header border-secondary">
               <h5 class="modal-title" id="${MODAL_ID}Title">Custom Skill List</h5>
-              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
               <div class="mb-2">

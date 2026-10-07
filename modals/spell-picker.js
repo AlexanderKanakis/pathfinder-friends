@@ -190,6 +190,10 @@
         color: #8fd19e;
         font-size: 12px;
       }
+      .spell-picker-spell-failure {
+        color: #ff6b78;
+        font-weight: 700;
+      }
       .spell-picker-calculation-toggle {
         position: absolute;
         top: 6px;
@@ -268,7 +272,6 @@
           <div class="modal-content bg-dark text-white border-secondary spell-picker-modal">
             <div class="modal-header">
               <h5 class="modal-title" id="${MODAL_ID}Label">Choose Spell</h5>
-              <button type="button" class="btn-close btn-close-white d-none" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
               <div class="spell-picker-filters">
@@ -615,6 +618,7 @@
         <div class="spell-picker-rule-block">
           ${spellDetail("Casting Time", details.casting_time)}
           ${spellDetail("Components", details.components)}
+          ${arcaneSpellFailureHtml(calculations)}
         </div>
         <div class="spell-picker-rule-heading">Effect</div>
         <div class="spell-picker-rule-block">
@@ -630,6 +634,13 @@
   function spellInlineDetail(label, value) {
     return value
       ? `<strong>${escapeHtml(label)}</strong> ${escapeHtml(value)} `
+      : "";
+  }
+
+  function arcaneSpellFailureHtml(calculations = null) {
+    const chance = Number(calculations?.arcaneSpellFailure?.chance || 0);
+    return chance > 0
+      ? `<div class="spell-picker-detail-line spell-picker-spell-failure"><strong>Arcane Spell Failure</strong> ${escapeHtml(chance)}%</div>`
       : "";
   }
 
@@ -659,16 +670,19 @@
     const base = Number(result.base || 0);
     const total = Number(result.total ?? base);
     const bonus = Number(result.bonus || 0);
+    const calculatedBonus = Number(result.calculatedBonus ?? bonus);
+    const miscBonus = Number(result.miscCasterLevelBonus || 0);
     const downcast = Number(result.downcastBy || 0);
     const detail = note || [
-      bonus ? `base ${base}, modifiers ${signed(bonus)}` : `base ${base}`,
+      calculatedBonus ? `base ${base}, modifiers ${signed(calculatedBonus)}` : `base ${base}`,
+      miscBonus > 0 ? `misc upcast ${signed(miscBonus)}` : "",
       downcast > 0 ? `downcast from CL ${result.downcastFrom || state?.maxCasterLevel || total}` : "",
     ].filter(Boolean).join("; ");
     const collapseId = `spellPicker${key || label.replace(/[^a-z0-9]+/gi, "")}Breakdown`;
     const stepper = options.stepper
       ? `<div class="spell-picker-cl-stepper" aria-label="Caster level adjustment">
           <button class="btn btn-outline-secondary btn-sm" type="button" data-spell-cl-step="-1" title="Decrease caster level">-</button>
-          <input class="form-control form-control-sm" type="number" min="1" max="${escapeHtml(options.max || total)}" value="${escapeHtml(total)}" data-spell-cl-input>
+          <input class="form-control form-control-sm" type="number" min="1" value="${escapeHtml(total)}" data-spell-cl-input>
           <button class="btn btn-outline-secondary btn-sm" type="button" data-spell-cl-step="1" title="Increase caster level">+</button>
         </div>`
       : "";
@@ -778,8 +792,7 @@
   }
 
   function clampCasterLevel(value) {
-    const max = Math.max(1, Number(state?.maxCasterLevel || 1) || 1);
-    return Math.max(1, Math.min(max, Number(value) || 1));
+    return Math.max(1, Number(value) || 1);
   }
 
   async function setDetailCasterLevel(value) {

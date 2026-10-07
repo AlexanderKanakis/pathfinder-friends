@@ -30,7 +30,6 @@
           <form id="classFeatureEditorForm" class="modal-content bg-dark text-white border-secondary">
             <div class="modal-header">
               <h5 class="modal-title" id="classFeatureEditorModalLabel">Class Feature</h5>
-              <button type="button" class="btn-close btn-close-white d-none" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
               <div class="mb-2">
@@ -167,6 +166,7 @@
     };
     const {
       effects,
+      branches,
       damageReduction,
       spellResistance,
       immunities,
@@ -183,9 +183,11 @@
       grantDomains,
       generatedEquipment,
       conditionalVariables,
+      damageRolls,
       activeMechanics,
     } = mechanicGroups.collect();
     if (effects.length) feature.effects = effects;
+    if (branches?.length) feature.branches = branches;
     if (damageReduction.length) feature.damageReduction = damageReduction;
     if (spellResistance.length) feature.spellResistance = spellResistance;
     if (immunities.length) feature.immunities = immunities;
@@ -207,6 +209,7 @@
       feature.generatedEquipment = generatedEquipment;
     if (conditionalVariables.length)
       feature.conditionalVariables = conditionalVariables;
+    if (damageRolls.length) feature.damageRolls = damageRolls;
     if (activeMechanics) feature.activeMechanics = activeMechanics;
     if (editingMode === "option") {
       const requirements = collectRequirements();

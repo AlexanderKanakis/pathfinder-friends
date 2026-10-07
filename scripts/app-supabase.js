@@ -732,7 +732,6 @@
 
   function normalizeActiveBuffState(activeBuffs) {
     if (Array.isArray(activeBuffs)) return activeBuffs;
-    if (Array.isArray(activeBuffs?.buffs)) return activeBuffs.buffs;
     return [];
   }
 
@@ -763,26 +762,6 @@
     }
 
     if (data?.[0]) return normalizeActiveBuffState(data[0].active_buffs);
-
-    if (characterId) {
-      const { data: legacy, error: legacyError } = await client
-        .from("user_buff_state")
-        .select("active_buffs")
-        .eq("user_id", user.id)
-        .eq("context_key", context.contextKey)
-        .is("character_id", null)
-        .order("updated_at", { ascending: false })
-        .limit(1);
-
-      if (legacyError) {
-        console.error(legacyError);
-        return [];
-      }
-
-      const legacyState = legacy?.[0]?.active_buffs;
-      if (legacyState?.characterId === characterId)
-        return normalizeActiveBuffState(legacyState);
-    }
 
     return [];
   }
@@ -1711,6 +1690,7 @@
 
   const LOOT_MECHANIC_KEYS = [
     "effects",
+    "branches",
     "damageReduction",
     "spellResistance",
     "immunities",
@@ -1727,6 +1707,7 @@
     "grantDomains",
     "generatedEquipment",
     "conditionalVariables",
+    "damageRolls",
   ];
 
   function storedLootMechanics(row = {}) {
@@ -1735,26 +1716,15 @@
       typeof row.details.effectMechanics === "object"
         ? row.details.effectMechanics
         : {};
-    const columnValues = {
-      effects: row.effects,
-      damageReduction: row.damage_reduction,
-      spellResistance: row.spell_resistance,
-      classSkillGrants: row.class_skill_grants,
-      bonusRanks: row.bonus_ranks,
-      extraRanksPerLevel: row.extra_ranks_per_level,
-      sizeChanges: row.size_changes,
-      spellLikeAbilities: row.spell_like_abilities,
+    return {
+      ...Object.fromEntries(
+        LOOT_MECHANIC_KEYS.map((key) => [
+          key,
+          Array.isArray(stored[key]) ? stored[key] : [],
+        ]),
+      ),
+      auraConfig: stored.auraConfig || null,
     };
-    return Object.fromEntries(
-      LOOT_MECHANIC_KEYS.map((key) => [
-        key,
-        Array.isArray(stored[key])
-          ? stored[key]
-          : Array.isArray(columnValues[key])
-            ? columnValues[key]
-            : [],
-      ]),
-    );
   }
 
   // game_loot is otherwise a raw pass-through, but damageReduction/spellResistance/
@@ -1768,72 +1738,10 @@
     return {
       ...row,
       activeMechanics:
-        row.activeMechanics ||
         row.details?.effectMechanics?.activeMechanics ||
-        row.details?.activeMechanics ||
         null,
       ...mechanics,
     };
-  }
-
-  // A repo whose migration hasn't reached its Supabase project yet
-  // doesn't have damage_reduction/spell_resistance/class_skill_grants/
-  // size_changes/spell_like_abilities
-  // as real columns -- selecting them fails the WHOLE query, which
-  // used to just return [] on any error. For loot that means every
-  // equipped item vanishes from the sheet the moment this shipped,
-  // not just the new DR/SR/class-skill fields, so a missing-column
-  // error here specifically retries without them instead of giving up.
-  const LOOT_COLUMNS =
-    "id,name,description,count,type,assigned_to,assigned_character_id,details,effects,damage_reduction,spell_resistance,class_skill_grants,bonus_ranks,extra_ranks_per_level,size_changes,spell_like_abilities,created_by,updated_at";
-  const LOOT_COLUMNS_WITHOUT_BONUS_RANKS =
-    "id,name,description,count,type,assigned_to,assigned_character_id,details,effects,damage_reduction,spell_resistance,class_skill_grants,extra_ranks_per_level,size_changes,spell_like_abilities,created_by,updated_at";
-  const LOOT_COLUMNS_WITHOUT_EXTRA_RANKS =
-    "id,name,description,count,type,assigned_to,assigned_character_id,details,effects,damage_reduction,spell_resistance,class_skill_grants,size_changes,spell_like_abilities,created_by,updated_at";
-  const LOOT_COLUMNS_WITHOUT_NEW_EXTRAS =
-    "id,name,description,count,type,assigned_to,assigned_character_id,details,effects,damage_reduction,spell_resistance,class_skill_grants,extra_ranks_per_level,created_by,updated_at";
-  const LOOT_COLUMNS_WITHOUT_EXTRA_RANKS_OR_NEW_EXTRAS =
-    "id,name,description,count,type,assigned_to,assigned_character_id,details,effects,damage_reduction,spell_resistance,class_skill_grants,created_by,updated_at";
-  const LOOT_COLUMNS_LEGACY =
-    "id,name,description,count,type,assigned_to,assigned_character_id,details,effects,created_by,updated_at";
-
-  function isMissingLootColumnsError(error) {
-    if (!error) return false;
-    if (error.code === "42703") return true;
-    const message = String(error.message || "");
-    return (
-      message.includes("damage_reduction") ||
-      message.includes("spell_resistance") ||
-      message.includes("class_skill_grants") ||
-      message.includes("bonus_ranks") ||
-      message.includes("extra_ranks_per_level") ||
-      message.includes("size_changes") ||
-      message.includes("spell_like_abilities")
-    );
-  }
-
-  function isMissingNewLootExtrasError(error) {
-    if (!error) return false;
-    const message = String(error.message || "");
-    return (
-      error.code === "42703" &&
-      (message.includes("size_changes") ||
-        message.includes("spell_like_abilities"))
-    );
-  }
-
-  function isMissingExtraRanksError(error) {
-    return (
-      error?.code === "42703" &&
-      String(error.message || "").includes("extra_ranks_per_level")
-    );
-  }
-
-  function isMissingBonusRanksError(error) {
-    return (
-      error?.code === "42703" &&
-      String(error.message || "").includes("bonus_ranks")
-    );
   }
 
   async function loadLootItems(contextKey = getSelectedContextKey()) {
@@ -1841,61 +1749,11 @@
     if (!user) return [];
 
     const context = normalizeContext(contextKey);
-    let { data, error } = await client
+    const { data, error } = await client
       .from("game_loot")
-      .select(LOOT_COLUMNS)
+      .select("*")
       .eq("context_key", context.contextKey)
       .order("updated_at", { ascending: false });
-
-    if (isMissingBonusRanksError(error)) {
-      const fallback = await client
-        .from("game_loot")
-        .select(LOOT_COLUMNS_WITHOUT_BONUS_RANKS)
-        .eq("context_key", context.contextKey)
-        .order("updated_at", { ascending: false });
-      data = fallback.data;
-      error = fallback.error;
-    }
-
-    if (isMissingExtraRanksError(error)) {
-      const fallback = await client
-        .from("game_loot")
-        .select(LOOT_COLUMNS_WITHOUT_EXTRA_RANKS)
-        .eq("context_key", context.contextKey)
-        .order("updated_at", { ascending: false });
-      data = fallback.data;
-      error = fallback.error;
-    }
-
-    if (isMissingNewLootExtrasError(error)) {
-      const fallback = await client
-        .from("game_loot")
-        .select(LOOT_COLUMNS_WITHOUT_NEW_EXTRAS)
-        .eq("context_key", context.contextKey)
-        .order("updated_at", { ascending: false });
-      data = fallback.data;
-      error = fallback.error;
-    }
-
-    if (isMissingExtraRanksError(error)) {
-      const fallback = await client
-        .from("game_loot")
-        .select(LOOT_COLUMNS_WITHOUT_EXTRA_RANKS_OR_NEW_EXTRAS)
-        .eq("context_key", context.contextKey)
-        .order("updated_at", { ascending: false });
-      data = fallback.data;
-      error = fallback.error;
-    }
-
-    if (isMissingLootColumnsError(error)) {
-      const fallback = await client
-        .from("game_loot")
-        .select(LOOT_COLUMNS_LEGACY)
-        .eq("context_key", context.contextKey)
-        .order("updated_at", { ascending: false });
-      data = fallback.data;
-      error = fallback.error;
-    }
 
     if (error) {
       console.error(error);
@@ -1926,13 +1784,18 @@
             : [],
       ]),
     );
+    if (item.auraConfig?.enabled) {
+      effectMechanics.auraConfig = item.auraConfig;
+    } else {
+      delete effectMechanics.auraConfig;
+    }
     if (item.activeMechanics) {
       effectMechanics.activeMechanics = item.activeMechanics;
-      itemDetails.activeMechanics = item.activeMechanics;
     } else {
       delete effectMechanics.activeMechanics;
-      delete itemDetails.activeMechanics;
     }
+    delete itemDetails.auraConfig;
+    delete itemDetails.activeMechanics;
     itemDetails.effectMechanics = effectMechanics;
     const payload = {
       name: item.name,
@@ -1942,14 +1805,6 @@
       assigned_to: item.assignedTo || null,
       assigned_character_id: item.assignedCharacterId || null,
       details: itemDetails,
-      effects: effectMechanics.effects,
-      damage_reduction: effectMechanics.damageReduction,
-      spell_resistance: effectMechanics.spellResistance,
-      class_skill_grants: effectMechanics.classSkillGrants,
-      bonus_ranks: effectMechanics.bonusRanks,
-      extra_ranks_per_level: effectMechanics.extraRanksPerLevel,
-      size_changes: effectMechanics.sizeChanges,
-      spell_like_abilities: effectMechanics.spellLikeAbilities,
       context_key: context.contextKey,
       game_id: context.gameId,
       updated_at: new Date().toISOString(),
@@ -1959,87 +1814,7 @@
       ? client.from("game_loot").update(payload).eq("id", item.id)
       : client.from("game_loot").insert({ ...payload, created_by: user.id });
 
-    let { data, error } = await query.select(LOOT_COLUMNS).single();
-
-    if (isMissingBonusRanksError(error)) {
-      const fallbackPayload = { ...payload };
-      delete fallbackPayload.bonus_ranks;
-      const fallbackQuery = item.id
-        ? client.from("game_loot").update(fallbackPayload).eq("id", item.id)
-        : client.from("game_loot").insert({ ...fallbackPayload, created_by: user.id });
-      const fallback = await fallbackQuery
-        .select(LOOT_COLUMNS_WITHOUT_BONUS_RANKS)
-        .single();
-      data = fallback.data;
-      error = fallback.error;
-    }
-
-    if (isMissingExtraRanksError(error)) {
-      const fallbackPayload = { ...payload };
-      delete fallbackPayload.extra_ranks_per_level;
-      const fallbackQuery = item.id
-        ? client.from("game_loot").update(fallbackPayload).eq("id", item.id)
-        : client
-            .from("game_loot")
-            .insert({ ...fallbackPayload, created_by: user.id });
-      const fallback = await fallbackQuery
-        .select(LOOT_COLUMNS_WITHOUT_EXTRA_RANKS)
-        .single();
-      data = fallback.data;
-      error = fallback.error;
-    }
-
-    if (isMissingNewLootExtrasError(error)) {
-      const fallbackPayload = { ...payload };
-      delete fallbackPayload.size_changes;
-      delete fallbackPayload.spell_like_abilities;
-      const fallbackQuery = item.id
-        ? client.from("game_loot").update(fallbackPayload).eq("id", item.id)
-        : client
-            .from("game_loot")
-            .insert({ ...fallbackPayload, created_by: user.id });
-      const fallback = await fallbackQuery
-        .select(LOOT_COLUMNS_WITHOUT_NEW_EXTRAS)
-        .single();
-      data = fallback.data;
-      error = fallback.error;
-    }
-
-    if (isMissingExtraRanksError(error)) {
-      const fallbackPayload = { ...payload };
-      delete fallbackPayload.extra_ranks_per_level;
-      delete fallbackPayload.size_changes;
-      delete fallbackPayload.spell_like_abilities;
-      const fallbackQuery = item.id
-        ? client.from("game_loot").update(fallbackPayload).eq("id", item.id)
-        : client
-            .from("game_loot")
-            .insert({ ...fallbackPayload, created_by: user.id });
-      const fallback = await fallbackQuery
-        .select(LOOT_COLUMNS_WITHOUT_EXTRA_RANKS_OR_NEW_EXTRAS)
-        .single();
-      data = fallback.data;
-      error = fallback.error;
-    }
-
-    if (isMissingLootColumnsError(error)) {
-      const legacyPayload = { ...payload };
-      delete legacyPayload.damage_reduction;
-      delete legacyPayload.spell_resistance;
-      delete legacyPayload.class_skill_grants;
-      delete legacyPayload.bonus_ranks;
-      delete legacyPayload.extra_ranks_per_level;
-      delete legacyPayload.size_changes;
-      delete legacyPayload.spell_like_abilities;
-      const legacyQuery = item.id
-        ? client.from("game_loot").update(legacyPayload).eq("id", item.id)
-        : client
-            .from("game_loot")
-            .insert({ ...legacyPayload, created_by: user.id });
-      const fallback = await legacyQuery.select(LOOT_COLUMNS_LEGACY).single();
-      data = fallback.data;
-      error = fallback.error;
-    }
+    const { data, error } = await query.select("*").single();
 
     if (error) {
       console.error(error);

@@ -26,6 +26,7 @@ const SPELL_EFFECT_EXTRA_KEYS = window.PFEffectMechanics?.extraKeys?.() || [
   "grantDomains",
   "generatedEquipment",
   "conditionalVariables",
+  "damageRolls",
 ];
 
 function el(id) {
@@ -390,6 +391,7 @@ function commitSelectedSpell() {
     spellLikeAbilities: extras.spellLikeAbilities || [],
     generatedEquipment: extras.generatedEquipment || [],
     conditionalVariables: extras.conditionalVariables || [],
+    damageRolls: extras.damageRolls || [],
     casterLevelBonuses: extras.casterLevelBonuses || [],
     spellDcBonuses: extras.spellDcBonuses || [],
     effectiveAttributeBonuses: extras.effectiveAttributeBonuses || [],

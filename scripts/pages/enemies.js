@@ -625,6 +625,8 @@ function defaultEnemySheet(name, startingClass = "", template = null) {
         speedBase: Array.isArray(template.speed) ? template.speed[0] || "" : "",
         flySpeed: formatMonsterList(template.flySpeed),
         acNatural: String(acNatural),
+        acNaturalBase: String(acNatural),
+        acNaturalMisc: "0",
         acDeflection: String(acDeflection),
         acMisc: String(acMisc),
         cmbMisc: String(Number(template.cmb || 0) - bab - str),

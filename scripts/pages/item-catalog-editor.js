@@ -300,12 +300,12 @@ function createBlankItem(key) {
       details: {
         source: "d20pfsrd armor",
         armorGroup: "Armor",
-        bonus: "0",
-        enhancement: "0",
+        bonus: 0,
+        enhancement: 0,
         enchantment: "",
-        maxDex: "",
-        penalty: "",
-        failure: "",
+        maxDex: null,
+        penalty: null,
+        failure: null,
         speed30: "",
         speed20: "",
         cost: "",
@@ -451,9 +451,10 @@ function filteredItemIndexes() {
     .map((_, index) => index)
     .filter((index) => {
       if (!term) return true;
-      return String(items[index].name || "")
-        .toLowerCase()
-        .includes(term);
+      const item = items[index] || {};
+      return [item.name, item.requirements, item.details?.requirements]
+        .map((value) => String(value || "").toLowerCase())
+        .some((value) => value.includes(term));
     });
 }
 
@@ -619,15 +620,27 @@ function armorShieldDetailFieldsHtml(item) {
       <select data-detail-field="type" id="itemDetailArmorType" class="form-select form-select-sm">${optionListHtml(["Armor", "Shield"], type, "Armor")}</select>
     </div>
     ${textFieldHtml("armorGroup", "Armor Group", details.armorGroup || type)}
-    ${textFieldHtml("bonus", "Bonus", details.bonus, { placeholder: "+1" })}
+    <div>
+      <label>Bonus</label>
+      <input data-detail-field="bonus" class="form-control form-control-sm" type="number" value="${escapeHtml(details.bonus ?? "")}">
+    </div>
     <div>
       <label>Enhancement</label>
-      <input data-detail-field="enhancement" class="form-control form-control-sm" type="number" min="0" max="5" value="${escapeHtml(details.enhancement ?? "0")}">
+      <input data-detail-field="enhancement" class="form-control form-control-sm" type="number" min="0" max="5" value="${escapeHtml(details.enhancement ?? 0)}">
     </div>
     ${selectFieldHtml("enchantment", "Enchantment", enchantments, details.enchantment, "None")}
-    ${textFieldHtml("maxDex", "Max Dex", details.maxDex, { placeholder: "+4" })}
-    ${textFieldHtml("penalty", "Armor Check Penalty", details.penalty)}
-    ${textFieldHtml("failure", "Spell Failure", details.failure, { placeholder: "20%" })}
+    <div>
+      <label>Max Dex</label>
+      <input data-detail-field="maxDex" class="form-control form-control-sm" type="number" min="0" value="${escapeHtml(details.maxDex ?? "")}" placeholder="No limit">
+    </div>
+    <div>
+      <label>Armor Check Penalty</label>
+      <input data-detail-field="penalty" class="form-control form-control-sm" type="number" max="0" value="${escapeHtml(details.penalty ?? "")}">
+    </div>
+    <div>
+      <label>Spell Failure (%)</label>
+      <input data-detail-field="failure" class="form-control form-control-sm" type="number" min="0" max="100" value="${escapeHtml(details.failure ?? "")}">
+    </div>
     ${textFieldHtml("speed30", "Speed (30 ft. base)", details.speed30, { placeholder: "20 ft." })}
     ${textFieldHtml("speed20", "Speed (20 ft. base)", details.speed20, { placeholder: "15 ft." })}
     ${textFieldHtml("cost", "Cost", details.cost, { placeholder: "150 gp" })}
@@ -640,16 +653,22 @@ function armorShieldDetailFieldsHtml(item) {
 }
 
 function collectArmorShieldDetails(item, container) {
+  const numericDetail = (field, fallback = null) => {
+    const value = detailValue(container, field).trim();
+    if (value === "") return fallback;
+    const number = Number(value);
+    return Number.isFinite(number) ? number : fallback;
+  };
   item.type = detailValue(container, "type") === "Shield" ? "Shield" : "Armor";
   item.details = {
     ...item.details,
     armorGroup: detailValue(container, "armorGroup").trim() || item.type,
-    bonus: detailValue(container, "bonus").trim() || "0",
-    enhancement: detailValue(container, "enhancement") || "0",
+    bonus: numericDetail("bonus", 0),
+    enhancement: numericDetail("enhancement", 0),
     enchantment: detailValue(container, "enchantment"),
-    maxDex: detailValue(container, "maxDex").trim(),
-    penalty: detailValue(container, "penalty").trim(),
-    failure: detailValue(container, "failure").trim(),
+    maxDex: numericDetail("maxDex"),
+    penalty: numericDetail("penalty"),
+    failure: numericDetail("failure"),
     speed30: detailValue(container, "speed30").trim(),
     speed20: detailValue(container, "speed20").trim(),
     cost: detailValue(container, "cost").trim(),
@@ -843,6 +862,7 @@ function commitSelectedItem() {
   DETAIL_BUILDERS[activeCatalogKey]?.collect(item, el("itemEditorPanel"));
   const {
     effects,
+    branches,
     damageReduction,
     spellResistance,
     immunities,
@@ -859,10 +879,13 @@ function commitSelectedItem() {
     grantDomains,
     generatedEquipment,
     conditionalVariables,
+    damageRolls,
     activeMechanics,
   } =
     currentEffectsAccordion.collect();
   item.effects = effects;
+  if (branches?.length) item.branches = branches;
+  else delete item.branches;
   item.damageReduction = damageReduction;
   item.spellResistance = spellResistance;
   item.immunities = immunities;
@@ -879,6 +902,7 @@ function commitSelectedItem() {
   item.grantDomains = grantDomains;
   item.generatedEquipment = generatedEquipment;
   item.conditionalVariables = conditionalVariables;
+  item.damageRolls = damageRolls;
   if (activeMechanics) item.activeMechanics = activeMechanics;
   else delete item.activeMechanics;
 }

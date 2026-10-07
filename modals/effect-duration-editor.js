@@ -117,31 +117,11 @@
     document.head.appendChild(style);
   }
 
-  function legacyDurationConfig(effectOrParts) {
-    const count = effectOrParts?.durationCount ?? effectOrParts?.count ?? null;
-    const unit =
-      effectOrParts?.durationUnit || effectOrParts?.unit || "variable";
-    const perLevel = Boolean(
-      effectOrParts?.durationPerLevel ?? effectOrParts?.perLevel,
-    );
-    return {
-      count:
-        count === null || count === undefined || count === ""
-          ? null
-          : Number(count),
-      unit,
-      factors: perLevel ? [{ type: "caster" }] : [],
-    };
-  }
-
   function normalizeDurationConfig(effectOrConfig) {
-    const raw = effectOrConfig?.durationConfig || effectOrConfig;
-    const fallback = legacyDurationConfig(effectOrConfig);
-    const count = raw?.count ?? fallback.count;
-    const unit = raw?.unit || fallback.unit || "variable";
-    const factors = Array.isArray(raw?.factors)
-      ? raw.factors
-      : fallback.factors;
+    const raw = effectOrConfig?.durationConfig || effectOrConfig || {};
+    const count = raw.count ?? null;
+    const unit = raw.unit || "variable";
+    const factors = Array.isArray(raw.factors) ? raw.factors : [];
     const durationScale = normalizeDurationScale(
       raw?.durationScale || raw?.scale || null,
     );
@@ -162,6 +142,9 @@
       // per-level scale. Defaulting to "multiply" keeps every duration
       // already configured the old way behaving identically.
       factorMode: raw?.factorMode === "add" ? "add" : "multiply",
+      splitAmongTargets:
+        unit !== "variable" &&
+        Boolean(raw?.splitAmongTargets),
       ...(unit !== "variable" && durationScale ? { durationScale } : {}),
     };
   }
@@ -251,7 +234,9 @@
       ? `${config.count} ${unit} + ${factors.join(" + ")}`
       : `${config.count} ${unit} / ${factors.join(" + ")}`;
     const scaleLabel = durationScaleLabel(config.durationScale);
-    return scaleLabel ? `${baseLabel}; ${scaleLabel}` : baseLabel;
+    const labels = [baseLabel, scaleLabel].filter(Boolean);
+    if (config.splitAmongTargets) labels.push("split among targets");
+    return labels.join("; ");
   }
 
   function durationScaleLabel(scale) {
@@ -373,11 +358,19 @@
       config.durationScale,
       context,
     );
-    if (config.unit === "turn" || config.unit === "round") return amount;
-    if (config.unit === "minute") return amount * 10;
-    if (config.unit === "hour") return amount * 600;
-    if (config.unit === "day") return amount * 14400;
-    return null;
+    let rounds = null;
+    if (config.unit === "turn" || config.unit === "round") rounds = amount;
+    if (config.unit === "minute") rounds = amount * 10;
+    if (config.unit === "hour") rounds = amount * 600;
+    if (config.unit === "day") rounds = amount * 14400;
+    if (rounds === null) return null;
+    const targetCount = Math.max(
+      1,
+      Math.floor(Number(context.targetCount || 1) || 1),
+    );
+    return config.splitAmongTargets && targetCount > 1
+      ? Math.max(1, Math.floor(rounds / targetCount))
+      : rounds;
   }
 
   function levelSourceOptions(selected = {}, options = {}) {
@@ -447,7 +440,6 @@
             <div class="modal-content bg-dark text-white border-secondary">
               <div class="modal-header">
                 <h5 class="modal-title">Duration</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
               <div class="modal-body">
                 <div class="row g-2 mb-3">
@@ -464,6 +456,10 @@
                   <div class="col-sm-4 d-flex align-items-end">
                     <button class="btn btn-outline-light btn-sm w-100" type="button" data-duration-add-level>Add Level Factor</button>
                   </div>
+                </div>
+                <div class="form-check form-switch mb-3">
+                  <input class="form-check-input" type="checkbox" role="switch" data-duration-split-targets>
+                  <label class="form-check-label">Split duration among targets</label>
                 </div>
                 <div class="d-flex gap-2 mb-2 align-items-end">
                   <button class="btn btn-outline-light btn-sm" type="button" data-duration-add-ability>Add Attribute Bonus</button>
@@ -524,6 +520,9 @@
       this.factorModeEl = this.modal.querySelector(
         "[data-duration-factor-mode]",
       );
+      this.splitTargetsEl = this.modal.querySelector(
+        "[data-duration-split-targets]",
+      );
       this.factorHintEl = this.modal.querySelector(
         "[data-duration-factor-hint]",
       );
@@ -571,6 +570,7 @@
       this.countEl.value = this.config.count || "";
       this.unitEl.value = this.config.unit || "variable";
       this.factorModeEl.value = this.config.factorMode || "multiply";
+      this.splitTargetsEl.checked = Boolean(this.config.splitAmongTargets);
       this.factorsEl.innerHTML = "";
       this.config.factors.forEach((factor) => this.addFactor(factor));
       const scale = this.config.durationScale || {};
@@ -599,6 +599,7 @@
         )
         .forEach((button) => (button.disabled = variable));
       this.factorModeEl.disabled = variable;
+      this.splitTargetsEl.disabled = variable;
       this.factorsEl.classList.toggle("d-none", variable);
       this.scalingEl.classList.toggle("d-none", variable);
       if (variable) this.countEl.value = "";
@@ -738,6 +739,7 @@
         unit,
         factors,
         factorMode: this.factorModeEl.value === "add" ? "add" : "multiply",
+        ...(this.splitTargetsEl.checked ? { splitAmongTargets: true } : {}),
         ...(durationScale ? { durationScale } : {}),
       };
     }
@@ -756,7 +758,6 @@
     ABILITIES,
     normalizeDurationConfig,
     normalizeDurationScale,
-    legacyDurationConfig,
     durationLabel,
     parseDuration,
     levelSourceOptions,

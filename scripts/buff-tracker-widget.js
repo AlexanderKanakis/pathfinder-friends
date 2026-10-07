@@ -18,6 +18,7 @@
       "grantDomains",
       "generatedEquipment",
       "conditionalVariables",
+      "damageRolls",
     ];
 
   function injectStyles() {
@@ -28,7 +29,29 @@
       .effect-tracker-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
       .effect-search-modal-dialog { width: min(1140px, calc(100vw - 2rem)); max-width: min(1140px, calc(100vw - 2rem)); min-width: min(860px, calc(100vw - 2rem)); }
       .effect-search-modal-dialog .modal-content { width: 100%; height: min(82vh, 820px); }
-      .effect-search-modal-body { display: grid; grid-template-rows: auto minmax(0, 1fr); min-height: 0; }
+      .effect-search-modal-body { display: grid; grid-template-rows: auto auto auto minmax(0, 1fr); min-height: 0; }
+      .effect-browser-nav { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); background: #1b1b1b; margin-bottom: 12px; }
+      .effect-browser-nav .nav-link { border: 0; border-bottom: 2px solid transparent; border-radius: 0; color: #ccc; min-width: 0; }
+      .effect-browser-nav .nav-link.active { background: transparent; border-bottom-color: #0dcaf0; color: #fff; font-weight: 700; }
+      .effect-browser-group-title { color: #aaa; font-size: 12px; letter-spacing: .04em; margin: 0 0 8px; text-transform: uppercase; }
+      .effect-browser-list { display: grid; gap: 8px; align-content: start; }
+      .effect-search-results.effect-browser-list { grid-template-columns: 1fr; }
+      .effect-browser-row { align-items: center; background: #242424; border: 1px solid #444; border-radius: 7px; color: #f4f4f4; display: grid; gap: 10px; grid-template-columns: minmax(0, 1fr) auto; min-height: 54px; padding: 9px 12px; text-align: left; }
+      .effect-browser-row[role="button"] { cursor: pointer; }
+      .effect-browser-row[role="button"]:hover, .effect-browser-row[role="button"]:focus { border-color: #0dcaf0; outline: none; }
+      .effect-browser-row.is-passive { cursor: default; opacity: .9; }
+      .effect-browser-row-title { font-weight: 700; }
+      .effect-browser-row-meta { color: #aaa; font-size: 12px; }
+      .effect-browser-controls { align-items: end; display: flex; gap: 8px; }
+      .effect-browser-controls input[type="number"] { width: 68px; }
+      .effect-browser-type-section + .effect-browser-type-section { margin-top: 14px; }
+      .effect-browser-spell-class { border: 1px solid #444; border-radius: 7px; padding: 10px; }
+      .effect-browser-spell-class + .effect-browser-spell-class { margin-top: 10px; }
+      .effect-browser-spell-level { border: 1px solid #3d3d3d; border-radius: 7px; display: grid; gap: 12px; grid-template-columns: 46px minmax(0, 1fr); margin-top: 8px; padding: 10px; }
+      .effect-browser-level-number { color: #ffd86b; font-size: 24px; font-weight: 700; text-align: center; }
+      .effect-browser-spell-columns { display: grid; gap: 14px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .effect-browser-spell-column-title { color: #aaa; font-size: 11px; margin-bottom: 5px; text-transform: uppercase; }
+      .effect-browser-spell-button { display: block; margin-bottom: 5px; overflow: hidden; text-align: left; text-overflow: ellipsis; white-space: nowrap; width: 100%; }
       .effect-search-results { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; align-content: start; height: 100%; min-height: 0; overflow: auto; }
       .effect-tracker-search-trigger { cursor: pointer; }
       .effect-tracker-card { position: relative; min-height: 116px; background: #242424; border: 1px solid #444; border-radius: 8px; padding: 12px 52px 12px 12px; text-align: left; color: #f4f4f4; cursor: pointer; }
@@ -47,7 +70,7 @@
       .effect-active-toolbar { display: flex; justify-content: space-between; align-items: end; gap: 10px; margin-bottom: 8px; }
       .effect-active-toolbar select { max-width: 180px; }
       .effect-active-head { display: grid; grid-template-columns: minmax(0, 1fr) 68px; gap: 10px; align-items: start; }
-      .effect-active-actions { display: grid; grid-template-columns: 30px 30px; gap: 4px; justify-content: end; }
+      .effect-active-actions { display: flex; gap: 4px; justify-content: end; }
       .effect-active-actions .btn { width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center; padding: 0; }
       .effect-active-adjustments { display: flex; flex-wrap: wrap; gap: 8px; align-items: end; margin-top: 8px; }
       .effect-active-adjustments .effect-tracker-inline input[type="number"] { width: 68px; }
@@ -104,6 +127,8 @@
         .effect-search-modal-dialog { min-width: 0; }
         .effect-tracker-grid,
         .effect-search-results { grid-template-columns: 1fr; }
+        .effect-browser-nav { grid-template-columns: repeat(5, minmax(90px, 1fr)); overflow-x: auto; }
+        .effect-browser-spell-columns { grid-template-columns: 1fr; }
       }
     `;
     document.head.appendChild(style);
@@ -226,10 +251,12 @@
   }
 
   function activeCategoryRank(category) {
+    const key = String(category || "").toLowerCase();
+    if (key === "item") return Number.MAX_SAFE_INTEGER;
     const index = ACTIVE_CATEGORY_PRIORITY.findIndex(
-      (item) => item.toLowerCase() === String(category || "").toLowerCase(),
+      (item) => item.toLowerCase() === key,
     );
-    return index >= 0 ? index : ACTIVE_CATEGORY_PRIORITY.length;
+    return index >= 0 ? index : ACTIVE_CATEGORY_PRIORITY.length - 1;
   }
 
   function sortActiveRows(rows) {
@@ -295,23 +322,6 @@
         config,
       };
     }
-    const hasStructured =
-      effect &&
-      (effect.durationCount !== undefined ||
-        effect.durationUnit ||
-        effect.durationPerLevel !== undefined);
-    if (hasStructured) {
-      return {
-        count:
-          effect.durationCount === null ||
-          effect.durationCount === undefined ||
-          effect.durationCount === ""
-            ? null
-            : Number(effect.durationCount),
-        unit: effect.durationUnit || "variable",
-        perLevel: Boolean(effect.durationPerLevel),
-      };
-    }
     return legacyDurationParts(effect?.duration);
   }
 
@@ -334,6 +344,15 @@
 
   function isCondition(effect) {
     return String(effect?.category || "").toLowerCase() === "condition";
+  }
+
+  function hasPersistentEffectMechanics(effect = {}) {
+    return Boolean(
+      isCondition(effect) ||
+        effect.auraConfig?.enabled ||
+        window.PFEffectMechanics?.hasBranches?.(effect) ||
+        window.PFEffectMechanics?.hasAnyMechanics?.(effect),
+    );
   }
 
   const FEAR_CONDITIONS = ["shaken", "frightened", "panicked"];
@@ -636,6 +655,9 @@
       this.prefix = `effectTracker${Math.random().toString(36).slice(2)}`;
       this.saveTimer = null;
       this.activeTypeFilter = "all";
+      this.pickerGroup = "personal";
+      this.pickerEffects = [];
+      this.pickerClosingForSelection = false;
     }
 
     async mount() {
@@ -654,16 +676,23 @@
         <div class="modal fade" id="${this.prefix}PickerModal" tabindex="-1" aria-labelledby="${this.prefix}PickerLabel" aria-hidden="true">
           <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable effect-search-modal-dialog">
             <div class="modal-content bg-dark text-white border-secondary">
-              <div class="modal-header">
-                <h5 class="modal-title" id="${this.prefix}PickerLabel">Activate Effect</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+              <div class="modal-header border-secondary">
+                <h5 class="modal-title" id="${this.prefix}PickerLabel">Apply Effect</h5>
               </div>
               <div class="modal-body effect-search-modal-body">
-                <div class="mb-3">
-                  <label class="small" for="${this.prefix}Search">Search</label>
-                  <input id="${this.prefix}Search" class="form-control form-control-sm" placeholder="Name, type, or stat change">
-                </div>
-                <div id="${this.prefix}Results" class="effect-tracker-grid effect-search-results"></div>
+                <nav id="${this.prefix}PickerNav" class="nav nav-pills effect-browser-nav" aria-label="Effect groups" role="tablist">
+                  <button class="nav-link active" type="button" data-effect-browser-group="personal" role="tab" aria-selected="true">Personal</button>
+                  <button class="nav-link" type="button" data-effect-browser-group="spells" role="tab" aria-selected="false">Spells</button>
+                  <button class="nav-link" type="button" data-effect-browser-group="conditions" role="tab" aria-selected="false">Conditions</button>
+                  <button class="nav-link" type="button" data-effect-browser-group="other" role="tab" aria-selected="false">Other</button>
+                  <button class="nav-link" type="button" data-effect-browser-group="passives" role="tab" aria-selected="false">Passives</button>
+                </nav>
+                <input id="${this.prefix}Search" class="form-control form-control-sm mb-3" placeholder="Search effects">
+                <div id="${this.prefix}PickerGroupTitle" class="effect-browser-group-title">Personal Effects</div>
+                <div id="${this.prefix}Results" class="effect-search-results effect-browser-list"></div>
+              </div>
+              <div class="modal-footer border-secondary">
+                <button type="button" class="btn btn-outline-light btn-sm" data-bs-dismiss="modal">Cancel</button>
               </div>
             </div>
           </div>
@@ -674,13 +703,28 @@
       this.openButtonEl = document.getElementById(`${this.prefix}OpenButton`);
       this.pickerModalEl = document.getElementById(`${this.prefix}PickerModal`);
       this.searchEl = document.getElementById(`${this.prefix}Search`);
+      this.pickerNavEl = document.getElementById(`${this.prefix}PickerNav`);
+      this.pickerGroupTitleEl = document.getElementById(`${this.prefix}PickerGroupTitle`);
       this.resultsEl = document.getElementById(`${this.prefix}Results`);
       this.activeEl = document.getElementById(`${this.prefix}Active`);
       if (this.pickerModalEl.parentElement !== document.body)
         document.body.appendChild(this.pickerModalEl);
       this.searchEl.addEventListener("input", () => this.renderResults());
+      this.pickerNavEl.querySelectorAll("[data-effect-browser-group]").forEach((button) => {
+        button.addEventListener("click", () => {
+          this.pickerGroup = button.dataset.effectBrowserGroup || "personal";
+          this.renderResults();
+        });
+      });
       this.openSearchEl.addEventListener("click", () => this.openPicker());
       this.openButtonEl.addEventListener("click", () => this.openPicker());
+      this.pickerModalEl.addEventListener("hidden.bs.modal", () => {
+        if (this.pickerClosingForSelection) {
+          this.pickerClosingForSelection = false;
+          return;
+        }
+        this.options.onEffectPickerCancel?.();
+      });
       await this.refresh(this.options);
     }
 
@@ -711,7 +755,10 @@
     }
 
     updateSearchVisibility() {
-      const hasActivations = Boolean(this.options.characterId && this.effects.length);
+      const hasActivations = Boolean(
+        this.options.characterId &&
+          (this.effects.length || this.options.effectPickerEffects),
+      );
       this.addShellEl?.classList.toggle("d-none", !hasActivations);
     }
 
@@ -723,128 +770,316 @@
       status.classList.toggle("d-none", !message);
     }
 
-    openPicker() {
+    pickerGroupFor(effect = {}) {
+      if (effect.passiveSource) return "passives";
+      if (isCondition(effect)) return "conditions";
+      if (effect.ownedSpell) return "spells";
+      if (effect.fromAbility) return "personal";
+      return "other";
+    }
+
+    pickerGroupLabel(group = this.pickerGroup) {
+      return {
+        personal: "Personal Effects",
+        spells: "Spells",
+        conditions: "Conditions",
+        other: "Other Effects",
+        passives: "Passives",
+      }[group] || "Effects";
+    }
+
+    async openPicker() {
       if (!this.options.characterId) return;
+      this.pickerGroup = "personal";
       this.searchEl.value = "";
+      this.resultsEl.innerHTML = '<div class="small-text">Loading effects...</div>';
+      this.renderPickerNav();
+      await this.options.onEffectPickerOpen?.();
+      bootstrap.Modal.getOrCreateInstance(this.pickerModalEl).show();
+      try {
+        const source = this.options.effectPickerEffects;
+        const loaded = typeof source === "function" ? await source() : source;
+        this.pickerEffects = Array.isArray(loaded) ? loaded : [...this.effects];
+      } catch (error) {
+        console.error(error);
+        this.pickerEffects = [...this.effects];
+      }
       this.renderResults();
       this.pickerModalEl.addEventListener(
         "shown.bs.modal",
-        () => {
-          this.searchEl?.focus();
-          this.searchEl?.select();
-        },
+        () => this.searchEl?.focus(),
         { once: true },
       );
-      bootstrap.Modal.getOrCreateInstance(this.pickerModalEl).show();
-      setTimeout(() => {
-        if (document.activeElement !== this.searchEl) this.searchEl?.focus();
-      }, 250);
+    }
+
+    renderPickerNav() {
+      this.pickerNavEl
+        ?.querySelectorAll("[data-effect-browser-group]")
+        .forEach((button) => {
+          const active = button.dataset.effectBrowserGroup === this.pickerGroup;
+          button.classList.toggle("active", active);
+          button.setAttribute("aria-selected", String(active));
+        });
+      if (this.pickerGroupTitleEl)
+        this.pickerGroupTitleEl.textContent = this.pickerGroupLabel();
+    }
+
+    hidePicker() {
+      const modal = bootstrap.Modal.getOrCreateInstance(this.pickerModalEl);
+      if (!this.pickerModalEl.classList.contains("show"))
+        return Promise.resolve();
+      return new Promise((resolve) => {
+        this.pickerModalEl.addEventListener("hidden.bs.modal", resolve, {
+          once: true,
+        });
+        modal.hide();
+      });
+    }
+
+    pickerControls(effect) {
+      if (effect.passiveSource) return "";
+      const needsCl = durationUsesCasterLevel(effect);
+      const condition = isCondition(effect);
+      return `
+        <div class="effect-browser-controls">
+          ${
+            needsCl
+              ? `<label class="small">CL<input class="form-control form-control-sm" data-picker-cl type="number" min="1" value="${escapeHtml(effect.casterLevel || 1)}"></label>`
+              : ""
+          }
+          ${
+            condition
+              ? `<label class="small">Turns<input class="form-control form-control-sm" data-picker-turns type="number" min="1" value="1"></label>`
+              : ""
+          }
+          <label class="form-check small mb-1">
+            <input class="form-check-input" data-picker-permanent type="checkbox">
+            <span class="form-check-label">Permanent</span>
+          </label>
+        </div>
+      `;
+    }
+
+    pickerRowHtml(effect, index) {
+      const passive = Boolean(effect.passiveSource);
+      return `
+        <article class="effect-browser-row${passive ? " is-passive" : ""}" ${
+          passive
+            ? ""
+            : `role="button" tabindex="0" data-picker-effect-index="${index}"`
+        }>
+          <div>
+            <div class="effect-browser-row-title">${escapeHtml(effect.name || "Effect")}</div>
+            <div class="effect-browser-row-meta">${escapeHtml(effect.category || "Effect")}${
+              effect.source ? ` | ${escapeHtml(effect.source)}` : ""
+            }</div>
+          </div>
+          ${this.pickerControls(effect)}
+        </article>
+      `;
+    }
+
+    renderPickerSpells(rows) {
+      const groups = new Map();
+      rows.forEach(({ effect, index }) => {
+        const className = effect.spellMeta?.className || "Spell-Like Abilities";
+        if (!groups.has(className)) groups.set(className, new Map());
+        const level = Number(effect.spellMeta?.level || 0);
+        if (!groups.get(className).has(level))
+          groups.get(className).set(level, []);
+        groups.get(className).get(level).push({ effect, index });
+      });
+      return [...groups.entries()]
+        .map(
+          ([className, levels]) => `
+            <section class="effect-browser-spell-class">
+              <div class="fw-bold text-uppercase">${escapeHtml(className)}</div>
+              ${[...levels.entries()]
+                .sort((a, b) => a[0] - b[0])
+                .map(([level, spells]) => {
+                  const left = spells.filter(
+                    ({ effect }) => effect.spellMeta?.bucket !== "prepared",
+                  );
+                  const right = spells.filter(
+                    ({ effect }) => effect.spellMeta?.bucket === "prepared",
+                  );
+                  const buttons = (entries) =>
+                    entries
+                      .map(
+                        ({ effect, index }) => `
+                          <button class="btn btn-outline-info btn-sm effect-browser-spell-button" type="button" data-picker-effect-index="${index}">
+                            ${escapeHtml(effect.name)}
+                          </button>
+                        `,
+                      )
+                      .join("");
+                  return `
+                    <div class="effect-browser-spell-level">
+                      <div class="effect-browser-level-number">${level}</div>
+                      <div class="effect-browser-spell-columns">
+                        <div>
+                          <div class="effect-browser-spell-column-title">Known / In Book</div>
+                          ${buttons(left)}
+                        </div>
+                        <div>
+                          <div class="effect-browser-spell-column-title">Prepared Today</div>
+                          ${buttons(right)}
+                        </div>
+                      </div>
+                    </div>
+                  `;
+                })
+                .join("")}
+            </section>
+          `,
+        )
+        .join("");
+    }
+
+    bindPickerRows() {
+      this.resultsEl
+        .querySelectorAll("[data-picker-effect-index]")
+        .forEach((row) => {
+          const choose = () =>
+            this.choosePickerEffect(
+              Number(row.dataset.pickerEffectIndex),
+              row.closest(".effect-browser-row") || row,
+            );
+          row.addEventListener("click", (event) => {
+            if (event.target.closest(".effect-browser-controls")) return;
+            choose();
+          });
+          row.addEventListener("keydown", (event) => {
+            if (event.key !== "Enter" && event.key !== " ") return;
+            event.preventDefault();
+            choose();
+          });
+        });
+    }
+
+    async choosePickerEffect(index, row) {
+      const effect = this.pickerEffects[index];
+      if (!effect || effect.passiveSource) return;
+      const selection = {
+        casterLevel: Math.max(
+          1,
+          Number.parseInt(row?.querySelector?.("[data-picker-cl]")?.value, 10) ||
+            Number(effect.casterLevel || 1) ||
+            1,
+        ),
+        turns: Math.max(
+          1,
+          Number.parseInt(
+            row?.querySelector?.("[data-picker-turns]")?.value,
+            10,
+          ) || 1,
+        ),
+        permanent: Boolean(
+          row?.querySelector?.("[data-picker-permanent]")?.checked,
+        ),
+      };
+      this.pickerClosingForSelection = true;
+      await this.hidePicker();
+      if (
+        effect.ownedSpell &&
+        effect.spell &&
+        window.PFSpellPicker?.openDetails
+      ) {
+        let cast = false;
+        await window.PFSpellPicker.openDetails({
+          title: effect.name,
+          spell: effect.spell,
+          spellName: effect.name,
+          className:
+            effect.spellMeta?.kind === "sla"
+              ? ""
+              : effect.spellMeta?.className || "",
+          spellLevel: Number(effect.spellMeta?.level || 0),
+          calculations: effect.spellCalculations || null,
+          recalculate:
+            typeof this.options.recalculateSpell === "function"
+              ? (casterLevel) =>
+                  this.options.recalculateSpell(effect, casterLevel)
+              : null,
+          onCast: async ({ casterLevel, closeDetails }) => {
+            cast = true;
+            closeDetails?.();
+            await new Promise((resolve) => setTimeout(resolve, 180));
+            await this.addEffectDefinition(effect, {
+              ...selection,
+              casterLevel: casterLevel || selection.casterLevel,
+            });
+            return { close: true };
+          },
+        });
+        if (!cast)
+          bootstrap.Modal.getOrCreateInstance(this.pickerModalEl).show();
+        return;
+      }
+      await this.addEffectDefinition(effect, selection);
     }
 
     renderResults() {
       if (!this.resultsEl) return;
+      this.renderPickerNav();
       const term = this.searchEl?.value.trim().toLowerCase() || "";
-      const matches = this.effects.filter(
-        (effect) => !term || searchText(effect).includes(term),
-      );
-
-      if (!matches.length) {
-        this.resultsEl.innerHTML = `<div class="small-text">No matching effects found.</div>`;
+      const rows = this.pickerEffects
+        .map((effect, index) => ({ effect, index }))
+        .filter(
+          ({ effect }) => this.pickerGroupFor(effect) === this.pickerGroup,
+        )
+        .filter(({ effect }) => !term || searchText(effect).includes(term))
+        .sort((a, b) => {
+          const aItem =
+            String(a.effect.category || "").toLowerCase() === "item";
+          const bItem =
+            String(b.effect.category || "").toLowerCase() === "item";
+          return (
+            Number(aItem) - Number(bItem) ||
+            String(a.effect.category || "").localeCompare(
+              String(b.effect.category || ""),
+            ) ||
+            String(a.effect.name || "").localeCompare(
+              String(b.effect.name || ""),
+            )
+          );
+        });
+      if (!rows.length) {
+        this.resultsEl.innerHTML =
+          '<div class="small-text">No matching effects found.</div>';
         return;
       }
-
-      this.resultsEl.innerHTML = matches
-        .map((effect) => {
-          const index = this.effects.indexOf(effect);
-          const allChips = [
-            ...(effect.bonuses || []).map(bonusText),
-            ...(effect.damageReduction || []).map(
-              (dr) =>
-                `DR ${Number(dr.amount || 0)}/${String(dr.overcomeType || "").trim() || "-"}`,
-            ),
-            ...(effect.spellResistance || []).map(
-              (sr) =>
-                `SR ${Number(sr.amount || 0)}${sr.conditional ? ` (${sr.appliesWhen || "conditional"})` : ""}`,
-            ),
-            ...(effect.immunities || []).map(immunityText),
-            ...(effect.applyConditions || []).map(applyConditionText),
-            ...(effect.classSkillGrants || []).map((grant) =>
-              window.PFEffectEditor.classSkillGrantText(grant, titleCaseStat),
-            ),
-            ...(effect.bonusRanks || []).map((entry) =>
-              window.PFEffectEditor.bonusRanksText(entry),
-            ),
-            ...(effect.extraRanksPerLevel || []).map(extraRanksPerLevelText),
-            ...(effect.featGrants || []).map(featGrantText),
-            ...(effect.spellLikeAbilities || []).map(spellLikeText),
-            ...(effect.casterLevelBonuses || []).map(casterLevelBonusText),
-            ...(effect.spellDcBonuses || []).map(spellDcBonusText),
-            ...(effect.effectiveAttributeBonuses || []).map(
-              effectiveAttributeBonusText,
-            ),
-            ...(effect.grantDomains || []).map(grantDomainText),
-            ...(effect.generatedEquipment || []).map(
-              (item) =>
-                `Generates ${item.type || "equipment"}: ${
-                  item.name || item.item || "Generated item"
-                }`,
-            ),
-            ...(this.choicePools(effect) || []).map(
-              (pool) =>
-                `${pool.name || "Choice"}: ${
-                  Array.isArray(pool.options) ? pool.options.length : 0
-                } options`,
-            ),
-          ];
-          const chips = allChips.slice(0, 8);
-          const bonusHtml = chips.length
-            ? chips
-                .map(
-                  (text) =>
-                    `<span class="effect-tracker-chip">${escapeHtml(text)}</span>`,
-                )
-                .join("")
-            : `<span class="small-text">No numerical changes</span>`;
-          const more =
-            allChips.length > chips.length
-              ? `<span class="small-text">+${allChips.length - chips.length} more</span>`
-              : "";
-          const abilitySource =
-            effect.fromAbility && effect.source
-              ? `<div class="small-text mb-2">${escapeHtml(effect.source)}</div>`
-              : "";
-          return `
-          <article class="effect-tracker-card${effect.fromAbility ? " effect-tracker-card-ability" : ""}" role="button" tabindex="0" data-effect-index="${index}">
-            ${effect.fromAbility ? `<span class="effect-tracker-ability-badge">Your Feature</span>` : ""}
-            <span class="effect-tracker-icon" title="${escapeHtml(effect.category || "Effect")}"><i class="bi ${categoryIcon(effect.category)}"></i></span>
-            <div class="fw-semibold pe-2">${escapeHtml(effect.name)}</div>
-            <div class="small-text mb-2">${escapeHtml(effect.category || "Effect")} | ${escapeHtml(durationLabel(effect))}</div>
-            ${abilitySource}
-            <div>${bonusHtml}${more}</div>
-            ${this.controls(effect, index)}
-          </article>
-        `;
-        })
-        .join("");
-
-      this.resultsEl.querySelectorAll("[data-effect-index]").forEach((card) => {
-        card.addEventListener("click", (event) => {
-          if (
-            event.target.closest(".effect-tracker-controls")
-          )
-            return;
-          this.addEffect(Number(card.dataset.effectIndex));
+      if (this.pickerGroup === "spells") {
+        this.resultsEl.innerHTML = this.renderPickerSpells(rows);
+      } else if (this.pickerGroup === "other") {
+        const groups = new Map();
+        rows.forEach((row) => {
+          const category = row.effect.category || "Effect";
+          if (!groups.has(category)) groups.set(category, []);
+          groups.get(category).push(row);
         });
-        card.addEventListener("keydown", (event) => {
-          if (
-            event.target.closest(".effect-tracker-controls")
+        this.resultsEl.innerHTML = [...groups.entries()]
+          .map(
+            ([category, entries]) => `
+              <section class="effect-browser-type-section">
+                <div class="effect-browser-group-title">${escapeHtml(category)}</div>
+                <div class="effect-browser-list">
+                  ${entries
+                    .map(({ effect, index }) =>
+                      this.pickerRowHtml(effect, index),
+                    )
+                    .join("")}
+                </div>
+              </section>
+            `,
           )
-            return;
-          if (event.key !== "Enter" && event.key !== " ") return;
-          event.preventDefault();
-          this.addEffect(Number(card.dataset.effectIndex));
-        });
-      });
+          .join("");
+      } else {
+        this.resultsEl.innerHTML = rows
+          .map(({ effect, index }) => this.pickerRowHtml(effect, index))
+          .join("");
+      }
+      this.bindPickerRows();
     }
 
     controls(effect, index) {
@@ -901,10 +1136,18 @@
         }
         const poolId = window.PFEffectStats.choicePoolIdFromStat(item.stat);
         const pool = window.PFEffectStats.poolById(poolId);
+        const equipmentSource = this.options.choicePoolEquipment;
+        const equipment =
+          pool?.kind !== "equipment"
+            ? undefined
+            : typeof equipmentSource === "function"
+              ? await equipmentSource()
+              : equipmentSource;
         const options = await window.PFEffectStats.resolveChoicePoolOptions(
           poolId,
           {
             skills: this.options.choicePoolSkills,
+            equipment,
             choicePool: item.choicePool,
           },
         );
@@ -916,9 +1159,7 @@
           : null;
         if (!picked) return null;
         resolved.push(
-          typeof picked === "object"
-            ? { ...item, stat: picked.value, skillName: picked.skillName }
-            : { ...item, stat: picked },
+          window.PFEffectStats.resolveChoiceStatItem(item, picked, options),
         );
       }
       return resolved;
@@ -1489,25 +1730,47 @@
     }
 
     async addEffect(index) {
-      const effect = this.effects[index];
+      return this.addEffectDefinition(this.effects[index], { index });
+    }
+
+    async resolveDamageRolls(effect, casterLevel, casterContext = {}) {
+      const rolls =
+        window.PFDamageRolls?.normalizeRolls?.(effect.damageRolls || []) || [];
+      if (!rolls.length) return effect;
+      const results = await window.PFDamageRolls?.open?.({
+        title: `${effect.name || "Effect"} Damage`,
+        rolls,
+        context: {
+          ...casterContext,
+          casterLevel,
+          classLevel: casterLevel,
+        },
+      });
+      if (!results) return null;
+      await this.options.onDamageRolled?.(effect, results);
+      const next = { ...effect };
+      delete next.damageRolls;
+      return next;
+    }
+
+    async addEffectDefinition(effect, selection = {}) {
+      const index = selection.index;
       if (!effect || !this.options.characterId) return;
       const casterLevel = Math.max(
         1,
-        Number.parseInt(
-          document.getElementById(`${this.prefix}Cl${index}`)?.value,
-          10,
-        ) || 1,
+        Number(selection.casterLevel) ||
+          Number.parseInt(document.getElementById(`${this.prefix}Cl${index}`)?.value, 10) ||
+          1,
       );
       const turns = Math.max(
         1,
-        Number.parseInt(
-          document.getElementById(`${this.prefix}Turns${index}`)?.value,
-          10,
-        ) || 1,
+        Number(selection.turns) ||
+          Number.parseInt(document.getElementById(`${this.prefix}Turns${index}`)?.value, 10) ||
+          1,
       );
-      const permanent = Boolean(
-        document.getElementById(`${this.prefix}Permanent${index}`)?.checked,
-      );
+      const permanent = selection.permanent !== undefined
+        ? Boolean(selection.permanent)
+        : Boolean(document.getElementById(`${this.prefix}Permanent${index}`)?.checked);
       const condition = isCondition(effect);
       const durationArg = effect.fromAbility
         ? effect.abilityContext || { casterLevel }
@@ -1535,8 +1798,15 @@
       // in here, BEFORE the choice is resolved, so a request sent to
       // another player (see requestEffectChoice) only ever needs them to
       // answer "which skill/target", never redo any of this.
-      const { fromAbility, abilityContext, ...persistedEffect } = effect;
-      const finalizedEffect = {
+      const casterAttributeContext =
+        effect.attributeScaleContext || effect.abilityContext || {};
+      const {
+        fromAbility,
+        abilityContext,
+        attributeScaleContext,
+        ...persistedEffect
+      } = effect;
+      let finalizedEffect = {
         ...persistedEffect,
         casterLevel: fromAbility
           ? abilityContext?.characterLevel || casterLevel
@@ -1547,26 +1817,74 @@
         computedDuration: calculatedDuration,
         durationLabel: appliedDurationLabel,
       };
+      finalizedEffect =
+        window.PFEffectMechanics?.resolveCasterAttributeScales?.(
+          finalizedEffect,
+          casterAttributeContext,
+        ) || finalizedEffect;
 
-      const needsChoice = [
-        ...(finalizedEffect.bonuses || []),
-        ...(finalizedEffect.classSkillGrants || []),
-        ...(finalizedEffect.bonusRanks || []),
-      ].some((item) => window.PFEffectStats?.isChoiceStat(item.stat)) ||
-        this.conditionalVariables(finalizedEffect).length > 0 ||
-        this.effectNeedsFavoredEnemyScaleChoice(finalizedEffect) ||
-        (finalizedEffect.spellLikeAbilities || []).some((entry) =>
+      const branchNeeded =
+        window.PFEffectMechanics?.hasBranches?.(finalizedEffect) || false;
+      const nestedChoiceNeeded = (candidate) =>
+        [
+          ...(candidate.bonuses || []),
+          ...(candidate.classSkillGrants || []),
+          ...(candidate.bonusRanks || []),
+        ].some((item) => window.PFEffectStats?.isChoiceStat(item.stat)) ||
+        this.conditionalVariables(candidate).length > 0 ||
+        this.effectNeedsFavoredEnemyScaleChoice(candidate) ||
+        (candidate.spellLikeAbilities || []).some((entry) =>
           this.spellLikeChoiceList(entry),
         ) ||
-        this.spellAdjustmentEntriesNeedChoice(finalizedEffect.casterLevelBonuses) ||
-        this.spellAdjustmentEntriesNeedChoice(finalizedEffect.spellDcBonuses) ||
+        this.spellAdjustmentEntriesNeedChoice(candidate.casterLevelBonuses) ||
+        this.spellAdjustmentEntriesNeedChoice(candidate.spellDcBonuses) ||
         this.spellAdjustmentEntriesNeedChoice(
-          finalizedEffect.effectiveAttributeBonuses,
+          candidate.effectiveAttributeBonuses,
         ) ||
-        this.grantDomainEntriesNeedChoice(finalizedEffect.grantDomains) ||
-        this.choicePools(finalizedEffect).length > 0;
-      if (needsChoice && this.options.isOwnCharacter === false) {
+        this.grantDomainEntriesNeedChoice(candidate.grantDomains) ||
+        this.choicePools(candidate).length > 0;
+      if (
+        (branchNeeded || nestedChoiceNeeded(finalizedEffect)) &&
+        this.options.isOwnCharacter === false &&
+        !Number.isInteger(selection.replaceIndex)
+      ) {
+        finalizedEffect = await this.resolveDamageRolls(
+          finalizedEffect,
+          casterLevel,
+          casterAttributeContext,
+        );
+        if (!finalizedEffect) return;
         await this.requestEffectChoice(finalizedEffect);
+        return;
+      }
+      if (branchNeeded) {
+        finalizedEffect = await window.PFEffectMechanics.chooseBranch(
+          finalizedEffect,
+          { title: finalizedEffect.name || "Effect" },
+        );
+        if (!finalizedEffect) return;
+      }
+      if (!Number.isInteger(selection.replaceIndex)) {
+        finalizedEffect = await this.resolveDamageRolls(
+          finalizedEffect,
+          casterLevel,
+          casterAttributeContext,
+        );
+        if (!finalizedEffect) return;
+      }
+      if (!hasPersistentEffectMechanics(finalizedEffect)) {
+        bootstrap.Modal.getInstance(this.pickerModalEl)?.hide();
+        return;
+      }
+
+      if (
+        finalizedEffect.auraConfig?.enabled &&
+        typeof this.options.onAuraActivate === "function"
+      ) {
+        const created = await this.options.onAuraActivate(finalizedEffect);
+        if (created) {
+          bootstrap.Modal.getInstance(this.pickerModalEl)?.hide();
+        }
         return;
       }
 
@@ -1651,11 +1969,29 @@
       const variableResolvedEffect =
         await this.resolveConditionalVariables(activeEffect);
       if (variableResolvedEffect === null) return;
-      const activeEffects = await this.expandAppliedConditions(
-        variableResolvedEffect,
+      const scaleResolvedEffect =
+        window.PFEffectMechanics?.resolveCasterAttributeScales?.(
+          variableResolvedEffect,
+          casterAttributeContext,
+        ) || variableResolvedEffect;
+      let activeEffects = await this.expandAppliedConditions(
+        scaleResolvedEffect,
       );
-      for (const nextEffect of activeEffects) {
-        await this.addActiveEffectWithFearEscalation(nextEffect);
+      if (selection.runtime && typeof selection.runtime === "object") {
+        activeEffects = activeEffects.map((nextEffect) => ({
+          ...nextEffect,
+          ...selection.runtime,
+          selectedBranchId: nextEffect.selectedBranchId,
+          selectedBranchName: nextEffect.selectedBranchName,
+          branchSource: nextEffect.branchSource,
+        }));
+      }
+      if (Number.isInteger(selection.replaceIndex)) {
+        this.active.splice(selection.replaceIndex, 1, ...activeEffects);
+      } else {
+        for (const nextEffect of activeEffects) {
+          await this.addActiveEffectWithFearEscalation(nextEffect);
+        }
       }
       this.renderActive();
       this.notifyChange();
@@ -1720,34 +2056,44 @@
         }
         this._watchedRequests.add(requestId);
         const status = document.getElementById(`${this.prefix}RequestStatus`);
-        if (result.status === "resolved" && Array.isArray(result.resolved_bonuses)) {
-          const resolvedSpellLikeAbilities =
-            await this.resolveSpellLikeAbilityChoices(
-              finalizedEffect.spellLikeAbilities,
-              finalizedEffect,
-            );
-          if (resolvedSpellLikeAbilities === null) return;
-          const activeEffects = await this.expandAppliedConditions({
-            ...finalizedEffect,
-            bonuses: result.resolved_bonuses,
-            ...(resolvedSpellLikeAbilities.length
-              ? { spellLikeAbilities: resolvedSpellLikeAbilities }
-              : {}),
-          });
-          for (const nextEffect of activeEffects) {
-            await this.addActiveEffectWithFearEscalation(nextEffect);
-          }
+        if (result.status === "resolved") {
+          const saved = this.options.loadActiveEffects
+            ? await this.options.loadActiveEffects()
+            : await PFApp.loadBuffState(
+                this.options.contextKey,
+                this.options.characterId,
+              );
+          this.active = Array.isArray(saved) ? saved : saved?.buffs || [];
           this.renderActive();
           this.notifyChange();
-          this.queueSave();
           if (status)
-            status.textContent = `"${finalizedEffect.name || "Effect"}" applied -- the player chose their target.`;
+            status.textContent = `"${finalizedEffect.name || "Effect"}" applied -- the player completed their choices.`;
         } else if (status) {
           status.textContent = `"${finalizedEffect.name || "Effect"}" request was cancelled.`;
         }
         if (status) setTimeout(() => status.classList.add("d-none"), 8000);
       };
       poll();
+    }
+
+    async reselectBranch(index) {
+      const current = this.active[index];
+      const source = window.PFEffectMechanics?.branchSource?.(current);
+      if (!source) return;
+      await this.addEffectDefinition(source, {
+        casterLevel: current.casterLevel || 1,
+        turns: current.turns || 1,
+        permanent: Boolean(current.permanent),
+        replaceIndex: index,
+        runtime: {
+          casterLevel: current.casterLevel,
+          turns: current.turns,
+          permanent: current.permanent,
+          remaining: current.remaining,
+          computedDuration: current.computedDuration,
+          durationLabel: current.durationLabel,
+        },
+      });
     }
 
     removeEffect(index) {
@@ -1784,7 +2130,8 @@
     activeAdjustmentControls(effect, index) {
       const needsCl = durationUsesCasterLevel(effect);
       const condition = isCondition(effect);
-      if (!needsCl && !condition) return "";
+      const canReselect = window.PFEffectMechanics?.canReselectBranch?.(effect);
+      if (!needsCl && !condition && !canReselect) return "";
       return `
         <div class="effect-active-adjustments">
           ${
@@ -1805,6 +2152,7 @@
           `
               : ""
           }
+          ${canReselect ? `<button class="btn btn-outline-info btn-sm" type="button" data-reselect-branch="${index}">Change ${escapeHtml(effect.selectedBranchName || "Option")}</button>` : ""}
         </div>
       `;
     }
@@ -1928,6 +2276,13 @@
           )
           .join("");
 
+      this.activeEl
+        .querySelectorAll("[data-reselect-branch]")
+        .forEach((button) => {
+          button.addEventListener("click", () =>
+            this.reselectBranch(Number(button.dataset.reselectBranch)),
+          );
+        });
       this.activeEl
         .querySelectorAll("[data-remove-effect]")
         .forEach((button) => {

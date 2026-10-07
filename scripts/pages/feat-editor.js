@@ -571,6 +571,7 @@ function commitSelectedFeat() {
     effectConfidence: el("featEffectConfidence")?.value || "manual",
     effectNotes: splitLineList(el("featEffectNotes")?.value),
     effects: extras.effects || [],
+    ...(extras.branches?.length ? { branches: extras.branches } : {}),
     damageReduction: extras.damageReduction || [],
     spellResistance: extras.spellResistance || [],
     immunities: extras.immunities || [],
@@ -587,6 +588,7 @@ function commitSelectedFeat() {
     grantDomains: extras.grantDomains || [],
     generatedEquipment: extras.generatedEquipment || [],
     conditionalVariables: extras.conditionalVariables || [],
+    damageRolls: extras.damageRolls || [],
     activeMechanics: extras.activeMechanics,
   });
 

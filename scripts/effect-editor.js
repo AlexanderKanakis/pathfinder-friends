@@ -535,7 +535,7 @@
     return weaponNameCatalogPromise;
   }
 
-  // data: { stat, value, type, stacks, conditional, appliesWhen,
+  // data: { stat, value, maximum?, type, stacks, conditional, appliesWhen,
   // skillName?, weaponTypeRestriction?, weaponNameRestriction?, bonusScale? }. options: { onDelete, skills, effectStats,
   // titleCaseStat } -- same meaning as bonusStatOptionsHtml's options,
   // plus onDelete (called after the row removes itself).
@@ -591,6 +591,10 @@
       <div class="effect-value-field">
         <label>Value</label>
         <input data-effect-field="value" class="form-control form-control-sm" type="number" value="${data.value ?? 0}">
+      </div>
+      <div class="effect-maximum-field">
+        <label>Maximum</label>
+        <input data-effect-field="maximum" class="form-control form-control-sm" type="number" value="${data.maximum ?? data.max ?? ""}" placeholder="No maximum">
       </div>
       <div class="effect-type-field">
         <label>Type</label>
@@ -698,6 +702,11 @@
           Boolean(appliesWhen),
         appliesWhen,
       };
+      const maximum = row
+        .querySelector('[data-effect-field="maximum"]')
+        .value.trim();
+      if (maximum !== "" && Number.isFinite(Number(maximum)))
+        effect.maximum = Number(maximum);
       if (
         window.PFEffectStats?.isAttackOrDamageStat?.(effect.stat) ||
         /^(?:(?:melee|ranged) )?(?:attack|damage)$/i.test(effect.stat)
@@ -860,7 +869,6 @@
           <div class="modal-content bg-dark text-white border-secondary">
             <div class="modal-header">
               <h5 class="modal-title">Bonus Scale</h5>
-              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
               <div class="row g-2 mb-3">
@@ -905,6 +913,18 @@
                 <label class="form-check-label" for="${SCALE_MODAL_ID}MinOne">Minimum 1 (never rounds down to 0)</label>
               </div>
               <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
+                <div class="small text-secondary">Attribute Bonuses</div>
+                <button id="${SCALE_MODAL_ID}AddAttribute" class="btn btn-outline-info btn-sm" type="button">Add Attribute Bonus</button>
+              </div>
+              <div class="mb-2">
+                <label for="${SCALE_MODAL_ID}AttributeSource">Attribute Modifier From</label>
+                <select id="${SCALE_MODAL_ID}AttributeSource" class="form-select form-select-sm">
+                  <option value="caster">Caster at cast / activation</option>
+                  <option value="recipient">Recipient</option>
+                </select>
+              </div>
+              <div id="${SCALE_MODAL_ID}AttributeRows" class="vstack gap-2 mb-3"></div>
+              <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
                 <div class="small text-secondary">Milestones</div>
                 <button id="${SCALE_MODAL_ID}AddMilestone" class="btn btn-outline-info btn-sm" type="button">Add Milestone</button>
               </div>
@@ -939,6 +959,9 @@
       </div>
     `;
     document.body.appendChild(wrapper.firstElementChild);
+    document
+      .getElementById(`${SCALE_MODAL_ID}AddAttribute`)
+      .addEventListener("click", () => addScaleAttributeRow());
     document
       .getElementById(`${SCALE_MODAL_ID}AddMilestone`)
       .addEventListener("click", () => addScaleMilestoneRow());
@@ -1000,7 +1023,60 @@
     rows.appendChild(row);
   }
 
+  function addScaleAttributeRow(data = {}) {
+    const rows = document.getElementById(`${SCALE_MODAL_ID}AttributeRows`);
+    const row = document.createElement("div");
+    row.className = "shared-scale-row row g-2 align-items-end";
+    const ability = String(data.ability || data.attribute || "CON").toUpperCase();
+    row.innerHTML = `
+      <div class="col-sm-5">
+        <label>Attribute Bonus</label>
+        <select data-scale-attribute-field="ability" class="form-select form-select-sm">
+          ${["STR", "DEX", "CON", "INT", "WIS", "CHA"]
+            .map((option) => `<option value="${option}" ${ability === option ? "selected" : ""}>${option}</option>`)
+            .join("")}
+        </select>
+      </div>
+      <div class="col-sm-3">
+        <label>Numerator</label>
+        <input data-scale-attribute-field="numerator" class="form-control form-control-sm" type="number" min="1" value="${data.numerator ?? 1}">
+      </div>
+      <div class="col-sm-3">
+        <label>Denominator</label>
+        <input data-scale-attribute-field="denominator" class="form-control form-control-sm" type="number" min="1" value="${data.denominator ?? 1}">
+      </div>
+      <div class="col-sm-1">
+        <button class="btn btn-outline-danger btn-sm w-100" type="button" aria-label="Delete attribute bonus"><i class="bi bi-trash"></i></button>
+      </div>
+    `;
+    row.querySelector("button").addEventListener("click", () => row.remove());
+    rows.appendChild(row);
+  }
+
   function collectScale() {
+    const attributeBonuses = [
+      ...document.querySelectorAll(
+        `#${SCALE_MODAL_ID}AttributeRows .shared-scale-row`,
+      ),
+    ].map((row) => ({
+      ability:
+        row.querySelector('[data-scale-attribute-field="ability"]')?.value ||
+        "CON",
+      numerator: Math.max(
+        1,
+        Number(
+          row.querySelector('[data-scale-attribute-field="numerator"]')?.value ||
+            1,
+        ),
+      ),
+      denominator: Math.max(
+        1,
+        Number(
+          row.querySelector('[data-scale-attribute-field="denominator"]')?.value ||
+            1,
+        ),
+      ),
+    }));
     const milestones = [
       ...document.querySelectorAll(`#${SCALE_MODAL_ID}Rows .shared-scale-row`),
     ]
@@ -1058,7 +1134,10 @@
     const multiplierNumerator = Number(multiplierNumeratorInput);
     const multiplierDenominator = Number(multiplierDenominatorInput);
     const hasOtherScaling =
-      milestones.length > 0 || skillRankThresholds.length > 0 || Boolean(every);
+      attributeBonuses.length > 0 ||
+      milestones.length > 0 ||
+      skillRankThresholds.length > 0 ||
+      Boolean(every);
     const isDefaultMultiplier =
       multiplierNumerator === 1 && multiplierDenominator === 1;
     const levelMultiplier =
@@ -1069,6 +1148,7 @@
         : null;
     const minimumOne = document.getElementById(`${SCALE_MODAL_ID}MinOne`).checked;
     if (
+      !attributeBonuses.length &&
       !milestones.length &&
       !skillRankThresholds.length &&
       !every &&
@@ -1080,8 +1160,16 @@
     const source = window.PFEffectMeta?.sourceFromSelect
       ? window.PFEffectMeta.sourceFromSelect(sourceSelect?.value || "caster")
       : { type: sourceSelect?.value || "caster" };
+    const attributeSource =
+      document.getElementById(`${SCALE_MODAL_ID}AttributeSource`)?.value ===
+      "recipient"
+        ? "recipient"
+        : "caster";
     return {
       source,
+      ...(attributeBonuses.length
+        ? { attributeBonuses, attributeSource }
+        : {}),
       milestones,
       ...(skillRankThresholds.length ? { skillRankThresholds } : {}),
       every,
@@ -1114,9 +1202,19 @@
           document.getElementById(`${SCALE_MODAL_ID}MinOne`).checked = Boolean(
             scale.minimumOne,
           );
+          document.getElementById(`${SCALE_MODAL_ID}AttributeSource`).value =
+            window.PFEffectMechanics?.attributeScaleSource?.(scale) || "caster";
+          document.getElementById(`${SCALE_MODAL_ID}AttributeRows`).innerHTML =
+            "";
           document.getElementById(`${SCALE_MODAL_ID}Rows`).innerHTML = "";
           document.getElementById(`${SCALE_MODAL_ID}SkillRankRows`).innerHTML =
             "";
+          const attributeBonuses = Array.isArray(scale.attributeBonuses)
+            ? scale.attributeBonuses
+            : scale.attributeBonus
+              ? [scale.attributeBonus]
+              : [];
+          attributeBonuses.forEach((entry) => addScaleAttributeRow(entry));
           const milestones = Array.isArray(scale.milestones)
             ? scale.milestones
             : [];
@@ -1197,6 +1295,26 @@
     if (!scale) return "";
     const parts = [];
     const source = scaleSourceLabel(scale.source || { type: "caster" });
+    const attributeBonuses = Array.isArray(scale.attributeBonuses)
+      ? scale.attributeBonuses
+      : scale.attributeBonus
+        ? [scale.attributeBonus]
+        : [];
+    const attributeOwner =
+      (window.PFEffectMechanics?.attributeScaleSource?.(scale) || "caster") ===
+      "recipient"
+        ? "recipient's"
+        : "caster's";
+    attributeBonuses.forEach((entry) => {
+      const ability = String(entry.ability || entry.attribute || "CON").toUpperCase();
+      const numerator = Math.max(1, Number(entry.numerator ?? 1) || 1);
+      const denominator = Math.max(1, Number(entry.denominator ?? 1) || 1);
+      parts.push(
+        numerator === 1 && denominator === 1
+          ? `${attributeOwner} ${ability} modifier`
+          : `${attributeOwner} ${ability} modifier x ${numerator}/${denominator}`,
+      );
+    });
     if (scale.levelMultiplier) {
       parts.push(
         `${levelMultiplierText(scale.levelMultiplier)} ${source} (round down)`,
@@ -1330,7 +1448,7 @@
   function createSrRow(data = {}, { onDelete } = {}) {
     const row = document.createElement("div");
     row.className = "shared-sr-row class-feature-sr-row";
-    const appliesWhen = data.appliesWhen || data.condition || "";
+    const appliesWhen = data.appliesWhen || "";
     const conditional =
       Boolean(String(appliesWhen).trim()) || Boolean(data.conditional);
     row.innerHTML = `
@@ -1393,7 +1511,7 @@
   function createImmunityRow(data = {}, { onDelete } = {}) {
     const row = document.createElement("div");
     row.className = "shared-immunity-row";
-    const appliesWhen = data.appliesWhen || data.condition || "";
+    const appliesWhen = data.appliesWhen || "";
     const conditional =
       Boolean(String(appliesWhen).trim()) || Boolean(data.conditional);
     row.innerHTML = `
@@ -3042,7 +3160,7 @@
     const row = document.createElement("div");
     row.className = "shared-spell-adjustment-row";
     const isCasterLevel = kind === "casterLevel";
-    const appliesWhen = data.appliesWhen || data.condition || "";
+    const appliesWhen = data.appliesWhen || "";
     const conditional =
       Boolean(String(appliesWhen).trim()) || Boolean(data.conditional);
     row.innerHTML = `
@@ -3627,11 +3745,11 @@
     row.querySelector('[data-generated-equipment-field="name"]').value =
       item.name || item.item || "";
     row.querySelector('[data-generated-equipment-field="weaponType"]').value =
-      details.weaponType === "Natural" ? "Natural Weapon" : details.weaponType || "Natural Weapon";
+      details.weaponType || "Natural Weapon";
     row.querySelector('[data-generated-equipment-field="naturalAttackKind"]').value =
-      details.naturalAttackKind || details.natural_attack_kind || "Other";
+      details.naturalAttackKind || "Other";
     row.querySelector('[data-generated-equipment-field="naturalAttackRole"]').value =
-      details.naturalAttackRole || details.natural_attack_role || "Primary";
+      details.naturalAttackRole || "Primary";
     row.querySelector('[data-generated-equipment-field="attackScale"]').value =
       details.attackScale || "STR";
     row.querySelector('[data-generated-equipment-field="damageScale"]').value =
@@ -3641,9 +3759,9 @@
     row.querySelector('[data-generated-equipment-field="critical"]').value =
       details.critical || "";
     row.querySelector('[data-generated-equipment-field="attackMisc"]').value =
-      details.attackMisc || details.attack_misc || "0";
+      details.attackMisc || "0";
     row.querySelector('[data-generated-equipment-field="damageMisc"]').value =
-      details.damageMisc || details.damage_misc || "0";
+      details.damageMisc || "0";
     row.querySelector('[data-generated-equipment-field="range"]').value =
       details.range || "";
     row.querySelector('[data-generated-equipment-field="armorBonus"]').value =
@@ -3700,19 +3818,19 @@
         <div>
           <label>Weapon Type</label>
           <select data-generated-equipment-field="weaponType" class="form-select form-select-sm">
-            ${weaponTypeOptionsHtml(details.weaponType === "Natural" ? "Natural Weapon" : details.weaponType || "Natural Weapon")}
+            ${weaponTypeOptionsHtml(details.weaponType || "Natural Weapon")}
           </select>
         </div>
         <div data-generated-equipment-natural-field>
           <label>Natural Attack</label>
           <select data-generated-equipment-field="naturalAttackKind" class="form-select form-select-sm">
-            ${simpleOptionsHtml(NATURAL_ATTACK_KINDS, details.naturalAttackKind || details.natural_attack_kind || "Other")}
+            ${simpleOptionsHtml(NATURAL_ATTACK_KINDS, details.naturalAttackKind || "Other")}
           </select>
         </div>
         <div data-generated-equipment-natural-field>
           <label>Attack Type</label>
           <select data-generated-equipment-field="naturalAttackRole" class="form-select form-select-sm">
-            ${simpleOptionsHtml(NATURAL_ATTACK_ROLES, details.naturalAttackRole || details.natural_attack_role || "Primary")}
+            ${simpleOptionsHtml(NATURAL_ATTACK_ROLES, details.naturalAttackRole || "Primary")}
           </select>
         </div>
         <div>
@@ -3781,10 +3899,10 @@
       row
         .querySelector("[data-generated-equipment-armor-fields]")
         .classList.toggle("d-none", selected === "Weapon");
-      const natural = selected === "Weapon" &&
-        ["Natural", "Natural Weapon"].includes(
-          row.querySelector('[data-generated-equipment-field="weaponType"]').value,
-        );
+      const natural =
+        selected === "Weapon" &&
+        row.querySelector('[data-generated-equipment-field="weaponType"]').value ===
+          "Natural Weapon";
       row
         .querySelectorAll("[data-generated-equipment-natural-field]")
         .forEach((field) => field.classList.toggle("d-none", !natural));
@@ -4000,6 +4118,141 @@
     return { element: row, collect };
   }
 
+function damageDieOptions(selected = 6) {
+  return [2, 3, 4, 6, 8, 10, 12, 20, 100]
+    .map(
+      (sides) =>
+        `<option value="${sides}"${Number(selected) === sides ? " selected" : ""}>d${sides}</option>`,
+    )
+    .join("");
+}
+
+function damageProfileMarkup(data = {}, { conditional = false } = {}) {
+  const maximum = (value) =>
+    value === null || value === undefined || value === "" ? "" : Number(value);
+  return `
+    <div class="shared-damage-profile${conditional ? " is-conditional" : ""}" data-damage-profile>
+      ${
+        conditional
+          ? `<div class="shared-damage-condition-heading">
+              <div><label>Profile Name</label><input class="form-control form-control-sm" data-damage-field="label" value="${escapeHtml(data.label || "")}" placeholder="Undead"></div>
+              <div><label>Applies When</label><input class="form-control form-control-sm" data-damage-field="appliesWhen" value="${escapeHtml(data.appliesWhen || "")}" placeholder="Target is undead"></div>
+              <button class="btn btn-outline-danger btn-sm btn-icon" type="button" data-delete-damage-profile aria-label="Delete conditional damage"><i class="bi bi-trash"></i></button>
+            </div>`
+          : `<div class="small text-secondary mb-2">Standard damage</div>`
+      }
+      <div class="shared-damage-profile-grid">
+        <div><label>Number of Dice</label><input class="form-control form-control-sm" type="number" min="0" data-damage-field="diceCount" value="${Math.max(0, Number(data.diceCount || 0))}"></div>
+        <div><label>Die</label><select class="form-select form-select-sm" data-damage-field="dieType">${damageDieOptions(data.dieType || 6)}</select></div>
+        <div><label>Maximum Dice</label><input class="form-control form-control-sm" type="number" min="0" data-damage-field="diceCountMax" value="${maximum(data.diceCountMax)}" placeholder="No maximum"></div>
+        <div><label>Static Damage</label><input class="form-control form-control-sm" type="number" data-damage-field="staticDamage" value="${Number(data.staticDamage || 0)}"></div>
+        <div><label>Maximum Static</label><input class="form-control form-control-sm" type="number" min="0" data-damage-field="staticDamageMax" value="${maximum(data.staticDamageMax)}" placeholder="No maximum"></div>
+        <div><label>Damage Type</label><input class="form-control form-control-sm" list="sharedDamageTypes" data-damage-field="damageType" value="${escapeHtml(data.damageType || "untyped")}" placeholder="fire"></div>
+      </div>
+      <div class="shared-damage-scale-row">
+        <div data-damage-scale-host="dice"><button class="btn btn-outline-info btn-sm" type="button" data-damage-scale-button>Scale Dice</button><span class="small text-secondary" data-damage-scale-summary></span></div>
+        <div data-damage-scale-host="static"><button class="btn btn-outline-info btn-sm" type="button" data-damage-scale-button>Scale Static</button><span class="small text-secondary" data-damage-scale-summary></span></div>
+      </div>
+    </div>`;
+}
+
+function wireDamageProfile(profile, data = {}) {
+  const diceHost = profile.querySelector('[data-damage-scale-host="dice"]');
+  const staticHost = profile.querySelector('[data-damage-scale-host="static"]');
+  wireScaleButton(
+    diceHost,
+    data.diceCountScale || null,
+    diceHost.querySelector("[data-damage-scale-summary]"),
+    diceHost.querySelector("[data-damage-scale-button]"),
+  );
+  wireScaleButton(
+    staticHost,
+    data.staticDamageScale || null,
+    staticHost.querySelector("[data-damage-scale-summary]"),
+    staticHost.querySelector("[data-damage-scale-button]"),
+  );
+}
+
+function collectDamageProfile(profile, { conditional = false } = {}) {
+  const value = (key) =>
+    profile.querySelector(`[data-damage-field="${key}"]`)?.value ?? "";
+  const optionalNumber = (key) => {
+    const raw = value(key);
+    return raw === "" ? null : Number(raw);
+  };
+  const diceHost = profile.querySelector('[data-damage-scale-host="dice"]');
+  const staticHost = profile.querySelector('[data-damage-scale-host="static"]');
+  return {
+    ...(conditional
+      ? {
+          label: value("label").trim() || "Conditional damage",
+          appliesWhen: value("appliesWhen").trim(),
+        }
+      : {}),
+    diceCount: Math.max(0, Number(value("diceCount")) || 0),
+    dieType: Math.max(2, Number(value("dieType")) || 6),
+    diceCountMax: optionalNumber("diceCountMax"),
+    staticDamage: Number(value("staticDamage")) || 0,
+    staticDamageMax: optionalNumber("staticDamageMax"),
+    damageType: value("damageType").trim() || "untyped",
+    diceCountScale: diceHost?._bonusScale || null,
+    staticDamageScale: staticHost?._bonusScale || null,
+  };
+}
+
+function createDamageRollRow(data = {}, { onDelete, onChange } = {}) {
+  const row = document.createElement("div");
+  row.className = "shared-damage-roll-row";
+  row.innerHTML = `
+    <div class="shared-damage-roll-heading">
+      <div><label>Roll Name</label><input class="form-control form-control-sm" data-damage-roll-label value="${escapeHtml(data.label || "Damage")}" placeholder="Ray damage"></div>
+      <button class="btn btn-outline-danger btn-sm btn-icon" type="button" data-delete-damage-roll aria-label="Delete damage roll"><i class="bi bi-trash"></i></button>
+    </div>
+    <div data-damage-standard>${damageProfileMarkup(data)}</div>
+    <div class="shared-damage-conditionals">
+      <div class="d-flex align-items-center justify-content-between gap-2 mb-2"><span class="small text-secondary">Conditional replacements</span><button class="btn btn-outline-info btn-sm" type="button" data-add-damage-profile>Add Conditional</button></div>
+      <div class="vstack gap-2" data-damage-conditionals></div>
+    </div>`;
+  const standard = row.querySelector("[data-damage-standard] [data-damage-profile]");
+  const conditionalRows = row.querySelector("[data-damage-conditionals]");
+  wireDamageProfile(standard, data);
+  const addConditional = (conditional = {}) => {
+    const wrapper = document.createElement("div");
+    wrapper.innerHTML = damageProfileMarkup(conditional, { conditional: true });
+    const profile = wrapper.firstElementChild;
+    conditionalRows.appendChild(profile);
+    wireDamageProfile(profile, conditional);
+    profile
+      .querySelector("[data-delete-damage-profile]")
+      .addEventListener("click", () => {
+        profile.remove();
+        onChange?.();
+      });
+  };
+  (Array.isArray(data.conditionals) ? data.conditionals : []).forEach(addConditional);
+  row.querySelector("[data-add-damage-profile]").addEventListener("click", () => {
+    addConditional();
+    onChange?.();
+  });
+  row.querySelector("[data-delete-damage-roll]").addEventListener("click", () => {
+    row.remove();
+    onDelete?.();
+  });
+  row.addEventListener("input", () => onChange?.());
+  row.addEventListener("change", () => onChange?.());
+  row.querySelectorAll("[data-damage-scale-button]").forEach((button) =>
+    button.addEventListener("click", () => onChange?.()),
+  );
+  row._collect = () => ({
+    label: row.querySelector("[data-damage-roll-label]").value.trim() || "Damage",
+    ...collectDamageProfile(standard),
+    conditionals: [...conditionalRows.querySelectorAll(":scope > [data-damage-profile]")].map(
+      (profile) => collectDamageProfile(profile, { conditional: true }),
+    ),
+  });
+  return { element: row, collect: row._collect };
+}
+
   // DR, Immunities, SR, applied conditions, Class Skill grants, bonus feats,
   // Size Changes, caster level/DC bonuses, Spell-Like Abilities, and generated equipped weapons/armor
   // are separate things but they're always authored together and rarely
@@ -4039,6 +4292,14 @@
         </h2>
         <div id="${prefix}Panel" class="accordion-collapse collapse"${parentAttr}>
           <div class="accordion-body">
+            <datalist id="sharedDamageTypes"><option value="acid"><option value="bludgeoning"><option value="cold"><option value="electricity"><option value="fire"><option value="force"><option value="light"><option value="negative energy"><option value="piercing"><option value="positive energy"><option value="precision"><option value="slashing"><option value="sonic"><option value="untyped"></datalist>
+            <div class="shared-extra-subsection">
+              <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
+                <div class="small text-secondary">Damage</div>
+                <button id="${prefix}AddDamageRoll" class="btn btn-outline-info btn-sm" type="button">Add Damage Roll</button>
+              </div>
+              <div id="${prefix}DamageRollRows" class="vstack gap-2"></div>
+            </div>
             <div class="shared-extra-subsection">
               <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
                 <div class="small text-secondary">Damage Reduction</div>
@@ -4162,6 +4423,7 @@
       </div>
     `;
 
+    const damageRollRowsEl = document.getElementById(`${prefix}DamageRollRows`);
     const drRowsEl = document.getElementById(`${prefix}DrRows`);
     const srRowsEl = document.getElementById(`${prefix}SrRows`);
     const immunityRowsEl = document.getElementById(`${prefix}ImmunityRows`);
@@ -4204,6 +4466,7 @@
 
     const updateCount = () => {
       const count =
+        damageRollRowsEl.children.length +
         drRowsEl.children.length +
         srRowsEl.children.length +
         immunityRowsEl.children.length +
@@ -4228,6 +4491,14 @@
       options.onChange?.();
     };
 
+    const addDamageRoll = (data = {}) => {
+      const { element } = createDamageRollRow(data, {
+        onDelete: updateCount,
+        onChange: updateCount,
+      });
+      damageRollRowsEl.appendChild(element);
+      updateCount();
+    };
     const addDr = (data = {}) => {
       const { element } = createDrRow(data, { onDelete: updateCount });
       drRowsEl.appendChild(element);
@@ -4352,6 +4623,9 @@
     };
 
     document
+      .getElementById(`${prefix}AddDamageRoll`)
+      .addEventListener("click", () => addDamageRoll());
+    document
       .getElementById(`${prefix}AddDr`)
       .addEventListener("click", () => addDr());
     document
@@ -4404,6 +4678,7 @@
       .addEventListener("click", () => addConditionalVariable());
 
     return {
+      addDamageRoll,
       addDr,
       addSr,
       addImmunity,
@@ -4421,6 +4696,7 @@
       addGeneratedEquipment,
       addConditionalVariable,
       reset(item = {}) {
+        damageRollRowsEl.innerHTML = "";
         drRowsEl.innerHTML = "";
         srRowsEl.innerHTML = "";
         immunityRowsEl.innerHTML = "";
@@ -4438,6 +4714,9 @@
         generatedEquipmentRowsEl.innerHTML = "";
         conditionalVariableRowsEl.innerHTML = "";
         specialToggleRowsEl.innerHTML = "";
+        (Array.isArray(item.damageRolls) ? item.damageRolls : []).forEach(
+          addDamageRoll,
+        );
         (Array.isArray(item.damageReduction) ? item.damageReduction : []).forEach(
           addDr,
         );
@@ -4503,6 +4782,7 @@
       },
       collect() {
         return {
+          damageRolls: collectRows(damageRollRowsEl),
           damageReduction: collectRows(drRowsEl),
           spellResistance: collectRows(srRowsEl),
           immunities: collectRows(immunityRowsEl),
@@ -4639,6 +4919,7 @@
 
     return {
       addEffect,
+      addDamageRoll: extra.addDamageRoll,
       addDr: extra.addDr,
       addSr: extra.addSr,
       addImmunity: extra.addImmunity,
@@ -4684,31 +4965,192 @@
   function mountMechanicGroups(container, options = {}) {
     const prefix = options.idPrefix;
     const activeOnly = Boolean(options.activeOnly);
+    const auraControls = (group) => `
+      <div class="d-flex align-items-center gap-2">
+        <label class="form-check form-switch mb-0 d-flex align-items-center gap-2">
+          <input id="${prefix}${group}Aura" class="form-check-input" type="checkbox">
+          <span class="form-check-label">Aura</span>
+        </label>
+        <label id="${prefix}${group}AuraRangeWrap" class="d-none d-flex align-items-center gap-1 mb-0">
+          <span class="small-text">Range</span>
+          <input id="${prefix}${group}AuraRange" class="form-control form-control-sm" type="number" min="5" step="5" value="5" style="width:5.5rem">
+          <span class="small-text">ft.</span>
+        </label>
+      </div>`;
     container.innerHTML = `
-      ${activeOnly ? "" : `<section class="shared-mechanic-group"><strong class="d-block mb-2">Passive</strong><div id="${prefix}Passive"></div></section>`}
+      ${activeOnly ? "" : `<section class="shared-mechanic-group"><div class="d-flex justify-content-between align-items-center gap-2 mb-2"><strong>Passive</strong><div class="d-flex align-items-center gap-2">${auraControls("Passive")}${options.allowBranches === false ? "" : `<button id="${prefix}PassiveCreateBranch" class="btn btn-outline-info btn-sm" type="button">Create Branch</button>`}</div></div><div id="${prefix}Passive"></div></section>`}
       <section class="shared-mechanic-group">
         <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
           <strong>Active</strong>
-          <div class="d-flex align-items-center gap-2">
+          <div class="d-flex align-items-center gap-2 flex-wrap justify-content-end">
+            ${auraControls("Active")}
             <button id="${prefix}EditDuration" class="btn btn-outline-light btn-sm" type="button">Edit Duration</button>
+            ${options.allowBranches === false ? "" : `<button id="${prefix}ActiveCreateBranch" class="btn btn-outline-info btn-sm" type="button">Create Branch</button>`}
             <span id="${prefix}DurationSummary" class="small-text"></span>
           </div>
         </div>
         <div id="${prefix}Active"></div>
       </section>`;
 
+    const newBranchId = () =>
+      globalThis.crypto?.randomUUID?.() ||
+      `branch-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const mechanicsOnly = (item = {}) =>
+      window.PFEffectMechanics?.copyMechanics?.(item) || item;
+
+    function mountBranchingGroup(group, hostId) {
+      const host = document.getElementById(hostId);
+      let baseEditor = null;
+      let branchEditors = [];
+      let branchState = [];
+      let renderSequence = 0;
+
+      const mountEditor = (mount, suffix) =>
+        mountEffectsAccordion(mount, {
+          ...options,
+          idPrefix: `${prefix}${group}Mechanics${suffix}`,
+        });
+
+      const currentBranches = () =>
+        branchEditors.map(({ id, nameInput, editor }, index) => ({
+          id,
+          name: nameInput.value.trim() || `Option ${index + 1}`,
+          ...editor.collect(),
+        }));
+
+      const renderBase = (data = {}) => {
+        branchState = [];
+        branchEditors = [];
+        renderSequence += 1;
+        host.innerHTML = `<div id="${prefix}${group}Base${renderSequence}"></div>`;
+        baseEditor = mountEditor(
+          document.getElementById(`${prefix}${group}Base${renderSequence}`),
+          `Base${renderSequence}`,
+        );
+        baseEditor.reset(data);
+      };
+
+      const renderBranches = (rows = []) => {
+        branchState = rows.map((branch, index) => ({
+          ...branch,
+          id: String(branch.id || newBranchId()),
+          name: String(branch.name || `Option ${index + 1}`),
+        }));
+        baseEditor = null;
+        branchEditors = [];
+        renderSequence += 1;
+        host.innerHTML = branchState
+          .map(
+            (branch, index) => `
+              <section class="shared-mechanic-branch" data-branch-index="${index}">
+                <div class="shared-mechanic-branch-header">
+                  <label class="form-label mb-0" for="${prefix}${group}BranchName${renderSequence}_${index}">Option name</label>
+                  <input id="${prefix}${group}BranchName${renderSequence}_${index}" class="form-control form-control-sm" value="${escapeHtml(branch.name)}">
+                  <button class="btn btn-outline-danger btn-sm btn-icon" type="button" data-delete-branch="${index}" aria-label="Delete branch"><i class="bi bi-trash"></i></button>
+                </div>
+                <div id="${prefix}${group}BranchMount${renderSequence}_${index}"></div>
+              </section>`,
+          )
+          .join("");
+        branchState.forEach((branch, index) => {
+          const editor = mountEditor(
+            document.getElementById(
+              `${prefix}${group}BranchMount${renderSequence}_${index}`,
+            ),
+            `Branch${renderSequence}_${index}`,
+          );
+          editor.reset(branch);
+          const nameInput = document.getElementById(
+            `${prefix}${group}BranchName${renderSequence}_${index}`,
+          );
+          nameInput.addEventListener("input", () => options.onChange?.());
+          branchEditors.push({ id: branch.id, nameInput, editor });
+        });
+        host.querySelectorAll("[data-delete-branch]").forEach((button) => {
+          button.addEventListener("click", () => {
+            const rows = currentBranches();
+            rows.splice(Number(button.dataset.deleteBranch), 1);
+            if (rows.length < 2) renderBase(rows[0] || {});
+            else renderBranches(rows);
+            options.onChange?.();
+          });
+        });
+      };
+
+      const createBranch = () => {
+        const rows = branchEditors.length
+          ? currentBranches()
+          : [
+              {
+                id: newBranchId(),
+                name: "Option 1",
+                ...(baseEditor?.collect() || mechanicsOnly({})),
+              },
+            ];
+        rows.push({
+          id: newBranchId(),
+          name: `Option ${rows.length + 1}`,
+          ...mechanicsOnly({}),
+        });
+        renderBranches(rows);
+        options.onChange?.();
+      };
+
+      document
+        .getElementById(`${prefix}${group}CreateBranch`)
+        ?.addEventListener("click", createBranch);
+      renderBase({});
+
+      return {
+        reset(item = {}) {
+          const rows = window.PFEffectMechanics?.branches?.(item) || [];
+          if (rows.length > 1) renderBranches(rows);
+          else renderBase(item);
+        },
+        collect() {
+          if (branchEditors.length > 1) return { branches: currentBranches() };
+          return baseEditor?.collect() || mechanicsOnly({});
+        },
+      };
+    }
+
     const passive = activeOnly
       ? null
-      : mountEffectsAccordion(document.getElementById(`${prefix}Passive`), {
-          ...options,
-          idPrefix: `${prefix}PassiveMechanics`,
-        });
-    const active = mountEffectsAccordion(
-      document.getElementById(`${prefix}Active`),
-      { ...options, idPrefix: `${prefix}ActiveMechanics` },
-    );
+      : mountBranchingGroup("Passive", `${prefix}Passive`);
+    const active = mountBranchingGroup("Active", `${prefix}Active`);
     let durationConfig = null;
     let durationEditor = null;
+    const auraConfigFor = (group) => {
+      const enabled = document.getElementById(`${prefix}${group}Aura`).checked;
+      if (!enabled) return null;
+      return {
+        enabled: true,
+        rangeFeet: Math.max(
+          5,
+          Number(document.getElementById(`${prefix}${group}AuraRange`).value || 5),
+        ),
+      };
+    };
+    const resetAura = (group, config = null) => {
+      const toggle = document.getElementById(`${prefix}${group}Aura`);
+      const range = document.getElementById(`${prefix}${group}AuraRange`);
+      const wrap = document.getElementById(`${prefix}${group}AuraRangeWrap`);
+      toggle.checked = Boolean(config?.enabled);
+      range.value = Math.max(5, Number(config?.rangeFeet || 5));
+      wrap.classList.toggle("d-none", !toggle.checked);
+    };
+    [activeOnly ? null : "Passive", "Active"].filter(Boolean).forEach((group) => {
+      const toggle = document.getElementById(`${prefix}${group}Aura`);
+      toggle.addEventListener("change", () => {
+        document
+          .getElementById(`${prefix}${group}AuraRangeWrap`)
+          .classList.toggle("d-none", !toggle.checked);
+        options.onChange?.();
+      });
+      document
+        .getElementById(`${prefix}${group}AuraRange`)
+        .addEventListener("input", () => options.onChange?.());
+    });
     const summary = document.getElementById(`${prefix}DurationSummary`);
     const updateDuration = () => {
       summary.textContent = window.PFEffectMeta?.durationLabel
@@ -4736,16 +5178,23 @@
           mechanics?.passiveMechanics?.(item) ||
             (item.activatable ? {} : item),
         );
+        if (!activeOnly) {
+          const passiveData = mechanics?.passiveMechanics?.(item) || item;
+          resetAura("Passive", passiveData.auraConfig);
+        }
         const activeData =
           mechanics?.activeMechanics?.(item, { activeOnly }) ||
           (item.activatable || activeOnly ? item : item.activeMechanics || {});
         active.reset(activeData);
         durationConfig = activeData.durationConfig || null;
+        resetAura("Active", activeData.auraConfig);
         updateDuration();
       },
       collect() {
         const passiveData = passive?.collect() || {};
+        const passiveAura = activeOnly ? null : auraConfigFor("Passive");
         const activeData = active.collect();
+        const activeAura = auraConfigFor("Active");
         const hasActive = window.PFEffectMechanics?.hasAnyMechanics
           ? window.PFEffectMechanics.hasAnyMechanics(activeData)
           : Object.values(activeData).some(
@@ -4753,11 +5202,13 @@
             );
         return {
           ...passiveData,
-          ...(hasActive || durationConfig
+          ...(passiveAura ? { auraConfig: passiveAura } : {}),
+          ...(hasActive || durationConfig || activeAura
             ? {
                 activeMechanics: {
                   ...activeData,
                   ...(durationConfig ? { durationConfig } : {}),
+                  ...(activeAura ? { auraConfig: activeAura } : {}),
                 },
               }
             : {}),
@@ -4774,6 +5225,7 @@
     skillStatOptionsHtml,
     namedSkill,
     skillKey,
+    createDamageRollRow,
     createDrRow,
     createSrRow,
     createImmunityRow,

@@ -382,18 +382,14 @@ function searchItem() {
   const wrapper = elem("search_wrapper");
   wrapper.innerHTML = "";
   const term = val("Search_Item").trim();
-  if (!term) {
-    resetSearch(false);
-    return;
-  }
 
   elem("footer").style.display = "flex";
   wrapper.style.display = "block";
-  const filteredItems = items
-    .filter(
-      (item) => item.dc && (findInName(item, term) || findInDesc(item, term)),
-    )
-    .slice(0, 60);
+  const matchingItems = items.filter(
+    (item) =>
+      item.dc && (!term || findInName(item, term) || findInDesc(item, term)),
+  );
+  const filteredItems = term ? matchingItems.slice(0, 60) : matchingItems;
 
   if (!filteredItems.length) {
     wrapper.innerHTML = `<div class="small text-secondary">No matching alchemical items found.</div>`;
@@ -449,7 +445,7 @@ function searchItemIcon(item) {
 }
 
 function highlight(text, term) {
-  if (!term) return text;
+  if (!term) return escapeHtml(text);
   const escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const regex = new RegExp(`(${escapedTerm})`, "gi");
   return escapeHtml(text).replace(regex, `<span class='text-danger'>$1</span>`);
@@ -491,8 +487,10 @@ function resetSearch(clearInput = true) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  elem("Search_Item").addEventListener("input", searchItem);
-  elem("Search_Item").addEventListener("focus", () => {
-    if (val("Search_Item").trim()) searchItem();
+  const searchInput = elem("Search_Item");
+  searchInput.addEventListener("input", searchItem);
+  searchInput.addEventListener("focus", searchItem);
+  searchInput.addEventListener("click", () => {
+    if (elem("search_wrapper").style.display !== "block") searchItem();
   });
 });

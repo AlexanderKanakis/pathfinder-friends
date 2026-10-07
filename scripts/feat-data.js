@@ -18,6 +18,7 @@
     "grantDomains",
     "generatedEquipment",
     "conditionalVariables",
+    "damageRolls",
   ];
 
   let featDataCache = null;

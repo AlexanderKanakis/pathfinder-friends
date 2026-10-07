@@ -117,10 +117,12 @@ function checkMarkers(results, gateway) {
 function checkGroupedMechanicPayload(results) {
   const source = {
     effects: [{ stat: "ac", value: 1 }],
+    auraConfig: { enabled: true, rangeFeet: 10 },
     activeMechanics: {
       effects: [{ stat: "attack", value: 2 }],
       spellResistance: [{ amount: 11 }],
       durationConfig: { count: 1, unit: "minute" },
+      auraConfig: { enabled: true, rangeFeet: 30 },
     },
   };
   const payload = mechanics.mechanicPayload(source);
@@ -135,6 +137,52 @@ function checkGroupedMechanicPayload(results) {
   }
   if (payload.activeMechanics?.durationConfig?.unit !== "minute") {
     results.push("Grouped mechanic payload: Active duration was not preserved.");
+  }
+  if (payload.auraConfig?.rangeFeet !== 10) {
+    results.push("Grouped mechanic payload: Passive aura configuration was not preserved.");
+  }
+  if (payload.activeMechanics?.auraConfig?.rangeFeet !== 30) {
+    results.push("Grouped mechanic payload: Active aura configuration was not preserved.");
+  }
+}
+
+function checkEffectBranches(results) {
+  const source = {
+    effects: [{ stat: "ac", value: 1 }],
+    branches: [
+      { id: "offense", name: "Offense", effects: [{ stat: "attack", value: 2 }] },
+      { id: "defense", name: "Defense", effects: [{ stat: "ac", value: 3 }] },
+    ],
+    activeMechanics: {
+      branches: [
+        { id: "fire", name: "Fire", damageRolls: [{ damageType: "fire" }] },
+        { id: "cold", name: "Cold", damageRolls: [{ damageType: "cold" }] },
+      ],
+    },
+  };
+  const passive = mechanics.passiveMechanics(source);
+  const active = mechanics.activeMechanics(source);
+  const resolved = mechanics.resolveBranch(passive, "defense");
+  if (!mechanics.hasBranches(passive) || !mechanics.hasBranches(active))
+    results.push("Effect branches: Passive or Active branches were not preserved.");
+  if (resolved?.effects?.length !== 2 || resolved.selectedBranchName !== "Defense")
+    results.push("Effect branches: selected mechanics were not merged correctly.");
+  if (mechanics.hasBranches(resolved))
+    results.push("Effect branches: resolved mechanics still request another branch.");
+  if (!mechanics.canReselectBranch(resolved) || !mechanics.hasBranches(mechanics.branchSource(resolved)))
+    results.push("Effect branches: resolved mechanics cannot reopen their original branch options.");
+
+  const editor = readProjectFile("scripts/effect-editor.js");
+  if (!editor.includes("PassiveCreateBranch") || !editor.includes("ActiveCreateBranch"))
+    results.push("Effect branches: shared Passive/Active editor controls are missing.");
+  for (const file of [
+    "scripts/buff-tracker-widget.js",
+    "modals/pending-effect-choices.js",
+    "scripts/pages/map.js",
+    "scripts/pages/character-sheet.js",
+  ]) {
+    if (!readProjectFile(file).includes("chooseBranch"))
+      results.push(`Effect branches: ${file} does not resolve branch choices.`);
   }
 }
 
@@ -351,7 +399,7 @@ const choiceFunctionGateways = [
   {
     name: "Buff tracker apply-time choice detector",
     file: "scripts/buff-tracker-widget.js",
-    functionName: "addEffect",
+    functionName: "addEffectDefinition",
     keys: promptedChoiceKeys,
   },
   {
@@ -409,7 +457,17 @@ const mechanicGroupGateways = [
   {
     name: "Class feature active runtime",
     file: "scripts/class-feature-abilities.js",
-    markers: ["activeMechanics"],
+    markers: ["activeMechanics", "auraConfig"],
+  },
+  {
+    name: "Aura activation runtime",
+    file: "scripts/pages/map.js",
+    markers: ["installAutomaticAura", "syncTokenPassiveAuras", "advanceAutomaticAuras"],
+  },
+  {
+    name: "Character-sheet aura activation gateway",
+    file: "scripts/buff-tracker-widget.js",
+    markers: ["onAuraActivate", "auraConfig"],
   },
   {
     name: "Bag source and save mechanic propagation",
@@ -426,14 +484,15 @@ const mechanicGroupGateways = [
     markers: [
       "LOOT_MECHANIC_KEYS",
       "effectMechanics",
-      "row.details?.activeMechanics",
-      "itemDetails.activeMechanics = item.activeMechanics",
+      "row.details?.effectMechanics?.activeMechanics",
+      "effectMechanics.activeMechanics = item.activeMechanics",
     ],
   },
 ];
 
 const errors = [];
 checkGroupedMechanicPayload(errors);
+checkEffectBranches(errors);
 checkInventoryActiveAbilityGateway(errors);
 checkMapItemActiveAbilityGateway(errors);
 checkMapEffectGroupNavigation(errors);

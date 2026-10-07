@@ -13,6 +13,7 @@
       rel="stylesheet"
     />
     <link href="css/enemies.css" rel="stylesheet" />
+    <link href="css/modal-rules.css?v=1" rel="stylesheet" />
   </head>
   <body>
     <div id="appNavbar"></div>
@@ -51,12 +52,6 @@
         >
           <div class="modal-header border-secondary">
             <h5 id="enemyModalTitle" class="modal-title">Enemy</h5>
-            <button
-              type="button"
-              class="btn-close btn-close-white d-none"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
           </div>
           <div class="modal-body">
             <input id="enemyId" type="hidden" />
@@ -132,12 +127,6 @@
         >
           <div class="modal-header border-secondary">
             <h5 class="modal-title" id="deleteEnemyModalLabel">Delete Enemy</h5>
-            <button
-              type="button"
-              class="btn-close btn-close-white d-none"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
           </div>
           <div class="modal-body">
             <p class="mb-1">Delete <strong id="deleteEnemyName"></strong>?</p>
@@ -169,7 +158,7 @@
       </div>
     </div>
 
-    <script src="scripts/navbar.js"></script>
+    <script src="scripts/navbar.js?v=responsive-navbar-1"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="scripts/supabase-config.js"></script>
     <script src="scripts/app-supabase.js"></script>
@@ -178,6 +167,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="scripts/weapon-damage-components.js"></script>
     <script src="scripts/pages/enemies.js?v=damage-components-1"></script>
+    <script src="scripts/modal-rules.js?v=1"></script>
   </body>
 </html>
 

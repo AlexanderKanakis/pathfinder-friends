@@ -42,7 +42,7 @@
                 class="btn btn-outline-light btn-sm"
                 data-bs-dismiss="modal"
               >
-                Close
+                Cancel
               </button>
             </div>
           </div>

@@ -37,7 +37,7 @@
     }
 
     mount.innerHTML = `
-      <nav class="navbar navbar-expand-md navbar-dark bg-black border-bottom">
+      <nav class="navbar navbar-expand-xxl navbar-dark bg-black border-bottom">
         <div class="container-fluid">
           <a class="navbar-brand" href="dice-roller.html">PathFriends</a>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
@@ -92,12 +92,36 @@
     style.id = "pf-navbar-styles";
     style.textContent = `
       #navbarMain { min-width: 0; }
-      #navbarMain .navbar-nav { min-width: 0; flex-wrap: wrap; align-items: center; }
-      #navbarMain .nav-link { white-space: normal; line-height: 1.25; }
-      #authNav { min-width: 0; margin-left: auto; justify-content: flex-end; }
-      #authNav .nav-session-controls { min-width: 0; }
-      #authNav .nav-session-field { min-width: 0; }
-      #authNav .nav-session-field select { width: clamp(140px, 16vw, 240px); max-width: 100%; }
+      #navbarMain .navbar-nav {
+        min-width: 0;
+        align-items: flex-start;
+      }
+      #navbarMain .nav-item,
+      #navbarMain .nav-link {
+        width: 100%;
+        text-align: left;
+      }
+      #navbarMain .nav-link {
+        white-space: nowrap;
+        line-height: 1.25;
+      }
+      #authNav {
+        width: 100%;
+        min-width: 0;
+        margin-top: .75rem;
+        justify-content: flex-start;
+        align-items: end !important;
+      }
+      #authNav .nav-session-controls {
+        width: 100%;
+        min-width: 0;
+        flex-wrap: wrap !important;
+      }
+      #authNav .nav-session-field {
+        min-width: 0;
+        flex: 1 1 220px;
+      }
+      #authNav .nav-session-field select { width: 100%; max-width: 100%; }
       #authNav .nav-profile-link span { max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
       input::placeholder,
       textarea::placeholder,
@@ -107,25 +131,19 @@
       }
       @media (min-width: 1400px) {
         #navbarMain .navbar-nav { flex-wrap: nowrap; align-items: center; }
-        #navbarMain .nav-link { white-space: nowrap; }
-        #authNav { flex-wrap: nowrap; align-items: end !important; }
-      }
-      @media (max-width: 1399.98px) {
-        #navbarMain .navbar-nav { display: flex; }
-        #authNav { align-items: end !important; flex: 0 1 auto; }
-        #authNav .nav-session-controls { flex-wrap: nowrap !important; }
+        #navbarMain .nav-item, #navbarMain .nav-link { width: auto; }
+        #authNav {
+          width: auto;
+          margin-top: 0;
+          margin-left: auto;
+          justify-content: flex-end;
+          flex: 0 1 auto;
+          flex-wrap: nowrap;
+        }
+        #authNav .nav-session-controls { width: auto; flex-wrap: nowrap !important; }
         #authNav .nav-session-field { flex: 0 1 190px; }
-        #authNav .nav-session-field select { width: 100%; }
+        #authNav .nav-session-field select { width: clamp(140px, 16vw, 240px); }
         #authNav .nav-profile-link { justify-content: flex-start; flex: 0 0 auto; }
-      }
-      @media (max-width: 850px) {
-        #navbarMain { align-items: stretch; }
-        #navbarMain .navbar-nav { display: flex; width: 100%; align-items: flex-start; text-align: left; }
-        #navbarMain .nav-item, #navbarMain .nav-link { width: 100%; text-align: left; }
-        #authNav, #authNav .nav-session-controls { width: 100%; }
-        #authNav { justify-content: flex-start; margin-top: .75rem; }
-        #authNav .nav-session-controls { flex-wrap: wrap !important; }
-        #authNav .nav-session-field { flex: 1 1 220px; }
       }
     `;
     document.head.appendChild(style);

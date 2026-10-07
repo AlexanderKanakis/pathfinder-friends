@@ -47,7 +47,7 @@
               <div id="calendarHolidayDescription" class="calendar-holiday-description"></div>
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-outline-light btn-sm" data-bs-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-outline-light btn-sm" data-bs-dismiss="modal">Cancel</button>
             </div>
           </div>
         </div>

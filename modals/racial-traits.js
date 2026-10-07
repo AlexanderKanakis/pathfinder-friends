@@ -526,7 +526,7 @@
                 </section>
               </div>
               <div class="modal-footer border-secondary">
-                <button type="button" class="btn btn-outline-light btn-sm" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-outline-light btn-sm" data-bs-dismiss="modal">Cancel</button>
               </div>
             </div>
           </div>

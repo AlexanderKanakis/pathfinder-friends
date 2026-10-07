@@ -321,6 +321,33 @@
     },
   ];
 
+  const EQUIPMENT_POOLS = [
+    {
+      id: "equipped-weapons",
+      label: "Equipped Weapons",
+      kind: "equipment",
+      equipmentKinds: ["weapon"],
+    },
+    {
+      id: "equipped-shields",
+      label: "Equipped Shields",
+      kind: "equipment",
+      equipmentKinds: ["shield"],
+    },
+    {
+      id: "equipped-armor",
+      label: "Equipped Armor",
+      kind: "equipment",
+      equipmentKinds: ["armor"],
+    },
+    {
+      id: "equipped-armor-shields",
+      label: "Equipped Armor / Shields",
+      kind: "equipment",
+      equipmentKinds: ["armor", "shield"],
+    },
+  ];
+
   const CONDITIONAL_VARIABLE_POOLS = [
     {
       id: "ranger-favored-enemies",
@@ -368,6 +395,7 @@
   const BASE_POOLS = [
     ...SKILL_POOLS.map((pool) => ({ ...pool, kind: "skill" })),
     ...STATIC_POOLS.map((pool) => ({ ...pool, kind: "static" })),
+    ...EQUIPMENT_POOLS,
     { id: "weapons-all", label: "All Weapons", kind: "weapon" },
   ];
   const ALL_POOLS = [];
@@ -814,11 +842,195 @@
     return `${name} ${customSkillListIsSkillOnly(normalized) ? "Skills" : "List"}`;
   }
 
+  function equipmentItemKind(item = {}, fallbackKind = "") {
+    const raw = String(
+      item.equipmentKind ||
+        item.kind ||
+        item.type ||
+        item.sourceType ||
+        item.details?.type ||
+        fallbackKind ||
+        "",
+    )
+      .trim()
+      .toLowerCase();
+    if (raw.includes("shield")) return "shield";
+    if (raw.includes("armor")) return "armor";
+    if (raw.includes("weapon")) return "weapon";
+    return fallbackKind;
+  }
+
+  function itemIsExplicitlyUnequipped(item = {}) {
+    const value = item.equipped ?? item.isEquipped ?? item.worn;
+    if (value === undefined || value === null || value === "") return false;
+    if (typeof value === "boolean") return !value;
+    return ["no", "false", "0", "unequipped"].includes(
+      String(value).trim().toLowerCase(),
+    );
+  }
+
+  function normalizeEquippedItems(equipment = {}) {
+    const rows = [];
+    const addRows = (items, fallbackKind) => {
+      (Array.isArray(items) ? items : []).forEach((item, index) => {
+        if (!item || itemIsExplicitlyUnequipped(item)) return;
+        const kind = equipmentItemKind(item, fallbackKind);
+        const name = String(item.name || item.item || item.label || "").trim();
+        if (!kind || !name) return;
+        const sourceId = String(
+          item.sourceLootId || item.source_loot_id || item.id || "",
+        ).trim();
+        const equipmentIndex = Number.isFinite(Number(item.__equipmentIndex))
+          ? Number(item.__equipmentIndex)
+          : index;
+        rows.push({
+          id: sourceId || `${kind}:${slugify(name)}:${equipmentIndex}`,
+          name,
+          kind,
+          sourceLootId: String(
+            item.sourceLootId || item.source_loot_id || "",
+          ).trim(),
+        });
+      });
+    };
+
+    if (Array.isArray(equipment)) addRows(equipment, "");
+    else {
+      addRows(equipment.weapons, "weapon");
+      addRows(equipment.armor, "armor");
+      addRows(equipment.items, "");
+    }
+    return rows;
+  }
+
+  function equipmentChoiceOptions(poolId, equipment = {}) {
+    const pool = poolById(poolId);
+    if (pool?.kind !== "equipment") return [];
+    const allowedKinds = new Set(pool.equipmentKinds || []);
+    return normalizeEquippedItems(equipment)
+      .filter((item) => allowedKinds.has(item.kind))
+      .map((item) => ({
+        value: `equipped:${item.kind}:${slugify(item.name)}:${slugify(item.id)}`,
+        label: item.name,
+        equipmentTarget: { ...item },
+      }));
+  }
+
+  function resolveChoiceStatItem(item = {}, picked = null, options = []) {
+    const value =
+      typeof picked === "object" ? picked?.value : String(picked || "");
+    const option =
+      (picked && typeof picked === "object" ? picked : null) ||
+      (Array.isArray(options)
+        ? options.find((candidate) => String(candidate.value) === value)
+        : null);
+    const resolved = { ...item, stat: value };
+    if (option?.skillName) resolved.skillName = option.skillName;
+    if (option?.equipmentTarget) {
+      resolved.equipmentTarget = { ...option.equipmentTarget };
+      resolved.selectedChoiceLabel = option.label || option.equipmentTarget.name;
+    }
+    return resolved;
+  }
+
+  function equipmentTargetFromBonus(bonus = {}) {
+    if (bonus.equipmentTarget && typeof bonus.equipmentTarget === "object")
+      return { ...bonus.equipmentTarget };
+    const stat = String(bonus.stat || "").trim().toLowerCase();
+    if (!stat.startsWith("equipped:")) return null;
+    const [, kind = "", name = "", id = ""] = stat.split(":");
+    return {
+      kind,
+      name: unslugify(name),
+      id,
+      synthetic: true,
+    };
+  }
+
+  function equipmentTargetMatchesItem(
+    target = {},
+    item = {},
+    fallbackKind = "",
+    index = 0,
+  ) {
+    const candidate = normalizeEquippedItems({
+      [fallbackKind === "weapon" ? "weapons" : "armor"]: [
+        { ...item, __equipmentIndex: index },
+      ],
+    })[0];
+    if (!candidate) return false;
+    const targetKind = String(target.kind || "").toLowerCase();
+    if (targetKind && targetKind !== candidate.kind) return false;
+    const targetSourceId = String(
+      target.sourceLootId || target.source_loot_id || "",
+    ).trim();
+    if (targetSourceId && candidate.sourceLootId)
+      return targetSourceId === candidate.sourceLootId;
+    const targetId = String(target.id || "").trim();
+    if (
+      targetId &&
+      (targetId === candidate.id || slugify(targetId) === slugify(candidate.id))
+    )
+      return true;
+    return slugify(target.name || "") === slugify(candidate.name || "");
+  }
+
+  function resolveEquipmentEnhancement({
+    item = {},
+    fallbackKind = "",
+    index = 0,
+    baseEnhancement = 0,
+    buffs = [],
+    valueForBonus = (bonus) => Number(bonus.value || 0),
+    normalizeValue = (value) => Math.max(0, Number(value || 0)),
+  } = {}) {
+    const base = normalizeValue(baseEnhancement);
+    const candidates = [];
+    (Array.isArray(buffs) ? buffs : []).forEach((buff) => {
+      (Array.isArray(buff?.bonuses) ? buff.bonuses : []).forEach((bonus) => {
+        if (bonus?.conditional) return;
+        const target = equipmentTargetFromBonus(bonus);
+        if (!target) return;
+        if (!equipmentTargetMatchesItem(target, item, fallbackKind, index)) return;
+        const value = normalizeValue(valueForBonus(bonus, buff));
+        if (value <= 0) return;
+        candidates.push({ bonus, buff, value });
+      });
+    });
+    const effect = candidates.reduce(
+      (highest, candidate) => Math.max(highest, candidate.value),
+      0,
+    );
+    const value = Math.max(base, effect);
+    let winnerClaimed = base >= effect;
+    const breakdown = candidates.map((candidate) => {
+      const applied = !winnerClaimed && candidate.value === effect;
+      if (applied) winnerClaimed = true;
+      const overridingValue = Math.max(
+        base,
+        ...candidates
+          .filter((entry) => entry !== candidate)
+          .map((entry) => entry.value),
+      );
+      return {
+        ...candidate.bonus,
+        source: candidate.buff?.name || candidate.buff?.source || "Effect",
+        value: candidate.value,
+        type: "equipment enhancement",
+        applied,
+        detail: applied
+          ? `sets the item's enhancement to +${candidate.value}`
+          : `overridden by enhancement +${overridingValue}`,
+      };
+    });
+    return { base, effect, value, breakdown };
+  }
+
   // skills: optional override list of [name, ability] pairs (or {name,
   // ability} objects) -- pass a character's own allSkills() to include
   // homebrew custom skills; falls back to the base 30 PF skills.
   async function resolveChoicePoolOptions(poolId, options = {}) {
-    const { skills } = options;
+    const { skills, equipment } = options;
     const pool = poolById(poolId) || choicePoolFallbackFromOptions(poolId, options);
     if (!pool) return [];
     if (pool.kind === "custom-skill-list") {
@@ -915,6 +1127,9 @@
         label: weapon.label,
       }));
     }
+    if (pool.kind === "equipment") {
+      return equipmentChoiceOptions(poolId, equipment);
+    }
     // static
     const prefix =
       pool.id === "weapon-types"
@@ -984,6 +1199,13 @@
       return `Weapon Type: ${unslugify(key.slice("weapon-type:".length))}`;
     if (key.startsWith("weapon:"))
       return `Weapon: ${unslugify(key.slice("weapon:".length))}`;
+    if (key.startsWith("equipped:")) {
+      const [, kind, name] = key.split(":");
+      const kindLabel =
+        { weapon: "Weapon", shield: "Shield", armor: "Armor" }[kind] ||
+        "Equipment";
+      return `Equipped ${kindLabel}: ${unslugify(name)}`;
+    }
     if (key.startsWith("spell-school:"))
       return `Spell School: ${unslugify(key.slice("spell-school:".length))}`;
     if (key.startsWith("resistance:"))
@@ -1021,6 +1243,12 @@
     isChoiceStat,
     choicePoolIdFromStat,
     resolveChoicePoolOptions,
+    normalizeEquippedItems,
+    equipmentChoiceOptions,
+    resolveChoiceStatItem,
+    equipmentTargetFromBonus,
+    equipmentTargetMatchesItem,
+    resolveEquipmentEnhancement,
     resolveConditionalVariableOptions,
     choiceOptgroupHtml,
     energyResistanceOptgroupHtml,

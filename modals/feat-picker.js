@@ -68,11 +68,20 @@
     modalElement.setAttribute("aria-hidden", "true");
     modalElement.innerHTML = `
       <style>
-        #featPickerModal .feat-picker-tabs {
-          max-height: 8rem;
-          overflow: auto;
+        #featPickerModal .feat-picker-filters {
+          display: grid;
+          grid-template-columns: minmax(180px, 240px) minmax(0, 1fr);
+          gap: 0.75rem;
+          align-items: center;
+          margin-bottom: 0.75rem;
+        }
+        #featPickerModal .feat-picker-category {
+          width: 100%;
         }
         #featPickerModal .feat-picker-card {
+          min-height: 0;
+          align-self: start;
+          padding: 0.5rem 0.65rem;
           text-align: left;
         }
         #featPickerModal .feat-picker-card.is-selected {
@@ -103,16 +112,29 @@
           font-size: 0.84rem;
           white-space: pre-wrap;
         }
+        @media (max-width: 700px) {
+          #featPickerModal .feat-picker-filters {
+            grid-template-columns: 1fr;
+            gap: 0.5rem;
+          }
+          #featPickerModal .feat-picker-category {
+            grid-row: 1;
+          }
+          #featPickerModal #featPickerSearch {
+            grid-row: 2;
+          }
+        }
       </style>
       <div class="modal-dialog modal-xl search-modal-dialog">
         <div class="modal-content bg-dark text-light">
           <div class="modal-header">
             <h5 class="modal-title" id="featPickerTitle">Choose Feat</h5>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <input id="featPickerSearch" class="form-control form-control-sm mb-3" placeholder="Search feats" aria-label="Search feats" />
-            <ul id="featPickerTabs" class="source-list-tablist feat-picker-tabs mb-3" role="tablist"></ul>
+            <div class="feat-picker-filters">
+              <select id="featPickerCategory" class="form-select form-select-sm feat-picker-category" aria-label="Feat category"></select>
+              <input id="featPickerSearch" class="form-control form-control-sm" placeholder="Search feats" aria-label="Search feats" />
+            </div>
             <div id="featPickerResults" class="source-results-panel search-modal-results"></div>
           </div>
           <div class="modal-footer">
@@ -137,6 +159,13 @@
         renderResults();
       });
     modalElement
+      .querySelector("#featPickerCategory")
+      .addEventListener("change", (event) => {
+        state.category = event.target.value || "General";
+        state.expandedId = "";
+        renderResults();
+      });
+    modalElement
       .querySelector("#featPickerClear")
       .addEventListener("click", () => finish(""));
     modalElement
@@ -145,7 +174,7 @@
     return modalElement;
   }
 
-  function categoriesForTabs() {
+  function categoryOptions() {
     const seen = new Set();
     const categories = state.categories
       .filter(Boolean)
@@ -168,28 +197,15 @@
     return categories;
   }
 
-  function renderTabs() {
-    const tabs = modalElement.querySelector("#featPickerTabs");
-    tabs.innerHTML = categoriesForTabs()
-      .map((category) => {
-        const active = category === state.category;
-        return `
-          <li class="source-list-tab-item" role="presentation">
-            <button class="source-list-tab ${active ? "active" : ""}" type="button" data-feat-category="${escapeHtml(category)}">
-              ${escapeHtml(category)}
-            </button>
-          </li>
-        `;
-      })
+  function renderCategories() {
+    const select = modalElement.querySelector("#featPickerCategory");
+    select.innerHTML = categoryOptions()
+      .map(
+        (category) =>
+          `<option value="${escapeHtml(category)}">${escapeHtml(category)}</option>`,
+      )
       .join("");
-    tabs.querySelectorAll("[data-feat-category]").forEach((button) => {
-      button.addEventListener("click", () => {
-        state.category = button.dataset.featCategory || "General";
-        state.expandedId = "";
-        renderTabs();
-        renderResults();
-      });
-    });
+    select.value = state.category;
   }
 
   function filteredFeats() {
@@ -292,7 +308,7 @@
     ).map(String);
     state.query = "";
     const requestedCategory = String(config.initialCategory || "");
-    const availableCategories = categoriesForTabs();
+    const availableCategories = categoryOptions();
     state.category =
       availableCategories.find(
         (category) =>
@@ -302,7 +318,7 @@
     modalElement.querySelector("#featPickerTitle").textContent =
       config.title || "Choose Feat";
     modalElement.querySelector("#featPickerSearch").value = "";
-    renderTabs();
+    renderCategories();
     renderResults();
     return new Promise((resolve) => {
       resolver = resolve;
