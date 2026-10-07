@@ -39,7 +39,11 @@ function rememberCharacter(characterId) {
 
 function openCharacter(characterId) {
   rememberCharacter(characterId);
-  window.location.href = `character-sheet.html?characterId=${encodeURIComponent(characterId)}`;
+  const params = new URLSearchParams({
+    characterId,
+    context: characterContextKey,
+  });
+  window.location.href = `character-sheet.html?${params.toString()}`;
 }
 
 function characterLevelText(sheet = {}) {

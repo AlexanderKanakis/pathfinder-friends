@@ -454,6 +454,7 @@ let armorCount = 0;
 let gearCount = 0;
 let generatedEquipmentSignature = "";
 let sheetSaveTimer;
+let sheetSaveQueue = Promise.resolve();
 let sheetContextKey = "general";
 let showCalculations = true;
 let currentSheetId = null;
@@ -470,6 +471,7 @@ let currentUserIsAdmin = false;
 let isEnemySheetMode = false;
 let enemySheetId = "";
 let classDefinitions = [];
+const loadedClassDefinitions = new Map();
 let domainDefinitions = { domains: [] };
 let bloodlineDefinitions = { bloodlines: [] };
 let classProgression = [];
@@ -5044,15 +5046,52 @@ function playableClassDefinitions() {
   });
 }
 
-async function loadClassDefinitions() {
-  if (classDefinitions.length) return classDefinitions;
+function classNamesFromSheet(sheet = {}) {
+  return [
+    ...new Set(
+      (Array.isArray(sheet?.classProgression) ? sheet.classProgression : [])
+        .map((row) => String(row?.className || row?.class || "").trim())
+        .filter(Boolean),
+    ),
+  ];
+}
+
+async function loadClassDefinitions(classNames = []) {
   try {
-    classDefinitions = await PFClassData.loadAllClasses();
+    const requestedNames = [
+      ...new Set(
+        (Array.isArray(classNames) ? classNames : [classNames])
+          .map((name) => String(name || "").trim())
+          .filter(Boolean),
+      ),
+    ];
+    const [index, requestedDefinitions] = await Promise.all([
+      PFClassData.loadIndex(),
+      PFClassData.loadClassesByNames(requestedNames),
+    ]);
+    requestedDefinitions.forEach((definition) => {
+      loadedClassDefinitions.set(
+        classNameOf(definition).toLowerCase(),
+        definition,
+      );
+    });
+    classDefinitions = index.map(
+      (entry) =>
+        loadedClassDefinitions.get(classNameOf(entry).toLowerCase()) || entry,
+    );
   } catch (error) {
     console.warn("Could not load class data", error);
-    classDefinitions = [];
   }
   return classDefinitions;
+}
+
+async function ensureClassDefinitionsForSheet(sheet = {}) {
+  return loadClassDefinitions(classNamesFromSheet(sheet));
+}
+
+async function restoreSheetWithClassDefinitions(sheet = {}) {
+  await ensureClassDefinitionsForSheet(sheet);
+  restoreSheet(sheet);
 }
 
 async function loadRaceDefinitions() {
@@ -6811,13 +6850,19 @@ function renderLevelProgression() {
     })
     .join("");
   root.querySelectorAll("[data-class-level]").forEach((select) => {
-    select.addEventListener("change", () => {
+    select.addEventListener("change", async () => {
       const level = Number(select.dataset.classLevel);
       const row = classProgression.find((item) => item.level === level);
       if (row) row.className = select.value;
-      updateClassDerivedViews();
-      recalculateSheet();
-      queueSheetSave();
+      select.disabled = true;
+      try {
+        await loadClassDefinitions([select.value]);
+        updateClassDerivedViews();
+        recalculateSheet();
+        queueSheetSave();
+      } finally {
+        select.disabled = false;
+      }
     });
   });
   root.querySelectorAll("[data-class-duplicate-next]").forEach((button) => {
@@ -7573,6 +7618,13 @@ function mechanicsChoiceSummary(mechanics = {}) {
   labels.push(...spellAdjustmentChoiceSummary(mechanics.spellDcBonuses));
   labels.push(...spellAdjustmentChoiceSummary(mechanics.effectiveAttributeBonuses));
   return [...new Set(labels.map(String).filter(Boolean))].join(", ");
+}
+
+function featChoiceSummary(selection) {
+  return mechanicsChoiceSummary(featSelectionMechanics(selection)).replace(
+    /\b(Craft|Knowledge|Perform|Profession) \(([^)]+)\)/g,
+    "$1: $2",
+  );
 }
 
 function renderClassFeatureMechanicChoices(feature) {
@@ -8495,35 +8547,44 @@ function renderFeatProgression() {
     kind,
     key,
     label,
-    selectedId,
+    selection = "",
     slot = null,
   }) => {
+    const selectedId = featSelectionId(selection);
     const grantMode = slot?.grant ? featGrantMode(slot.grant) : "";
     const lockedStaticGrant = kind === "effect" && grantMode === "static";
     const selectedFeat = featById(selectedId);
     const selectedName = selectedFeat?.name || selectedId || "";
-    const description = selectedFeat ? featDescription(selectedFeat) : "";
     const hasChoiceButton =
       selectedFeat && featHasChoiceBearingMechanics(selectedFeat);
+    const choiceSummary = hasChoiceButton
+      ? featChoiceSummary(selection)
+      : "";
+    const displayName =
+      selectedName && hasChoiceButton
+        ? `${selectedName} (${choiceSummary || "not selected"})`
+        : selectedName;
     const safeKey = escapeHtml(key);
-    const collapseId = `featDescription${kind}${String(key).replace(/[^a-z0-9]/gi, "_")}`;
+    const primaryAction = selectedFeat
+      ? `data-character-feat-detail="${escapeHtml(featId(selectedFeat))}"`
+      : `data-character-feat-pick="${safeKey}" data-character-feat-kind="${escapeHtml(kind)}" data-character-feat-level="${level}" data-character-feat-label="${escapeHtml(label)}"`;
     return `
       <article class="feat-choice-entry">
-        <div class="class-feature-choice-row">
-          <button class="btn btn-outline-info btn-sm class-feature-choice-select" type="button" data-character-feat-pick="${safeKey}" data-character-feat-kind="${escapeHtml(kind)}" data-character-feat-level="${level}" data-character-feat-label="${escapeHtml(label)}" title="${escapeHtml(`${label}: ${selectedName || "not selected"}`)}">
-            <span>${escapeHtml(selectedName || "not selected")}</span>
+        <div class="class-feature-choice-row feat-choice-row">
+          <button class="btn btn-outline-info btn-sm class-feature-choice-select" type="button" ${primaryAction} title="${escapeHtml(selectedFeat ? `View ${displayName}` : `${label}: not selected`)}">
+            <span>${escapeHtml(displayName || "not selected")}</span>
           </button>
           ${
             hasChoiceButton
               ? `
-            <button class="btn btn-outline-info btn-sm btn-icon class-feature-choice-clear" type="button" data-character-feat-rechoose="${safeKey}" data-character-feat-kind="${escapeHtml(kind)}" data-character-feat-level="${level}" data-character-feat-label="${escapeHtml(label)}" title="Redo feat choices" aria-label="Redo choices for ${escapeHtml(selectedName || "feat")}"><i class="bi bi-arrow-clockwise"></i></button>
+            <button class="btn btn-outline-info btn-sm btn-icon class-feature-choice-clear feat-choice-reselect" type="button" data-character-feat-rechoose="${safeKey}" data-character-feat-kind="${escapeHtml(kind)}" data-character-feat-level="${level}" data-character-feat-label="${escapeHtml(label)}" title="Redo feat choices" aria-label="Redo choices for ${escapeHtml(selectedName || "feat")}"><i class="bi bi-arrow-clockwise"></i></button>
           `
               : ""
           }
           ${
             selectedId && !lockedStaticGrant
               ? `
-            <button class="btn btn-outline-danger btn-sm btn-icon class-feature-choice-clear" type="button" data-character-feat-clear="${safeKey}" data-character-feat-kind="${escapeHtml(kind)}" aria-label="Clear ${escapeHtml(selectedName || "feat")}"><i class="bi bi-trash"></i></button>
+            <button class="btn btn-outline-danger btn-sm btn-icon class-feature-choice-clear feat-choice-remove" type="button" data-character-feat-clear="${safeKey}" data-character-feat-kind="${escapeHtml(kind)}" aria-label="Clear ${escapeHtml(selectedName || "feat")}"><i class="bi bi-trash"></i></button>
           `
               : ""
           }
@@ -8531,17 +8592,6 @@ function renderFeatProgression() {
         ${
           slot?.description
             ? `<div class="small text-secondary mt-2">${escapeHtml(slot.description)}</div>`
-            : ""
-        }
-        ${
-          selectedFeat
-            ? `
-          <button class="class-feature-description-toggle mt-2" type="button" data-bs-toggle="collapse" data-bs-target="#${collapseId}" aria-expanded="false">
-            <span>${escapeHtml(selectedFeat.name || "Feat Details")}</span>
-            <i class="bi bi-chevron-down"></i>
-          </button>
-          <div id="${collapseId}" class="collapse small mt-2">${description ? escapeHtml(description) : "No description available."}</div>
-        `
             : ""
         }
       </article>
@@ -8557,9 +8607,7 @@ function renderFeatProgression() {
             kind: "normal",
             key: String(level),
             label: "Feat",
-            selectedId: featSelectionId(
-              characterFeats?.normal?.[String(level)] || "",
-            ),
+            selection: characterFeats?.normal?.[String(level)] || "",
           }),
         );
       }
@@ -8571,7 +8619,7 @@ function renderFeatProgression() {
             kind: "granted",
             key,
             label: slot.name || "Bonus Feat",
-            selectedId: featSelectionId(characterFeats?.granted?.[key] || ""),
+            selection: characterFeats?.granted?.[key] || "",
             slot,
           }),
         );
@@ -8588,7 +8636,7 @@ function renderFeatProgression() {
             kind: "effect",
             key,
             label: slot.label || "Bonus Feat",
-            selectedId: featSelectionId(selection),
+            selection,
             slot,
           }),
         );
@@ -8607,6 +8655,12 @@ function renderFeatProgression() {
       `;
     })
     .join("");
+  root.querySelectorAll("[data-character-feat-detail]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const feat = featById(button.dataset.characterFeatDetail || "");
+      if (feat) window.PFFeatDetails?.open?.(feat);
+    });
+  });
   root.querySelectorAll("[data-character-feat-pick]").forEach((button) => {
     button.addEventListener("click", async () => {
       const level = Number(
@@ -11154,7 +11208,7 @@ function setStatus(message, type = "info") {
   status.classList.remove("d-none");
 }
 
-function buildSheet() {
+function buildSheet(deferDynamicSections = false) {
   setSelectValuePreservingUnknown("race", el("race")?.value || "");
   setSelectValuePreservingUnknown("alignment", el("alignment")?.value || "");
   setSelectValuePreservingUnknown("size", el("size")?.value || "Medium");
@@ -11202,10 +11256,12 @@ function buildSheet() {
   `,
   ).join("");
 
-  renderSkillRows();
-  renderLevelProgression();
-  updateRacialTraitsButton();
-  renderCharacterSpellLikeAbilities();
+  if (!deferDynamicSections) {
+    renderSkillRows();
+    renderLevelProgression();
+    updateRacialTraitsButton();
+    renderCharacterSpellLikeAbilities();
+  }
   setSheetInfoTab(activeSheetInfoTab);
 }
 
@@ -12938,7 +12994,7 @@ function toggleAppliedBuffs() {
 function recalculateSheet() {
   equipmentEnhancementCache = new WeakMap();
   equipmentEnhancementBuffCache = null;
-  updateClassDerivedViews();
+  applyClassProgressionStats();
   updateCreatureSizeFields();
   syncGeneratedEquipmentCards();
   const skillRankCap = characterSkillRankCap();
@@ -14170,8 +14226,10 @@ function renderCharacterInventory(items = []) {
             <article class="inventory-item${equipped ? " equipped" : ""}" data-loot-id="${escapeHtml(item.id)}" role="button" tabindex="0" aria-label="View ${escapeHtml(item.name)} details">
               <div class="inventory-card-head">
                 <div class="inventory-card-title">
-                  <div class="fw-semibold text-truncate"><span class="me-1">${sourceItemIcon(item)}</span>${escapeHtml(item.name)}</div>
-                  ${equipped ? `<div class="inventory-equipped-badge"><i class="bi bi-check2-circle"></i> Equipped</div>` : ""}
+                  <div class="inventory-card-name fw-semibold" title="${escapeHtml(item.name)}">
+                    <span class="inventory-card-icon">${sourceItemIcon(item)}</span>
+                    <span class="inventory-card-name-text">${escapeHtml(item.name)}</span>
+                  </div>
                 </div>
                 <span class="inventory-count-actions">
                   <span class="inventory-count">x${escapeHtml(item.count || 1)}</span>
@@ -14320,7 +14378,7 @@ async function wearLootItem(item) {
   if (sheetViewMode === "simplified") renderSimplifiedSheet();
 }
 
-async function syncCharacterInventoryWithEquipment() {
+async function syncCharacterInventoryWithEquipment(preloadedLoot = null) {
   if (isEnemySheetMode) {
     characterInventoryItems = characterInventoryItems.map((item) => ({
       ...item,
@@ -14333,15 +14391,17 @@ async function syncCharacterInventoryWithEquipment() {
     return;
   }
 
-  const loot = await PFApp.loadLootItems(sheetContextKey);
+  const loot = Array.isArray(preloadedLoot)
+    ? preloadedLoot
+    : await PFApp.loadLootItems(sheetContextKey);
   characterInventoryItems = loot.filter(
     (item) => item.assigned_character_id === currentSheetId,
   );
   await reconcileEquippedLoot(loot);
 }
 
-async function loadCharacterInventory() {
-  await syncCharacterInventoryWithEquipment();
+async function loadCharacterInventory(preloadedLoot = null) {
+  await syncCharacterInventoryWithEquipment(preloadedLoot);
   renderCharacterInventory(characterInventoryItems);
   if (sheetViewMode === "simplified") renderSimplifiedSheet();
 }
@@ -14937,6 +14997,8 @@ function attachInputListeners(root = document) {
     button.addEventListener("click", () => deleteEnemySpellRow(button));
   });
   root.querySelectorAll(".sheet-input, #characterName").forEach((input) => {
+    if (input.dataset.sheetInputBound === "true") return;
+    input.dataset.sheetInputBound = "true";
     input.addEventListener("input", () => {
       if (input.classList.contains("enemy-auto-input"))
         updateEnemyAutoInputSizes(input.parentElement || document);
@@ -14959,11 +15021,13 @@ function attachInputListeners(root = document) {
         updateRacialTraitsButton();
         pruneUnavailableRacialTraitActiveBuffs({ persist: true });
       }
+      if (input.id === "race" || input.id === "characterLevel")
+        updateClassDerivedViews();
       if (input.matches("[data-enemy-spell-label], [data-enemy-spell-list]"))
         syncEnemyStructuredSpellFields();
       if (input.id === "imageUrl") updateCharacterImagePreview();
       recalculateSheet();
-      queueSheetSave();
+      void saveSheetNow(true);
     });
   });
 }
@@ -14972,7 +15036,10 @@ function queueSheetSave() {
   if (isRestoringSheet) return;
   if (!isSheetEditable()) return;
   clearTimeout(sheetSaveTimer);
-  sheetSaveTimer = setTimeout(() => saveSheetNow(true), 500);
+  sheetSaveTimer = setTimeout(() => {
+    sheetSaveTimer = null;
+    void enqueueSheetSave(true);
+  }, 500);
 }
 
 function isSheetEditable() {
@@ -14981,14 +15048,25 @@ function isSheetEditable() {
   return currentSheetOwnerId === currentUserId || currentUserIsAdmin;
 }
 
-async function saveSheetNow(silent = false) {
+function saveSheetNow(silent = false) {
+  clearTimeout(sheetSaveTimer);
+  sheetSaveTimer = null;
+  return enqueueSheetSave(silent);
+}
+
+function enqueueSheetSave(silent = false) {
+  const run = () => saveSheetSnapshot(silent);
+  sheetSaveQueue = sheetSaveQueue.then(run, run);
+  return sheetSaveQueue;
+}
+
+async function saveSheetSnapshot(silent = false) {
   if (!isSheetEditable()) {
-    if (!silent)
-      setStatus(
-        "You can view this campaign character, but only its owner or an admin can save changes.",
-        "warning",
-      );
-    return;
+    setStatus(
+      "You can view this campaign character, but only its owner or an admin can save changes.",
+      "warning",
+    );
+    return null;
   }
 
   const name = el("characterName").value.trim();
@@ -15013,13 +15091,19 @@ async function saveSheetNow(silent = false) {
     if (savedEnemy?.id) {
       enemySheetId = savedEnemy.id;
       currentSheetId = savedEnemy.id;
+    } else {
+      setStatus(
+        "Changes could not be saved. Refreshing now would discard them.",
+        "danger",
+      );
+      return null;
     }
     localStorage.setItem(
       `pf_enemy_sheet_updated_${sheetContextKey}_${enemySheetId}`,
       String(Date.now()),
     );
     if (!silent) setStatus("Enemy sheet saved.", "success");
-    return;
+    return savedEnemy;
   }
 
   const saved = await PFApp.saveCharacterSheet(
@@ -15028,7 +15112,14 @@ async function saveSheetNow(silent = false) {
     sheetContextKey,
     currentSheetId,
   );
-  if (saved?.id) currentSheetId = saved.id;
+  if (!saved?.id) {
+    setStatus(
+      "Changes could not be saved. Refreshing now would discard them.",
+      "danger",
+    );
+    return null;
+  }
+  currentSheetId = saved.id;
   if (currentSheetId) rememberSelectedCharacter(currentSheetId);
   await loadCharacterInventory();
   if (currentSheetId)
@@ -15037,10 +15128,14 @@ async function saveSheetNow(silent = false) {
       String(Date.now()),
     );
   if (!silent) setStatus("Character sheet saved.", "success");
+  return saved;
 }
 
-async function loadEnemySheet(enemyId) {
-  const enemy = await PFApp.loadEnemy(enemyId, sheetContextKey);
+async function loadEnemySheet(enemyId, prefetchedEnemy = null) {
+  const enemy =
+    prefetchedEnemy && String(prefetchedEnemy.id) === String(enemyId)
+      ? prefetchedEnemy
+      : await PFApp.loadEnemy(enemyId, sheetContextKey);
   if (!enemy) {
     setStatus("Could not load that enemy.", "warning");
     return;
@@ -15053,7 +15148,7 @@ async function loadEnemySheet(enemyId) {
   activeBuffs = Array.isArray(enemy.sheet?.activeBuffs)
     ? enemy.sheet.activeBuffs
     : [];
-  restoreSheet(enemy.sheet || {});
+  await restoreSheetWithClassDefinitions(enemy.sheet || {});
   el("characterName").value = enemy.name;
   characterInventoryItems = Array.isArray(enemy.sheet?.enemyInventory)
     ? enemy.sheet.enemyInventory.map((item) => ({
@@ -15066,18 +15161,31 @@ async function loadEnemySheet(enemyId) {
   el("enemySourceItemButton")?.classList.remove("d-none");
 }
 
-async function loadCurrentSheet(sheetId = currentSheetId) {
+async function loadCurrentSheet(
+  sheetId = currentSheetId,
+  prefetchedSheet = null,
+) {
   const name = el("characterName").value.trim();
   if (!name && !sheetId) return;
-  const saved = await PFApp.loadCharacterSheet(name, sheetContextKey, sheetId);
+  const saved =
+    prefetchedSheet && String(prefetchedSheet.id) === String(sheetId)
+      ? prefetchedSheet
+      : await PFApp.loadCharacterSheet(name, sheetContextKey, sheetId);
   if (saved?.sheet) {
     currentSheetId = saved.id;
     currentSheetOwnerId = saved.user_id || currentUserId;
     rememberSelectedCharacter(currentSheetId);
-    await loadActiveBuffs(currentSheetId);
-    restoreSheet(saved.sheet);
+    const [savedBuffState, loot] = await Promise.all([
+      PFApp.loadBuffState(sheetContextKey, currentSheetId),
+      PFApp.loadLootItems(sheetContextKey),
+    ]);
+    activeBuffs = Array.isArray(savedBuffState)
+      ? savedBuffState
+      : savedBuffState?.buffs || [];
+    lastBuffRefresh = localStorage.getItem(buffRefreshKey(currentSheetId)) || "";
+    await restoreSheetWithClassDefinitions(saved.sheet);
     el("characterName").value = saved.character_name;
-    await loadCharacterInventory();
+    await loadCharacterInventory(loot);
   } else {
     setStatus("Could not load that character sheet.", "warning");
   }
@@ -15294,7 +15402,7 @@ async function prepareBridgeCharacterSheet(
       sheetContextKey,
     )) || [];
   lastBuffRefresh = localStorage.getItem(buffRefreshKey(saved.id)) || "";
-  restoreSheet(saved.sheet);
+  await restoreSheetWithClassDefinitions(saved.sheet);
   el("characterName").value = saved.character_name;
   await syncCharacterInventoryWithEquipment();
   if (inventory) renderCharacterInventory(characterInventoryItems);
@@ -15330,7 +15438,7 @@ async function spellDetailsForCharacter(
     currentSheetOwnerId = saved.user_id || currentUserId;
     activeBuffs =
       (await PFApp.loadCharacterBuffStateForRecalculation?.(saved.id, sheetContextKey)) || [];
-    restoreSheet(saved.sheet);
+    await restoreSheetWithClassDefinitions(saved.sheet);
     el("characterName").value = saved.character_name;
     await syncCharacterInventoryWithEquipment();
     recalculateSheet();
@@ -15428,7 +15536,7 @@ async function recalculateAndSaveCharacterSnapshot(
     currentSheetId = character.id;
     currentSheetOwnerId = character.userId || character.user_id || currentUserId;
     activeBuffs = Array.isArray(nextActiveBuffs) ? nextActiveBuffs : [];
-    restoreSheet(character.sheet);
+    await restoreSheetWithClassDefinitions(character.sheet);
     el("characterName").value =
       character.name || character.character_name || "Character";
     await syncCharacterInventoryWithEquipment();
@@ -15465,7 +15573,7 @@ async function recalculateAndSaveEnemySnapshot(contextKey, enemy) {
     activeBuffs = Array.isArray(enemy.sheet.activeBuffs)
       ? enemy.sheet.activeBuffs
       : [];
-    restoreSheet(enemy.sheet);
+    await restoreSheetWithClassDefinitions(enemy.sheet);
     el("characterName").value = enemy.name || "Enemy";
     recalculateSheet();
     const calculated = collectCalculatedSummary();
@@ -15519,7 +15627,7 @@ async function recalculateAndSaveCharacterSheetNow(contextKey, characterId) {
       sheetContextKey,
     )) || [];
   lastBuffRefresh = localStorage.getItem(buffRefreshKey(targetSheetId)) || "";
-  restoreSheet(saved.sheet);
+  await restoreSheetWithClassDefinitions(saved.sheet);
   el("characterName").value = saved.character_name;
   await syncCharacterInventoryWithEquipment();
   recalculateSheet();
@@ -15561,7 +15669,7 @@ async function recalculateAndSaveEnemySheetNow(contextKey, enemyId) {
   activeBuffs = Array.isArray(enemy.sheet.activeBuffs)
     ? enemy.sheet.activeBuffs
     : [];
-  restoreSheet(enemy.sheet);
+  await restoreSheetWithClassDefinitions(enemy.sheet);
   el("characterName").value = enemy.name;
   recalculateSheet();
   const nextSheet = collectSheet();
@@ -15669,26 +15777,49 @@ async function startPendingEffectChoicePolling() {
 
 async function initCharacterSheet() {
   showSheetLoading();
+  const params = new URLSearchParams(window.location.search);
+  const requestedCharacterId = params.get("characterId") || "";
+  const contextFromUrl = params.get("context") || "";
+  if (contextFromUrl) PFApp.setSelectedContextKey(contextFromUrl);
   const user = await PFApp.requireAuth();
   if (!user) return;
+  const requestedContext =
+    contextFromUrl ||
+    (requestedCharacterId
+      ? await PFApp.loadCharacterSheetContext?.(requestedCharacterId)
+      : "");
+  if (
+    requestedContext &&
+    requestedContext !== PFApp.getSelectedContextKey()
+  ) {
+    PFApp.setSelectedContextKey(requestedContext);
+    await PFApp.renderAuthNav(user);
+  }
   sheetContextKey = await PFApp.requireGameContext();
   if (!sheetContextKey) return;
   currentUserId = user.id;
   currentUserIsAdmin = (await PFApp.isAppAdmin?.()) || false;
   currentSheetOwnerId = user.id;
-  startPendingEffectChoicePolling();
-  await loadClassDefinitions();
-  await loadRaceDefinitions();
-  await loadFeatDefinitions();
-  await loadDomainDefinitions();
-  await loadBloodlineDefinitions();
-  const params = new URLSearchParams(window.location.search);
   const bridgeMode = params.get("bridge") === "1";
-  const requestedCharacterId = params.get("characterId") || "";
   enemySheetId = params.get("enemyId") || "";
   isEnemySheetMode = Boolean(enemySheetId);
+  const initialCharacterPromise =
+    requestedCharacterId && !isEnemySheetMode
+      ? PFApp.loadCharacterSheet("", sheetContextKey, requestedCharacterId)
+      : Promise.resolve(null);
+  const sharedDefinitionsPromise = Promise.all([
+    loadRaceDefinitions(),
+    loadFeatDefinitions(),
+    loadDomainDefinitions(),
+    loadBloodlineDefinitions(),
+  ]);
+  const initialCharacter = await initialCharacterPromise;
+  await Promise.all([
+    sharedDefinitionsPromise,
+    loadClassDefinitions(classNamesFromSheet(initialCharacter?.sheet)),
+  ]);
   document.body.classList.toggle("enemy-sheet-mode", isEnemySheetMode);
-  buildSheet();
+  buildSheet(Boolean(initialCharacter?.sheet) || isEnemySheetMode);
   if (isEnemySheetMode) {
     const canManageEnemies = await PFApp.isGameManager(sheetContextKey);
     if (!canManageEnemies) {
@@ -15739,7 +15870,7 @@ async function initCharacterSheet() {
   if (isEnemySheetMode) {
     await loadEnemySheet(enemySheetId);
   } else if (requestedCharacterId) {
-    await loadCurrentSheet(requestedCharacterId);
+    await loadCurrentSheet(requestedCharacterId, initialCharacter);
   } else if (bridgeMode) {
     loadSampleValues();
     renderCharacterInventory([]);
@@ -15747,6 +15878,7 @@ async function initCharacterSheet() {
     window.location.href = "characters.html";
     return;
   }
+  void startPendingEffectChoicePolling();
   hideSheetLoading();
   el("sheetMain")?.classList.remove("d-none");
   attachInputListeners();

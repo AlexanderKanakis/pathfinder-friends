@@ -20,7 +20,8 @@
       rel="stylesheet"
     />
 
-    <link href="css/character-sheet.css?v=spell-like-details-1" rel="stylesheet" />
+    <link href="css/character-sheet.css?v=inventory-row-layout-1" rel="stylesheet" />
+    <link href="css/feat-details.css?v=1" rel="stylesheet" />
     <link href="css/effect-editor.css?v=effect-branches-1" rel="stylesheet" />
     <link href="css/damage-rolls.css?v=4" rel="stylesheet" />
     <link href="modals/generated-equipment-picker.css?v=effect-labels-white-1" rel="stylesheet" />
@@ -83,6 +84,7 @@
           <h3 id="sheetPageTitle" class="mb-0">Character Sheet</h3>
         </div>
       </div>
+      <div id="sheetStatus" class="alert py-2 d-none" role="status"></div>
       <div
         id="sheetStickySentinel"
         class="sheet-sticky-sentinel"
@@ -2194,12 +2196,12 @@
     <script src="scripts/navbar.js?v=responsive-navbar-1"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="scripts/supabase-config.js"></script>
-    <script src="scripts/app-supabase.js?v=canonical-data-1"></script>
+    <script src="scripts/app-supabase.js?v=sheet-load-performance-1"></script>
     <script src="scripts/effect-mechanics.js?v=canonical-data-1"></script>
     <script src="scripts/buff-calculator.js?v=canonical-data-1"></script>
     <script src="scripts/damage-rolls.js?v=5"></script>
     <script src="scripts/armor-rules.js?v=1"></script>
-    <script src="scripts/class-data.js"></script>
+    <script src="scripts/class-data.js?v=sheet-load-performance-2"></script>
     <script src="scripts/race-data.js?v=active-passive-overrides-1"></script>
     <script src="scripts/class-feature-abilities.js?v=aura-mechanics-1"></script>
     <script src="modals/effect-duration-editor.js?v=canonical-data-1"></script>
@@ -2213,6 +2215,7 @@
     <script src="modals/pending-effect-choices.js?v=effect-branches-1"></script>
     <script src="modals/class-feature-choice-picker.js"></script>
     <script src="scripts/feat-data.js?v=gain-feat-1"></script>
+    <script src="modals/feat-details.js?v=1"></script>
     <script src="modals/feat-picker.js?v=feat-category-dropdown-1"></script>
     <script src="modals/spell-picker.js?v=damage-rolls-1"></script>
     <script src="modals/arcane-spell-failure.js?v=1"></script>
@@ -2225,7 +2228,7 @@
     <script src="modals/item-editor.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="scripts/weapon-damage-components.js"></script>
-    <script src="scripts/pages/character-sheet.js?v=canonical-data-1"></script>
+    <script src="scripts/pages/character-sheet.js?v=inventory-row-layout-1"></script>
     <script src="scripts/modal-rules.js?v=1"></script>
   </body>
 </html>

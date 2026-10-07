@@ -19,6 +19,9 @@
   let campaignsCacheUserId = "";
   let campaignsPromise = null;
   let conditionDefinitionsPromise = null;
+  let appAdminCacheUserId = "";
+  let appAdminCache = null;
+  let appAdminPromise = null;
 
   if (!missingConfig && window.supabase) {
     client = window.supabase.createClient(config.url, config.anonKey);
@@ -167,8 +170,9 @@
     const slot = document.getElementById("authNav");
     if (!slot) return;
     const currentUser = user === undefined ? await getUser() : user;
-    const profile = currentUser ? await loadProfile(currentUser.id) : null;
-    const admin = currentUser ? await isAppAdmin() : false;
+    const [profile, admin] = currentUser
+      ? await Promise.all([loadProfile(currentUser.id), isAppAdmin()])
+      : [null, false];
     slot.innerHTML = authLinkHtml(currentUser, profile, admin);
     if (currentUser) {
       await setupContextSelect("navContextSelect", async (contextKey) => {
@@ -682,14 +686,23 @@
   async function isAppAdmin() {
     const user = await getUser();
     if (!client || !user) return false;
+    if (appAdminCacheUserId === user.id && appAdminCache !== null)
+      return appAdminCache;
+    if (appAdminCacheUserId === user.id && appAdminPromise)
+      return appAdminPromise;
 
-    const { data, error } = await client.rpc("is_app_admin");
-    if (error) {
-      console.error(error);
-      return false;
-    }
-
-    return Boolean(data);
+    appAdminCacheUserId = user.id;
+    appAdminPromise = (async () => {
+      const { data, error } = await client.rpc("is_app_admin");
+      if (error) {
+        console.error(error);
+        return false;
+      }
+      return Boolean(data);
+    })();
+    appAdminCache = await appAdminPromise;
+    appAdminPromise = null;
+    return appAdminCache;
   }
 
   async function loadDiceState(contextKey = getSelectedContextKey()) {
@@ -1151,6 +1164,24 @@
     return Array.isArray(data) ? data[0] || null : data;
   }
 
+  async function loadCharacterSheetContext(sheetId) {
+    const user = await getUser();
+    if (!user || !sheetId) return "";
+
+    const { data, error } = await client
+      .from("character_sheets")
+      .select("context_key")
+      .eq("id", sheetId)
+      .maybeSingle();
+
+    if (error) {
+      console.error(error);
+      return "";
+    }
+
+    return data?.context_key || "";
+  }
+
   async function loadCharacterSheetForRecalculation(
     sheetId,
     contextKey = getSelectedContextKey(),
@@ -1319,7 +1350,10 @@
           .single());
       }
 
-      if (error) console.error(error);
+      if (error) {
+        console.error(error);
+        return null;
+      }
       return data;
     }
 
@@ -1343,7 +1377,10 @@
         .single());
     }
 
-    if (error) console.error(error);
+    if (error) {
+      console.error(error);
+      return null;
+    }
     return data;
   }
 
@@ -2182,6 +2219,7 @@
     loadConditionDefinitions,
     loadCharacterSheets,
     loadCharacterSheet,
+    loadCharacterSheetContext,
     loadCharacterSheetForRecalculation,
     saveCharacterSheet,
     deleteCharacterSheet,

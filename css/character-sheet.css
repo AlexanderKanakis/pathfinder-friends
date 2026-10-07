@@ -499,6 +499,18 @@ body {
   width: 100%;
 }
 
+.feat-choice-row {
+  grid-template-columns: minmax(0, 1fr) 34px 34px;
+}
+
+.feat-choice-row .feat-choice-reselect {
+  grid-column: 2;
+}
+
+.feat-choice-row .feat-choice-remove {
+  grid-column: 3;
+}
+
 .class-feature-choice-select,
 .class-feature-choice-clear {
   width: 100%;
@@ -2079,8 +2091,9 @@ textarea.enemy-header-control.form-control-sm {
 
 .inventory-card-head {
   display: flex;
-  gap: 8px;
-  align-items: flex-start;
+  gap: 6px;
+  align-items: center;
+  min-width: 0;
 }
 
 .inventory-card-title {
@@ -2088,10 +2101,29 @@ textarea.enemy-header-control.form-control-sm {
   flex: 1 1 auto;
 }
 
+.inventory-card-name {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.inventory-card-icon {
+  display: inline-flex;
+  flex: 0 0 auto;
+}
+
+.inventory-card-name-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .inventory-count-actions {
   display: inline-flex;
-  flex-direction: column;
-  align-items: flex-end;
+  align-items: center;
   gap: 4px;
   flex: 0 0 auto;
 }
