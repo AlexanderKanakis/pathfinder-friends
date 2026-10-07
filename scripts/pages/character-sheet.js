@@ -9211,6 +9211,7 @@ function spellSubschools(spell = {}) {
 }
 
 function spellcastingMagicType(className = "", meta = {}) {
+  if (spellcastingSourceKind(className, meta) === "extracts") return "extracts";
   const explicit = String(meta.magicType || meta.typeOfMagic || "").trim();
   if (explicit) return explicit.toLowerCase();
   const name = String(className || "").toLowerCase();

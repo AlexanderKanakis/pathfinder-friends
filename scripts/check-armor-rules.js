@@ -88,6 +88,16 @@ assert.strictEqual(
   }).chance,
   0,
 );
+assert.strictEqual(
+  rules.arcaneSpellFailure({
+    className: "Alchemist",
+    magicType: "extracts",
+    sourceKind: "extracts",
+    components: "V, S",
+    equipment: [heavyArmor],
+  }).chance,
+  0,
+);
 
 const mithral = { ...heavyArmor, specialMaterial: "Mithral" };
 assert.strictEqual(rules.itemMaxDex(mithral), 5);
@@ -103,7 +113,7 @@ for (const [file, pattern] of [
   ["scripts/pages/character-sheet.js", /arcaneSpellFailure/],
   [
     "scripts/pages/character-sheet.js",
-    /async function syncCharacterInventoryWithEquipment\(\)/,
+    /async function syncCharacterInventoryWithEquipment\([^)]*\)/,
   ],
   [
     "scripts/pages/character-sheet.js",
@@ -126,6 +136,12 @@ for (const [file, pattern] of [
 const characterSheetSource = fs.readFileSync(
   path.join(root, "scripts/pages/character-sheet.js"),
   "utf8",
+);
+assert(
+  /spellcastingSourceKind\(className, meta\) === "extracts"\) return "extracts"/.test(
+    characterSheetSource,
+  ),
+  "Extract-using classes must not be classified as arcane spellcasters.",
 );
 for (const legacyHydrator of [
   "loadArmorRulesCatalog",
