@@ -63,6 +63,42 @@ assert.strictEqual(
 );
 assert.strictEqual(
   rules.arcaneSpellFailure({
+    className: "Bard",
+    classLevel: 10,
+    components: "V, S",
+    equipment: [{ ...heavyArmor, armorGroup: "Medium Armors" }, shield],
+  }).chance,
+  35,
+);
+assert.strictEqual(
+  rules.arcaneSpellFailure({
+    className: "Skald",
+    classLevel: 10,
+    components: "V, S",
+    equipment: [{ ...heavyArmor, armorGroup: "Light Armors" }, shield],
+  }).chance,
+  0,
+);
+assert.strictEqual(
+  rules.arcaneSpellFailure({
+    className: "Skald",
+    classLevel: 10,
+    components: "V, S",
+    equipment: [{ ...heavyArmor, armorGroup: "Medium Armors" }, shield],
+  }).chance,
+  0,
+);
+assert.strictEqual(
+  rules.arcaneSpellFailure({
+    className: "Skald",
+    classLevel: 10,
+    components: "V, S",
+    equipment: [heavyArmor, shield],
+  }).chance,
+  35,
+);
+assert.strictEqual(
+  rules.arcaneSpellFailure({
     className: "Bloodrager",
     classLevel: 10,
     components: "V, S",

@@ -34,6 +34,8 @@
       damageType: String(profile.damageType || "untyped").trim() || "untyped",
       diceCountScale: profile.diceCountScale || null,
       staticDamageScale: profile.staticDamageScale || null,
+      maximizeDice: Boolean(profile.maximizeDice),
+      damageMultiplier: Math.max(0, numberOr(profile.damageMultiplier, 1)),
     };
   }
 
@@ -154,6 +156,7 @@
         ? ` ${staticDamage >= 0 ? "+" : "-"} ${Math.abs(staticDamage)}`
         : String(staticDamage)
       : "";
+    const baseFormula = `${diceFormula}${staticFormula}` || "0";
     return {
       label: normalizeRoll(roll).label,
       profileLabel: profile.profileLabel,
@@ -162,18 +165,27 @@
       dieType: profile.dieType,
       staticDamage,
       damageType: profile.damageType,
-      formula: `${diceFormula}${staticFormula}` || "0",
+      ...(profile.maximizeDice ? { maximizeDice: true } : {}),
+      ...(profile.damageMultiplier !== 1
+        ? { damageMultiplier: profile.damageMultiplier }
+        : {}),
+      formula: `${baseFormula}${profile.maximizeDice && diceCount ? " (maximized)" : ""}${profile.damageMultiplier !== 1 ? ` x ${profile.damageMultiplier}` : ""}`,
     };
   }
 
   function rollCalculated(calculated, random = Math.random) {
     const dice = Array.from({ length: calculated.diceCount }, () =>
-      Math.floor(random() * calculated.dieType) + 1,
+      calculated.maximizeDice
+        ? calculated.dieType
+        : Math.floor(random() * calculated.dieType) + 1,
     );
+    const subtotal =
+      dice.reduce((sum, value) => sum + value, 0) + calculated.staticDamage;
     return {
       ...calculated,
       dice,
-      total: dice.reduce((sum, value) => sum + value, 0) + calculated.staticDamage,
+      subtotal,
+      total: Math.floor(subtotal * numberOr(calculated.damageMultiplier, 1)),
     };
   }
 
@@ -293,7 +305,7 @@
 
   function animateRollingResults(body, results) {
     results.forEach((result, index) => {
-      if (!result.dice.length) return;
+      if (!result.dice.length || result.maximizeDice) return;
       const section = body.querySelector(`[data-damage-result-index="${index}"]`);
       if (!section) return;
       const dice = Array.from(
@@ -387,6 +399,10 @@
           };
         };
         if (!rolledResults.some((result) => result.dice.length > 0)) {
+          showFinalResults();
+          return;
+        }
+        if (!rolledResults.some((result) => result.dice.length > 0 && !result.maximizeDice)) {
           showFinalResults();
           return;
         }

@@ -187,6 +187,12 @@
           : {}),
         durationConfig: item.activeMechanics.durationConfig || null,
         auraConfig: item.activeMechanics.auraConfig || null,
+        metamagicRiders: Array.isArray(item.activeMechanics.metamagicRiders)
+          ? item.activeMechanics.metamagicRiders
+          : [],
+        metamagicDurationMultiplier: Number(
+          item.activeMechanics.metamagicDurationMultiplier || 1,
+        ),
       };
     }
     if (activeOnly) {
@@ -195,9 +201,21 @@
         ...(hasBranches(item) ? { branches: branches(item) } : {}),
         durationConfig: item.durationConfig || null,
         auraConfig: item.auraConfig || null,
+        metamagicRiders: Array.isArray(item.metamagicRiders)
+          ? item.metamagicRiders
+          : [],
+        metamagicDurationMultiplier: Number(
+          item.metamagicDurationMultiplier || 1,
+        ),
       };
     }
-    return { ...copyMechanics({}), durationConfig: null, auraConfig: null };
+    return {
+      ...copyMechanics({}),
+      durationConfig: null,
+      auraConfig: null,
+      metamagicRiders: [],
+      metamagicDurationMultiplier: 1,
+    };
   }
 
   function hasActiveMechanics(item = {}, options = {}) {
@@ -294,6 +312,50 @@
     return cloned;
   }
 
+  function createAuraLink(sourceToken = {}, effect = {}, options = {}) {
+    if (!effect?.auraConfig?.enabled) return null;
+    const auraId =
+      options.id ||
+      `automatic-aura-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    const kind = options.kind || "active";
+    const config = effect.auraConfig || {};
+    const auraEffect = JSON.parse(JSON.stringify(effect));
+    delete auraEffect.auraConfig;
+
+    const controller = JSON.parse(JSON.stringify(effect));
+    mechanicKeys().forEach((key) => delete controller[key]);
+    delete controller.bonuses;
+    delete controller.branches;
+    delete controller.auraConfig;
+    delete controller.metamagicRiders;
+    controller.id = `${auraId}:effect`;
+    controller.auraController = true;
+    controller.linkedAuraId = auraId;
+    controller.durationAnchorTokenId = sourceToken.id;
+
+    return {
+      aura: {
+        id: auraId,
+        ...(kind === "active" ? { linkedEffectId: controller.id } : {}),
+        kind,
+        visible: true,
+        radius: Math.max(1, Math.ceil(Number(config.rangeFeet || 5) / 5)),
+        rangeFeet: Math.max(5, Number(config.rangeFeet || 5)),
+        color: sourceToken.kind === "enemy" ? "#b02a37" : "#8fd19e",
+        effect: auraEffect,
+        removeWhenOutOfRange: true,
+        permanent: Boolean(effect.permanent || kind === "passive"),
+        remaining: effect.remaining ?? null,
+        durationAnchorTokenId: sourceToken.id,
+      },
+      controller,
+    };
+  }
+
+  function isAuraController(effect = {}) {
+    return Boolean(effect.auraController && effect.linkedAuraId);
+  }
+
   return {
     baseEffectKey: BASE_EFFECT_KEY,
     branchKey: BRANCH_KEY,
@@ -317,5 +379,7 @@
     mechanicPayload,
     attributeScaleSource,
     resolveCasterAttributeScales,
+    createAuraLink,
+    isAuraController,
   };
 });

@@ -186,6 +186,59 @@ function checkEffectBranches(results) {
   }
 }
 
+function checkAuraLinks(results) {
+  const link = mechanics.createAuraLink(
+    { id: "caster-token", kind: "character" },
+    {
+      id: "aura-of-doom",
+      name: "Aura of Doom",
+      category: "Spell",
+      auraConfig: { enabled: true, rangeFeet: 20 },
+      effects: [{ stat: "ac", value: -2 }],
+      applyConditions: [{ name: "Shaken" }],
+      casterLevel: 10,
+      remaining: 1000,
+    },
+    { id: "linked-aura" },
+  );
+  if (!link || link.aura.linkedEffectId !== link.controller.id)
+    results.push("Aura links: Aura and active-effect controller are not linked.");
+  if (link.aura.radius !== 4 || link.aura.rangeFeet !== 20)
+    results.push("Aura links: Authored range was not preserved.");
+  if (!mechanics.isAuraController(link.controller))
+    results.push("Aura links: Controller marker is missing.");
+  if (
+    link.controller.effects ||
+    link.controller.bonuses ||
+    link.controller.applyConditions
+  )
+    results.push("Aura links: Controller must not apply aura mechanics to its caster.");
+  if (link.controller.remaining !== 1000 || link.controller.casterLevel !== 10)
+    results.push("Aura links: Controller did not retain spell duration metadata.");
+
+  const passive = mechanics.createAuraLink(
+    { id: "caster-token", kind: "character" },
+    {
+      name: "Passive Aura",
+      auraConfig: { enabled: true, rangeFeet: 10 },
+      effects: [{ stat: "ac", value: 1 }],
+    },
+    { id: "passive-aura", kind: "passive" },
+  );
+  if (passive.aura.linkedEffectId)
+    results.push("Aura links: Passive auras must not require an active controller.");
+
+  const map = readProjectFile("scripts/pages/map.js");
+  const sheet = readProjectFile("scripts/pages/character-sheet.js");
+  const tracker = readProjectFile("scripts/buff-tracker-widget.js");
+  if (!map.includes("removed?.linkedEffectId") || !map.includes("reconcileTokenLinkedAuras"))
+    results.push("Aura links: Map aura/effect removal synchronization is missing.");
+  if (!sheet.includes("syncCurrentMapLinkedAuras(activeBuffs)"))
+    results.push("Aura links: Character-sheet effect removal does not remove its aura.");
+  if (!tracker.includes("this.active.push(controller)"))
+    results.push("Aura links: Aura activation is not listed as an active effect.");
+}
+
 function checkInventoryActiveAbilityGateway(results) {
   const text = readProjectFile("scripts/pages/character-sheet.js");
   const body = functionBody(text, "collectActivatableAbilities");
@@ -493,6 +546,7 @@ const mechanicGroupGateways = [
 const errors = [];
 checkGroupedMechanicPayload(errors);
 checkEffectBranches(errors);
+checkAuraLinks(errors);
 checkInventoryActiveAbilityGateway(errors);
 checkMapItemActiveAbilityGateway(errors);
 checkMapEffectGroupNavigation(errors);

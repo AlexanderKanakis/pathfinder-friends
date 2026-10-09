@@ -73,7 +73,9 @@
       .effect-active-actions { display: flex; gap: 4px; justify-content: end; }
       .effect-active-actions .btn { width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center; padding: 0; }
       .effect-active-adjustments { display: flex; flex-wrap: wrap; gap: 8px; align-items: end; margin-top: 8px; }
-      .effect-active-adjustments .effect-tracker-inline input[type="number"] { width: 68px; }
+      .effect-adjustable-control { display: inline-flex; align-items: center; gap: 8px; }
+      .effect-adjustable-label { max-width: 110px; }
+      .effect-adjustable-control .modal-number-stepper { width: 132px; }
       .effect-duration-grid { display: grid; grid-template-columns: .75fr 1fr .7fr; gap: 8px; align-items: end; }
       .shared-bonus-row { position: relative; display: grid; grid-template-columns: 1.5fr .7fr 1fr .7fr auto; gap: 8px; align-items: end; background: #242424; border: 1px solid #444; border-radius: 8px; padding: 10px 48px 10px 10px; }
       .shared-bonus-row .shared-named-skill-field { grid-column: 1 / -1; max-width: 280px; }
@@ -1881,8 +1883,17 @@
         finalizedEffect.auraConfig?.enabled &&
         typeof this.options.onAuraActivate === "function"
       ) {
-        const created = await this.options.onAuraActivate(finalizedEffect);
-        if (created) {
+        const activation = await this.options.onAuraActivate(finalizedEffect);
+        const controller =
+          activation?.controller ||
+          (activation?.auraController ? activation : null);
+        if (controller) {
+          this.active.push(controller);
+          this.renderActive();
+          this.notifyChange({ collectionChanged: true });
+          this.queueSave();
+        }
+        if (activation) {
           bootstrap.Modal.getInstance(this.pickerModalEl)?.hide();
         }
         return;
@@ -1994,7 +2005,7 @@
         }
       }
       this.renderActive();
-      this.notifyChange();
+      this.notifyChange({ collectionChanged: true });
       this.queueSave();
       bootstrap.Modal.getInstance(this.pickerModalEl)?.hide();
     }
@@ -2065,7 +2076,7 @@
               );
           this.active = Array.isArray(saved) ? saved : saved?.buffs || [];
           this.renderActive();
-          this.notifyChange();
+          this.notifyChange({ collectionChanged: true });
           if (status)
             status.textContent = `"${finalizedEffect.name || "Effect"}" applied -- the player completed their choices.`;
         } else if (status) {
@@ -2100,7 +2111,7 @@
       if (isItemSourcedEffect(this.active[index])) return;
       this.active.splice(index, 1);
       this.renderActive();
-      this.notifyChange();
+      this.notifyChange({ collectionChanged: true });
       this.queueSave();
     }
 
@@ -2127,11 +2138,33 @@
       this.queueSave();
     }
 
+    updateAdjustableCondition(index, amount) {
+      const effect = this.active[index];
+      const config = effect?.adjustableCondition;
+      if (!effect || !config) return;
+      const minimum = Math.max(0, Number(config.minimum || 0));
+      const nextAmount = Math.max(minimum, Math.floor(Number(amount) || 0));
+      config.amount = nextAmount;
+      if (["ability-damage", "ability-drain"].includes(config.kind)) {
+        effect.bonuses = (Array.isArray(effect.bonuses) ? effect.bonuses : []).map(
+          (bonus) =>
+            String(bonus.stat || "").toLowerCase() ===
+            String(config.stat || "").toLowerCase()
+              ? { ...bonus, value: -nextAmount }
+              : bonus,
+        );
+      }
+      this.renderActive();
+      this.notifyChange();
+      this.queueSave();
+    }
+
     activeAdjustmentControls(effect, index) {
       const needsCl = durationUsesCasterLevel(effect);
       const condition = isCondition(effect);
       const canReselect = window.PFEffectMechanics?.canReselectBranch?.(effect);
-      if (!needsCl && !condition && !canReselect) return "";
+      const adjustable = effect.adjustableCondition || null;
+      if (!needsCl && !condition && !canReselect && !adjustable) return "";
       return `
         <div class="effect-active-adjustments">
           ${
@@ -2153,6 +2186,14 @@
               : ""
           }
           ${canReselect ? `<button class="btn btn-outline-info btn-sm" type="button" data-reselect-branch="${index}">Change ${escapeHtml(effect.selectedBranchName || "Option")}</button>` : ""}
+          ${
+            adjustable
+              ? `<div class="effect-adjustable-control">
+                  <span class="small effect-adjustable-label">${escapeHtml(adjustable.label || "Amount")}</span>
+                  <input class="form-control form-control-sm text-center" type="number" inputmode="numeric" min="${Math.max(0, Number(adjustable.minimum || 0))}" value="${Math.max(0, Number(adjustable.amount || 0))}" data-active-adjustment="${index}" aria-label="${escapeHtml(adjustable.label || "Amount")}">
+                </div>`
+              : ""
+          }
         </div>
       `;
     }
@@ -2304,6 +2345,16 @@
           });
         });
       });
+      this.activeEl
+        .querySelectorAll("[data-active-adjustment]")
+        .forEach((input) => {
+          input.addEventListener("change", () => {
+            this.updateAdjustableCondition(
+              Number(input.dataset.activeAdjustment),
+              input.value,
+            );
+          });
+        });
       this.bindActiveFilter();
     }
 
@@ -2328,12 +2379,11 @@
           );
           stamp(this.options.contextKey, this.options.characterId);
         }
-        this.notifyChange();
       }, 250);
     }
 
-    notifyChange() {
-      this.options.onChange?.([...this.active]);
+    notifyChange(change = {}) {
+      this.options.onChange?.([...this.active], change);
     }
   }
 

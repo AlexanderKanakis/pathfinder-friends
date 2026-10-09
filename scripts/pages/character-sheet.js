@@ -504,6 +504,10 @@ let spellCastTargetModal = null;
 let spellCastTargetResolver = null;
 let spellCastTargetMapState = null;
 let spellCastTargetMapSlot = 1;
+const spellCastMapClientId = `character-sheet-${
+  globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random()}`
+}`;
+let spellCastMapRevision = 0;
 let spellCastBridgeFrame = null;
 let spellCastBridgePromise = null;
 let inventoryItemModal = null;
@@ -9722,6 +9726,25 @@ function currentSheetMapSlot() {
   return Math.max(1, Math.min(maxSlot, stored || 1));
 }
 
+async function saveSpellCastMapState() {
+  if (!spellCastTargetMapState || !PFApp.saveMapState) return null;
+  const previousMeta = spellCastTargetMapState._meta || {};
+  spellCastMapRevision = Math.max(
+    spellCastMapRevision + 1,
+    Number(previousMeta.revision || 0) + 1,
+  );
+  spellCastTargetMapState._meta = {
+    clientId: spellCastMapClientId,
+    revision: spellCastMapRevision,
+    savedAt: Math.max(Date.now(), Number(previousMeta.savedAt || 0) + 1),
+  };
+  return PFApp.saveMapState(
+    spellCastTargetMapState,
+    sheetContextKey,
+    spellCastTargetMapSlot,
+  );
+}
+
 function spellEffectPayloads(spell = {}) {
   const keys = window.PFEffectMechanics?.extraKeys?.() || [
     "damageReduction",
@@ -9754,13 +9777,18 @@ function spellEffectPayloads(spell = {}) {
     (key) => Array.isArray(mechanics[key]) && mechanics[key].length,
   );
   const hasBranches = window.PFEffectMechanics?.hasBranches?.(mechanics);
-  if (!bonusRows.length && !hasInlineEffect && !hasBranches) return [];
+  const metamagicRiders = Array.isArray(mechanics.metamagicRiders)
+    ? mechanics.metamagicRiders
+    : [];
+  const hasBasePayload = bonusRows.length || hasInlineEffect || hasBranches;
+  if (!hasBasePayload && !metamagicRiders.length) return [];
   const payload = {
     name: spell.name || "Spell Effect",
     description: spell.details?.description || spell.description || "",
     bonuses: bonusRows,
     durationConfig: mechanics.durationConfig || spell.durationConfig || null,
     auraConfig: mechanics.auraConfig || spell.auraConfig || null,
+    metamagicDurationMultiplier: mechanics.metamagicDurationMultiplier || 1,
     duration: spell.duration || spell.details?.duration || "",
     ...(window.PFEffectMechanics?.hasBranches?.(mechanics)
       ? { branches: mechanics.branches }
@@ -9769,7 +9797,10 @@ function spellEffectPayloads(spell = {}) {
   targetKeys.forEach((key) => {
     payload[key] = Array.isArray(mechanics[key]) ? mechanics[key] : [];
   });
-  return [payload];
+  return [
+    ...(hasBasePayload ? [payload] : []),
+    ...metamagicRiders.map((rider) => cloneJson(rider)),
+  ];
 }
 
 function spellDamageRolls(spell = {}) {
@@ -9777,6 +9808,13 @@ function spellDamageRolls(spell = {}) {
     activeOnly: true,
   }) || spell;
   return window.PFDamageRolls?.normalizeRolls?.(mechanics.damageRolls || []) || [];
+}
+
+function spellTargetPayloadHasMechanics(payload = {}) {
+  return Boolean(
+    (Array.isArray(payload.bonuses) && payload.bonuses.length) ||
+      window.PFEffectMechanics?.hasAnyMechanics?.(payload),
+  );
 }
 
 async function recordSpellDamageTimeline(spell = {}, results = []) {
@@ -9792,11 +9830,23 @@ async function recordSpellDamageTimeline(spell = {}, results = []) {
     time: new Date().toLocaleString(),
   });
   spellCastTargetMapState.timeline = spellCastTargetMapState.timeline.slice(-20);
-  await PFApp.saveMapState?.(
-    spellCastTargetMapState,
-    sheetContextKey,
-    spellCastTargetMapSlot,
-  );
+  await saveSpellCastMapState();
+}
+
+async function recordSpellCastTimeline(spell = {}) {
+  await spellCastTargetsFromCurrentMap();
+  const actor =
+    el("characterName")?.value?.trim() ||
+    (isEnemySheetMode ? "Enemy" : "Character");
+  if (!Array.isArray(spellCastTargetMapState.timeline))
+    spellCastTargetMapState.timeline = [];
+  spellCastTargetMapState.timeline.push({
+    id: globalThis.crypto?.randomUUID?.() || `spell-cast-${Date.now()}`,
+    text: `${actor} casts ${spell.name || "a spell"}.`,
+    time: new Date().toLocaleString(),
+  });
+  spellCastTargetMapState.timeline = spellCastTargetMapState.timeline.slice(-20);
+  await saveSpellCastMapState();
 }
 
 async function rollSpellDamageFromDetails(
@@ -9906,28 +9956,6 @@ async function resolveSpellCastEffectChoices(
   };
 }
 
-function spellDurationConfigFromText(duration = "") {
-  const text = String(duration || "").toLowerCase();
-  const match = text.match(
-    /(\d+)?\s*(rounds?|minutes?|mins?\.?|hours?|days?)\s*(?:\/|per)\s*(?:caster\s*)?levels?/i,
-  );
-  if (!match) return null;
-  const rawUnit = String(match[2] || "").toLowerCase();
-  const unit = /^min/.test(rawUnit)
-    ? "minute"
-    : /^hour/.test(rawUnit)
-      ? "hour"
-      : /^day/.test(rawUnit)
-        ? "day"
-        : "round";
-  return {
-    count: Math.max(1, Number(match[1] || 1) || 1),
-    unit,
-    factors: [{ type: "caster" }],
-    factorMode: "multiply",
-  };
-}
-
 function appliedSpellEffect(
   effect = {},
   spell = {},
@@ -9944,16 +9972,28 @@ function appliedSpellEffect(
     cloned.durationConfig ||
     cloned.duration;
   if (!hasOwnDuration && spell.details?.duration) {
-    const durationConfig = spellDurationConfigFromText(spell.details.duration);
+    const durationConfig =
+      window.PFEffectMeta?.durationConfigFromSpellText?.(
+        spell.details.duration,
+      ) || null;
     if (durationConfig) cloned.durationConfig = durationConfig;
     else cloned.duration = spell.details.duration;
   }
   const baseDurationLabel = spellCastDurationLabel(cloned);
-  const computedDuration = spellCastParseDuration(
+  let computedDuration = spellCastParseDuration(
     cloned,
     casterLevel,
     targetCount,
   );
+  const durationMultiplier = Number(cloned.metamagicDurationMultiplier || 1);
+  if (
+    computedDuration !== null &&
+    computedDuration !== undefined &&
+    Number.isFinite(durationMultiplier) &&
+    durationMultiplier !== 1
+  ) {
+    computedDuration = Math.max(1, Math.floor(computedDuration * durationMultiplier));
+  }
   const splitAmongTargets = Boolean(
     window.PFEffectMeta?.normalizeDurationConfig?.(cloned)?.splitAmongTargets &&
       targetCount > 1,
@@ -10307,7 +10347,19 @@ async function refreshSpellCastTargetOnMap(target) {
   );
 }
 
-async function resolveSpellCastEffectForTarget(target, effect, spell) {
+async function resolveSpellCastEffectForTarget(
+  target,
+  effect,
+  spell,
+  metamagicSaveResults = null,
+) {
+  if (window.PFMetamagic?.resolveTargetEffect) {
+    effect = await window.PFMetamagic.resolveTargetEffect(effect, {
+      targetName: target.name || "the target",
+      saveResults: metamagicSaveResults,
+    });
+    if (!effect) return { effect: null, queued: false };
+  }
   const branchNeeded =
     window.PFEffectMechanics?.hasBranches?.(effect) || false;
   const remoteCharacter =
@@ -10350,25 +10402,6 @@ async function applySpellEffectToTarget(target, effect) {
   return Boolean(saved);
 }
 
-function spellAuraRecord(sourceToken = {}, effect = {}) {
-  const config = effect.auraConfig || {};
-  const auraEffect = cloneJson(effect);
-  delete auraEffect.auraConfig;
-  return {
-    id: `spell-aura-${Date.now()}-${Math.random().toString(16).slice(2)}`,
-    kind: "active",
-    visible: true,
-    radius: Math.max(1, Math.ceil(Number(config.rangeFeet || 5) / 5)),
-    rangeFeet: Math.max(5, Number(config.rangeFeet || 5)),
-    color: sourceToken.kind === "enemy" ? "#b02a37" : "#8fd19e",
-    effect: auraEffect,
-    removeWhenOutOfRange: true,
-    permanent: Boolean(effect.permanent),
-    remaining: effect.remaining ?? null,
-    durationAnchorTokenId: sourceToken.id,
-  };
-}
-
 async function createAuraOnCurrentMap(effect) {
   await spellCastTargetsFromCurrentMap();
   const sourceToken = (spellCastTargetMapState?.tokens || []).find((token) =>
@@ -10376,21 +10409,17 @@ async function createAuraOnCurrentMap(effect) {
       ? token.kind === "enemy" && String(token.enemyId) === String(enemySheetId)
       : token.kind === "character" && String(token.characterId) === String(currentSheetId),
   );
-  if (!sourceToken) return false;
+  if (!sourceToken) return null;
+  const link = window.PFEffectMechanics?.createAuraLink?.(sourceToken, effect);
+  if (!link) return null;
   const current = Array.isArray(sourceToken.automaticAuras)
     ? sourceToken.automaticAuras
     : [];
   sourceToken.automaticAuras = [
     ...current,
-    spellAuraRecord(sourceToken, effect),
+    link.aura,
   ];
-  return Boolean(
-    await PFApp.saveMapState?.(
-      spellCastTargetMapState,
-      sheetContextKey,
-      spellCastTargetMapSlot,
-    ),
-  );
+  return (await saveSpellCastMapState()) ? link.controller : null;
 }
 
 async function createSpellAurasOnCurrentMap(spell, payloads, casterLevel) {
@@ -10400,24 +10429,80 @@ async function createSpellAurasOnCurrentMap(spell, payloads, casterLevel) {
       ? token.kind === "enemy" && String(token.enemyId) === String(enemySheetId)
       : token.kind === "character" && String(token.characterId) === String(currentSheetId),
   );
-  if (!sourceToken) return false;
+  if (!sourceToken) return null;
   const current = Array.isArray(sourceToken.automaticAuras)
     ? sourceToken.automaticAuras
     : [];
-  const additions = payloads.map((payload, index) =>
-    spellAuraRecord(
-      sourceToken,
-      appliedSpellEffect(payload, spell, casterLevel, index),
-    ),
-  );
-  sourceToken.automaticAuras = [...current, ...additions];
-  return Boolean(
-    await PFApp.saveMapState?.(
-      spellCastTargetMapState,
+  const links = payloads
+    .map((payload, index) =>
+      window.PFEffectMechanics?.createAuraLink?.(
+        sourceToken,
+        appliedSpellEffect(payload, spell, casterLevel, index),
+      ),
+    )
+    .filter(Boolean);
+  sourceToken.automaticAuras = [...current, ...links.map((link) => link.aura)];
+  return (await saveSpellCastMapState())
+    ? links.map((link) => link.controller)
+    : null;
+}
+
+async function saveAuraControllerEffects(controllers = []) {
+  const additions = Array.isArray(controllers) ? controllers : [controllers];
+  if (!additions.length) return true;
+  const next = [...activeBuffs, ...additions];
+  if (isEnemySheetMode) {
+    const name = el("characterName").value.trim();
+    if (!name) return false;
+    const sheet = collectSheet();
+    sheet.activeBuffs = next;
+    const saved = await PFApp.saveEnemy(
+      { id: enemySheetId, name, visible: true, sheet },
       sheetContextKey,
-      spellCastTargetMapSlot,
-    ),
+    );
+    if (!saved) return false;
+  } else {
+    const saved =
+      (await PFApp.updateCharacterEffectState?.(
+        currentSheetId,
+        next,
+        sheetContextKey,
+      )) ||
+      (await PFApp.saveBuffState(next, sheetContextKey, currentSheetId));
+    if (saved?.ok === false) return false;
+  }
+  activeBuffs = next;
+  localStorage.setItem(buffRefreshKey(), String(Date.now()));
+  recalculateSheet();
+  return true;
+}
+
+async function syncCurrentMapLinkedAuras(activeEffects = []) {
+  const mapSlot = currentSheetMapSlot();
+  spellCastTargetMapState =
+    (await PFApp.loadMapState?.(sheetContextKey, mapSlot)) || { tokens: [] };
+  spellCastTargetMapSlot = mapSlot;
+  const sourceToken = (spellCastTargetMapState?.tokens || []).find((token) =>
+    isEnemySheetMode
+      ? token.kind === "enemy" && String(token.enemyId) === String(enemySheetId)
+      : token.kind === "character" && String(token.characterId) === String(currentSheetId),
   );
+  if (!sourceToken) return false;
+  const effectIds = new Set(
+    activeEffects.map((effect) => effect?.id).filter(Boolean),
+  );
+  const current = Array.isArray(sourceToken.automaticAuras)
+    ? sourceToken.automaticAuras
+    : [];
+  const next = current.filter(
+    (aura) =>
+      aura.kind === "passive" ||
+      !aura.linkedEffectId ||
+      effectIds.has(aura.linkedEffectId),
+  );
+  if (next.length === current.length) return false;
+  sourceToken.automaticAuras = next;
+  return Boolean(await saveSpellCastMapState());
 }
 
 async function castSpellFromDetails({
@@ -10428,11 +10513,6 @@ async function castSpellFromDetails({
 } = {}) {
   const effectPayloads = spellEffectPayloads(spell);
   let damageRolls = spellDamageRolls(spell);
-  if (!effectPayloads.length && !damageRolls.length)
-    return {
-      close: false,
-      message: `${spell?.name || "This spell"} has no configured effects or damage.`,
-    };
   const failureChance = Number(
     calculations?.arcaneSpellFailure?.chance || 0,
   );
@@ -10475,11 +10555,16 @@ async function castSpellFromDetails({
       (payload) =>
         payload.auraConfig?.enabled ||
         window.PFEffectMechanics?.hasBranches?.(payload) ||
-        window.PFEffectMechanics?.hasAnyMechanics?.(payload),
+        spellTargetPayloadHasMechanics(payload),
     );
   if (!failureChance) {
     closeDetails?.();
     await new Promise((resolve) => setTimeout(resolve, 180));
+  }
+  if (!damageRolls.length && !resolvedPayloads.length) {
+    await recordSpellCastTimeline(spell);
+    setStatus(`${spell.name || "Spell"} cast.`, "success");
+    return { close: true };
   }
   if (damageRolls.length) {
     const damageResults = await rollSpellDamageFromDetails(
@@ -10497,16 +10582,21 @@ async function castSpellFromDetails({
     (payload) => payload.auraConfig?.enabled,
   );
   if (auraPayloads.length) {
-    const created = await createSpellAurasOnCurrentMap(
+    const controllers = await createSpellAurasOnCurrentMap(
       spell,
       auraPayloads,
       casterLevel,
     );
-    if (!created) {
+    if (!controllers) {
       setStatus(
         `Place ${isEnemySheetMode ? "this enemy" : "this character"} on the current map before casting an aura.`,
         "warning",
       );
+      return { close: true };
+    }
+    if (!(await saveAuraControllerEffects(controllers))) {
+      await syncCurrentMapLinkedAuras(activeBuffs);
+      setStatus(`${spell.name || "Spell"} aura could not be saved.`, "danger");
       return { close: true };
     }
     resolvedPayloads = resolvedPayloads.filter(
@@ -10523,6 +10613,7 @@ async function castSpellFromDetails({
   let queuedCount = 0;
   const locallyAppliedTargets = new Set();
   for (const target of targets) {
+    const metamagicSaveResults = new Map();
     for (let index = 0; index < resolvedPayloads.length; index += 1) {
       const unresolvedEffect = appliedSpellEffect(
         resolvedPayloads[index],
@@ -10532,7 +10623,12 @@ async function castSpellFromDetails({
         targets.length,
       );
       const { effect: resolvedEffect, queued } =
-        await resolveSpellCastEffectForTarget(target, unresolvedEffect, spell);
+        await resolveSpellCastEffectForTarget(
+          target,
+          unresolvedEffect,
+          spell,
+          metamagicSaveResults,
+        );
       if (queued) {
         queuedCount += 1;
         continue;
@@ -10550,7 +10646,7 @@ async function castSpellFromDetails({
         if (!damageResults) continue;
       }
       const { damageRolls: _damageRolls, ...effect } = resolvedEffect;
-      if (!window.PFEffectMechanics?.hasAnyMechanics?.(effect)) continue;
+      if (!spellTargetPayloadHasMechanics(effect)) continue;
       if (await applySpellEffectToTarget(target, effect)) {
         appliedCount += 1;
         locallyAppliedTargets.add(target.key);
@@ -10559,12 +10655,7 @@ async function castSpellFromDetails({
     if (locallyAppliedTargets.has(target.key))
       await refreshSpellCastTargetOnMap(target);
   }
-  if (spellCastTargetMapState?.tokens && PFApp.saveMapState)
-    await PFApp.saveMapState(
-      spellCastTargetMapState,
-      sheetContextKey,
-      spellCastTargetMapSlot,
-    );
+  if (spellCastTargetMapState?.tokens) await saveSpellCastMapState();
   const targetedCurrentCharacter =
     !isEnemySheetMode &&
     currentSheetId &&
@@ -13362,14 +13453,14 @@ async function openEffectTrackerModal() {
     choicePoolEquipment: currentEffectChoiceEquipment,
     favoredEnemyOptions: characterFavoredEnemyOptions,
     onAuraActivate: async (effect) => {
-      const created = await createAuraOnCurrentMap(effect);
+      const controller = await createAuraOnCurrentMap(effect);
       setStatus(
-        created
+        controller
           ? `${effect.name || "Aura"} activated on the current map.`
           : `Place ${isEnemySheetMode ? "this enemy" : "this character"} on the current map before activating an aura.`,
-        created ? "success" : "warning",
+        controller ? "success" : "warning",
       );
-      return created;
+      return controller;
     },
     // Enemies aren't "controlled" by a separate real person the way a
     // PC is -- only route PC effects-with-a-choice through the request
@@ -13380,7 +13471,7 @@ async function openEffectTrackerModal() {
       : !currentSheetOwnerId || currentSheetOwnerId === currentUserId,
     loadActiveEffects: isEnemySheetMode ? async () => activeBuffs : undefined,
     saveActiveEffects: enemySaveActiveEffects || undefined,
-    onChange: async (buffs) => {
+    onChange: (buffs, { collectionChanged = false } = {}) => {
       activeBuffs = Array.isArray(buffs) ? buffs : [];
       lastBuffRefresh =
         localStorage.getItem(buffRefreshKey()) || String(Date.now());
@@ -13393,13 +13484,8 @@ async function openEffectTrackerModal() {
         return;
       }
       recalculateSheet();
-      if (!isEnemySheetMode)
-        await PFApp.saveCharacterSheet(
-          name,
-          collectSheet(),
-          sheetContextKey,
-          currentSheetId,
-        );
+      if (collectionChanged) void syncCurrentMapLinkedAuras(activeBuffs);
+      if (!isEnemySheetMode) queueSheetSave();
     },
   };
 

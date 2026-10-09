@@ -1,0 +1,20 @@
+.metamagic-picker-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.metamagic-picker-row { border: 1px solid #454545; border-radius: 6px; padding: 10px 12px; background: #222; min-width: 0; min-height: 46px; cursor: pointer; }
+.metamagic-picker-row:hover, .metamagic-picker-row:focus-visible { border-color: #777; background: #272727; outline: none; }
+.metamagic-picker-row.is-selected { border-color: #0dcaf0; background: #202a2c; }
+.metamagic-picker-heading { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; align-items: center; gap: 10px; }
+.metamagic-picker-select { display: grid; place-items: center; margin: 0; cursor: pointer; }
+.metamagic-picker-select .form-check-input { width: 19px; height: 19px; margin: 0; }
+.metamagic-picker-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 15px; line-height: 1.25; }
+.metamagic-level-badge { color: #f0d58c; font-size: 12px; white-space: nowrap; }
+.metamagic-option, .metamagic-option-grid { margin-top: 8px; }
+.metamagic-option { display: grid; grid-template-columns: minmax(110px, 1fr) minmax(130px, 1fr); align-items: center; gap: 8px; font-size: 12px; }
+.metamagic-option-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.metamagic-option-grid .metamagic-option { grid-template-columns: 1fr; }
+.metamagic-option-stepper { display: grid; grid-template-columns: 30px minmax(50px, 1fr) 30px; gap: 4px; }
+.metamagic-option-stepper .btn, .metamagic-option-stepper input { height: 30px; padding: 0; text-align: center; }
+.metamagic-details-section + .metamagic-details-section { margin-top: 20px; }
+.metamagic-details-section h6 { color: #aaa; font-size: 12px; font-weight: 500; text-transform: uppercase; margin-bottom: 6px; }
+.metamagic-details-section p { line-height: 1.5; margin: 0; white-space: pre-wrap; }
+.spell-picker-metamagic-summary { color: #f0d58c; font-size: 12px; }
+@media (max-width: 760px) { .metamagic-picker-list, .metamagic-option-grid { grid-template-columns: 1fr; } }

@@ -256,6 +256,7 @@
         "spellPickerSchool",
         "spellPickerResults",
         "spellPickerSelect",
+        "spellPickerMetamagic",
         "spellPickerCast",
       ];
       const complete = requiredIds.every((id) => document.getElementById(id));
@@ -296,6 +297,7 @@
               <button id="spellPickerSelect" type="button" class="btn btn-info btn-sm" disabled>
                 <i class="bi bi-check2"></i> Select
               </button>
+              <button id="spellPickerMetamagic" type="button" class="btn btn-outline-info btn-sm d-none">Metamagic</button>
               <button type="button" class="btn btn-outline-light btn-sm" data-bs-dismiss="modal">Cancel</button>
               <button id="spellPickerCast" type="button" class="btn btn-success btn-sm d-none">Cast</button>
             </div>
@@ -338,6 +340,9 @@
         resolveSpell(spell);
       });
     document
+      .getElementById("spellPickerMetamagic")
+      .addEventListener("click", openMetamagicPicker);
+    document
       .getElementById("spellPickerCast")
       .addEventListener("click", async () => {
         if (!state?.detailSpell || typeof state.onCast !== "function") return;
@@ -348,10 +353,11 @@
         status.classList.remove("d-none");
         try {
           const result = await state.onCast({
-            spell: state.detailSpell,
+            spell: state.effectiveSpell || state.detailSpell,
             casterLevel: state.currentCasterLevel,
             calculatedCasterLevel: state.maxCasterLevel,
             calculations: state.calculations,
+            metamagic: state.metamagicSelections || [],
             closeDetails: () => modal?.hide(),
           });
           if (result?.message) status.textContent = result.message;
@@ -363,6 +369,7 @@
     document
       .getElementById(MODAL_ID)
       .addEventListener("hidden.bs.modal", () => {
+        if (state?.suspendClose) return;
         if (resolver) {
           resolver(null);
           resolver = null;
@@ -376,6 +383,7 @@
       ?.classList.toggle("d-none", !visible);
     document.getElementById("spellPickerSearch")?.classList.toggle("d-none", !visible);
     document.getElementById("spellPickerSelect")?.classList.toggle("d-none", !visible);
+    document.getElementById("spellPickerMetamagic")?.classList.toggle("d-none", visible);
     document.getElementById("spellPickerCast")?.classList.toggle("d-none", visible);
     const castStatus = document.getElementById("spellPickerCastStatus");
     castStatus?.classList.add("d-none");
@@ -759,12 +767,19 @@
       })
       .filter(Boolean)
       .join("");
+    const metamagic = Array.isArray(calculations.metamagic)
+      ? calculations.metamagic
+      : [];
+    const metamagicSummary = metamagic.length
+      ? `<div class="spell-picker-metamagic-summary mt-2"><strong>Metamagic</strong> ${escapeHtml(metamagic.map((entry) => entry.name).join(", "))} | Effective slot ${escapeHtml(calculations.effectiveSlotLevel ?? calculations.spellLevel ?? 0)}</div>`
+      : "";
     return `
       <div class="spell-picker-rule-heading">Calculated</div>
       <div class="spell-picker-calculations">
         ${calculationCardHtml("Caster Level", casterLevel, "", "Cl", { stepper: true, max: calculations.calculatedCasterLevel || casterLevel.total })}
         ${calculationCardHtml("DC", spellDc, `10 + spell level ${calculations.spellLevel ?? 0} + ${calculations.castingAbility || "ability"} ${signed(calculations.castingAbilityMod || 0)}${Number(spellDc.bonus || 0) ? ` + modifiers ${signed(spellDc.bonus)}` : ""}`, "Dc")}
       </div>
+      ${metamagicSummary}
       <div class="accordion spell-picker-effects-accordion mt-2" id="spellPickerEffectBreakdown">
         <div class="accordion-item">
           <h2 class="accordion-header">
@@ -801,17 +816,58 @@
     state.currentCasterLevel = nextLevel;
     if (typeof state.recalculate === "function") {
       const nextCalculations = await state.recalculate(nextLevel);
-      if (nextCalculations) state.calculations = nextCalculations;
-    } else if (state.calculations?.casterLevel) {
-      state.calculations = {
-        ...state.calculations,
+      if (nextCalculations) state.baseCalculations = nextCalculations;
+    } else if (state.baseCalculations?.casterLevel) {
+      state.baseCalculations = {
+        ...state.baseCalculations,
         casterLevel: {
-          ...state.calculations.casterLevel,
+          ...state.baseCalculations.casterLevel,
           total: nextLevel,
         },
       };
     }
-    renderDetailOnly(state.detailSpell, state.calculations);
+    applyDetailMetamagic();
+    renderDetailOnly(state.effectiveSpell || state.detailSpell, state.calculations);
+  }
+
+  function applyDetailMetamagic() {
+    if (!state?.detailSpell) return;
+    const result = window.PFMetamagic?.apply?.({
+      spell: state.detailSpell,
+      calculations: state.baseCalculations,
+      selections: state.metamagicSelections || [],
+    });
+    state.effectiveSpell = result?.spell || state.detailSpell;
+    state.calculations = result?.calculations || state.baseCalculations;
+    const button = document.getElementById("spellPickerMetamagic");
+    if (button) {
+      const count = state.metamagicSelections?.length || 0;
+      button.textContent = count ? `Metamagic (${count})` : "Metamagic";
+    }
+  }
+
+  async function waitForHidden(element) {
+    if (!element?.classList.contains("show")) return;
+    await new Promise((resolve) =>
+      element.addEventListener("hidden.bs.modal", resolve, { once: true }),
+    );
+  }
+
+  async function openMetamagicPicker() {
+    if (!state?.detailSpell || !window.PFMetamagicPicker?.open) return;
+    const element = document.getElementById(MODAL_ID);
+    state.suspendClose = true;
+    modal?.hide();
+    await waitForHidden(element);
+    const selections = await window.PFMetamagicPicker.open({
+      selections: state.metamagicSelections || [],
+      spellLevel: state.baseCalculations?.originalSpellLevel ?? state.baseCalculations?.spellLevel ?? state.spellLevel,
+    });
+    if (selections) state.metamagicSelections = selections;
+    applyDetailMetamagic();
+    renderDetailOnly(state.effectiveSpell || state.detailSpell, state.calculations);
+    state.suspendClose = false;
+    modal?.show();
   }
 
   function bindDetailControls() {
@@ -866,7 +922,10 @@
         expanded: config.initialSpellName || "",
         scrollToExpanded: Boolean(config.initialSpellName),
         detailSpell: null,
+        effectiveSpell: null,
         calculations: null,
+        baseCalculations: null,
+        metamagicSelections: [],
         recalculate: null,
         onCast: null,
         calculationsForSpell:
@@ -929,7 +988,10 @@
         expanded: spell.name || "",
         scrollToExpanded: false,
         detailSpell: spell,
+        effectiveSpell: spell,
         calculations: config.calculations || null,
+        baseCalculations: config.calculations || null,
+        metamagicSelections: Array.isArray(config.metamagic) ? config.metamagic : [],
         recalculate: typeof config.recalculate === "function" ? config.recalculate : null,
         onCast: typeof config.onCast === "function" ? config.onCast : null,
         calculationsForSpell: null,
@@ -938,10 +1000,11 @@
         maxSpellLevel: 9,
       };
       setPickerControlsVisible(false);
+      applyDetailMetamagic();
       document.querySelector(`#${MODAL_ID} .spell-picker-modal`)?.classList.add("is-detail-mode");
       document.getElementById(`${MODAL_ID}Label`).textContent = state.title;
       document.getElementById("spellPickerSearch").value = "";
-      renderDetailOnly(spell, state.calculations || null);
+      renderDetailOnly(state.effectiveSpell || spell, state.calculations || null);
       modal = bootstrap.Modal.getOrCreateInstance(
         document.getElementById(MODAL_ID),
       );

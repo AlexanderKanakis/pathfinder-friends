@@ -239,6 +239,27 @@
     return labels.join("; ");
   }
 
+  function durationConfigFromSpellText(duration = "") {
+    const match = String(duration || "").match(
+      /(\d+)?\s*(rounds?|minutes?|mins?\.?|hours?|days?)\s*(?:\/|per)\s*(?:caster\s*)?levels?/i,
+    );
+    if (!match) return null;
+    const rawUnit = String(match[2] || "").toLowerCase();
+    const unit = /^min/.test(rawUnit)
+      ? "minute"
+      : /^hour/.test(rawUnit)
+        ? "hour"
+        : /^day/.test(rawUnit)
+          ? "day"
+          : "round";
+    return {
+      count: Math.max(1, Number(match[1] || 1) || 1),
+      unit,
+      factors: [{ type: "caster" }],
+      factorMode: "multiply",
+    };
+  }
+
   function durationScaleLabel(scale) {
     const normalized = normalizeDurationScale(scale);
     if (!normalized) return "";
@@ -766,6 +787,7 @@
     durationMultiplier,
     applyDurationScale,
     durationScaleLabel,
+    durationConfigFromSpellText,
   };
   window.PFEffectDurationEditor = DurationEditor;
 })();

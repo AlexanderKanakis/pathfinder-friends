@@ -7121,22 +7121,12 @@ async function characterActivatableAbilities(character) {
 // already unambiguous from the right-click context, so this doesn't
 // need its own "cast as" picker.
 function automaticAuraRecord(sourceToken, effect, { id, kind = "active" } = {}) {
-  const config = effect?.auraConfig || {};
-  const auraEffect = structuredClone(effect || {});
-  delete auraEffect.auraConfig;
-  return {
-    id: id || uid("automatic_aura"),
-    kind,
-    visible: true,
-    radius: auraRangeCells(config),
-    rangeFeet: Math.max(5, Number(config.rangeFeet || 5)),
-    color: sourceToken.kind === "enemy" ? "#b02a37" : "#8fd19e",
-    effect: auraEffect,
-    removeWhenOutOfRange: true,
-    permanent: Boolean(effect?.permanent || kind === "passive"),
-    remaining: effect?.remaining ?? null,
-    durationAnchorTokenId: sourceToken.id,
-  };
+  return (
+    window.PFEffectMechanics?.createAuraLink?.(sourceToken, effect, {
+      id: id || uid("automatic_aura"),
+      kind,
+    })?.aura || null
+  );
 }
 
 function installAutomaticAura(sourceToken, effect, options = {}) {
@@ -7150,6 +7140,16 @@ function installAutomaticAura(sourceToken, effect, options = {}) {
     aura,
   ];
   return aura;
+}
+
+function installLinkedAutomaticAura(sourceToken, effect) {
+  const link = window.PFEffectMechanics?.createAuraLink?.(sourceToken, effect);
+  if (!sourceToken || !link) return null;
+  const current = Array.isArray(sourceToken.automaticAuras)
+    ? sourceToken.automaticAuras
+    : [];
+  sourceToken.automaticAuras = [...current, link.aura];
+  return link;
 }
 
 async function syncTokenPassiveAuras(token) {
@@ -7247,10 +7247,11 @@ async function openMapEffects(tokenId) {
         ? characterFavoredEnemyOptions(tokenCharacter(token))
         : [],
     onAuraActivate: async (effect) => {
-      if (!installAutomaticAura(token, effect)) return false;
+      const link = installLinkedAutomaticAura(token, effect);
+      if (!link) return false;
       addTimeline(`${displayTokenName(token)} activates ${effect.name || "an aura"}.`);
       renderAll();
-      return true;
+      return link.controller;
     },
     loadActiveEffects:
       token.kind === "enemy"
@@ -7297,6 +7298,7 @@ async function openMapEffects(tokenId) {
           syncTokenFromSheet(token, character);
           renderAll(false);
         }
+        if (reconcileTokenLinkedAuras(token, activeEffects)) renderAll();
         return;
       }
 
@@ -7333,6 +7335,7 @@ async function openMapEffects(tokenId) {
             `pf_enemy_sheet_updated_${mapContextKey}_${nextEnemy.id}`,
             String(Date.now()),
           );
+          reconcileTokenLinkedAuras(token, activeEffects);
           renderAll();
         }
       }
@@ -7380,6 +7383,15 @@ function incrementQuickEffectUsage(effect) {
   const counts = quickEffectUsageCounts();
   counts[key] = Number(counts[key] || 0) + 1;
   localStorage.setItem(quickEffectUsageKey(), JSON.stringify(counts));
+}
+
+function recordQuickSpellCast(effect) {
+  const sourceToken = tokenById(quickEffectSourceTokenId);
+  const actor = sourceToken ? displayTokenName(sourceToken) : "A character";
+  addTimeline(`${actor} casts ${effect?.name || "a spell"}.`);
+  incrementQuickEffectUsage(effect);
+  queueSave();
+  renderAll();
 }
 
 function tokenLevel(token) {
@@ -7631,6 +7643,8 @@ function effectDamageRolls(effect = {}) {
 function effectHasTargetMechanics(effect = {}) {
   if (effect.auraConfig?.enabled) return true;
   if (window.PFEffectMechanics?.hasBranches?.(effect)) return true;
+  if (Array.isArray(effect.metamagicRiders) && effect.metamagicRiders.length)
+    return true;
   if (Array.isArray(effect.bonuses) && effect.bonuses.length) return true;
   return (window.PFEffectMechanics?.extraKeys?.() || [])
     .filter((key) => key !== "damageRolls")
@@ -7696,7 +7710,17 @@ async function chooseQuickEffect(effect, options = {}) {
   if (effect.auraConfig?.enabled) {
     const sourceToken = tokenById(quickEffectSourceTokenId);
     const applied = appliedEffectFromQuickSelection(effect, selection);
-    if (!sourceToken || !installAutomaticAura(sourceToken, applied)) return;
+    const link = sourceToken
+      ? installLinkedAutomaticAura(sourceToken, applied)
+      : null;
+    if (!link) return;
+    const active = await loadTokenActiveEffects(sourceToken);
+    if (!(await saveTokenActiveEffects(sourceToken, [...active, link.controller]))) {
+      sourceToken.automaticAuras = sourceToken.automaticAuras.filter(
+        (aura) => aura.id !== link.aura.id,
+      );
+      return;
+    }
     incrementQuickEffectUsage(effect);
     addTimeline(`${displayTokenName(sourceToken)} activates ${effect.name || "an aura"}.`);
     quickEffectModal.hide();
@@ -7868,13 +7892,14 @@ async function openMapOwnedSpellDetails(effect, defaultCl = 1) {
       );
       return detail?.calculations || calculations;
     },
-    onCast: async ({ casterLevel, calculations: castCalculations, closeDetails }) => {
-      if (!hasConfiguredEffects) {
-        return {
-          close: false,
-          message: `${effect.name || "This spell"} has no configured effects or damage.`,
-        };
-      }
+    onCast: async ({ spell: castSpell, casterLevel, calculations: castCalculations, closeDetails }) => {
+      const castEffect = window.PFMetamagic?.decorateQuickEffect
+        ? window.PFMetamagic.decorateQuickEffect(effect, castSpell || spell)
+        : effect;
+      const castHasConfiguredEffects =
+        hasConfiguredEffects ||
+        effectHasTargetMechanics(castEffect) ||
+        effectDamageRolls(castEffect).length > 0;
       casting = true;
       closeDetails?.();
       await new Promise((resolve) => setTimeout(resolve, 180));
@@ -7888,7 +7913,11 @@ async function openMapOwnedSpellDetails(effect, defaultCl = 1) {
         });
         if (!castContinues) return { close: true };
       }
-      void chooseQuickEffect(effect, {
+      if (!castHasConfiguredEffects) {
+        recordQuickSpellCast(castEffect);
+        return { close: true };
+      }
+      void chooseQuickEffect(castEffect, {
         casterLevel: casterLevel || defaultCl,
       });
       return { close: true };
@@ -8035,6 +8064,10 @@ function spellEffectDefinition(spell = {}, metadata = {}) {
   const mechanics = window.PFEffectMechanics?.activeMechanics?.(spell, {
     activeOnly: true,
   }) || { effects: [] };
+  const durationConfig =
+    mechanics.durationConfig ||
+    window.PFEffectMeta?.durationConfigFromSpellText?.(spell.details?.duration) ||
+    null;
   const effect = {
     id: `spell:${metadata.kind || "spell"}:${metadata.className || ""}:${metadata.level ?? ""}:${spell.name || metadata.name || "spell"}`,
     name: spell.name || metadata.name || "Spell",
@@ -8044,13 +8077,13 @@ function spellEffectDefinition(spell = {}, metadata = {}) {
         ? `${metadata.source || "Spell-Like Ability"} | ${metadata.frequency || "At will"}`
         : metadata.className || "Spell",
     bonuses: mechanics.effects || [],
-    durationConfig: mechanics.durationConfig || null,
+    durationConfig,
     auraConfig: mechanics.auraConfig || null,
     ...(window.PFEffectMechanics?.hasBranches?.(mechanics)
       ? { branches: mechanics.branches }
       : {}),
     duration: window.PFEffectMeta?.durationLabel
-      ? window.PFEffectMeta.durationLabel(mechanics.durationConfig || {})
+      ? window.PFEffectMeta.durationLabel(durationConfig || {})
       : "variable",
     ownedSpell: true,
     spellMeta: metadata,
@@ -8492,9 +8525,21 @@ function appliedEffectFromQuickSelection(effect, options, targetCount = 1) {
     ? { ...(effect.abilityContext || { casterLevel }), targetCount }
     : { casterLevel, targetCount };
   const baseDurationLabel = durationLabel(effect);
-  const calculatedDuration = condition
+  let calculatedDuration = condition
     ? turns
     : parseEffectDuration(effect, durationArg);
+  const durationMultiplier = Number(effect.metamagicDurationMultiplier || 1);
+  if (
+    calculatedDuration !== null &&
+    calculatedDuration !== undefined &&
+    Number.isFinite(durationMultiplier) &&
+    durationMultiplier !== 1
+  ) {
+    calculatedDuration = Math.max(
+      1,
+      Math.floor(calculatedDuration * durationMultiplier),
+    );
+  }
   const splitAmongTargets = Boolean(
     window.PFEffectMeta?.normalizeDurationConfig?.(effect)?.splitAmongTargets &&
       targetCount > 1,
@@ -8634,6 +8679,26 @@ async function loadTokenActiveEffects(token) {
   return [];
 }
 
+function reconcileTokenLinkedAuras(token, activeEffects = []) {
+  const effectIds = new Set(
+    (Array.isArray(activeEffects) ? activeEffects : [])
+      .map((effect) => effect?.id)
+      .filter(Boolean),
+  );
+  const current = Array.isArray(token?.automaticAuras)
+    ? token.automaticAuras
+    : [];
+  const next = current.filter(
+    (aura) =>
+      aura.kind === "passive" ||
+      !aura.linkedEffectId ||
+      effectIds.has(aura.linkedEffectId),
+  );
+  if (next.length === current.length) return false;
+  token.automaticAuras = next;
+  return true;
+}
+
 async function saveTokenActiveEffects(token, effects) {
   const activeEffects = Array.isArray(effects) ? effects : [];
   if (token.kind === "character") {
@@ -8664,6 +8729,7 @@ async function saveTokenActiveEffects(token, effects) {
       if (calculated) character.sheet.calculated = calculated;
       syncTokenFromSheet(token, character);
     }
+    if (reconcileTokenLinkedAuras(token, nextActiveBuffs)) queueSave();
     return true;
   }
   if (token.kind === "enemy") {
@@ -8677,6 +8743,7 @@ async function saveTokenActiveEffects(token, effects) {
     token.sheet = saved.sheet || token.sheet || {};
     const calculated = await recalculateEnemySheetFromMap(token.enemyId, saved);
     if (calculated) token.sheet.calculated = calculated;
+    if (reconcileTokenLinkedAuras(token, activeEffects)) queueSave();
     return true;
   }
   return false;
@@ -9201,25 +9268,35 @@ async function confirmQuickEffectTargets() {
   el("confirmQuickEffectTargets").disabled = true;
   el("quickEffectApplyStatus").textContent = "Applying...";
   await hideQuickEffectTargetsBeforeChoices();
-  const appliedEffect = appliedEffectFromQuickSelection(
-    quickEffectSelection.effect,
-    quickEffectSelection.options,
-    targets.length,
-  );
   const sourceTokenId =
     quickEffectSelection.sourceTokenId || quickEffectSourceTokenId || "";
   const queuedTargets = [];
   const readyTargets = [];
   for (const token of targets) {
     const targetEffect = {
-      ...structuredClone(appliedEffect),
+      ...structuredClone(quickEffectSelection.effect),
       sourceTokenId: sourceTokenId || token.id,
       durationAnchorTokenId: sourceTokenId || token.id,
     };
-    const { effect: resolvedEffect, queued } =
-      await resolveEffectChoicesForToken(token, targetEffect);
-    if (queued) queuedTargets.push(tokenActualName(token));
-    else if (resolvedEffect) readyTargets.push({ token, effect: resolvedEffect });
+    const targetEffects = window.PFMetamagic?.resolveTargetEffects
+      ? await window.PFMetamagic.resolveTargetEffects(targetEffect, {
+          targetName: tokenActualName(token),
+        })
+      : [targetEffect];
+    if (!targetEffects) continue;
+    for (const candidate of targetEffects) {
+      if (!effectHasTargetMechanics(candidate)) continue;
+      const appliedEffect = appliedEffectFromQuickSelection(
+        candidate,
+        quickEffectSelection.options,
+        targets.length,
+      );
+      const { effect: resolvedEffect, queued } =
+        await resolveEffectChoicesForToken(token, appliedEffect);
+      if (queued) queuedTargets.push(tokenActualName(token));
+      else if (resolvedEffect)
+        readyTargets.push({ token, effect: resolvedEffect });
+    }
   }
   const appliedTargets = (
     await Promise.all(
@@ -9337,6 +9414,7 @@ function renderTurnEffectNotices() {
 async function advanceAutomaticAuras(endingTokenId) {
   if (!endingTokenId) return;
   let changed = false;
+  const expiredLinks = [];
   state.tokens.forEach((token) => {
     const auras = Array.isArray(token.automaticAuras) ? token.automaticAuras : [];
     const next = auras.flatMap((aura) => {
@@ -9351,12 +9429,21 @@ async function advanceAutomaticAuras(endingTokenId) {
       }
       const remaining = Number(aura.remaining) - 1;
       changed = true;
+      if (remaining <= 0 && aura.linkedEffectId)
+        expiredLinks.push({ token, effectId: aura.linkedEffectId });
       return remaining > 0 ? [{ ...aura, remaining }] : [];
     });
     if (next.length !== auras.length || next.some((entry, index) => entry !== auras[index]))
       token.automaticAuras = next;
   });
   if (!changed) return;
+  for (const { token, effectId } of expiredLinks) {
+    const active = await loadTokenActiveEffects(token);
+    await saveTokenActiveEffects(
+      token,
+      active.filter((effect) => effect.id !== effectId),
+    );
+  }
   renderAll();
   await removeOutOfRangeAuraEffects();
 }
@@ -10351,9 +10438,19 @@ function renderAutomaticAuraList(token) {
     : `<div class="small text-secondary">None</div>`;
   list.querySelectorAll("[data-remove-automatic-aura]").forEach((button) => {
     button.addEventListener("click", async () => {
+      const removed = auras.find(
+        (aura) => aura.id === button.dataset.removeAutomaticAura,
+      );
       token.automaticAuras = auras.filter(
         (aura) => aura.id !== button.dataset.removeAutomaticAura,
       );
+      if (removed?.linkedEffectId) {
+        const active = await loadTokenActiveEffects(token);
+        await saveTokenActiveEffects(
+          token,
+          active.filter((effect) => effect.id !== removed.linkedEffectId),
+        );
+      }
       renderAutomaticAuraList(token);
       renderAll();
       await removeOutOfRangeAuraEffects();

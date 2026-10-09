@@ -29,6 +29,22 @@ assert.strictEqual(
   ),
   1,
 );
+assert.deepStrictEqual(
+  global.PFEffectMeta.durationConfigFromSpellText("10 minutes/level"),
+  {
+    count: 10,
+    unit: "minute",
+    factors: [{ type: "caster" }],
+    factorMode: "multiply",
+  },
+);
+assert.strictEqual(
+  global.PFEffectMeta.parseDuration(
+    global.PFEffectMeta.durationConfigFromSpellText("10 minutes/level"),
+    { casterLevel: 21 },
+  ),
+  2100,
+);
 
 const editor = fs.readFileSync(
   require.resolve("../modals/effect-duration-editor.js"),
@@ -45,6 +61,7 @@ assert(characterSheet.includes("targets.length,"));
 
 const map = fs.readFileSync(require.resolve("./pages/map.js"), "utf8");
 assert(map.includes("appliedEffectFromQuickSelection(effect, options, targetCount = 1)"));
-assert(map.includes("quickEffectSelection.options,\n    targets.length,"));
+assert(map.includes("durationConfigFromSpellText?.(spell.details?.duration)"));
+assert(/quickEffectSelection\.options,\s*targets\.length,/.test(map));
 
 console.log("Shared duration checks passed.");

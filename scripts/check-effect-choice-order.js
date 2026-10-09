@@ -41,6 +41,33 @@ assert(
     spellCast.indexOf("resolveSpellCastEffectForTarget"),
   "Spell targets must be selected before branch choices are resolved.",
 );
+assert(
+  !spellCast.includes("has no configured effects or damage"),
+  "Spells without configured mechanics must remain castable from the character sheet.",
+);
+assert(
+  spellCast.indexOf("recordSpellCastTimeline(spell)") <
+    spellCast.indexOf("openSpellCastTargetModal(spell)"),
+  "Mechanic-free casts must finish before opening the target picker.",
+);
+
+const mapStateSave = functionBody(sheet, "saveSpellCastMapState");
+assert(mapStateSave.includes("clientId: spellCastMapClientId"));
+assert(mapStateSave.includes("savedAt: Math.max(Date.now()"));
+assert(
+  functionBody(sheet, "createSpellAurasOnCurrentMap").includes(
+    "saveSpellCastMapState()",
+  ),
+  "Character-sheet aura casts must publish fresh map synchronization metadata.",
+);
+assert(
+  functionBody(sheet, "createSpellAurasOnCurrentMap").includes("createAuraLink"),
+  "Character-sheet aura casts must create a linked active-effect entry.",
+);
+assert(
+  spellCast.includes("saveAuraControllerEffects(controllers)"),
+  "Character-sheet aura casts must persist their linked active-effect entry.",
+);
 
 const targetResolver = functionBody(sheet, "resolveSpellCastEffectForTarget");
 assert(targetResolver.includes('target.ownerId !== currentUserId'));
@@ -66,6 +93,14 @@ const mapSpellDetails = functionBody(map, "openMapOwnedSpellDetails");
 assert(
   mapSpellDetails.includes("effectHasTargetMechanics(effect)"),
   "Branch-only spells must count as configured effects on the map.",
+);
+assert(
+  !mapSpellDetails.includes("has no configured effects or damage"),
+  "Spells without configured mechanics must remain castable from the map.",
+);
+assert(
+  mapSpellDetails.includes("recordQuickSpellCast(castEffect)"),
+  "Mechanic-free map casts must be recorded without opening the target picker.",
 );
 assert(
   /function effectHasTargetMechanics[\s\S]{0,240}PFEffectMechanics\?\.hasBranches\?\.\(effect\)/.test(map),

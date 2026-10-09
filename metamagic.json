@@ -1,0 +1,583 @@
+{
+    "statModificationsFound": [
+        "add descriptor to spell",
+        "change effective spell-slot needed to cast (no dc change with the one exception being heighten spell)",
+        "change effective spell-slot needed to cast with an accompanied dc change (Heighten Spell)",
+        "the parameter changes may be partly or full conditional, marked by (Condition: ..., Condition effect: ...)",
+        "change caster's stats upon casting for a period of time (see brackish spell). treat those as temporary user effects ideally use already existing effect mechanics if they are available",
+        "attribute damage/drain (Side note: these are separate pf1 mechanics and the will be used as conditions. The only exception is that those are easy to add reduce by not necessarily removing them completely as a condition. So we need to add them as a condition, them and negative levels and wherever they apper they need a stepper to increase/decrease them)",
+        "if a spell has in any capacity randomness in it's effect then the result must be maximum (see Maximize spell)",
+        "multiply variable numerical effects (determined partially or fully by randomness fireball is correct (dice rolls only) cure light wounds is correct (dicerolls and based on scaling) desctruction does not count (static damage per level), heroism does not count (completely static)) by 1.5 (empower spell)",
+        "if the spell gives a stat effect of a certain type, increase the bonus",
+        "if spells have an aura, it needs to be modifoed as per the metamagic instructs (widen spell)"
+    ],
+    "metamagic": [
+        {
+            "name": "Apocalyptic Spell",
+            "benefits":"You can alter a spell with an area of effect and a duration of instantaneous to become an apocalyptic spell.",
+            "description":"Your spell becomes infused with the devastating horror personified by the Horsemen of the Apocalypse, temporarily transforming reality into a treacherous ruin.",
+            "spellLevelIncrease":1,
+            "effect":"spell gains evil descriptor"
+        },
+        {
+            "name": "Aquatic Spell (Metamagic)",
+            "benefits":"An aquatic spell functions normally underwater and requires no caster level check to cast, even if it has the fire descriptor. In addition, the spell can be cast from the surface into water and still be effective.",
+            "description":"You can cast your spells underwater or into water with little difficulty.",
+            "spellLevelIncrease":1,
+            "effect":""
+        },
+        {
+            "name": "Authoritative Spell",
+            "benefits":"You can alter any spell that targets a single creature to become an authoritative spell. When you cast an authoritative spell, choose one of the following activities to prohibit: move closer to you, move away from you, make a melee weapon attack, make a ranged weapon attack, cast an offensive spell, or cast a non-offensive spell. A creature that is affected by the spell and fails its saving throw against that spell (if the spell allows a saving throw to resist) cannot perform any action of the selected type on its next turn. An authoritative spell gains the lawful descriptor, and the additional effect is a mind-affecting compulsion effect.",
+            "description":"Your magic holds all the intricacies of Axis’s idealized laws, enforcing their strictures upon your enemies.",
+            "spellLevelIncrease":2,
+            "effect":"spell gains lawful descriptor"
+        },
+        {
+            "name": "Benthic Spell",
+            "benefits":"You can modify a spell that deals acid, cold, electricity, or fire damage to deal damage through high-pressure water instead. The spell gains the water descriptor, and you can either replace the spell’s normal damage with bludgeoning damage or split the spell’s damage so that half is bludgeoning and half is of its normal type. Creatures with damage reduction apply their damage reduction to bludgeoning damage from a benthic spell, but the spell counts as bludgeoning and magic for the purposes of bypassing damage reduction.",
+            "description":"Explorers in the depths of the Arcadian Ocean have learned that deadly pressure can be just as lethal as any flame",
+            "spellLevelIncrease":1,
+            "effect":""
+        },
+        {
+            "name": "Blissful Spell",
+            "benefits":"You can alter any spell that targets a single creature to become a blissful spell, although the exact effects of the metamagic vary depending on whether the spell is beneficial or offensive. A creature successfully hit by an offensive blissful spell (if the spell requires an attack roll) or that fails its saving throw against an offensive blissful spell takes a –2 penalty on attack rolls and weapon damage rolls for 1 round. A beneficial blissful spell instead grants affected creatures a +2 morale bonus on skill checks and saving throws for 1 round in addition to its normal effects.",
+            "description":"The absolute peace of Nirvana infuses your spells, giving pause to foes and granting boldness to allies.",
+            "spellLevelIncrease":1,
+            "effect":"spell gains good descriptor"
+        },
+        {
+            "name": "Bouncing Spell",
+            "benefits":"Whenever a bouncing spell targeting a single creature has no effect on its intended target (whether due to spell resistance or a successful saving throw) you may, as a swift action, redirect it to target another eligible creature within range. The redirected spell behaves in all ways as if its new target were the original target for the spell. Spells that affect a target in any way (including a lesser effect from a successful saving throw) may not be redirected in this manner.",
+            "description":"You can direct a failed spell against a different target.",
+            "spellLevelIncrease":1,
+            "effect":""
+        },
+        {
+            "name": "Brackish Spell",
+            "benefits":"This feat can be applied only to spells with the water descriptor. You can modify the spell to surround you with a thin sheath of brackish salt water in addition to the spell’s normal effect. You gain DR/piercing equal to the spell’s level for 1 round after you finish casting the spell.",
+            "description":"You can conjure a seawater orb to protect yourself.",
+            "spellLevelIncrease":0,
+            "effect":"add/increase user dr/spell level for 1 round"
+        },
+        {
+            "name": "Brisk Spell",
+            "benefits":"You can alter spells that grant a creature a movement type it doesn’t normally have to increase the speed for that movement type by 10 feet.",
+            "description":"Your movement spells make allies swifter than normal.",
+            "spellLevelIncrease":0,
+            "effect":""
+        },
+        {
+            "name": "Burning Spell",
+            "benefits":"The acid or fire effects of the affected spell adhere to the creature, causing more damage the next round. When a creature takes acid or fire damage from the affected spell, that creature takes damage equal to 2x the spell’s actual level at the start of its next turn. The damage is acid or fire, as determined by the spell’s descriptor. If a burning spell has both the fire and acid descriptor, the caster chooses what kind of damage is dealt by the burning spell effect.",
+            "description":"You cause creatures to take extra damage when you affect them with a spell that has the acid or fire descriptor.",
+            "spellLevelIncrease":2,
+            "effect":""
+        },
+        {
+            "name": "Centered Spell",
+            "benefits":"You can center the area of a spell with an area effect and duration of instantaneous on you, and exclude yourself from the effects of the spell. Your familiar (if any) is also excluded from the effect, provided that it is in your square and at least one size category smaller than you.",
+            "description":"You can make a spell explode around you, leaving a safe zone for yourself at the center of the blast.",
+            "spellLevelIncrease":0,
+            "effect":""
+        },
+        {
+            "name": "Cherry Blossom Spell",
+            "benefits":"When a living creature takes damage from the affected spell, that creature also takes 2 points of damage to Strength, Dexterity, and Constitution or 2 points of damage to Intelligence, Wisdom, and Charisma (your choice). If the spell does not normally allow a save, the target can attempt a Fortitude save to negate the effect. Ageless or immortal creatures are immune to this effect. This is a magical aging effect, but it does not alter the creature’s true age—it merely simulates the effects of old age on the flesh or the reversion to a more infantile mental age. Spells that don’t deal damage don’t benefit from this feat.",
+            "description":"You can infuse your spells with the ability to cripple your targets with old age or regress them to the folly of youth.",
+            "spellLevelIncrease":3,
+            "effect":""
+        },
+        {
+            "name": "Coaxing Spell",
+            "benefits":"This feat only works with mind-affecting effects. A coaxing spell affects mindless oozes and vermin as if they weren’t mindless, but has no effect on other creature types.",
+            "description":"Your charms and enchantments reach the minds of even the lowliest dungeon denizens.",
+            "spellLevelIncrease":2,
+            "effect":""
+        },
+        {
+            "name": "Concussive Spell",
+            "benefits":"With sonic damage comes a concussive wave of energy that rattles creatures affected by the spell. A concussive spell causes creatures that take damage from a spell that has the sonic descriptor to take a –2 penalty on attack rolls, saving throws, skill checks, and ability checks for a number of rounds equal to the actual spell level of the spell. A concussive spell only affects spells with the sonic descriptor.",
+            "description":"You cause creatures to be disoriented when you affect them with a spell that has the sonic descriptor.",
+            "spellLevelIncrease":2,
+            "effect":"-2 on attack rolls, -2 on saving throws, -2 on skill checks, -2 on ability checks, for original spell level turns"
+        },
+        {
+            "name": "Conditional Spell",
+            "benefits":"A conditional spell is subject to the rules laid out in the spell conditional favor.",
+            "description":"You know how to apply restrictions on how a creature can use the benefits of your spells.",
+            "spellLevelIncrease":1,
+            "effect":""
+        },
+        {
+            "name": "Consecrate Spell",
+            "benefits":"A consecrated spell is treated as a maximized spell against evil creatures and creatures with the evil subtype. Against all other creatures, this feat does not modify the spell in any way (for example, a consecrated fireball acts as a normal fireball against neutral or good creatures). This feat does not stack with Maximize Spell.A consecrated spell is treated as a maximized spell against evil creatures and creatures with the evil subtype. Against all other creatures, this feat does not modify the spell in any way (for example, a consecrated fireball acts as a normal fireball against neutral or good creatures). This feat does not stack with Maximize Spell.",
+            "description":"You infuse spells with heavenly power, drastically increasing their effectiveness against would-be heralds of evil.",
+            "spellLevelIncrease":2,
+            "effect":"maximized"
+        },
+        {
+            "name": "Contagious Spell",
+            "benefits":"A caster level check to dispel or remove a contagious spell that fails by 5 or more causes it to spread from the original target to the creature that attempted to remove it. The spell spreads to the new target regardless of its normal range or any special targeting requirement like a melee or ranged touch attack. The spell is treated as if you had just cast it on the new target. The new target receives a saving throw or the benefit of spell resistance (if applicable) if the spell normally allows it.",
+            "description":"Your spells are dangerous to dispel and likely to backfire upon those who try.",
+            "spellLevelIncrease":2,
+            "effect":""
+        },
+        {
+            "name": "Contingent Spell",
+            "benefits":"A contingent spell infuses a target with a dormant healing or restorative spell that can trigger when the target needs it the most. This metamagic feat can be applied to only cure spells; breath of life; or any harmless spell that can be used to remove ability score damage, ability score drain, or a negative condition or effect (including break enchantment, neutralize poison, and remove disease). When you cast a contingent spell, you must set a specific trigger that dictates under what circumstances the target is immediately subject to the spell’s effects (for instance, “When the target dies, breath of life takes effect”). The contingent spell’s effects can remain dormant within the target for up to 10 minutes per caster level you have. A creature can be infused with only one contingent spell at a time.",
+            "description":"You are able to set up healing spells in advance so that they instantly take effect at the most opportune moments, especially those that take place on the field of battle.",
+            "spellLevelIncrease":2,
+            "effect":""
+        },
+        {
+            "name": "Crypt Spell",
+            "benefits":"You can enhance any spell that inflicts hit point damage to become a crypt spell. A creature that dies within 1 round of being damaged by a crypt spell is considered to have been killed by a death effect for the purpose of being returned to life. An undead creature damaged by a crypt spell gains the sickened condition for a number of rounds equal to the spell’s original spell level; this duration is halved if the undead creature succeeds at its saving throw against the spell. If the spell does not allow a save, the target can attempt a Will save to negate the sickened effect. A crypt spell gains the death descriptor.You can enhance any spell that inflicts hit point damage to become a crypt spell. A creature that dies within 1 round of being damaged by a crypt spell is considered to have been killed by a death effect for the purpose of being returned to life. An undead creature damaged by a crypt spell gains the sickened condition for a number of rounds equal to the spell’s original spell level; this duration is halved if the undead creature succeeds at its saving throw against the spell. If the spell does not allow a save, the target can attempt a Will save to negate the sickened effect. A crypt spell gains the death descriptor.",
+            "description":"You can infuse your magic with the power of the crypts, sending foes to face ineluctable judgment.",
+            "spellLevelIncrease":1,
+            "effect":"gains death descriptor. CHOICE : (vs undead: apply sickened) | (not vs undead: no further effect)"
+        },
+        {
+            "name": "Dazing Spell",
+            "benefits":"You can modify a spell to daze a creature damaged by the spell. When a creature takes damage from this spell, they become dazed for a number of rounds equal to the original level of the spell. If the spell allows a saving throw, a successful save negates the daze effect. If the spell does not allow a save, the target can make a Will save to negate the daze effect. If the spell effect also causes the creature to become dazed, the duration of this metamagic effect is added to the duration of the spell.",
+            "description":"You can daze creatures with the power of your spells.",
+            "spellLevelIncrease":3,
+            "effect":"dazed condition"
+        },
+        {
+            "name": "Delayed Spell",
+            "benefits":" A delayed spell can be activated as a standard action anytime within 1 minute per spell level of being cast. Only spells that target one or more squares or grid intersections can be affected by Delayed Spell, and the target (as well as any other variables determined at the time of casting) cannot be changed once the delayed spell is cast. You can have as many delayed spells as you wish at any given time, but only one spell can be triggered in a single standard action. Though a delayed spell does not manifest until it is triggered, it emits a magical aura as normal and can be identified with Knowledge (arcana) as a spell effect in place.",
+            "description":"You can set a spell to trigger on a delay.",
+            "spellLevelIncrease":1,
+            "effect":""
+        },
+        {
+            "name": "Disruptive Spell",
+            "benefits":"Targets affected by a disruptive spell must make concentration checks when using spells or spell-like abilities (DC equals the save DC of the disruptive spell plus the level of the spell being cast) for 1 round. Targets that avoid the spell’s effects avoid this feat’s effect as well.",
+            "description":"Your magical energies cling to enemies, interfering with their spellcasting.",
+            "spellLevelIncrease":1,
+            "effect":""
+        },
+        {
+            "name": "Echoing Spell",
+            "benefits":"When you cast an echoing spell, it does not disappear entirely from memory, and you can cast it one additional time during that day. No effect that allows you to reprepare or recast a spell can affect the echoed spell. If you prepare spells, this second casting does not require you to prepare it in another spell slot. If you spontaneously cast spells, this second casting does not expend another available spell slot.",
+            "description":"You have learned how to release most, but not all, of a spell’s potential when you cast it.",
+            "spellLevelIncrease":3,
+            "effect":""
+        },
+        {
+            "name": "Eclipsed Spell",
+            "benefits":"Only spells that create areas of light or darkness can be eclipsed spells. If the eclipsed spell creates an area that shines like a torch or raises the light level by one step, you can choose to have the spell lower the illumination level in the affected area by one step, functioning like darkness. If the eclipsed spell creates an area that shines like daylight or raises the light level by two steps, you can choose to have the spell lower the illumination level in the affected area by two steps and create an area of magical darkness, functioning like deeper darkness. If the eclipsed spell lowers the illumination level in the affected area by one step, you can choose to have the spell cause the affected area to glow with normal light, functioning like light. If the eclipsed spell lowers the illumination level in the affected area by two steps, you can choose to have the spell cause the affected area to shed bright light, functioning like daylight.",
+            "description":"You alter how your spells affect illumination.",
+            "spellLevelIncrease":0,
+            "effect":""
+        },
+        {
+            "name": "Ectoplasmic Spell",
+            "benefits":"An ectoplasmic spell has full effect against incorporeal or ethereal creatures.",
+            "description":"Your spells breach the gulf between dimensions, sending ghostly emanations into the ether.",
+            "spellLevelIncrease":1,
+            "effect":""
+        },
+        {
+            "name": "Elemental Spell",
+            "benefits":"Choose one energy type: acid, cold, electricity, or fire. You may replace a spell’s normal damage with that energy type or split the spell’s damage, so that half is of that energy type and half is of its normal type.",
+            "description":"You can manipulate the elemental nature of your spells.",
+            "spellLevelIncrease":1,
+            "effect":""
+        },
+        {
+            "name": "Empower Spell",
+            "benefits":"All variable, numeric effects of an empowered spell are increased by half including bonuses to those dice rolls. Saving throws and opposed rolls are not affected, nor are spells without random variables.",
+            "description":"You can increase the power of your spells, causing them to deal more damage",
+            "spellLevelIncrease":2,
+            "effect":"look up the statModificationsFound"
+        },
+        {
+            "name": "Encouraging Spell",
+            "benefits":"Any morale bonus granted by an encouraging spell is increased by 1.",
+            "description":"Your inspiration provides your allies with greater support.",
+            "spellLevelIncrease":1,
+            "effect":"if the spell gives a stat effect of morale type, increase the bonus by 1"
+        },
+        {
+      "name": "Enlarge Spell",
+            "benefits":"You can alter a spell with a range of close, medium, or long to increase its range by 100%. An enlarged spell with a range of close now has a range of 50 ft. + 5 ft./level, while medium-range spells have a range of 200 ft. + 20 ft./level and long-range spells have a range of 800 ft. + 80 ft./level.",
+            "description":"You can increase the range of your spells.",
+            "spellLevelIncrease": 1,
+            "effect":"Increase the static range of a spell (not the per level part) by 100%"
+        },
+        {
+            "name": "Extend Spell",
+            "benefits":"An extended spell lasts twice as long as normal. A spell with a duration of concentration, instantaneous, or permanent is not affected by this feat.",
+            "description":"You can make your spells last twice as long.",
+            "spellLevelIncrease":1,
+            "effect":"double duration"
+        },
+        {
+            "name": "Familiar Spell",
+            "benefits":"You can transfer a prepared spell to your familiar, allowing the familiar to cast that spell at a later time. Variables that rely on caster level function according to your caster level, not your familiar’s Hit Dice, though your familiar’s Intelligence may influence how precisely it can follow your instructions on how to use these spells. Your familiar must be able to speak to cast spells with a verbal component (the ability to speak with its master or creatures of its kind is insufficient). Your familiar must be carrying any material or focus components necessary, unless the materials cost less than 1 gp and the spell is prepared with Eschew Materials. Attack rolls use your familiar’s ability scores. A familiar spell counts against the number of spells you may prepare for as long as your familiar retains the spell. Once your familiar casts a retained spell, you can prepare a new spell in that slot the next time you prepare spells. A familiar spell uses up a spell slot 3 levels higher than the spell’s actual level. Your familiar can store a number of spell levels (including this modifier) equal to your caster level, but no spell’s adjusted level can exceed half your caster level.",
+            "description":"You can imbue your familiar with a spell.",
+            "spellLevelIncrease": 3,
+            "effect":""
+        },
+        {
+            "name": "Fearsome Spell",
+            "benefits":"When a creature takes damage from a fearsome spell, if that creature failed its save against the spell, it becomes shaken for a number of rounds equal to the spell’s original level. If the spell doesn’t allow a save, creatures harmed by it can attempt a Will save (against the same DC the spell would have if it did allow a save) to negate the shaken effect. If the spell effect already causes creatures to become shaken, on a failed save, add the duration of this metamagic effect to the duration of the shaken condition imposed by the spell. A fearsome spell can’t cause a creature to become frightened, even if that creature is already shaken.",
+            "description":"Your spells inspire great fear in those harmed by them.",
+            "spellLevelIncrease": 2,
+            "effect":"shaken condition for number of turns equal to spell level (reminder that shaken stacks and causes frightened)"
+        },
+        {
+            "name": "Flaring Spell",
+            "benefits":"",
+            "description":"You dazzle creatures when you affect them with a spell that has the fire, light, or electricity descriptor.",
+            "spellLevelIncrease":1,
+            "effect":"dazzled condition for number of turns equal to spell level"
+        },
+        {
+            "name": "Fleeting Spell",
+            "benefits":"A fleeting spell’s duration becomes dismissible, if it is not already. You can dismiss your own fleeting spell as a swift action. When you dismiss a fleeting spell, its lingering aura cannot be detected by magic unless the caster succeeds at a caster level check against a DC equal to 11 + your caster level. The DC of dispel checks to counter a fleeting spell is reduced by 2, and once active, dispel magic removes a fleeting spell without a caster level check. A fleeting spell has half its normal duration (with an extended fleeting spell, these duration adjustments cancel out). Only spells with a duration of at least 2 rounds can be made fleeting, and instantaneous or permanent spells cannot be fleeting spells.",
+            "description":"Your spells vanish with unusual speed.",
+            "spellLevelIncrease":0,
+            "effect":""
+        },
+        {
+            "name": "Focused Spell",
+            "benefits":"When casting a spell that affects or targets more than one creature, you can choose one target or creature within the spell effect. That creature’s saving throw DC to resist the spell is increased by +2. You must choose which target to focus the spell on before casting the spell.",
+            "description":"When you cast a spell that affects more than one creature, one opponent finds it more difficult to resist.",
+            "spellLevelIncrease":1,
+            "effect":"increase spell dc by 2"
+        },
+        {
+            "name": "Furious Spell",
+            "benefits":"A furious spell that deals hit point damage adds twice the spell’s original level to the amount of damage dealt by the spell. Spells that affect multiple targets deal the extra damage once to each target, regardless of whether the spell deals its damage all at once or in multiple hits (in the latter case, add the extra damage to the first hit against each target). In addition, a furious spell can be cast while the caster is enraged, including during a barbarian rage or while affected by a rage spell. Even a furious spell that requires an emotion component can be cast while enraged. The caster gains a +2 circumstance bonus on concentration checks and caster level checks related to casting a furious spell if she is enraged.",
+            "description":"Your spells seethe with the ferocious intensity of your blood-red rage.",
+            "spellLevelIncrease":1,
+            "effect":"if damaging spell add original spell levelX2 to damage"
+        },
+        {
+            "name": "Heighten Spell",
+            "benefits":"A heightened spell has a higher spell level than normal (up to a maximum of 9th level). Unlike other metamagic feats, Heighten Spell actually increases the effective level of the spell that it modifies. All effects dependent on spell level (such as saving throw DCs and ability to penetrate a lesser globe of invulnerability) are calculated according to the heightened level.",
+            "description":"You can cast spells as if they were a higher level.",
+            "spellLevelIncrease":0,
+            "effect":"look up statModificationsFound mind that heighten spell increase is not actually 0 so we need a modal to ask which spell slot to use"
+        },
+        {
+            "name": "Intensified Spell",
+            "benefits":"An intensified spell increases the maximum number of damage dice by 5 levels. You must actually have sufficient caster levels to surpass the maximum in order to benefit from this feat. No other variables of the spell are affected, and spells that inflict damage that is not modified by caster level are not affected by this feat.",
+            "description":"Your spells can go beyond several normal limitations.",
+            "spellLevelIncrease":1,
+            "effect":"if a spell uses dice that scale in number via level (we need to add a from level, every level, increase bonus by to scale dice for this to correctly apply) add five dice. This can break max limits if they exist. But the repeater must apply. Example fireball caps at 10d6 with a from level :1 every 1 levels increase by 1. In order to get to 15d6 you actually need to be cl 15, being level 14 will not work (as in 14d6)"
+        },
+        {
+            "name": "Intuitive Spell",
+            "benefits":"An intuitive spell can be cast with no thought components. Spells without thought components are not affected.",
+            "description":"You can avoid the need for thought components by trusting your instincts.",
+            "spellLevelIncrease":1,
+            "effect":""
+        },
+        {
+            "name": "Jinxed Spell",
+            "benefits":"Any creature that fails its saving throw against a jinxed spell also suffers the effects of your jinx. This feat has no effect on spells that do not allow a saving throw. If the spell affects an area or multiple creatures, you must select one creature to take the jinx, unless you have the Area Jinx feat; if you have the Area Jinx feat, choose a jinx burst area within the spell’s area or among its targets and apply the jinx to those in the burst that failed their save.Any creature that fails its saving throw against a jinxed spell also suffers the effects of your jinx. This feat has no effect on spells that do not allow a saving throw. If the spell affects an area or multiple creatures, you must select one creature to take the jinx, unless you have the Area Jinx feat; if you have the Area Jinx feat, choose a jinx burst area within the spell’s area or among its targets and apply the jinx to those in the burst that failed their save.",
+            "description":"You can make a creature that fails its spell save suffer your jinx as well.",
+            "spellLevelIncrease": 1,
+            "effect":"-1 on all saving throws"
+        },
+        {
+            "name": "Latent Curse",
+            "benefits":"You can alter a spell with the curse descriptor to target an object rather than a person. Your spell immediately targets the next creature to pick up, handle, or interact with the object as if that creature were the spell’s original target. The curse affects only the first creature to use the item, even if the curse originally affected multiple targets. An object invested with a latent curse detects as magical, with an aura appropriate for the spell’s original level and school. As with all cursed items, someone studying the object’s magic aura recognizes that it is cursed only if her Spellcraft check exceeds the target DC by 10 or more. So long as a latent curse remains active in an item, you cannot recover the spell slot used to cast that spell. A latent curse remains active in an item for 1 day per caster level, but you can dispel the latent curse whenever you recover your spells as a free action, rending the cursed object harmless and regaining the expended spell slot.",
+            "description":"You can imbue curse magic into objects.",
+            "spellLevelIncrease":1,
+            "effect":""
+        },
+        {
+            "name": "Lingering Spell",
+            "benefits":"You may cause an instantaneous spell that affects an area to persist until the beginning of your next turn. Those already in the area suffer no additional harm, but other creatures or objects entering the area are subject to its effects. A lingering spell with a visual manifestation obscures vision, providing concealment (20% miss chance) beyond 5 feet and total concealment (50% miss chance) beyond 20 feet.",
+            "description":"Your spell clings to existence, slowly fading from the world.",
+            "spellLevelIncrease":1,
+            "effect":""
+        },
+        {
+            "name": "Logical Spell",
+            "benefits":"A logical spell can be cast without emotion components. Spells that don’t require emotion components are not affected.",
+            "description":"You can eschew emotional components by exercising logic.",
+            "spellLevelIncrease":1,
+            "effect":""
+        },
+        {
+            "name": "Maximize Spell",
+            "benefits":"All variable, numeric effects of a spell modified by this feat are maximized. Saving throws and opposed rolls are not affected, nor are spells without random variables.",
+            "description":"Your spells have the maximum possible effect.",
+            "spellLevelIncrease":3,
+            "effect":"look up statModificationsFound"
+        },
+        {
+            "name": "Merciful Spell",
+            "benefits":"You can alter spells that inflict damage to inflict nonlethal damage instead. Spells that inflict damage of a particular type (such as fire) inflict nonlethal damage of that same type.",
+            "description":"Your damaging spells subdue rather than kill.",
+            "spellLevelIncrease":0,
+            "effect":""
+        },
+        {
+            "name": "Murky Spell",
+            "benefits":"You can apply Murky Spell only to a mist or fog spell that normally doesn’t work underwater, such as cloudkill, fog cloud, mind fog, obscuring mist, or solid fog. When cast underwater, a murky spell clouds the water with sediments, producing roughly the same effects as the normal spell would above water except as follows. Due to the dilution, a murky spell has only one-tenth of the duration of a normal spell (generally 1 minute per level, though mind fog lasts 3 minutes), but this reduction doesn’t affect the duration of secondary effects like mind fog’s mental penalties. Abilities that see through mist and fog can’t see through a murky spell unless they also specifically see through murky water (like the mistsight universal monster rule). Instead of wind, currents can disperse a murky spell; any current with a speed of at least 10 feet disperses a murky spell in 1 round. A murky spell has no effect above the water.",
+            "description":"You can call upon murky sediments in the water to transform a mist spell underwater",
+            "spellLevelIncrease":0,
+            "effect":"spells duration is 10% or the original min 1 round. keep in mind that 1 turn is 6 seconds"
+        },
+        {
+            "name": "Persistent Spell",
+            "benefits":"Whenever a creature targeted by a persistent spell or within its area succeeds on its saving throw against the spell, it must make another saving throw against the effect. If a creature fails this second saving throw, it suffers the full effects of the spell, as if it had failed its first saving throw.Whenever a creature targeted by a persistent spell or within its area succeeds on its saving throw against the spell, it must make another saving throw against the effect. If a creature fails this second saving throw, it suffers the full effects of the spell, as if it had failed its first saving throw.",
+            "description":"You can modify a spell to become more tenacious when its targets resist its effect.",
+            "spellLevelIncrease":2,
+            "effect":""
+        },
+        {
+            "name": "Piercing Spell",
+            "benefits":"When you cast a piercing spell against a target with spell resistance, it treats the spell resistance of the target as 5 lower than its actual SR.",
+            "description":"Your studies have helped you develop methods to overcome spell resistance.",
+            "spellLevelIncrease":1,
+            "effect":""
+        },
+        {
+            "name": "Quicken Spell",
+            "benefits":"Casting a quickened spell is a swift action. You can perform another action, even casting another spell, in the same round as you cast a quickened spell. A spell whose casting time is more than 1 full-round action cannot be quickened.",
+            "description":"You can cast spells in a fraction of the normal time.",
+            "spellLevelIncrease":4,
+            "effect":""
+        },
+        {
+            "name": "Reach Spell",
+            "benefits":" You can alter a spell with a range of touch, close, or medium to increase its range to a higher range category, using the following order: touch, close, medium, and long.",
+            "description":"Your spells go farther than normal.",
+            "spellLevelIncrease":0,
+            "effect":"Requires a modal. There are 4 ranges: touch, short, medium, long. Depending on which range is chosen the range changes and the spellLevelIncrease is the difference"
+        },
+        {
+            "name": "Rime Spell",
+            "benefits":"The frost of your cold spell clings to the target, impeding it for a short time. A rime spell causes creatures that takes cold damage from the spell to become entangled for a number of rounds equal to the original level of the spell. This feat only affects spells with the cold descriptor.",
+            "description":"Creatures damaged by your spells with the cold descriptor become entangled.",
+            "spellLevelIncrease":1,
+            "effect":"entangled condition for a number of turns equal to original spell level"
+        },
+        {
+            "name": "Scarring Spell",
+            "benefits":"When a creature fails a saving throw against a scarring spell, for the next 24 hours that creature takes a —2 penalty on saving throws against emotion and fear effects you create, and a —1 penalty on saving throws against other emotion and fear effects. Penalties from multiple scarring spells don’t stack. This metamagic feat can be applied only to spells with the emotion or fear descriptor.",
+            "description":"Your emotion-affecting magic causes psychic trauma in your opponents.",
+            "spellLevelIncrease":1,
+            "effect":"-2 penalty on saving throws 'vs emotion and fear' this is a conditional"
+        },
+        {
+            "name": "Scouting Summons",
+            "benefits":"When casting a conjuration (summoning) spell that summons a single creature, you can possess the creature as per magic jar (but with no receptacle necessary). If the creature takes damage while you possess it, you must succeed at a concentration check (DC equal to the amount of damage taken) or be ejected from the creature immediately. If the creature takes enough damage to reduce it to 0 hit points or fewer, you are immediately ejected from the creature and take an amount of damage equal to double the level of the spell slot used to summon that creature",
+            "description":"Your experiments with the connection between summoners and the creatures they summon have taught you to see through the eyes of a summoned creature for a short time.",
+            "spellLevelIncrease":2,
+            "effect":""
+        },
+        {
+            "name": "Seeking Spell",
+            "benefits":"A seeking spell’s range can bend around obstacles to reach the intended target. You can define the route yourself or unambiguously identify a target and allow the spell to determine its own path. However, the spell fails if it would have to travel farther than its maximum range to reach the identified target. A ranged attack roll made to deliver a seeking spell is not subject to cover or concealment. In order to benefit from this feat, the selected spell must have a range greater than touch and target one or more creatures, or it must require the caster to make a ranged touch attack.",
+            "description":"You can cast spells that bend around barriers to reach their intended destination.",
+            "spellLevelIncrease":2,
+            "effect":""
+        },
+        {
+            "name": "Selective Spell",
+            "benefits":"When casting a selective spell with an area effect and a duration of instantaneous, you can choose a number of targets in the area equal to the ability score modifier used to determine bonus spells of the same type (Charisma for bards, oracles, paladins, sorcerers, and summoners; Intelligence for witches and wizards; Wisdom for clerics, druids, inquisitors, and rangers). These targets are excluded from the effects of your spell.",
+            "description":"Your allies need not fear friendly fire.",
+            "spellLevelIncrease":1,
+            "effect":""
+        },
+        {
+            "name": "Shadow Grasp",
+            "benefits":"When you cast a spell with the darkness descriptor that affects an area, creatures in the area are entangled. If the spell allows a saving throw, a successful save negates the entangle effect. If the spell does not normally allow a save, a creature can make a Reflex save (DC = the spell’s DC if it had a saving throw) to negate the effect. If the spell allows spell resistance, failing to overcome a creature’s spell resistance means it is not entangled. An entangled creature remains so as long as it is in the area of the spell and for 1 round after it leaves. A creature that leaves and reenters the area must make a new saving throw to avoid becoming entangled. Creatures that succeed at a save to resist being entangled do not have to make additional saves if they stay within the darkened area. You are never impeded by the effects of your spells modified by this feat.",
+            "description":"Your darkness spells have substance and bind your foes.",
+            "spellLevelIncrease":1,
+            "effect":""
+        },
+        {
+            "name": "Sickening Spell",
+            "benefits":"You can modify a spell to sicken a creature damaged by the spell. When a creature takes damage from this spell, they become sickened for a number of rounds equal to the original level of the spell. If the spell allows a saving throw, a successful save negates the sickening effect. If the spell does not allow a save, the target can make a Fortitude save to negate the sickening effect. If the spell effect also causes the creature to become sickened, the duration of this metamagic effect is added on to the duration of the spell",
+            "description":"You can sicken creatures with your spells",
+            "spellLevelIncrease":1,
+            "effect":"if the spell applies damage apply sickened condition for number of rounds equal to original spell level"
+        },
+        {
+            "name": "Silent Spell",
+            "benefits":"A silent spell can be cast with no verbal components. Spells without verbal components are not affected.",
+            "description":"You can cast your spells without making any sound.",
+            "spellLevelIncrease":1,
+            "effect":""
+        },
+        {
+            "name": "Snuffing Spell",
+            "benefits":"You can modify a spell to extinguish magical and non-magical light sources that the target has. The first time a creature takes damage from or fails a saving throw against a snuffing spell, any non-magical light sources it has are immediately extinguished and you can attempt to dispel any active spells with the light descriptor that are affecting the target as if you had also cast the targeted version of dispel magic. Spells that do not target creatures can’t be snuffing spells.",
+            "description":"Your magic disrupts sources of light.",
+            "spellLevelIncrease":2,
+            "effect":""
+        },
+        {
+            "name": "Solar Spell",
+            "benefits":"Any spell you cast with the [light] descriptor is fortified with the cleansing energies of the sun. If the spell creates an area of light, all creatures are dazzled for as long as they remain within the spell’s area. Oozes, fungal creatures, creatures from the Shadow Plane, and undead must also succeed at a Will save (DC 10 + the spell level + your Wisdom or Charisma bonus) or take a –2 penalty on attack rolls, damage rolls, saving throws, skill checks, and ability checks for as long as they remain within the spell’s area. If the spell normally dazzles or blinds affected creatures with a duration other than instantaneous or permanent, the duration of that effect is increased by a number of rounds equal to the spell’s original level. Saving throws to remove the effect early still apply and can bypass this increase. If the spell deals more damage against oozes, fungal creatures, creatures from the Shadow Plane, or undead with a specific vulnerability to sunlight, the spell deals 1 additional point of damage per die against such creatures.",
+            "description":"Your spells erupt with the searing light of the sun, blinding or burning creatures of evil.",
+            "spellLevelIncrease":1,
+            "effect":"apply dazzled condition for turns equal to original caster levvel"
+        },
+        {
+            "name": "Solid Shadows",
+            "benefits":"When casting greater shadow conjuration, greater shadow evocation, shadow conjuration, or shadow evocation (and, at the GM’s discretion, any similar spell with the shadow descriptor that mimics a spell of another school), that spell is 20% more real than normal.",
+            "description":"Your shadowy illusions are more potent.",
+            "spellLevelIncrease":1,
+            "effect":""
+        },
+        {
+            "name": "Still Spell",
+            "benefits":"A stilled spell can be cast with no somatic components. Spells without somatic components are not affected.",
+            "description":"You can cast spells without moving.",
+            "spellLevelIncrease":1,
+            "effect":""
+        },
+        {
+            "name": "Steam Spell",
+            "benefits":"You can apply Steam Spell only to a spell with the fire descriptor. A steam spell works underwater without a caster level check, but it requires a caster level check to function above water. A steam spell uses up a slot the same spell level as the spell’s actual level.",
+            "description":"You’ve built off of some of the closely-guarded secrets of the undine steamcasters, allowing you to use fire magic underwater easily.",
+            "spellLevelIncrease":0,
+            "effect":""
+        },
+        {
+            "name": "Studied Spell",
+            "benefits":" When casting a studied spell, designate one target affected by the spell. Attempt an appropriate Knowledge check based on that target’s creature type as you cast the spell. The DC for this check is equal to 20 + the creature’s CR based on its race and not including any class levels or template (a creature that is defined by class levels has an effective CR of 0 for this ability). If you succeed, your studied spell ignores any energy resistance or damage reduction the target has because of its race as well as any bonuses on saving throws against the spell granted by the target’s race (such as the bonus from a dwarf’s hardy ability or a halfling’s halfling luck ability). Your studied spell doesn’t ignore energy resistance, damage reduction, or saving throw bonuses granted by other spells and effects. If you fail the Knowledge check, the spell still has its normal effects.",
+            "description":"You use your knowledge about the target to bypass its resistances and damage reduction.",
+            "spellLevelIncrease":2,
+            "effect":""
+        },
+        {
+            "name": "Stygian Spell",
+            "benefits":"Stygian spells forsake pure water for the memory-destroying tides of the River Styx.",
+            "description":"Stygian spells forsake pure water for the memory-destroying tides of the River Styx.",
+            "spellLevelIncrease":2,
+            "effect":""
+        },
+        {
+            "name": "Stylized Spell",
+            "benefits":"",
+            "description":"You cast a spell in a distinctive manner.",
+            "spellLevelIncrease":1,
+            "effect":""
+        },
+        {
+            "name": "Tenacious Spell",
+            "benefits":"Increase the DC of caster level checks to counter or dispel a tenacious spell by 2. If a tenacious spell is dispelled or dismissed, it lasts for 1d4 further rounds (to a maximum of the spell’s normal duration) before ending (this does not occur if antimagic field or a similar spell or effect suppresses or ends the spell’s effect without dispelling or dismissing it). The lingering auras of tenacious spells detectable with detect magic last for twice as long as usual after the spells end.",
+            "description":"Your magic is difficult to unravel.",
+            "spellLevelIncrease":1,
+            "effect":""
+        },
+        {
+            "name": "Tenebrous Spell",
+            "benefits":"When you cast a tenebrous spell in darkness or dim light, the spell’s effective caster level and any associated save DCs are increased by 1. Any attempts at dispelling a tenebrous spell in darkness or dim light take a –2 penalty on the dispel check. Casting a tenebrous spell in bright light is difficult, and requires a concentration check (DC 15 + twice the tenebrous spell’s effective spell level). Attempts to dispel a tenebrous spell in bright light gain a +4 bonus on the dispel check. You cannot use this feat on spells with the light descriptor. A tenebrous spell uses up a spell Slot one level higher than the spell’s actual level, except in the case of spells with the darkness or shadow descriptor or of the illusion (shadow) subschool; this feat does not change the effective level of those spells (but still counts as using a metamagic feat for all other purposes).",
+            "description":"You blend shadow into your spells, increasing their efficacy at the price of susceptibility to light.",
+            "spellLevelIncrease":1,
+            "effect":""
+        },
+        {
+            "name": "Thanatopic Spell",
+            "benefits":" A thanatopic spell pierces defenses and immunities that protect against death effects, negative levels, and energy drain, affecting the target as if the protective barrier did not exist. For example, you could cast a thanatopic vampiric touch or enervation spell on a target under the effects of death ward, and the target would suffer the normal effect of the spell. Saving throws and SR (if any) still apply. Undead are susceptible to spells augmented by this feat, as it retunes the negative energy to be harmful to them. A thanatopic spell that would kill a living creature (such as by giving it negative levels equal to its Hit Dice) destroys an undead (though undead such as ghosts, liches, and vampires may reform as normal). Undead affected by thanatopic spells that give negative levels automatically make their saving throws to remove negative levels after 24 hours.",
+            "description":"Your spells can pierce wards against negative energy and even affect undead targets.",
+            "spellLevelIncrease":2,
+            "effect":""
+        },
+        {
+            "name": "Threatening Illusion",
+            "benefits":"You can use this metamagic feat only on illusion (figment) spells. A threatening illusion spell causes one target to believe your illusion is a threat. Choose one 5-foot square within the area of your illusion; that square threatens the target as long as it is adjacent. Thus, if you or an ally is on the opposite side of the target, it is considered flanking. Normally the area must contain an illusory creature of Small or Medium size. However, you can select one square of a larger illusory creature to threaten the target. For example, an illusory Large ogre takes up four 5-foot squares; you select one square to be the source of the threat, and its other three squares do not threaten anyone. If the target has reason to believe there is an invisible creature in the vicinity, even an auditory illusion with no visual elements (such as ghost sound) is sufficient to convince the target that the selected square contains an actual threat. As long as you maintain the illusion, you can change the location of the threatening square as a swift action. When you threaten a target with this spell, the foe may make a Will save to disbelieve (DC 10 + threatening spell’s level + your spellcasting ability score modifier). If the target makes this save, the threatening effect of this feat no longer applies to it.",
+            "description":"You’ve mastered the art of making illusions that force foes to divide their attention in combat.",
+            "spellLevelIncrease":1,
+            "effect":""
+        },
+        {
+            "name": "Threnodic Spell",
+            "benefits":"This feat only works on mind-affecting spells. A threnodic spell affects undead creatures (even mindless undead) as if they weren’t immune to mind-affecting effects, but has no effect on living creatures.",
+            "description":"You can convert mind-affecting magic to necromantic power capable of controlling undead.",
+            "spellLevelIncrease":2,
+            "effect":""
+        },
+        {
+            "name": "Thundering Spell",
+            "benefits":"You can modify a spell to deafen a creature damaged by the spell. When a creature takes damage from this spell, it becomes deafened for a number of rounds equal to the original level of the spell. If the spell allows a saving throw, a successful save negates the deafening effect. If the spell does not allow a save, the target can make a Fortitude save to negate the deafening effect. If the spell effect also causes the creature to become deafened, the duration of this metamagic effect is added to the duration of the spell.",
+            "description":"You can conjure your spells into existence with blaring thunder or fearful shrieks, deafening creatures damaged by their effects.",
+            "spellLevelIncrease":2,
+            "effect":"apply deafened condition for turns equal to original spell level"
+        },
+        {
+            "name": "Toppling Spell",
+            "benefits":"The impact of your force spell is strong enough to knock the target prone. If the target takes damage, fails its saving throw, or is moved by your force spell, make a trip check against the target, using your caster level plus your casting ability score bonus (Wisdom for clerics, Intelligence for wizards, and so on). This does not provoke an attack of opportunity. If the check fails, the target cannot attempt to trip you or the force effect in response.",
+            "description":"Your spells with the force descriptor knock the affected creatures prone.",
+            "spellLevelIncrease":1,
+            "effect":""
+        },
+        {
+            "name": "Toxic Spell",
+            "benefits":" You can use 1 dose of contact, ingested, inhaled, or injury poison as an additional material component for a spell you cast. This spell gains the poison descriptor. Select a single creature affected by the spell. If that creature fails its saving throw against the spell, it must also attempt a saving throw against the poison used as a material component. If the target fails the save against the poison, the poison takes effect immediately, ignoring any onset time. The poison uses its save DC (rather than the save DC of the spell), but is modified by any effects that increase the spell’s DC (such as Spell Focus). This feat works only with spells whose effects can be negated by a successful Fortitude save.",
+            "description":"You can infuse a spell with the power of a poison.",
+            "spellLevelIncrease":1,
+            "effect":"add poison descriptior"
+        },
+        {
+            "name": "Traumatic Spell",
+            "benefits":"A traumatic spell causes lingering memories of pain and suffering in creatures harmed by it. When a creature fails a saving throw against a traumatic spell, the next time it sleeps it must succeed at a Will save with a DC equal to the original spell’s DC or be affected as if by nightmare. Each time the target fails its save, it must save again the following night or be affected by another nightmare, though the save DC decreases by 2 each night after the first.",
+            "description":"Creatures harmed by your spells relive their torments in nightly terrors.",
+            "spellLevelIncrease":2,
+            "effect":""
+        },
+        {
+            "name": "Trick Spell",
+            "benefits":"Only enchantment spells that affect a single target and can be negated with a successful Will save can be trick spells. If the target fails its Will save against a trick spell, in addition to the spell’s normal effects, the target also clumsily hinders itself. Immediately attempt a special combat maneuver check (1d20 + your caster level + your Charisma bonus) to perform a dirty trick combat maneuver against the target. Any feats you have that apply to dirty trick maneuvers (such as Greater Dirty Trick) also apply to this check.",
+            "description":"The vengeful nature of your goddess flows through your magic, turning your enemies against themselves.",
+            "spellLevelIncrease":1,
+            "effect":""
+        },
+        {
+            "name": "Tumultuous Spell",
+            "benefits":"You can enhance any spell that targets a single creature to become a tumultuous spell. A creature hit by a tumultuous spell (if the spell requires an attack roll) or that fails its saving throw against a tumultuous spell immediately moves 1d4×5 feet in a random direction. This movement does not provoke attacks of opportunity. If this movement would force a creature into a solid object or another creature, the movement ends harmlessly just before impact.",
+            "description":"You can pour the churning chaos of the Maelstrom into your magic, causing foes to scatter unpredictably, pushed apart in random directions as the unknowable whims of chaos itself, bringing with it strange and unexpected sounds and flashes of unnatural color.",
+            "spellLevelIncrease":1,
+            "effect":""
+        },
+        {
+            "name": "Umbral Spell",
+            "benefits":"An umbral spell gains the darkness descriptor. As long as the spell is in effect, the creature or object affected radiates darkness in a 10-foot radius, reducing illumination similar to the effects of the darkness spell. Nonmagical sources of light, such as torches or lanterns, do not increase the light level in this area. Magical light sources only increase the light level in an area affected by an umbral spell if they are of a higher level than the umbral spell’s unmodified spell level. This effect does not stack with itself or with any other effect that creates darkness.",
+            "description":"Targets of your darkness spells radiate darkness.",
+            "spellLevelIncrease":2,
+            "effect":"spell gains the darkness descriptor. "
+        },
+        {
+            "name": "Vast Spell",
+            "benefits":"You can alter a spell that targets a number of creatures no more than 30 feet apart, such as haste. The maximum distance apart of those you target with the spell increases to 60 feet.",
+            "description":"Your spells cover targets across a larger area.",
+            "spellLevelIncrease":1,
+            "effect":""
+        },
+        {
+            "name": "Verdant Spell",
+            "benefits":"A verdant spell affects plant creatures (even mindless plant creatures) as if they weren’t immune to mind-affecting effects, but it has no effect on other types of creatures. This feat works only on mind-affecting spells.",
+            "description":"Your magical connection to nature allows you to entice, fool, and misdirect plants and fungi as though they were people.",
+            "spellLevelIncrease":2,
+            "effect":""
+        },
+        {
+            "name": "Widen Spell",
+            "benefits":"You can cast your spells so that they occupy a larger space.",
+            "description":"You can alter a burst, emanation, or spread-shaped spell to increase its area. Any numeric measurements of the spell’s area increase by 100%.",
+            "spellLevelIncrease":3,
+            "effect":"if the spell has an aura effect (map mechanic) with range double that range"
+        },
+        {
+            "name": "Yai-Mimic Spell",
+            "benefits":"You can modify a ray spell to issue from the center of your forehead, where the third eye would be on a yai. This spell doesn’t require somatic components. When the spell is cast, you gain regeneration 1 for a number of rounds equal to the original level of the spell. This regeneration can’t regrow lost body parts or reattach severed limbs. Fire or acid damage suppresses this regeneration for 1 round, which counts against the total duration of the regeneration effect.",
+            "description":"You have studied the magical nature of giant oni and can use your spells to imitate their esoteric features.",
+            "spellLevelIncrease":3,
+            "effect":""
+        }
+    ]
+}
