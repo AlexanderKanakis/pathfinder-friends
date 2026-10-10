@@ -8,9 +8,24 @@ const data = JSON.parse(read("metamagic.json"));
 const metamagic = require(path.join(rootDir, "scripts", "metamagic.js"));
 const damage = require(path.join(rootDir, "scripts", "damage-rolls.js"));
 const effectMechanics = require(path.join(rootDir, "scripts", "effect-mechanics.js"));
+const spells = JSON.parse(read(path.join("data", "spells.json")));
 
 assert.equal(data.metamagic.length, 81, "The metamagic catalog should expose every authored feat.");
 assert(data.metamagic.some((entry) => entry.name === "Enlarge Spell"));
+
+const heroism = spells.find((spell) => spell.name === "Heroism");
+assert(heroism, "Heroism must remain in the spell catalog.");
+const heroismAfterMetamagic = metamagic.apply({
+  spell: heroism,
+  calculations: { spellLevel: 3 },
+  selections: [],
+}).spell;
+const heroismMechanics = effectMechanics.activeMechanics(
+  heroismAfterMetamagic,
+  { activeOnly: true },
+);
+assert.equal(heroismMechanics.effects.length, 3);
+assert(effectMechanics.hasAnyMechanics(heroismMechanics));
 
 const definition = (name) => {
   const entry = data.metamagic.find((item) => item.name === name);
@@ -162,6 +177,7 @@ assert(abilityRiders.every((rider) => rider.adjustableCondition.amount === 2));
 assert(abilityRiders.every((rider) => rider.metamagicSave.group === "Cherry Blossom Spell"));
 
 const picker = read(path.join("modals", "metamagic-picker.js"));
+const spellPicker = read(path.join("modals", "spell-picker.js"));
 assert(!/btn-close/.test(picker), "Metamagic modals must not include a header close button.");
 assert(picker.includes("data-metamagic-save-failed"));
 assert(picker.includes("data-metamagic-step"));
@@ -170,6 +186,8 @@ assert(picker.includes("data-metamagic-details-description"));
 assert(picker.includes("data-metamagic-details-benefits"));
 assert(!picker.includes("metamagic-picker-description"));
 assert(!picker.includes("metamagic-picker-benefit"));
+assert(spellPicker.includes("closeDetails: async () =>"));
+assert(spellPicker.includes("await waitForHidden(element)"));
 const characterSheet = read(path.join("scripts", "pages", "character-sheet.js"));
 assert(characterSheet.includes("function spellTargetPayloadHasMechanics"));
 assert.equal(
@@ -193,6 +211,13 @@ assert(
 );
 assert(characterSheet.includes("if (collectionChanged) void syncCurrentMapLinkedAuras(activeBuffs)"));
 assert(characterSheet.includes("if (!isEnemySheetMode) queueSheetSave()"));
+assert.equal(
+  (characterSheet.match(/await closeDetails\?\.\(\);/g) || []).length,
+  2,
+  "Character-sheet spell flows must wait until the details modal is fully hidden.",
+);
+const map = read(path.join("scripts", "pages", "map.js"));
+assert(map.includes("await closeDetails?.();"));
 
 for (const page of ["character-sheet.html", "map.html"]) {
   const html = read(page);

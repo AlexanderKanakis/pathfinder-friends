@@ -358,7 +358,12 @@
             calculatedCasterLevel: state.maxCasterLevel,
             calculations: state.calculations,
             metamagic: state.metamagicSelections || [],
-            closeDetails: () => modal?.hide(),
+            closeDetails: async () => {
+              const element = document.getElementById(MODAL_ID);
+              const hidden = waitForHidden(element);
+              modal?.hide();
+              await hidden;
+            },
           });
           if (result?.message) status.textContent = result.message;
           if (result?.close === true) modal?.hide();

@@ -7901,8 +7901,7 @@ async function openMapOwnedSpellDetails(effect, defaultCl = 1) {
         effectHasTargetMechanics(castEffect) ||
         effectDamageRolls(castEffect).length > 0;
       casting = true;
-      closeDetails?.();
-      await new Promise((resolve) => setTimeout(resolve, 180));
+      await closeDetails?.();
       const failureChance = Number(
         castCalculations?.arcaneSpellFailure?.chance || 0,
       );

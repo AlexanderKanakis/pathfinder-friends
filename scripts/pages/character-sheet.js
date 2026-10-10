@@ -10517,8 +10517,7 @@ async function castSpellFromDetails({
     calculations?.arcaneSpellFailure?.chance || 0,
   );
   if (failureChance > 0) {
-    closeDetails?.();
-    await new Promise((resolve) => setTimeout(resolve, 180));
+    await closeDetails?.();
     const castContinues = await window.PFArcaneSpellFailure?.check?.({
       chance: failureChance,
       spellName: spell?.name || "Spell",
@@ -10558,8 +10557,7 @@ async function castSpellFromDetails({
         spellTargetPayloadHasMechanics(payload),
     );
   if (!failureChance) {
-    closeDetails?.();
-    await new Promise((resolve) => setTimeout(resolve, 180));
+    await closeDetails?.();
   }
   if (!damageRolls.length && !resolvedPayloads.length) {
     await recordSpellCastTimeline(spell);
