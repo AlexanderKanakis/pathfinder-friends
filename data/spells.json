@@ -1184,7 +1184,10 @@
       "target": "you",
       "duration": "1 round/level (D) or until discharged",
       "description": "</h3>This spell allows you to act more swiftly while maintaining a bardic performance. You must already be maintaining a bardic performance before you can cast <i>allegro</i>. You gain the benefits of the spell <i>haste </i>for as long as you maintain that bardic performance. If you cease maintaining the bardic performance or it is interrupted, this spell’s duration ends. As an immediate action while you are maintaining a bardic performance, you can dismiss <i>allegro </i>to reroll a Reflex save or Dexterity-based skill check—you must choose to reroll before the result of the original roll is known. You must take the result of the reroll, even if it’s worse than the original roll. <i>Allegro </i>dispels and is dispelled by <i>slow</i>.",
-      "descriptors": []
+      "descriptors": [],
+      "area": "",
+      "saving_throw": "",
+      "spell_resistance": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Allegro"
   },
@@ -1256,7 +1259,6 @@
       "spell_resistance": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Allied Cloak",
-    "effects": [],
     "activeMechanics": {
       "effects": [
         {
@@ -1285,24 +1287,7 @@
       "generatedEquipment": [],
       "conditionalVariables": [],
       "damageRolls": []
-    },
-    "damageReduction": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    }
   },
   {
     "name": "Alluring Light",
@@ -2849,7 +2834,6 @@
       "area": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Armor of Darkness",
-    "effects": [],
     "activeMechanics": {
       "effects": [
         {
@@ -2917,24 +2901,7 @@
         "factorMode": "multiply"
       },
       "damageRolls": []
-    },
-    "damageReduction": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    }
   },
   {
     "name": "Aroden's Magic Army",
@@ -3519,7 +3486,6 @@
       "target": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Aura of Doom",
-    "applyConditions": [],
     "activeMechanics": {
       "effects": [],
       "damageReduction": [],
@@ -3590,24 +3556,7 @@
         "rangeFeet": 20
       },
       "damageRolls": []
-    },
-    "effects": [],
-    "damageReduction": [],
-    "spellResistance": [],
-    "immunities": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    }
   },
   {
     "name": "Aura of Greater Courage",
@@ -3626,7 +3575,6 @@
       "target": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Aura of Greater Courage",
-    "immunities": [],
     "activeMechanics": {
       "effects": [],
       "damageReduction": [],
@@ -3668,24 +3616,7 @@
         "rangeFeet": 10
       },
       "damageRolls": []
-    },
-    "effects": [],
-    "damageReduction": [],
-    "spellResistance": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    }
   },
   {
     "name": "Aura of Inviolate Ownership",
@@ -4123,9 +4054,85 @@
       "saving_throw": "none;",
       "spell_resistance": "yes (harmless)",
       "description": "</h3><i>Barkskin</i> toughens a creature's skin. The effect grants a +2 enhancement bonus to the creature's existing natural armor bonus. This enhancement bonus increases by 1 for every three caster levels above 3rd, to a maximum of +5 at 12th level.<br/><br/>The enhancement bonus provided by <i>barkskin</i> stacks with the target's natural armor bonus, but not with other enhancement bonuses to natural armor. A creature without natural armor has an effective natural armor bonus of +0.<h2 class=\"title\">Mythic Barkskin</h2><b>Source</b> <a class=\"external-link\" href=\"http://paizo.com/products/btpy8ywe?Pathfinder-Roleplaying-Game-Mythic-Adventures\" target=\"_blank\"><i>Mythic Adventures pg. 85</i></a><br/>The target also gains DR/magic equal to the double the enhancement bonus the spell provides to the target’s natural armor bonus.<br/><br/><b>Augmented (6th)</b>: If you expend two uses of mythic power, the spell grants DR/epic rather than DR/magic.",
-      "descriptors": []
+      "descriptors": [],
+      "area": ""
     },
-    "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Barkskin"
+    "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Barkskin",
+    "effects": [
+      {
+        "stat": "natural armor",
+        "value": 2,
+        "type": "enhancement",
+        "stacks": true,
+        "conditional": false,
+        "appliesWhen": "",
+        "maximum": 5,
+        "bonusScale": {
+          "source": {
+            "type": "caster"
+          },
+          "milestones": [],
+          "every": {
+            "fromLevel": 3,
+            "everyLevels": 3,
+            "increase": 1
+          }
+        }
+      }
+    ],
+    "activeMechanics": {
+      "effects": [
+        {
+          "stat": "natural armor",
+          "value": 2,
+          "type": "enhancement",
+          "stacks": true,
+          "conditional": false,
+          "appliesWhen": "",
+          "maximum": 5,
+          "bonusScale": {
+            "source": {
+              "type": "caster"
+            },
+            "milestones": [],
+            "every": {
+              "fromLevel": 3,
+              "everyLevels": 3,
+              "increase": 1
+            }
+          }
+        }
+      ],
+      "damageRolls": [],
+      "damageReduction": [],
+      "spellResistance": [],
+      "immunities": [],
+      "applyConditions": [],
+      "classSkillGrants": [],
+      "bonusRanks": [],
+      "extraRanksPerLevel": [],
+      "grantDomains": [],
+      "featGrants": [],
+      "sizeChanges": [],
+      "spellLikeAbilities": [],
+      "casterLevelBonuses": [],
+      "spellDcBonuses": [],
+      "effectiveAttributeBonuses": [],
+      "generatedEquipment": [],
+      "conditionalVariables": [],
+      "durationConfig": {
+        "count": 10,
+        "unit": "minute",
+        "factors": [
+          {
+            "type": "caster",
+            "numerator": 1,
+            "denominator": 1
+          }
+        ],
+        "factorMode": "multiply"
+      }
+    }
   },
   {
     "name": "Barrow Haze",
@@ -4613,7 +4620,6 @@
       "area": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Bestow Grace",
-    "effects": [],
     "activeMechanics": {
       "effects": [
         {
@@ -4669,24 +4675,7 @@
         "factorMode": "multiply"
       },
       "damageRolls": []
-    },
-    "damageReduction": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    }
   },
   {
     "name": "Bestow Grace of the Champion",
@@ -5803,25 +5792,7 @@
       "generatedEquipment": [],
       "conditionalVariables": [],
       "damageRolls": []
-    },
-    "effects": [],
-    "damageReduction": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    }
   },
   {
     "name": "Blessing of Liberty",
@@ -5840,7 +5811,6 @@
       "spell_resistance": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Blessing of Liberty",
-    "effects": [],
     "activeMechanics": {
       "effects": [
         {
@@ -5929,24 +5899,7 @@
         "factorMode": "multiply"
       },
       "damageRolls": []
-    },
-    "damageReduction": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    }
   },
   {
     "name": "Blessing of Luck and Resolve",
@@ -7281,7 +7234,6 @@
       "area": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Bullet Shield",
-    "effects": [],
     "activeMechanics": {
       "effects": [
         {
@@ -7333,24 +7285,7 @@
         "factorMode": "multiply"
       },
       "damageRolls": []
-    },
-    "damageReduction": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    }
   },
   {
     "name": "Bullet Ward",
@@ -11051,7 +10986,6 @@
       "area": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Corruption Resistance",
-    "damageReduction": [],
     "activeMechanics": {
       "effects": [],
       "damageReduction": [
@@ -11104,24 +11038,7 @@
         "factorMode": "multiply"
       },
       "damageRolls": []
-    },
-    "effects": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    }
   },
   {
     "name": "Cosmic Ray",
@@ -11281,24 +11198,6 @@
       "area": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Crafter's Fortune",
-    "effects": [],
-    "damageReduction": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": [],
     "activeMechanics": {
       "effects": [
         {
@@ -13010,25 +12909,7 @@
         "factorMode": "multiply"
       },
       "damageRolls": []
-    },
-    "effects": [],
-    "damageReduction": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    }
   },
   {
     "name": "Death Knell",
@@ -13944,7 +13825,6 @@
       "area": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Destruction",
-    "damageRolls": [],
     "activeMechanics": {
       "effects": [],
       "damageRolls": [
@@ -14000,24 +13880,7 @@
       "effectiveAttributeBonuses": [],
       "generatedEquipment": [],
       "conditionalVariables": []
-    },
-    "effects": [],
-    "damageReduction": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": []
+    }
   },
   {
     "name": "Detect Aberration",
@@ -15981,8 +15844,6 @@
       "area": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Dream Shield",
-    "effects": [],
-    "spellResistance": [],
     "activeMechanics": {
       "effects": [
         {
@@ -16040,23 +15901,7 @@
         "factorMode": "multiply"
       },
       "damageRolls": []
-    },
-    "damageReduction": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    }
   },
   {
     "name": "Dream Travel",
@@ -18641,7 +18486,6 @@
       "spell_resistance": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Fastidiousness",
-    "effects": [],
     "activeMechanics": {
       "effects": [
         {
@@ -18676,24 +18520,7 @@
         "factorMode": "multiply"
       },
       "damageRolls": []
-    },
-    "damageReduction": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    }
   },
   {
     "name": "Fear",
@@ -19478,7 +19305,6 @@
       "area": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Firebelly",
-    "effects": [],
     "activeMechanics": {
       "effects": [
         {
@@ -19519,24 +19345,7 @@
         "factorMode": "multiply"
       },
       "damageRolls": []
-    },
-    "damageReduction": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    }
   },
   {
     "name": "Firebrand",
@@ -20732,7 +20541,6 @@
       "area": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Forest Friend",
-    "effects": [],
     "activeMechanics": {
       "effects": [
         {
@@ -20769,24 +20577,7 @@
       "generatedEquipment": [],
       "conditionalVariables": [],
       "damageRolls": []
-    },
-    "damageReduction": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    }
   },
   {
     "name": "Forest's Sense",
@@ -21996,7 +21787,6 @@
       "area": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Gird Ally",
-    "effects": [],
     "activeMechanics": {
       "effects": [
         {
@@ -22048,24 +21838,7 @@
         "factorMode": "multiply"
       },
       "damageRolls": []
-    },
-    "damageReduction": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    }
   },
   {
     "name": "Glibness",
@@ -22345,9 +22118,185 @@
       "description": "</h3>This spell instills powerful hope in the subjects. Each affected creature gains a +2 morale bonus on saving throws, attack rolls, ability checks, skill checks, and weapon damage rolls.<br/><br/><i>Good hope</i> counters and dispels <i>crushing despair</i>.",
       "descriptors": [
         "mind-affecting"
-      ]
+      ],
+      "area": ""
     },
-    "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Good Hope"
+    "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Good Hope",
+    "effects": [
+      {
+        "stat": "attack",
+        "value": 2,
+        "type": "morale",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": "",
+        "weaponTypeRestriction": "all",
+        "weaponNameRestriction": "all"
+      },
+      {
+        "stat": "damage",
+        "value": 2,
+        "type": "morale",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": "",
+        "weaponTypeRestriction": "melee-two-handed",
+        "weaponNameRestriction": "all"
+      },
+      {
+        "stat": "damage",
+        "value": 2,
+        "type": "morale",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": "",
+        "weaponTypeRestriction": "melee-one-handed",
+        "weaponNameRestriction": "all"
+      },
+      {
+        "stat": "damage",
+        "value": 2,
+        "type": "morale",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": "",
+        "weaponTypeRestriction": "melee-light",
+        "weaponNameRestriction": "all"
+      },
+      {
+        "stat": "damage",
+        "value": 2,
+        "type": "morale",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": "",
+        "weaponTypeRestriction": "ranged",
+        "weaponNameRestriction": "all"
+      },
+      {
+        "stat": "damage",
+        "value": 2,
+        "type": "morale",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": "",
+        "weaponTypeRestriction": "firearm-one-handed",
+        "weaponNameRestriction": "all"
+      },
+      {
+        "stat": "damage",
+        "value": 2,
+        "type": "morale",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": "",
+        "weaponTypeRestriction": "firearm-two-handed",
+        "weaponNameRestriction": "all"
+      }
+    ],
+    "activeMechanics": {
+      "effects": [
+        {
+          "stat": "attack",
+          "value": 2,
+          "type": "morale",
+          "stacks": false,
+          "conditional": false,
+          "appliesWhen": "",
+          "weaponTypeRestriction": "all",
+          "weaponNameRestriction": "all"
+        },
+        {
+          "stat": "damage",
+          "value": 2,
+          "type": "morale",
+          "stacks": false,
+          "conditional": false,
+          "appliesWhen": "",
+          "weaponTypeRestriction": "melee-two-handed",
+          "weaponNameRestriction": "all"
+        },
+        {
+          "stat": "damage",
+          "value": 2,
+          "type": "morale",
+          "stacks": false,
+          "conditional": false,
+          "appliesWhen": "",
+          "weaponTypeRestriction": "melee-one-handed",
+          "weaponNameRestriction": "all"
+        },
+        {
+          "stat": "damage",
+          "value": 2,
+          "type": "morale",
+          "stacks": false,
+          "conditional": false,
+          "appliesWhen": "",
+          "weaponTypeRestriction": "melee-light",
+          "weaponNameRestriction": "all"
+        },
+        {
+          "stat": "damage",
+          "value": 2,
+          "type": "morale",
+          "stacks": false,
+          "conditional": false,
+          "appliesWhen": "",
+          "weaponTypeRestriction": "ranged",
+          "weaponNameRestriction": "all"
+        },
+        {
+          "stat": "damage",
+          "value": 2,
+          "type": "morale",
+          "stacks": false,
+          "conditional": false,
+          "appliesWhen": "",
+          "weaponTypeRestriction": "firearm-one-handed",
+          "weaponNameRestriction": "all"
+        },
+        {
+          "stat": "damage",
+          "value": 2,
+          "type": "morale",
+          "stacks": false,
+          "conditional": false,
+          "appliesWhen": "",
+          "weaponTypeRestriction": "firearm-two-handed",
+          "weaponNameRestriction": "all"
+        }
+      ],
+      "damageRolls": [],
+      "damageReduction": [],
+      "spellResistance": [],
+      "immunities": [],
+      "applyConditions": [],
+      "classSkillGrants": [],
+      "bonusRanks": [],
+      "extraRanksPerLevel": [],
+      "grantDomains": [],
+      "featGrants": [],
+      "sizeChanges": [],
+      "spellLikeAbilities": [],
+      "casterLevelBonuses": [],
+      "spellDcBonuses": [],
+      "effectiveAttributeBonuses": [],
+      "generatedEquipment": [],
+      "conditionalVariables": [],
+      "durationConfig": {
+        "count": 1,
+        "unit": "minute",
+        "factors": [
+          {
+            "type": "caster",
+            "numerator": 1,
+            "denominator": 1
+          }
+        ],
+        "factorMode": "multiply"
+      }
+    }
   },
   {
     "name": "Goodberry",
@@ -22853,7 +22802,6 @@
       "spell_resistance": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Guarding Knowledge",
-    "effects": [],
     "activeMechanics": {
       "effects": [
         {
@@ -22902,24 +22850,7 @@
         "factorMode": "multiply"
       },
       "damageRolls": []
-    },
-    "damageReduction": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    }
   },
   {
     "name": "Guards and Wards",
@@ -23361,9 +23292,97 @@
       "saving_throw": "Fortitude negates (harmless);",
       "spell_resistance": "yes (harmless)",
       "description": "</h3>The transmuted creatures move and act more quickly than normal. This extra speed has several effects.<br/><br/>When making a full attack action, a hasted creature may make one extra attack with one natural or manufactured weapon. The attack is made using the creature's full base attack bonus, plus any modifiers appropriate to the situation. (This effect is not cumulative with similar effects, such as that provided by a <i>speed</i> weapon, nor does it actually grant an extra action, so you can't use it to cast a second spell or otherwise take an extra action in the round.)<br/><br/>A hasted creature gains a +1 bonus on attack rolls and a +1 dodge bonus to AC and Reflex saves. Any condition that makes you lose your Dexterity bonus to Armor Class (if any) also makes you lose dodge bonuses.<br/><br/>All of the hasted creature's modes of movement (including land movement, burrow, climb, fly, and swim) increase by 30 feet, to a maximum of twice the subject's normal speed using that form of movement. This increase counts as an enhancement bonus, and it affects the creature's jumping distance as normal for increased speed. Multiple <i>haste</i> effects don't stack. <i>Haste</i> dispels and counters <i>slow</i>.<h2 class=\"title\">Mythic Haste</h2><b>Source</b> <a class=\"external-link\" href=\"http://paizo.com/products/btpy8ywe?Pathfinder-Roleplaying-Game-Mythic-Adventures\" target=\"_blank\"><i>Mythic Adventures pg. 97</i></a><br/>Affected creatures gain an additional move action each round. The movement speed increase changes to 50 feet, to a maximum of three times the creature’s normal speed for that movement type. <br/><br/><b>Augmented (3rd)</b>: If you expend two uses of mythic power, the movement speed increase changes to 70 feet, with no limit based on the creature’s normal speed. If an affected creature moves at least 30 feet on its turn, it can travel across liquid as if the liquid were solid. If the liquid deals damage on contact, the creature takes only half damage from moving across it.",
-      "descriptors": []
+      "descriptors": [],
+      "area": ""
     },
-    "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Haste"
+    "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Haste",
+    "effects": [
+      {
+        "stat": "attack",
+        "value": 1,
+        "type": "untyped",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": "",
+        "weaponTypeRestriction": "all",
+        "weaponNameRestriction": "all"
+      },
+      {
+        "stat": "ac",
+        "value": 1,
+        "type": "dodge",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      },
+      {
+        "stat": "extra attack",
+        "value": 1,
+        "type": "untyped",
+        "stacks": true,
+        "conditional": false,
+        "appliesWhen": ""
+      }
+    ],
+    "activeMechanics": {
+      "effects": [
+        {
+          "stat": "attack",
+          "value": 1,
+          "type": "untyped",
+          "stacks": false,
+          "conditional": false,
+          "appliesWhen": "",
+          "weaponTypeRestriction": "all",
+          "weaponNameRestriction": "all"
+        },
+        {
+          "stat": "ac",
+          "value": 1,
+          "type": "dodge",
+          "stacks": false,
+          "conditional": false,
+          "appliesWhen": ""
+        },
+        {
+          "stat": "extra attack",
+          "value": 1,
+          "type": "untyped",
+          "stacks": true,
+          "conditional": false,
+          "appliesWhen": ""
+        }
+      ],
+      "damageRolls": [],
+      "damageReduction": [],
+      "spellResistance": [],
+      "immunities": [],
+      "applyConditions": [],
+      "classSkillGrants": [],
+      "bonusRanks": [],
+      "extraRanksPerLevel": [],
+      "grantDomains": [],
+      "featGrants": [],
+      "sizeChanges": [],
+      "spellLikeAbilities": [],
+      "casterLevelBonuses": [],
+      "spellDcBonuses": [],
+      "effectiveAttributeBonuses": [],
+      "generatedEquipment": [],
+      "conditionalVariables": [],
+      "durationConfig": {
+        "count": 1,
+        "unit": "round",
+        "factors": [
+          {
+            "type": "caster",
+            "numerator": 1,
+            "denominator": 1
+          }
+        ],
+        "factorMode": "multiply"
+      }
+    }
   },
   {
     "name": "Hasten Judgment",
@@ -23739,7 +23758,6 @@
       "spell_resistance": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Hedging Weapons",
-    "effects": [],
     "activeMechanics": {
       "effects": [
         {
@@ -23804,24 +23822,7 @@
         "factorMode": "multiply"
       },
       "damageRolls": []
-    },
-    "damageReduction": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    }
   },
   {
     "name": "Heightened Awareness",
@@ -24049,9 +24050,97 @@
       "description": "</h3>This spell imbues a single creature with great bravery and morale in battle. The target gains a +2 morale bonus on attack rolls, saves, and skill checks.<h2 class=\"title\">",
       "descriptors": [
         "mind-affecting"
-      ]
+      ],
+      "area": ""
     },
-    "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Heroism"
+    "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Heroism",
+    "effects": [
+      {
+        "stat": "attack",
+        "value": 2,
+        "type": "morale",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": "",
+        "weaponTypeRestriction": "all",
+        "weaponNameRestriction": "all"
+      },
+      {
+        "stat": "all saves",
+        "value": 2,
+        "type": "morale",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      },
+      {
+        "stat": "skill checks",
+        "value": 2,
+        "type": "morale",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      }
+    ],
+    "activeMechanics": {
+      "effects": [
+        {
+          "stat": "attack",
+          "value": 2,
+          "type": "morale",
+          "stacks": false,
+          "conditional": false,
+          "appliesWhen": "",
+          "weaponTypeRestriction": "all",
+          "weaponNameRestriction": "all"
+        },
+        {
+          "stat": "all saves",
+          "value": 2,
+          "type": "morale",
+          "stacks": false,
+          "conditional": false,
+          "appliesWhen": ""
+        },
+        {
+          "stat": "skill checks",
+          "value": 2,
+          "type": "morale",
+          "stacks": false,
+          "conditional": false,
+          "appliesWhen": ""
+        }
+      ],
+      "damageRolls": [],
+      "damageReduction": [],
+      "spellResistance": [],
+      "immunities": [],
+      "applyConditions": [],
+      "classSkillGrants": [],
+      "bonusRanks": [],
+      "extraRanksPerLevel": [],
+      "grantDomains": [],
+      "featGrants": [],
+      "sizeChanges": [],
+      "spellLikeAbilities": [],
+      "casterLevelBonuses": [],
+      "spellDcBonuses": [],
+      "effectiveAttributeBonuses": [],
+      "generatedEquipment": [],
+      "conditionalVariables": [],
+      "durationConfig": {
+        "count": 10,
+        "unit": "minute",
+        "factors": [
+          {
+            "type": "caster",
+            "numerator": 1,
+            "denominator": 1
+          }
+        ],
+        "factorMode": "multiply"
+      }
+    }
   },
   {
     "name": "Heroism, Greater",
@@ -24233,25 +24322,7 @@
         "factorMode": "multiply"
       },
       "damageRolls": []
-    },
-    "effects": [],
-    "damageReduction": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    }
   },
   {
     "name": "Hibernate",
@@ -30426,7 +30497,6 @@
       "area": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Magic Vestment",
-    "effects": [],
     "activeMechanics": {
       "effects": [
         {
@@ -30478,24 +30548,7 @@
         ],
         "factorMode": "multiply"
       }
-    },
-    "damageReduction": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    }
   },
   {
     "name": "Magic Weapon",
@@ -31443,7 +31496,6 @@
       "spell_resistance": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Mental Barrier I",
-    "effects": [],
     "activeMechanics": {
       "effects": [
         {
@@ -31478,24 +31530,7 @@
         "factorMode": "multiply"
       },
       "damageRolls": []
-    },
-    "damageReduction": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    }
   },
   {
     "name": "Mental Barrier II",
@@ -33164,7 +33199,6 @@
       "spell_resistance": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Nereid's Grace",
-    "effects": [],
     "activeMechanics": {
       "effects": [
         {
@@ -33243,24 +33277,7 @@
         "factorMode": "multiply"
       },
       "damageRolls": []
-    },
-    "damageReduction": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    }
   },
   {
     "name": "Neutral Buoyancy",
@@ -36646,7 +36663,6 @@
       "area": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Protection from Arrows",
-    "damageReduction": [],
     "activeMechanics": {
       "effects": [],
       "damageRolls": [],
@@ -36683,24 +36699,7 @@
         ],
         "factorMode": "multiply"
       }
-    },
-    "effects": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    }
   },
   {
     "name": "Protection from Arrows, Communal",
@@ -36738,7 +36737,6 @@
       "area": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Protection from Chaos",
-    "effects": [],
     "activeMechanics": {
       "effects": [
         {
@@ -36795,24 +36793,7 @@
         "factorMode": "multiply"
       },
       "damageRolls": []
-    },
-    "damageReduction": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    }
   },
   {
     "name": "Protection from Chaos",
@@ -36833,7 +36814,6 @@
       "area": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Protection from Chaos",
-    "effects": [],
     "activeMechanics": {
       "effects": [
         {
@@ -36890,24 +36870,7 @@
         ],
         "factorMode": "multiply"
       }
-    },
-    "damageReduction": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    }
   },
   {
     "name": "Protection from Chaos, Communal",
@@ -36985,25 +36948,7 @@
         "factorMode": "multiply",
         "splitAmongTargets": true
       }
-    },
-    "effects": [],
-    "damageReduction": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    }
   },
   {
     "name": "Protection from Evil, Communal",
@@ -37024,7 +36969,6 @@
       "area": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Protection from Chaos",
-    "effects": [],
     "activeMechanics": {
       "effects": [
         {
@@ -37082,24 +37026,7 @@
         "factorMode": "multiply",
         "splitAmongTargets": true
       }
-    },
-    "damageReduction": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    }
   },
   {
     "name": "Protection from Good",
@@ -37120,7 +37047,6 @@
       "area": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Protection from Chaos",
-    "effects": [],
     "activeMechanics": {
       "effects": [
         {
@@ -37177,24 +37103,7 @@
         "factorMode": "multiply"
       },
       "damageRolls": []
-    },
-    "damageReduction": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    }
   },
   {
     "name": "Protection from Good, Communal",
@@ -37215,7 +37124,6 @@
       "area": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Protection from Chaos",
-    "effects": [],
     "activeMechanics": {
       "effects": [
         {
@@ -37273,24 +37181,7 @@
         "factorMode": "multiply",
         "splitAmongTargets": true
       }
-    },
-    "damageReduction": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    }
   },
   {
     "name": "Protection from Law",
@@ -37311,7 +37202,6 @@
       "area": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Protection from Chaos",
-    "effects": [],
     "activeMechanics": {
       "effects": [
         {
@@ -37356,24 +37246,7 @@
       "generatedEquipment": [],
       "conditionalVariables": [],
       "damageRolls": []
-    },
-    "damageReduction": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    }
   },
   {
     "name": "Protection from Law, Communal",
@@ -37394,7 +37267,6 @@
       "area": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Protection from Chaos",
-    "effects": [],
     "activeMechanics": {
       "effects": [
         {
@@ -37452,24 +37324,7 @@
         "factorMode": "multiply",
         "splitAmongTargets": true
       }
-    },
-    "damageReduction": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    }
   },
   {
     "name": "Protection from Energy",
@@ -37519,25 +37374,7 @@
         ],
         "factorMode": "multiply"
       }
-    },
-    "effects": [],
-    "damageReduction": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    }
   },
   {
     "name": "Protection from Energy, Communal",
@@ -37573,7 +37410,6 @@
       "area": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Protection from Natural Attacks",
-    "damageReduction": [],
     "activeMechanics": {
       "effects": [],
       "damageRolls": [],
@@ -37610,24 +37446,7 @@
         ],
         "factorMode": "multiply"
       }
-    },
-    "effects": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    }
   },
   {
     "name": "Protection from Outsiders",
@@ -37646,7 +37465,6 @@
       "area": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Protection from Outsiders",
-    "effects": [],
     "activeMechanics": {
       "effects": [
         {
@@ -37703,24 +37521,7 @@
         ],
         "factorMode": "multiply"
       }
-    },
-    "damageReduction": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    }
   },
   {
     "name": "Protection from Spells",
@@ -37756,8 +37557,6 @@
       "area": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Protection from Spores",
-    "effects": [],
-    "immunities": [],
     "activeMechanics": {
       "effects": [
         {
@@ -37829,23 +37628,7 @@
         "factorMode": "multiply"
       },
       "damageRolls": []
-    },
-    "damageReduction": [],
-    "spellResistance": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    }
   },
   {
     "name": "Protection from Technology",
@@ -37864,7 +37647,6 @@
       "area": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Protection from Technology",
-    "effects": [],
     "activeMechanics": {
       "effects": [
         {
@@ -37921,24 +37703,7 @@
         ],
         "factorMode": "multiply"
       }
-    },
-    "damageReduction": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    }
   },
   {
     "name": "Protective Penumbra",
@@ -38605,7 +38370,6 @@
       "area": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Radiation Ward",
-    "effects": [],
     "activeMechanics": {
       "effects": [
         {
@@ -38646,24 +38410,7 @@
         "factorMode": "multiply"
       },
       "damageRolls": []
-    },
-    "damageReduction": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    }
   },
   {
     "name": "Rage",
@@ -39583,7 +39330,6 @@
       "area": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Remove Fear",
-    "effects": [],
     "activeMechanics": {
       "effects": [
         {
@@ -39618,24 +39364,7 @@
         "factorMode": "multiply"
       },
       "damageRolls": []
-    },
-    "damageReduction": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    }
   },
   {
     "name": "Remove Paralysis",
@@ -40057,7 +39786,6 @@
       "area": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Resist Energy",
-    "effects": [],
     "activeMechanics": {
       "effects": [
         {
@@ -40114,24 +39842,7 @@
         "factorMode": "multiply"
       },
       "damageRolls": []
-    },
-    "damageReduction": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    }
   },
   {
     "name": "Resist Energy, Communal",
@@ -40184,7 +39895,6 @@
       "area": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Resistance",
-    "effects": [],
     "activeMechanics": {
       "effects": [
         {
@@ -40219,24 +39929,7 @@
         "factorMode": "multiply"
       },
       "damageRolls": []
-    },
-    "damageReduction": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    }
   },
   {
     "name": "Resize Item",
@@ -40942,25 +40635,7 @@
         ],
         "factorMode": "multiply"
       }
-    },
-    "effects": [],
-    "damageReduction": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    }
   },
   {
     "name": "Righteous Might",
@@ -41049,7 +40724,6 @@
       "spell_resistance": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Rite of Bodily Purity",
-    "effects": [],
     "activeMechanics": {
       "effects": [
         {
@@ -41084,24 +40758,7 @@
         "factorMode": "multiply"
       },
       "damageRolls": []
-    },
-    "damageReduction": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    }
   },
   {
     "name": "Rite of Centered Mind",
@@ -41120,7 +40777,6 @@
       "spell_resistance": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Rite of Centered Mind",
-    "effects": [],
     "activeMechanics": {
       "effects": [
         {
@@ -41163,24 +40819,7 @@
         "factorMode": "multiply"
       },
       "damageRolls": []
-    },
-    "damageReduction": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    }
   },
   {
     "name": "Rival's Weald",
@@ -42554,7 +42193,6 @@
       "area": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Searing Light",
-    "damageRolls": [],
     "activeMechanics": {
       "effects": [],
       "damageRolls": [
@@ -42752,24 +42390,7 @@
       "effectiveAttributeBonuses": [],
       "generatedEquipment": [],
       "conditionalVariables": []
-    },
-    "effects": [],
-    "damageReduction": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": []
+    }
   },
   {
     "name": "Sebaceous Twin",
@@ -44324,7 +43945,6 @@
       "spell_resistance": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Shield",
-    "effects": [],
     "activeMechanics": {
       "effects": [
         {
@@ -44336,6 +43956,7 @@
           "appliesWhen": ""
         }
       ],
+      "damageRolls": [],
       "damageReduction": [],
       "spellResistance": [],
       "immunities": [],
@@ -44363,26 +43984,18 @@
           }
         ],
         "factorMode": "multiply"
-      },
-      "damageRolls": []
+      }
     },
-    "damageReduction": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    "effects": [
+      {
+        "stat": "ac",
+        "value": 4,
+        "type": "shield",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": ""
+      }
+    ]
   },
   {
     "name": "Shield Other",
@@ -44401,7 +44014,6 @@
       "area": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Shield Companion (AA)",
-    "effects": [],
     "activeMechanics": {
       "effects": [
         {
@@ -44450,24 +44062,7 @@
         ],
         "factorMode": "multiply"
       }
-    },
-    "damageReduction": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    }
   },
   {
     "name": "Shield Companion (AA)",
@@ -44504,7 +44099,6 @@
       "area": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Shield Companion (AA)",
-    "effects": [],
     "activeMechanics": {
       "effects": [
         {
@@ -44553,24 +44147,7 @@
         ],
         "factorMode": "multiply"
       }
-    },
-    "damageReduction": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    }
   },
   {
     "name": "Shield Companion (ACG)",
@@ -44626,7 +44203,6 @@
       "area": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Shield of Faith",
-    "effects": [],
     "activeMechanics": {
       "effects": [
         {
@@ -44649,6 +44225,7 @@
           }
         }
       ],
+      "damageRolls": [],
       "damageReduction": [],
       "spellResistance": [],
       "immunities": [],
@@ -44676,26 +44253,29 @@
           }
         ],
         "factorMode": "multiply"
-      },
-      "damageRolls": []
+      }
     },
-    "damageReduction": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    "effects": [
+      {
+        "stat": "ac",
+        "value": 2,
+        "type": "deflection",
+        "stacks": false,
+        "conditional": false,
+        "appliesWhen": "",
+        "bonusScale": {
+          "source": {
+            "type": "caster"
+          },
+          "milestones": [],
+          "every": {
+            "fromLevel": 6,
+            "everyLevels": 6,
+            "increase": 1
+          }
+        }
+      }
+    ]
   },
   {
     "name": "Shield of Fortification",
@@ -44991,7 +44571,6 @@
       "spell_resistance": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Shock Shield",
-    "effects": [],
     "activeMechanics": {
       "effects": [
         {
@@ -45032,24 +44611,7 @@
         "factorMode": "multiply"
       },
       "damageRolls": []
-    },
-    "damageReduction": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    }
   },
   {
     "name": "Shocking Grasp",
@@ -46314,7 +45876,6 @@
       "area": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Soul Vault",
-    "effects": [],
     "activeMechanics": {
       "effects": [
         {
@@ -46355,24 +45916,7 @@
         ],
         "factorMode": "multiply"
       }
-    },
-    "damageReduction": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    }
   },
   {
     "name": "Soulreaver",
@@ -47683,7 +47227,6 @@
       "area": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Stave Off Corruption",
-    "effects": [],
     "activeMechanics": {
       "effects": [
         {
@@ -47724,24 +47267,7 @@
         ],
         "factorMode": "multiply"
       }
-    },
-    "damageReduction": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    }
   },
   {
     "name": "Stay the Hand",
@@ -48335,7 +47861,6 @@
       "area": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Stunning Barrier",
-    "effects": [],
     "activeMechanics": {
       "effects": [
         {
@@ -48384,24 +47909,7 @@
         "factorMode": "multiply"
       },
       "damageRolls": []
-    },
-    "damageReduction": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    }
   },
   {
     "name": "Stunning Barrier, Greater",
@@ -49653,7 +49161,6 @@
       "area": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Suppress Charms and Compulsions",
-    "effects": [],
     "activeMechanics": {
       "effects": [
         {
@@ -49688,24 +49195,7 @@
         "factors": [],
         "factorMode": "multiply"
       }
-    },
-    "damageReduction": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    }
   },
   {
     "name": "Suppress Primal Magic",
@@ -50819,7 +50309,6 @@
       "area": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Tears to Wine",
-    "effects": [],
     "activeMechanics": {
       "effects": [
         {
@@ -50900,24 +50389,7 @@
         "factorMode": "multiply"
       },
       "damageRolls": []
-    },
-    "damageReduction": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    }
   },
   {
     "name": "Technomancy",
@@ -51480,7 +50952,6 @@
       "area": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Theft Ward",
-    "effects": [],
     "activeMechanics": {
       "effects": [
         {
@@ -51515,24 +50986,7 @@
         "factorMode": "multiply"
       },
       "damageRolls": []
-    },
-    "damageReduction": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    }
   },
   {
     "name": "They Know",
@@ -51635,7 +51089,6 @@
       "spell_resistance": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Thought Shield I",
-    "effects": [],
     "activeMechanics": {
       "effects": [
         {
@@ -51670,24 +51123,7 @@
         "factors": [],
         "factorMode": "multiply"
       }
-    },
-    "damageReduction": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    }
   },
   {
     "name": "Thought Shield II",
@@ -54388,7 +53824,6 @@
       "area": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Veil of Heaven",
-    "effects": [],
     "activeMechanics": {
       "effects": [
         {
@@ -54437,24 +53872,7 @@
         "factorMode": "multiply"
       },
       "damageRolls": []
-    },
-    "damageReduction": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    }
   },
   {
     "name": "Veil of Positive Energy",
@@ -54475,7 +53893,6 @@
       "spell_resistance": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Veil of Positive Energy",
-    "effects": [],
     "activeMechanics": {
       "effects": [
         {
@@ -54524,24 +53941,7 @@
         "factorMode": "multiply"
       },
       "damageRolls": []
-    },
-    "damageReduction": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    }
   },
   {
     "name": "Vengeful Comets",
@@ -54766,7 +54166,6 @@
       "area": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Vestment of the Champion",
-    "effects": [],
     "activeMechanics": {
       "effects": [
         {
@@ -54818,24 +54217,7 @@
         ],
         "factorMode": "multiply"
       }
-    },
-    "damageReduction": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    }
   },
   {
     "name": "Vex Giant",
@@ -56868,7 +56250,6 @@
       "area": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Word of Resolve",
-    "effects": [],
     "activeMechanics": {
       "effects": [
         {
@@ -56903,24 +56284,7 @@
         "factorMode": "multiply"
       },
       "damageRolls": []
-    },
-    "damageReduction": [],
-    "spellResistance": [],
-    "immunities": [],
-    "applyConditions": [],
-    "classSkillGrants": [],
-    "bonusRanks": [],
-    "extraRanksPerLevel": [],
-    "featGrants": [],
-    "sizeChanges": [],
-    "spellLikeAbilities": [],
-    "casterLevelBonuses": [],
-    "spellDcBonuses": [],
-    "effectiveAttributeBonuses": [],
-    "grantDomains": [],
-    "generatedEquipment": [],
-    "conditionalVariables": [],
-    "damageRolls": []
+    }
   },
   {
     "name": "World Wave",
