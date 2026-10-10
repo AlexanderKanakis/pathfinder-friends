@@ -251,5 +251,16 @@ assert(
     sheetCss.includes("max-width: none"),
   "Weapon attack and damage totals must be full-width exceptions to compact calculated boxes.",
 );
+assert(
+  sheetPage.includes(
+    "const buffRows = formatBreakdown(items, total, showCalculations);",
+  ) &&
+    sheetPage.includes("includeAppliedEffects = true") &&
+    sheetPage.includes("const normalItems = includeAppliedEffects") &&
+    !sheetPage.includes(
+      'const buffRows = showCalculations ? formatBreakdown(items, total) : "";',
+    ),
+  "Conditional calculations must remain visible when ordinary effect explanations are hidden.",
+);
 
 console.log("Character sheet persistence checks passed.");

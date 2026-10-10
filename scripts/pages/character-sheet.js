@@ -12892,13 +12892,17 @@ function recalculateWeapons(buffed, buffBonuses) {
         }));
       }
       if (attackCalc)
-        attackCalc.innerHTML = showCalculations
-          ? formatBreakdown(attack.breakdown, attack.attacks)
-          : "";
+        attackCalc.innerHTML = formatBreakdown(
+          attack.breakdown,
+          attack.attacks,
+          showCalculations,
+        );
       if (damageCalc)
-        damageCalc.innerHTML = showCalculations
-          ? formatBreakdown(damage.breakdown, damage.totalText)
-          : "";
+        damageCalc.innerHTML = formatBreakdown(
+          damage.breakdown,
+          damage.totalText,
+          showCalculations,
+        );
     });
 }
 
@@ -12906,7 +12910,7 @@ function setCalc(id, formula, items = [], currentTotal = null) {
   const line = document.querySelector(`[data-calc-for="${id}"]`);
   if (!line) return;
   const total = currentTotal ?? el(id)?.value ?? "";
-  const buffRows = showCalculations ? formatBreakdown(items, total) : "";
+  const buffRows = formatBreakdown(items, total, showCalculations);
   line.innerHTML = buffRows;
   const skillCalcRow = line.closest(".skill-calc-row");
   if (!skillCalcRow) {
@@ -13011,7 +13015,11 @@ function mergedConditionalBreakdownItems(items = []) {
   return [...groups.values()];
 }
 
-function formatBreakdown(items = [], currentTotal = "") {
+function formatBreakdown(
+  items = [],
+  currentTotal = "",
+  includeAppliedEffects = true,
+) {
   const buffItems = items.filter((b) => {
     if (["Formula", "Base"].includes(b.source)) return false;
     if (["derived", "score", "temporary"].includes(b.type)) return false;
@@ -13021,9 +13029,11 @@ function formatBreakdown(items = [], currentTotal = "") {
   const conditionalItems = buffItems.filter(
     (b) => b.conditional || b.applied === "conditional",
   );
-  const normalItems = buffItems.filter(
-    (b) => !(b.conditional || b.applied === "conditional"),
-  );
+  const normalItems = includeAppliedEffects
+    ? buffItems.filter(
+        (b) => !(b.conditional || b.applied === "conditional"),
+      )
+    : [];
   const conditionalRows = mergedConditionalBreakdownItems(conditionalItems)
     .map((b) => {
       const target = b.targetLabel
@@ -13063,6 +13073,7 @@ function formatBreakdown(items = [], currentTotal = "") {
       return `<div class="${className}">${target}${label}: <span class="calc-buff-name ${valueClass}">${escapeHtml(b.source)}</span> <span class="${valueClass}">${signed(value)}</span> (${escapeHtml(b.type)})${detail}</div>`;
     })
     .join("");
+  if (!conditionalRows && !normalRows) return "";
   return `<div class="calc-buffs">${conditionalRows ? `<div class="calc-conditional-block"><div class="small text-warning-emphasis fw-semibold">Conditional Effects</div>${conditionalRows}</div>` : ""}${normalRows ? `<div class="calc-buff-block">${normalRows}</div>` : ""}</div>`;
 }
 
