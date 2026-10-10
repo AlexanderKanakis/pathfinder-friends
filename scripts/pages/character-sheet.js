@@ -11366,10 +11366,8 @@ function renderSkillRows(saved = {}) {
         <td class="class-skill-cell"><span id="${id}ClassSkill" class="class-skill-dot" title="Not a class skill"></span></td>
         <th class="skill-name-cell">
           ${escapeHtml(skill)}
-          ${custom ? `<button class="btn btn-outline-danger btn-sm ms-2 py-0 px-1" type="button" onclick="removeNamedSkillByKey('${normalizeSkillName(skill)}')" aria-label="Remove ${escapeHtml(skill)}"><i class="bi bi-trash"></i></button>` : ""}
+          ${custom ? `<button class="btn btn-outline-danger btn-sm skill-remove-btn" type="button" onclick="removeNamedSkillByKey('${normalizeSkillName(skill)}')" aria-label="Remove ${escapeHtml(skill)}"><i class="bi bi-trash"></i></button>` : ""}
         </th>
-        <td><output id="${id}Total" class="sheet-output sheet-output-sm total-first-input"></output></td>
-        <td><output id="${id}Ability" class="sheet-output sheet-output-sm" data-ability="${ability}">0</output></td>
         <td>
           <div class="skill-stepper">
             <button class="btn btn-outline-light btn-sm skill-stepper-btn" type="button" onclick="adjustSkillNumber('${id}Ranks', -1)" aria-label="Decrease ${escapeHtml(skill)} ranks">-</button>
@@ -11377,6 +11375,9 @@ function renderSkillRows(saved = {}) {
             <button class="btn btn-outline-light btn-sm skill-stepper-btn" type="button" onclick="adjustSkillNumber('${id}Ranks', 1)" aria-label="Increase ${escapeHtml(skill)} ranks">+</button>
           </div>
         </td>
+        <td><output id="${id}Total" class="sheet-output sheet-output-sm total-first-input"></output></td>
+        <td><output id="${id}Ability" class="sheet-output sheet-output-sm" data-ability="${ability}">0</output></td>
+        <td><output id="${id}Buff" class="sheet-output sheet-output-sm buff-field"></output></td>
         <td>
           <div class="skill-stepper">
             <button class="btn btn-outline-light btn-sm skill-stepper-btn" type="button" onclick="adjustSkillNumber('${id}Misc', -1)" aria-label="Decrease ${escapeHtml(skill)} misc">-</button>
@@ -11384,7 +11385,6 @@ function renderSkillRows(saved = {}) {
             <button class="btn btn-outline-light btn-sm skill-stepper-btn" type="button" onclick="adjustSkillNumber('${id}Misc', 1)" aria-label="Increase ${escapeHtml(skill)} misc">+</button>
           </div>
         </td>
-        <td><output id="${id}Buff" class="sheet-output sheet-output-sm buff-field"></output></td>
       </tr>
       <tr class="skill-calc-row d-none" data-skill-row="${searchName}">
         <td colspan="7"><div class="small-text calc-line" data-calc-for="${id}Total"></div></td>

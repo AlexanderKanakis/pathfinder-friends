@@ -1617,9 +1617,14 @@ body.enemy-sheet-mode .enemy-field-pair {
   border-color: #8fd19e;
 }
 
+.ability-table,
+.save-table,
 .skill-table {
   --bs-table-color: #fff;
   --bs-table-bg: transparent;
+}
+
+.skill-table {
   --bs-table-border-color: transparent;
   width: 100%;
   min-width: 540px;
@@ -1627,10 +1632,15 @@ body.enemy-sheet-mode .enemy-field-pair {
   margin-bottom: 0;
 }
 
+.ability-table > :not(caption) > * > *,
+.save-table > :not(caption) > * > *,
 .skill-table > :not(caption) > * > * {
   background: transparent;
-  border-bottom: 0;
   box-shadow: none;
+}
+
+.skill-table > :not(caption) > * > * {
+  border-bottom: 0;
 }
 
 .skill-table th,
@@ -1665,7 +1675,7 @@ body.enemy-sheet-mode .enemy-field-pair {
 
 .skill-table th:nth-child(3),
 .skill-table td:nth-child(3) {
-  width: 11%;
+  width: 18%;
 }
 
 .skill-table th:nth-child(4),
@@ -1675,17 +1685,17 @@ body.enemy-sheet-mode .enemy-field-pair {
 
 .skill-table th:nth-child(5),
 .skill-table td:nth-child(5) {
-  width: 18%;
+  width: 11%;
 }
 
 .skill-table th:nth-child(6),
 .skill-table td:nth-child(6) {
-  width: 18%;
+  width: 14%;
 }
 
 .skill-table th:nth-child(7),
 .skill-table td:nth-child(7) {
-  width: 14%;
+  width: 18%;
 }
 
 .skill-table input,
@@ -1719,45 +1729,148 @@ body.enemy-sheet-mode .enemy-field-pair {
   max-width: 360px;
 }
 
-.skill-summary-accordion .accordion-button {
-  background: #242424;
-  color: #fff;
-  padding: 8px 10px;
+.skills-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
-.skill-summary-accordion .accordion-button:not(.collapsed) {
-  background: #2b2b2b;
-  color: #fff;
-  box-shadow: none;
+.skill-remove-btn {
+  width: 24px;
+  height: 24px;
+  margin-left: 0.25rem;
+  padding: 0;
+  vertical-align: middle;
 }
 
-.skill-summary-accordion .accordion-button::after {
-  display: none;
-}
+@media (max-width: 575.98px) {
+  .skills-section {
+    padding-inline: 0;
+  }
 
-.skill-summary-accordion .accordion-button {
-  justify-content: space-between;
-  gap: 8px;
-}
+  .skills-section > .sheet-title,
+  .skills-section > .skills-actions,
+  .skills-section > .skill-search {
+    margin-inline: 4px;
+  }
 
-.skill-summary-icon {
-  transition: transform 0.18s ease;
-}
+  .skills-actions {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 4px;
+  }
 
-.skill-summary-accordion .accordion-button:not(.collapsed) .skill-summary-icon {
-  transform: rotate(180deg);
-}
+  .skills-actions .btn {
+    min-width: 0;
+    padding: 0.25rem 0.15rem;
+    font-size: 0.72rem;
+    white-space: nowrap;
+  }
 
-.skill-summary-accordion .accordion-body {
-  background: transparent;
-  padding: 8px 10px;
-}
+  .skill-search {
+    width: calc(100% - 8px);
+    max-width: none;
+  }
 
-@media (max-width: 520px) {
+  .skill-table-region {
+    overflow: visible;
+  }
+
+  .skill-table {
+    width: 100%;
+    min-width: 0;
+    font-size: 0.67rem;
+    line-height: 1.1;
+  }
+
   .skill-table th,
   .skill-table td {
-    padding-left: 0.15rem;
-    padding-right: 0.15rem;
+    min-width: 0;
+    padding-left: 1px;
+    padding-right: 1px;
+  }
+
+  .skill-table th:first-child,
+  .skill-table td:first-child {
+    width: 8px;
+  }
+
+  .skill-table th:nth-child(2),
+  .skill-table td:nth-child(2) {
+    width: 30%;
+  }
+
+  .skill-table th:nth-child(3),
+  .skill-table td:nth-child(3) {
+    width: 18%;
+  }
+
+  .skill-table th:nth-child(4),
+  .skill-table td:nth-child(4) {
+    width: 10%;
+  }
+
+  .skill-table th:nth-child(5),
+  .skill-table td:nth-child(5) {
+    width: 12%;
+  }
+
+  .skill-table th:nth-child(6),
+  .skill-table td:nth-child(6) {
+    width: 9%;
+  }
+
+  .skill-table th:nth-child(7),
+  .skill-table td:nth-child(7) {
+    width: 18%;
+  }
+
+  .skill-table .skill-stepper {
+    --sheet-stepper-width: 100%;
+    --sheet-stepper-button-width: 16px;
+    --sheet-stepper-height: 28px;
+    --sheet-stepper-gap: 1px;
+    width: 100%;
+    max-width: none;
+  }
+
+  .skill-table .skill-stepper input {
+    padding-inline: 0 !important;
+    font-size: 0.68rem;
+  }
+
+  .skill-table .skill-stepper-btn {
+    font-size: 0.68rem;
+  }
+
+  .skill-table .sheet-output,
+  .skill-table .total-first-input {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    min-height: 28px;
+    height: 28px;
+    padding-inline: 0;
+    font-size: 0.68rem;
+  }
+
+  .skill-table .skill-name-cell {
+    padding-right: 2px;
+    font-size: 0.66rem;
+    line-height: 1.15;
+    overflow-wrap: anywhere;
+  }
+
+  .skill-table .skill-stepper-heading span {
+    width: 100%;
+    font-size: 0.62rem;
+  }
+
+  .skill-remove-btn {
+    width: 20px;
+    height: 20px;
+    margin-left: 2px;
+    font-size: 0.65rem;
   }
 }
 

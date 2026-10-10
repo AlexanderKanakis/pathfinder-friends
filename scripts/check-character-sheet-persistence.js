@@ -190,15 +190,58 @@ assert(
 );
 assert(
   sheetHtml.indexOf('id="skillSearch"') >
-    sheetHtml.indexOf('id="skillSummaryCollapse"') &&
+    sheetHtml.indexOf('class="sheet-section skills-section"') &&
     sheetHtml.indexOf('id="skillRows"') >
-      sheetHtml.indexOf('id="skillSummaryCollapse"'),
-  "The full skills editor must live inside the Character tab Skills accordion.",
+      sheetHtml.indexOf('class="sheet-section skills-section"'),
+  "The full skills editor must live inside the Character tab Skills section.",
 );
 assert(
   !sheetPage.includes("skillSummaryRows") &&
-    sheetCss.includes("min-width: 540px"),
-  "Embedded skills must use the shared editor and preserve every column on narrow screens.",
+    !sheetHtml.includes("skillSummaryAccordion") &&
+    !sheetHtml.includes("skillSummaryCollapse") &&
+    !sheetCss.includes("skill-summary-accordion") &&
+    sheetCss.includes(".skills-section {") &&
+    sheetCss.includes("min-width: 0") &&
+    sheetCss.includes("width: 30%") &&
+    sheetCss.includes("--sheet-stepper-width: 100%") &&
+    sheetCss.includes("overflow-wrap: anywhere"),
+  "Embedded skills must be unframed and fit every column within conventional mobile widths.",
+);
+const skillsSectionMarkup = sheetHtml.slice(
+  sheetHtml.indexOf('class="sheet-section skills-section"'),
+  sheetHtml.indexOf('class="sheet-section character-only"'),
+);
+const skillHeaderOrder = [
+  "<th>Skill</th>",
+  "<span>Ranks</span>",
+  "<th>Total</th>",
+  "<th>Ability</th>",
+  "<th>Buff</th>",
+  "<span>Misc</span>",
+].map((marker) => skillsSectionMarkup.indexOf(marker));
+const skillRowRenderer = sheetPage.slice(
+  sheetPage.indexOf("function renderSkillRows"),
+  sheetPage.indexOf("function adjustSkillNumber"),
+);
+const skillValueOrder = [
+  "${id}Ranks",
+  "${id}Total",
+  "${id}Ability",
+  "${id}Buff",
+  "${id}Misc",
+].map((marker) => skillRowRenderer.indexOf(marker));
+assert(
+  skillHeaderOrder.every((index) => index >= 0) &&
+    skillHeaderOrder.every(
+      (index, position) =>
+        position === 0 || index > skillHeaderOrder[position - 1],
+    ) &&
+    skillValueOrder.every((index) => index >= 0) &&
+    skillValueOrder.every(
+      (index, position) =>
+        position === 0 || index > skillValueOrder[position - 1],
+    ),
+  "Skills must display Ranks before Total and place Misc last.",
 );
 assert(
   !sheetHtml.includes("skill-table-wrap") &&
@@ -208,6 +251,23 @@ assert(
     sheetPage.includes('class="skill-calc-row d-none"') &&
     sheetPage.includes('skillCalcRow.dataset.hasCalculation = "true"'),
   "The Skills table must be unframed, borderless, and omit unused calculation rows.",
+);
+const attributeTableMarkup = sheetHtml.slice(
+  sheetHtml.indexOf('class="sheet-section full-order-attributes"'),
+  sheetHtml.indexOf('class="sheet-section full-order-hp"'),
+);
+const saveTableMarkup = sheetHtml.slice(
+  sheetHtml.indexOf('class="sheet-section full-order-saves"'),
+  sheetHtml.indexOf('class="sheet-section full-order-bab"'),
+);
+assert(
+  !attributeTableMarkup.includes("table-dark") &&
+    !saveTableMarkup.includes("table-dark") &&
+    sheetCss.includes(".ability-table,\n.save-table,\n.skill-table {") &&
+    sheetCss.includes(
+      ".ability-table > :not(caption) > * > *,\n.save-table > :not(caption) > * > *,\n.skill-table > :not(caption) > * > * {",
+    ),
+  "Attributes and Saving Throws must use the same transparent table surface as Skills.",
 );
 assert(
   !sheetHtml.includes('class="maneuver-block"') &&
