@@ -40,9 +40,13 @@
       .effect-browser-row[role="button"] { cursor: pointer; }
       .effect-browser-row[role="button"]:hover, .effect-browser-row[role="button"]:focus { border-color: #0dcaf0; outline: none; }
       .effect-browser-row.is-passive { cursor: default; opacity: .9; }
+      .effect-browser-row.is-condition { min-height: 58px; }
       .effect-browser-row-title { font-weight: 700; }
       .effect-browser-row-meta { color: #aaa; font-size: 12px; }
-      .effect-browser-controls { align-items: end; display: flex; gap: 8px; }
+      .effect-browser-controls { align-items: center; display: flex; gap: 10px; }
+      .effect-browser-number-control { align-items: center; display: flex; gap: 6px; margin: 0; white-space: nowrap; }
+      .effect-browser-number-control .modal-number-stepper { width: 132px; }
+      .effect-browser-controls .form-check { align-items: center; display: flex; min-height: 31px; margin: 0 !important; }
       .effect-browser-controls input[type="number"] { width: 68px; }
       .effect-browser-type-section + .effect-browser-type-section { margin-top: 14px; }
       .effect-browser-spell-class { border: 1px solid #444; border-radius: 7px; padding: 10px; }
@@ -52,6 +56,12 @@
       .effect-browser-spell-columns { display: grid; gap: 14px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .effect-browser-spell-column-title { color: #aaa; font-size: 11px; margin-bottom: 5px; text-transform: uppercase; }
       .effect-browser-spell-button { display: block; margin-bottom: 5px; overflow: hidden; text-align: left; text-overflow: ellipsis; white-space: nowrap; width: 100%; }
+      .effect-browser-loading { pointer-events: none; }
+      .effect-browser-loading-line { animation: effect-browser-loading-pulse 1.1s ease-in-out infinite alternate; background: #4a4a4a; border-radius: 4px; display: block; height: 10px; width: min(72%, 260px); }
+      .effect-browser-loading-line.is-title { background: #5b5b5b; height: 15px; margin-bottom: 8px; width: min(48%, 180px); }
+      .effect-browser-loading-line.is-short { width: min(34%, 110px); }
+      .effect-browser-loading-spell { animation: effect-browser-loading-pulse 1.1s ease-in-out infinite alternate; background: #303030; border: 1px solid #46545a; border-radius: 4px; height: 31px; margin-bottom: 5px; }
+      @keyframes effect-browser-loading-pulse { from { opacity: .48; } to { opacity: 1; } }
       .effect-search-results { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; align-content: start; height: 100%; min-height: 0; overflow: auto; }
       .effect-tracker-search-trigger { cursor: pointer; }
       .effect-tracker-card { position: relative; min-height: 116px; background: #242424; border: 1px solid #444; border-radius: 8px; padding: 12px 52px 12px 12px; text-align: left; color: #f4f4f4; cursor: pointer; }
@@ -65,6 +75,9 @@
       .effect-tracker-inline input[type="number"] { width: 62px; }
       .effect-tracker-chip { display: inline-block; margin: 2px 3px 2px 0; color: #ddd; }
       .effect-tracker-active { background: #242424; border: 1px solid #444; border-radius: 8px; padding: 10px; margin-bottom: 8px; }
+      .effect-tracker-loading-card { min-height: 66px; pointer-events: none; }
+      .effect-tracker-loading-line { animation: effect-browser-loading-pulse 1.1s ease-in-out infinite alternate; background: #4a4a4a; border-radius: 4px; display: block; height: 10px; width: min(68%, 260px); }
+      .effect-tracker-loading-line.is-title { background: #5b5b5b; height: 15px; margin-bottom: 9px; width: min(42%, 170px); }
       .effect-active-group { margin-top: 10px; }
       .effect-active-group-title { color: #bbb; font-size: 12px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; margin: 0 0 6px; }
       .effect-active-toolbar { display: flex; justify-content: space-between; align-items: end; gap: 10px; margin-bottom: 8px; }
@@ -131,6 +144,7 @@
         .effect-search-results { grid-template-columns: 1fr; }
         .effect-browser-nav { grid-template-columns: repeat(5, minmax(90px, 1fr)); overflow-x: auto; }
         .effect-browser-spell-columns { grid-template-columns: 1fr; }
+        .effect-browser-row.is-condition { align-items: start; grid-template-columns: 1fr; }
       }
     `;
     document.head.appendChild(style);
@@ -143,6 +157,29 @@
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&#039;");
+  }
+
+  function trackerLoadingHtml() {
+    const cards = Array.from(
+      { length: 3 },
+      () => `
+        <article class="effect-tracker-active effect-tracker-loading-card" aria-label="Loading active effect">
+          <span class="effect-tracker-loading-line is-title"></span>
+          <span class="effect-tracker-loading-line"></span>
+        </article>
+      `,
+    ).join("");
+    return `
+      <div class="mb-3">
+        <label class="small">Activate</label>
+        <div class="d-flex gap-2">
+          <input class="form-control form-control-sm" placeholder="Loading available abilities..." disabled>
+          <button class="btn btn-outline-success btn-sm" type="button" disabled>Select</button>
+        </div>
+      </div>
+      <h6>Active Effects</h6>
+      <div>${cards}</div>
+    `;
   }
 
   function fmt(value) {
@@ -660,6 +697,9 @@
       this.pickerGroup = "personal";
       this.pickerEffects = [];
       this.pickerClosingForSelection = false;
+      this.pickerFinishing = false;
+      this.pickerLoading = false;
+      this.pickerReturnModalEl = null;
     }
 
     async mount() {
@@ -725,7 +765,9 @@
           this.pickerClosingForSelection = false;
           return;
         }
-        this.options.onEffectPickerCancel?.();
+        if (!this.pickerFinishing) this.options.onEffectPickerCancel?.();
+        this.pickerFinishing = false;
+        this.restorePickerParent();
       });
       await this.refresh(this.options);
     }
@@ -753,6 +795,11 @@
       this.active = Array.isArray(saved) ? saved : saved?.buffs || [];
       this.updateSearchVisibility();
       this.renderResults();
+      this.renderActive();
+    }
+
+    setActiveEffects(effects = []) {
+      this.active = Array.isArray(effects) ? [...effects] : [];
       this.renderActive();
     }
 
@@ -790,13 +837,48 @@
       }[group] || "Effects";
     }
 
+    waitForModalHidden(modalEl) {
+      if (!modalEl?.classList.contains("show")) return Promise.resolve();
+      return new Promise((resolve) => {
+        modalEl.addEventListener("hidden.bs.modal", resolve, { once: true });
+        bootstrap.Modal.getOrCreateInstance(modalEl).hide();
+      });
+    }
+
+    async hidePickerParent() {
+      const parentModal = this.container.closest(".modal.show");
+      if (!parentModal || parentModal === this.pickerModalEl) return;
+      this.pickerReturnModalEl = parentModal;
+      await this.waitForModalHidden(parentModal);
+    }
+
+    restorePickerParent() {
+      const parentModal = this.pickerReturnModalEl;
+      this.pickerReturnModalEl = null;
+      if (!parentModal?.isConnected) return;
+      bootstrap.Modal.getOrCreateInstance(parentModal).show();
+    }
+
+    finishPicker() {
+      const modal = bootstrap.Modal.getOrCreateInstance(this.pickerModalEl);
+      this.pickerFinishing = true;
+      if (this.pickerModalEl.classList.contains("show")) {
+        modal.hide();
+        return;
+      }
+      this.pickerFinishing = false;
+      this.restorePickerParent();
+    }
+
     async openPicker() {
       if (!this.options.characterId) return;
       this.pickerGroup = "personal";
       this.searchEl.value = "";
-      this.resultsEl.innerHTML = '<div class="small-text">Loading effects...</div>';
+      this.pickerLoading = true;
       this.renderPickerNav();
+      this.renderResults();
       await this.options.onEffectPickerOpen?.();
+      await this.hidePickerParent();
       bootstrap.Modal.getOrCreateInstance(this.pickerModalEl).show();
       try {
         const source = this.options.effectPickerEffects;
@@ -805,6 +887,8 @@
       } catch (error) {
         console.error(error);
         this.pickerEffects = [...this.effects];
+      } finally {
+        this.pickerLoading = false;
       }
       this.renderResults();
       this.pickerModalEl.addEventListener(
@@ -846,12 +930,12 @@
         <div class="effect-browser-controls">
           ${
             needsCl
-              ? `<label class="small">CL<input class="form-control form-control-sm" data-picker-cl type="number" min="1" value="${escapeHtml(effect.casterLevel || 1)}"></label>`
+              ? `<label class="small effect-browser-number-control"><span>CL</span><input class="form-control form-control-sm" data-picker-cl type="number" min="1" value="${escapeHtml(effect.casterLevel || 1)}"></label>`
               : ""
           }
           ${
             condition
-              ? `<label class="small">Turns<input class="form-control form-control-sm" data-picker-turns type="number" min="1" value="1"></label>`
+              ? `<label class="small effect-browser-number-control"><span>Turns</span><input class="form-control form-control-sm" data-picker-turns type="number" min="1" value="1"></label>`
               : ""
           }
           <label class="form-check small mb-1">
@@ -864,17 +948,18 @@
 
     pickerRowHtml(effect, index) {
       const passive = Boolean(effect.passiveSource);
+      const condition = isCondition(effect);
       return `
-        <article class="effect-browser-row${passive ? " is-passive" : ""}" ${
+        <article class="effect-browser-row${passive ? " is-passive" : ""}${condition ? " is-condition" : ""}" ${
           passive
             ? ""
             : `role="button" tabindex="0" data-picker-effect-index="${index}"`
         }>
           <div>
             <div class="effect-browser-row-title">${escapeHtml(effect.name || "Effect")}</div>
-            <div class="effect-browser-row-meta">${escapeHtml(effect.category || "Effect")}${
+            ${condition ? "" : `<div class="effect-browser-row-meta">${escapeHtml(effect.category || "Effect")}${
               effect.source ? ` | ${escapeHtml(effect.source)}` : ""
-            }</div>
+            }</div>`}
           </div>
           ${this.pickerControls(effect)}
         </article>
@@ -936,6 +1021,38 @@
           `,
         )
         .join("");
+    }
+
+    loadingResultsHtml() {
+      if (this.pickerGroup === "spells") {
+        const spellRows = Array.from({ length: 4 }, () =>
+          '<div class="effect-browser-loading-spell"></div>',
+        ).join("");
+        return `
+          <section class="effect-browser-spell-class effect-browser-loading" aria-label="Loading spells">
+            <span class="effect-browser-loading-line is-title"></span>
+            <div class="effect-browser-spell-level">
+              <div class="effect-browser-level-number">1</div>
+              <div class="effect-browser-spell-columns">
+                <div><div class="effect-browser-spell-column-title">Known / In Book</div>${spellRows}</div>
+                <div><div class="effect-browser-spell-column-title">Prepared Today</div>${spellRows}</div>
+              </div>
+            </div>
+          </section>
+        `;
+      }
+      return Array.from(
+        { length: this.pickerGroup === "conditions" ? 5 : 4 },
+        () => `
+          <article class="effect-browser-row effect-browser-loading" aria-label="Loading effect">
+            <div>
+              <span class="effect-browser-loading-line is-title"></span>
+              <span class="effect-browser-loading-line"></span>
+            </div>
+            <span class="effect-browser-loading-line is-short"></span>
+          </article>
+        `,
+      ).join("");
     }
 
     bindPickerRows() {
@@ -1014,16 +1131,22 @@
             return { close: true };
           },
         });
-        if (!cast)
+        if (!cast || this.pickerReturnModalEl)
           bootstrap.Modal.getOrCreateInstance(this.pickerModalEl).show();
         return;
       }
       await this.addEffectDefinition(effect, selection);
+      if (this.pickerReturnModalEl)
+        bootstrap.Modal.getOrCreateInstance(this.pickerModalEl).show();
     }
 
     renderResults() {
       if (!this.resultsEl) return;
       this.renderPickerNav();
+      if (this.pickerLoading) {
+        this.resultsEl.innerHTML = this.loadingResultsHtml();
+        return;
+      }
       const term = this.searchEl?.value.trim().toLowerCase() || "";
       const rows = this.pickerEffects
         .map((effect, index) => ({ effect, index }))
@@ -1875,7 +1998,7 @@
         if (!finalizedEffect) return;
       }
       if (!hasPersistentEffectMechanics(finalizedEffect)) {
-        bootstrap.Modal.getInstance(this.pickerModalEl)?.hide();
+        this.finishPicker();
         return;
       }
 
@@ -1894,7 +2017,7 @@
           this.queueSave();
         }
         if (activation) {
-          bootstrap.Modal.getInstance(this.pickerModalEl)?.hide();
+          this.finishPicker();
         }
         return;
       }
@@ -2007,7 +2130,7 @@
       this.renderActive();
       this.notifyChange({ collectionChanged: true });
       this.queueSave();
-      bootstrap.Modal.getInstance(this.pickerModalEl)?.hide();
+      this.finishPicker();
     }
 
     // Applying a choice-needing effect to a character someone else
@@ -2037,7 +2160,7 @@
       if (status) {
         status.textContent = `Sent "${finalizedEffect.name || "effect"}" to the player -- waiting for them to choose.`;
       }
-      bootstrap.Modal.getInstance(this.pickerModalEl)?.hide();
+      this.finishPicker();
       this.watchEffectChoiceRequest(result.id, finalizedEffect);
     }
 
@@ -2388,6 +2511,11 @@
   }
 
   window.PFEffectTracker = {
+    prepareLoading(container) {
+      if (!container) return;
+      injectStyles();
+      container.innerHTML = trackerLoadingHtml();
+    },
     mount(container, options) {
       const tracker = new EffectTracker(container, options);
       tracker.ready = tracker.mount();

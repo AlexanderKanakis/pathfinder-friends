@@ -465,6 +465,10 @@ let equipmentEnhancementBuffCache = null;
 let lastBuffRefresh = "";
 let effectTrackerInstance = null;
 let effectTrackerModal = null;
+let buffRealtimeChannel = null;
+let effectPickerDefinitionsPromise = null;
+let effectPickerDefinitionsKey = "";
+let effectPickerPrefetchTimer = null;
 let currentUserId = "";
 let currentSheetOwnerId = "";
 let currentUserIsAdmin = false;
@@ -943,16 +947,12 @@ function enemySpellGridHeader(options = {}) {
   `;
 }
 
-function enemySpellRowMarkup(row = {}, options = {}) {
-  const readonly = options.readonly === true;
-  const deleteButton = readonly
-    ? ""
-    : `<button class="btn btn-outline-danger btn-sm enemy-spell-delete" type="button" data-delete-enemy-spell-row aria-label="Delete row"><i class="bi bi-trash"></i></button>`;
+function enemySpellRowMarkup(row = {}) {
   return `
-      <div class="enemy-spell-row${readonly ? " character-spell-like-row" : ""}" data-enemy-spell-row>
-        <input class="form-control form-control-sm sheet-input enemy-auto-input" data-enemy-spell-label value="${escapeHtml(row.label || "")}" aria-label="Frequency or spell level"${readonly ? " readonly" : ""}>
-        <textarea class="form-control form-control-sm sheet-input" data-enemy-spell-list aria-label="Spells"${readonly ? " readonly" : ""}>${escapeHtml(row.spells || "")}</textarea>
-        ${deleteButton}
+      <div class="enemy-spell-row" data-enemy-spell-row>
+        <input class="form-control form-control-sm sheet-input enemy-auto-input" data-enemy-spell-label value="${escapeHtml(row.label || "")}" aria-label="Frequency or spell level">
+        <textarea class="form-control form-control-sm sheet-input" data-enemy-spell-list aria-label="Spells">${escapeHtml(row.spells || "")}</textarea>
+        <button class="btn btn-outline-danger btn-sm enemy-spell-delete" type="button" data-delete-enemy-spell-row aria-label="Delete row"><i class="bi bi-trash"></i></button>
       </div>
     `;
 }
@@ -1210,8 +1210,8 @@ function characterSpellLikeRowMarkup(row = {}) {
   const separator = spells && plain ? '<span class="character-spell-like-separator">, </span>' : "";
   return `
     <div class="enemy-spell-row character-spell-like-row" data-enemy-spell-row>
-      <input class="form-control form-control-sm sheet-input enemy-auto-input" value="${escapeHtml(row.label || "")}" aria-label="Frequency or spell level" readonly>
-      <div class="form-control form-control-sm sheet-input character-spell-like-list" aria-label="Spells">${spells}${separator}${plain}</div>
+      <output class="sheet-output sheet-output-sm" aria-label="Frequency or spell level">${escapeHtml(row.label || "")}</output>
+      <div class="sheet-output sheet-output-sm character-spell-like-list" aria-label="Spells">${spells}${separator}${plain}</div>
     </div>
   `;
 }
@@ -2067,7 +2067,6 @@ function ensureNamedSkillChoiceVisible(skillName = "") {
   const saved = currentSkillValues();
   customSkills.push({ name, ability: abilityForNamedSkillChoice(name) });
   renderSkillRows(saved);
-  renderSkillSummaryRows();
 }
 
 function conditionalVariables(item = {}) {
@@ -11307,9 +11306,9 @@ function buildSheet(deferDynamicSections = false) {
     ([key, label]) => `
     <tr>
       <th>${label}</th>
-      <td><input id="${key}Total" class="form-control form-control-sm ability-total-input" readonly></td>
-      <td><input id="${key}Buff" class="form-control form-control-sm buff-field" readonly></td>
-      <td><input id="${key}Mod" class="form-control form-control-sm" readonly></td>
+      <td><output id="${key}Total" class="sheet-output sheet-output-sm ability-total-input"></output></td>
+      <td><output id="${key}Buff" class="sheet-output sheet-output-sm buff-field"></output></td>
+      <td><output id="${key}Mod" class="sheet-output sheet-output-sm"></output></td>
       <td>
         <div class="ability-score-stepper">
           <button class="btn btn-outline-light btn-sm ability-stepper-btn" type="button" onclick="adjustSkillNumber('${key}Score', -1)" aria-label="Decrease ${label} score">-</button>
@@ -11328,8 +11327,8 @@ function buildSheet(deferDynamicSections = false) {
     ([key, label]) => `
     <tr>
       <th>${label}</th>
-      <td><input id="${key}Total" class="form-control form-control-sm total-first-input" readonly></td>
-      <td><input id="${key}Base" class="form-control form-control-sm no-spinner" inputmode="numeric" value="0" readonly></td>
+      <td><output id="${key}Total" class="sheet-output sheet-output-sm total-first-input"></output></td>
+      <td><output id="${key}Base" class="sheet-output sheet-output-sm">0</output></td>
       <td>
         <div class="number-stepper">
           <button class="btn btn-outline-light btn-sm ability-stepper-btn" type="button" onclick="adjustSkillNumber('${key}Misc', -1)" aria-label="Decrease ${label} misc">-</button>
@@ -11337,8 +11336,8 @@ function buildSheet(deferDynamicSections = false) {
           <button class="btn btn-outline-light btn-sm ability-stepper-btn" type="button" onclick="adjustSkillNumber('${key}Misc', 1)" aria-label="Increase ${label} misc">+</button>
         </div>
       </td>
-      <td><input id="${key}Ability" class="form-control form-control-sm" readonly></td>
-      <td><input id="${key}Buff" class="form-control form-control-sm buff-field" readonly></td>
+      <td><output id="${key}Ability" class="sheet-output sheet-output-sm"></output></td>
+      <td><output id="${key}Buff" class="sheet-output sheet-output-sm buff-field"></output></td>
     </tr>
     <tr>
       <td colspan="6"><div class="small-text calc-line" data-calc-for="${key}Total"></div></td>
@@ -11369,8 +11368,8 @@ function renderSkillRows(saved = {}) {
           ${escapeHtml(skill)}
           ${custom ? `<button class="btn btn-outline-danger btn-sm ms-2 py-0 px-1" type="button" onclick="removeNamedSkillByKey('${normalizeSkillName(skill)}')" aria-label="Remove ${escapeHtml(skill)}"><i class="bi bi-trash"></i></button>` : ""}
         </th>
-        <td><input id="${id}Total" class="form-control form-control-sm total-first-input" readonly></td>
-        <td><input id="${id}Ability" class="form-control form-control-sm no-spinner" value="0" data-ability="${ability}" readonly></td>
+        <td><output id="${id}Total" class="sheet-output sheet-output-sm total-first-input"></output></td>
+        <td><output id="${id}Ability" class="sheet-output sheet-output-sm" data-ability="${ability}">0</output></td>
         <td>
           <div class="skill-stepper">
             <button class="btn btn-outline-light btn-sm skill-stepper-btn" type="button" onclick="adjustSkillNumber('${id}Ranks', -1)" aria-label="Decrease ${escapeHtml(skill)} ranks">-</button>
@@ -11385,9 +11384,9 @@ function renderSkillRows(saved = {}) {
             <button class="btn btn-outline-light btn-sm skill-stepper-btn" type="button" onclick="adjustSkillNumber('${id}Misc', 1)" aria-label="Increase ${escapeHtml(skill)} misc">+</button>
           </div>
         </td>
-        <td><input id="${id}Buff" class="form-control form-control-sm buff-field" readonly></td>
+        <td><output id="${id}Buff" class="sheet-output sheet-output-sm buff-field"></output></td>
       </tr>
-      <tr data-skill-row="${searchName}">
+      <tr class="skill-calc-row d-none" data-skill-row="${searchName}">
         <td colspan="7"><div class="small-text calc-line" data-calc-for="${id}Total"></div></td>
       </tr>
     `;
@@ -11418,34 +11417,16 @@ function adjustNumberInput(input, delta) {
   input.dispatchEvent(new Event("input", { bubbles: true }));
 }
 
-function renderSkillSummaryRows() {
-  const root = el("skillSummaryRows");
-  if (!root) return;
-  root.innerHTML = allSkills()
-    .map(
-      ([skill]) => `
-    <div class="skill-summary-row" data-skill-summary-row="${escapeHtml(skill.toLowerCase())}">
-      <div class="skill-summary-name">${escapeHtml(skill)}</div>
-      <div class="skill-summary-total">${escapeHtml(fieldValue(`${skillId(skill)}Total`, "-"))}</div>
-    </div>
-  `,
-    )
-    .join("");
-  applySkillSearchFilter();
-}
-
 function applySkillSearchFilter() {
   const term = skillSearchTerm.trim().toLowerCase();
   document.querySelectorAll("[data-skill-row]").forEach((row) => {
+    const filtered = Boolean(term) && !row.dataset.skillRow.includes(term);
+    const emptyCalculation =
+      row.classList.contains("skill-calc-row") &&
+      row.dataset.hasCalculation !== "true";
     row.classList.toggle(
       "d-none",
-      Boolean(term) && !row.dataset.skillRow.includes(term),
-    );
-  });
-  document.querySelectorAll("[data-skill-summary-row]").forEach((row) => {
-    row.classList.toggle(
-      "d-none",
-      Boolean(term) && !row.dataset.skillSummaryRow.includes(term),
+      filtered || emptyCalculation,
     );
   });
 }
@@ -11475,7 +11456,6 @@ function addNamedSkill(prefix, ability) {
   }
   customSkills.push({ name, ability });
   renderSkillRows(currentSkillValues());
-  renderSkillSummaryRows();
   recalculateSheet();
   queueSheetSave();
 }
@@ -11486,9 +11466,21 @@ function removeNamedSkillByKey(key) {
     (skill) => normalizeSkillName(skill.name) !== key,
   );
   renderSkillRows(saved);
-  renderSkillSummaryRows();
   recalculateSheet();
   queueSheetSave();
+}
+
+function equipmentTextFieldMarkup(
+  field,
+  value,
+  { locked = false, className = "" } = {},
+) {
+  const classes = String(className || "").trim();
+  const escapedValue = escapeHtml(value ?? "");
+  if (locked) {
+    return `<output data-field="${field}" class="sheet-output sheet-output-sm ${classes}">${escapedValue}</output>`;
+  }
+  return `<input data-field="${field}" class="form-control form-control-sm sheet-input ${classes}" value="${escapedValue}">`;
 }
 
 function addWeapon(data = {}) {
@@ -11538,7 +11530,7 @@ function addWeapon(data = {}) {
   if (generatedLocked) card.dataset.generatedEquipment = "true";
   card.innerHTML = `
     <div class="equipment-card-header">
-      <input data-field="name" class="form-control form-control-sm sheet-input fw-semibold equipment-name-input" value="${escapeHtml(name)}" ${sourceLocked ? "readonly" : ""}>
+      ${equipmentTextFieldMarkup("name", name, { locked: sourceLocked, className: "fw-semibold equipment-name-input" })}
       <div class="equipment-actions">
         ${
           generatedLocked
@@ -11556,12 +11548,10 @@ function addWeapon(data = {}) {
     <input data-field="generatedSource" class="sheet-input" type="hidden" value="${escapeHtml(generatedSource)}">
     <input data-field="templateAttack" class="sheet-input" type="hidden" value="${escapeHtml(data.templateAttack || "")}">
     <div class="weapon-summary">
-      <div class="weapon-attack-summary"><label>Attack Bonus</label><input data-attack-total class="form-control form-control-sm" readonly></div>
-      <div><label>Damage</label><input data-damage-total class="form-control form-control-sm" readonly><div class="weapon-extra-damage-results" data-extra-damage-results></div></div>
-      <div><label>Critical</label><input data-field="critical" class="form-control form-control-sm sheet-input" value="${data.critical || ""}" ${sourceLocked ? "readonly" : ""}></div>
+      <div class="weapon-attack-summary"><label>Attack Bonus</label><output data-attack-total class="sheet-output sheet-output-sm"></output><div class="small-text calc-line" data-weapon-attack-calc></div></div>
+      <div><label>Damage</label><output data-damage-total class="sheet-output sheet-output-sm"></output><div class="weapon-extra-damage-results" data-extra-damage-results></div><div class="small-text calc-line" data-weapon-damage-calc></div></div>
+      <div><label>Critical</label>${equipmentTextFieldMarkup("critical", data.critical || "", { locked: sourceLocked })}</div>
     </div>
-    <div class="small-text calc-line" data-weapon-attack-calc></div>
-    <div class="small-text calc-line" data-weapon-damage-calc></div>
     <input data-field="enhancement" class="sheet-input" type="hidden" value="${enhancement}">
     <input data-field="enchantment" class="sheet-input" type="hidden" value="${escapeHtml(enchantment)}">
     <input data-field="specialMaterial" class="sheet-input" type="hidden" value="${escapeHtml(specialMaterial)}">
@@ -11617,7 +11607,7 @@ function addArmor(data = {}) {
   if (generatedLocked) card.dataset.generatedEquipment = "true";
   card.innerHTML = `
     <div class="equipment-card-header">
-      <input data-field="item" class="form-control form-control-sm sheet-input fw-semibold equipment-name-input" value="${escapeHtml(itemName)}" ${sourceLocked ? "readonly" : ""}>
+      ${equipmentTextFieldMarkup("item", itemName, { locked: sourceLocked, className: "fw-semibold equipment-name-input" })}
       <div class="equipment-actions">
         ${
           generatedLocked
@@ -11631,7 +11621,7 @@ function addArmor(data = {}) {
       </div>
     </div>
     <div class="card-summary">
-      <div><label>Total</label><input data-armor-total class="form-control form-control-sm" readonly></div>
+      <div><label>Total</label><output data-armor-total class="sheet-output sheet-output-sm"></output></div>
     </div>
     <input data-field="sourceLootId" class="sheet-input" type="hidden" value="${sourceLootId}">
     <input data-field="generatedEquipmentId" class="sheet-input" type="hidden" value="${escapeHtml(generatedEquipmentId)}">
@@ -11663,7 +11653,7 @@ function addGear(data = {}) {
   const sourceLocked = Boolean(sourceLootId);
   card.innerHTML = `
     <div class="equipment-card-header">
-      <input data-field="item" class="form-control form-control-sm sheet-input fw-semibold equipment-name-input" value="${escapeHtml(itemName)}" ${sourceLocked ? "readonly" : ""}>
+      ${equipmentTextFieldMarkup("item", itemName, { locked: sourceLocked, className: "fw-semibold equipment-name-input" })}
       <div class="equipment-actions">
         <button class="btn btn-outline-light btn-sm" type="button" onclick="openEquipmentItemEditor(this)">More</button>
         <button class="btn btn-outline-danger btn-sm equipment-icon-btn" type="button" onclick="removeCard(this)" aria-label="Remove ${escapeHtml(itemName)}" title="Remove">
@@ -12893,12 +12883,12 @@ function recalculateWeapons(buffed, buffBonuses) {
       const extraResults = card.querySelector("[data-extra-damage-results]");
       if (extraResults) {
         extraResults.replaceChildren(...damage.extraDamage.map(({ formula, type }) => {
-          const input = document.createElement("input");
-          input.className = "form-control form-control-sm";
-          input.readOnly = true;
-          input.value = `${formula}${type ? ` ${type}` : ""}`;
-          input.setAttribute("aria-label", `Additional ${type || "weapon"} damage`);
-          return input;
+          const output = document.createElement("output");
+          output.className = "sheet-output sheet-output-sm";
+          output.dataset.extraDamageValue = "true";
+          output.value = `${formula}${type ? ` ${type}` : ""}`;
+          output.setAttribute("aria-label", `Additional ${type || "weapon"} damage`);
+          return output;
         }));
       }
       if (attackCalc)
@@ -12918,7 +12908,17 @@ function setCalc(id, formula, items = [], currentTotal = null) {
   const total = currentTotal ?? el(id)?.value ?? "";
   const buffRows = showCalculations ? formatBreakdown(items, total) : "";
   line.innerHTML = buffRows;
-  line.classList.remove("d-none");
+  const skillCalcRow = line.closest(".skill-calc-row");
+  if (!skillCalcRow) {
+    line.classList.remove("d-none");
+    return;
+  }
+  if (buffRows) skillCalcRow.dataset.hasCalculation = "true";
+  else delete skillCalcRow.dataset.hasCalculation;
+  const filtered =
+    Boolean(skillSearchTerm) &&
+    !skillCalcRow.dataset.skillRow.includes(skillSearchTerm.toLowerCase());
+  skillCalcRow.classList.toggle("d-none", filtered || !buffRows);
 }
 
 function numericTotalText(currentTotal, bonusValue, statName = "") {
@@ -13360,7 +13360,6 @@ function recalculateSheet() {
     }
     setCalc(`${id}Total`, "", skillBreakdownItems);
   });
-  renderSkillSummaryRows();
   renderCharacterSpellLikeAbilities();
   if (sheetViewMode === "simplified") renderSimplifiedSheet();
 }
@@ -13384,6 +13383,7 @@ async function refreshBuffsIfChanged(force = false, saveAfterRefresh = false) {
   const stamp = localStorage.getItem(buffRefreshKey()) || "";
   if (!force && stamp === lastBuffRefresh) return;
   await loadActiveBuffs();
+  effectTrackerInstance?.setActiveEffects?.(activeBuffs);
   recalculateSheet();
   if (saveAfterRefresh && currentSheetId && !isEnemySheetMode)
     await saveSheetNow(true);
@@ -13435,18 +13435,7 @@ async function openEffectTrackerModal() {
       );
       return detail?.calculations || effect.spellCalculations || null;
     },
-    effectPickerEffects: async () => {
-      const [spells, catalog] = await Promise.all([
-        collectBridgeOwnedSpellEffects(),
-        window.PFEffectCatalog?.load?.() || [],
-      ]);
-      return [
-        ...collectActivatableAbilities(),
-        ...spells,
-        ...catalog,
-        ...collectBridgePassiveEffectSources(),
-      ];
-    },
+    effectPickerEffects: loadCurrentEffectPickerDefinitions,
     choicePoolSkills: allSkills(),
     choicePoolEquipment: currentEffectChoiceEquipment,
     favoredEnemyOptions: characterFavoredEnemyOptions,
@@ -13467,7 +13456,7 @@ async function openEffectTrackerModal() {
     isOwnCharacter: isEnemySheetMode
       ? true
       : !currentSheetOwnerId || currentSheetOwnerId === currentUserId,
-    loadActiveEffects: isEnemySheetMode ? async () => activeBuffs : undefined,
+    loadActiveEffects: async () => activeBuffs,
     saveActiveEffects: enemySaveActiveEffects || undefined,
     onChange: (buffs, { collectionChanged = false } = {}) => {
       activeBuffs = Array.isArray(buffs) ? buffs : [];
@@ -14485,6 +14474,46 @@ async function syncCharacterInventoryWithEquipment(preloadedLoot = null) {
   await reconcileEquippedLoot(loot);
 }
 
+function unsubscribeCharacterBuffRealtime() {
+  if (buffRealtimeChannel && PFApp.client)
+    PFApp.client.removeChannel(buffRealtimeChannel);
+  buffRealtimeChannel = null;
+}
+
+function subscribeCharacterBuffRealtime() {
+  unsubscribeCharacterBuffRealtime();
+  if (isEnemySheetMode || !currentSheetId || !PFApp.client) return;
+  const subscribedCharacterId = String(currentSheetId);
+  const subscribedContextKey = sheetContextKey;
+  buffRealtimeChannel = PFApp.client
+    .channel(`character_buffs:${subscribedContextKey}:${subscribedCharacterId}`)
+    .on(
+      "postgres_changes",
+      {
+        event: "*",
+        schema: "public",
+        table: "user_buff_state",
+        filter: `character_id=eq.${subscribedCharacterId}`,
+      },
+      (payload) => {
+        const row = payload.new || {};
+        if (
+          String(row.character_id || subscribedCharacterId) !==
+            subscribedCharacterId ||
+          (row.context_key && row.context_key !== subscribedContextKey)
+        )
+          return;
+        activeBuffs = Array.isArray(row.active_buffs) ? row.active_buffs : [];
+        const updateStamp = String(row.updated_at || Date.now());
+        localStorage.setItem(buffRefreshKey(subscribedCharacterId), updateStamp);
+        lastBuffRefresh = updateStamp;
+        effectTrackerInstance?.setActiveEffects?.(activeBuffs);
+        recalculateSheet();
+      },
+    )
+    .subscribe();
+}
+
 async function loadCharacterInventory(preloadedLoot = null) {
   await syncCharacterInventoryWithEquipment(preloadedLoot);
   renderCharacterInventory(characterInventoryItems);
@@ -14773,7 +14802,9 @@ function renderSimplifiedSheet() {
         critical,
         attackConditionals,
         damageConditionals,
-        [...card.querySelectorAll("[data-extra-damage-results] input")].map((input) => input.value),
+        [...card.querySelectorAll("[data-extra-damage-value]")].map(
+          (output) => output.value,
+        ),
       ];
     },
   );
@@ -15140,6 +15171,7 @@ function saveSheetNow(silent = false) {
 }
 
 function enqueueSheetSave(silent = false) {
+  invalidateEffectPickerDefinitions();
   const run = () => saveSheetSnapshot(silent);
   sheetSaveQueue = sheetSaveQueue.then(run, run);
   return sheetSaveQueue;
@@ -15271,6 +15303,9 @@ async function loadCurrentSheet(
     await restoreSheetWithClassDefinitions(saved.sheet);
     el("characterName").value = saved.character_name;
     await loadCharacterInventory(loot);
+    invalidateEffectPickerDefinitions();
+    scheduleEffectPickerPrefetch();
+    subscribeCharacterBuffRealtime();
   } else {
     setStatus("Could not load that character sheet.", "warning");
   }
@@ -15278,6 +15313,59 @@ async function loadCurrentSheet(
 
 let sheetBridgeRecalculationQueue = Promise.resolve();
 let sheetBridgeSummarySaveQueue = Promise.resolve();
+
+function currentEffectPickerDefinitionsKey() {
+  return `${sheetContextKey}:${isEnemySheetMode ? "enemy" : "character"}:${currentSheetId || ""}`;
+}
+
+function invalidateEffectPickerDefinitions() {
+  effectPickerDefinitionsPromise = null;
+  effectPickerDefinitionsKey = "";
+  if (effectPickerPrefetchTimer) {
+    window.clearTimeout(effectPickerPrefetchTimer);
+    effectPickerPrefetchTimer = null;
+  }
+}
+
+function loadCurrentEffectPickerDefinitions() {
+  const key = currentEffectPickerDefinitionsKey();
+  if (effectPickerDefinitionsPromise && effectPickerDefinitionsKey === key)
+    return effectPickerDefinitionsPromise;
+  effectPickerDefinitionsKey = key;
+  effectPickerDefinitionsPromise = Promise.all([
+    collectBridgeOwnedSpellEffects(),
+    window.PFEffectCatalog?.load?.() || [],
+  ])
+    .then(([spells, catalog]) => [
+      ...collectActivatableAbilities(),
+      ...spells,
+      ...catalog,
+      ...collectBridgePassiveEffectSources(),
+    ])
+    .catch((error) => {
+      if (effectPickerDefinitionsKey === key) {
+        effectPickerDefinitionsPromise = null;
+        effectPickerDefinitionsKey = "";
+      }
+      throw error;
+    });
+  return effectPickerDefinitionsPromise;
+}
+
+function scheduleEffectPickerPrefetch() {
+  if (!currentSheetId) return;
+  const prefetch = () => {
+    effectPickerPrefetchTimer = null;
+    void loadCurrentEffectPickerDefinitions().catch((error) =>
+      console.warn("Could not prefetch character effects.", error),
+    );
+  };
+  if (window.requestIdleCallback) {
+    window.requestIdleCallback(prefetch, { timeout: 1800 });
+    return;
+  }
+  effectPickerPrefetchTimer = window.setTimeout(prefetch, 500);
+}
 
 function bridgeSpellEffectDefinition(spell = {}, metadata = {}) {
   const mechanics = window.PFEffectMechanics?.activeMechanics?.(spell, {
@@ -16009,13 +16097,20 @@ async function initCharacterSheet() {
   el("openEffectTrackerButton").addEventListener("click", async (event) => {
     const button = event.currentTarget;
     button.disabled = true;
+    if (!effectTrackerInstance)
+      PFEffectTracker.prepareLoading?.(el("sheetEffectTracker"));
+    effectTrackerModal.show();
     try {
+      await new Promise((resolve) =>
+        requestAnimationFrame(() => window.setTimeout(resolve, 0)),
+      );
       await openEffectTrackerModal();
-      effectTrackerModal.show();
+      void refreshBuffsIfChanged(false);
     } finally {
       button.disabled = false;
     }
   });
+  window.addEventListener("beforeunload", unsubscribeCharacterBuffRealtime);
   el("characterName").addEventListener("change", async () => {
     if (isEnemySheetMode) return;
     const saved = await PFApp.loadCharacterSheet(

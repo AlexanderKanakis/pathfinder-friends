@@ -98,4 +98,158 @@ assert(
   "Inventory names and controls must remain on one truncating row.",
 );
 
+[
+  "hitPointsTotal",
+  "initTotal",
+  "acTotal",
+  "bab",
+  "cmbTotal",
+  "cmdTotal",
+].forEach((id) => {
+  assert(
+    new RegExp(`<output[^>]+id="${id}"`).test(sheetHtml),
+    `${id} must be rendered as a calculated output, not a read-only input.`,
+  );
+});
+assert(
+  !/<(?:input|textarea)\b[^>]*\breadonly\b/i.test(sheetHtml) &&
+    sheetPage.includes('<output id="${key}Total"') &&
+    sheetPage.includes('<output id="${id}Total"') &&
+    sheetPage.includes("function equipmentTextFieldMarkup("),
+  "Non-editable sheet values must use the shared output presentation.",
+);
+assert(
+  sheetCss.includes(".sheet-output-sm") &&
+    sheetCss.includes("min-height: 31px") &&
+    sheetCss.includes("height: 31px") &&
+    sheetCss.includes("background-color: #202020") &&
+    sheetCss.includes("border: 1px solid #555") &&
+    sheetCss.includes("font-size: 0.875rem") &&
+    sheetCss.includes("font-weight: 400"),
+  "Calculated outputs must use the standard boxed control presentation without broad emphasis.",
+);
+assert(
+  sheetCss.includes(".ability-total-input {") &&
+    sheetCss.includes(".save-table .total-first-input {") &&
+    sheetCss.includes("#hitPointsTotal") &&
+    sheetCss.includes("#initTotal") &&
+    !sheetCss.slice(
+      sheetCss.indexOf(".buff-field {"),
+      sheetCss.indexOf("}", sheetCss.indexOf(".buff-field {")) + 1,
+    ).includes("font-weight"),
+  "Only attribute totals, save totals, Total HP, and Initiative may retain enlarged bold output values.",
+);
+assert(
+  sheetCss.includes("--sheet-stepper-width: 96px") &&
+    sheetCss.includes("--sheet-stepper-button-width: 26px") &&
+    sheetCss.includes(".item-number-stepper {") &&
+    sheetCss.includes("width: min(100%, var(--sheet-stepper-width))"),
+  "Every character-sheet stepper must use the shared BAB Misc dimensions.",
+);
+assert(
+  sheetHtml.includes("character-level-field") &&
+    sheetHtml.includes("character-level-stepper") &&
+    sheetCss.includes(".character-level-stepper {") &&
+    sheetCss.includes("max-width: none"),
+  "Character Level must retain its original full-column stepper width.",
+);
+const sheetOutputCss = sheetCss.slice(
+  sheetCss.indexOf(".sheet-output {"),
+  sheetCss.indexOf(".sheet-output-sm {"),
+);
+assert(
+  sheetOutputCss.includes("width: min(100%, 96px)") &&
+    sheetOutputCss.includes("max-width: 96px"),
+  "Calculated non-input boxes must match the 96px BAB Misc stepper width.",
+);
+assert(
+  sheetCss.includes(".full-order-ac > .sheet-grid") &&
+    sheetCss.includes("grid-template-columns: repeat(4, minmax(0, 1fr))"),
+  "The AC summary and detail values must share the same column grid.",
+);
+const acPrimaryGrid = sheetHtml.slice(
+  sheetHtml.indexOf('<div class="ac-primary-grid">'),
+  sheetHtml.indexOf('<div class="sheet-grid">', sheetHtml.indexOf('<div class="ac-primary-grid">')),
+);
+assert(
+    (sheetHtml.match(/id="acMisc"/g) || []).length === 1 &&
+    acPrimaryGrid.includes('for="acBuff"') &&
+    acPrimaryGrid.indexOf('for="acMisc"') > acPrimaryGrid.indexOf('for="acBuff"') &&
+    sheetCss.includes(".sheet-number-field > .number-stepper-label") &&
+    sheetCss.includes("text-align: left"),
+  "AC Misc must sit beside AC Buff with its stepper aligned to the AC value grid.",
+);
+
+assert(
+  (sheetHtml.match(/id="skillSearch"/g) || []).length === 1 &&
+    (sheetHtml.match(/id="skillRows"/g) || []).length === 1 &&
+    !sheetHtml.includes('data-sheet-info-tab="skills"') &&
+    !sheetHtml.includes('data-sheet-info-panel="skills"') &&
+    !sheetHtml.includes('id="skillSummaryRows"'),
+  "The Character tab must own the only full skills editor without a duplicate Skills tab.",
+);
+assert(
+  sheetHtml.indexOf('id="skillSearch"') >
+    sheetHtml.indexOf('id="skillSummaryCollapse"') &&
+    sheetHtml.indexOf('id="skillRows"') >
+      sheetHtml.indexOf('id="skillSummaryCollapse"'),
+  "The full skills editor must live inside the Character tab Skills accordion.",
+);
+assert(
+  !sheetPage.includes("skillSummaryRows") &&
+    sheetCss.includes("min-width: 540px"),
+  "Embedded skills must use the shared editor and preserve every column on narrow screens.",
+);
+assert(
+  !sheetHtml.includes("skill-table-wrap") &&
+    !sheetHtml.includes("table table-dark table-sm align-middle compact-table skill-table") &&
+    sheetCss.includes("--bs-table-bg: transparent") &&
+    sheetCss.includes("border-bottom: 0") &&
+    sheetPage.includes('class="skill-calc-row d-none"') &&
+    sheetPage.includes('skillCalcRow.dataset.hasCalculation = "true"'),
+  "The Skills table must be unframed, borderless, and omit unused calculation rows.",
+);
+assert(
+  !sheetHtml.includes('class="maneuver-block"') &&
+    !sheetCss.includes(".maneuver-block {") &&
+    sheetCss.includes(".bab-grid,\n.maneuver-fields {") &&
+    sheetCss.includes("grid-template-columns: repeat(3, minmax(85px, 1fr))"),
+  "CMB and CMD must be unframed while BAB shares their aligned three-column layout.",
+);
+
+const weaponRenderer = sheetPage.slice(
+  sheetPage.indexOf("function addWeapon"),
+  sheetPage.indexOf("function addArmor"),
+);
+const weaponDisplayOrder = [
+  'data-attack-total',
+  'data-weapon-attack-calc',
+  '<label>Damage</label>',
+  'data-weapon-damage-calc',
+  '<label>Critical</label>',
+].map((marker) => weaponRenderer.indexOf(marker));
+assert(
+  weaponDisplayOrder.every((index) => index >= 0) &&
+    weaponDisplayOrder.every(
+      (index, position) => position === 0 || index > weaponDisplayOrder[position - 1],
+    ),
+  "Weapon cards must show attack details under attack, followed by damage and its details.",
+);
+const weaponSummaryCss = sheetCss.slice(
+  sheetCss.indexOf(".weapon-summary {"),
+  sheetCss.indexOf(".maneuver-grid {"),
+);
+assert(
+  weaponSummaryCss.includes("grid-template-columns: repeat(2, minmax(0, 1fr))") &&
+    weaponSummaryCss.includes(".weapon-attack-summary {") &&
+    weaponSummaryCss.includes("grid-column: 1 / -1"),
+  "Weapon attack values and explanations must occupy the full row before damage.",
+);
+assert(
+  sheetCss.includes(".weapon-summary [data-attack-total]") &&
+    sheetCss.includes(".weapon-summary [data-damage-total]") &&
+    sheetCss.includes("max-width: none"),
+  "Weapon attack and damage totals must be full-width exceptions to compact calculated boxes.",
+);
+
 console.log("Character sheet persistence checks passed.");

@@ -20,7 +20,7 @@
       rel="stylesheet"
     />
 
-    <link href="css/character-sheet.css?v=inventory-row-layout-1" rel="stylesheet" />
+    <link href="css/character-sheet.css?v=flat-skills-combat-1" rel="stylesheet" />
     <link href="css/feat-details.css?v=1" rel="stylesheet" />
     <link href="css/effect-editor.css?v=effect-branches-1" rel="stylesheet" />
     <link href="css/damage-rolls.css?v=4" rel="stylesheet" />
@@ -134,17 +134,6 @@
           <button
             class="sheet-info-tab"
             type="button"
-            data-sheet-info-tab="skills"
-            role="tab"
-            aria-selected="false"
-            title="Skills"
-            aria-label="Skills"
-          >
-            <i class="bi bi-list-check"></i><span>Skills</span>
-          </button>
-          <button
-            class="sheet-info-tab"
-            type="button"
             data-sheet-info-tab="spells"
             role="tab"
             aria-selected="false"
@@ -219,64 +208,6 @@
             <div class="sheet-title">Class Features</div>
             <div id="classFeatureList" class="class-feature-list"></div>
           </div>
-          <div id="skillsPanel" class="d-none" data-sheet-info-panel="skills">
-            <div class="skill-table-wrap">
-              <div
-                class="d-flex justify-content-between align-items-center gap-2 flex-wrap mb-2"
-              >
-                <div class="sheet-title mb-0">Skills</div>
-                <div class="d-flex gap-2 flex-wrap">
-                  <button
-                    class="btn btn-outline-light btn-sm"
-                    type="button"
-                    onclick="addNamedSkill('Craft', 'int')"
-                  >
-                    Add Craft
-                  </button>
-                  <button
-                    class="btn btn-outline-light btn-sm"
-                    type="button"
-                    onclick="addNamedSkill('Profession', 'wis')"
-                  >
-                    Add Profession
-                  </button>
-                  <button
-                    class="btn btn-outline-light btn-sm"
-                    type="button"
-                    onclick="addNamedSkill('Perform', 'cha')"
-                  >
-                    Add Perform
-                  </button>
-                </div>
-              </div>
-              <input
-                id="skillSearch"
-                class="form-control form-control-sm skill-search mb-2"
-                placeholder="Skill Name"
-                aria-label="Search skills"
-              />
-              <div class="table-responsive">
-                <table
-                  class="table table-dark table-sm align-middle compact-table skill-table"
-                >
-                  <thead>
-                    <tr>
-                      <th class="class-skill-heading" title="Class Skill">
-                        <span class="visually-hidden">Class Skill</span>
-                      </th>
-                      <th>Skill</th>
-                      <th>Total</th>
-                      <th>Ability</th>
-                      <th class="skill-stepper-heading"><span>Ranks</span></th>
-                      <th class="skill-stepper-heading"><span>Misc</span></th>
-                      <th>Buff</th>
-                    </tr>
-                  </thead>
-                  <tbody id="skillRows"></tbody>
-                </table>
-              </div>
-            </div>
-          </div>
           <div id="spellsPanel" class="d-none" data-sheet-info-panel="spells">
             <div class="sheet-title">Spells</div>
             <div id="spellProgressionList" class="small-text"></div>
@@ -316,11 +247,13 @@
                     class="form-control form-control-sm sheet-input"
                   />
                 </div>
-                <div class="sheet-number-field">
+                <div class="sheet-number-field character-level-field">
                   <label for="characterLevel" class="number-stepper-label"
                     >Character Level</label
                   >
-                  <div class="ability-score-stepper sheet-number-stepper">
+                  <div
+                    class="ability-score-stepper sheet-number-stepper character-level-stepper"
+                  >
                     <button
                       class="btn btn-outline-light btn-sm ability-stepper-btn"
                       type="button"
@@ -354,12 +287,10 @@
                 </div>
                 <div class="enemy-only enemy-double-field">
                   <label for="subtype">Subtype</label
-                  ><textarea
+                  ><output
                     id="subtype"
-                    class="form-control form-control-sm sheet-input enemy-auto-textarea enemy-header-control"
-                    rows="1"
-                    readonly
-                  ></textarea>
+                    class="sheet-output sheet-output-sm sheet-output-multiline enemy-header-control"
+                  ></output>
                 </div>
                 <div>
                   <label for="alignment">Alignment</label
@@ -370,11 +301,10 @@
                 </div>
                 <div class="enemy-only">
                   <label for="xp">XP</label
-                  ><input
+                  ><output
                     id="xp"
-                    class="form-control form-control-sm sheet-input enemy-header-control"
-                    readonly
-                  />
+                    class="sheet-output sheet-output-sm enemy-header-control"
+                  ></output>
                 </div>
                 <div class="character-only">
                   <label for="deity">Deity</label
@@ -399,31 +329,25 @@
                 </div>
                 <div>
                   <label for="reach">Reach</label
-                  ><input
+                  ><output
                     id="reach"
-                    class="form-control form-control-sm sheet-input"
-                    value="5 ft."
-                    readonly
-                  />
+                    class="sheet-output sheet-output-sm"
+                  >5 ft.</output>
                 </div>
                 <div class="enemy-only enemy-field-pair">
                   <div>
                     <label for="senses">Senses</label
-                    ><textarea
+                    ><output
                       id="senses"
-                      class="form-control form-control-sm sheet-input enemy-auto-textarea enemy-header-control"
-                      rows="1"
-                      readonly
-                    ></textarea>
+                      class="sheet-output sheet-output-sm sheet-output-multiline enemy-header-control"
+                    ></output>
                   </div>
                   <div>
                     <label for="aura">Aura</label
-                    ><textarea
+                    ><output
                       id="aura"
-                      class="form-control form-control-sm sheet-input enemy-auto-textarea enemy-header-control"
-                      rows="1"
-                      readonly
-                    ></textarea>
+                      class="sheet-output sheet-output-sm sheet-output-multiline enemy-header-control"
+                    ></output>
                   </div>
                 </div>
                 <div class="character-only">
@@ -573,19 +497,17 @@
                   </div>
                   <div>
                     <label for="hitPointsBuff">Buff</label
-                    ><input
+                    ><output
                       id="hitPointsBuff"
-                      class="form-control form-control-sm buff-field"
-                      readonly
-                    />
+                      class="sheet-output sheet-output-sm buff-field"
+                    ></output>
                   </div>
                   <div>
                     <label for="hitPointsTotal">Total HP</label
-                    ><input
+                    ><output
                       id="hitPointsTotal"
-                      class="form-control form-control-sm"
-                      readonly
-                    />
+                      class="sheet-output sheet-output-sm"
+                    ></output>
                   </div>
                   <div
                     class="small-text calc-line sheet-full-row hp-calc-row"
@@ -661,27 +583,24 @@
                 <div class="sheet-grid">
                   <div>
                     <label for="initTotal">Total</label
-                    ><input
+                    ><output
                       id="initTotal"
-                      class="form-control form-control-sm"
-                      readonly
-                    />
+                      class="sheet-output sheet-output-sm"
+                    ></output>
                   </div>
                   <div>
                     <label for="initDexMod">Dex</label
-                    ><input
+                    ><output
                       id="initDexMod"
-                      class="form-control form-control-sm"
-                      readonly
-                    />
+                      class="sheet-output sheet-output-sm"
+                    ></output>
                   </div>
                   <div>
                     <label for="initBuff">Buff</label
-                    ><input
+                    ><output
                       id="initBuff"
-                      class="form-control form-control-sm buff-field"
-                      readonly
-                    />
+                      class="sheet-output sheet-output-sm buff-field"
+                    ></output>
                   </div>
                   <div class="sheet-number-field">
                     <label for="initMisc" class="number-stepper-label"
@@ -737,12 +656,10 @@
                   </div>
                   <div class="enemy-only">
                     <label for="flySpeed">Fly Speed</label
-                    ><textarea
+                    ><output
                       id="flySpeed"
-                      class="form-control form-control-sm sheet-input enemy-auto-textarea enemy-header-control"
-                      rows="1"
-                      readonly
-                    ></textarea>
+                      class="sheet-output sheet-output-sm sheet-output-multiline enemy-header-control"
+                    ></output>
                   </div>
                 </div>
               </section>
@@ -802,86 +719,103 @@
                 <div class="ac-primary-grid">
                   <div>
                     <label for="acTotal">AC</label
-                    ><input
+                    ><output
                       id="acTotal"
-                      class="form-control form-control-sm"
-                      readonly
-                    />
+                      class="sheet-output sheet-output-sm"
+                    ></output>
                   </div>
                   <div>
                     <label for="acBuff">AC Buff</label
-                    ><input
+                    ><output
                       id="acBuff"
-                      class="form-control form-control-sm buff-field"
-                      readonly
-                    />
+                      class="sheet-output sheet-output-sm buff-field"
+                    ></output>
+                  </div>
+                  <div class="sheet-number-field">
+                    <label for="acMisc" class="number-stepper-label"
+                      >Misc</label
+                    >
+                    <div class="ability-score-stepper sheet-number-stepper">
+                      <button
+                        class="btn btn-outline-light btn-sm ability-stepper-btn"
+                        type="button"
+                        onclick="adjustSkillNumber('acMisc', -1)"
+                        aria-label="Decrease AC misc"
+                      >
+                        -</button
+                      ><input
+                        id="acMisc"
+                        class="form-control form-control-sm sheet-input no-spinner"
+                        type="number"
+                        value="0"
+                        inputmode="numeric"
+                      /><button
+                        class="btn btn-outline-light btn-sm ability-stepper-btn"
+                        type="button"
+                        onclick="adjustSkillNumber('acMisc', 1)"
+                        aria-label="Increase AC misc"
+                      >
+                        +
+                      </button>
+                    </div>
                   </div>
                 </div>
                 <div class="sheet-grid">
                   <div>
                     <label for="acTouch">Touch</label
-                    ><input
+                    ><output
                       id="acTouch"
-                      class="form-control form-control-sm"
-                      readonly
-                    />
+                      class="sheet-output sheet-output-sm"
+                    ></output>
                   </div>
                   <div>
                     <label for="acTouchBuff">Touch Buff</label
-                    ><input
+                    ><output
                       id="acTouchBuff"
-                      class="form-control form-control-sm buff-field"
-                      readonly
-                    />
+                      class="sheet-output sheet-output-sm buff-field"
+                    ></output>
                   </div>
                   <div>
                     <label for="acFlat">Flat-Footed</label
-                    ><input
+                    ><output
                       id="acFlat"
-                      class="form-control form-control-sm"
-                      readonly
-                    />
+                      class="sheet-output sheet-output-sm"
+                    ></output>
                   </div>
                   <div>
                     <label for="acFlatBuff">Flat Buff</label
-                    ><input
+                    ><output
                       id="acFlatBuff"
-                      class="form-control form-control-sm buff-field"
-                      readonly
-                    />
+                      class="sheet-output sheet-output-sm buff-field"
+                    ></output>
                   </div>
                   <div>
                     <label for="acArmor">Armor</label
-                    ><input
+                    ><output
                       id="acArmor"
-                      class="form-control form-control-sm"
-                      readonly
-                    />
+                      class="sheet-output sheet-output-sm"
+                    ></output>
                   </div>
                   <div>
                     <label for="acShield">Shield</label
-                    ><input
+                    ><output
                       id="acShield"
-                      class="form-control form-control-sm"
-                      readonly
-                    />
+                      class="sheet-output sheet-output-sm"
+                    ></output>
                   </div>
                   <div>
                     <label for="acDex">Dex</label
-                    ><input
+                    ><output
                       id="acDex"
-                      class="form-control form-control-sm"
-                      readonly
-                    />
+                      class="sheet-output sheet-output-sm"
+                    ></output>
                   </div>
                   <div>
                     <label for="acNatural">Natural</label
-                    ><input
+                    ><output
                       id="acNatural"
-                      class="form-control form-control-sm no-spinner"
-                      value="0"
-                      readonly
-                    />
+                      class="sheet-output sheet-output-sm"
+                    >0</output>
                   </div>
                   <div class="sheet-number-field">
                     <label for="acNaturalMisc" class="number-stepper-label"
@@ -914,40 +848,10 @@
                   </div>
                   <div>
                     <label for="acDeflection">Deflection</label
-                    ><input
+                    ><output
                       id="acDeflection"
-                      class="form-control form-control-sm no-spinner"
-                      value="0"
-                      readonly
-                    />
-                  </div>
-                  <div class="sheet-number-field">
-                    <label for="acMisc" class="number-stepper-label"
-                      >Misc</label
-                    >
-                    <div class="ability-score-stepper sheet-number-stepper">
-                      <button
-                        class="btn btn-outline-light btn-sm ability-stepper-btn"
-                        type="button"
-                        onclick="adjustSkillNumber('acMisc', -1)"
-                        aria-label="Decrease AC misc"
-                      >
-                        -</button
-                      ><input
-                        id="acMisc"
-                        class="form-control form-control-sm sheet-input no-spinner"
-                        type="number"
-                        value="0"
-                        inputmode="numeric"
-                      /><button
-                        class="btn btn-outline-light btn-sm ability-stepper-btn"
-                        type="button"
-                        onclick="adjustSkillNumber('acMisc', 1)"
-                        aria-label="Increase AC misc"
-                      >
-                        +
-                      </button>
-                    </div>
+                      class="sheet-output sheet-output-sm"
+                    >0</output>
                   </div>
                 </div>
                 <div class="small-text calc-line" data-calc-for="acTotal"></div>
@@ -981,23 +885,17 @@
                 <div class="bab-grid">
                   <div>
                     <label for="bab">BAB</label
-                    ><input
+                    ><output
                       id="bab"
-                      class="form-control form-control-sm no-spinner"
-                      inputmode="numeric"
-                      value="0"
-                      readonly
-                    />
+                      class="sheet-output sheet-output-sm"
+                    >0</output>
                   </div>
                   <div>
                     <label for="babBase">Base</label
-                    ><input
+                    ><output
                       id="babBase"
-                      class="form-control form-control-sm no-spinner"
-                      inputmode="numeric"
-                      value="0"
-                      readonly
-                    />
+                      class="sheet-output sheet-output-sm"
+                    >0</output>
                   </div>
                   <div class="sheet-number-field">
                     <label for="babMisc" class="number-stepper-label"
@@ -1033,24 +931,22 @@
               <section class="sheet-section full-order-maneuvers">
                 <div class="sheet-title">Combat Maneuvers</div>
                 <div class="maneuver-grid">
-                  <div class="maneuver-block">
+                  <div class="maneuver-group">
                     <div class="maneuver-block-title">CMB</div>
                     <div class="maneuver-fields">
                       <div>
                         <label for="cmbTotal">Total</label
-                        ><input
+                        ><output
                           id="cmbTotal"
-                          class="form-control form-control-sm"
-                          readonly
-                        />
+                          class="sheet-output sheet-output-sm"
+                        ></output>
                       </div>
                       <div>
                         <label for="cmbBuff">Buff</label
-                        ><input
+                        ><output
                           id="cmbBuff"
-                          class="form-control form-control-sm buff-field"
-                          readonly
-                        />
+                          class="sheet-output sheet-output-sm buff-field"
+                        ></output>
                       </div>
                       <div class="sheet-number-field">
                         <label for="cmbMisc" class="number-stepper-label"
@@ -1086,24 +982,22 @@
                       data-calc-for="cmbTotal"
                     ></div>
                   </div>
-                  <div class="maneuver-block">
+                  <div class="maneuver-group">
                     <div class="maneuver-block-title">CMD</div>
                     <div class="maneuver-fields">
                       <div>
                         <label for="cmdTotal">Total</label
-                        ><input
+                        ><output
                           id="cmdTotal"
-                          class="form-control form-control-sm"
-                          readonly
-                        />
+                          class="sheet-output sheet-output-sm"
+                        ></output>
                       </div>
                       <div>
                         <label for="cmdBuff">Buff</label
-                        ><input
+                        ><output
                           id="cmdBuff"
-                          class="form-control form-control-sm buff-field"
-                          readonly
-                        />
+                          class="sheet-output sheet-output-sm buff-field"
+                        ></output>
                       </div>
                       <div class="sheet-number-field">
                         <label for="cmdMisc" class="number-stepper-label"
@@ -1145,20 +1039,18 @@
               <div class="enemy-section-stack sheet-extra-magic-stack">
                 <section class="sheet-section enemy-only">
                   <div class="sheet-title">Defensive Abilities</div>
-                  <textarea
+                  <output
                     id="defensiveAbilities"
-                    class="form-control sheet-input enemy-textarea enemy-auto-textarea"
-                    readonly
-                  ></textarea>
+                    class="sheet-output sheet-output-multiline enemy-textarea"
+                  ></output>
                 </section>
 
                 <section class="sheet-section enemy-only">
                   <div class="sheet-title">Special Attacks</div>
-                  <textarea
+                  <output
                     id="specialAttacks"
-                    class="form-control sheet-input enemy-textarea enemy-auto-textarea"
-                    readonly
-                  ></textarea>
+                    class="sheet-output sheet-output-multiline enemy-textarea"
+                  ></output>
                 </section>
 
                 <section id="sheetSpellLikeSection" class="sheet-section d-none">
@@ -1178,19 +1070,17 @@
                     <div class="enemy-spell-meta-grid">
                       <div>
                         <label for="spellLikeCl">CL</label
-                        ><input
+                        ><output
                           id="spellLikeCl"
-                          class="form-control form-control-sm sheet-input enemy-auto-input"
-                          readonly
-                        />
+                          class="sheet-output sheet-output-sm"
+                        ></output>
                       </div>
                       <div>
                         <label for="spellLikeConcentration">Concentration</label
-                        ><input
+                        ><output
                           id="spellLikeConcentration"
-                          class="form-control form-control-sm sheet-input enemy-auto-input"
-                          readonly
-                        />
+                          class="sheet-output sheet-output-sm"
+                        ></output>
                       </div>
                     </div>
                   </div>
@@ -1255,10 +1145,64 @@
                       data-bs-parent="#skillSummaryAccordion"
                     >
                       <div class="accordion-body">
-                        <div
-                          id="skillSummaryRows"
-                          class="skill-summary-list"
-                        ></div>
+                          <div class="d-flex gap-2 flex-wrap mb-2">
+                            <button
+                              class="btn btn-outline-light btn-sm"
+                              type="button"
+                              onclick="addNamedSkill('Craft', 'int')"
+                            >
+                              Add Craft
+                            </button>
+                            <button
+                              class="btn btn-outline-light btn-sm"
+                              type="button"
+                              onclick="addNamedSkill('Profession', 'wis')"
+                            >
+                              Add Profession
+                            </button>
+                            <button
+                              class="btn btn-outline-light btn-sm"
+                              type="button"
+                              onclick="addNamedSkill('Perform', 'cha')"
+                            >
+                              Add Perform
+                            </button>
+                          </div>
+                          <input
+                            id="skillSearch"
+                            class="form-control form-control-sm skill-search mb-2"
+                            placeholder="Skill Name"
+                            aria-label="Search skills"
+                          />
+                          <div class="table-responsive">
+                            <table
+                              class="table table-sm align-middle compact-table skill-table"
+                            >
+                              <thead>
+                                <tr>
+                                  <th
+                                    class="class-skill-heading"
+                                    title="Class Skill"
+                                  >
+                                    <span class="visually-hidden"
+                                      >Class Skill</span
+                                    >
+                                  </th>
+                                  <th>Skill</th>
+                                  <th>Total</th>
+                                  <th>Ability</th>
+                                  <th class="skill-stepper-heading">
+                                    <span>Ranks</span>
+                                  </th>
+                                  <th class="skill-stepper-heading">
+                                    <span>Misc</span>
+                                  </th>
+                                  <th>Buff</th>
+                                </tr>
+                              </thead>
+                              <tbody id="skillRows"></tbody>
+                            </table>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -1281,20 +1225,18 @@
               <div class="enemy-section-stack enemy-only">
                 <section class="sheet-section">
                   <div class="sheet-title">Languages</div>
-                  <textarea
+                  <output
                     id="languages"
-                    class="form-control sheet-input enemy-textarea enemy-auto-textarea"
-                    readonly
-                  ></textarea>
+                    class="sheet-output sheet-output-multiline enemy-textarea"
+                  ></output>
                 </section>
 
                 <section class="sheet-section">
                   <div class="sheet-title">SQ</div>
-                  <textarea
+                  <output
                     id="sq"
-                    class="form-control sheet-input enemy-textarea enemy-auto-textarea"
-                    readonly
-                  ></textarea>
+                    class="sheet-output sheet-output-multiline enemy-textarea"
+                  ></output>
                 </section>
               </div>
             </div>
@@ -1302,11 +1244,10 @@
 
           <section class="sheet-section enemy-only">
             <div class="sheet-title">Special Abilities</div>
-            <textarea
+            <output
               id="specialAbilities"
-              class="form-control sheet-input enemy-auto-textarea"
-              readonly
-            ></textarea>
+              class="sheet-output sheet-output-multiline enemy-textarea"
+            ></output>
           </section>
 
           <section class="sheet-section">
@@ -2225,13 +2166,13 @@
     <script src="modals/spellcasting-info.js"></script>
     <script src="modals/racial-traits.js?v=choice-label-case-1"></script>
     <script src="scripts/effect-catalog.js?v=effect-browser-1"></script>
-    <script src="scripts/buff-tracker-widget.js?v=ability-stepper-2"></script>
+    <script src="scripts/buff-tracker-widget.js?v=effects-modal-async-1"></script>
     <script src="scripts/item-data.js?v=1"></script>
     <script src="scripts/scripts.js"></script>
     <script src="modals/item-editor.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="scripts/weapon-damage-components.js"></script>
-    <script src="scripts/pages/character-sheet.js?v=heroism-targeting-1"></script>
+    <script src="scripts/pages/character-sheet.js?v=embedded-skills-1"></script>
     <script src="scripts/modal-rules.js?v=1"></script>
   </body>
 </html>

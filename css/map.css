@@ -1925,6 +1925,40 @@ body {
   gap: 10px;
 }
 
+.quick-effect-loading-card {
+  pointer-events: none;
+}
+
+.quick-effect-loading-line {
+  animation: quick-effect-loading-pulse 1.1s ease-in-out infinite alternate;
+  background: #4a4a4a;
+  border-radius: 4px;
+  display: block;
+  height: 10px;
+  width: min(72%, 260px);
+}
+
+.quick-effect-loading-line.is-title {
+  background: #5b5b5b;
+  height: 15px;
+  margin-bottom: 8px;
+  width: min(48%, 180px);
+}
+
+.quick-effect-loading-spell {
+  animation: quick-effect-loading-pulse 1.1s ease-in-out infinite alternate;
+  background: #303030;
+  border: 1px solid #46545a;
+  border-radius: 4px;
+  display: block;
+  height: 31px;
+}
+
+@keyframes quick-effect-loading-pulse {
+  from { opacity: 0.48; }
+  to { opacity: 1; }
+}
+
 .quick-effect-list {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

@@ -199,28 +199,6 @@ body {
   min-height: 260px;
 }
 
-.item-number-stepper {
-  display: grid;
-  grid-template-columns: 28px minmax(54px, 1fr) 28px;
-  gap: 4px;
-  align-items: stretch;
-}
-
-.item-number-stepper input {
-  min-width: 0;
-  text-align: center;
-}
-
-.item-stepper-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 31px;
-  padding: 0;
-  line-height: 1;
-  font-weight: 800;
-}
-
 .source-list-tablist {
   list-style: none;
   padding: 0;
@@ -398,9 +376,10 @@ body {
   flex: 1 1 120px;
 }
 
-.bab-grid {
+.bab-grid,
+.maneuver-fields {
   display: grid;
-  grid-template-columns: repeat(3, minmax(64px, 96px));
+  grid-template-columns: repeat(3, minmax(85px, 1fr));
   gap: 8px;
 }
 
@@ -1269,10 +1248,7 @@ body.enemy-sheet-mode .enemy-field-pair {
 
 .weapon-summary {
   display: grid;
-  grid-template-columns: minmax(260px, 2fr) minmax(150px, 1fr) minmax(
-      130px,
-      1fr
-    );
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
   align-items: end;
   margin-top: 8px;
@@ -1289,9 +1265,14 @@ body.enemy-sheet-mode .enemy-field-pair {
   margin-top: 6px;
 }
 
-.weapon-attack-summary input {
+.weapon-attack-summary input,
+.weapon-attack-summary .sheet-output {
   font-size: 13px;
   min-width: 0;
+}
+
+.weapon-attack-summary {
+  grid-column: 1 / -1;
 }
 
 .maneuver-grid {
@@ -1300,45 +1281,12 @@ body.enemy-sheet-mode .enemy-field-pair {
   gap: 10px;
 }
 
-.maneuver-block {
-  border: 1px solid #333;
-  border-radius: 8px;
-  padding: 8px;
-  background: #202020;
-}
-
 .maneuver-block-title {
   font-size: 12px;
   color: #aaa;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   margin-bottom: 6px;
-}
-
-.maneuver-fields {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(85px, 1fr));
-  gap: 8px;
-}
-
-@media (max-width: 1120px) {
-  .weapon-summary {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .weapon-attack-summary {
-    grid-column: 1 / -1;
-  }
-}
-
-@container (max-width: 640px) {
-  .weapon-summary {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .weapon-attack-summary {
-    grid-column: 1 / -1;
-  }
 }
 
 @media (max-width: 360px) {
@@ -1351,23 +1299,34 @@ body.enemy-sheet-mode .enemy-field-pair {
   display: none !important;
 }
 
-.ac-primary-grid {
+.ac-primary-grid,
+.full-order-ac > .sheet-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(120px, 180px));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
+}
+
+.ac-primary-grid {
   margin-bottom: 8px;
+}
+
+@media (max-width: 575.98px) {
+  .ac-primary-grid,
+  .full-order-ac > .sheet-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 .compact-table {
   font-size: 13px;
 }
 
-.compact-table input {
+.compact-table input,
+.compact-table .sheet-output {
   min-width: 58px;
 }
 
 .ability-total-input {
-  font-weight: 800;
   color: #fff !important;
 }
 
@@ -1406,28 +1365,64 @@ body.enemy-sheet-mode .enemy-field-pair {
   text-align: center;
 }
 
-.ability-score-stepper {
+.ability-table .sheet-output {
+  justify-content: center;
+  padding-inline: 0;
+}
+
+.ability-score-stepper,
+.number-stepper,
+.skill-stepper,
+.item-number-stepper {
+  --sheet-stepper-width: 96px;
+  --sheet-stepper-button-width: 26px;
+  --sheet-stepper-height: 31px;
+  --sheet-stepper-gap: 2px;
   display: grid;
-  grid-template-columns: 26px minmax(38px, 1fr) 26px;
-  gap: 2px;
+  grid-template-columns:
+    var(--sheet-stepper-button-width)
+    minmax(0, 1fr)
+    var(--sheet-stepper-button-width);
+  gap: var(--sheet-stepper-gap);
   align-items: center;
+  width: min(100%, var(--sheet-stepper-width));
+  max-width: var(--sheet-stepper-width);
+  margin-inline: auto;
 }
 
-.ability-table .ability-score-stepper {
-  grid-template-columns: 26px minmax(38px, 1fr) 26px;
+.ability-score-stepper input,
+.number-stepper input,
+.skill-stepper input,
+.item-number-stepper input {
+  box-sizing: border-box !important;
   width: 100%;
-}
-
-.sheet-number-stepper {
-  grid-template-columns: 26px minmax(38px, 1fr) 26px;
-}
-
-.sheet-number-stepper input {
   min-width: 0;
-  width: 100%;
-  padding-left: 0.3rem;
-  padding-right: 0.3rem;
+  height: var(--sheet-stepper-height) !important;
+  min-height: var(--sheet-stepper-height) !important;
+  max-height: var(--sheet-stepper-height) !important;
+  margin: 0 !important;
+  padding: 0 0.3rem !important;
+  line-height: 1 !important;
   text-align: center;
+}
+
+.ability-score-stepper .ability-stepper-btn,
+.number-stepper .ability-stepper-btn,
+.skill-stepper .skill-stepper-btn,
+.item-number-stepper .item-stepper-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+  width: var(--sheet-stepper-button-width) !important;
+  min-width: var(--sheet-stepper-button-width) !important;
+  height: var(--sheet-stepper-height) !important;
+  min-height: var(--sheet-stepper-height) !important;
+  max-height: var(--sheet-stepper-height) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+  font-weight: 800;
 }
 
 .sheet-number-field {
@@ -1439,93 +1434,35 @@ body.enemy-sheet-mode .enemy-field-pair {
 
 .sheet-number-field > .number-stepper-label {
   flex: 0 0 auto;
-  line-height: 1.2;
-}
-
-.number-stepper {
-  --number-stepper-control-height: 30px;
-  display: grid;
-  grid-template-columns: 26px minmax(42px, 1fr) 26px;
-  gap: 2px;
-  align-items: stretch;
-}
-
-.number-stepper input {
-  min-width: 0;
-  width: 100%;
-  height: var(--number-stepper-control-height) !important;
-  min-height: var(--number-stepper-control-height) !important;
-  max-height: var(--number-stepper-control-height) !important;
-  box-sizing: border-box !important;
-  margin: 0 !important;
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
-  text-align: center;
-  padding-left: 0.3rem;
-  padding-right: 0.3rem;
-}
-
-.number-stepper .ability-stepper-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  height: var(--number-stepper-control-height) !important;
-  min-height: var(--number-stepper-control-height) !important;
-  max-height: var(--number-stepper-control-height) !important;
-  box-sizing: border-box !important;
-  align-self: stretch;
-  margin: 0 !important;
-  padding: 0 !important;
-  line-height: 1 !important;
-}
-
-.ability-stepper-btn {
-  width: 26px;
-  height: 31px;
+  width: min(100%, 96px);
+  margin-inline: 0;
   padding: 0;
-  line-height: 1;
-  font-weight: 800;
+  line-height: 1.2;
+  text-align: left;
 }
 
-.sheet-number-stepper {
-  --sheet-number-stepper-height: 31px;
-  align-items: center;
+.sheet-number-field > .sheet-number-stepper {
+  margin-inline: 0;
 }
 
-.sheet-number-stepper > input.form-control-sm {
-  height: var(--sheet-number-stepper-height) !important;
-  min-height: var(--sheet-number-stepper-height) !important;
-  max-height: var(--sheet-number-stepper-height) !important;
-  box-sizing: border-box !important;
-  margin: 0 !important;
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
-  line-height: var(--sheet-number-stepper-height) !important;
+.character-level-stepper {
+  width: 100%;
+  max-width: none;
 }
 
-.sheet-number-stepper > .ability-stepper-btn {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  height: var(--sheet-number-stepper-height) !important;
-  min-height: var(--sheet-number-stepper-height) !important;
-  max-height: var(--sheet-number-stepper-height) !important;
-  box-sizing: border-box !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  line-height: 1 !important;
-}
-
-.number-stepper-label {
-  display: block;
+.character-level-field > .number-stepper-label {
+  width: 100%;
   padding-left: 28px;
-  text-align: left;
 }
 
-.number-stepper-heading span {
+.number-stepper-label,
+.number-stepper-heading span,
+.skill-stepper-heading span {
   display: block;
-  margin-left: 28px;
-  text-align: left;
+  width: min(100%, 96px);
+  margin-inline: auto;
+  padding: 0;
+  text-align: center;
 }
 
 .ability-table .ability-calc-row td {
@@ -1549,31 +1486,6 @@ body.enemy-sheet-mode .enemy-field-pair {
     width: 108px;
   }
 
-  .ability-score-stepper {
-    grid-template-columns: 24px minmax(32px, 1fr) 24px;
-  }
-
-  .ability-table .ability-score-stepper {
-    grid-template-columns: 24px minmax(32px, 1fr) 24px;
-  }
-
-  .sheet-number-stepper {
-    grid-template-columns: 24px minmax(32px, 1fr) 24px;
-  }
-
-  .number-stepper {
-    grid-template-columns: 24px minmax(34px, 1fr) 24px;
-  }
-
-  .ability-stepper-btn {
-    width: 24px;
-  }
-
-  .number-stepper-label,
-  .number-stepper-heading span {
-    padding-left: 26px;
-    margin-left: 0;
-  }
 }
 
 .skill-table {
@@ -1621,7 +1533,8 @@ body.enemy-sheet-mode .enemy-field-pair {
   width: 100px;
 }
 
-.save-table input {
+.save-table input,
+.save-table .sheet-output {
   width: 100%;
   min-width: 0;
   padding-left: 0.25rem;
@@ -1629,25 +1542,15 @@ body.enemy-sheet-mode .enemy-field-pair {
   text-align: center;
 }
 
-.save-table .number-stepper {
-  min-width: 0;
-  grid-template-columns: 24px minmax(34px, 1fr) 24px;
-}
-
-.save-table .ability-stepper-btn {
-  width: 24px;
-}
-
-.save-table .number-stepper input {
-  width: 100%;
-  min-width: 0;
+.save-table .sheet-output,
+.skill-table .sheet-output {
+  justify-content: center;
 }
 
 .save-table .total-first-input,
 .skill-table .total-first-input {
   width: 5rem;
   min-width: 5rem;
-  font-weight: 700;
 }
 
 .save-table .total-first-input {
@@ -1681,9 +1584,6 @@ body.enemy-sheet-mode .enemy-field-pair {
     width: 92px;
   }
 
-  .save-table .number-stepper {
-    grid-template-columns: 24px minmax(30px, 1fr) 24px;
-  }
 }
 
 .skill-table .skill-name-cell {
@@ -1717,21 +1617,40 @@ body.enemy-sheet-mode .enemy-field-pair {
   border-color: #8fd19e;
 }
 
-.skill-table-wrap {
+.skill-table {
+  --bs-table-color: #fff;
+  --bs-table-bg: transparent;
+  --bs-table-border-color: transparent;
   width: 100%;
-  max-width: 100%;
+  min-width: 540px;
+  table-layout: fixed;
+  margin-bottom: 0;
 }
 
-.skill-table {
-  width: 100%;
-  min-width: 0;
-  table-layout: fixed;
+.skill-table > :not(caption) > * > * {
+  background: transparent;
+  border-bottom: 0;
+  box-shadow: none;
 }
 
 .skill-table th,
 .skill-table td {
   padding-left: 0.25rem;
   padding-right: 0.25rem;
+}
+
+.skill-table tbody tr:not(.skill-calc-row) > * {
+  padding-top: 0.2rem;
+  padding-bottom: 0.2rem;
+}
+
+.skill-table .skill-calc-row > td {
+  padding-top: 0;
+  padding-bottom: 0.15rem;
+}
+
+.skill-table .skill-calc-row .calc-line {
+  margin-top: 0;
 }
 
 .skill-table th:first-child,
@@ -1770,35 +1689,12 @@ body.enemy-sheet-mode .enemy-field-pair {
 }
 
 .skill-table input,
+.skill-table .sheet-output,
 .skill-table .total-first-input {
   width: 100%;
   min-width: 0;
   padding-left: 0.3rem;
   padding-right: 0.3rem;
-}
-
-.skill-stepper {
-  display: grid;
-  grid-template-columns: 30px minmax(42px, 1fr) 30px;
-  gap: 3px;
-  align-items: center;
-}
-
-.skill-stepper-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px;
-  min-width: 30px;
-  height: 31px;
-  padding: 0;
-  font-weight: 800;
-}
-
-.skill-stepper-heading span {
-  display: block;
-  margin-inline: 33px;
-  text-align: center;
 }
 
 .skill-table input[type="number"]::-webkit-outer-spin-button,
@@ -1821,37 +1717,6 @@ body.enemy-sheet-mode .enemy-field-pair {
 
 .skill-search {
   max-width: 360px;
-}
-
-.skill-summary-list {
-  display: grid;
-  gap: 4px;
-}
-
-.skill-summary-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) max-content;
-  gap: 10px;
-  align-items: center;
-  padding: 4px 0;
-  border-bottom: 1px solid #333;
-}
-
-.skill-summary-row:last-child {
-  border-bottom: 0;
-}
-
-.skill-summary-name {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  color: #fff;
-}
-
-.skill-summary-total {
-  font-weight: 800;
-  color: #fff;
 }
 
 .skill-summary-accordion .accordion-button {
@@ -1884,38 +1749,8 @@ body.enemy-sheet-mode .enemy-field-pair {
 }
 
 .skill-summary-accordion .accordion-body {
-  background: #1e1e1e;
+  background: transparent;
   padding: 8px 10px;
-}
-
-@media (max-width: 1024px) {
-  .skill-table {
-    table-layout: auto;
-  }
-
-  .skill-table th:first-child,
-  .skill-table td:first-child {
-    width: 14px;
-  }
-
-  .skill-table th:nth-child(2),
-  .skill-table td:nth-child(2) {
-    width: 32%;
-  }
-
-  .skill-table th:nth-child(3),
-  .skill-table td:nth-child(3),
-  .skill-table th:nth-child(6),
-  .skill-table td:nth-child(6) {
-    display: none;
-  }
-
-  .skill-table th:nth-child(4),
-  .skill-table td:nth-child(4),
-  .skill-table th:nth-child(5),
-  .skill-table td:nth-child(5) {
-    width: 26%;
-  }
 }
 
 @media (max-width: 520px) {
@@ -1923,20 +1758,6 @@ body.enemy-sheet-mode .enemy-field-pair {
   .skill-table td {
     padding-left: 0.15rem;
     padding-right: 0.15rem;
-  }
-
-  .skill-stepper {
-    grid-template-columns: 26px minmax(34px, 1fr) 26px;
-    gap: 2px;
-  }
-
-  .skill-stepper-btn {
-    width: 26px;
-    min-width: 26px;
-  }
-
-  .skill-stepper-heading span {
-    margin-inline: 28px;
   }
 }
 
@@ -1963,6 +1784,79 @@ select {
   background-color: #2b2b2b !important;
   color: white !important;
   border-color: #555 !important;
+}
+
+.sheet-output {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  width: min(100%, 96px);
+  max-width: 96px;
+  min-width: 0;
+  background-color: #202020;
+  border: 1px solid #555;
+  border-radius: 0.25rem;
+  color: #ddd;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sheet-output-sm {
+  min-height: 31px;
+  height: 31px;
+  padding: 0.25rem 0.5rem;
+  line-height: 1.5;
+  font-size: 0.875rem;
+  font-weight: 400;
+}
+
+.ability-total-input,
+.save-table .total-first-input,
+#hitPointsTotal,
+#initTotal {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.ability-total-input {
+  font-weight: 800;
+}
+
+.sheet-output-multiline {
+  width: 100%;
+  max-width: none;
+  align-items: flex-start;
+  height: auto;
+  min-height: 31px;
+  padding: 0.25rem 0.5rem;
+  overflow: visible;
+  overflow-wrap: anywhere;
+  text-overflow: clip;
+  white-space: pre-wrap;
+}
+
+.enemy-textarea.sheet-output {
+  min-height: 92px;
+}
+
+.sheet-output.character-spell-like-list {
+  width: 100%;
+  max-width: none;
+  flex-wrap: wrap;
+  height: auto;
+  white-space: normal;
+}
+
+.equipment-name-input.sheet-output {
+  width: 100%;
+  max-width: none;
+}
+
+.weapon-summary [data-attack-total],
+.weapon-summary [data-damage-total] {
+  width: 100%;
+  max-width: none;
 }
 
 input[readonly] {
@@ -2037,7 +1931,6 @@ textarea.enemy-header-control.form-control-sm {
 
 .buff-field {
   color: #8fd19e !important;
-  font-weight: 600;
 }
 
 .calc-applied {

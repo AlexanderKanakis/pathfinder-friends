@@ -75,7 +75,9 @@ let auraCleanupTimer = null;
 let pendingAuraCleanupTokenIds = new Set();
 let currentActorNamePromise = null;
 let mapEffectSourceCache = new Map();
+let mapEffectPrefetchGeneration = 0;
 let quickEffectDefinitions = [];
+let quickEffectLoading = false;
 let quickEffectSourceTokenId = "";
 let quickEffectSelection = null;
 let quickConditionEffect = null;
@@ -1622,6 +1624,7 @@ async function hydrateMapCharacterSheets() {
   const refreshed = await PFApp.loadContextCharacters(mapContextKey);
   if (!Array.isArray(refreshed)) return;
   mapCharacters = refreshed;
+  mapEffectPrefetchGeneration += 1;
   mapEffectSourceCache.clear();
 }
 
@@ -7201,6 +7204,12 @@ async function openMapEffects(tokenId) {
   }
 
   el("mapEffectsModalLabel").textContent = `${displayTokenName(token)} Effects`;
+  if (!mapEffectTrackerInstance)
+    PFEffectTracker.prepareLoading?.(mount);
+  mapEffectsModal.show();
+  await new Promise((resolve) =>
+    requestAnimationFrame(() => window.setTimeout(resolve, 0)),
+  );
   // Enemies aren't "controlled" by a separate real person -- only route
   // a choice-needing effect through the pending-request flow when
   // whoever's applying it isn't that character's own owner.
@@ -7360,7 +7369,6 @@ async function openMapEffects(tokenId) {
   } else {
     await mapEffectTrackerInstance.refresh(options);
   }
-  mapEffectsModal.show();
 }
 
 function quickEffectUsageKey() {
@@ -7973,6 +7981,54 @@ function quickEffectGroupLabel(group = "other") {
   }[group] || "Other";
 }
 
+function quickEffectLoadingCardHtml() {
+  return `
+    <article class="quick-effect-card quick-effect-loading-card" aria-label="Loading effect">
+      <span class="quick-effect-loading-line is-title"></span>
+      <span class="quick-effect-loading-line"></span>
+    </article>
+  `;
+}
+
+function quickEffectLoadingHtml(group = quickEffectGroup) {
+  if (group === "spells") {
+    const spellRows = Array.from(
+      { length: 4 },
+      () => '<span class="quick-effect-loading-spell"></span>',
+    ).join("");
+    return `
+      <article class="quick-spellcasting-card quick-effect-loading-card" aria-label="Loading spells">
+        <span class="quick-effect-loading-line is-title"></span>
+        <div class="quick-spell-row">
+          <div class="quick-spell-level">1</div>
+          <div class="quick-spell-buckets">
+            <section class="quick-spell-bucket">
+              <div class="quick-spell-bucket-title">Known / In Book</div>
+              <div class="quick-spell-list">${spellRows}</div>
+            </section>
+            <section class="quick-spell-bucket">
+              <div class="quick-spell-bucket-title">Prepared Today</div>
+              <div class="quick-spell-list">${spellRows}</div>
+            </section>
+          </div>
+        </div>
+      </article>
+    `;
+  }
+  const cards = Array.from({ length: group === "conditions" ? 5 : 4 }, () =>
+    quickEffectLoadingCardHtml(),
+  ).join("");
+  if (group === "other") {
+    return `
+      <section class="quick-effect-type-section quick-effect-loading-card" aria-label="Loading effects">
+        <span class="quick-effect-loading-line is-title"></span>
+        <div class="quick-effect-grid">${cards}</div>
+      </section>
+    `;
+  }
+  return cards;
+}
+
 function selectQuickEffectGroup(group) {
   if (!["personal", "spells", "conditions", "other", "passives"].includes(group)) return;
   quickEffectGroup = group;
@@ -8014,6 +8070,24 @@ function renderQuickEffects() {
     ["spells", "conditions", "passives"].includes(quickEffectGroup)
       ? quickEffectGroupLabel(quickEffectGroup)
       : `${quickEffectGroupLabel(quickEffectGroup)} Effects`;
+
+  if (quickEffectLoading) {
+    el("quickEffectMostUsedWrap").classList.add("d-none");
+    el("quickEffectResults").classList.toggle(
+      "quick-effect-list",
+      ["personal", "conditions", "passives"].includes(quickEffectGroup),
+    );
+    el("quickEffectResults").classList.toggle(
+      "quick-spells-view",
+      quickEffectGroup === "spells",
+    );
+    el("quickEffectResults").classList.toggle(
+      "quick-grouped-view",
+      quickEffectGroup === "other",
+    );
+    el("quickEffectResults").innerHTML = quickEffectLoadingHtml();
+    return;
+  }
 
   const useStandardCards = !["spells", "other", "passives", "personal"].includes(quickEffectGroup);
   el("quickEffectMostUsedWrap").classList.toggle(
@@ -8399,6 +8473,30 @@ async function characterMapEffectSources(character) {
   return sources;
 }
 
+function scheduleAccessibleEffectSourcePrefetch() {
+  const generation = ++mapEffectPrefetchGeneration;
+  const characters = mapCharacters.filter(
+    (character) => isGm || character.userId === currentUserId,
+  );
+  const prefetch = async () => {
+    try {
+      await authoredCatalogEffects();
+      for (const character of characters) {
+        if (generation !== mapEffectPrefetchGeneration) return;
+        await characterMapEffectSources(character);
+        await new Promise((resolve) => window.setTimeout(resolve, 0));
+      }
+    } catch (error) {
+      console.warn("Could not prefetch map effect sources.", error);
+    }
+  };
+  if (window.requestIdleCallback) {
+    window.requestIdleCallback(() => void prefetch(), { timeout: 2500 });
+    return;
+  }
+  window.setTimeout(() => void prefetch(), 900);
+}
+
 // The source token's own class features (Rage, its bundled totems/rage
 // powers, ...) come first, ahead of the general library -- both "Apply
 // Effect" and Aura Options already know their caster unambiguously (the
@@ -8432,12 +8530,15 @@ async function openQuickApplyEffect() {
   el("quickEffectModalLabel").textContent =
     `Apply Effect from ${displayTokenName(token)}`;
   el("quickEffectSearch").value = "";
-  el("quickEffectResults").innerHTML =
-    `<div class="small text-secondary">Loading effects...</div>`;
-  el("quickEffectMostUsedWrap").classList.add("d-none");
+  quickEffectLoading = true;
+  renderQuickEffects();
   quickEffectModal.show();
   setTimeout(() => el("quickEffectSearch").focus(), 150);
-  quickEffectDefinitions = await sourceEffectDefinitions(token);
+  try {
+    quickEffectDefinitions = await sourceEffectDefinitions(token);
+  } finally {
+    quickEffectLoading = false;
+  }
   renderQuickEffects();
 }
 
@@ -8450,13 +8551,16 @@ async function openAuraEffectPicker() {
   el("quickEffectModalLabel").textContent =
     `Aura Effect for ${displayTokenName(token)}`;
   el("quickEffectSearch").value = "";
-  el("quickEffectResults").innerHTML =
-    `<div class="small text-secondary">Loading effects...</div>`;
-  el("quickEffectMostUsedWrap").classList.add("d-none");
+  quickEffectLoading = true;
+  renderQuickEffects();
   auraModal.hide();
   quickEffectModal.show();
   setTimeout(() => el("quickEffectSearch").focus(), 150);
-  quickEffectDefinitions = await sourceEffectDefinitions(token);
+  try {
+    quickEffectDefinitions = await sourceEffectDefinitions(token);
+  } finally {
+    quickEffectLoading = false;
+  }
   renderQuickEffects();
 }
 
@@ -10749,6 +10853,7 @@ async function loadMapSlot(slot) {
   renderAll(false);
   centerMapViewport();
   subscribeMapRealtime();
+  scheduleAccessibleEffectSourcePrefetch();
   const syncPassiveAuras = () =>
     void refreshMapTokenSheets({
       save: false,
