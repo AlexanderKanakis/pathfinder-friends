@@ -287,6 +287,7 @@ function checkMapItemActiveAbilityGateway(results) {
 function checkMapEffectGroupNavigation(results) {
   const script = readProjectFile("scripts/pages/map.js");
   const html = readProjectFile("map.html");
+  const tracker = readProjectFile("scripts/buff-tracker-widget.js");
   for (const group of [
     "spells",
     "conditions",
@@ -296,7 +297,7 @@ function checkMapEffectGroupNavigation(results) {
     "items",
     "other",
   ]) {
-    if (!html.includes(`data-quick-effect-group="${group}"`)) {
+    if (!tracker.includes(`["${group}",`)) {
       results.push(`Map effect groups: missing ${group} navigation support.`);
     }
   }
@@ -306,21 +307,23 @@ function checkMapEffectGroupNavigation(results) {
   ) {
     results.push("Map effect groups: missing shared effect classification gateway.");
   }
-  if (html.includes('data-quick-effect-group="personal"'))
+  if (tracker.includes('["personal",'))
     results.push("Map effect groups: obsolete Personal navigation is still present.");
-  if (html.includes('data-quick-effect-group="passives"'))
+  if (tracker.includes('["passives",'))
     results.push("Map effect groups: passive effects must not appear in Apply Effect.");
   if (
     !script.includes("characterOwnedSpellEffects") ||
-    !script.includes("renderOwnedSpellEffects") ||
-    !script.includes("renderOtherEffectGroups") ||
+    !script.includes("browser.spellsHtml") ||
+    !script.includes("browser.rowHtml") ||
+    !script.includes("window.PFEffectTracker?.browser?.navHtml?.()") ||
     !script.includes("activatableEffectSourcesForCharacter") ||
     !script.includes("passiveEffectSourcesForCharacter") ||
     !script.includes("openMapOwnedSpellDetails") ||
     !script.includes("spellDetailsForCharacter") ||
     !script.includes("authoredCatalogEffects") ||
     !script.includes("catalogEffect: true") ||
-    !script.includes('quickEffectGroup === "other"')
+    !script.includes('quickEffectGroup === "other"') ||
+    !html.includes('class="nav nav-pills effect-browser-nav"')
   ) {
     results.push(
       "Map effect groups: owned spells, calculated spell details, authored source catalogs, and character passives must use their dedicated gateways.",

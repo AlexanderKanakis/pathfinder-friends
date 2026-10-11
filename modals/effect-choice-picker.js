@@ -6,6 +6,8 @@
   const MODAL_ID = "effectChoicePickerModal";
   let modal = null;
   let resolver = null;
+  let multiple = false;
+  let selectedValues = new Set();
 
   // Resolves once the modal has fully finished hiding and is safe to
   // show() again. An effect can carry more than one "choice:" bonus (a
@@ -55,6 +57,7 @@
             </div>
             <div class="modal-footer border-secondary">
               <button type="button" class="btn btn-outline-light btn-sm" data-bs-dismiss="modal">Cancel</button>
+              <button id="${MODAL_ID}Confirm" type="button" class="btn btn-primary btn-sm d-none">Continue</button>
             </div>
           </div>
         </div>
@@ -63,13 +66,19 @@
     document.body.appendChild(wrapper.firstElementChild);
     document
       .getElementById(`${MODAL_ID}Search`)
-      .addEventListener("input", renderList);
+      .addEventListener("input", () => renderList({ resetScroll: true }));
     document
       .getElementById(`${MODAL_ID}NamedSkillBack`)
       .addEventListener("click", renderList);
     document
       .getElementById(`${MODAL_ID}NamedSkillUse`)
       .addEventListener("click", settleNamedSkill);
+    document
+      .getElementById(`${MODAL_ID}Confirm`)
+      .addEventListener("click", () => {
+        resolver?.([...selectedValues]);
+        modal.hide();
+      });
   }
 
   let currentOptions = [];
@@ -137,7 +146,7 @@
     input.focus();
   }
 
-  function renderList() {
+  function renderList({ resetScroll = false } = {}) {
     pendingNamedSkillOption = null;
     document.getElementById(`${MODAL_ID}Search`).classList.remove("d-none");
     document.getElementById(`${MODAL_ID}List`).classList.remove("d-none");
@@ -148,6 +157,7 @@
         ?.value.trim()
         .toLowerCase() || "";
     const list = document.getElementById(`${MODAL_ID}List`);
+    const previousScrollTop = list.scrollTop;
     const matches = currentOptions.filter(
       (option) => !term || option.label.toLowerCase().includes(term),
     );
@@ -157,18 +167,27 @@
     list.innerHTML = matches
       .map(
         (option, index) => `
-      <button type="button" class="list-group-item list-group-item-action bg-dark text-white border-secondary" data-choice-index="${index}">
-        ${escapeHtml(option.label)}
+      <button type="button" class="list-group-item list-group-item-action bg-dark text-white border-secondary d-flex align-items-center gap-2" data-choice-index="${index}" ${multiple ? `aria-pressed="${selectedValues.has(String(option.value))}"` : ""}>
+        ${multiple ? `<span class="border rounded-1 d-inline-flex align-items-center justify-content-center flex-shrink-0" style="width: 1rem; height: 1rem" aria-hidden="true">${selectedValues.has(String(option.value)) ? "&#10003;" : ""}</span>` : ""}
+        <span>${escapeHtml(option.label)}</span>
       </button>
     `,
       )
       .join("");
+    list.scrollTop = resetScroll ? 0 : previousScrollTop;
     list.querySelectorAll("[data-choice-index]").forEach((button) => {
       button.addEventListener("click", () => {
         const option = matches[Number(button.dataset.choiceIndex)];
         if (!option) return;
         if (option.namedSkillKind) {
           renderNamedSkill(option);
+          return;
+        }
+        if (multiple) {
+          const value = String(option.value);
+          if (selectedValues.has(value)) selectedValues.delete(value);
+          else selectedValues.add(value);
+          renderList();
           return;
         }
         // resolver is this session's settle() (see open() below) -- it
@@ -183,7 +202,13 @@
 
   // options: [{ value, label }]. Resolves to the chosen value, a
   // { value, skillName } named-skill object, or null if cancelled.
-  function open({ title = "Choose a Target", options = [] } = {}) {
+  function openPicker({
+    title = "Choose a Target",
+    options = [],
+    allowMultiple = false,
+    selected = [],
+    confirmLabel = "Continue",
+  } = {}) {
     // Wait for any still-closing previous session before touching the
     // (singleton) modal element again -- see hideSignal above.
     return hideSignal.then(
@@ -193,7 +218,14 @@
           document.getElementById(`${MODAL_ID}Title`).textContent = title;
           document.getElementById(`${MODAL_ID}Search`).value = "";
           currentOptions = Array.isArray(options) ? options : [];
-          renderList();
+          multiple = Boolean(allowMultiple);
+          selectedValues = new Set(
+            (Array.isArray(selected) ? selected : []).map(String),
+          );
+          const confirm = document.getElementById(`${MODAL_ID}Confirm`);
+          confirm.classList.toggle("d-none", !multiple);
+          confirm.textContent = confirmLabel;
+          renderList({ resetScroll: true });
           const modalEl = document.getElementById(MODAL_ID);
           modal = bootstrap.Modal.getOrCreateInstance(modalEl);
 
@@ -230,5 +262,13 @@
     );
   }
 
-  window.PFEffectChoicePicker = { open };
+  function open(options = {}) {
+    return openPicker(options);
+  }
+
+  function openMultiple(options = {}) {
+    return openPicker({ ...options, allowMultiple: true });
+  }
+
+  window.PFEffectChoicePicker = { open, openMultiple };
 })();

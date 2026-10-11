@@ -8,6 +8,10 @@ const mapJs = fs.readFileSync(
   path.join(rootDir, "scripts", "pages", "map.js"),
   "utf8",
 );
+const trackerJs = fs.readFileSync(
+  path.join(rootDir, "scripts", "buff-tracker-widget.js"),
+  "utf8",
+);
 
 function functionBody(source, name) {
   const start = source.indexOf(`function ${name}`);
@@ -24,42 +28,39 @@ function functionBody(source, name) {
   throw new Error(`Could not read ${name}().`);
 }
 
-assert(mapHtml.includes('id="quickConditionModal"'));
-assert(mapHtml.includes('id="quickConditionDescription"'));
-assert(mapHtml.includes('id="quickConditionTurns"'));
-assert(mapHtml.includes('id="quickConditionAbility"'));
-assert(mapHtml.includes('id="quickConditionAmount"'));
-assert(
-  mapHtml.indexOf('id="quickConditionAbilityField"') <
-    mapHtml.indexOf('id="quickConditionAmountField"') &&
-    mapHtml.indexOf('id="quickConditionAmountField"') <
-      mapHtml.indexOf('id="quickConditionTurnsField"'),
-);
-assert(mapHtml.includes('data-item-stepper-delta="-1"'));
-assert(mapHtml.includes('data-item-stepper-delta="1"'));
-assert(mapHtml.includes('id="confirmQuickCondition"'));
+assert(mapHtml.includes('id="quickEffectModal"'));
+assert(mapHtml.includes('class="nav nav-pills effect-browser-nav"'));
+assert(mapHtml.includes('class="effect-search-results effect-browser-list"'));
+assert(!mapHtml.includes('id="quickConditionModal"'));
+assert(!mapHtml.includes('id="quickEffectInfoModal"'));
+assert(!mapHtml.includes('id="quickEffectMostUsedWrap"'));
 
-const cardBody = functionBody(mapJs, "effectCardHtml");
-const conditionBranch = cardBody.slice(
-  cardBody.indexOf("if (condition)"),
-  cardBody.indexOf("const needsCl"),
-);
-assert(conditionBranch.includes("quick-condition-card"));
-assert(!conditionBranch.includes("effect-type-icon"));
-assert(!conditionBranch.includes("data-quick-turns"));
-assert(!conditionBranch.includes("data-quick-permanent"));
-assert(!conditionBranch.includes("quick-effect-info"));
+const controlsBody = functionBody(trackerJs, "effectBrowserControlsHtml");
+assert(controlsBody.includes("data-picker-condition-ability"));
+assert(controlsBody.includes("data-picker-condition-amount"));
+assert(controlsBody.includes("data-picker-turns"));
+assert(controlsBody.includes("conditionUsesTurns(effect)"));
 
-const bindingBody = functionBody(mapJs, "bindQuickEffectCards");
-assert(bindingBody.includes("openQuickConditionConfig(effect)"));
-const confirmationBody = functionBody(mapJs, "confirmQuickConditionConfig");
-assert(confirmationBody.includes("quickConditionTurns"));
-assert(confirmationBody.includes("PFConditionConfig.configure"));
-assert(confirmationBody.includes("quickConditionAbility"));
-assert(confirmationBody.includes("quickConditionAmount"));
-assert(confirmationBody.includes("permanent: false"));
-assert(confirmationBody.includes("chooseQuickEffect"));
+const bindingBody = functionBody(mapJs, "bindQuickEffectBrowser");
+assert(bindingBody.includes("PFConditionConfig.configure"));
+assert(bindingBody.includes("data-picker-condition-ability"));
+assert(bindingBody.includes("data-picker-condition-amount"));
+assert(bindingBody.includes("data-picker-turns"));
+assert(bindingBody.includes("permanent: false"));
+assert(bindingBody.includes("chooseQuickEffect"));
 
-assert(!functionBody(mapJs, "effectCardHtml").includes("data-quick-permanent"));
+const renderBody = functionBody(mapJs, "renderQuickEffects");
+assert(renderBody.includes("browser.rowHtml"));
+assert(renderBody.includes("browser.spellsHtml"));
+assert(renderBody.includes("browser.loadingHtml"));
+
+for (const entryPoint of ["openQuickApplyEffect", "openAuraEffectPicker"]) {
+  const body = functionBody(mapJs, entryPoint);
+  assert(body.includes("sourceEffectDefinitions"));
+  assert(body.includes("renderQuickEffects"));
+}
+const effectsBody = functionBody(mapJs, "openMapEffects");
+assert(effectsBody.includes("PFEffectTracker.mount"));
+assert(effectsBody.includes("choicePoolEquipment"));
 
 console.log("Map condition picker checks passed.");

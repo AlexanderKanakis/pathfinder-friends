@@ -87,6 +87,70 @@
     );
   }
 
+  function contributionOptions(item = {}) {
+    const rows = Array.isArray(item?.contributionOptions)
+      ? item.contributionOptions
+      : [];
+    return rows.map((option, index) => ({
+      ...option,
+      id: String(option?.id || option?.name || `contribution-${index + 1}`),
+      name:
+        String(option?.name || `Option ${index + 1}`).trim() ||
+        `Option ${index + 1}`,
+      ...copyMechanics(option),
+    }));
+  }
+
+  function hasContributionOptions(item = {}) {
+    return contributionOptions(item).length > 0;
+  }
+
+  function resolveContributions(item = {}, selectedIds = []) {
+    const selected = new Set((selectedIds || []).map(String));
+    const chosen = contributionOptions(item).filter((option) =>
+      selected.has(option.id),
+    );
+    const resolved = { ...item };
+    delete resolved.contributionOptions;
+    mechanicKeys().forEach((key) => {
+      const targetKey =
+        key === BASE_EFFECT_KEY &&
+        Array.isArray(item.bonuses) &&
+        !Array.isArray(item.effects)
+          ? "bonuses"
+          : key;
+      const baseRows = Array.isArray(item[targetKey]) ? item[targetKey] : [];
+      const contributedRows = chosen.flatMap((option) =>
+        Array.isArray(option[key]) ? option[key] : [],
+      );
+      resolved[targetKey] = [...baseRows, ...contributedRows];
+    });
+    resolved.selectedContributionIds = chosen.map((option) => option.id);
+    resolved.selectedContributionNames = chosen.map((option) => option.name);
+    return resolved;
+  }
+
+  async function chooseContributions(
+    item = {},
+    { title = "Effect", pick } = {},
+  ) {
+    const options = contributionOptions(item);
+    if (!options.length) return item;
+    const open = pick || globalThis.PFEffectChoicePicker?.openMultiple;
+    if (typeof open !== "function") return null;
+    const selected = await open({
+      title: `${title}: Choose Rage Powers`,
+      options: options.map((option) => ({
+        value: option.id,
+        label: option.name,
+      })),
+      selected: item.selectedContributionIds || [],
+      confirmLabel: "Continue",
+    });
+    if (!Array.isArray(selected)) return null;
+    return resolveContributions(item, selected);
+  }
+
   function branches(item = {}) {
     const rows = Array.isArray(item?.[BRANCH_KEY]) ? item[BRANCH_KEY] : [];
     if (rows.length < 2) return [];
@@ -369,6 +433,10 @@
     hasMechanicList,
     hasAnyMechanics,
     copyMechanics,
+    contributionOptions,
+    hasContributionOptions,
+    resolveContributions,
+    chooseContributions,
     branches,
     hasBranches,
     branchOptions,

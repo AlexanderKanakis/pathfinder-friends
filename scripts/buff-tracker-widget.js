@@ -1,6 +1,15 @@
 (function () {
   const STYLE_ID = "pf-effect-tracker-style";
   const PICKER_RESULT_BATCH_SIZE = 80;
+  const EFFECT_BROWSER_GROUPS = [
+    ["spells", "Spells"],
+    ["conditions", "Conditions"],
+    ["class", "Class"],
+    ["racial", "Racials"],
+    ["feats", "Feats"],
+    ["items", "Items"],
+    ["other", "Other"],
+  ];
   const CHOICE_POOL_MECHANIC_KEYS =
     window.PFEffectMechanics?.extraKeys?.() || [
       "damageReduction",
@@ -485,6 +494,7 @@
     return Boolean(
       isCondition(effect) ||
         (Array.isArray(effect.bonuses) && effect.bonuses.length > 0) ||
+        effect.trackActive ||
         effect.auraConfig?.enabled ||
         window.PFEffectMechanics?.hasBranches?.(effect) ||
         window.PFEffectMechanics?.hasAnyMechanics?.(effect),
@@ -792,6 +802,154 @@
       .toLowerCase();
   }
 
+  function effectBrowserNavHtml({
+    attribute = "data-effect-browser-group",
+    activeGroup = "spells",
+  } = {}) {
+    return EFFECT_BROWSER_GROUPS.map(([group, label]) => {
+      const active = group === activeGroup;
+      return `<button class="nav-link${active ? " active" : ""}" type="button" ${attribute}="${group}" role="tab" aria-selected="${active}">${label}</button>`;
+    }).join("");
+  }
+
+  function effectBrowserControlsHtml(effect, defaultCasterLevel = 1) {
+    const needsCl = durationUsesCasterLevel(effect);
+    const configurable = window.PFConditionConfig?.isConfigurable?.(effect);
+    const needsAbility = window.PFConditionConfig?.needsAbility?.(effect);
+    const adjustment = effect.adjustableCondition || {};
+    const abilityOptions = (window.PFConditionConfig?.ABILITIES || [])
+      .map(
+        ([value, label]) =>
+          `<option value="${escapeHtml(value)}" ${value === adjustment.stat ? "selected" : ""}>${escapeHtml(label)}</option>`,
+      )
+      .join("");
+    return `
+      <div class="effect-browser-controls">
+        ${
+          needsCl
+            ? `<label class="small effect-browser-number-control"><span>CL</span><input class="form-control form-control-sm" data-picker-cl type="number" min="1" value="${escapeHtml(effect.casterLevel || defaultCasterLevel || 1)}"></label>`
+            : ""
+        }
+        ${needsAbility ? `<label class="small effect-browser-condition-control"><span>Ability</span><select class="form-select form-select-sm" data-picker-condition-ability>${abilityOptions}</select></label>` : ""}
+        ${configurable ? `<label class="small effect-browser-number-control"><span>${escapeHtml(adjustment.label || "Amount")}</span><input class="form-control form-control-sm" data-picker-condition-amount type="number" min="${Math.max(1, Number(adjustment.minimum || 1))}" value="${Math.max(1, Number(adjustment.amount || 1))}" inputmode="numeric"></label>` : ""}
+        ${
+          conditionUsesTurns(effect)
+            ? `<label class="small effect-browser-number-control"><span>Turns</span><input class="form-control form-control-sm" data-picker-turns type="number" min="1" value="1"></label>`
+            : ""
+        }
+      </div>
+    `;
+  }
+
+  function effectBrowserRowHtml(effect, index, options = {}) {
+    const condition = isCondition(effect);
+    return `
+      <article class="effect-browser-row${condition ? " is-condition" : ""}" role="button" tabindex="0" data-picker-effect-index="${index}">
+        <div>
+          <div class="effect-browser-row-title">${escapeHtml(effect.name || "Effect")}</div>
+          ${condition ? "" : `<div class="effect-browser-row-meta">${escapeHtml(effect.category || "Effect")}${
+            effect.source ? ` | ${escapeHtml(effect.source)}` : ""
+          }</div>`}
+        </div>
+        ${effectBrowserControlsHtml(effect, options.defaultCasterLevel)}
+      </article>
+    `;
+  }
+
+  function effectBrowserSpellsHtml(rows, spellPanels = {}) {
+    const groups = new Map();
+    rows.forEach(({ effect, index }) => {
+      const className = effect.spellMeta?.className || "Spell-Like Abilities";
+      if (!groups.has(className)) groups.set(className, new Map());
+      const level = Number(effect.spellMeta?.level || 0);
+      if (!groups.get(className).has(level)) groups.get(className).set(level, []);
+      groups.get(className).get(level).push({ effect, index });
+    });
+    return [...groups.entries()]
+      .map(
+        ([className, levels]) => `
+          <section class="effect-browser-spell-class">
+            <div class="effect-browser-spell-class-title fw-bold text-uppercase">${escapeHtml(className)}</div>
+            ${[...levels.entries()]
+              .sort((a, b) => a[0] - b[0])
+              .map(([level, spells]) => {
+                const left = spells.filter(
+                  ({ effect }) => effect.spellMeta?.bucket !== "prepared",
+                );
+                const right = spells.filter(
+                  ({ effect }) => effect.spellMeta?.bucket === "prepared",
+                );
+                const mobileGroup = `${className}:${level}`;
+                const activePanel = spellPanels[mobileGroup] || "known";
+                const buttons = (entries) =>
+                  entries
+                    .map(
+                      ({ effect, index }) => `
+                        <button class="btn btn-outline-info btn-sm effect-browser-spell-button" type="button" data-picker-effect-index="${index}">
+                          ${escapeHtml(effect.name)}
+                        </button>
+                      `,
+                    )
+                    .join("");
+                return `
+                  <div class="effect-browser-spell-level">
+                    <div class="effect-browser-level-number">${level}</div>
+                    <div class="effect-browser-spell-mobile-tabs" role="group" aria-label="${escapeHtml(className)} level ${level} spells">
+                      <button class="effect-browser-spell-mobile-tab${activePanel === "known" ? " active" : ""}" type="button" data-effect-browser-spell-tab="known" data-effect-browser-spell-group="${escapeHtml(mobileGroup)}" aria-selected="${activePanel === "known"}">Known</button>
+                      <button class="effect-browser-spell-mobile-tab${activePanel === "prepared" ? " active" : ""}" type="button" data-effect-browser-spell-tab="prepared" data-effect-browser-spell-group="${escapeHtml(mobileGroup)}" aria-selected="${activePanel === "prepared"}">Prepared</button>
+                    </div>
+                    <div class="effect-browser-spell-columns">
+                      <div class="effect-browser-spell-panel${activePanel === "known" ? " is-mobile-active" : ""}" data-effect-browser-spell-panel="known">
+                        <div class="effect-browser-spell-column-title">Known / In Book</div>
+                        ${buttons(left)}
+                      </div>
+                      <div class="effect-browser-spell-panel${activePanel === "prepared" ? " is-mobile-active" : ""}" data-effect-browser-spell-panel="prepared">
+                        <div class="effect-browser-spell-column-title">Prepared Today</div>
+                        ${buttons(right)}
+                      </div>
+                    </div>
+                  </div>
+                `;
+              })
+              .join("")}
+          </section>
+        `,
+      )
+      .join("");
+  }
+
+  function effectBrowserLoadingHtml(group = "spells") {
+    if (group === "spells") {
+      const spellRows = Array.from({ length: 4 }, () =>
+        '<div class="effect-browser-loading-spell"></div>',
+      ).join("");
+      return `
+        <section class="effect-browser-spell-class effect-browser-loading" aria-label="Loading spells">
+          <span class="effect-browser-loading-line is-title"></span>
+          <div class="effect-browser-spell-level">
+            <div class="effect-browser-level-number">1</div>
+            <div class="effect-browser-spell-columns">
+              <div><div class="effect-browser-spell-column-title">Known / In Book</div>${spellRows}</div>
+              <div><div class="effect-browser-spell-column-title">Prepared Today</div>${spellRows}</div>
+            </div>
+          </div>
+        </section>
+      `;
+    }
+    return Array.from(
+      { length: group === "conditions" ? 5 : 4 },
+      () => `
+        <article class="effect-browser-row effect-browser-loading" aria-label="Loading effect">
+          <div>
+            <span class="effect-browser-loading-line is-title"></span>
+            <span class="effect-browser-loading-line"></span>
+          </div>
+          <span class="effect-browser-loading-line is-short"></span>
+        </article>
+      `,
+    ).join("");
+  }
+
   function stamp(contextKey, characterId) {
     const value = String(Date.now());
     localStorage.setItem(`pf_buffs_updated_${contextKey}`, value);
@@ -841,13 +999,7 @@
               </div>
               <div class="modal-body effect-search-modal-body">
                 <nav id="${this.prefix}PickerNav" class="nav nav-pills effect-browser-nav" aria-label="Effect groups" role="tablist">
-                  <button class="nav-link active" type="button" data-effect-browser-group="spells" role="tab" aria-selected="true">Spells</button>
-                  <button class="nav-link" type="button" data-effect-browser-group="conditions" role="tab" aria-selected="false">Conditions</button>
-                  <button class="nav-link" type="button" data-effect-browser-group="class" role="tab" aria-selected="false">Class</button>
-                  <button class="nav-link" type="button" data-effect-browser-group="racial" role="tab" aria-selected="false">Racials</button>
-                  <button class="nav-link" type="button" data-effect-browser-group="feats" role="tab" aria-selected="false">Feats</button>
-                  <button class="nav-link" type="button" data-effect-browser-group="items" role="tab" aria-selected="false">Items</button>
-                  <button class="nav-link" type="button" data-effect-browser-group="other" role="tab" aria-selected="false">Other</button>
+                  ${effectBrowserNavHtml()}
                 </nav>
                 <input id="${this.prefix}Search" class="form-control form-control-sm mb-3" placeholder="Search effects">
                 <div id="${this.prefix}Results" class="effect-search-results effect-browser-list"></div>
@@ -1044,142 +1196,19 @@
     }
 
     pickerControls(effect) {
-      const needsCl = durationUsesCasterLevel(effect);
-      const configurable = window.PFConditionConfig?.isConfigurable?.(effect);
-      const needsAbility = window.PFConditionConfig?.needsAbility?.(effect);
-      const adjustment = effect.adjustableCondition || {};
-      const abilityOptions = (window.PFConditionConfig?.ABILITIES || [])
-        .map(
-          ([value, label]) =>
-            `<option value="${escapeHtml(value)}" ${value === adjustment.stat ? "selected" : ""}>${escapeHtml(label)}</option>`,
-        )
-        .join("");
-      return `
-        <div class="effect-browser-controls">
-          ${
-            needsCl
-              ? `<label class="small effect-browser-number-control"><span>CL</span><input class="form-control form-control-sm" data-picker-cl type="number" min="1" value="${escapeHtml(effect.casterLevel || 1)}"></label>`
-              : ""
-          }
-          ${needsAbility ? `<label class="small effect-browser-condition-control"><span>Ability</span><select class="form-select form-select-sm" data-picker-condition-ability>${abilityOptions}</select></label>` : ""}
-          ${configurable ? `<label class="small effect-browser-number-control"><span>${escapeHtml(adjustment.label || "Amount")}</span><input class="form-control form-control-sm" data-picker-condition-amount type="number" min="${Math.max(1, Number(adjustment.minimum || 1))}" value="${Math.max(1, Number(adjustment.amount || 1))}" inputmode="numeric"></label>` : ""}
-          ${
-            conditionUsesTurns(effect)
-              ? `<label class="small effect-browser-number-control"><span>Turns</span><input class="form-control form-control-sm" data-picker-turns type="number" min="1" value="1"></label>`
-              : ""
-          }
-        </div>
-      `;
+      return effectBrowserControlsHtml(effect);
     }
 
     pickerRowHtml(effect, index) {
-      const condition = isCondition(effect);
-      return `
-        <article class="effect-browser-row${condition ? " is-condition" : ""}" role="button" tabindex="0" data-picker-effect-index="${index}">
-          <div>
-            <div class="effect-browser-row-title">${escapeHtml(effect.name || "Effect")}</div>
-            ${condition ? "" : `<div class="effect-browser-row-meta">${escapeHtml(effect.category || "Effect")}${
-              effect.source ? ` | ${escapeHtml(effect.source)}` : ""
-            }</div>`}
-          </div>
-          ${this.pickerControls(effect)}
-        </article>
-      `;
+      return effectBrowserRowHtml(effect, index);
     }
 
     renderPickerSpells(rows) {
-      const groups = new Map();
-      rows.forEach(({ effect, index }) => {
-        const className = effect.spellMeta?.className || "Spell-Like Abilities";
-        if (!groups.has(className)) groups.set(className, new Map());
-        const level = Number(effect.spellMeta?.level || 0);
-        if (!groups.get(className).has(level))
-          groups.get(className).set(level, []);
-        groups.get(className).get(level).push({ effect, index });
-      });
-      return [...groups.entries()]
-        .map(
-          ([className, levels]) => `
-            <section class="effect-browser-spell-class">
-              <div class="effect-browser-spell-class-title fw-bold text-uppercase">${escapeHtml(className)}</div>
-              ${[...levels.entries()]
-                .sort((a, b) => a[0] - b[0])
-                .map(([level, spells]) => {
-                  const left = spells.filter(
-                    ({ effect }) => effect.spellMeta?.bucket !== "prepared",
-                  );
-                  const right = spells.filter(
-                    ({ effect }) => effect.spellMeta?.bucket === "prepared",
-                  );
-                  const mobileGroup = `${className}:${level}`;
-                  const activePanel = this.pickerSpellPanels[mobileGroup] || "known";
-                  const buttons = (entries) =>
-                    entries
-                      .map(
-                        ({ effect, index }) => `
-                          <button class="btn btn-outline-info btn-sm effect-browser-spell-button" type="button" data-picker-effect-index="${index}">
-                            ${escapeHtml(effect.name)}
-                          </button>
-                        `,
-                      )
-                      .join("");
-                  return `
-                    <div class="effect-browser-spell-level">
-                      <div class="effect-browser-level-number">${level}</div>
-                      <div class="effect-browser-spell-mobile-tabs" role="group" aria-label="${escapeHtml(className)} level ${level} spells">
-                        <button class="effect-browser-spell-mobile-tab${activePanel === "known" ? " active" : ""}" type="button" data-effect-browser-spell-tab="known" data-effect-browser-spell-group="${escapeHtml(mobileGroup)}" aria-selected="${activePanel === "known"}">Known</button>
-                        <button class="effect-browser-spell-mobile-tab${activePanel === "prepared" ? " active" : ""}" type="button" data-effect-browser-spell-tab="prepared" data-effect-browser-spell-group="${escapeHtml(mobileGroup)}" aria-selected="${activePanel === "prepared"}">Prepared</button>
-                      </div>
-                      <div class="effect-browser-spell-columns">
-                        <div class="effect-browser-spell-panel${activePanel === "known" ? " is-mobile-active" : ""}" data-effect-browser-spell-panel="known">
-                          <div class="effect-browser-spell-column-title">Known / In Book</div>
-                          ${buttons(left)}
-                        </div>
-                        <div class="effect-browser-spell-panel${activePanel === "prepared" ? " is-mobile-active" : ""}" data-effect-browser-spell-panel="prepared">
-                          <div class="effect-browser-spell-column-title">Prepared Today</div>
-                          ${buttons(right)}
-                        </div>
-                      </div>
-                    </div>
-                  `;
-                })
-                .join("")}
-            </section>
-          `,
-        )
-        .join("");
+      return effectBrowserSpellsHtml(rows, this.pickerSpellPanels);
     }
 
     loadingResultsHtml() {
-      if (this.pickerGroup === "spells") {
-        const spellRows = Array.from({ length: 4 }, () =>
-          '<div class="effect-browser-loading-spell"></div>',
-        ).join("");
-        return `
-          <section class="effect-browser-spell-class effect-browser-loading" aria-label="Loading spells">
-            <span class="effect-browser-loading-line is-title"></span>
-            <div class="effect-browser-spell-level">
-              <div class="effect-browser-level-number">1</div>
-              <div class="effect-browser-spell-columns">
-                <div><div class="effect-browser-spell-column-title">Known / In Book</div>${spellRows}</div>
-                <div><div class="effect-browser-spell-column-title">Prepared Today</div>${spellRows}</div>
-              </div>
-            </div>
-          </section>
-        `;
-      }
-      return Array.from(
-        { length: this.pickerGroup === "conditions" ? 5 : 4 },
-        () => `
-          <article class="effect-browser-row effect-browser-loading" aria-label="Loading effect">
-            <div>
-              <span class="effect-browser-loading-line is-title"></span>
-              <span class="effect-browser-loading-line"></span>
-            </div>
-            <span class="effect-browser-loading-line is-short"></span>
-          </article>
-        `,
-      ).join("");
+      return effectBrowserLoadingHtml(this.pickerGroup);
     }
 
     bindPickerRows() {
@@ -2076,17 +2105,39 @@
         casterLevel: fromAbility
           ? abilityContext?.characterLevel || casterLevel
           : casterLevel,
+        ...(fromAbility && abilityContext?.classLevels
+          ? { classLevels: { ...abilityContext.classLevels } }
+          : {}),
         turns: trackedTurns ? turns : undefined,
         permanent,
         remaining: permanent ? null : calculatedDuration,
         computedDuration: calculatedDuration,
         durationLabel: appliedDurationLabel,
+        ...(persistedEffect.activationGroup
+          ? {
+              activationSourceId:
+                selection.activationSourceId ||
+                selection.runtime?.sourceTokenId ||
+                persistedEffect.activationSourceId ||
+                this.options.characterId,
+            }
+          : {}),
       };
       finalizedEffect =
         window.PFEffectMechanics?.resolveCasterAttributeScales?.(
           finalizedEffect,
           casterAttributeContext,
         ) || finalizedEffect;
+
+      if (
+        window.PFEffectMechanics?.hasContributionOptions?.(finalizedEffect)
+      ) {
+        finalizedEffect = await window.PFEffectMechanics.chooseContributions(
+          finalizedEffect,
+          { title: finalizedEffect.name || "Effect" },
+        );
+        if (!finalizedEffect) return;
+      }
 
       const branchNeeded =
         window.PFEffectMechanics?.hasBranches?.(finalizedEffect) || false;
@@ -2272,6 +2323,19 @@
       if (Number.isInteger(selection.replaceIndex)) {
         this.active.splice(selection.replaceIndex, 1, ...activeEffects);
       } else {
+        if (scaleResolvedEffect.activationGroup) {
+          const sourceId = String(
+            scaleResolvedEffect.activationSourceId || "",
+          );
+          this.active = this.active.filter(
+            (existing) =>
+              !(
+                existing.activationGroup ===
+                  scaleResolvedEffect.activationGroup &&
+                String(existing.activationSourceId || "") === sourceId
+              ),
+          );
+        }
         for (const nextEffect of activeEffects) {
           await this.addActiveEffectWithFearEscalation(nextEffect);
         }
@@ -2600,6 +2664,16 @@
   window.PFEffectTracker = {
     sourceGroup: effectSourceGroup,
     preferOwnedPickerEffects,
+    browser: {
+      groups: EFFECT_BROWSER_GROUPS.map(([value, label]) => ({ value, label })),
+      prepare: injectStyles,
+      navHtml: effectBrowserNavHtml,
+      controlsHtml: effectBrowserControlsHtml,
+      rowHtml: effectBrowserRowHtml,
+      spellsHtml: effectBrowserSpellsHtml,
+      loadingHtml: effectBrowserLoadingHtml,
+      searchText,
+    },
     prepareLoading(container) {
       if (!container) return;
       injectStyles();

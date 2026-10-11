@@ -53,7 +53,6 @@ let characterPickerModal = null;
 let genericTokenModal = null;
 let mapEffectsModal = null;
 let quickEffectModal = null;
-let quickConditionModal = null;
 let quickEffectTargetsModal = null;
 let rollModal = null;
 let rollResultModal = null;
@@ -80,8 +79,6 @@ let quickEffectDefinitions = [];
 let quickEffectLoading = false;
 let quickEffectSourceTokenId = "";
 let quickEffectSelection = null;
-let quickConditionEffect = null;
-let quickConditionReturnToPicker = false;
 let quickEffectMode = "apply";
 let quickEffectGroup = "spells";
 const QUICK_EFFECT_BATCH_SIZE = 80;
@@ -7179,7 +7176,17 @@ function installLinkedAutomaticAura(sourceToken, effect) {
   const current = Array.isArray(sourceToken.automaticAuras)
     ? sourceToken.automaticAuras
     : [];
-  sourceToken.automaticAuras = [...current, link.aura];
+  const retained = effect.activationGroup
+    ? current.filter(
+        (aura) =>
+          aura.effect?.activationGroup !== effect.activationGroup ||
+          String(
+            aura.effect?.activationSourceId || aura.effect?.sourceTokenId || "",
+          ) !==
+            String(effect.activationSourceId || effect.sourceTokenId || ""),
+      )
+    : current;
+  sourceToken.automaticAuras = [...retained, link.aura];
   return link;
 }
 
@@ -7281,6 +7288,8 @@ async function openMapEffects(tokenId) {
       token.kind === "character"
         ? characterSkillOptions(tokenCharacter(token))
         : undefined,
+    choicePoolEquipment:
+      token.kind === "character" ? tokenCharacter(token)?.sheet || {} : {},
     favoredEnemyOptions: () =>
       token.kind === "character"
         ? characterFavoredEnemyOptions(tokenCharacter(token))
@@ -7405,33 +7414,10 @@ async function openMapEffects(tokenId) {
   }
 }
 
-function quickEffectUsageKey() {
-  return `pf_map_quick_effect_usage_${mapContextKey || "general"}`;
-}
-
-function quickEffectUsageCounts() {
-  try {
-    return (
-      JSON.parse(localStorage.getItem(quickEffectUsageKey()) || "{}") || {}
-    );
-  } catch {
-    return {};
-  }
-}
-
-function incrementQuickEffectUsage(effect) {
-  const key = effect?.id || effect?.name;
-  if (!key) return;
-  const counts = quickEffectUsageCounts();
-  counts[key] = Number(counts[key] || 0) + 1;
-  localStorage.setItem(quickEffectUsageKey(), JSON.stringify(counts));
-}
-
 function recordQuickSpellCast(effect) {
   const sourceToken = tokenById(quickEffectSourceTokenId);
   const actor = sourceToken ? displayTokenName(sourceToken) : "A character";
   addTimeline(`${actor} casts ${effect?.name || "a spell"}.`);
-  incrementQuickEffectUsage(effect);
   queueSave();
   renderAll();
 }
@@ -7449,260 +7435,35 @@ function tokenLevel(token) {
   );
 }
 
-function effectCardHtml(effect, index, prefix, defaultCl) {
-  const condition = isConditionEffect(effect);
-  if (condition) {
-    return `
-      <article class="quick-effect-card quick-condition-card" role="button" tabindex="0" data-quick-effect-index="${index}">
-        <div class="quick-effect-name">${escapeHtml(effect.name || "Condition")}</div>
-      </article>
-    `;
-  }
-
-  const needsCl = durationUsesCasterLevel(effect);
-  return `
-    <article class="quick-effect-card" role="button" tabindex="0" data-quick-effect-index="${index}">
-      <span class="effect-type-icon" title="${escapeHtml(effect.category || "Effect")}"><i class="bi ${effectCategoryIcon(effect.category)}"></i></span>
-      <div class="quick-effect-name">${escapeHtml(effect.name || "Effect")}</div>
-      ${!needsCl ? "" : `<div class="quick-effect-controls">
-          <label class="small">CL
-            <input id="${prefix}Cl${index}" class="form-control form-control-sm" data-quick-cl type="number" min="1" value="${defaultCl}">
-          </label>
-      </div>`}
-      <button class="btn btn-outline-secondary btn-sm quick-effect-info" type="button" data-quick-effect-info="${index}" title="View details" aria-label="View ${escapeHtml(effect.name || "effect")} details"><i class="bi bi-info-lg"></i></button>
-    </article>
-  `;
-}
-
-function bindQuickEffectCards(container, effects) {
-  container.querySelectorAll("[data-quick-effect-info]").forEach((button) => {
-    button.addEventListener("click", (event) => {
-      event.stopPropagation();
-      openQuickEffectInfo(effects[Number(button.dataset.quickEffectInfo)]);
-    });
-  });
-  container.querySelectorAll("[data-quick-effect-index]").forEach((card) => {
-    const choose = () => {
-      const effect = effects[Number(card.dataset.quickEffectIndex)];
-      if (!effect) return;
-      if (isConditionEffect(effect)) {
-        openQuickConditionConfig(effect);
-        return;
-      }
-      const casterLevel = Math.max(
-        1,
-        Number.parseInt(card.querySelector("[data-quick-cl]")?.value, 10) ||
-          tokenLevel(tokenById(quickEffectSourceTokenId)),
-      );
-      const turns = Math.max(
-        1,
-        Number.parseInt(card.querySelector("[data-quick-turns]")?.value, 10) ||
-          1,
-      );
-      chooseQuickEffect(effect, { casterLevel, turns, permanent: false });
-    };
-    card.addEventListener("click", (event) => {
-      if (event.target.closest(".quick-effect-controls")) return;
-      choose();
-    });
-    card.addEventListener("keydown", (event) => {
-      if (event.target.closest(".quick-effect-controls")) return;
-      if (event.key !== "Enter" && event.key !== " ") return;
-      event.preventDefault();
-      choose();
-    });
-  });
-}
-
 function quickEffectGroupFor(effect = {}) {
   return window.PFEffectTracker?.sourceGroup?.(effect) || "other";
-}
-
-function quickEffectDetailLabel(key = "") {
-  return String(key || "")
-    .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
-    .replace(/[_-]+/g, " ")
-    .replace(/^./, (letter) => letter.toUpperCase());
-}
-
-function quickEffectDetailRows(effect = {}) {
-  const ignored = new Set([
-    "effects", "bonuses", "activeMechanics", "passiveMechanics",
-    "description", "summary", "link", "url", "sourceUrl", "type",
-  ]);
-  const sourceDetails =
-    effect.details && typeof effect.details === "object" ? effect.details : {};
-  const data = {
-    type: effect.type || effect.category || "",
-    prerequisites: effect.prerequisites || "",
-    benefit: effect.benefit || "",
-    normal: effect.normal || "",
-    special: effect.special || "",
-    aura: sourceDetails.aura || "",
-    casterLevel: sourceDetails.casterLevel || sourceDetails.cl || "",
-    slot: sourceDetails.slot || "",
-    price: sourceDetails.price || "",
-    weight: sourceDetails.weight || "",
-    requirements: sourceDetails.requirements || "",
-    cost: sourceDetails.cost || "",
-    ...(effect.detailData && typeof effect.detailData === "object"
-      ? effect.detailData
-      : {}),
-  };
-  const preferred = [
-    "type", "class", "aura", "casterLevel", "slot", "price", "weight",
-    "prerequisites", "benefit", "normal", "special", "requirements", "cost",
-  ];
-  const entries = [];
-  preferred.forEach((key) => {
-    const value = data[key];
-    if (value !== undefined && value !== null && String(value).trim())
-      entries.push([key, value]);
-  });
-  Object.entries(data).forEach(([key, value]) => {
-    if (preferred.includes(key) || ignored.has(key)) return;
-    if (value === undefined || value === null || typeof value === "object") return;
-    if (!String(value).trim()) return;
-    entries.push([key, value]);
-  });
-  return entries;
-}
-
-function openQuickEffectInfo(effect = {}) {
-  if (!effect?.name) return;
-  el("quickEffectInfoModalLabel").textContent = effect.name;
-  const description =
-    effect.detailData?.description || effect.description || effect.summary || "";
-  const rows = quickEffectDetailRows(effect);
-  const link =
-    effect.detailUrl || effect.url || effect.link || effect.detailData?.link || "";
-  el("quickEffectInfoBody").innerHTML = `
-    ${rows
-      .map(([label, value]) => `<div class="quick-effect-detail-row"><strong>${escapeHtml(quickEffectDetailLabel(label))}</strong><div>${escapeHtml(String(value))}</div></div>`)
-      .join("")}
-    <div class="quick-effect-detail-description">${escapeHtml(description || "No description available.")}</div>
-    ${link ? `<a class="btn btn-outline-info btn-sm" href="${escapeHtml(link)}" target="_blank" rel="noopener noreferrer">Open source</a>` : ""}
-  `;
-  const infoModal = bootstrap.Modal.getOrCreateInstance(
-    el("quickEffectInfoModal"),
-  );
-  const showInfo = () => infoModal.show();
-  if (el("quickEffectModal").classList.contains("show")) {
-    el("quickEffectModal").addEventListener("hidden.bs.modal", showInfo, {
-      once: true,
-    });
-    el("quickEffectInfoModal").addEventListener(
-      "hidden.bs.modal",
-      () => quickEffectModal.show(),
-      { once: true },
-    );
-    quickEffectModal.hide();
-  } else {
-    showInfo();
-  }
-}
-
-function quickConditionDescription(effect = {}) {
-  return (
-    effect.detailData?.description ||
-    effect.description ||
-    effect.summary ||
-    effect.details?.description ||
-    "No description available."
-  );
-}
-
-function openQuickConditionConfig(effect = {}) {
-  if (!effect?.name || !quickConditionModal) return;
-  quickConditionEffect = effect;
-  quickConditionReturnToPicker = true;
-  el("quickConditionModalLabel").textContent = effect.name;
-  el("quickConditionDescription").textContent = quickConditionDescription(effect);
-  el("quickConditionTurns").value = "1";
-  const configurable = window.PFConditionConfig?.isConfigurable?.(effect);
-  const needsAbility = window.PFConditionConfig?.needsAbility?.(effect);
-  const adjustment = effect.adjustableCondition || {};
-  el("quickConditionTurnsField").classList.toggle(
-    "d-none",
-    !conditionUsesTurns(effect),
-  );
-  el("quickConditionAbilityField").classList.toggle("d-none", !needsAbility);
-  el("quickConditionAmountField").classList.toggle("d-none", !configurable);
-  if (needsAbility) {
-    el("quickConditionAbility").innerHTML = (
-      window.PFConditionConfig?.ABILITIES || []
-    )
-      .map(
-        ([value, label]) =>
-          `<option value="${escapeHtml(value)}">${escapeHtml(label)}</option>`,
-      )
-      .join("");
-    el("quickConditionAbility").value = adjustment.stat || "strength";
-  }
-  if (configurable) {
-    el("quickConditionAmountLabel").textContent = adjustment.label || "Amount";
-    el("quickConditionAmount").min = String(
-      Math.max(1, Number(adjustment.minimum || 1)),
-    );
-    el("quickConditionAmount").value = String(
-      Math.max(1, Number(adjustment.amount || 1)),
-    );
-  }
-  const showConfig = () => {
-    const confirm = el("confirmQuickCondition");
-    confirm.disabled = true;
-    el("quickConditionModal").addEventListener(
-      "shown.bs.modal",
-      () => {
-        confirm.disabled = false;
-        (configurable
-          ? el("quickConditionAmount")
-          : el("quickConditionTurns")
-        ).focus();
-      },
-      { once: true },
-    );
-    quickConditionModal.show();
-  };
-  if (el("quickEffectModal").classList.contains("show")) {
-    el("quickEffectModal").addEventListener("hidden.bs.modal", showConfig, {
-      once: true,
-    });
-    quickEffectModal.hide();
-  } else {
-    showConfig();
-  }
-}
-
-function confirmQuickConditionConfig() {
-  if (!quickConditionEffect) return;
-  const effect = window.PFConditionConfig?.isConfigurable?.(quickConditionEffect)
-    ? window.PFConditionConfig.configure(quickConditionEffect, {
-        ability: el("quickConditionAbility").value,
-        amount: el("quickConditionAmount").value,
-      })
-    : quickConditionEffect;
-  const turns = Math.max(1, Number.parseInt(el("quickConditionTurns").value, 10) || 1);
-  const casterLevel = tokenLevel(tokenById(quickEffectSourceTokenId));
-  el("confirmQuickCondition").disabled = true;
-  quickConditionReturnToPicker = false;
-  el("quickConditionModal").addEventListener(
-    "hidden.bs.modal",
-    () => {
-      quickConditionEffect = null;
-      chooseQuickEffect(effect, { casterLevel, turns, permanent: false });
-    },
-    { once: true },
-  );
-  quickConditionModal.hide();
 }
 
 function effectDamageRolls(effect = {}) {
   return window.PFDamageRolls?.normalizeRolls?.(effect.damageRolls || []) || [];
 }
 
+async function chooseQuickEffectContributions(effect = {}) {
+  if (!window.PFEffectMechanics?.hasContributionOptions?.(effect))
+    return effect;
+  const modalElement = el("quickEffectModal");
+  const wasOpen = modalElement?.classList.contains("show");
+  if (wasOpen) {
+    await new Promise((resolve) => {
+      modalElement.addEventListener("hidden.bs.modal", resolve, { once: true });
+      quickEffectModal.hide();
+    });
+  }
+  const resolved = await window.PFEffectMechanics.chooseContributions(effect, {
+    title: effect.name || "Effect",
+  });
+  if (!resolved && wasOpen) quickEffectModal.show();
+  return resolved;
+}
+
 function effectHasTargetMechanics(effect = {}) {
   if (effect.auraConfig?.enabled) return true;
+  if (effect.trackActive) return true;
   if (window.PFEffectMechanics?.hasBranches?.(effect)) return true;
   if (Array.isArray(effect.metamagicRiders) && effect.metamagicRiders.length)
     return true;
@@ -7743,6 +7504,8 @@ async function rollQuickEffectDamage(effect = {}, casterLevel = 1) {
 
 async function chooseQuickEffect(effect, options = {}) {
   if (!effect) return;
+  effect = await chooseQuickEffectContributions(effect);
+  if (!effect) return;
   const selection = {
     casterLevel: Math.max(1, Number(options.casterLevel || 1) || 1),
     turns: Math.max(1, Number(options.turns || 1) || 1),
@@ -7763,149 +7526,49 @@ async function chooseQuickEffect(effect, options = {}) {
       return;
     }
     if (!effectHasTargetMechanics(effect)) {
-      incrementQuickEffectUsage(effect);
       renderAll();
       return;
     }
   }
   if (effect.auraConfig?.enabled) {
     const sourceToken = tokenById(quickEffectSourceTokenId);
-    const applied = appliedEffectFromQuickSelection(effect, selection);
-    const link = sourceToken
-      ? installLinkedAutomaticAura(sourceToken, applied)
-      : null;
-    if (!link) return;
+    if (!sourceToken) return;
+    const applied = {
+      ...appliedEffectFromQuickSelection(effect, selection),
+      sourceTokenId: sourceToken?.id || quickEffectSourceTokenId,
+      ...(effect.activationGroup
+        ? {
+            activationSourceId:
+              sourceToken?.id || quickEffectSourceTokenId,
+          }
+        : {}),
+    };
+    const previousAuras = structuredClone(sourceToken.automaticAuras || []);
     const active = await loadTokenActiveEffects(sourceToken);
-    if (!(await saveTokenActiveEffects(sourceToken, [...active, link.controller]))) {
-      sourceToken.automaticAuras = sourceToken.automaticAuras.filter(
-        (aura) => aura.id !== link.aura.id,
-      );
+    const retained = effect.activationGroup
+      ? active.filter(
+          (entry) =>
+            !(
+              entry.activationGroup === effect.activationGroup &&
+              String(
+                entry.activationSourceId || entry.sourceTokenId || "",
+              ) === String(applied.activationSourceId || "")
+            ),
+        )
+      : active;
+    const link = installLinkedAutomaticAura(sourceToken, applied);
+    if (!link) return;
+    if (!(await saveTokenActiveEffects(sourceToken, [...retained, link.controller]))) {
+      sourceToken.automaticAuras = previousAuras;
       return;
     }
-    incrementQuickEffectUsage(effect);
+    scheduleOutOfRangeAuraCleanup("", 0);
     addTimeline(`${displayTokenName(sourceToken)} activates ${effect.name || "an aura"}.`);
     quickEffectModal.hide();
     renderAll();
     return;
   }
-  openQuickEffectTargets(effect, selection);
-}
-
-function renderOwnedSpellEffects(effects, defaultCl) {
-  const results = el("quickEffectResults");
-  const groups = new Map();
-  effects.forEach((effect) => {
-    const className = effect.spellMeta?.className || "Spells";
-    if (!groups.has(className)) groups.set(className, new Map());
-    const level = Number(effect.spellMeta?.level || 0);
-    if (!groups.get(className).has(level)) groups.get(className).set(level, []);
-    groups.get(className).get(level).push(effect);
-  });
-  const bucketOrder = ["book", "known", "prepared", "sla"];
-  const bucketLabel = (bucket) => ({
-    book: "Known in Book",
-    known: "Known Spells",
-    prepared: "Prepared Today",
-    sla: "Spell-Like Abilities",
-  }[bucket] || "Spells");
-  results.innerHTML = groups.size
-    ? [...groups.entries()]
-        .map(
-          ([className, levels]) => `
-            <article class="quick-spellcasting-card">
-              <div class="quick-spellcasting-header">${escapeHtml(className)}</div>
-              ${[...levels.entries()]
-                .sort(([left], [right]) => left - right)
-                .map(
-                  ([level, levelEffects]) => {
-                    const buckets = new Map();
-                    levelEffects.forEach((effect) => {
-                      const bucket = effect.spellMeta?.kind === "sla"
-                        ? "sla"
-                        : effect.spellMeta?.bucket || "known";
-                      if (!buckets.has(bucket)) buckets.set(bucket, []);
-                      buckets.get(bucket).push(effect);
-                    });
-                    const visibleBuckets = bucketOrder.filter((bucket) =>
-                      buckets.has(bucket),
-                    );
-                    const tabGroup = `${String(className).replace(/[^a-z0-9]+/gi, "-")}-${level}`;
-                    const activeBucket = visibleBuckets.includes(
-                      quickSpellMobilePanels[tabGroup],
-                    )
-                      ? quickSpellMobilePanels[tabGroup]
-                      : visibleBuckets[0];
-                    return `
-                    <div class="quick-spell-row">
-                      <div class="quick-spell-level">${level}</div>
-                      <div class="quick-spell-buckets${visibleBuckets.length === 1 ? " is-single" : ""}">
-                        ${visibleBuckets.length > 1
-                          ? `<div class="quick-spell-mobile-tabs" role="group" aria-label="${escapeHtml(className)} level ${level} spell lists">
-                              ${visibleBuckets
-                                .map(
-                                  (bucket) => `<button class="quick-spell-mobile-tab${bucket === activeBucket ? " active" : ""}" type="button" data-quick-spell-mobile-tab="${escapeHtml(bucket)}" data-quick-spell-mobile-group="${escapeHtml(tabGroup)}">${escapeHtml(bucketLabel(bucket).replace(" in Book", ""))}</button>`,
-                                )
-                                .join("")}
-                            </div>`
-                          : ""}
-                        ${visibleBuckets
-                          .map((bucket) => `
-                          <section class="quick-spell-bucket${bucket === activeBucket ? " is-mobile-active" : ""}" data-quick-spell-mobile-panel="${escapeHtml(bucket)}" data-quick-spell-mobile-group="${escapeHtml(tabGroup)}">
-                            <div class="quick-spell-bucket-title">${bucketLabel(bucket)}</div>
-                            <div class="quick-spell-list">
-                              ${buckets.get(bucket)
-                                .sort((left, right) => left.name.localeCompare(right.name))
-                                .map((effect) => {
-                                  const index = effects.indexOf(effect);
-                                  const frequency = bucket === "sla"
-                                    ? `<span>${escapeHtml(effect.spellMeta?.frequency || "At will")}</span>`
-                                    : "";
-                                  return `<button class="btn btn-outline-info btn-sm quick-spell-button" type="button" data-quick-spell-index="${index}"><span>${escapeHtml(effect.name)}</span>${frequency}</button>`;
-                                })
-                                .join("")}
-                            </div>
-                          </section>`)
-                          .join("")}
-                      </div>
-                    </div>`;
-                  },
-                )
-                .join("")}
-            </article>`,
-        )
-        .join("")
-    : `<div class="small text-secondary">No matching owned spells or spell-like abilities found.</div>`;
-  results.querySelectorAll("[data-quick-spell-index]").forEach((button) => {
-    button.addEventListener("click", () =>
-      openMapOwnedSpellDetails(
-        effects[Number(button.dataset.quickSpellIndex)],
-        defaultCl,
-      ),
-    );
-  });
-  results.querySelectorAll("[data-quick-spell-mobile-tab]").forEach((button) => {
-    button.addEventListener("click", () => {
-      const group = button.dataset.quickSpellMobileGroup || "";
-      const bucket = button.dataset.quickSpellMobileTab || "";
-      if (!group || !bucket) return;
-      quickSpellMobilePanels[group] = bucket;
-      results
-        .querySelectorAll(`[data-quick-spell-mobile-group="${CSS.escape(group)}"]`)
-        .forEach((element) => {
-          if (element.matches("[data-quick-spell-mobile-tab]")) {
-            element.classList.toggle(
-              "active",
-              element.dataset.quickSpellMobileTab === bucket,
-            );
-          } else {
-            element.classList.toggle(
-              "is-mobile-active",
-              element.dataset.quickSpellMobilePanel === bucket,
-            );
-          }
-        });
-    });
-  });
+  await openQuickEffectTargets(effect, selection);
 }
 
 async function openMapOwnedSpellDetails(effect, defaultCl = 1) {
@@ -7986,105 +7649,9 @@ async function openMapOwnedSpellDetails(effect, defaultCl = 1) {
   if (!casting) quickEffectModal.show();
 }
 
-function renderOtherEffectGroups(effects, defaultCl) {
-  const results = el("quickEffectResults");
-  const groups = new Map();
-  effects.forEach((effect) => {
-    const type = String(effect.category || "Effect").trim() || "Effect";
-    if (!groups.has(type)) groups.set(type, []);
-    groups.get(type).push(effect);
-  });
-  const entries = [...groups.entries()].sort(([left], [right]) => {
-    const leftItem = left.toLowerCase() === "item";
-    const rightItem = right.toLowerCase() === "item";
-    return Number(leftItem) - Number(rightItem) || left.localeCompare(right);
-  });
-  results.innerHTML = entries.length
-    ? entries
-        .map(
-          ([type, group], groupIndex) => `
-            <section class="quick-effect-type-section">
-              <div class="side-title">${escapeHtml(type)}</div>
-              <div class="quick-effect-grid" data-quick-effect-type-group="${groupIndex}">
-                ${group
-                  .map((effect, index) =>
-                    effectCardHtml(effect, index, `quickOther${groupIndex}`, defaultCl),
-                  )
-                  .join("")}
-              </div>
-            </section>`,
-        )
-        .join("")
-    : `<div class="small text-secondary">No matching effects found.</div>`;
-  entries.forEach(([, group], index) => {
-    const container = results.querySelector(
-      `[data-quick-effect-type-group="${index}"]`,
-    );
-    if (container) bindQuickEffectCards(container, group);
-  });
-}
-
-function quickEffectLoadingCardHtml() {
-  return `
-    <article class="quick-effect-card quick-effect-loading-card" aria-label="Loading effect">
-      <span class="quick-effect-loading-line is-title"></span>
-      <span class="quick-effect-loading-line"></span>
-    </article>
-  `;
-}
-
-function quickEffectLoadingHtml(group = quickEffectGroup) {
-  if (group === "spells") {
-    const spellRows = Array.from(
-      { length: 4 },
-      () => '<span class="quick-effect-loading-spell"></span>',
-    ).join("");
-    return `
-      <article class="quick-spellcasting-card quick-effect-loading-card" aria-label="Loading spells">
-        <span class="quick-effect-loading-line is-title"></span>
-        <div class="quick-spell-row">
-          <div class="quick-spell-level">1</div>
-          <div class="quick-spell-buckets">
-            <section class="quick-spell-bucket">
-              <div class="quick-spell-bucket-title">Known / In Book</div>
-              <div class="quick-spell-list">${spellRows}</div>
-            </section>
-            <section class="quick-spell-bucket">
-              <div class="quick-spell-bucket-title">Prepared Today</div>
-              <div class="quick-spell-list">${spellRows}</div>
-            </section>
-          </div>
-        </div>
-      </article>
-    `;
-  }
-  const cards = Array.from({ length: group === "conditions" ? 5 : 4 }, () =>
-    quickEffectLoadingCardHtml(),
-  ).join("");
-  if (group === "other") {
-    return `
-      <section class="quick-effect-type-section quick-effect-loading-card" aria-label="Loading effects">
-        <span class="quick-effect-loading-line is-title"></span>
-        <div class="quick-effect-grid">${cards}</div>
-      </section>
-    `;
-  }
-  return cards;
-}
-
 function selectQuickEffectGroup(group) {
-  if (
-    ![
-      "spells",
-      "conditions",
-      "class",
-      "racial",
-      "feats",
-      "items",
-      "other",
-    ].includes(group)
-  )
-    return;
+  const groups = window.PFEffectTracker?.browser?.groups || [];
+  if (!groups.some((entry) => entry.value === group)) return;
   quickEffectGroup = group;
   quickEffectVisibleLimit = QUICK_EFFECT_BATCH_SIZE;
   renderQuickEffects();
@@ -8095,109 +7662,167 @@ function appendQuickEffectMore(visibleCount, totalCount) {
   const results = el("quickEffectResults");
   results.insertAdjacentHTML(
     "beforeend",
-    `<button class="btn btn-outline-info btn-sm w-100" type="button" data-quick-effect-more>Show more (${visibleCount} of ${totalCount})</button>`,
+    `<button class="btn btn-outline-info btn-sm w-100" type="button" data-effect-browser-more>Show more (${visibleCount} of ${totalCount})</button>`,
   );
   results
-    .querySelector("[data-quick-effect-more]")
+    .querySelector("[data-effect-browser-more]")
     ?.addEventListener("click", () => {
       quickEffectVisibleLimit += QUICK_EFFECT_BATCH_SIZE;
       renderQuickEffects();
     });
 }
 
+function bindQuickEffectBrowser() {
+  const results = el("quickEffectResults");
+  results
+    .querySelectorAll("[data-effect-browser-spell-tab]")
+    .forEach((button) => {
+      button.addEventListener("click", () => {
+        const group = button.dataset.effectBrowserSpellGroup || "";
+        const target = button.dataset.effectBrowserSpellTab || "known";
+        quickSpellMobilePanels[group] = target;
+        const wrapper = button.closest(".effect-browser-spell-level");
+        if (!wrapper) return;
+        wrapper
+          .querySelectorAll("[data-effect-browser-spell-tab]")
+          .forEach((tab) => {
+            const active = tab.dataset.effectBrowserSpellTab === target;
+            tab.classList.toggle("active", active);
+            tab.setAttribute("aria-selected", String(active));
+          });
+        wrapper
+          .querySelectorAll("[data-effect-browser-spell-panel]")
+          .forEach((panel) => {
+            panel.classList.toggle(
+              "is-mobile-active",
+              panel.dataset.effectBrowserSpellPanel === target,
+            );
+          });
+      });
+    });
+  results.querySelectorAll("[data-picker-effect-index]").forEach((row) => {
+    const choose = () => {
+      const effect = quickEffectDefinitions[Number(row.dataset.pickerEffectIndex)];
+      if (!effect) return;
+      const container = row.closest(".effect-browser-row") || row;
+      const configuredEffect = window.PFConditionConfig?.isConfigurable?.(effect)
+        ? window.PFConditionConfig.configure(effect, {
+            ability: container.querySelector("[data-picker-condition-ability]")?.value,
+            amount: container.querySelector("[data-picker-condition-amount]")?.value,
+          })
+        : effect;
+      const casterLevel = Math.max(
+        1,
+        Number.parseInt(container.querySelector("[data-picker-cl]")?.value, 10) ||
+          tokenLevel(tokenById(quickEffectSourceTokenId)),
+      );
+      const turns = Math.max(
+        1,
+        Number.parseInt(container.querySelector("[data-picker-turns]")?.value, 10) || 1,
+      );
+      if (effect.ownedSpell) {
+        void openMapOwnedSpellDetails(effect, casterLevel);
+        return;
+      }
+      void chooseQuickEffect(configuredEffect, {
+        casterLevel,
+        turns,
+        permanent: false,
+      });
+    };
+    row.addEventListener("click", (event) => {
+      if (event.target.closest(".effect-browser-controls")) return;
+      choose();
+    });
+    row.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      event.preventDefault();
+      choose();
+    });
+  });
+}
+
 function renderQuickEffects() {
+  const browser = window.PFEffectTracker?.browser;
+  if (!browser) return;
   const sourceToken = tokenById(quickEffectSourceTokenId);
   const defaultCl = tokenLevel(sourceToken);
   const term = el("quickEffectSearch").value.trim().toLowerCase();
-  const groupedEffects = quickEffectDefinitions.filter(
-    (effect) => quickEffectGroupFor(effect) === quickEffectGroup,
-  );
-  const matches = groupedEffects.filter(
-    (effect) => !term || effectSearchText(effect).includes(term),
-  );
-  const visibleMatches =
-    quickEffectGroup === "spells"
-      ? matches
-      : matches.slice(0, quickEffectVisibleLimit);
-  const counts = quickEffectUsageCounts();
-  const mostUsed = groupedEffects
+  const rows = quickEffectDefinitions
+    .map((effect, index) => ({ effect, index }))
+    .filter(({ effect }) => quickEffectGroupFor(effect) === quickEffectGroup)
     .filter(
-      (effect) => Number(counts[effect.id] || counts[effect.name] || 0) > 0,
+      ({ effect }) =>
+        !term || (browser.searchText?.(effect) || effectSearchText(effect)).includes(term),
     )
-    .sort(
-      (a, b) =>
-        Number(counts[b.id] || counts[b.name] || 0) -
-        Number(counts[a.id] || counts[a.name] || 0),
-    )
-    .slice(0, 7);
+    .sort((a, b) => {
+      const aItem = String(a.effect.category || "").toLowerCase() === "item";
+      const bItem = String(b.effect.category || "").toLowerCase() === "item";
+      return (
+        Number(aItem) - Number(bItem) ||
+        String(a.effect.category || "").localeCompare(String(b.effect.category || "")) ||
+        String(a.effect.name || "").localeCompare(String(b.effect.name || ""))
+      );
+    });
+  const visibleRows =
+    quickEffectGroup === "spells"
+      ? rows
+      : rows.slice(0, quickEffectVisibleLimit);
 
   el("quickEffectNav")
-    .querySelectorAll("[data-quick-effect-group]")
+    .querySelectorAll("[data-effect-browser-group]")
     .forEach((button) => {
-      const active = button.dataset.quickEffectGroup === quickEffectGroup;
+      const active = button.dataset.effectBrowserGroup === quickEffectGroup;
       button.classList.toggle("active", active);
       button.setAttribute("aria-selected", String(active));
     });
   if (quickEffectLoading) {
-    el("quickEffectMostUsedWrap").classList.add("d-none");
-    el("quickEffectResults").classList.toggle(
-      "quick-effect-list",
-      quickEffectGroup === "conditions",
-    );
-    el("quickEffectResults").classList.toggle(
-      "quick-spells-view",
-      quickEffectGroup === "spells",
-    );
-    el("quickEffectResults").classList.toggle(
-      "quick-grouped-view",
-      quickEffectGroup === "other",
-    );
-    el("quickEffectResults").innerHTML = quickEffectLoadingHtml();
+    el("quickEffectResults").innerHTML = browser.loadingHtml(quickEffectGroup);
     return;
   }
-
-  const useStandardCards = !["spells", "other"].includes(
-    quickEffectGroup,
-  );
-  el("quickEffectMostUsedWrap").classList.toggle(
-    "d-none",
-    !useStandardCards || !mostUsed.length,
-  );
-  el("quickEffectMostUsed").innerHTML = mostUsed
-    .map((effect, index) =>
-      effectCardHtml(effect, index, "quickMost", defaultCl),
-    )
-    .join("");
-  el("quickEffectResults").classList.toggle(
-    "quick-effect-list",
-    quickEffectGroup === "conditions",
-  );
-  el("quickEffectResults").classList.toggle(
-    "quick-spells-view",
-    quickEffectGroup === "spells",
-  );
-  el("quickEffectResults").classList.toggle(
-    "quick-grouped-view",
-    quickEffectGroup === "other",
-  );
-  if (quickEffectGroup === "spells") {
-    renderOwnedSpellEffects(matches, defaultCl);
-  } else if (quickEffectGroup === "other") {
-    renderOtherEffectGroups(visibleMatches, defaultCl);
-    appendQuickEffectMore(visibleMatches.length, matches.length);
-  } else {
-    el("quickEffectResults").innerHTML = visibleMatches.length
-      ? visibleMatches
-          .map((effect, index) =>
-            effectCardHtml(effect, index, "quickAll", defaultCl),
-          )
-          .join("")
-      : `<div class="small text-secondary">No matching effects found.</div>`;
-    bindQuickEffectCards(el("quickEffectResults"), visibleMatches);
-    appendQuickEffectMore(visibleMatches.length, matches.length);
+  if (!rows.length) {
+    el("quickEffectResults").innerHTML =
+      '<div class="small-text">No matching effects found.</div>';
+    return;
   }
-
-  bindQuickEffectCards(el("quickEffectMostUsed"), mostUsed);
+  if (quickEffectGroup === "spells") {
+    el("quickEffectResults").innerHTML = browser.spellsHtml(
+      rows,
+      quickSpellMobilePanels,
+    );
+  } else if (quickEffectGroup === "other") {
+    const groups = new Map();
+    visibleRows.forEach((row) => {
+      const category = row.effect.category || "Effect";
+      if (!groups.has(category)) groups.set(category, []);
+      groups.get(category).push(row);
+    });
+    el("quickEffectResults").innerHTML = [...groups.entries()]
+      .map(
+        ([category, entries]) => `
+          <section class="effect-browser-type-section">
+            <div class="effect-browser-group-title">${escapeHtml(category)}</div>
+            <div class="effect-browser-list">
+              ${entries
+                .map(({ effect, index }) =>
+                  browser.rowHtml(effect, index, { defaultCasterLevel: defaultCl }),
+                )
+                .join("")}
+            </div>
+          </section>
+        `,
+      )
+      .join("");
+    appendQuickEffectMore(visibleRows.length, rows.length);
+  } else {
+    el("quickEffectResults").innerHTML = visibleRows
+      .map(({ effect, index }) =>
+        browser.rowHtml(effect, index, { defaultCasterLevel: defaultCl }),
+      )
+      .join("");
+    appendQuickEffectMore(visibleRows.length, rows.length);
+  }
+  bindQuickEffectBrowser();
 }
 
 function mapSpellcastingStateKey(value = "") {
@@ -8653,17 +8278,41 @@ function quickEffectTargets() {
     .sort((a, b) => a.name.localeCompare(b.name));
 }
 
-function openQuickEffectTargets(effect, options) {
+async function activationGroupTargetIds(effect, targets) {
+  if (!effect.activationGroup || !quickEffectSourceTokenId) return new Set();
+  const sourceId = String(quickEffectSourceTokenId);
+  const matches = await Promise.all(
+    targets.map(async ({ token }) => {
+      const active =
+        cachedTokenActiveEffects(token) ||
+        (await loadTokenActiveEffects(token));
+      const found = active.some(
+        (entry) =>
+          entry.activationGroup === effect.activationGroup &&
+          String(entry.activationSourceId || entry.sourceTokenId || "") ===
+            sourceId,
+      );
+      return found ? token.id : null;
+    }),
+  );
+  return new Set(matches.filter(Boolean));
+}
+
+async function openQuickEffectTargets(effect, options) {
+  const targets = quickEffectTargets();
+  const previousTargetIds = await activationGroupTargetIds(effect, targets);
   quickEffectSelection = {
     effect,
     options,
     sourceTokenId: quickEffectSourceTokenId,
+    previousTargetIds: [...previousTargetIds],
   };
-  const targets = quickEffectTargets();
   el("quickEffectTargetsModalLabel").textContent =
     `Apply ${effect.name || "Effect"}`;
   el("quickEffectTargetHint").textContent =
-    "Choose one or more tokens on the current map.";
+    previousTargetIds.size > 0
+      ? "Choose the current recipients. Previous recipients are selected; uncheck one to end this source's earlier option."
+      : "Choose one or more tokens on the current map.";
   el("quickEffectApplyStatus").textContent = "";
   el("quickEffectTargetList").innerHTML = targets.length
     ? targets
@@ -8671,7 +8320,7 @@ function openQuickEffectTargets(effect, options) {
           ({ token, name }) => `
       <label class="quick-target-card">
         <div class="form-check">
-          <input class="form-check-input" type="checkbox" data-quick-target-token="${escapeHtml(token.id)}" ${token.id === quickEffectSourceTokenId ? "checked" : ""}>
+          <input class="form-check-input" type="checkbox" data-quick-target-token="${escapeHtml(token.id)}" ${token.id === quickEffectSourceTokenId || previousTargetIds.has(token.id) ? "checked" : ""}>
           <span class="form-check-label">
             <strong>${escapeHtml(name)}</strong>
             <span class="small text-secondary d-block">${escapeHtml(token.kind === "enemy" ? "Enemy" : "Character")}${token.visible === false ? " | hidden" : ""}</span>
@@ -8755,16 +8404,42 @@ function appliedEffectFromQuickSelection(effect, options, targetCount = 1) {
     casterLevel: fromAbility
       ? abilityContext?.characterLevel || casterLevel
       : casterLevel,
+    ...(fromAbility && abilityContext?.classLevels
+      ? { classLevels: { ...abilityContext.classLevels } }
+      : {}),
     turns: trackedTurns ? turns : undefined,
     permanent,
     remaining: permanent ? null : calculatedDuration,
     computedDuration: calculatedDuration,
     durationTargetCount: splitAmongTargets ? targetCount : undefined,
     durationLabel: appliedDurationLabel,
+    ...(resolvedEffect.activationGroup
+      ? {
+          activationSourceId:
+            resolvedEffect.activationSourceId ||
+            resolvedEffect.sourceTokenId ||
+            quickEffectSourceTokenId,
+        }
+      : {}),
   };
 }
 
 async function applyQuickEffectToToken(token, appliedEffect) {
+  if (appliedEffect.activationGroup) {
+    const active = await loadTokenActiveEffects(token);
+    const sourceId = String(
+      appliedEffect.activationSourceId || appliedEffect.sourceTokenId || "",
+    );
+    const retained = active.filter(
+      (effect) =>
+        !(
+          effect.activationGroup === appliedEffect.activationGroup &&
+          String(effect.activationSourceId || effect.sourceTokenId || "") ===
+            sourceId
+        ),
+    );
+    return saveTokenActiveEffects(token, [...retained, appliedEffect]);
+  }
   if (token.kind === "character") {
     const savedBuffs = await PFApp.applyCharacterMapEffect?.(
       token.characterId,
@@ -8830,6 +8505,19 @@ async function applyQuickEffectToToken(token, appliedEffect) {
   }
 
   return false;
+}
+
+function cachedTokenActiveEffects(token) {
+  if (token.kind === "character") {
+    const active = tokenCharacter(token)?.sheet?.activeBuffs;
+    return Array.isArray(active) ? active : null;
+  }
+  if (token.kind === "enemy") {
+    const enemy = mapEnemies.find((entry) => entry.id === token.enemyId);
+    const active = enemy?.sheet?.activeBuffs || token.sheet?.activeBuffs;
+    return Array.isArray(active) ? active : null;
+  }
+  return null;
 }
 
 async function loadTokenActiveEffects(token) {
@@ -9438,6 +9126,26 @@ function hideQuickEffectTargetsBeforeChoices() {
   });
 }
 
+async function endActivationGroupForToken(
+  token,
+  activationGroup,
+  sourceTokenId,
+) {
+  if (!token || !activationGroup || !sourceTokenId) return;
+  const active = await loadTokenActiveEffects(token);
+  const sourceId = String(sourceTokenId);
+  const retained = active.filter(
+    (effect) =>
+      !(
+        effect.activationGroup === activationGroup &&
+        String(effect.activationSourceId || effect.sourceTokenId || "") ===
+          sourceId
+      ),
+  );
+  if (retained.length !== active.length)
+    await saveTokenActiveEffects(token, retained);
+}
+
 async function confirmQuickEffectTargets() {
   if (!quickEffectSelection?.effect) return;
   const selectedTokenIds = [
@@ -9456,6 +9164,20 @@ async function confirmQuickEffectTargets() {
   await hideQuickEffectTargetsBeforeChoices();
   const sourceTokenId =
     quickEffectSelection.sourceTokenId || quickEffectSourceTokenId || "";
+  const selectedTargetIds = new Set(selectedTokenIds);
+  const removedTargets = (quickEffectSelection.previousTargetIds || [])
+    .filter((tokenId) => !selectedTargetIds.has(tokenId))
+    .map(tokenById)
+    .filter(Boolean);
+  await Promise.all(
+    removedTargets.map((token) =>
+      endActivationGroupForToken(
+        token,
+        quickEffectSelection.effect.activationGroup,
+        sourceTokenId,
+      ),
+    ),
+  );
   const queuedTargets = [];
   const readyTargets = [];
   for (const token of targets) {
@@ -9501,7 +9223,6 @@ async function confirmQuickEffectTargets() {
     return;
   }
 
-  incrementQuickEffectUsage(quickEffectSelection.effect);
   const actor = await currentActorName();
   const effectName = quickEffectSelection.effect.name || "Effect";
   if (appliedTargets.length) {
@@ -11127,14 +10848,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       flushPendingRemoteState();
   }, 3000);
   quickEffectModal = new bootstrap.Modal(el("quickEffectModal"));
-  quickConditionModal = new bootstrap.Modal(el("quickConditionModal"));
   quickEffectTargetsModal = new bootstrap.Modal(el("quickEffectTargetsModal"));
-  el("quickConditionModal").addEventListener("hidden.bs.modal", () => {
-    if (!quickConditionReturnToPicker) return;
-    quickConditionReturnToPicker = false;
-    quickConditionEffect = null;
-    quickEffectModal.show();
-  });
+  window.PFEffectTracker?.browser?.prepare?.();
   rollModal = new bootstrap.Modal(el("rollModal"));
   rollResultModal = new bootstrap.Modal(el("rollResultModal"));
   el("rollResultModal").addEventListener("hidden.bs.modal", () =>
@@ -11147,11 +10862,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     quickEffectVisibleLimit = QUICK_EFFECT_BATCH_SIZE;
     renderQuickEffects();
   });
+  el("quickEffectNav").innerHTML =
+    window.PFEffectTracker?.browser?.navHtml?.() || "";
   el("quickEffectNav")
-    .querySelectorAll("[data-quick-effect-group]")
+    .querySelectorAll("[data-effect-browser-group]")
     .forEach((button) =>
       button.addEventListener("click", () =>
-        selectQuickEffectGroup(button.dataset.quickEffectGroup),
+        selectQuickEffectGroup(button.dataset.effectBrowserGroup),
       ),
     );
   el("addCharacterToken").addEventListener("click", () =>

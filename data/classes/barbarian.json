@@ -34,8 +34,14 @@
                     "prestige": false
                   },
                   "milestones": [
-                    { "level": 11, "value": 6 },
-                    { "level": 20, "value": 8 }
+                    {
+                      "level": 11,
+                      "value": 6
+                    },
+                    {
+                      "level": 20,
+                      "value": 8
+                    }
                   ],
                   "every": null
                 }
@@ -54,8 +60,14 @@
                     "prestige": false
                   },
                   "milestones": [
-                    { "level": 11, "value": 6 },
-                    { "level": 20, "value": 8 }
+                    {
+                      "level": 11,
+                      "value": 6
+                    },
+                    {
+                      "level": 20,
+                      "value": 8
+                    }
                   ],
                   "every": null
                 }
@@ -74,8 +86,14 @@
                     "prestige": false
                   },
                   "milestones": [
-                    { "level": 11, "value": 3 },
-                    { "level": 20, "value": 4 }
+                    {
+                      "level": 11,
+                      "value": 3
+                    },
+                    {
+                      "level": 20,
+                      "value": 4
+                    }
                   ],
                   "every": null
                 }
@@ -3274,7 +3292,8 @@
                   "scrapeSource": "https://www.d20pfsrd.com/classes/core-classes/barbarian/rage-powers/",
                   "scrapeConfidence": "high"
                 }
-              ]
+              ],
+              "chooseContributionsOnActivate": true
             }
           ]
         },
@@ -6499,7 +6518,8 @@
                   "scrapeSource": "https://www.d20pfsrd.com/classes/core-classes/barbarian/rage-powers/",
                   "scrapeConfidence": "high"
                 }
-              ]
+              ],
+              "chooseContributionsOnActivate": true
             }
           ]
         }
@@ -9675,7 +9695,8 @@
                   "scrapeSource": "https://www.d20pfsrd.com/classes/core-classes/barbarian/rage-powers/",
                   "scrapeConfidence": "high"
                 }
-              ]
+              ],
+              "chooseContributionsOnActivate": true
             }
           ]
         }
@@ -12851,7 +12872,8 @@
                   "scrapeSource": "https://www.d20pfsrd.com/classes/core-classes/barbarian/rage-powers/",
                   "scrapeConfidence": "high"
                 }
-              ]
+              ],
+              "chooseContributionsOnActivate": true
             }
           ]
         }
@@ -16026,7 +16048,8 @@
                   "scrapeSource": "https://www.d20pfsrd.com/classes/core-classes/barbarian/rage-powers/",
                   "scrapeConfidence": "high"
                 }
-              ]
+              ],
+              "chooseContributionsOnActivate": true
             }
           ]
         }
@@ -19202,7 +19225,8 @@
                   "scrapeSource": "https://www.d20pfsrd.com/classes/core-classes/barbarian/rage-powers/",
                   "scrapeConfidence": "high"
                 }
-              ]
+              ],
+              "chooseContributionsOnActivate": true
             }
           ]
         }
@@ -22387,7 +22411,8 @@
                   "scrapeSource": "https://www.d20pfsrd.com/classes/core-classes/barbarian/rage-powers/",
                   "scrapeConfidence": "high"
                 }
-              ]
+              ],
+              "chooseContributionsOnActivate": true
             }
           ]
         }
@@ -25557,7 +25582,8 @@
                   "scrapeSource": "https://www.d20pfsrd.com/classes/core-classes/barbarian/rage-powers/",
                   "scrapeConfidence": "high"
                 }
-              ]
+              ],
+              "chooseContributionsOnActivate": true
             }
           ]
         }
@@ -28733,7 +28759,8 @@
                   "scrapeSource": "https://www.d20pfsrd.com/classes/core-classes/barbarian/rage-powers/",
                   "scrapeConfidence": "high"
                 }
-              ]
+              ],
+              "chooseContributionsOnActivate": true
             }
           ]
         }
@@ -31914,7 +31941,8 @@
                   "scrapeSource": "https://www.d20pfsrd.com/classes/core-classes/barbarian/rage-powers/",
                   "scrapeConfidence": "high"
                 }
-              ]
+              ],
+              "chooseContributionsOnActivate": true
             }
           ]
         }

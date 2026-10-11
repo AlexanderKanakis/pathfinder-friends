@@ -179,6 +179,7 @@
     entries.push(...optionEntries);
 
     const contributedOptions = new Map();
+    const optionalContributedOptions = new Map();
     entries.forEach(({ feature, context }) => {
       featurePools(feature).forEach((pool) => {
         const target = String(pool.contributesToAbility || "").trim();
@@ -194,10 +195,26 @@
         );
         if (!option) return;
         const targetKey = target.toLowerCase();
-        const list = contributedOptions.get(targetKey) || [];
+        const targetMap = pool.chooseContributionsOnActivate
+          ? optionalContributedOptions
+          : contributedOptions;
+        const list = targetMap.get(targetKey) || [];
         list.push(option);
-        contributedOptions.set(targetKey, list);
+        targetMap.set(targetKey, list);
       });
+    });
+
+    const selectableContributions = new Map();
+    optionalContributedOptions.forEach((options, targetKey) => {
+      selectableContributions.set(
+        targetKey,
+        terminalOptions(options).map((option, index) => ({
+          id: String(option.id || option.name || `contribution-${index + 1}`),
+          name: option.name || `Option ${index + 1}`,
+          description: option.description || option.summary || "",
+          ...(window.PFEffectMechanics?.copyMechanics?.(option) || {}),
+        })),
+      );
     });
 
     const contributedEffects = new Map();
@@ -394,6 +411,7 @@
       const bundledConditionalVariables =
         contributedConditionalVariables.get(targetKey) || [];
       const bundledNames = contributedNames.get(targetKey) || [];
+      const contributionOptions = selectableContributions.get(targetKey) || [];
       const durationConfig = activeFeature.durationConfig || feature.durationConfig || {
         count: null,
         unit: "variable",
@@ -530,8 +548,26 @@
         ...(grantDomains.length ? { grantDomains } : {}),
         ...(generatedEquipment.length ? { generatedEquipment } : {}),
         ...(conditionalVariables.length ? { conditionalVariables } : {}),
+        ...(contributionOptions.length ? { contributionOptions } : {}),
         durationConfig,
         auraConfig: activeFeature.auraConfig || null,
+        ...(activeFeature.activationGroup || feature.activationGroup
+          ? {
+              activationGroup:
+                activeFeature.activationGroup || feature.activationGroup,
+            }
+          : {}),
+        ...(activeFeature.abilityFamily || feature.abilityFamily
+          ? {
+              abilityFamily: activeFeature.abilityFamily || feature.abilityFamily,
+            }
+          : {}),
+        ...(activeFeature.resourcePool || feature.resourcePool
+          ? { resourcePool: activeFeature.resourcePool || feature.resourcePool }
+          : {}),
+        ...(activeFeature.trackActive || feature.trackActive
+          ? { trackActive: true }
+          : {}),
         ...(window.PFEffectMechanics?.hasBranches?.(activeFeature)
           ? { branches: activeFeature.branches }
           : {}),

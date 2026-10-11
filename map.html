@@ -746,95 +746,27 @@
       aria-hidden="true"
     >
       <div
-        class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable search-modal-dialog"
+        class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable effect-search-modal-dialog"
       >
         <div class="modal-content bg-dark text-white border-secondary">
           <div class="modal-header border-secondary">
             <h5 class="modal-title" id="quickEffectModalLabel">Apply Effect</h5>
           </div>
-          <div class="modal-body">
+          <div class="modal-body effect-search-modal-body">
             <nav
               id="quickEffectNav"
-              class="nav nav-pills map-side-nav quick-effect-nav"
+              class="nav nav-pills effect-browser-nav"
               aria-label="Effect groups"
               role="tablist"
-            >
-              <button
-                class="nav-link active"
-                type="button"
-                data-quick-effect-group="spells"
-                aria-selected="true"
-                role="tab"
-              >
-                Spells
-              </button>
-              <button
-                class="nav-link"
-                type="button"
-                data-quick-effect-group="conditions"
-                aria-selected="false"
-                role="tab"
-              >
-                Conditions
-              </button>
-              <button
-                class="nav-link"
-                type="button"
-                data-quick-effect-group="class"
-                aria-selected="false"
-                role="tab"
-              >
-                Class
-              </button>
-              <button
-                class="nav-link"
-                type="button"
-                data-quick-effect-group="racial"
-                aria-selected="false"
-                role="tab"
-              >
-                Racials
-              </button>
-              <button
-                class="nav-link"
-                type="button"
-                data-quick-effect-group="feats"
-                aria-selected="false"
-                role="tab"
-              >
-                Feats
-              </button>
-              <button
-                class="nav-link"
-                type="button"
-                data-quick-effect-group="items"
-                aria-selected="false"
-                role="tab"
-              >
-                Items
-              </button>
-              <button
-                class="nav-link"
-                type="button"
-                data-quick-effect-group="other"
-                aria-selected="false"
-                role="tab"
-              >
-                Other
-              </button>
-            </nav>
+            ></nav>
             <input
               id="quickEffectSearch"
               class="form-control form-control-sm mb-3"
               placeholder="Search effects"
             />
-            <section id="quickEffectMostUsedWrap" class="mb-4">
-              <div class="side-title">Most Used</div>
-              <div id="quickEffectMostUsed" class="quick-effect-grid"></div>
-            </section>
             <div
               id="quickEffectResults"
-              class="quick-effect-grid search-modal-results"
+              class="effect-search-results effect-browser-list"
             ></div>
           </div>
           <div class="modal-footer border-secondary">
@@ -844,99 +776,6 @@
               data-bs-dismiss="modal"
             >
               Cancel
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div
-      class="modal fade"
-      id="quickConditionModal"
-      tabindex="-1"
-      aria-labelledby="quickConditionModalLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content bg-dark text-white border-secondary">
-          <div class="modal-header border-secondary">
-            <h5 class="modal-title" id="quickConditionModalLabel">Condition</h5>
-          </div>
-          <div class="modal-body">
-            <div id="quickConditionDescription" class="quick-condition-description"></div>
-            <div id="quickConditionAbilityField" class="mb-3 d-none">
-              <label for="quickConditionAbility">Ability</label>
-              <select id="quickConditionAbility" class="form-select form-select-sm"></select>
-            </div>
-            <div id="quickConditionAmountField" class="quick-condition-turns-field d-none">
-              <label id="quickConditionAmountLabel" for="quickConditionAmount">Amount</label>
-              <div class="item-number-stepper quick-condition-turns" data-item-stepper>
-                <button
-                  type="button"
-                  class="btn btn-outline-light btn-sm item-stepper-btn"
-                  data-item-stepper-delta="-1"
-                  aria-label="Decrease condition amount"
-                >
-                  -
-                </button>
-                <input
-                  id="quickConditionAmount"
-                  class="form-control form-control-sm no-spinner"
-                  type="number"
-                  min="1"
-                  value="1"
-                  inputmode="numeric"
-                />
-                <button
-                  type="button"
-                  class="btn btn-outline-light btn-sm item-stepper-btn"
-                  data-item-stepper-delta="1"
-                  aria-label="Increase condition amount"
-                >
-                  +
-                </button>
-              </div>
-            </div>
-            <div id="quickConditionTurnsField" class="quick-condition-turns-field">
-              <label for="quickConditionTurns">Turns</label>
-              <div class="item-number-stepper quick-condition-turns" data-item-stepper>
-                <button
-                  type="button"
-                  class="btn btn-outline-light btn-sm item-stepper-btn"
-                  data-item-stepper-delta="-1"
-                  aria-label="Decrease turns"
-                >
-                  -
-                </button>
-                <input
-                  id="quickConditionTurns"
-                  class="form-control form-control-sm no-spinner"
-                  type="number"
-                  min="1"
-                  value="1"
-                  inputmode="numeric"
-                />
-                <button
-                  type="button"
-                  class="btn btn-outline-light btn-sm item-stepper-btn"
-                  data-item-stepper-delta="1"
-                  aria-label="Increase turns"
-                >
-                  +
-                </button>
-              </div>
-            </div>
-          </div>
-          <div class="modal-footer border-secondary">
-            <button
-              type="button"
-              class="btn btn-outline-light btn-sm"
-              data-bs-dismiss="modal"
-            >
-              Cancel
-            </button>
-            <button id="confirmQuickCondition" class="btn btn-success btn-sm" type="button">
-              Apply Condition
             </button>
           </div>
         </div>
@@ -985,26 +824,6 @@
             >
               Apply Effect
             </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div
-      class="modal fade"
-      id="quickEffectInfoModal"
-      tabindex="-1"
-      aria-labelledby="quickEffectInfoModalLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content bg-dark text-white border-secondary">
-          <div class="modal-header border-secondary">
-            <h5 class="modal-title" id="quickEffectInfoModalLabel">Effect Details</h5>
-          </div>
-          <div class="modal-body" id="quickEffectInfoBody"></div>
-          <div class="modal-footer border-secondary">
-            <button type="button" class="btn btn-outline-light btn-sm" data-bs-dismiss="modal">Cancel</button>
           </div>
         </div>
       </div>
@@ -1569,11 +1388,11 @@
     <script src="modals/pending-effect-choices.js?v=trained-skills-1"></script>
     <script src="scripts/effect-catalog.js?v=effect-browser-1"></script>
     <script src="scripts/condition-config.js?v=active-conditions-3"></script>
-    <script src="scripts/buff-tracker-widget.js?v=trained-skills-1"></script>
+    <script src="scripts/buff-tracker-widget.js?v=effect-browser-shared-1"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="modals/map-hp-editor.js"></script>
     <script src="scripts/wall-patterns.js"></script>
-    <script src="scripts/pages/map.js?v=trained-skills-1"></script>
+    <script src="scripts/pages/map.js?v=effect-browser-shared-1"></script>
     <script src="scripts/modal-rules.js?v=mobile-compact-1"></script>
   </body>
 </html>

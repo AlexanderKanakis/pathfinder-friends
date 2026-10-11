@@ -72,6 +72,10 @@
                 <label for="classFeaturePoolContributesTo">Contributes To Active Feature</label>
                 <input id="classFeaturePoolContributesTo" class="form-control form-control-sm" placeholder="Rage">
                 <div class="small-text">If set, a selected choice's effects are bundled into that active feature when it's used (e.g. rage powers into Rage) instead of applying on their own.</div>
+                <div class="form-check form-switch mt-2">
+                  <input id="classFeaturePoolChooseOnActivate" class="form-check-input" type="checkbox">
+                  <label class="form-check-label" for="classFeaturePoolChooseOnActivate">Caster chooses contributions when activating</label>
+                </div>
               </div>
               <div class="mb-3">
                 <label for="classFeaturePoolRequirementText">Requirement Notes</label>
@@ -321,6 +325,10 @@
         .value.trim(),
       requirements,
       ...(contributesToAbility ? { contributesToAbility } : {}),
+      ...(contributesToAbility &&
+      document.getElementById("classFeaturePoolChooseOnActivate").checked
+        ? { chooseContributionsOnActivate: true }
+        : {}),
       options,
     };
   }
@@ -340,6 +348,8 @@
       req.text || "";
     document.getElementById("classFeaturePoolContributesTo").value =
       pool.contributesToAbility || "";
+    document.getElementById("classFeaturePoolChooseOnActivate").checked =
+      Boolean(pool.chooseContributionsOnActivate);
     document.getElementById("classFeaturePoolOptionSearch").value = "";
     document.getElementById("classFeaturePoolOptions").innerHTML = "";
     (Array.isArray(pool.options) ? pool.options : []).forEach((option) =>

@@ -1070,6 +1070,9 @@ function syncPoolAcrossLevels(levelIndex, featureIndex, poolIndex) {
         if (sourcePool.contributesToAbility)
           pool.contributesToAbility = sourcePool.contributesToAbility;
         else delete pool.contributesToAbility;
+        if (sourcePool.chooseContributionsOnActivate)
+          pool.chooseContributionsOnActivate = true;
+        else delete pool.chooseContributionsOnActivate;
         (pool.options || []).forEach((option) => {
           const match = (sourcePool.options || []).find(
             (candidate) => candidate.name === option.name,

@@ -705,8 +705,25 @@
         pollOptions.contextKey,
         request.character_id,
       );
+      const current = Array.isArray(existing) ? existing : [];
+      const activationSourceId = String(
+        variableResolved.activationSourceId ||
+          variableResolved.sourceTokenId ||
+          "",
+      );
+      const retained = variableResolved.activationGroup
+        ? current.filter(
+            (effect) =>
+              !(
+                effect.activationGroup === variableResolved.activationGroup &&
+                String(
+                  effect.activationSourceId || effect.sourceTokenId || "",
+                ) === activationSourceId
+              ),
+          )
+        : current;
       const nextBuffs = [
-        ...(Array.isArray(existing) ? existing : []),
+        ...retained,
         variableResolved,
       ];
       const saved = await window.PFApp.saveBuffState(
