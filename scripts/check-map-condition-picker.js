@@ -27,13 +27,21 @@ function functionBody(source, name) {
 assert(mapHtml.includes('id="quickConditionModal"'));
 assert(mapHtml.includes('id="quickConditionDescription"'));
 assert(mapHtml.includes('id="quickConditionTurns"'));
+assert(mapHtml.includes('id="quickConditionAbility"'));
+assert(mapHtml.includes('id="quickConditionAmount"'));
+assert(
+  mapHtml.indexOf('id="quickConditionAbilityField"') <
+    mapHtml.indexOf('id="quickConditionAmountField"') &&
+    mapHtml.indexOf('id="quickConditionAmountField"') <
+      mapHtml.indexOf('id="quickConditionTurnsField"'),
+);
 assert(mapHtml.includes('data-item-stepper-delta="-1"'));
 assert(mapHtml.includes('data-item-stepper-delta="1"'));
 assert(mapHtml.includes('id="confirmQuickCondition"'));
 
 const cardBody = functionBody(mapJs, "effectCardHtml");
 const conditionBranch = cardBody.slice(
-  cardBody.indexOf("if (condition && !passive)"),
+  cardBody.indexOf("if (condition)"),
   cardBody.indexOf("const needsCl"),
 );
 assert(conditionBranch.includes("quick-condition-card"));
@@ -46,7 +54,12 @@ const bindingBody = functionBody(mapJs, "bindQuickEffectCards");
 assert(bindingBody.includes("openQuickConditionConfig(effect)"));
 const confirmationBody = functionBody(mapJs, "confirmQuickConditionConfig");
 assert(confirmationBody.includes("quickConditionTurns"));
+assert(confirmationBody.includes("PFConditionConfig.configure"));
+assert(confirmationBody.includes("quickConditionAbility"));
+assert(confirmationBody.includes("quickConditionAmount"));
 assert(confirmationBody.includes("permanent: false"));
 assert(confirmationBody.includes("chooseQuickEffect"));
+
+assert(!functionBody(mapJs, "effectCardHtml").includes("data-quick-permanent"));
 
 console.log("Map condition picker checks passed.");

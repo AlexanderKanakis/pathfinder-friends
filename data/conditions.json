@@ -675,5 +675,76 @@
       }
     ],
     "description": "Knocked out and helpless."
+  },
+  {
+    "id": "condition-ability-damage",
+    "name": "Ability Damage",
+    "category": "Condition",
+    "duration": "permanent",
+    "durationConfig": null,
+    "bonuses": [
+      {
+        "stat": "strength",
+        "value": -1,
+        "type": "ability damage",
+        "stacks": true
+      }
+    ],
+    "adjustableCondition": {
+      "kind": "ability-damage",
+      "label": "Value",
+      "amount": 1,
+      "minimum": 1,
+      "stat": "strength"
+    },
+    "description": "Reduces one selected ability score by the chosen amount until the damage is healed."
+  },
+  {
+    "id": "condition-ability-drain",
+    "name": "Ability Drain",
+    "category": "Condition",
+    "duration": "permanent",
+    "durationConfig": null,
+    "bonuses": [
+      {
+        "stat": "strength",
+        "value": -1,
+        "type": "ability drain",
+        "stacks": true
+      }
+    ],
+    "adjustableCondition": {
+      "kind": "ability-drain",
+      "label": "Value",
+      "amount": 1,
+      "minimum": 1,
+      "stat": "strength"
+    },
+    "description": "Permanently reduces one selected ability score by the chosen amount until the drain is restored."
+  },
+  {
+    "id": "condition-negative-level",
+    "name": "Negative Level",
+    "category": "Condition",
+    "duration": "permanent",
+    "durationConfig": null,
+    "bonuses": [
+      { "stat": "ability checks", "value": -1, "type": "negative level", "stacks": true, "negativeLevelPenalty": true },
+      { "stat": "melee attack", "value": -1, "type": "negative level", "stacks": true, "negativeLevelPenalty": true },
+      { "stat": "ranged attack", "value": -1, "type": "negative level", "stacks": true, "negativeLevelPenalty": true },
+      { "stat": "cmb", "value": -1, "type": "negative level", "stacks": true, "negativeLevelPenalty": true },
+      { "stat": "cmd", "value": -1, "type": "negative level", "stacks": true, "negativeLevelPenalty": true },
+      { "stat": "all saves", "value": -1, "type": "negative level", "stacks": true, "negativeLevelPenalty": true },
+      { "stat": "skill checks", "value": -1, "type": "negative level", "stacks": true, "negativeLevelPenalty": true },
+      { "stat": "hit points", "value": -5, "type": "negative level", "stacks": true, "negativeLevelPenalty": true },
+      { "stat": "current hit points", "value": -5, "type": "negative level", "stacks": true, "negativeLevelPenalty": true }
+    ],
+    "adjustableCondition": {
+      "kind": "negative-level",
+      "label": "Value",
+      "amount": 1,
+      "minimum": 1
+    },
+    "description": "Each negative level applies a cumulative -1 penalty to ability checks, attack rolls, combat maneuver checks, CMD, saving throws, and skill checks, and reduces current and total hit points by 5."
   }
 ]

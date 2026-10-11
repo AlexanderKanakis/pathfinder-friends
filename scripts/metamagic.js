@@ -10,6 +10,7 @@
     "immunities",
     "applyConditions",
     "classSkillGrants",
+    "useUntrained",
     "bonusRanks",
     "extraRanksPerLevel",
     "featGrants",
@@ -443,7 +444,7 @@
         rider.durationConfig = null;
         rider.adjustableCondition = {
           kind: "ability-damage",
-          label,
+          label: "Value",
           amount: 2,
           minimum: 0,
           stat,

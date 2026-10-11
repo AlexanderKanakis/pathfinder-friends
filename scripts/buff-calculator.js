@@ -2052,6 +2052,10 @@
       Number(baseline.hitDice || 0) *
         (abilityMods.constitution - abilityMod(baseline.con)) +
       (direct["hit points"] || 0);
+    totals["current hit points"] =
+      Number(baseline.currentHitPoints || 0) +
+      (direct["current hit points"] || 0);
+    totals["ability checks"] = direct["ability checks"] || 0;
     totals["skill checks"] = direct["skill checks"] || 0;
     totals["trained skill checks"] = direct["trained skill checks"] || 0;
     totals["untrained skill checks"] = direct["untrained skill checks"] || 0;
@@ -2117,6 +2121,8 @@
         Number(baseline.cmdMisc || 0));
     bonuses["hit points"] =
       totals["hit points"] - Number(baseline.hitPoints || 0);
+    bonuses["current hit points"] =
+      totals["current hit points"] - Number(baseline.currentHitPoints || 0);
     cmdAcApplied.used.forEach((b) =>
       addBreakdown(
         breakdown,

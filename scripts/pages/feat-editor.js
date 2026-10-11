@@ -577,6 +577,7 @@ function commitSelectedFeat() {
     immunities: extras.immunities || [],
     applyConditions: extras.applyConditions || [],
     classSkillGrants: extras.classSkillGrants || [],
+    useUntrained: extras.useUntrained || [],
     bonusRanks: extras.bonusRanks || [],
     extraRanksPerLevel: extras.extraRanksPerLevel || [],
     featGrants: extras.featGrants || [],

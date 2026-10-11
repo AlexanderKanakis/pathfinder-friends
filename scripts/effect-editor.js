@@ -834,6 +834,55 @@
     `;
   }
 
+  function useUntrainedOptionsHtml(selected = "", { skills } = {}) {
+    const option = (value, label) =>
+      `<option value="${escapeHtml(value)}" ${selected === value ? "selected" : ""}>${escapeHtml(label)}</option>`;
+    const customSkillLists = (window.PFEffectStats?.customSkillLists?.() || [])
+      .filter((list) =>
+        window.PFEffectStats?.customSkillListIsSkillOnly
+          ? window.PFEffectStats.customSkillListIsSkillOnly(list)
+          : true,
+      );
+    const poolIds = [
+      "skills-trained",
+      "skills-class-trained",
+      "skills-knowledge",
+      "skills-all",
+    ];
+    return `
+      <optgroup label="Skill Groups">
+        ${option("trained skill checks", "All Trained-Only Skills")}
+        ${option("class trained skill checks", "Class Trained-Only Skills")}
+        ${option("knowledge skill checks", "Knowledge Skills")}
+        ${option("skill checks", "All Skills")}
+        ${customSkillLists
+          .map((list) =>
+            option(
+              window.PFEffectStats.skillListStatValue(list),
+              customSkillListDisplayLabel(list),
+            ),
+          )
+          .join("")}
+        ${option(window.PFEffectStats?.CREATE_SKILL_LIST_STAT_VALUE || "__create-custom-skill-list-stat__", "Create custom skill list...")}
+      </optgroup>
+      <optgroup label="Choose When Applied">
+        ${poolIds
+          .map((id) => {
+            const pool = window.PFEffectStats?.poolById?.(id);
+            return option(`choice:${id}`, `${pool?.label || id} (choose one)`);
+          })
+          .join("")}
+        ${customSkillLists
+          .map((list) => {
+            const stat = window.PFEffectStats.skillListStatValue(list);
+            return option(`choice:${stat}`, `${customSkillListDisplayLabel(list)} (choose one)`);
+          })
+          .join("")}
+        ${option(window.PFEffectStats?.CREATE_SKILL_LIST_CHOICE_VALUE || "__create-custom-skill-list-choice__", "Create custom skill list...")}
+      </optgroup>
+    `;
+  }
+
   function bonusRanksStatOptionsHtml(selected = "", { skills } = {}) {
     const option = (value, label) =>
       `<option value="${escapeHtml(value)}" ${selected === value ? "selected" : ""}>${escapeHtml(label)}</option>`;
@@ -1642,6 +1691,63 @@
     return `${label} becomes a class skill`;
   }
 
+  function createUseUntrainedRow(data = {}, { onDelete, skills } = {}) {
+    const row = document.createElement("div");
+    row.className = "shared-use-untrained-row";
+    row.innerHTML = `
+      <div>
+        <label>Skills</label>
+        <select data-use-untrained-field="stat" class="form-select form-select-sm">
+          ${useUntrainedOptionsHtml(String(data.stat || "trained skill checks"), { skills })}
+        </select>
+      </div>
+      <button class="btn btn-outline-danger btn-sm" type="button" aria-label="Delete use untrained rule"><i class="bi bi-trash"></i></button>
+    `;
+    const statSelect = row.querySelector('[data-use-untrained-field="stat"]');
+    wireCustomSkillListSelect(statSelect, {
+      skills,
+      renderOptions: (selected) =>
+        useUntrainedOptionsHtml(selected, { skills }),
+    });
+    row
+      .querySelector('button[aria-label="Delete use untrained rule"]')
+      .addEventListener("click", () => {
+        row.remove();
+        onDelete?.();
+      });
+    const collect = () => {
+      const stat = statSelect.value;
+      if (!stat) return null;
+      const entry = { stat };
+      const skillList = customSkillListPayloadForStat(stat);
+      if (skillList) entry.skillList = skillList;
+      if (window.PFEffectStats?.isChoiceStat(stat)) {
+        const poolId = window.PFEffectStats.choicePoolIdFromStat(stat);
+        const choicePool = customSkillListPayloadForStat(poolId);
+        if (choicePool) entry.choicePool = choicePool;
+      }
+      return entry;
+    };
+    row._collect = collect;
+    return { element: row, collect };
+  }
+
+  function useUntrainedText(entry = {}) {
+    const labels = {
+      "trained skill checks": "All trained-only skills",
+      "class trained skill checks": "Class trained-only skills",
+      "knowledge skill checks": "Knowledge skills",
+      "skill checks": "All skills",
+    };
+    const stat = String(entry.stat || "");
+    const label =
+      labels[stat] ||
+      window.PFEffectStats?.skillLabelForStatKey?.(stat) ||
+      window.PFEffectStats?.choiceStatLabel?.(stat) ||
+      titleCaseStat(stat || "Skills");
+    return `Use untrained: ${label}`;
+  }
+
   function createBonusRanksRow(data = {}, { onDelete, skills } = {}) {
     const row = document.createElement("div");
     row.className = "shared-bonus-ranks-row";
@@ -2210,6 +2316,9 @@
       immunities: Array.isArray(condition.immunities) ? condition.immunities : [],
       classSkillGrants: Array.isArray(condition.classSkillGrants)
         ? condition.classSkillGrants
+        : [],
+      useUntrained: Array.isArray(condition.useUntrained)
+        ? condition.useUntrained
         : [],
       extraRanksPerLevel: Array.isArray(condition.extraRanksPerLevel)
         ? condition.extraRanksPerLevel
@@ -4340,6 +4449,13 @@ function createDamageRollRow(data = {}, { onDelete, onChange } = {}) {
             </div>
             <div class="shared-extra-subsection">
               <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
+                <div class="small text-secondary">Use Untrained</div>
+                <button id="${prefix}AddUseUntrained" class="btn btn-outline-info btn-sm" type="button">Add Rule</button>
+              </div>
+              <div id="${prefix}UseUntrainedRows" class="vstack gap-2"></div>
+            </div>
+            <div class="shared-extra-subsection">
+              <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
                 <div class="small text-secondary">Bonus Ranks</div>
                 <button id="${prefix}AddBonusRanks" class="btn btn-outline-info btn-sm" type="button">Add Bonus Ranks</button>
               </div>
@@ -4431,6 +4547,9 @@ function createDamageRollRow(data = {}, { onDelete, onChange } = {}) {
       `${prefix}ApplyConditionRows`,
     );
     const csRowsEl = document.getElementById(`${prefix}ClassSkillRows`);
+    const useUntrainedRowsEl = document.getElementById(
+      `${prefix}UseUntrainedRows`,
+    );
     const bonusRanksRowsEl = document.getElementById(`${prefix}BonusRanksRows`);
     const extraRanksRowsEl = document.getElementById(
       `${prefix}ExtraRanksPerLevelRows`,
@@ -4472,6 +4591,7 @@ function createDamageRollRow(data = {}, { onDelete, onChange } = {}) {
         immunityRowsEl.children.length +
         applyConditionRowsEl.children.length +
         csRowsEl.children.length +
+        useUntrainedRowsEl.children.length +
         bonusRanksRowsEl.children.length +
         extraRanksRowsEl.children.length +
         grantDomainRowsEl.children.length +
@@ -4527,6 +4647,14 @@ function createDamageRollRow(data = {}, { onDelete, onChange } = {}) {
         skills: options.skills,
       });
       csRowsEl.appendChild(element);
+      updateCount();
+    };
+    const addUseUntrained = (data = {}) => {
+      const { element } = createUseUntrainedRow(data, {
+        onDelete: updateCount,
+        skills: options.skills,
+      });
+      useUntrainedRowsEl.appendChild(element);
       updateCount();
     };
     const addExtraRanksPerLevel = (data = {}) => {
@@ -4644,6 +4772,9 @@ function createDamageRollRow(data = {}, { onDelete, onChange } = {}) {
       .getElementById(`${prefix}AddClassSkill`)
       .addEventListener("click", () => addClassSkill());
     document
+      .getElementById(`${prefix}AddUseUntrained`)
+      .addEventListener("click", () => addUseUntrained());
+    document
       .getElementById(`${prefix}AddExtraRanksPerLevel`)
       .addEventListener("click", () => addExtraRanksPerLevel());
     document
@@ -4684,6 +4815,7 @@ function createDamageRollRow(data = {}, { onDelete, onChange } = {}) {
       addImmunity,
       addApplyCondition,
       addClassSkill,
+      addUseUntrained,
       addBonusRanks,
       addExtraRanksPerLevel,
       addGrantDomain,
@@ -4702,6 +4834,7 @@ function createDamageRollRow(data = {}, { onDelete, onChange } = {}) {
         immunityRowsEl.innerHTML = "";
         applyConditionRowsEl.innerHTML = "";
         csRowsEl.innerHTML = "";
+        useUntrainedRowsEl.innerHTML = "";
         bonusRanksRowsEl.innerHTML = "";
         extraRanksRowsEl.innerHTML = "";
         grantDomainRowsEl.innerHTML = "";
@@ -4732,6 +4865,9 @@ function createDamageRollRow(data = {}, { onDelete, onChange } = {}) {
         ).forEach(addApplyCondition);
         (Array.isArray(item.classSkillGrants) ? item.classSkillGrants : []).forEach(
           addClassSkill,
+        );
+        (Array.isArray(item.useUntrained) ? item.useUntrained : []).forEach(
+          addUseUntrained,
         );
         (Array.isArray(item.bonusRanks) ? item.bonusRanks : []).forEach(
           addBonusRanks,
@@ -4788,6 +4924,7 @@ function createDamageRollRow(data = {}, { onDelete, onChange } = {}) {
           immunities: collectRows(immunityRowsEl),
           applyConditions: collectRows(applyConditionRowsEl),
           classSkillGrants: collectRows(csRowsEl),
+          useUntrained: collectRows(useUntrainedRowsEl),
           bonusRanks: collectRows(bonusRanksRowsEl),
           extraRanksPerLevel: collectRows(extraRanksRowsEl),
           grantDomains: collectRows(grantDomainRowsEl),
@@ -4925,6 +5062,7 @@ function createDamageRollRow(data = {}, { onDelete, onChange } = {}) {
       addImmunity: extra.addImmunity,
       addApplyCondition: extra.addApplyCondition,
       addClassSkill: extra.addClassSkill,
+      addUseUntrained: extra.addUseUntrained,
       addExtraRanksPerLevel: extra.addExtraRanksPerLevel,
       addSizeChange: extra.addSizeChange,
       addSpellLikeAbility: extra.addSpellLikeAbility,
@@ -5233,6 +5371,8 @@ function createDamageRollRow(data = {}, { onDelete, onChange } = {}) {
     applyConditionText,
     createConditionalVariableRow,
     createClassSkillRow,
+    createUseUntrainedRow,
+    useUntrainedText,
     createBonusRanksRow,
     bonusRanksText,
     createExtraRanksPerLevelRow,

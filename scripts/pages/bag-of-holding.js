@@ -1130,6 +1130,9 @@ function renderLootEffects(item) {
   const classSkillGrants = Array.isArray(item.classSkillGrants)
     ? item.classSkillGrants
     : [];
+  const useUntrained = Array.isArray(item.useUntrained)
+    ? item.useUntrained
+    : [];
   const bonusRanks = Array.isArray(item.bonusRanks) ? item.bonusRanks : [];
   const extraRanksPerLevel = Array.isArray(item.extraRanksPerLevel)
     ? item.extraRanksPerLevel
@@ -1154,6 +1157,9 @@ function renderLootEffects(item) {
           window.PFEffectEditor.titleCaseStat,
         ),
       ),
+    ),
+    ...useUntrained.map((entry) =>
+      escapeHtml(window.PFEffectEditor.useUntrainedText(entry)),
     ),
     ...bonusRanks.map((entry) =>
       escapeHtml(window.PFEffectEditor.bonusRanksText(entry)),
@@ -1280,6 +1286,7 @@ function lootEffectPayload(item = {}) {
     "immunities",
     "applyConditions",
     "classSkillGrants",
+    "useUntrained",
     "bonusRanks",
     "extraRanksPerLevel",
     "featGrants",
@@ -1503,6 +1510,7 @@ async function syncEditedLootBuff(item) {
       "immunities",
       "applyConditions",
       "classSkillGrants",
+      "useUntrained",
       "bonusRanks",
       "extraRanksPerLevel",
       "featGrants",
@@ -1528,6 +1536,7 @@ async function syncEditedLootBuff(item) {
       "immunities",
       "applyConditions",
       "classSkillGrants",
+      "useUntrained",
       "bonusRanks",
       "extraRanksPerLevel",
       "featGrants",
@@ -1711,10 +1720,6 @@ async function loadBagContext(contextKey, showLoading = true) {
   bagLoot = await PFApp.loadLootItems(bagContextKey);
   renderCharacterOptions(el("lootAssignedTo"));
   renderLoot();
-
-  const contexts = await PFApp.loadContexts();
-  const current = contexts.find((context) => context.key === bagContextKey);
-  el("contextHint").textContent = current ? `Context: ${current.label}` : "";
   clearLootStatus();
 }
 

@@ -3,6 +3,8 @@
 }
 
 .modal-content {
+  display: flex;
+  flex-direction: column;
   max-height: calc(100dvh - 1rem);
   overflow: hidden;
 }
@@ -13,6 +15,7 @@
 }
 
 .modal-body {
+  flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
 }
@@ -62,6 +65,15 @@
   max-height: 100dvh;
 }
 
+.modal.modal-workspace .modal-dialog {
+  height: calc(100dvh - 1rem);
+}
+
+.modal.modal-workspace .modal-content {
+  height: 100%;
+  max-height: 100%;
+}
+
 @media (min-width: 576px) {
   .modal-dialog {
     max-height: calc(100dvh - 3.5rem);
@@ -69,5 +81,70 @@
 
   .modal-content {
     max-height: calc(100dvh - 3.5rem);
+  }
+
+  .modal.modal-workspace .modal-dialog {
+    height: calc(100dvh - 3.5rem);
+  }
+}
+
+@media (max-width: 575.98px) {
+  .modal .modal-header,
+  .modal .modal-footer {
+    min-height: 0;
+    gap: 0.375rem;
+    padding: 0.45rem 0.65rem;
+  }
+
+  .modal .modal-title {
+    font-size: 1rem;
+    line-height: 1.2;
+  }
+
+  .modal .modal-body {
+    padding: 0.5rem;
+  }
+
+  .modal .form-label,
+  .modal legend {
+    margin-bottom: 0.2rem;
+    font-size: 0.75rem;
+    line-height: 1.2;
+  }
+
+  .modal .form-control,
+  .modal .form-select,
+  .modal .input-group-text,
+  .modal .btn {
+    min-height: 29px;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    line-height: 1.2;
+  }
+
+  .modal textarea.form-control {
+    min-height: 4.5rem;
+  }
+
+  .modal .nav-link {
+    min-height: 31px;
+    padding: 0.35rem 0.4rem;
+    font-size: 0.75rem;
+    line-height: 1.1;
+  }
+
+  .modal .accordion-button {
+    min-height: 34px;
+    padding: 0.45rem 0.65rem;
+    font-size: 0.75rem;
+    line-height: 1.2;
+  }
+
+  .modal .accordion-body {
+    padding: 0.5rem;
+  }
+
+  .modal-number-stepper {
+    grid-template-columns: 1.75rem minmax(0, 1fr) 1.75rem;
   }
 }

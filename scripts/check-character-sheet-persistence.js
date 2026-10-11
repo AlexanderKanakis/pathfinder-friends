@@ -67,6 +67,17 @@ assert(
     !recalculateSheetBody.includes("updateClassDerivedViews();"),
   "Ordinary stat recalculation must not rebuild class, feat, and spell panels.",
 );
+const inputListenersBody = sheetPage.slice(
+  sheetPage.indexOf("function attachInputListeners"),
+  sheetPage.indexOf("function queueSheetSave"),
+);
+assert(
+  sheetPage.includes("function updateCharacterLevelProgression()") &&
+    inputListenersBody.includes(
+      'if (input.id === "characterLevel") updateCharacterLevelProgression();',
+    ),
+  "Character-level input must immediately refresh class, feat, spell, and effect-source progression.",
+);
 assert(
   sheetPage.indexOf("void startPendingEffectChoicePolling();") >
     sheetPage.indexOf("await loadCurrentSheet(requestedCharacterId);"),
@@ -256,8 +267,8 @@ const skillsSectionMarkup = sheetHtml.slice(
 );
 const skillHeaderOrder = [
   "<th>Skill</th>",
-  "<span>Ranks</span>",
   "<th>Total</th>",
+  "<span>Ranks</span>",
   "<th>Ability</th>",
   "<th>Buff</th>",
   "<span>Misc</span>",
@@ -267,8 +278,8 @@ const skillRowRenderer = sheetPage.slice(
   sheetPage.indexOf("function adjustSkillNumber"),
 );
 const skillValueOrder = [
-  "${id}Ranks",
   "${id}Total",
+  "${id}Ranks",
   "${id}Ability",
   "${id}Buff",
   "${id}Misc",
@@ -284,7 +295,7 @@ assert(
       (index, position) =>
         position === 0 || index > skillValueOrder[position - 1],
     ),
-  "Skills must display Ranks before Total and place Misc last.",
+  "Skills must display Ranks after Total and place Misc last.",
 );
 assert(
   !sheetHtml.includes("skill-table-wrap") &&
@@ -308,6 +319,47 @@ const attributeTableMarkup = sheetHtml.slice(
 const saveTableMarkup = sheetHtml.slice(
   sheetHtml.indexOf('class="sheet-section full-order-saves"'),
   sheetHtml.indexOf('class="sheet-section full-order-bab"'),
+);
+const saveHeaderOrder = [
+  "<th>Save</th>",
+  "<th>Total</th>",
+  "<th>Base</th>",
+  "<th>Ability</th>",
+  "<th>Buff</th>",
+  "<span>Misc</span>",
+].map((marker) => saveTableMarkup.indexOf(marker));
+const saveRowRenderer = sheetPage.slice(
+  sheetPage.indexOf('el("saveRows").innerHTML'),
+  sheetPage.indexOf("if (!deferDynamicSections)"),
+);
+const saveValueOrder = [
+  "${key}Total",
+  "${key}Base",
+  "${key}Ability",
+  "${key}Buff",
+  "${key}Misc",
+].map((marker) => saveRowRenderer.indexOf(marker));
+assert(
+  saveHeaderOrder.every((index) => index >= 0) &&
+    saveHeaderOrder.every(
+      (index, position) =>
+        position === 0 || index > saveHeaderOrder[position - 1],
+    ) &&
+    saveValueOrder.every((index) => index >= 0) &&
+    saveValueOrder.every(
+      (index, position) =>
+        position === 0 || index > saveValueOrder[position - 1],
+    ),
+  "Saving Throws must place Misc after Buff.",
+);
+assert(
+  sheetCss.includes(
+    ".ability-table th:last-child,\n.ability-table td:last-child {\n  width: 96px;\n  padding-left: 0;\n  padding-right: 0;",
+  ) &&
+    sheetCss.includes(
+      ".save-table th:nth-child(6),\n.save-table td:nth-child(6) {\n  width: 96px;\n  padding-left: 0;\n  padding-right: 0;",
+    ),
+  "Attribute Score and Saving Throw Misc must not add padding around their steppers.",
 );
 assert(
   !attributeTableMarkup.includes("table-dark") &&

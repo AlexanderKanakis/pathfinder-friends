@@ -54,8 +54,17 @@
     increase.addEventListener("click", () => step(input, 1));
   }
 
+  function enhanceModal(modal) {
+    const dialog = modal.querySelector(".modal-dialog");
+    if (dialog) dialog.classList.add("modal-dialog-scrollable");
+  }
+
   function enhance(root) {
     if (!(root instanceof Element || root instanceof Document)) return;
+    if (root instanceof Element && root.matches(".modal")) {
+      enhanceModal(root);
+    }
+    root.querySelectorAll(".modal").forEach(enhanceModal);
     if (root instanceof Element && root.matches(".modal input[type='number']")) {
       enhanceNumberInput(root);
     }

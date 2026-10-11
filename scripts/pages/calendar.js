@@ -1,5 +1,4 @@
 let calendarContextKey = "";
-let calendarContextLabel = "";
 let isCalendarManager = false;
 let calendarState = null;
 let calendarEvents = [];
@@ -548,8 +547,7 @@ async function loadCalendarContext(contextKey, showLoading = true) {
   calendarContextKey = contextKey;
   if (showLoading) status("Loading calendar...", "secondary");
 
-  const [contexts, manager, loadedState, loadedHolidays] = await Promise.all([
-    PFApp.loadContexts(),
+  const [manager, loadedState, loadedHolidays] = await Promise.all([
     PFApp.isGameManager(calendarContextKey),
     PFApp.loadCampaignCalendarState(calendarContextKey),
     window.PFHolidayData.loadHolidays(),
@@ -557,10 +555,6 @@ async function loadCalendarContext(contextKey, showLoading = true) {
   holidayRules = Array.isArray(loadedHolidays) ? loadedHolidays : [];
   holidayRangeCache = new Map();
   isCalendarManager = Boolean(manager);
-  calendarContextLabel =
-    contexts.find((context) => context.key === calendarContextKey)?.label ||
-    "Current campaign";
-  el("calendarCampaignLabel").textContent = calendarContextLabel;
   calendarState =
     loadedState ||
     {

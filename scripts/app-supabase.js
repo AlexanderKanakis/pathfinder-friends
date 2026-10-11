@@ -1733,6 +1733,7 @@
     "immunities",
     "applyConditions",
     "classSkillGrants",
+    "useUntrained",
     "bonusRanks",
     "extraRanksPerLevel",
     "featGrants",

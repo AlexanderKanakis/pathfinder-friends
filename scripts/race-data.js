@@ -141,6 +141,7 @@
       "immunities",
       "applyConditions",
       "classSkillGrants",
+      "useUntrained",
       "extraRanksPerLevel",
       "featGrants",
       "sizeChanges",

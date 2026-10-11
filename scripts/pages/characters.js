@@ -209,11 +209,7 @@ function renderCharacterSkeletons(count = 6) {
 
 async function loadCharacters() {
   renderCharacterSkeletons();
-  const [canViewAll, contexts] = await Promise.all([
-    PFApp.isGameManager(characterContextKey),
-    PFApp.loadContexts(),
-  ]);
-  canViewCampaignCharacters = canViewAll;
+  canViewCampaignCharacters = await PFApp.isGameManager(characterContextKey);
   characters = await PFApp.loadCharacterSheets(characterContextKey, {
     ownOnly: !canViewCampaignCharacters,
     summaryOnly: true,
@@ -236,14 +232,8 @@ async function loadCharacters() {
       ? { ...character, character_level: characterLevelText(character.sheet) }
       : character,
   );
-  updateCharacterContextLabel(contexts);
   el("characterList").setAttribute("aria-busy", "false");
   renderCharacters();
-}
-
-function updateCharacterContextLabel(contexts = []) {
-  const context = contexts.find((item) => item.key === characterContextKey);
-  el("characterContextLabel").textContent = context?.label || "";
 }
 
 function defaultCharacterSheet(name, startingClass) {

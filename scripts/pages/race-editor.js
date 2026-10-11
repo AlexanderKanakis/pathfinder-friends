@@ -100,6 +100,9 @@ function normalizeTrait(trait = {}) {
     classSkillGrants: Array.isArray(trait.classSkillGrants)
       ? trait.classSkillGrants
       : [],
+    useUntrained: Array.isArray(trait.useUntrained)
+      ? trait.useUntrained
+      : [],
     bonusRanks: Array.isArray(trait.bonusRanks) ? trait.bonusRanks : [],
     extraRanksPerLevel: Array.isArray(trait.extraRanksPerLevel)
       ? trait.extraRanksPerLevel
@@ -337,6 +340,7 @@ const TRAIT_MECHANIC_KEYS = window.PFEffectMechanics?.mechanicKeys?.() || [
   "immunities",
   "applyConditions",
   "classSkillGrants",
+  "useUntrained",
   "bonusRanks",
   "extraRanksPerLevel",
   "featGrants",
@@ -358,6 +362,7 @@ const TRAIT_MECHANIC_LABELS = {
   immunities: "Immunities",
   applyConditions: "Conditions",
   classSkillGrants: "Class Skills",
+  useUntrained: "Use Untrained",
   bonusRanks: "Bonus Ranks",
   extraRanksPerLevel: "Ranks",
   featGrants: "Feats",
@@ -503,6 +508,9 @@ function mechanicRowSummary(key = "", row = {}) {
   if (key === "classSkillGrants") {
     return `${row.skillName || row.stat || "Skill"} becomes a class skill`;
   }
+  if (key === "useUntrained") {
+    return window.PFEffectEditor.useUntrainedText(row);
+  }
   if (key === "bonusRanks") {
     return window.PFEffectEditor.bonusRanksText(row);
   }
@@ -590,6 +598,8 @@ function createMechanicEditorRow(key = "", data = {}, options = {}) {
       window.PFEffectEditor.createApplyConditionRow(data, rowOptions),
     classSkillGrants: () =>
       window.PFEffectEditor.createClassSkillRow(data, rowOptions),
+    useUntrained: () =>
+      window.PFEffectEditor.createUseUntrainedRow(data, rowOptions),
     bonusRanks: () =>
       window.PFEffectEditor.createBonusRanksRow(data, rowOptions),
     extraRanksPerLevel: () =>
@@ -1401,6 +1411,7 @@ function collectTrait(card) {
     immunities: extras.immunities || [],
     applyConditions: extras.applyConditions || [],
     classSkillGrants: extras.classSkillGrants || [],
+    useUntrained: extras.useUntrained || [],
     bonusRanks: extras.bonusRanks || [],
     extraRanksPerLevel: extras.extraRanksPerLevel || [],
     featGrants: extras.featGrants || [],

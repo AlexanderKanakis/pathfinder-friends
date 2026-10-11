@@ -172,6 +172,7 @@
       immunities,
       applyConditions,
       classSkillGrants,
+      useUntrained,
       bonusRanks,
       extraRanksPerLevel,
       featGrants,
@@ -193,6 +194,7 @@
     if (immunities.length) feature.immunities = immunities;
     if (applyConditions.length) feature.applyConditions = applyConditions;
     if (classSkillGrants.length) feature.classSkillGrants = classSkillGrants;
+    if (useUntrained.length) feature.useUntrained = useUntrained;
     if (bonusRanks.length) feature.bonusRanks = bonusRanks;
     if (extraRanksPerLevel.length) feature.extraRanksPerLevel = extraRanksPerLevel;
     if (featGrants.length) feature.featGrants = featGrants;

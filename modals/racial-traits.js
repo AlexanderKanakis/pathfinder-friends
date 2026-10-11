@@ -117,7 +117,10 @@
 
   function operationNeedsChoice(key = "", value = {}) {
     return (
-      ((key === "bonusRanks" || key === "effects" || key === "classSkillGrants") &&
+      ((key === "bonusRanks" ||
+        key === "effects" ||
+        key === "classSkillGrants" ||
+        key === "useUntrained") &&
         window.PFEffectStats?.isChoiceStat?.(value?.stat)) ||
       mechanicFavoredEnemyScaleChoices([value]) ||
       (key === "spellLikeAbilities" && spellLikeChoiceList(value)) ||
@@ -135,6 +138,7 @@
         [
           "effects",
           "classSkillGrants",
+          "useUntrained",
           "bonusRanks",
           "spellLikeAbilities",
           "casterLevelBonuses",
@@ -153,6 +157,7 @@
       mechanicChoiceStats(trait.effects) ||
       mechanicFavoredEnemyScaleChoices(trait.effects) ||
       mechanicChoiceStats(trait.classSkillGrants) ||
+      mechanicChoiceStats(trait.useUntrained) ||
       mechanicChoiceStats(trait.bonusRanks) ||
       mechanicSpellLikeChoices(trait.spellLikeAbilities) ||
       mechanicSpellAdjustmentChoices(trait.casterLevelBonuses) ||

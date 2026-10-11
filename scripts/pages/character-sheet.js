@@ -459,6 +459,9 @@ let sheetContextKey = "general";
 let showCalculations = true;
 let currentSheetId = null;
 let isRestoringSheet = false;
+let currentHitPointsBase = 0;
+let currentHitPointsAdjustment = 0;
+let renderingCurrentHitPoints = false;
 let activeBuffs = [];
 let equipmentEnhancementCache = new WeakMap();
 let equipmentEnhancementBuffCache = null;
@@ -469,6 +472,7 @@ let buffRealtimeChannel = null;
 let effectPickerDefinitionsPromise = null;
 let effectPickerDefinitionsKey = "";
 let effectPickerPrefetchTimer = null;
+let effectPickerPrefetchIdleCallback = null;
 let currentUserId = "";
 let currentSheetOwnerId = "";
 let currentUserIsAdmin = false;
@@ -600,6 +604,20 @@ function allSkills() {
     ...SKILLS,
     ...customSkills.map((skill) => [skill.name, skill.ability || "int", true]),
   ];
+}
+
+function effectChoiceSkills() {
+  const classSkills = characterClassSkillSet();
+  return allSkills().map(([name, ability, custom]) => {
+    const training = window.PFEffectStats?.skillTrainingStatus?.(name) || "";
+    return [
+      name,
+      ability,
+      custom,
+      training ? training === "untrained" : true,
+      classSkillSetHasSkill(classSkills, name),
+    ];
+  });
 }
 function abilityMod(key) {
   return mod(num(`${key}Score`));
@@ -1968,6 +1986,9 @@ function resolvedRacialTrait(trait = {}) {
     classSkillGrants: Array.isArray(choices.classSkillGrants)
       ? choices.classSkillGrants
       : trait.classSkillGrants,
+    useUntrained: Array.isArray(choices.useUntrained)
+      ? choices.useUntrained
+      : trait.useUntrained,
     bonusRanks: Array.isArray(choices.bonusRanks)
       ? choices.bonusRanks
       : trait.bonusRanks,
@@ -2375,7 +2396,7 @@ async function resolveRacialTraitChoiceStats(items, trait = {}) {
     const options = await window.PFEffectStats.resolveChoicePoolOptions(
       poolId,
       {
-        skills: allSkills(),
+        skills: effectChoiceSkills(),
         equipment: currentEffectChoiceEquipment(),
         choicePool: item.choicePool,
       },
@@ -2504,6 +2525,11 @@ async function resolveRacialTraitMechanicChoices(
     trait,
   );
   if (!resolvedClassSkillGrants) return false;
+  const resolvedUseUntrained = await resolveRacialTraitChoiceStats(
+    item.useUntrained,
+    trait,
+  );
+  if (!resolvedUseUntrained) return false;
   const resolvedBonusRanks = await resolveRacialTraitChoiceStats(
     item.bonusRanks,
     trait,
@@ -2540,6 +2566,7 @@ async function resolveRacialTraitMechanicChoices(
     ...item,
     effects: resolvedEffects,
     classSkillGrants: resolvedClassSkillGrants,
+    useUntrained: resolvedUseUntrained,
     bonusRanks: resolvedBonusRanks,
     spellLikeAbilities: resolvedSpellLikeAbilities,
     casterLevelBonuses: resolvedCasterLevelBonuses,
@@ -2597,7 +2624,12 @@ async function resolveRacialTraitOperationValueChoice(
   value = {},
   trait = {},
 ) {
-  if (key === "effects" || key === "classSkillGrants" || key === "bonusRanks") {
+  if (
+    key === "effects" ||
+    key === "classSkillGrants" ||
+    key === "useUntrained" ||
+    key === "bonusRanks"
+  ) {
     const resolved = await resolveRacialTraitChoiceStats([value], trait);
     if (!resolved) return null;
     if (key !== "effects") return resolved[0];
@@ -2671,6 +2703,10 @@ function racialTraitMechanicsHaveChoiceStats(item = {}) {
       item.classSkillGrants.some((grant) =>
         window.PFEffectStats?.isChoiceStat(grant.stat),
       )) ||
+    (Array.isArray(item.useUntrained) &&
+      item.useUntrained.some((entry) =>
+        window.PFEffectStats?.isChoiceStat(entry.stat),
+      )) ||
     (Array.isArray(item.bonusRanks) &&
       item.bonusRanks.some((grant) =>
         window.PFEffectStats?.isChoiceStat(grant.stat),
@@ -2697,6 +2733,7 @@ function racialTraitOverrideHasChoiceStats(override = {}) {
           [
             "effects",
             "classSkillGrants",
+            "useUntrained",
             "bonusRanks",
             "spellLikeAbilities",
             "casterLevelBonuses",
@@ -2766,6 +2803,7 @@ async function resolveRacialTraitChoicesBeforeApply(trait = {}) {
       immunities: cloneJson(variableResolvedTrait.immunities),
       applyConditions: cloneJson(variableResolvedTrait.applyConditions),
       classSkillGrants: cloneJson(variableResolvedTrait.classSkillGrants),
+      useUntrained: cloneJson(variableResolvedTrait.useUntrained),
       bonusRanks: cloneJson(variableResolvedTrait.bonusRanks),
       extraRanksPerLevel: cloneJson(variableResolvedTrait.extraRanksPerLevel),
       featGrants: cloneJson(variableResolvedTrait.featGrants),
@@ -2833,6 +2871,7 @@ const RACIAL_TRAIT_MECHANIC_KEYS =
     "immunities",
     "applyConditions",
     "classSkillGrants",
+    "useUntrained",
     "bonusRanks",
     "extraRanksPerLevel",
     "featGrants",
@@ -3224,6 +3263,8 @@ function collectSelectedRaceBuffs() {
       Array.isArray(trait.applyConditions) && trait.applyConditions.length;
     const hasClassSkills =
       Array.isArray(trait.classSkillGrants) && trait.classSkillGrants.length;
+    const hasUseUntrained =
+      Array.isArray(trait.useUntrained) && trait.useUntrained.length;
     const hasBonusRanks =
       Array.isArray(trait.bonusRanks) && trait.bonusRanks.length;
     const hasExtraRanks =
@@ -3272,6 +3313,7 @@ function collectSelectedRaceBuffs() {
       !hasImmunities &&
       !hasApplyConditions &&
       !hasClassSkills &&
+      !hasUseUntrained &&
       !hasBonusRanks &&
       !hasExtraRanks &&
       !hasFeatGrants &&
@@ -3297,6 +3339,7 @@ function collectSelectedRaceBuffs() {
       immunities: hasImmunities ? trait.immunities : [],
       applyConditions: hasApplyConditions ? trait.applyConditions : [],
       classSkillGrants: hasClassSkills ? trait.classSkillGrants : [],
+      useUntrained: hasUseUntrained ? trait.useUntrained : [],
       bonusRanks: hasBonusRanks ? trait.bonusRanks : [],
       extraRanksPerLevel: hasExtraRanks ? trait.extraRanksPerLevel : [],
       featGrants: hasFeatGrants ? featGrants : [],
@@ -3364,6 +3407,9 @@ function racialTraitAbilityFromTrait(trait, race, sourceLabel, options = {}) {
     classSkillGrants: Array.isArray(trait.classSkillGrants)
       ? trait.classSkillGrants
       : [],
+    useUntrained: Array.isArray(trait.useUntrained)
+      ? trait.useUntrained
+      : [],
     bonusRanks: Array.isArray(trait.bonusRanks) ? trait.bonusRanks : [],
     extraRanksPerLevel: Array.isArray(trait.extraRanksPerLevel)
       ? trait.extraRanksPerLevel
@@ -3419,6 +3465,7 @@ function racialTraitAbilityFromTrait(trait, race, sourceLabel, options = {}) {
     (ability.immunities || []).length ||
     (ability.applyConditions || []).length ||
     (ability.classSkillGrants || []).length ||
+    (ability.useUntrained || []).length ||
     (ability.bonusRanks || []).length ||
     (ability.extraRanksPerLevel || []).length ||
     (ability.featGrants || []).length ||
@@ -4512,6 +4559,7 @@ function normalizeWondrousSourceItem(item, index) {
     classSkillGrants: Array.isArray(item.classSkillGrants)
       ? item.classSkillGrants
       : [],
+    useUntrained: Array.isArray(item.useUntrained) ? item.useUntrained : [],
     bonusRanks: Array.isArray(item.bonusRanks) ? item.bonusRanks : [],
     extraRanksPerLevel: Array.isArray(item.extraRanksPerLevel)
       ? item.extraRanksPerLevel
@@ -4608,6 +4656,7 @@ function normalizeMundaneSourceItem(item, index) {
     classSkillGrants: Array.isArray(item.classSkillGrants)
       ? item.classSkillGrants
       : [],
+    useUntrained: Array.isArray(item.useUntrained) ? item.useUntrained : [],
     bonusRanks: Array.isArray(item.bonusRanks) ? item.bonusRanks : [],
     extraRanksPerLevel: Array.isArray(item.extraRanksPerLevel)
       ? item.extraRanksPerLevel
@@ -4690,6 +4739,7 @@ function normalizeWeaponSourceItem(item, index) {
     classSkillGrants: Array.isArray(item.classSkillGrants)
       ? item.classSkillGrants
       : [],
+    useUntrained: Array.isArray(item.useUntrained) ? item.useUntrained : [],
     bonusRanks: Array.isArray(item.bonusRanks) ? item.bonusRanks : [],
     extraRanksPerLevel: Array.isArray(item.extraRanksPerLevel)
       ? item.extraRanksPerLevel
@@ -4774,6 +4824,7 @@ function normalizeArmorShieldSourceItem(item, index) {
     classSkillGrants: Array.isArray(item.classSkillGrants)
       ? item.classSkillGrants
       : [],
+    useUntrained: Array.isArray(item.useUntrained) ? item.useUntrained : [],
     bonusRanks: Array.isArray(item.bonusRanks) ? item.bonusRanks : [],
     extraRanksPerLevel: Array.isArray(item.extraRanksPerLevel)
       ? item.extraRanksPerLevel
@@ -5281,6 +5332,8 @@ function collectClassFeatureBuffs() {
               passiveFeature.description || passiveFeature.desc || "",
           },
           bonuses: passiveFeature.effects,
+          classSkillGrants: passiveFeature.classSkillGrants,
+          useUntrained: passiveFeature.useUntrained,
           bonusRanks: passiveFeature.bonusRanks,
           extraRanksPerLevel: passiveFeature.extraRanksPerLevel,
           featGrants: passiveFeature.featGrants,
@@ -5330,6 +5383,7 @@ function collectClassFeatureBuffs() {
         if (
           option &&
           ((Array.isArray(option.effects) && option.effects.length) ||
+            (Array.isArray(option.useUntrained) && option.useUntrained.length) ||
             (Array.isArray(option.bonusRanks) && option.bonusRanks.length) ||
             (Array.isArray(option.extraRanksPerLevel) &&
               option.extraRanksPerLevel.length) ||
@@ -5364,6 +5418,8 @@ function collectClassFeatureBuffs() {
                 option.description || option.desc || pool.description || "",
             },
             bonuses: option.effects,
+            classSkillGrants: option.classSkillGrants,
+            useUntrained: option.useUntrained,
             bonusRanks: option.bonusRanks,
             extraRanksPerLevel: option.extraRanksPerLevel,
             featGrants: option.featGrants,
@@ -6352,6 +6408,9 @@ function conditionBuffFromApplyCondition(entry = {}, sourceBuff = {}) {
     classSkillGrants: Array.isArray(condition.classSkillGrants)
       ? condition.classSkillGrants
       : [],
+    useUntrained: Array.isArray(condition.useUntrained)
+      ? condition.useUntrained
+      : [],
     bonusRanks: Array.isArray(condition.bonusRanks) ? condition.bonusRanks : [],
     extraRanksPerLevel: Array.isArray(condition.extraRanksPerLevel)
       ? condition.extraRanksPerLevel
@@ -6673,6 +6732,57 @@ function effectiveSkillRanks(skill = "", abilityKey = "") {
     entries.reduce((sum, entry) => sum + bonusRanksValue(entry), 0),
   );
   return { manual, bonus: granted, total: manual + granted, entries };
+}
+
+function useUntrainedRuleMatchesSkill(
+  entry = {},
+  skill = "",
+  isClassSkill = false,
+) {
+  const stat = String(entry.stat || "").trim().toLowerCase();
+  if (!stat || window.PFEffectStats?.isChoiceStat?.(stat)) return false;
+  if (stat === "skill checks") return true;
+  if (stat === "trained skill checks") {
+    return window.PFEffectStats?.skillTrainingStatus?.(skill) === "trained";
+  }
+  if (stat === "class trained skill checks") {
+    return (
+      isClassSkill &&
+      window.PFEffectStats?.skillTrainingStatus?.(skill) === "trained"
+    );
+  }
+  if (stat === "knowledge skill checks") return isKnowledgeSkill(skill);
+  if (stat.startsWith("skill-list:")) {
+    return Boolean(
+      window.PFEffectStats?.skillListIncludesSkill?.(
+        stat,
+        skill,
+        entry.skillList,
+      ),
+    );
+  }
+  return (
+    stat === skillStatKey(skill) ||
+    Boolean(genericSkillStatKey(skill) && stat === genericSkillStatKey(skill))
+  );
+}
+
+function useUntrainedRules() {
+  return calculationBuffs().flatMap((buff) =>
+    (Array.isArray(buff.useUntrained) ? buff.useUntrained : []).map((entry) => ({
+      ...entry,
+      source: buff.name || buff.source || "Effect",
+    })),
+  );
+}
+
+function skillIsUsable(skill, ranks, isClassSkill, rules = []) {
+  if (Number(ranks || 0) >= 1) return true;
+  if (window.PFEffectStats?.skillTrainingStatus?.(skill) !== "trained")
+    return true;
+  return rules.some((entry) =>
+    useUntrainedRuleMatchesSkill(entry, skill, isClassSkill),
+  );
 }
 
 // Every class skill from every class this character has levels in --
@@ -7461,6 +7571,10 @@ function classFeatureMechanicsNeedChoice(item = {}) {
       item.classSkillGrants.some((grant) =>
         window.PFEffectStats?.isChoiceStat(grant.stat),
       )) ||
+    (Array.isArray(item.useUntrained) &&
+      item.useUntrained.some((entry) =>
+        window.PFEffectStats?.isChoiceStat(entry.stat),
+      )) ||
     (Array.isArray(item.bonusRanks) &&
       item.bonusRanks.some((grant) =>
         window.PFEffectStats?.isChoiceStat(grant.stat),
@@ -7604,6 +7718,10 @@ function mechanicsChoiceSummary(mechanics = {}) {
   });
   (mechanics.classSkillGrants || []).forEach((grant) => {
     const label = firstChoiceLabel(grant.skillName || grant.stat);
+    if (label) labels.push(label);
+  });
+  (mechanics.useUntrained || []).forEach((entry) => {
+    const label = firstChoiceLabel(entry.skillName || entry.stat);
     if (label) labels.push(label);
   });
   (mechanics.bonusRanks || []).forEach((grant) => {
@@ -8385,6 +8503,7 @@ function featHasChoiceBearingMechanics(feat = {}) {
     window.PFEffectMechanics?.hasBranches?.(feat) ||
     hasChoiceStats(feat.effects) ||
     hasChoiceStats(feat.classSkillGrants) ||
+    hasChoiceStats(feat.useUntrained) ||
     hasChoiceStats(feat.bonusRanks) ||
     (Array.isArray(feat.spellLikeAbilities) &&
       feat.spellLikeAbilities.some(spellLikeAbilityHasChoiceList)) ||
@@ -8431,6 +8550,7 @@ const FEAT_MECHANIC_KEYS = window.PFEffectMechanics?.mechanicKeys?.() || [
   "immunities",
   "applyConditions",
   "classSkillGrants",
+  "useUntrained",
   "bonusRanks",
   "extraRanksPerLevel",
   "featGrants",
@@ -8502,6 +8622,9 @@ function collectSelectedFeatBuffs() {
         : [],
       classSkillGrants: Array.isArray(feat.classSkillGrants)
         ? feat.classSkillGrants
+        : [],
+      useUntrained: Array.isArray(feat.useUntrained)
+        ? feat.useUntrained
         : [],
       bonusRanks: Array.isArray(feat.bonusRanks) ? feat.bonusRanks : [],
       extraRanksPerLevel: Array.isArray(feat.extraRanksPerLevel)
@@ -8849,6 +8972,9 @@ function renderClassFeatures() {
                   : [],
                 classSkillGrants: Array.isArray(feature.classSkillGrants)
                   ? feature.classSkillGrants
+                  : [],
+                useUntrained: Array.isArray(feature.useUntrained)
+                  ? feature.useUntrained
                   : [],
                 bonusRanks: Array.isArray(feature.bonusRanks)
                   ? feature.bonusRanks
@@ -9753,6 +9879,7 @@ function spellEffectPayloads(spell = {}) {
     "immunities",
     "applyConditions",
     "classSkillGrants",
+    "useUntrained",
     "bonusRanks",
     "extraRanksPerLevel",
     "featGrants",
@@ -11216,6 +11343,11 @@ function updateClassDerivedViews() {
   updateClassFeatureSpellResistanceSummary();
 }
 
+function updateCharacterLevelProgression() {
+  updateClassDerivedViews();
+  invalidateEffectPickerDefinitions();
+}
+
 function setSheetInfoTab(tab) {
   activeSheetInfoTab = tab || "character";
   const isCharacter = activeSheetInfoTab === "character";
@@ -11269,6 +11401,7 @@ function sheetToBaseline(gearAcOverride = null) {
     cha: num("chaScore"),
     bab: num("bab"),
     hitPoints: num("hitPoints"),
+    currentHitPoints: currentHitPointsBase,
     level: Math.max(1, num("characterLevel") || 1),
     characterLevel: Math.max(1, num("characterLevel") || 1),
     classLevels,
@@ -11331,6 +11464,8 @@ function buildSheet(deferDynamicSections = false) {
       <th>${label}</th>
       <td><output id="${key}Total" class="sheet-output sheet-output-sm total-first-input"></output></td>
       <td><output id="${key}Base" class="sheet-output sheet-output-sm">0</output></td>
+      <td><output id="${key}Ability" class="sheet-output sheet-output-sm"></output></td>
+      <td><output id="${key}Buff" class="sheet-output sheet-output-sm buff-field"></output></td>
       <td>
         <div class="number-stepper">
           <button class="btn btn-outline-light btn-sm ability-stepper-btn" type="button" onclick="adjustSkillNumber('${key}Misc', -1)" aria-label="Decrease ${label} misc">-</button>
@@ -11338,8 +11473,6 @@ function buildSheet(deferDynamicSections = false) {
           <button class="btn btn-outline-light btn-sm ability-stepper-btn" type="button" onclick="adjustSkillNumber('${key}Misc', 1)" aria-label="Increase ${label} misc">+</button>
         </div>
       </td>
-      <td><output id="${key}Ability" class="sheet-output sheet-output-sm"></output></td>
-      <td><output id="${key}Buff" class="sheet-output sheet-output-sm buff-field"></output></td>
     </tr>
     <tr>
       <td colspan="6"><div class="small-text calc-line" data-calc-for="${key}Total"></div></td>
@@ -11370,6 +11503,7 @@ function renderSkillRows(saved = {}) {
           ${escapeHtml(skill)}
           ${custom && !managedNamedSkill(skill) ? `<button class="btn btn-outline-danger btn-sm skill-remove-btn" type="button" onclick="removeNamedSkillByKey('${normalizeSkillName(skill)}')" aria-label="Remove ${escapeHtml(skill)}"><i class="bi bi-trash"></i></button>` : ""}
         </th>
+        <td><output id="${id}Total" class="sheet-output sheet-output-sm total-first-input"></output></td>
         <td>
           <div class="skill-stepper">
             <button class="btn btn-outline-light btn-sm skill-stepper-btn" type="button" onclick="adjustSkillNumber('${id}Ranks', -1)" aria-label="Decrease ${escapeHtml(skill)} ranks">-</button>
@@ -11377,7 +11511,6 @@ function renderSkillRows(saved = {}) {
             <button class="btn btn-outline-light btn-sm skill-stepper-btn" type="button" onclick="adjustSkillNumber('${id}Ranks', 1)" aria-label="Increase ${escapeHtml(skill)} ranks">+</button>
           </div>
         </td>
-        <td><output id="${id}Total" class="sheet-output sheet-output-sm total-first-input"></output></td>
         <td><output id="${id}Ability" class="sheet-output sheet-output-sm" data-ability="${ability}">0</output></td>
         <td><output id="${id}Buff" class="sheet-output sheet-output-sm buff-field"></output></td>
         <td>
@@ -12247,6 +12380,9 @@ function syncEquippedLootBuffFromItem(item) {
   const classSkillGrants = Array.isArray(item.classSkillGrants)
     ? item.classSkillGrants
     : [];
+  const useUntrained = Array.isArray(item.useUntrained)
+    ? item.useUntrained
+    : [];
   const bonusRanks = Array.isArray(item.bonusRanks) ? item.bonusRanks : [];
   const extraRanksPerLevel = Array.isArray(item.extraRanksPerLevel)
     ? item.extraRanksPerLevel
@@ -12281,6 +12417,7 @@ function syncEquippedLootBuffFromItem(item) {
     !immunities.length &&
     !applyConditions.length &&
     !classSkillGrants.length &&
+    !useUntrained.length &&
     !bonusRanks.length &&
     !extraRanksPerLevel.length &&
     !featGrants.length &&
@@ -12323,6 +12460,7 @@ function syncEquippedLootBuffFromItem(item) {
     ...(immunities.length ? { immunities } : {}),
     ...(applyConditions.length ? { applyConditions } : {}),
     ...(classSkillGrants.length ? { classSkillGrants } : {}),
+    ...(useUntrained.length ? { useUntrained } : {}),
     ...(bonusRanks.length ? { bonusRanks } : {}),
     ...(extraRanksPerLevel.length ? { extraRanksPerLevel } : {}),
     ...(featGrants.length ? { featGrants } : {}),
@@ -13223,6 +13361,13 @@ function recalculateSheet() {
   const wis = abilityModFor("wis", buffed);
   el("hitPointsBuff").value = signed(buffBonuses["hit points"] || 0);
   el("hitPointsTotal").value = buffTotals["hit points"] ?? num("hitPoints");
+  currentHitPointsAdjustment = Number(
+    buffBonuses["current hit points"] || 0,
+  );
+  renderingCurrentHitPoints = true;
+  el("currentHitPoints").value =
+    buffTotals["current hit points"] ?? currentHitPointsBase;
+  renderingCurrentHitPoints = false;
   setCalc(
     "hitPointsTotal",
     `Base HP ${num("hitPoints")} + CON modifier changes x level ${Math.max(1, num("characterLevel"))}`,
@@ -13347,6 +13492,7 @@ function recalculateSheet() {
 
   const classSkillSet = characterClassSkillSet();
   const classSkillEffectSet = characterClassSkillKeys();
+  const untrainedRules = useUntrainedRules();
   allSkills().forEach(([skill]) => {
     const id = skillId(skill);
     const abilityKey = el(`${id}Ability`)?.dataset.ability;
@@ -13375,6 +13521,7 @@ function recalculateSheet() {
     const hasClassKnowledgeSkillEffect =
       hasClassSkillEffect && isKnowledgeSkill(skill);
     const classSkillBonus = isClassSkill && ranks > 0 ? 3 : 0;
+    const usable = skillIsUsable(skill, ranks, isClassSkill, untrainedRules);
     const classSkillEffectBonus = hasClassSkillEffect
       ? Number(buffBonuses["class skill checks"] || 0)
       : 0;
@@ -13389,15 +13536,24 @@ function recalculateSheet() {
         classSkillBonus +
         effectiveRanks.bonus,
     );
-    el(`${id}Total`).value = String(
-      abilityValue +
-        ranks +
-        num(`${id}Misc`) +
-        skillBuff +
-        classSkillEffectBonus +
-        classKnowledgeSkillEffectBonus +
-        classSkillBonus,
-    );
+    el(`${id}Total`).value = usable
+      ? String(
+          abilityValue +
+            ranks +
+            num(`${id}Misc`) +
+            skillBuff +
+            classSkillEffectBonus +
+            classKnowledgeSkillEffectBonus +
+            classSkillBonus,
+        )
+      : "";
+    const skillRow = el(`${id}Total`)?.closest("tr");
+    skillRow?.classList.toggle("is-untrained-skill", !usable);
+    if (skillRow) {
+      skillRow.title = usable
+        ? ""
+        : `${skill} requires at least 1 rank to use.`;
+    }
     const classSkillEl = el(`${id}ClassSkill`);
     if (classSkillEl) {
       classSkillEl.classList.toggle("is-class-skill", isClassSkill);
@@ -13451,7 +13607,7 @@ function recalculateSheet() {
         detail: `effective ranks ${effectiveRanks.total}/${skillRankCap}`,
       });
     }
-    setCalc(`${id}Total`, "", skillBreakdownItems);
+    setCalc(`${id}Total`, "", usable ? skillBreakdownItems : []);
   });
   renderCharacterSpellLikeAbilities();
   if (sheetViewMode === "simplified") renderSimplifiedSheet();
@@ -13529,7 +13685,7 @@ async function openEffectTrackerModal() {
       return detail?.calculations || effect.spellCalculations || null;
     },
     effectPickerEffects: loadCurrentEffectPickerDefinitions,
-    choicePoolSkills: allSkills(),
+    choicePoolSkills: effectChoiceSkills(),
     choicePoolEquipment: currentEffectChoiceEquipment,
     favoredEnemyOptions: characterFavoredEnemyOptions,
     onAuraActivate: async (effect) => {
@@ -13550,6 +13706,7 @@ async function openEffectTrackerModal() {
       ? true
       : !currentSheetOwnerId || currentSheetOwnerId === currentUserId,
     loadActiveEffects: async () => activeBuffs,
+    loadPassiveEffects: async () => collectBridgePassiveEffectSources(),
     saveActiveEffects: enemySaveActiveEffects || undefined,
     onChange: (buffs, { collectionChanged = false } = {}) => {
       activeBuffs = Array.isArray(buffs) ? buffs : [];
@@ -13633,6 +13790,9 @@ function renderInventoryEffects(item) {
   const classSkillGrants = Array.isArray(item.classSkillGrants)
     ? item.classSkillGrants
     : [];
+  const useUntrained = Array.isArray(item.useUntrained)
+    ? item.useUntrained
+    : [];
   const bonusRanks = Array.isArray(item.bonusRanks) ? item.bonusRanks : [];
   const extraRanksPerLevel = Array.isArray(item.extraRanksPerLevel)
     ? item.extraRanksPerLevel
@@ -13709,6 +13869,9 @@ function renderInventoryEffects(item) {
     ),
     ...classSkillGrants.map((grant) =>
       escapeHtml(window.PFEffectEditor.classSkillGrantText(grant, titleCaseStat)),
+    ),
+    ...useUntrained.map((entry) =>
+      escapeHtml(window.PFEffectEditor.useUntrainedText(entry)),
     ),
     ...bonusRanks.map((entry) =>
       escapeHtml(window.PFEffectEditor.bonusRanksText(entry)),
@@ -13816,6 +13979,7 @@ function makeEnemyInventoryItem(source) {
     immunities: cloneJson(source.immunities || []),
     applyConditions: cloneJson(source.applyConditions || []),
     classSkillGrants: cloneJson(source.classSkillGrants || []),
+    useUntrained: cloneJson(source.useUntrained || []),
     bonusRanks: cloneJson(source.bonusRanks || []),
     extraRanksPerLevel: cloneJson(source.extraRanksPerLevel || []),
     featGrants: cloneJson(source.featGrants || []),
@@ -14697,6 +14861,8 @@ function collectCalculatedSummary() {
   const gearAc = calculateGearAc();
   const conditionalGroups = simpleConditionalsByStat();
   const classSkillEffectSet = characterClassSkillKeys();
+  const classSkillSet = characterClassSkillSet();
+  const untrainedRules = useUntrainedRules();
   const abilityRows = ABILITIES.map(([key, label]) => ({
     key,
     label,
@@ -14722,10 +14888,21 @@ function collectCalculatedSummary() {
     const hasClassSkillEffect = classSkillSetHasSkill(classSkillEffectSet, skill);
     const hasClassKnowledgeSkillEffect =
       hasClassSkillEffect && isKnowledgeSkill(skill);
+    const ranks = effectiveSkillRanks(skill, ability).total;
+    const isClassSkill = classSkillSetHasSkill(classSkillSet, skill);
+    const usable = skillIsUsable(
+      skill,
+      ranks,
+      isClassSkill,
+      untrainedRules,
+    );
     return {
       key: id,
       label: skill,
-      total: currentTotal,
+      total: usable ? currentTotal : "",
+      ranks,
+      usable,
+      classSkill: isClassSkill,
       conditionals: [
         ...conditionalTableRows("skill checks", conditionalGroups, currentTotal),
         ...conditionalTableRows(
@@ -15045,6 +15222,7 @@ function collectSheet() {
   sheet.calculated = collectCalculatedSummary();
   if (isEnemySheetMode) syncEnemyStructuredSpellFields();
   SIMPLE_FIELDS.forEach((id) => (sheet.fields[id] = el(id)?.value || ""));
+  sheet.fields.currentHitPoints = String(currentHitPointsBase);
   ABILITIES.forEach(
     ([key]) => (sheet.abilities[key] = { score: el(`${key}Score`).value }),
   );
@@ -15090,6 +15268,8 @@ function restoreSheet(sheet) {
       setSelectValuePreservingUnknown(id, value);
     else if (el(id)) el(id).value = value;
   });
+  currentHitPointsBase = Number(data.fields?.currentHitPoints || 0);
+  currentHitPointsAdjustment = 0;
   if (el("acNaturalBase")) {
     el("acNaturalBase").value = data.fields?.acNaturalBase ?? 0;
   }
@@ -15178,6 +15358,8 @@ function loadSampleValues() {
       setSelectValuePreservingUnknown(id, value);
     else if (el(id)) el(id).value = value;
   });
+  currentHitPointsBase = Number(PDF_SAMPLE.currentHitPoints || 0);
+  currentHitPointsAdjustment = 0;
 }
 
 function updateCharacterImagePreview() {
@@ -15209,6 +15391,10 @@ function attachInputListeners(root = document) {
     if (input.dataset.sheetInputBound === "true") return;
     input.dataset.sheetInputBound = "true";
     input.addEventListener("input", () => {
+      if (input.id === "currentHitPoints" && !renderingCurrentHitPoints) {
+        currentHitPointsBase =
+          Number(input.value || 0) - currentHitPointsAdjustment;
+      }
       if (input.classList.contains("enemy-auto-input"))
         updateEnemyAutoInputSizes(input.parentElement || document);
       if (
@@ -15219,6 +15405,7 @@ function attachInputListeners(root = document) {
       if (input.matches("[data-enemy-spell-label], [data-enemy-spell-list]"))
         syncEnemyStructuredSpellFields();
       if (input.id === "imageUrl") updateCharacterImagePreview();
+      if (input.id === "characterLevel") updateCharacterLevelProgression();
       recalculateSheet();
       queueSheetSave();
     });
@@ -15230,8 +15417,7 @@ function attachInputListeners(root = document) {
         updateRacialTraitsButton();
         pruneUnavailableRacialTraitActiveBuffs({ persist: true });
       }
-      if (input.id === "race" || input.id === "characterLevel")
-        updateClassDerivedViews();
+      if (input.id === "race") updateClassDerivedViews();
       if (input.matches("[data-enemy-spell-label], [data-enemy-spell-list]"))
         syncEnemyStructuredSpellFields();
       if (input.id === "imageUrl") updateCharacterImagePreview();
@@ -15264,7 +15450,7 @@ function saveSheetNow(silent = false) {
 }
 
 function enqueueSheetSave(silent = false) {
-  invalidateEffectPickerDefinitions();
+  scheduleEffectPickerPrefetch();
   const run = () => saveSheetSnapshot(silent);
   sheetSaveQueue = sheetSaveQueue.then(run, run);
   return sheetSaveQueue;
@@ -15407,8 +15593,42 @@ async function loadCurrentSheet(
 let sheetBridgeRecalculationQueue = Promise.resolve();
 let sheetBridgeSummarySaveQueue = Promise.resolve();
 
+function effectPickerSourceSignature() {
+  const itemSources = (characterInventoryItems || []).map((item) => ({
+    id: item.id || "",
+    name: item.name || "",
+    activeMechanics:
+      window.PFEffectMechanics?.activeMechanics?.(item) || null,
+  }));
+  const sourceState = JSON.stringify({
+    characterLevel: num("characterLevel"),
+    abilityScores: currentAttributeScaleContext().abilityScores,
+    race: el("race")?.value || "",
+    classProgression,
+    classFeatureChoices,
+    classFeatureVariableChoices,
+    feats: characterFeats,
+    racialAlternateTraits: selectedRacialAlternateTraits,
+    racialTraitChoices: selectedRacialTraitChoices,
+    spells: characterSpells,
+    spellLikeChoices: selectedSpellLikeChoices,
+    itemSources,
+  });
+  let hash = 2166136261;
+  for (let index = 0; index < sourceState.length; index += 1) {
+    hash ^= sourceState.charCodeAt(index);
+    hash = Math.imul(hash, 16777619);
+  }
+  return `${sourceState.length}:${(hash >>> 0).toString(36)}`;
+}
+
 function currentEffectPickerDefinitionsKey() {
-  return `${sheetContextKey}:${isEnemySheetMode ? "enemy" : "character"}:${currentSheetId || ""}`;
+  return [
+    sheetContextKey,
+    isEnemySheetMode ? "enemy" : "character",
+    currentSheetId || "",
+    effectPickerSourceSignature(),
+  ].join(":");
 }
 
 function invalidateEffectPickerDefinitions() {
@@ -15417,6 +15637,10 @@ function invalidateEffectPickerDefinitions() {
   if (effectPickerPrefetchTimer) {
     window.clearTimeout(effectPickerPrefetchTimer);
     effectPickerPrefetchTimer = null;
+  }
+  if (effectPickerPrefetchIdleCallback !== null) {
+    window.cancelIdleCallback?.(effectPickerPrefetchIdleCallback);
+    effectPickerPrefetchIdleCallback = null;
   }
 }
 
@@ -15433,7 +15657,6 @@ function loadCurrentEffectPickerDefinitions() {
       ...collectActivatableAbilities(),
       ...spells,
       ...catalog,
-      ...collectBridgePassiveEffectSources(),
     ])
     .catch((error) => {
       if (effectPickerDefinitionsKey === key) {
@@ -15447,14 +15670,25 @@ function loadCurrentEffectPickerDefinitions() {
 
 function scheduleEffectPickerPrefetch() {
   if (!currentSheetId) return;
+  if (effectPickerPrefetchTimer) {
+    window.clearTimeout(effectPickerPrefetchTimer);
+    effectPickerPrefetchTimer = null;
+  }
+  if (effectPickerPrefetchIdleCallback !== null) {
+    window.cancelIdleCallback?.(effectPickerPrefetchIdleCallback);
+    effectPickerPrefetchIdleCallback = null;
+  }
   const prefetch = () => {
     effectPickerPrefetchTimer = null;
+    effectPickerPrefetchIdleCallback = null;
     void loadCurrentEffectPickerDefinitions().catch((error) =>
       console.warn("Could not prefetch character effects.", error),
     );
   };
   if (window.requestIdleCallback) {
-    window.requestIdleCallback(prefetch, { timeout: 1800 });
+    effectPickerPrefetchIdleCallback = window.requestIdleCallback(prefetch, {
+      timeout: 1800,
+    });
     return;
   }
   effectPickerPrefetchTimer = window.setTimeout(prefetch, 500);
@@ -15638,7 +15872,11 @@ function collectBridgePassiveEffectSources() {
     .forEach((item) => {
       const mechanics = window.PFEffectMechanics?.passiveMechanics?.(item) || {};
       if (!window.PFEffectMechanics?.hasAnyMechanics?.(mechanics)) return;
-      add(passiveEffectSource({ ...item, ...mechanics }, "Item", `passive:item:${item.id}`));
+      add(passiveEffectSource(
+        { ...item, ...mechanics, sourceLootId: item.id },
+        "Item",
+        `passive:item:${item.id}`,
+      ));
     });
   return results;
 }
@@ -16021,7 +16259,9 @@ async function startPendingEffectChoicePolling() {
       myCharacterOptionsCache.find((row) => row.id === id)?.character_name ||
       "",
     choicePoolSkillsFor: (id) =>
-      !isEnemySheetMode && id === currentSheetId ? allSkills() : undefined,
+      !isEnemySheetMode && id === currentSheetId
+        ? effectChoiceSkills()
+        : undefined,
     choicePoolEquipmentFor: async (id) => {
       if (id === currentSheetId) return currentEffectChoiceEquipment();
       const saved = await PFApp.loadCharacterSheet("", sheetContextKey, id);

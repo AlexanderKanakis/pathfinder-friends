@@ -206,6 +206,7 @@
     const contributedImmunities = new Map();
     const contributedApplyConditions = new Map();
     const contributedClassSkillGrants = new Map();
+    const contributedUseUntrained = new Map();
     const contributedExtraRanksPerLevel = new Map();
     const contributedFeatGrants = new Map();
     const contributedSizeChanges = new Map();
@@ -225,6 +226,7 @@
       const immunities = [];
       const applyConditions = [];
       const classSkillGrants = [];
+      const useUntrained = [];
       const extraRanksPerLevel = [];
       const featGrants = [];
       const sizeChanges = [];
@@ -261,6 +263,8 @@
           option.classSkillGrants.length
         )
           classSkillGrants.push(...option.classSkillGrants);
+        if (Array.isArray(option.useUntrained) && option.useUntrained.length)
+          useUntrained.push(...option.useUntrained);
         if (
           Array.isArray(option.extraRanksPerLevel) &&
           option.extraRanksPerLevel.length
@@ -312,6 +316,8 @@
         contributedApplyConditions.set(targetKey, applyConditions);
       if (classSkillGrants.length)
         contributedClassSkillGrants.set(targetKey, classSkillGrants);
+      if (useUntrained.length)
+        contributedUseUntrained.set(targetKey, useUntrained);
       if (extraRanksPerLevel.length)
         contributedExtraRanksPerLevel.set(targetKey, extraRanksPerLevel);
       if (featGrants.length)
@@ -421,6 +427,13 @@
           : []),
         ...bundledClassSkillGrants,
       ];
+      const bundledUseUntrained = contributedUseUntrained.get(targetKey) || [];
+      const useUntrained = [
+        ...(Array.isArray(activeFeature.useUntrained)
+          ? activeFeature.useUntrained
+          : []),
+        ...bundledUseUntrained,
+      ];
       const sizeChanges = [
         ...(Array.isArray(activeFeature.sizeChanges) ? activeFeature.sizeChanges : []),
         ...bundledSizeChanges,
@@ -504,6 +517,7 @@
         ...(immunities.length ? { immunities } : {}),
         ...(applyConditions.length ? { applyConditions } : {}),
         ...(classSkillGrants.length ? { classSkillGrants } : {}),
+        ...(useUntrained.length ? { useUntrained } : {}),
         ...(extraRanksPerLevel.length ? { extraRanksPerLevel } : {}),
         ...(featGrants.length ? { featGrants } : {}),
         ...(sizeChanges.length ? { sizeChanges } : {}),

@@ -1901,13 +1901,14 @@ body {
 }
 
 .map-side-nav.quick-effect-nav {
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   margin: 0 0 0.75rem;
 }
 
 @media (max-width: 575.98px) {
   .map-side-nav.quick-effect-nav {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(7, minmax(90px, 1fr));
+    overflow-x: auto;
   }
 }
 
@@ -3288,4 +3289,7 @@ textarea {
     display: none;
   }
 
+}
+#quickEffectResults > [data-quick-effect-more] {
+  grid-column: 1 / -1;
 }

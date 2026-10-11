@@ -1065,6 +1065,24 @@ body.enemy-sheet-mode .enemy-field-pair {
   margin-bottom: 8px;
 }
 
+@media (min-width: 761px) {
+  .character-primary-fields {
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .character-level-field > .number-stepper-label {
+    padding-left: 0;
+  }
+}
+
+@media (min-width: 901px) {
+  .character-primary-fields {
+    width: calc(100% - 112px);
+  }
+}
+
 .character-details-toggle {
   display: none;
 }
@@ -1076,6 +1094,11 @@ body.enemy-sheet-mode .enemy-field-pair {
 .character-image-panel {
   display: grid;
   gap: 8px;
+}
+
+.character-secondary-fields #reach {
+  width: 100%;
+  max-width: none;
 }
 
 .character-image-frame {
@@ -1401,7 +1424,9 @@ body.enemy-sheet-mode .enemy-field-pair {
 
 .ability-table th:last-child,
 .ability-table td:last-child {
-  width: 122px;
+  width: 96px;
+  padding-left: 0;
+  padding-right: 0;
 }
 
 .ability-table input {
@@ -1528,11 +1553,6 @@ body.enemy-sheet-mode .enemy-field-pair {
     width: 52px;
   }
 
-  .ability-table th:last-child,
-  .ability-table td:last-child {
-    width: 108px;
-  }
-
 }
 
 .skill-table {
@@ -1567,17 +1587,19 @@ body.enemy-sheet-mode .enemy-field-pair {
 .save-table td:nth-child(2),
 .save-table th:nth-child(3),
 .save-table td:nth-child(3),
+.save-table th:nth-child(4),
+.save-table td:nth-child(4),
 .save-table th:nth-child(5),
-.save-table td:nth-child(5),
-.save-table th:nth-child(6),
-.save-table td:nth-child(6) {
+.save-table td:nth-child(5) {
   width: 46px;
   text-align: center;
 }
 
-.save-table th:nth-child(4),
-.save-table td:nth-child(4) {
-  width: 100px;
+.save-table th:nth-child(6),
+.save-table td:nth-child(6) {
+  width: 96px;
+  padding-left: 0;
+  padding-right: 0;
 }
 
 .save-table input,
@@ -1619,15 +1641,15 @@ body.enemy-sheet-mode .enemy-field-pair {
   .save-table td:nth-child(2),
   .save-table th:nth-child(3),
   .save-table td:nth-child(3),
+  .save-table th:nth-child(4),
+  .save-table td:nth-child(4),
   .save-table th:nth-child(5),
-  .save-table td:nth-child(5),
-  .save-table th:nth-child(6),
-  .save-table td:nth-child(6) {
+  .save-table td:nth-child(5) {
     width: 42px;
   }
 
-  .save-table th:nth-child(4),
-  .save-table td:nth-child(4) {
+  .save-table th:nth-child(6),
+  .save-table td:nth-child(6) {
     width: 92px;
   }
 
@@ -1637,6 +1659,10 @@ body.enemy-sheet-mode .enemy-field-pair {
   min-width: 180px;
   max-width: 320px;
   white-space: normal;
+}
+
+.skill-table tbody tr.is-untrained-skill {
+  opacity: 0.48;
 }
 
 .skill-table .class-skill-heading,
@@ -1724,12 +1750,12 @@ body.enemy-sheet-mode .enemy-field-pair {
 
 .skill-table th:nth-child(3),
 .skill-table td:nth-child(3) {
-  width: 18%;
+  width: 11%;
 }
 
 .skill-table th:nth-child(4),
 .skill-table td:nth-child(4) {
-  width: 11%;
+  width: 18%;
 }
 
 .skill-table th:nth-child(5),
@@ -1878,12 +1904,12 @@ body.enemy-sheet-mode .enemy-field-pair {
 
   .skill-table th:nth-child(3),
   .skill-table td:nth-child(3) {
-    width: 18%;
+    width: 10%;
   }
 
   .skill-table th:nth-child(4),
   .skill-table td:nth-child(4) {
-    width: 10%;
+    width: 18%;
   }
 
   .skill-table th:nth-child(5),
@@ -2002,9 +2028,15 @@ select {
 
 .ability-total-input,
 .save-table .total-first-input,
+.skill-table .total-first-input,
 #hitPointsTotal,
-#initTotal {
-  font-size: 1rem;
+#initTotal,
+#acTotal,
+#acTouch,
+#acFlat,
+#bab,
+#cmbTotal,
+#cmdTotal {
   font-weight: 700;
 }
 
@@ -2206,7 +2238,7 @@ textarea.enemy-header-control.form-control-sm {
 .inventory-count-actions {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
   flex: 0 0 auto;
 }
 
@@ -2234,12 +2266,12 @@ textarea.enemy-header-control.form-control-sm {
 }
 
 .inventory-icon-btn {
-  width: 24px;
-  height: 24px;
+  width: 34px;
+  height: 34px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0;
+  padding: 5px;
 }
 
 .inventory-description {
@@ -2343,22 +2375,6 @@ textarea.enemy-header-control.form-control-sm {
   min-height: min(48vh, 460px);
   max-height: min(62vh, 680px);
   overflow: auto;
-}
-
-#effectTrackerModal .modal-dialog {
-  align-items: flex-start;
-  margin-top: 1rem;
-  margin-bottom: 1rem;
-}
-
-#effectTrackerModal .modal-content {
-  max-height: calc(100vh - 2rem);
-  overflow: hidden;
-}
-
-#effectTrackerModal .modal-body {
-  min-height: 0;
-  overflow-y: auto;
 }
 
 .source-results-panel {

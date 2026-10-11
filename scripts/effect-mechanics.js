@@ -12,6 +12,7 @@
     "immunities",
     "applyConditions",
     "classSkillGrants",
+    "useUntrained",
     "bonusRanks",
     "extraRanksPerLevel",
     "featGrants",
@@ -28,6 +29,7 @@
 
   const CHOICE_BEARING_EXTRA_KEYS = Object.freeze([
     "classSkillGrants",
+    "useUntrained",
     "bonusRanks",
     "featGrants",
     "spellLikeAbilities",
@@ -41,6 +43,7 @@
   const PROMPTED_CHOICE_MECHANIC_KEYS = Object.freeze([
     BASE_EFFECT_KEY,
     "classSkillGrants",
+    "useUntrained",
     "bonusRanks",
     "spellLikeAbilities",
     "casterLevelBonuses",

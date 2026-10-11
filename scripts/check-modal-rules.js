@@ -78,6 +78,25 @@ for (const file of javascriptFiles) {
 const modalRules = source(path.join(root, "scripts", "modal-rules.js"));
 assert(modalRules.includes(".modal input[type='number']"));
 assert(modalRules.includes("MutationObserver"));
+assert(modalRules.includes('classList.add("modal-dialog-scrollable")'));
+
+const modalStyles = source(path.join(root, "css", "modal-rules.css"));
+assert(modalStyles.includes("@media (max-width: 575.98px)"));
+assert(modalStyles.includes(".modal .modal-header,"));
+assert(modalStyles.includes(".modal .modal-body {\n    padding: 0.5rem;"));
+assert(modalStyles.includes(".modal .nav-link {"));
+assert(modalStyles.includes(".modal .accordion-button {"));
+assert(modalStyles.includes("grid-template-columns: 1.75rem minmax(0, 1fr) 1.75rem;"));
+assert(modalStyles.includes(".modal.modal-workspace .modal-dialog {"));
+assert(modalStyles.includes(".modal.modal-workspace .modal-content {"));
+
+const characterSheetStyles = source(
+  path.join(root, "css", "character-sheet.css"),
+);
+assert(
+  !characterSheetStyles.includes("#effectTrackerModal .modal-header"),
+  "Shared modal sizing must not be duplicated in the Effects modal.",
+);
 
 const allModalSources = [...htmlFiles, ...javascriptFiles]
   .map(source)
@@ -88,5 +107,5 @@ assert(
 );
 
 console.log(
-  "Modal checks passed for persistent footers, Cancel exits, separate handlers, and numeric steppers.",
+  "Modal checks passed for compact mobile layout, persistent footers, Cancel exits, separate handlers, and numeric steppers.",
 );

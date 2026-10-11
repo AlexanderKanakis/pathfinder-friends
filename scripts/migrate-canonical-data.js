@@ -12,6 +12,7 @@ const mechanicKeys = [
   "immunities",
   "applyConditions",
   "classSkillGrants",
+  "useUntrained",
   "bonusRanks",
   "extraRanksPerLevel",
   "featGrants",

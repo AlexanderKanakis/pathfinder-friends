@@ -263,6 +263,12 @@
       namePrefix: "Knowledge",
     },
     {
+      id: "skills-class-trained",
+      label: "Class Trained-Only Skills",
+      trainedOnly: true,
+      classSkillOnly: true,
+    },
+    {
       id: "skills-craft",
       label: "Craft Skills",
       namePrefix: "Craft",
@@ -413,12 +419,14 @@
         ability: entry[1],
         custom: Boolean(entry[2]),
         untrained: entry.length >= 4 ? Boolean(entry[3]) : null,
+        classSkill: Boolean(entry[4]),
       };
     }
     return {
       name: entry?.name,
       ability: entry?.ability,
       custom: Boolean(entry?.custom),
+      classSkill: Boolean(entry?.classSkill),
       untrained:
         typeof entry?.untrained === "boolean" ? entry.untrained : null,
     };
@@ -1080,7 +1088,10 @@
         .map(normalizeSkillEntry)
         .filter((entry) => {
           if (pool.trainedOnly)
-            return skillTrainingStatus(entry.name) === "trained";
+            return (
+              skillTrainingStatus(entry.name) === "trained" &&
+              (!pool.classSkillOnly || entry.classSkill)
+            );
           if (pool.untrained)
             return skillTrainingStatus(entry.name) === "untrained";
           if (

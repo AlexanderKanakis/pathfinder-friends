@@ -45,6 +45,16 @@ function checkLiteralGateway(results, gateway) {
   }
 }
 
+function checkRuntimeBonusPersistenceGate(results) {
+  const text = readProjectFile("scripts/buff-tracker-widget.js");
+  const body = functionBody(text, "hasPersistentEffectMechanics");
+  if (!body.includes("effect.bonuses")) {
+    results.push(
+      "Buff tracker persistence gate must accept resolved runtime bonuses.",
+    );
+  }
+}
+
 function functionBody(text, functionName) {
   let start = text.indexOf(`function ${functionName}`);
   if (start < 0) start = text.indexOf(`async ${functionName}`);
@@ -277,17 +287,29 @@ function checkMapItemActiveAbilityGateway(results) {
 function checkMapEffectGroupNavigation(results) {
   const script = readProjectFile("scripts/pages/map.js");
   const html = readProjectFile("map.html");
-  for (const group of ["personal", "spells", "conditions", "other", "passives"]) {
-    if (
-      !script.includes(`${group}:`) ||
-      !html.includes(`data-quick-effect-group="${group}"`)
-    ) {
+  for (const group of [
+    "spells",
+    "conditions",
+    "class",
+    "racial",
+    "feats",
+    "items",
+    "other",
+  ]) {
+    if (!html.includes(`data-quick-effect-group="${group}"`)) {
       results.push(`Map effect groups: missing ${group} navigation support.`);
     }
   }
-  if (!script.includes("quickEffectGroupFor")) {
-    results.push("Map effect groups: missing effect classification gateway.");
+  if (
+    !script.includes("quickEffectGroupFor") ||
+    !script.includes("window.PFEffectTracker?.sourceGroup?.(effect)")
+  ) {
+    results.push("Map effect groups: missing shared effect classification gateway.");
   }
+  if (html.includes('data-quick-effect-group="personal"'))
+    results.push("Map effect groups: obsolete Personal navigation is still present.");
+  if (html.includes('data-quick-effect-group="passives"'))
+    results.push("Map effect groups: passive effects must not appear in Apply Effect.");
   if (
     !script.includes("characterOwnedSpellEffects") ||
     !script.includes("renderOwnedSpellEffects") ||
@@ -550,6 +572,7 @@ checkAuraLinks(errors);
 checkInventoryActiveAbilityGateway(errors);
 checkMapItemActiveAbilityGateway(errors);
 checkMapEffectGroupNavigation(errors);
+checkRuntimeBonusPersistenceGate(errors);
 registryGateways.forEach((gateway) => checkRegistryGateway(errors, gateway));
 literalGateways.forEach((gateway) => checkLiteralGateway(errors, gateway));
 choiceFunctionGateways.forEach((gateway) =>

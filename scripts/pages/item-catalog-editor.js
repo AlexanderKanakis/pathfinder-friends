@@ -427,6 +427,7 @@ function itemHasEffects(item) {
       (Array.isArray(item.immunities) && item.immunities.length) ||
       (Array.isArray(item.applyConditions) && item.applyConditions.length) ||
       (Array.isArray(item.classSkillGrants) && item.classSkillGrants.length) ||
+      (Array.isArray(item.useUntrained) && item.useUntrained.length) ||
       (Array.isArray(item.bonusRanks) && item.bonusRanks.length) ||
       (Array.isArray(item.extraRanksPerLevel) &&
         item.extraRanksPerLevel.length) ||
@@ -868,6 +869,7 @@ function commitSelectedItem() {
     immunities,
     applyConditions,
     classSkillGrants,
+    useUntrained,
     bonusRanks,
     extraRanksPerLevel,
     featGrants,
@@ -891,6 +893,7 @@ function commitSelectedItem() {
   item.immunities = immunities;
   item.applyConditions = applyConditions;
   item.classSkillGrants = classSkillGrants;
+  item.useUntrained = useUntrained;
   item.bonusRanks = bonusRanks;
   item.extraRanksPerLevel = extraRanksPerLevel;
   item.featGrants = featGrants;

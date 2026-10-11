@@ -523,6 +523,11 @@
       request,
     );
     if (resolvedClassSkillGrants === null) return null;
+    const resolvedUseUntrained = await resolveChoiceStats(
+      option.useUntrained,
+      request,
+    );
+    if (resolvedUseUntrained === null) return null;
     const resolvedBonusRanks = await resolveChoiceStats(
       option.bonusRanks,
       request,
@@ -558,6 +563,7 @@
       ...option,
       effects: resolvedEffects,
       classSkillGrants: resolvedClassSkillGrants,
+      useUntrained: resolvedUseUntrained,
       bonusRanks: resolvedBonusRanks,
       spellLikeAbilities: resolvedSpellLikeAbilities,
       casterLevelBonuses: resolvedCasterLevelBonuses,
@@ -621,6 +627,11 @@
         request,
       );
       if (resolvedClassSkillGrants === null) return;
+      const resolvedUseUntrained = await resolveChoiceStats(
+        ability.useUntrained,
+        request,
+      );
+      if (resolvedUseUntrained === null) return;
       const resolvedBonusRanks = await resolveChoiceStats(
         ability.bonusRanks,
         request,
@@ -663,6 +674,9 @@
         bonuses: resolved,
         ...(resolvedClassSkillGrants.length
           ? { classSkillGrants: resolvedClassSkillGrants }
+          : {}),
+        ...(resolvedUseUntrained.length
+          ? { useUntrained: resolvedUseUntrained }
           : {}),
         ...(resolvedBonusRanks.length ? { bonusRanks: resolvedBonusRanks } : {}),
         ...(resolvedSpellLikeAbilities.length

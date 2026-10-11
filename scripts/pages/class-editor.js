@@ -1083,6 +1083,7 @@ function syncPoolAcrossLevels(levelIndex, featureIndex, poolIndex) {
             "immunities",
             "applyConditions",
             "classSkillGrants",
+            "useUntrained",
             "bonusRanks",
             "extraRanksPerLevel",
             "featGrants",

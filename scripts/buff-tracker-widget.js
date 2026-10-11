@@ -1,5 +1,6 @@
 (function () {
   const STYLE_ID = "pf-effect-tracker-style";
+  const PICKER_RESULT_BATCH_SIZE = 80;
   const CHOICE_POOL_MECHANIC_KEYS =
     window.PFEffectMechanics?.extraKeys?.() || [
       "damageReduction",
@@ -27,34 +28,44 @@
     style.id = STYLE_ID;
     style.textContent = `
       .effect-tracker-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+      .effect-tracker-add-shell { margin-bottom: 1rem; }
+      .effect-tracker-add-row { display: grid; gap: 8px; grid-template-columns: minmax(0, 1fr) max-content; }
+      .effect-tracker-add-row .form-control { min-width: 0; }
+      .effect-tracker-add-row .btn { white-space: nowrap; }
       .effect-search-modal-dialog { width: min(1140px, calc(100vw - 2rem)); max-width: min(1140px, calc(100vw - 2rem)); min-width: min(860px, calc(100vw - 2rem)); }
       .effect-search-modal-dialog .modal-content { width: 100%; height: min(82vh, 820px); }
-      .effect-search-modal-body { display: grid; grid-template-rows: auto auto auto minmax(0, 1fr); min-height: 0; }
-      .effect-browser-nav { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); background: #1b1b1b; margin-bottom: 12px; }
+      .effect-search-modal-body { display: grid; grid-template-rows: auto auto minmax(0, 1fr); min-height: 0; }
+      .effect-browser-nav { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); background: #1b1b1b; margin-bottom: 12px; }
       .effect-browser-nav .nav-link { border: 0; border-bottom: 2px solid transparent; border-radius: 0; color: #ccc; min-width: 0; }
       .effect-browser-nav .nav-link.active { background: transparent; border-bottom-color: #0dcaf0; color: #fff; font-weight: 700; }
       .effect-browser-group-title { color: #aaa; font-size: 12px; letter-spacing: .04em; margin: 0 0 8px; text-transform: uppercase; }
       .effect-browser-list { display: grid; gap: 8px; align-content: start; }
       .effect-search-results.effect-browser-list { grid-template-columns: 1fr; }
+      [data-effect-browser-more] { grid-column: 1 / -1; }
       .effect-browser-row { align-items: center; background: #242424; border: 1px solid #444; border-radius: 7px; color: #f4f4f4; display: grid; gap: 10px; grid-template-columns: minmax(0, 1fr) auto; min-height: 54px; padding: 9px 12px; text-align: left; }
       .effect-browser-row[role="button"] { cursor: pointer; }
       .effect-browser-row[role="button"]:hover, .effect-browser-row[role="button"]:focus { border-color: #0dcaf0; outline: none; }
-      .effect-browser-row.is-passive { cursor: default; opacity: .9; }
       .effect-browser-row.is-condition { min-height: 58px; }
       .effect-browser-row-title { font-weight: 700; }
       .effect-browser-row-meta { color: #aaa; font-size: 12px; }
-      .effect-browser-controls { align-items: center; display: flex; gap: 10px; }
+      .effect-browser-controls { align-items: center; display: flex; flex-wrap: wrap; gap: 10px; }
       .effect-browser-number-control { align-items: center; display: flex; gap: 6px; margin: 0; white-space: nowrap; }
+      .effect-browser-condition-control { align-items: center; display: flex; gap: 6px; margin: 0; white-space: nowrap; }
+      .effect-browser-condition-control .form-select { min-width: 132px; }
       .effect-browser-number-control .modal-number-stepper { width: 132px; }
       .effect-browser-controls .form-check { align-items: center; display: flex; min-height: 31px; margin: 0 !important; }
       .effect-browser-controls input[type="number"] { width: 68px; }
       .effect-browser-type-section + .effect-browser-type-section { margin-top: 14px; }
-      .effect-browser-spell-class { border: 1px solid #444; border-radius: 7px; padding: 10px; }
-      .effect-browser-spell-class + .effect-browser-spell-class { margin-top: 10px; }
+      .effect-browser-spell-class + .effect-browser-spell-class { margin-top: 14px; }
+      .effect-browser-spell-class-title { margin-bottom: 6px; }
       .effect-browser-spell-level { border: 1px solid #3d3d3d; border-radius: 7px; display: grid; gap: 12px; grid-template-columns: 46px minmax(0, 1fr); margin-top: 8px; padding: 10px; }
       .effect-browser-level-number { color: #ffd86b; font-size: 24px; font-weight: 700; text-align: center; }
       .effect-browser-spell-columns { display: grid; gap: 14px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .effect-browser-spell-column-title { color: #aaa; font-size: 11px; margin-bottom: 5px; text-transform: uppercase; }
+      .effect-browser-spell-mobile-tabs { display: none; gap: 2px; border-bottom: 1px solid #333; background: #121212; margin-bottom: 8px; }
+      .effect-browser-spell-mobile-tab { flex: 1 1 0; min-width: 0; border: 0; border-bottom: 2px solid transparent; border-radius: 0; background: transparent; color: #bbb; padding: 7px 8px 8px; line-height: 1.1; text-align: center; }
+      .effect-browser-spell-mobile-tab:hover, .effect-browser-spell-mobile-tab:focus { color: #fff; background: #1b1b1b; outline: none; }
+      .effect-browser-spell-mobile-tab.active { color: #fff; border-bottom-color: #0dcaf0; background: #202020; }
       .effect-browser-spell-button { display: block; margin-bottom: 5px; overflow: hidden; text-align: left; text-overflow: ellipsis; white-space: nowrap; width: 100%; }
       .effect-browser-loading { pointer-events: none; }
       .effect-browser-loading-line { animation: effect-browser-loading-pulse 1.1s ease-in-out infinite alternate; background: #4a4a4a; border-radius: 4px; display: block; height: 10px; width: min(72%, 260px); }
@@ -62,7 +73,7 @@
       .effect-browser-loading-line.is-short { width: min(34%, 110px); }
       .effect-browser-loading-spell { animation: effect-browser-loading-pulse 1.1s ease-in-out infinite alternate; background: #303030; border: 1px solid #46545a; border-radius: 4px; height: 31px; margin-bottom: 5px; }
       @keyframes effect-browser-loading-pulse { from { opacity: .48; } to { opacity: 1; } }
-      .effect-search-results { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; align-content: start; height: 100%; min-height: 0; overflow: auto; }
+      .effect-search-results { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: max-content; gap: 10px; align-content: start; height: 100%; min-height: 0; overflow: auto; }
       .effect-tracker-search-trigger { cursor: pointer; }
       .effect-tracker-card { position: relative; min-height: 116px; background: #242424; border: 1px solid #444; border-radius: 8px; padding: 12px 52px 12px 12px; text-align: left; color: #f4f4f4; cursor: pointer; }
       .effect-tracker-card:hover, .effect-tracker-card:focus { border-color: #0d6efd; outline: none; box-shadow: 0 0 0 2px rgba(13, 110, 253, .25); }
@@ -70,18 +81,14 @@
       .effect-tracker-card-ability:hover, .effect-tracker-card-ability:focus { border-color: #8fd19e; box-shadow: 0 0 0 2px rgba(143, 209, 158, .25); }
       .effect-tracker-ability-badge { display: inline-block; background: rgba(143, 209, 158, .16); border: 1px solid rgba(143, 209, 158, .4); color: #d9f5df; border-radius: 999px; padding: 1px 7px; font-size: 11px; margin-bottom: 4px; }
       .effect-tracker-icon { position: absolute; top: 10px; right: 10px; width: 28px; height: 28px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; background: #151515; border: 1px solid #555; color: #9ec5fe; }
-      .effect-tracker-controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 10px; }
-      .effect-tracker-inline { display: inline-flex; align-items: center; gap: 4px; }
-      .effect-tracker-inline input[type="number"] { width: 62px; }
       .effect-tracker-chip { display: inline-block; margin: 2px 3px 2px 0; color: #ddd; }
       .effect-tracker-active { background: #242424; border: 1px solid #444; border-radius: 8px; padding: 10px; margin-bottom: 8px; }
       .effect-tracker-loading-card { min-height: 66px; pointer-events: none; }
       .effect-tracker-loading-line { animation: effect-browser-loading-pulse 1.1s ease-in-out infinite alternate; background: #4a4a4a; border-radius: 4px; display: block; height: 10px; width: min(68%, 260px); }
       .effect-tracker-loading-line.is-title { background: #5b5b5b; height: 15px; margin-bottom: 9px; width: min(42%, 170px); }
-      .effect-active-group { margin-top: 10px; }
-      .effect-active-group-title { color: #bbb; font-size: 12px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; margin: 0 0 6px; }
-      .effect-active-toolbar { display: flex; justify-content: space-between; align-items: end; gap: 10px; margin-bottom: 8px; }
-      .effect-active-toolbar select { max-width: 180px; }
+      .effect-active-nav { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); background: #1b1b1b; margin-bottom: 10px; }
+      .effect-active-nav .nav-link { border: 0; border-bottom: 2px solid transparent; border-radius: 0; color: #ccc; min-width: 0; padding-inline: 4px; }
+      .effect-active-nav .nav-link.active { background: transparent; border-bottom-color: #0dcaf0; color: #fff; font-weight: 700; }
       .effect-active-head { display: grid; grid-template-columns: minmax(0, 1fr) 68px; gap: 10px; align-items: start; }
       .effect-active-actions { display: flex; gap: 4px; justify-content: end; }
       .effect-active-actions .btn { width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center; padding: 0; }
@@ -142,9 +149,29 @@
         .effect-search-modal-dialog { min-width: 0; }
         .effect-tracker-grid,
         .effect-search-results { grid-template-columns: 1fr; }
-        .effect-browser-nav { grid-template-columns: repeat(5, minmax(90px, 1fr)); overflow-x: auto; }
-        .effect-browser-spell-columns { grid-template-columns: 1fr; }
+        .effect-browser-nav { grid-template-columns: repeat(7, minmax(90px, 1fr)); overflow-x: auto; }
+        .effect-browser-spell-level { grid-template-columns: 1fr; gap: 6px; padding: 8px; }
+        .effect-browser-spell-mobile-tabs { display: flex; }
+        .effect-browser-spell-panel { display: none; }
+        .effect-browser-spell-panel.is-mobile-active { display: block; }
+        .effect-browser-spell-column-title { display: none; }
         .effect-browser-row.is-condition { align-items: start; grid-template-columns: 1fr; }
+        .effect-tracker-add-shell { margin-bottom: 6px; }
+        .effect-tracker-add-row { gap: 4px; }
+        .effect-tracker-add-row .form-control,
+        .effect-tracker-add-row .btn { min-height: 29px; height: 29px; font-size: 12px; }
+        .effect-active-nav { grid-template-columns: repeat(6, minmax(62px, 1fr)); margin-bottom: 6px; overflow-x: auto; }
+        .effect-active-nav .nav-link { min-height: 31px; padding: 5px 2px; font-size: 12px; line-height: 1.1; }
+        .effect-tracker-active { border-radius: 6px; margin-bottom: 5px; padding: 7px 8px; }
+        .effect-active-head { grid-template-columns: minmax(0, 1fr) 60px; gap: 6px; }
+        .effect-active-head strong { font-size: 13px; line-height: 1.2; }
+        .effect-tracker-active .small-text { font-size: 11px; line-height: 1.25; }
+        .effect-active-actions { gap: 3px; }
+        .effect-active-actions .btn { width: 28px; height: 28px; }
+        .effect-active-adjustments { gap: 5px; margin-top: 5px; }
+        .effect-adjustable-control { gap: 5px; }
+        .effect-adjustable-label { max-width: 86px; font-size: 11px; }
+        .effect-adjustable-control .modal-number-stepper { width: 108px; }
       }
     `;
     document.head.appendChild(style);
@@ -170,14 +197,20 @@
       `,
     ).join("");
     return `
-      <div class="mb-3">
-        <label class="small">Activate</label>
-        <div class="d-flex gap-2">
+      <div class="effect-tracker-add-shell">
+        <div class="effect-tracker-add-row">
           <input class="form-control form-control-sm" placeholder="Loading available abilities..." disabled>
-          <button class="btn btn-outline-success btn-sm" type="button" disabled>Select</button>
+          <button class="btn btn-outline-success btn-sm" type="button" disabled>Apply Effect</button>
         </div>
       </div>
-      <h6>Active Effects</h6>
+      <nav class="nav effect-active-nav" aria-label="Active effect types">
+        <button class="nav-link active" type="button" disabled>Spells</button>
+        <button class="nav-link" type="button" disabled>Conditions</button>
+        <button class="nav-link" type="button" disabled>Class</button>
+        <button class="nav-link" type="button" disabled>Racials</button>
+        <button class="nav-link" type="button" disabled>Feats</button>
+        <button class="nav-link" type="button" disabled>Items</button>
+      </nav>
       <div>${cards}</div>
     `;
   }
@@ -263,13 +296,13 @@
     ),
   };
   const DURATION_UNITS = ["variable", "turn", "round", "minute", "hour", "day"];
-  const ACTIVE_CATEGORY_PRIORITY = [
-    "Spell",
-    "Special Ability",
-    "Feat",
-    "Debuff",
-    "Condition",
-    "Item",
+  const ACTIVE_EFFECT_TABS = [
+    { key: "spell", label: "Spells" },
+    { key: "condition", label: "Conditions" },
+    { key: "class", label: "Class" },
+    { key: "racial", label: "Racials" },
+    { key: "feat", label: "Feats" },
+    { key: "item", label: "Items" },
   ];
 
   function titleCaseStat(value) {
@@ -289,20 +322,87 @@
       .join(" ");
   }
 
-  function activeCategoryRank(category) {
-    const key = String(category || "").toLowerCase();
-    if (key === "item") return Number.MAX_SAFE_INTEGER;
-    const index = ACTIVE_CATEGORY_PRIORITY.findIndex(
-      (item) => item.toLowerCase() === key,
+  function activeEffectTab(effect = {}) {
+    if (isCondition(effect)) return "condition";
+    const sourceGroup = categorizedSourceGroup(effect);
+    if (sourceGroup === "racial") return "racial";
+    if (sourceGroup === "feats") return "feat";
+    if (sourceGroup === "items") return "item";
+    if (sourceGroup === "spells") return "spell";
+    return "class";
+  }
+
+  function categorizedSourceGroup(effect = {}) {
+    const sourceText = [
+      effect.category,
+      effect.sourceCategory,
+      effect.sourceType,
+      effect.type,
+      effect.detailData?.type,
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase();
+    if (/\bclass(?: ability| feature)?\b/.test(sourceText)) return "class";
+    if (/\b(?:race|racial)\b/.test(sourceText)) return "racial";
+    if (/\bfeat\b/.test(sourceText)) return "feats";
+    if (isItemSourcedEffect(effect) || /\bitem\b/.test(sourceText)) return "items";
+    if (/\bspell\b/.test(sourceText)) return "spells";
+    return "other";
+  }
+
+  function effectSourceGroup(effect = {}) {
+    if (isCondition(effect)) return "conditions";
+    if (effect.ownedSpell) return "spells";
+    const categoryGroup = categorizedSourceGroup(effect);
+    if (
+      effect.catalogEffect &&
+      ["class", "racial", "feats", "items"].includes(categoryGroup)
+    )
+      return "other";
+    if (categoryGroup === "spells") return "other";
+    return categoryGroup;
+  }
+
+  function normalizedPickerSource(effect = {}, group = effectSourceGroup(effect)) {
+    const detailKey = group === "class" ? "class" : group === "racial" ? "race" : "";
+    const value = (detailKey && effect.detailData?.[detailKey]) || effect.source || "";
+    return String(value)
+      .split("|")[0]
+      .split(" -- with ")[0]
+      .trim()
+      .toLowerCase();
+  }
+
+  function ownedPickerIdentity(effect = {}) {
+    const group = effectSourceGroup(effect);
+    if (!["class", "racial", "feats", "items"].includes(group)) return "";
+    const name = String(effect.name || "").trim().toLowerCase();
+    if (!name) return "";
+    const source = ["class", "racial"].includes(group)
+      ? normalizedPickerSource(effect, group)
+      : "";
+    return `${group}::${name}::${source}`;
+  }
+
+  function preferOwnedPickerEffects(effects = []) {
+    const rows = Array.isArray(effects) ? effects : [];
+    const owned = new Set(
+      rows
+        .filter((effect) => !effect?.catalogEffect)
+        .map(ownedPickerIdentity)
+        .filter(Boolean),
     );
-    return index >= 0 ? index : ACTIVE_CATEGORY_PRIORITY.length - 1;
+    return rows.filter((effect) => {
+      if (!effect?.catalogEffect) return true;
+      const identity = ownedPickerIdentity(effect);
+      return !identity || !owned.has(identity);
+    });
   }
 
   function sortActiveRows(rows) {
     return rows.sort(
       (a, b) =>
-        activeCategoryRank(a.effect.category) -
-          activeCategoryRank(b.effect.category) ||
         String(a.effect.name || "").localeCompare(
           String(b.effect.name || ""),
         ) ||
@@ -312,16 +412,6 @@
 
   function isItemSourcedEffect(effect = {}) {
     return Boolean(effect.sourceLootId || effect.source_loot_id);
-  }
-
-  function groupedActiveRows(rows) {
-    return rows.reduce((groups, row) => {
-      const category = row.effect.category || "Effect";
-      const group = groups.find((entry) => entry.category === category);
-      if (group) group.rows.push(row);
-      else groups.push({ category, rows: [row] });
-      return groups;
-    }, []);
   }
 
   function categoryIcon(category) {
@@ -385,9 +475,16 @@
     return String(effect?.category || "").toLowerCase() === "condition";
   }
 
+  function conditionUsesTurns(effect = {}) {
+    return window.PFConditionConfig?.usesTurns
+      ? window.PFConditionConfig.usesTurns(effect)
+      : isCondition(effect);
+  }
+
   function hasPersistentEffectMechanics(effect = {}) {
     return Boolean(
       isCondition(effect) ||
+        (Array.isArray(effect.bonuses) && effect.bonuses.length > 0) ||
         effect.auraConfig?.enabled ||
         window.PFEffectMechanics?.hasBranches?.(effect) ||
         window.PFEffectMechanics?.hasAnyMechanics?.(effect),
@@ -457,6 +554,7 @@
 
   function formatDurationRounds(rounds) {
     if (rounds === null || rounds === undefined) return "variable";
+    if (Number(rounds) <= 0) return "0 turns";
     if (rounds === 1) return "1 turn";
     if (rounds % 600 === 0)
       return `${rounds / 600} hour${rounds === 600 ? "" : "s"}`;
@@ -466,19 +564,35 @@
   }
 
   function activeDuration(effect) {
+    if (effect.passiveSource) return "Permanent";
     if (effect.permanent) return "Permanent";
-    if (effect.durationLabel) return effect.durationLabel;
-    if (
-      effect.computedDuration !== undefined &&
-      effect.computedDuration !== null
+    if (conditionUsesTurns(effect)) {
+      const turns = Math.max(
+        0,
+        Number(effect.remaining ?? effect.turns ?? 1) || 0,
+      );
+      return `${turns} turn${turns === 1 ? "" : "s"}`;
+    }
+    const rounds = effect.remaining ?? effect.computedDuration;
+    if (rounds !== undefined && rounds !== null && Number.isFinite(Number(rounds)))
+      return formatDurationRounds(Math.max(0, Number(rounds)));
+    const calculated = parseDuration(effect, effect.casterLevel || 1);
+    if (calculated !== null) return formatDurationRounds(calculated);
+    const stored = String(effect.durationLabel || "")
+      .split("|")
+      .pop()
+      .trim()
+      .replace(/^CL\s*\d+\s*:\s*/i, "");
+    return /^(?:\d+(?:\.\d+)?\s+(?:turns?|rounds?|minutes?|hours?|days?)|permanent|variable)$/i.test(
+      stored,
     )
-      return formatDurationRounds(effect.computedDuration);
-    return durationLabel(effect);
+      ? stored
+      : "Variable";
   }
 
   function appliedDurationLabel(effect) {
     if (effect.permanent) return "Permanent";
-    if (isCondition(effect)) {
+    if (conditionUsesTurns(effect)) {
       const turns = Math.max(1, Number(effect.turns || effect.remaining || 1));
       return `${turns} turn${turns === 1 ? "" : "s"}`;
     }
@@ -658,6 +772,9 @@
       ...(effect.bonuses || []).map(bonusText),
       ...(effect.immunities || []).map(immunityText),
       ...(effect.applyConditions || []).map(applyConditionText),
+      ...(effect.useUntrained || []).map((entry) =>
+        window.PFEffectEditor?.useUntrainedText?.(entry) || "use untrained",
+      ),
       ...(effect.extraRanksPerLevel || []).map(extraRanksPerLevelText),
       ...(effect.featGrants || []).map(featGrantText),
       ...(effect.spellLikeAbilities || []).map(spellLikeText),
@@ -693,29 +810,30 @@
       this.active = [];
       this.prefix = `effectTracker${Math.random().toString(36).slice(2)}`;
       this.saveTimer = null;
-      this.activeTypeFilter = "all";
-      this.pickerGroup = "personal";
+      this.activeTypeFilter = "spell";
+      this.pickerGroup = "spells";
       this.pickerEffects = [];
+      this.passiveEffects = [];
       this.pickerClosingForSelection = false;
       this.pickerFinishing = false;
       this.pickerLoading = false;
       this.pickerReturnModalEl = null;
+      this.pickerSpellPanels = {};
+      this.pickerVisibleLimit = PICKER_RESULT_BATCH_SIZE;
     }
 
     async mount() {
       injectStyles();
       this.container.innerHTML = `
-        <div id="${this.prefix}AddShell" class="mb-3">
-          <label class="small" for="${this.prefix}OpenSearch">Activate</label>
-          <div class="d-flex gap-2">
+        <div id="${this.prefix}AddShell" class="effect-tracker-add-shell">
+          <div class="effect-tracker-add-row">
             <input id="${this.prefix}OpenSearch" class="form-control form-control-sm effect-tracker-search-trigger" placeholder="Search available abilities..." readonly>
-            <button id="${this.prefix}OpenButton" class="btn btn-outline-success btn-sm" type="button">Select</button>
+            <button id="${this.prefix}OpenButton" class="btn btn-outline-success btn-sm" type="button">Apply Effect</button>
           </div>
         </div>
         <div id="${this.prefix}RequestStatus" class="small-text mb-2 d-none"></div>
-        <h6>Active Effects</h6>
         <div id="${this.prefix}Active"></div>
-        <div class="modal fade" id="${this.prefix}PickerModal" tabindex="-1" aria-labelledby="${this.prefix}PickerLabel" aria-hidden="true">
+        <div class="modal fade modal-workspace" id="${this.prefix}PickerModal" tabindex="-1" aria-labelledby="${this.prefix}PickerLabel" aria-hidden="true">
           <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable effect-search-modal-dialog">
             <div class="modal-content bg-dark text-white border-secondary">
               <div class="modal-header border-secondary">
@@ -723,14 +841,15 @@
               </div>
               <div class="modal-body effect-search-modal-body">
                 <nav id="${this.prefix}PickerNav" class="nav nav-pills effect-browser-nav" aria-label="Effect groups" role="tablist">
-                  <button class="nav-link active" type="button" data-effect-browser-group="personal" role="tab" aria-selected="true">Personal</button>
-                  <button class="nav-link" type="button" data-effect-browser-group="spells" role="tab" aria-selected="false">Spells</button>
+                  <button class="nav-link active" type="button" data-effect-browser-group="spells" role="tab" aria-selected="true">Spells</button>
                   <button class="nav-link" type="button" data-effect-browser-group="conditions" role="tab" aria-selected="false">Conditions</button>
+                  <button class="nav-link" type="button" data-effect-browser-group="class" role="tab" aria-selected="false">Class</button>
+                  <button class="nav-link" type="button" data-effect-browser-group="racial" role="tab" aria-selected="false">Racials</button>
+                  <button class="nav-link" type="button" data-effect-browser-group="feats" role="tab" aria-selected="false">Feats</button>
+                  <button class="nav-link" type="button" data-effect-browser-group="items" role="tab" aria-selected="false">Items</button>
                   <button class="nav-link" type="button" data-effect-browser-group="other" role="tab" aria-selected="false">Other</button>
-                  <button class="nav-link" type="button" data-effect-browser-group="passives" role="tab" aria-selected="false">Passives</button>
                 </nav>
                 <input id="${this.prefix}Search" class="form-control form-control-sm mb-3" placeholder="Search effects">
-                <div id="${this.prefix}PickerGroupTitle" class="effect-browser-group-title">Personal Effects</div>
                 <div id="${this.prefix}Results" class="effect-search-results effect-browser-list"></div>
               </div>
               <div class="modal-footer border-secondary">
@@ -746,15 +865,18 @@
       this.pickerModalEl = document.getElementById(`${this.prefix}PickerModal`);
       this.searchEl = document.getElementById(`${this.prefix}Search`);
       this.pickerNavEl = document.getElementById(`${this.prefix}PickerNav`);
-      this.pickerGroupTitleEl = document.getElementById(`${this.prefix}PickerGroupTitle`);
       this.resultsEl = document.getElementById(`${this.prefix}Results`);
       this.activeEl = document.getElementById(`${this.prefix}Active`);
       if (this.pickerModalEl.parentElement !== document.body)
         document.body.appendChild(this.pickerModalEl);
-      this.searchEl.addEventListener("input", () => this.renderResults());
+      this.searchEl.addEventListener("input", () => {
+        this.pickerVisibleLimit = PICKER_RESULT_BATCH_SIZE;
+        this.renderResults();
+      });
       this.pickerNavEl.querySelectorAll("[data-effect-browser-group]").forEach((button) => {
         button.addEventListener("click", () => {
-          this.pickerGroup = button.dataset.effectBrowserGroup || "personal";
+          this.pickerGroup = button.dataset.effectBrowserGroup || "spells";
+          this.pickerVisibleLimit = PICKER_RESULT_BATCH_SIZE;
           this.renderResults();
         });
       });
@@ -777,6 +899,7 @@
       if (!this.options.characterId) {
         this.effects = [];
         this.active = [];
+        this.passiveEffects = [];
         this.updateSearchVisibility();
         this.renderResults();
         this.renderActive();
@@ -786,13 +909,19 @@
         ? this.options.activatableAbilities
         : [];
       this.effects = abilities;
-      const saved = this.options.loadActiveEffects
-        ? await this.options.loadActiveEffects()
-        : await PFApp.loadBuffState(
-            this.options.contextKey,
-            this.options.characterId,
-          );
+      const [saved, passives] = await Promise.all([
+        this.options.loadActiveEffects
+          ? this.options.loadActiveEffects()
+          : PFApp.loadBuffState(
+              this.options.contextKey,
+              this.options.characterId,
+            ),
+        this.options.loadPassiveEffects
+          ? this.options.loadPassiveEffects()
+          : Promise.resolve([]),
+      ]);
       this.active = Array.isArray(saved) ? saved : saved?.buffs || [];
+      this.passiveEffects = Array.isArray(passives) ? passives : [];
       this.updateSearchVisibility();
       this.renderResults();
       this.renderActive();
@@ -800,6 +929,11 @@
 
     setActiveEffects(effects = []) {
       this.active = Array.isArray(effects) ? [...effects] : [];
+      this.renderActive();
+    }
+
+    setPassiveEffects(effects = []) {
+      this.passiveEffects = Array.isArray(effects) ? [...effects] : [];
       this.renderActive();
     }
 
@@ -820,21 +954,7 @@
     }
 
     pickerGroupFor(effect = {}) {
-      if (effect.passiveSource) return "passives";
-      if (isCondition(effect)) return "conditions";
-      if (effect.ownedSpell) return "spells";
-      if (effect.fromAbility) return "personal";
-      return "other";
-    }
-
-    pickerGroupLabel(group = this.pickerGroup) {
-      return {
-        personal: "Personal Effects",
-        spells: "Spells",
-        conditions: "Conditions",
-        other: "Other Effects",
-        passives: "Passives",
-      }[group] || "Effects";
+      return effectSourceGroup(effect);
     }
 
     waitForModalHidden(modalEl) {
@@ -872,7 +992,8 @@
 
     async openPicker() {
       if (!this.options.characterId) return;
-      this.pickerGroup = "personal";
+      this.pickerGroup = "spells";
+      this.pickerVisibleLimit = PICKER_RESULT_BATCH_SIZE;
       this.searchEl.value = "";
       this.pickerLoading = true;
       this.renderPickerNav();
@@ -883,7 +1004,9 @@
       try {
         const source = this.options.effectPickerEffects;
         const loaded = typeof source === "function" ? await source() : source;
-        this.pickerEffects = Array.isArray(loaded) ? loaded : [...this.effects];
+        this.pickerEffects = preferOwnedPickerEffects(
+          Array.isArray(loaded) ? loaded : this.effects,
+        );
       } catch (error) {
         console.error(error);
         this.pickerEffects = [...this.effects];
@@ -906,8 +1029,6 @@
           button.classList.toggle("active", active);
           button.setAttribute("aria-selected", String(active));
         });
-      if (this.pickerGroupTitleEl)
-        this.pickerGroupTitleEl.textContent = this.pickerGroupLabel();
     }
 
     hidePicker() {
@@ -923,9 +1044,16 @@
     }
 
     pickerControls(effect) {
-      if (effect.passiveSource) return "";
       const needsCl = durationUsesCasterLevel(effect);
-      const condition = isCondition(effect);
+      const configurable = window.PFConditionConfig?.isConfigurable?.(effect);
+      const needsAbility = window.PFConditionConfig?.needsAbility?.(effect);
+      const adjustment = effect.adjustableCondition || {};
+      const abilityOptions = (window.PFConditionConfig?.ABILITIES || [])
+        .map(
+          ([value, label]) =>
+            `<option value="${escapeHtml(value)}" ${value === adjustment.stat ? "selected" : ""}>${escapeHtml(label)}</option>`,
+        )
+        .join("");
       return `
         <div class="effect-browser-controls">
           ${
@@ -933,28 +1061,21 @@
               ? `<label class="small effect-browser-number-control"><span>CL</span><input class="form-control form-control-sm" data-picker-cl type="number" min="1" value="${escapeHtml(effect.casterLevel || 1)}"></label>`
               : ""
           }
+          ${needsAbility ? `<label class="small effect-browser-condition-control"><span>Ability</span><select class="form-select form-select-sm" data-picker-condition-ability>${abilityOptions}</select></label>` : ""}
+          ${configurable ? `<label class="small effect-browser-number-control"><span>${escapeHtml(adjustment.label || "Amount")}</span><input class="form-control form-control-sm" data-picker-condition-amount type="number" min="${Math.max(1, Number(adjustment.minimum || 1))}" value="${Math.max(1, Number(adjustment.amount || 1))}" inputmode="numeric"></label>` : ""}
           ${
-            condition
+            conditionUsesTurns(effect)
               ? `<label class="small effect-browser-number-control"><span>Turns</span><input class="form-control form-control-sm" data-picker-turns type="number" min="1" value="1"></label>`
               : ""
           }
-          <label class="form-check small mb-1">
-            <input class="form-check-input" data-picker-permanent type="checkbox">
-            <span class="form-check-label">Permanent</span>
-          </label>
         </div>
       `;
     }
 
     pickerRowHtml(effect, index) {
-      const passive = Boolean(effect.passiveSource);
       const condition = isCondition(effect);
       return `
-        <article class="effect-browser-row${passive ? " is-passive" : ""}${condition ? " is-condition" : ""}" ${
-          passive
-            ? ""
-            : `role="button" tabindex="0" data-picker-effect-index="${index}"`
-        }>
+        <article class="effect-browser-row${condition ? " is-condition" : ""}" role="button" tabindex="0" data-picker-effect-index="${index}">
           <div>
             <div class="effect-browser-row-title">${escapeHtml(effect.name || "Effect")}</div>
             ${condition ? "" : `<div class="effect-browser-row-meta">${escapeHtml(effect.category || "Effect")}${
@@ -980,7 +1101,7 @@
         .map(
           ([className, levels]) => `
             <section class="effect-browser-spell-class">
-              <div class="fw-bold text-uppercase">${escapeHtml(className)}</div>
+              <div class="effect-browser-spell-class-title fw-bold text-uppercase">${escapeHtml(className)}</div>
               ${[...levels.entries()]
                 .sort((a, b) => a[0] - b[0])
                 .map(([level, spells]) => {
@@ -990,6 +1111,8 @@
                   const right = spells.filter(
                     ({ effect }) => effect.spellMeta?.bucket === "prepared",
                   );
+                  const mobileGroup = `${className}:${level}`;
+                  const activePanel = this.pickerSpellPanels[mobileGroup] || "known";
                   const buttons = (entries) =>
                     entries
                       .map(
@@ -1003,12 +1126,16 @@
                   return `
                     <div class="effect-browser-spell-level">
                       <div class="effect-browser-level-number">${level}</div>
+                      <div class="effect-browser-spell-mobile-tabs" role="group" aria-label="${escapeHtml(className)} level ${level} spells">
+                        <button class="effect-browser-spell-mobile-tab${activePanel === "known" ? " active" : ""}" type="button" data-effect-browser-spell-tab="known" data-effect-browser-spell-group="${escapeHtml(mobileGroup)}" aria-selected="${activePanel === "known"}">Known</button>
+                        <button class="effect-browser-spell-mobile-tab${activePanel === "prepared" ? " active" : ""}" type="button" data-effect-browser-spell-tab="prepared" data-effect-browser-spell-group="${escapeHtml(mobileGroup)}" aria-selected="${activePanel === "prepared"}">Prepared</button>
+                      </div>
                       <div class="effect-browser-spell-columns">
-                        <div>
+                        <div class="effect-browser-spell-panel${activePanel === "known" ? " is-mobile-active" : ""}" data-effect-browser-spell-panel="known">
                           <div class="effect-browser-spell-column-title">Known / In Book</div>
                           ${buttons(left)}
                         </div>
-                        <div>
+                        <div class="effect-browser-spell-panel${activePanel === "prepared" ? " is-mobile-active" : ""}" data-effect-browser-spell-panel="prepared">
                           <div class="effect-browser-spell-column-title">Prepared Today</div>
                           ${buttons(right)}
                         </div>
@@ -1057,6 +1184,38 @@
 
     bindPickerRows() {
       this.resultsEl
+        .querySelector("[data-effect-browser-more]")
+        ?.addEventListener("click", () => {
+          this.pickerVisibleLimit += PICKER_RESULT_BATCH_SIZE;
+          this.renderResults();
+        });
+      this.resultsEl
+        .querySelectorAll("[data-effect-browser-spell-tab]")
+        .forEach((button) => {
+          button.addEventListener("click", () => {
+            const group = button.dataset.effectBrowserSpellGroup || "";
+            const target = button.dataset.effectBrowserSpellTab || "known";
+            this.pickerSpellPanels[group] = target;
+            const wrapper = button.closest(".effect-browser-spell-level");
+            if (!wrapper) return;
+            wrapper
+              .querySelectorAll("[data-effect-browser-spell-tab]")
+              .forEach((tab) => {
+                const active = tab.dataset.effectBrowserSpellTab === target;
+                tab.classList.toggle("active", active);
+                tab.setAttribute("aria-selected", String(active));
+              });
+            wrapper
+              .querySelectorAll("[data-effect-browser-spell-panel]")
+              .forEach((panel) => {
+                panel.classList.toggle(
+                  "is-mobile-active",
+                  panel.dataset.effectBrowserSpellPanel === target,
+                );
+              });
+          });
+        });
+      this.resultsEl
         .querySelectorAll("[data-picker-effect-index]")
         .forEach((row) => {
           const choose = () =>
@@ -1078,7 +1237,13 @@
 
     async choosePickerEffect(index, row) {
       const effect = this.pickerEffects[index];
-      if (!effect || effect.passiveSource) return;
+      if (!effect) return;
+      const configuredEffect = window.PFConditionConfig?.isConfigurable?.(effect)
+        ? window.PFConditionConfig.configure(effect, {
+            ability: row?.querySelector?.("[data-picker-condition-ability]")?.value,
+            amount: row?.querySelector?.("[data-picker-condition-amount]")?.value,
+          })
+        : effect;
       const selection = {
         casterLevel: Math.max(
           1,
@@ -1093,9 +1258,7 @@
             10,
           ) || 1,
         ),
-        permanent: Boolean(
-          row?.querySelector?.("[data-picker-permanent]")?.checked,
-        ),
+        permanent: false,
       };
       this.pickerClosingForSelection = true;
       await this.hidePicker();
@@ -1124,7 +1287,7 @@
             cast = true;
             closeDetails?.();
             await new Promise((resolve) => setTimeout(resolve, 180));
-            await this.addEffectDefinition(effect, {
+            await this.addEffectDefinition(configuredEffect, {
               ...selection,
               casterLevel: casterLevel || selection.casterLevel,
             });
@@ -1135,7 +1298,7 @@
           bootstrap.Modal.getOrCreateInstance(this.pickerModalEl).show();
         return;
       }
-      await this.addEffectDefinition(effect, selection);
+      await this.addEffectDefinition(configuredEffect, selection);
       if (this.pickerReturnModalEl)
         bootstrap.Modal.getOrCreateInstance(this.pickerModalEl).show();
     }
@@ -1174,11 +1337,18 @@
           '<div class="small-text">No matching effects found.</div>';
         return;
       }
+      const visibleRows =
+        this.pickerGroup === "spells"
+          ? rows
+          : rows.slice(0, this.pickerVisibleLimit);
+      const moreResults = visibleRows.length < rows.length
+        ? `<button class="btn btn-outline-info btn-sm w-100" type="button" data-effect-browser-more>Show more (${visibleRows.length} of ${rows.length})</button>`
+        : "";
       if (this.pickerGroup === "spells") {
         this.resultsEl.innerHTML = this.renderPickerSpells(rows);
       } else if (this.pickerGroup === "other") {
         const groups = new Map();
-        rows.forEach((row) => {
+        visibleRows.forEach((row) => {
           const category = row.effect.category || "Effect";
           if (!groups.has(category)) groups.set(category, []);
           groups.get(category).push(row);
@@ -1198,47 +1368,13 @@
               </section>
             `,
           )
-          .join("");
+          .join("") + moreResults;
       } else {
-        this.resultsEl.innerHTML = rows
+        this.resultsEl.innerHTML = visibleRows
           .map(({ effect, index }) => this.pickerRowHtml(effect, index))
-          .join("");
+          .join("") + moreResults;
       }
       this.bindPickerRows();
-    }
-
-    controls(effect, index) {
-      // Abilities carry their own resolved duration context (the
-      // character's actual level/ability mods), so there's nothing to ask
-      // the player to type in -- just activate it.
-      const needsCl = durationUsesCasterLevel(effect) && !effect.fromAbility;
-      const condition = isCondition(effect);
-      return `
-        <div class="effect-tracker-controls">
-          ${
-            needsCl
-              ? `
-            <label class="small effect-tracker-inline">CL
-              <input id="${this.prefix}Cl${index}" class="form-control form-control-sm" type="number" min="1" value="1">
-            </label>
-          `
-              : ""
-          }
-          ${
-            condition
-              ? `
-            <label class="small effect-tracker-inline">Turns
-              <input id="${this.prefix}Turns${index}" class="form-control form-control-sm" type="number" min="1" value="1">
-            </label>
-          `
-              : ""
-          }
-          <label class="form-check small">
-            <input id="${this.prefix}Permanent${index}" class="form-check-input" type="checkbox">
-            <span class="form-check-label">Permanent</span>
-          </label>
-        </div>
-      `;
     }
 
     // Resolves any "choice:<poolId>" stats within a list of stat-bearing
@@ -1657,6 +1793,11 @@
         effect,
       );
       if (resolvedClassSkillGrants === null) return null;
+      const resolvedUseUntrained = await this.resolveChoiceStats(
+        option.useUntrained,
+        effect,
+      );
+      if (resolvedUseUntrained === null) return null;
       const resolvedBonusRanks = await this.resolveChoiceStats(
         option.bonusRanks,
         effect,
@@ -1693,6 +1834,7 @@
         ...option,
         effects: resolvedEffects,
         classSkillGrants: resolvedClassSkillGrants,
+        useUntrained: resolvedUseUntrained,
         bonusRanks: resolvedBonusRanks,
         spellLikeAbilities: resolvedSpellLikeAbilities,
         casterLevelBonuses: resolvedCasterLevelBonuses,
@@ -1893,20 +2035,18 @@
           Number.parseInt(document.getElementById(`${this.prefix}Turns${index}`)?.value, 10) ||
           1,
       );
-      const permanent = selection.permanent !== undefined
-        ? Boolean(selection.permanent)
-        : Boolean(document.getElementById(`${this.prefix}Permanent${index}`)?.checked);
-      const condition = isCondition(effect);
+      const permanent = Boolean(selection.permanent);
+      const trackedTurns = conditionUsesTurns(effect);
       const durationArg = effect.fromAbility
         ? effect.abilityContext || { casterLevel }
         : casterLevel;
       const baseDurationLabel = durationLabel(effect);
-      const calculatedDuration = condition
+      const calculatedDuration = trackedTurns
         ? turns
         : parseDuration(effect, durationArg);
       const appliedDurationLabel = permanent
         ? "Permanent"
-        : condition
+        : trackedTurns
           ? `${turns} turn${turns === 1 ? "" : "s"}`
           : calculatedDuration === null
             ? baseDurationLabel
@@ -1936,7 +2076,7 @@
         casterLevel: fromAbility
           ? abilityContext?.characterLevel || casterLevel
           : casterLevel,
-        turns: condition ? turns : undefined,
+        turns: trackedTurns ? turns : undefined,
         permanent,
         remaining: permanent ? null : calculatedDuration,
         computedDuration: calculatedDuration,
@@ -1954,6 +2094,7 @@
         [
           ...(candidate.bonuses || []),
           ...(candidate.classSkillGrants || []),
+          ...(candidate.useUntrained || []),
           ...(candidate.bonusRanks || []),
         ].some((item) => window.PFEffectStats?.isChoiceStat(item.stat)) ||
         this.conditionalVariables(candidate).length > 0 ||
@@ -2037,6 +2178,11 @@
         finalizedEffect,
       );
       if (resolvedClassSkillGrants === null) return;
+      const resolvedUseUntrained = await this.resolveChoiceStats(
+        finalizedEffect.useUntrained,
+        finalizedEffect,
+      );
+      if (resolvedUseUntrained === null) return;
       const resolvedBonusRanks = await this.resolveChoiceStats(
         finalizedEffect.bonusRanks,
         finalizedEffect,
@@ -2078,6 +2224,9 @@
         bonuses: resolvedBonuses,
         ...(resolvedClassSkillGrants.length
           ? { classSkillGrants: resolvedClassSkillGrants }
+          : {}),
+        ...(resolvedUseUntrained.length
+          ? { useUntrained: resolvedUseUntrained }
           : {}),
         ...(resolvedBonusRanks.length ? { bonusRanks: resolvedBonusRanks } : {}),
         ...(resolvedSpellLikeAbilities.length
@@ -2238,76 +2387,26 @@
       this.queueSave();
     }
 
-    updateActiveDuration(index, patch = {}) {
-      const effect = this.active[index];
-      if (!effect) return;
-      Object.assign(effect, patch);
-      if (effect.permanent) {
-        effect.remaining = null;
-        effect.computedDuration = null;
-      } else if (isCondition(effect)) {
-        const turns = Math.max(1, Number(effect.turns || 1));
-        effect.turns = turns;
-        effect.remaining = turns;
-        effect.computedDuration = turns;
-      } else {
-        const computedDuration = parseDuration(effect, effect.casterLevel || 1);
-        effect.remaining = computedDuration;
-        effect.computedDuration = computedDuration;
-      }
-      effect.durationLabel = appliedDurationLabel(effect);
-      this.renderActive();
-      this.notifyChange();
-      this.queueSave();
-    }
-
     updateAdjustableCondition(index, amount) {
       const effect = this.active[index];
       const config = effect?.adjustableCondition;
       if (!effect || !config) return;
       const minimum = Math.max(0, Number(config.minimum || 0));
       const nextAmount = Math.max(minimum, Math.floor(Number(amount) || 0));
-      config.amount = nextAmount;
-      if (["ability-damage", "ability-drain"].includes(config.kind)) {
-        effect.bonuses = (Array.isArray(effect.bonuses) ? effect.bonuses : []).map(
-          (bonus) =>
-            String(bonus.stat || "").toLowerCase() ===
-            String(config.stat || "").toLowerCase()
-              ? { ...bonus, value: -nextAmount }
-              : bonus,
-        );
-      }
+      this.active[index] = window.PFConditionConfig?.updateAmount
+        ? window.PFConditionConfig.updateAmount(effect, nextAmount)
+        : { ...effect, adjustableCondition: { ...config, amount: nextAmount } };
       this.renderActive();
       this.notifyChange();
       this.queueSave();
     }
 
     activeAdjustmentControls(effect, index) {
-      const needsCl = durationUsesCasterLevel(effect);
-      const condition = isCondition(effect);
       const canReselect = window.PFEffectMechanics?.canReselectBranch?.(effect);
       const adjustable = effect.adjustableCondition || null;
-      if (!needsCl && !condition && !canReselect && !adjustable) return "";
+      if (!canReselect && !adjustable) return "";
       return `
         <div class="effect-active-adjustments">
-          ${
-            needsCl
-              ? `
-            <label class="small effect-tracker-inline">CL
-              <input class="form-control form-control-sm" type="number" min="1" value="${escapeHtml(effect.casterLevel || 1)}" data-active-cl="${index}">
-            </label>
-          `
-              : ""
-          }
-          ${
-            condition
-              ? `
-            <label class="small effect-tracker-inline">Turns
-              <input class="form-control form-control-sm" type="number" min="1" value="${escapeHtml(effect.turns || effect.remaining || 1)}" data-active-turns="${index}">
-            </label>
-          `
-              : ""
-          }
           ${canReselect ? `<button class="btn btn-outline-info btn-sm" type="button" data-reselect-branch="${index}">Change ${escapeHtml(effect.selectedBranchName || "Option")}</button>` : ""}
           ${
             adjustable
@@ -2328,50 +2427,56 @@
         return;
       }
 
-      const activeCategories = [
-        ...new Set(this.active.map((effect) => effect.category || "Effect")),
-      ].sort(
-        (a, b) =>
-          activeCategoryRank(a) - activeCategoryRank(b) ||
-          String(a).localeCompare(String(b)),
-      );
-      const filterOptions = ["all", ...activeCategories];
-      if (!filterOptions.includes(this.activeTypeFilter))
-        this.activeTypeFilter = "all";
-      const filteredActive = this.active
-        .map((effect, index) => ({ effect, index }))
-        .filter(
-          (row) =>
-            this.activeTypeFilter === "all" ||
-            row.effect.category === this.activeTypeFilter,
+      if (!ACTIVE_EFFECT_TABS.some((tab) => tab.key === this.activeTypeFilter))
+        this.activeTypeFilter = ACTIVE_EFFECT_TABS[0].key;
+      const visiblePassives = this.passiveEffects.filter((passive) => {
+        const passiveLootId = passive.sourceLootId || passive.source_loot_id;
+        return !passiveLootId || !this.active.some(
+          (active) =>
+            String(active.sourceLootId || active.source_loot_id || "") ===
+            String(passiveLootId),
         );
+      });
+      const activeRows = [
+        ...this.active.map((effect, index) => ({ effect, index, passive: false })),
+        ...visiblePassives.map((effect, index) => ({ effect, index, passive: true })),
+      ];
+      const filteredActive = activeRows
+        .filter((row) => activeEffectTab(row.effect) === this.activeTypeFilter);
       sortActiveRows(filteredActive);
 
-      const toolbar = `
-        <div class="effect-active-toolbar">
-          <div class="small-text">${this.active.length} active effect${this.active.length === 1 ? "" : "s"}</div>
-          <div>
-            <label class="small" for="${this.prefix}ActiveTypeFilter">Type</label>
-            <select id="${this.prefix}ActiveTypeFilter" class="form-select form-select-sm">
-              ${filterOptions.map((type) => `<option value="${escapeHtml(type)}" ${this.activeTypeFilter === type ? "selected" : ""}>${escapeHtml(type === "all" ? "All" : type)}</option>`).join("")}
-            </select>
-          </div>
-        </div>
+      const navigation = `
+        <nav class="nav effect-active-nav" aria-label="Active effect types" role="tablist">
+          ${ACTIVE_EFFECT_TABS.map(
+            (tab) => `
+              <button
+                class="nav-link${this.activeTypeFilter === tab.key ? " active" : ""}"
+                type="button"
+                data-active-effect-tab="${tab.key}"
+                role="tab"
+                aria-selected="${this.activeTypeFilter === tab.key ? "true" : "false"}"
+              >${tab.label}</button>
+            `,
+          ).join("")}
+        </nav>
       `;
 
-      if (!this.active.length) {
-        this.activeEl.innerHTML = `${toolbar}<div class="small-text">No active effects.</div>`;
-        this.bindActiveFilter();
+      if (!activeRows.length) {
+        this.activeEl.innerHTML = `${navigation}<div class="small-text">No active effects.</div>`;
+        this.bindActiveTabs();
         return;
       }
       if (!filteredActive.length) {
-        this.activeEl.innerHTML = `${toolbar}<div class="small-text">No active effects match this type.</div>`;
-        this.bindActiveFilter();
+        const activeTab = ACTIVE_EFFECT_TABS.find(
+          (tab) => tab.key === this.activeTypeFilter,
+        );
+        this.activeEl.innerHTML = `${navigation}<div class="small-text">No ${escapeHtml(activeTab?.label || "matching")} effects.</div>`;
+        this.bindActiveTabs();
         return;
       }
 
-      const renderRow = ({ effect, index }) => {
-        const detailsId = `${this.prefix}Details${index}`;
+      const renderRow = ({ effect, index, passive }) => {
+        const detailsId = `${this.prefix}${passive ? "Passive" : ""}Details${index}`;
         const detailLines = [
           ...(effect.bonuses || []).map(bonusText),
           ...(effect.damageReduction || []).map(
@@ -2386,6 +2491,9 @@
           ...(effect.applyConditions || []).map(applyConditionText),
           ...(effect.classSkillGrants || []).map((grant) =>
             window.PFEffectEditor.classSkillGrantText(grant, titleCaseStat),
+          ),
+          ...(effect.useUntrained || []).map((entry) =>
+            window.PFEffectEditor.useUntrainedText(entry),
           ),
           ...(effect.bonusRanks || []).map((entry) =>
             window.PFEffectEditor.bonusRanksText(entry),
@@ -2409,18 +2517,18 @@
         const bonuses = detailLines
           .map((text) => `<div class="small-text">${escapeHtml(text)}</div>`)
           .join("");
-        const lockedToItem = isItemSourcedEffect(effect);
+        const locked = passive || isItemSourcedEffect(effect);
         return `
           <article class="effect-tracker-active">
             <div class="effect-active-head">
               <div>
                 <strong>${escapeHtml(effect.name)}</strong>
-                <div class="small-text">${escapeHtml(effect.category || "Effect")} | ${escapeHtml(activeDuration(effect))}</div>
-                ${this.activeAdjustmentControls(effect, index)}
+                <div class="small-text">${escapeHtml(activeDuration(effect))}</div>
+                ${passive ? "" : this.activeAdjustmentControls(effect, index)}
               </div>
               <div class="effect-active-actions">
                 <button class="btn btn-outline-info btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#${detailsId}" aria-label="Show effect details">i</button>
-                ${lockedToItem ? "" : `<button class="btn btn-danger btn-sm" type="button" data-remove-effect="${index}" aria-label="Remove effect"><i class="bi bi-trash"></i></button>`}
+                ${locked ? "" : `<button class="btn btn-danger btn-sm" type="button" data-remove-effect="${index}" aria-label="Remove effect"><i class="bi bi-trash"></i></button>`}
               </div>
             </div>
             <div id="${detailsId}" class="collapse mt-2">${bonuses || '<div class="small-text">No mechanical bonuses listed.</div>'}</div>
@@ -2428,17 +2536,7 @@
         `;
       };
       this.activeEl.innerHTML =
-        toolbar +
-        groupedActiveRows(filteredActive)
-          .map(
-            (group) => `
-        <section class="effect-active-group">
-          <div class="effect-active-group-title">${escapeHtml(group.category)}</div>
-          ${group.rows.map(renderRow).join("")}
-        </section>
-      `,
-          )
-          .join("");
+        navigation + filteredActive.map(renderRow).join("");
 
       this.activeEl
         .querySelectorAll("[data-reselect-branch]")
@@ -2454,20 +2552,6 @@
             this.removeEffect(Number(button.dataset.removeEffect)),
           );
         });
-      this.activeEl.querySelectorAll("[data-active-cl]").forEach((input) => {
-        input.addEventListener("change", () => {
-          this.updateActiveDuration(Number(input.dataset.activeCl), {
-            casterLevel: Math.max(1, Number.parseInt(input.value, 10) || 1),
-          });
-        });
-      });
-      this.activeEl.querySelectorAll("[data-active-turns]").forEach((input) => {
-        input.addEventListener("change", () => {
-          this.updateActiveDuration(Number(input.dataset.activeTurns), {
-            turns: Math.max(1, Number.parseInt(input.value, 10) || 1),
-          });
-        });
-      });
       this.activeEl
         .querySelectorAll("[data-active-adjustment]")
         .forEach((input) => {
@@ -2478,15 +2562,18 @@
             );
           });
         });
-      this.bindActiveFilter();
+      this.bindActiveTabs();
     }
 
-    bindActiveFilter() {
-      const filter = document.getElementById(`${this.prefix}ActiveTypeFilter`);
-      filter?.addEventListener("change", () => {
-        this.activeTypeFilter = filter.value || "all";
-        this.renderActive();
-      });
+    bindActiveTabs() {
+      this.activeEl
+        ?.querySelectorAll("[data-active-effect-tab]")
+        .forEach((button) => {
+          button.addEventListener("click", () => {
+            this.activeTypeFilter = button.dataset.activeEffectTab || "spell";
+            this.renderActive();
+          });
+        });
     }
 
     queueSave() {
@@ -2511,6 +2598,8 @@
   }
 
   window.PFEffectTracker = {
+    sourceGroup: effectSourceGroup,
+    preferOwnedPickerEffects,
     prepareLoading(container) {
       if (!container) return;
       injectStyles();

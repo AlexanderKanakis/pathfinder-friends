@@ -4,6 +4,7 @@
 .shared-immunity-row label,
 .shared-apply-condition-row label,
 .shared-class-skill-row label,
+.shared-use-untrained-row label,
 .shared-bonus-ranks-row label,
 .shared-extra-ranks-row label,
 .shared-feat-grant-row label,
@@ -120,7 +121,8 @@
   grid-column: 1 / -1;
 }
 
-.shared-class-skill-row {
+.shared-class-skill-row,
+.shared-use-untrained-row {
   display: grid;
   grid-template-columns: 1fr auto;
   gap: 8px;
@@ -465,6 +467,7 @@
   .shared-spell-adjustment-increase-row,
   .shared-spell-adjustment-condition,
   .shared-bonus-ranks-row,
+  .shared-use-untrained-row,
   .shared-feat-grant-row,
   .shared-grant-domain-row,
   .shared-special-toggle-row {
@@ -498,6 +501,7 @@
   }
 
   .shared-extra-ranks-row button[aria-label="Delete extra ranks per level"],
+  .shared-use-untrained-row button[aria-label="Delete use untrained rule"],
   .shared-bonus-ranks-row button[aria-label="Delete bonus ranks"],
   .shared-feat-grant-row button[aria-label="Delete feat grant"],
   .shared-grant-domain-row button[aria-label="Delete domain grant"],
