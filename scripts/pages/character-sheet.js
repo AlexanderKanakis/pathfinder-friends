@@ -489,6 +489,8 @@ const characterSheetReady = new Promise((resolve) => {
 let sheetViewMode = sessionStorage.getItem("pf_character_sheet_view") || "full";
 let customSkills = [];
 let skillSearchTerm = "";
+let namedSkillManagerModal = null;
+let namedSkillManagerConfig = null;
 let classFeatureChoices = {};
 let classFeatureVariableChoices = {};
 let selectedRacialAlternateTraits = [];
@@ -11366,7 +11368,7 @@ function renderSkillRows(saved = {}) {
         <td class="class-skill-cell"><span id="${id}ClassSkill" class="class-skill-dot" title="Not a class skill"></span></td>
         <th class="skill-name-cell">
           ${escapeHtml(skill)}
-          ${custom ? `<button class="btn btn-outline-danger btn-sm skill-remove-btn" type="button" onclick="removeNamedSkillByKey('${normalizeSkillName(skill)}')" aria-label="Remove ${escapeHtml(skill)}"><i class="bi bi-trash"></i></button>` : ""}
+          ${custom && !managedNamedSkill(skill) ? `<button class="btn btn-outline-danger btn-sm skill-remove-btn" type="button" onclick="removeNamedSkillByKey('${normalizeSkillName(skill)}')" aria-label="Remove ${escapeHtml(skill)}"><i class="bi bi-trash"></i></button>` : ""}
         </th>
         <td>
           <div class="skill-stepper">
@@ -11443,21 +11445,100 @@ function currentSkillValues() {
   return values;
 }
 
-function addNamedSkill(prefix, ability) {
-  const detail = window.prompt(`${prefix} name`, "");
-  if (detail === null) return;
+function createNamedSkill(prefix, ability, detail) {
   const clean = detail.trim();
-  if (!clean) return;
+  if (!clean) return { ok: false, message: `${prefix} name is required.` };
   const name = `${prefix} (${clean})`;
   const key = normalizeSkillName(name);
   if (allSkills().some(([skill]) => normalizeSkillName(skill) === key)) {
-    setStatus(`${name} already exists.`, "warning");
-    return;
+    return { ok: false, message: `${name} already exists.` };
   }
   customSkills.push({ name, ability });
   renderSkillRows(currentSkillValues());
   recalculateSheet();
   queueSheetSave();
+  return { ok: true, name };
+}
+
+function addNamedSkill(prefix, ability) {
+  const detail = window.prompt(`${prefix} name`, "");
+  if (detail === null) return;
+  const result = createNamedSkill(prefix, ability, detail);
+  if (!result.ok) setStatus(result.message, "warning");
+}
+
+function managedNamedSkill(name = "") {
+  return /^(Craft|Profession|Perform)\s*\(/i.test(String(name));
+}
+
+function managedNamedSkills(prefix = "") {
+  const start = `${prefix} (`.toLowerCase();
+  return customSkills.filter((skill) =>
+    String(skill.name || "").toLowerCase().startsWith(start),
+  );
+}
+
+function setNamedSkillManagerFeedback(message = "") {
+  const feedback = el("namedSkillManagerFeedback");
+  if (!feedback) return;
+  feedback.textContent = message;
+  feedback.classList.toggle("d-none", !message);
+}
+
+function renderNamedSkillManager() {
+  const list = el("namedSkillManagerList");
+  if (!list || !namedSkillManagerConfig) return;
+  const skills = managedNamedSkills(namedSkillManagerConfig.prefix);
+  list.innerHTML = skills.length
+    ? skills
+        .map(
+          (skill) => `
+            <div class="named-skill-manager-row">
+              <span>${escapeHtml(skill.name)}</span>
+              <button
+                class="btn btn-outline-danger btn-sm btn-icon"
+                type="button"
+                data-remove-named-skill="${escapeHtml(normalizeSkillName(skill.name))}"
+                aria-label="Delete ${escapeHtml(skill.name)}"
+                title="Delete"
+              ><i class="bi bi-trash"></i></button>
+            </div>
+          `,
+        )
+        .join("")
+    : `<div class="named-skill-manager-empty">No ${escapeHtml(namedSkillManagerConfig.prefix.toLowerCase())} skills created.</div>`;
+}
+
+function openNamedSkillManager(prefix, ability) {
+  namedSkillManagerConfig = { prefix, ability };
+  const plural =
+    prefix === "Perform" ? "Performances" : `${prefix}s`;
+  el("namedSkillManagerModalLabel").textContent = `Handle ${plural}`;
+  el("namedSkillManagerInputLabel").textContent = `${prefix} name`;
+  el("namedSkillManagerAddButton").textContent = `Add ${prefix}`;
+  el("namedSkillManagerInput").value = "";
+  setNamedSkillManagerFeedback();
+  renderNamedSkillManager();
+  namedSkillManagerModal.show();
+}
+
+function submitNamedSkillManager(event) {
+  event.preventDefault();
+  if (!namedSkillManagerConfig) return;
+  const input = el("namedSkillManagerInput");
+  const result = createNamedSkill(
+    namedSkillManagerConfig.prefix,
+    namedSkillManagerConfig.ability,
+    input.value,
+  );
+  if (!result.ok) {
+    setNamedSkillManagerFeedback(result.message);
+    return;
+  }
+  input.value = "";
+  setNamedSkillManagerFeedback();
+  renderNamedSkillManager();
+  input.focus();
 }
 
 function removeNamedSkillByKey(key) {
@@ -11468,6 +11549,7 @@ function removeNamedSkillByKey(key) {
   renderSkillRows(saved);
   recalculateSheet();
   queueSheetSave();
+  renderNamedSkillManager();
 }
 
 function equipmentTextFieldMarkup(
@@ -16100,6 +16182,30 @@ async function initCharacterSheet() {
     skillSearchTerm = event.target.value.trim();
     applySkillSearchFilter();
   });
+  namedSkillManagerModal = bootstrap.Modal.getOrCreateInstance(
+    el("namedSkillManagerModal"),
+  );
+  el("manageCraftSkillsButton")?.addEventListener("click", () =>
+    openNamedSkillManager("Craft", "int"),
+  );
+  el("manageProfessionSkillsButton")?.addEventListener("click", () =>
+    openNamedSkillManager("Profession", "wis"),
+  );
+  el("managePerformSkillsButton")?.addEventListener("click", () =>
+    openNamedSkillManager("Perform", "cha"),
+  );
+  el("namedSkillManagerForm")?.addEventListener(
+    "submit",
+    submitNamedSkillManager,
+  );
+  el("namedSkillManagerList")?.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-remove-named-skill]");
+    if (!button) return;
+    removeNamedSkillByKey(button.dataset.removeNamedSkill);
+  });
+  el("namedSkillManagerModal")?.addEventListener("shown.bs.modal", () =>
+    el("namedSkillManagerInput")?.focus(),
+  );
   el("racialTraitsButton")?.addEventListener("click", openRacialTraitsModal);
   el("showAppliedBuffsToggle")?.addEventListener("click", toggleAppliedBuffs);
   effectTrackerModal = bootstrap.Modal.getOrCreateInstance(

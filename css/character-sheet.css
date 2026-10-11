@@ -1061,6 +1061,18 @@ body.enemy-sheet-mode .enemy-field-pair {
   align-items: start;
 }
 
+.character-primary-fields {
+  margin-bottom: 8px;
+}
+
+.character-details-toggle {
+  display: none;
+}
+
+.character-details-collapse {
+  display: block !important;
+}
+
 .character-image-panel {
   display: grid;
   gap: 8px;
@@ -1097,12 +1109,47 @@ body.enemy-sheet-mode .enemy-field-pair {
 }
 
 @media (max-width: 760px) {
-  .character-layout > .sheet-grid-wide:first-child {
+  .character-primary-fields,
+  .character-secondary-fields {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .character-layout > .sheet-grid-wide:first-child > div:nth-child(-n + 2) {
+  .character-primary-fields > div:nth-child(-n + 2),
+  .character-secondary-fields > div:nth-child(-n + 2) {
     grid-column: 1 / -1;
+  }
+
+  .character-details-toggle {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 8px;
+    padding: 8px 0 0;
+    border: 0;
+    border-top: 1px solid #444;
+    background: transparent;
+    color: #fff;
+    font-size: 0.8rem;
+    text-align: left;
+  }
+
+  .character-details-toggle i {
+    transition: transform 0.15s ease;
+  }
+
+  .character-details-toggle[aria-expanded="true"] i {
+    transform: rotate(180deg);
+  }
+
+  .character-details-collapse:not(.show) {
+    display: none !important;
+  }
+
+  .character-details-collapse.show {
+    display: block !important;
+    padding-top: 8px;
   }
 }
 
@@ -1639,6 +1686,8 @@ body.enemy-sheet-mode .enemy-field-pair {
   box-shadow: none;
 }
 
+.ability-table > :not(caption) > * > *,
+.save-table > :not(caption) > * > *,
 .skill-table > :not(caption) > * > * {
   border-bottom: 0;
 }
@@ -1741,6 +1790,33 @@ body.enemy-sheet-mode .enemy-field-pair {
   margin-left: 0.25rem;
   padding: 0;
   vertical-align: middle;
+}
+
+.named-skill-manager-list {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 1rem;
+}
+
+.named-skill-manager-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 32px;
+  gap: 8px;
+  align-items: center;
+  min-height: 38px;
+  padding: 4px 6px 4px 10px;
+  border: 1px solid #444;
+  border-radius: 4px;
+}
+
+.named-skill-manager-row > span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.named-skill-manager-empty {
+  color: #aaa;
+  padding: 8px 0;
 }
 
 @media (max-width: 575.98px) {

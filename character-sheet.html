@@ -20,7 +20,7 @@
       rel="stylesheet"
     />
 
-    <link href="css/character-sheet.css?v=compact-mobile-skills-3" rel="stylesheet" />
+    <link href="css/character-sheet.css?v=borderless-data-tables-1" rel="stylesheet" />
     <link href="css/feat-details.css?v=1" rel="stylesheet" />
     <link href="css/effect-editor.css?v=effect-branches-1" rel="stylesheet" />
     <link href="css/damage-rolls.css?v=4" rel="stylesheet" />
@@ -230,8 +230,7 @@
         <div id="characterSheetPanel" data-sheet-info-panel="character">
           <section class="sheet-section">
             <div class="sheet-title">Character</div>
-            <div class="character-layout">
-              <div class="sheet-grid-wide">
+            <div class="sheet-grid-wide character-primary-fields">
                 <div>
                   <label for="characterName">Character Name</label
                   ><input
@@ -278,6 +277,24 @@
                     </button>
                   </div>
                 </div>
+            </div>
+            <button
+              class="character-details-toggle"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#characterDetailsCollapse"
+              aria-expanded="false"
+              aria-controls="characterDetailsCollapse"
+            >
+              <span>Character Details</span>
+              <i class="bi bi-chevron-down" aria-hidden="true"></i>
+            </button>
+            <div
+              id="characterDetailsCollapse"
+              class="collapse character-details-collapse"
+            >
+              <div class="character-layout">
+                <div class="sheet-grid-wide character-secondary-fields">
                 <div>
                   <label for="race">Race</label
                   ><select
@@ -410,6 +427,7 @@
                     placeholder="https://..."
                   />
                 </div>
+              </div>
               </div>
             </div>
           </section>
@@ -1120,25 +1138,25 @@
                 <div class="sheet-title">Skills</div>
                 <div class="skills-actions mb-2">
                   <button
+                    id="manageCraftSkillsButton"
                     class="btn btn-outline-light btn-sm"
                     type="button"
-                    onclick="addNamedSkill('Craft', 'int')"
                   >
-                    Add Craft
+                    Crafts
                   </button>
                   <button
+                    id="manageProfessionSkillsButton"
                     class="btn btn-outline-light btn-sm"
                     type="button"
-                    onclick="addNamedSkill('Profession', 'wis')"
                   >
-                    Add Profession
+                    Professions
                   </button>
                   <button
+                    id="managePerformSkillsButton"
                     class="btn btn-outline-light btn-sm"
                     type="button"
-                    onclick="addNamedSkill('Perform', 'cha')"
                   >
-                    Add Perform
+                    Performances
                   </button>
                 </div>
                 <input
@@ -1319,6 +1337,69 @@
 
       <div id="simplifiedSheetView" class="simple-wrap d-none"></div>
     </main>
+
+    <div
+      class="modal fade"
+      id="namedSkillManagerModal"
+      tabindex="-1"
+      aria-labelledby="namedSkillManagerModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <form
+          id="namedSkillManagerForm"
+          class="modal-content bg-dark text-white border-secondary"
+        >
+          <div class="modal-header">
+            <h5 class="modal-title" id="namedSkillManagerModalLabel">
+              Handle Crafts
+            </h5>
+          </div>
+          <div class="modal-body">
+            <div
+              id="namedSkillManagerList"
+              class="named-skill-manager-list"
+            ></div>
+            <div>
+              <label
+                id="namedSkillManagerInputLabel"
+                for="namedSkillManagerInput"
+              >
+                Craft name
+              </label>
+              <input
+                id="namedSkillManagerInput"
+                class="form-control form-control-sm"
+                autocomplete="off"
+                required
+              />
+            </div>
+            <div
+              id="namedSkillManagerFeedback"
+              class="small text-warning mt-2 d-none"
+              role="status"
+              aria-live="polite"
+            ></div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-outline-light btn-sm"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
+            <button
+              id="namedSkillManagerAddButton"
+              type="submit"
+              class="btn btn-primary btn-sm"
+            >
+              Add Craft
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
 
     <div
       class="modal fade"
@@ -2139,7 +2220,7 @@
     <script src="modals/item-editor.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="scripts/weapon-damage-components.js"></script>
-    <script src="scripts/pages/character-sheet.js?v=embedded-skills-1"></script>
+    <script src="scripts/pages/character-sheet.js?v=named-skill-manager-1"></script>
     <script src="scripts/modal-rules.js?v=1"></script>
   </body>
 </html>

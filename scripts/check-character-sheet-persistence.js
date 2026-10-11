@@ -189,6 +189,24 @@ assert(
   "The Character tab must own the only full skills editor without a duplicate Skills tab.",
 );
 assert(
+  sheetHtml.includes('class="sheet-grid-wide character-primary-fields"') &&
+    sheetHtml.includes('id="characterDetailsCollapse"') &&
+    sheetHtml.includes('data-bs-target="#characterDetailsCollapse"') &&
+    sheetCss.includes(".character-details-toggle") &&
+    sheetCss.includes(".character-details-collapse:not(.show)") &&
+    sheetHtml.indexOf('id="characterName"') <
+      sheetHtml.indexOf('id="characterDetailsCollapse"') &&
+    sheetHtml.indexOf('id="classLevel"') <
+      sheetHtml.indexOf('id="characterDetailsCollapse"') &&
+    sheetHtml.indexOf('id="characterLevel"') <
+      sheetHtml.indexOf('id="characterDetailsCollapse"') &&
+    sheetHtml.indexOf('id="race"') >
+      sheetHtml.indexOf('id="characterDetailsCollapse"') &&
+    sheetHtml.indexOf('id="imageUrl"') >
+      sheetHtml.indexOf('id="characterDetailsCollapse"'),
+  "Mobile Character details must keep only name, class/level, and character level outside the collapse.",
+);
+assert(
   sheetHtml.indexOf('id="skillSearch"') >
     sheetHtml.indexOf('class="sheet-section skills-section"') &&
     sheetHtml.indexOf('id="skillRows"') >
@@ -206,6 +224,31 @@ assert(
     sheetCss.includes("--sheet-stepper-width: 100%") &&
     sheetCss.includes("overflow-wrap: anywhere"),
   "Embedded skills must be unframed and fit every column within conventional mobile widths.",
+);
+assert(
+    sheetHtml.includes('id="manageCraftSkillsButton"') &&
+    sheetHtml.includes('id="manageProfessionSkillsButton"') &&
+    sheetHtml.includes('id="managePerformSkillsButton"') &&
+    sheetHtml.includes(">\n                    Crafts\n") &&
+    sheetHtml.includes(">\n                    Professions\n") &&
+    sheetHtml.includes(">\n                    Performances\n") &&
+    sheetHtml.includes('id="namedSkillManagerModal"') &&
+    sheetHtml.includes('id="namedSkillManagerList"') &&
+    sheetHtml.includes('id="namedSkillManagerAddButton"') &&
+    !sheetHtml.includes("onclick=\"addNamedSkill('Craft', 'int')\"") &&
+    !sheetHtml.includes("onclick=\"addNamedSkill('Profession', 'wis')\"") &&
+    !sheetHtml.includes("onclick=\"addNamedSkill('Perform', 'cha')\""),
+  "Craft, Profession, and Perform controls must open the shared named-skill manager.",
+);
+assert(
+  sheetPage.includes("function createNamedSkill(") &&
+    sheetPage.includes("function renderNamedSkillManager(") &&
+    sheetPage.includes('openNamedSkillManager("Craft", "int")') &&
+    sheetPage.includes('openNamedSkillManager("Profession", "wis")') &&
+    sheetPage.includes('openNamedSkillManager("Perform", "cha")') &&
+    sheetPage.includes("custom && !managedNamedSkill(skill)") &&
+    sheetPage.includes('data-remove-named-skill="${escapeHtml(normalizeSkillName(skill.name))}"'),
+  "Craft, Profession, and Perform creation and deletion must reuse the canonical custom-skill flow.",
 );
 const skillsSectionMarkup = sheetHtml.slice(
   sheetHtml.indexOf('class="sheet-section skills-section"'),
@@ -251,6 +294,12 @@ assert(
     sheetPage.includes('class="skill-calc-row d-none"') &&
     sheetPage.includes('skillCalcRow.dataset.hasCalculation = "true"'),
   "The Skills table must be unframed, borderless, and omit unused calculation rows.",
+);
+assert(
+  sheetCss.includes(
+    ".ability-table > :not(caption) > * > *,\n.save-table > :not(caption) > * > *,\n.skill-table > :not(caption) > * > * {\n  border-bottom: 0;",
+  ),
+  "Attributes, saving throws, and skills must all use borderless rows.",
 );
 const attributeTableMarkup = sheetHtml.slice(
   sheetHtml.indexOf('class="sheet-section full-order-attributes"'),
