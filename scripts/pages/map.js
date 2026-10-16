@@ -118,6 +118,16 @@ const MAP_GRID_LINES_CSS = [
   "linear-gradient(to right, rgba(255,255,255,0.18) 1px, transparent 1px)",
   "linear-gradient(to bottom, rgba(255,255,255,0.18) 1px, transparent 1px)",
 ].join(", ");
+const MAP_WEATHER_OPTIONS = Object.freeze([
+  { id: "clear", label: "Clear", imageUrl: "" },
+  {
+    id: "rain",
+    label: "Rain",
+    imageUrl: "assets/weather%20drops/rain.png",
+    tileWidth: 1920,
+    tileHeight: 1080,
+  },
+]);
 const defaultState = {
   settings: {
     cols: 30,
@@ -126,6 +136,7 @@ const defaultState = {
     backgroundCols: 0,
     backgroundRows: 0,
     name: "",
+    weather: "clear",
   },
   tokens: [],
   shapes: [],
@@ -1809,6 +1820,9 @@ function normalizeState(raw) {
     raw?.initiative,
   );
   const settings = { ...defaultState.settings, ...(raw?.settings || {}) };
+  if (!MAP_WEATHER_OPTIONS.some((option) => option.id === settings.weather)) {
+    settings.weather = defaultState.settings.weather;
+  }
   // backgroundCols/backgroundRows record the image's own aspect ratio (used
   // to seed Cell X/Y when it first loads, and as the link button's target
   // ratio) -- they are not a floor. Cell X/Y are freely adjustable in
@@ -2028,6 +2042,9 @@ function applySettingsToInputs() {
   el("cellX").value = state.settings.cols;
   el("cellY").value = state.settings.rows;
   el("backgroundUrl").value = state.settings.backgroundUrl || "";
+  populateMapWeatherOptions();
+  el("weatherSettingsWrap").classList.toggle("d-none", !isGm);
+  el("mapWeather").value = state.settings.weather || "clear";
   applyCellSizeBounds();
   el("fogSettingsWrap").classList.toggle("d-none", !isGm);
   el("fogColor").value = state.fog?.color || "#000000";
@@ -2827,6 +2844,7 @@ function renderMap() {
       is3D ? "" : renderFogLayer(false),
       is3D ? "" : renderLimitedViewGrayscale(),
       is3D ? "" : renderOwnTokenFogReveal(visibleTokens),
+      renderMapWeatherLayer(),
       `<div id="tokenHoverLayer" class="token-hover-layer"></div>`,
     ].join("");
   }
@@ -2938,10 +2956,33 @@ function renderMapBackgroundLayer() {
   return `<div class="map-background-layer"></div>`;
 }
 
+function currentMapWeather() {
+  return (
+    MAP_WEATHER_OPTIONS.find((option) => option.id === state.settings.weather) ||
+    MAP_WEATHER_OPTIONS[0]
+  );
+}
+
+function populateMapWeatherOptions() {
+  const select = el("mapWeather");
+  if (!select || select.options.length === MAP_WEATHER_OPTIONS.length) return;
+  select.innerHTML = MAP_WEATHER_OPTIONS.map(
+    (option) =>
+      `<option value="${escapeHtml(option.id)}">${escapeHtml(option.label)}</option>`,
+  ).join("");
+}
+
+function renderMapWeatherLayer() {
+  return currentMapWeather().imageUrl
+    ? `<div class="map-weather-layer" aria-hidden="true"></div>`
+    : "";
+}
+
 function applyMapStageVars() {
   const stage = el("mapStage");
   if (!stage) return;
   const { cols, rows, backgroundUrl } = state.settings;
+  const weather = currentMapWeather();
   stage.style.setProperty("--cell", `${localGridSize}px`);
   stage.style.setProperty("--cols", cols);
   stage.style.setProperty("--rows", rows);
@@ -2952,6 +2993,12 @@ function applyMapStageVars() {
       backgroundUrl ? `url("${backgroundUrl.replaceAll('"', "%22")}")` : "none",
     );
   }
+  stage.style.setProperty(
+    "--map-weather-image",
+    weather.imageUrl ? `url("${weather.imageUrl}")` : "none",
+  );
+  stage.style.setProperty("--map-weather-tile-width", `${weather.tileWidth || 1}px`);
+  stage.style.setProperty("--map-weather-tile-height", `${weather.tileHeight || 1}px`);
 }
 
 function auraRangeCells(config = {}) {
@@ -12145,6 +12192,7 @@ async function saveBackgroundOptions(event) {
 
   if (isGm) {
     state.settings.name = el("mapName").value.trim();
+    state.settings.weather = el("mapWeather").value;
     const meta = mapSlotMeta.find((entry) => entry.slot === mapViewSlot);
     if (meta) meta.name = state.settings.name;
     else mapSlotMeta.push({ slot: mapViewSlot, name: state.settings.name });

@@ -12,7 +12,7 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
       rel="stylesheet"
     />
-    <link href="css/map.css?v=d20-boosts-1" rel="stylesheet" />
+    <link href="css/map.css?v=map-weather-1" rel="stylesheet" />
     <link href="css/effect-editor.css?v=effect-saves-2" rel="stylesheet" />
     <link href="css/effect-rolls.css?v=healing-layout-1" rel="stylesheet" />
     <link href="css/damage-rolls.css?v=4" rel="stylesheet" />
@@ -879,6 +879,10 @@
                 cells just means each one is bigger.
               </div>
             </div>
+            <div id="weatherSettingsWrap" class="mb-3 d-none">
+              <label for="mapWeather">Weather</label>
+              <select id="mapWeather" class="form-select form-select-sm"></select>
+            </div>
             <hr class="border-secondary" />
             <div class="mb-3">
               <label for="gridSize">Map Size</label>
@@ -1414,7 +1418,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="modals/map-hp-editor.js"></script>
     <script src="scripts/wall-patterns.js"></script>
-    <script src="scripts/pages/map.js?v=hidden-save-result-1"></script>
+    <script src="scripts/pages/map.js?v=map-weather-1"></script>
     <script src="scripts/modal-rules.js?v=mobile-compact-1"></script>
   </body>
 </html>
