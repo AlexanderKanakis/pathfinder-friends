@@ -26,6 +26,10 @@ assert(
   map.includes("renderMapWeatherLayer()"),
   "The selected weather must render on the shared map stage.",
 );
+assert(
+  map.includes("new URL(weather.imageUrl, window.location.href).href"),
+  "Weather paths must resolve from the page before CSS consumes them.",
+);
 assert(css.includes("opacity: 0.7"), "Weather artwork must render at 70% opacity.");
 assert(
   css.includes("pointer-events: none") && css.includes("map-weather-drift"),

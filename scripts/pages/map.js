@@ -2993,9 +2993,12 @@ function applyMapStageVars() {
       backgroundUrl ? `url("${backgroundUrl.replaceAll('"', "%22")}")` : "none",
     );
   }
+  const weatherImageUrl = weather.imageUrl
+    ? new URL(weather.imageUrl, window.location.href).href
+    : "";
   stage.style.setProperty(
     "--map-weather-image",
-    weather.imageUrl ? `url("${weather.imageUrl}")` : "none",
+    weatherImageUrl ? `url("${weatherImageUrl.replaceAll('"', "%22")}")` : "none",
   );
   stage.style.setProperty("--map-weather-tile-width", `${weather.tileWidth || 1}px`);
   stage.style.setProperty("--map-weather-tile-height", `${weather.tileHeight || 1}px`);
