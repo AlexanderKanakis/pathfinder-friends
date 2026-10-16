@@ -12,15 +12,18 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
       rel="stylesheet"
     />
-    <link href="css/map.css?v=passives-active-1" rel="stylesheet" />
-    <link href="css/effect-editor.css?v=trained-skills-1" rel="stylesheet" />
+    <link href="css/map.css?v=d20-boosts-1" rel="stylesheet" />
+    <link href="css/effect-editor.css?v=effect-saves-2" rel="stylesheet" />
+    <link href="css/effect-rolls.css?v=healing-layout-1" rel="stylesheet" />
     <link href="css/damage-rolls.css?v=4" rel="stylesheet" />
+<link href="css/attack-rolls.css?v=d20-boosts-1" rel="stylesheet" />
     <link href="css/metamagic.css?v=details-1" rel="stylesheet" />
     <link href="modals/generated-equipment-picker.css?v=effect-labels-white-1" rel="stylesheet" />
     <link href="modals/magic-search.css" rel="stylesheet" />
     <link href="modals/map-hp-editor.css" rel="stylesheet" />
     <link href="modals/custom-skill-list.css?v=custom-target-lists-1" rel="stylesheet" />
     <link href="css/modal-rules.css?v=mobile-workspace-1" rel="stylesheet" />
+    <link href="css/toast.css?v=1" rel="stylesheet" />
   </head>
   <body>
     <div id="appNavbar"></div>
@@ -457,7 +460,7 @@
         type="button"
         role="menuitem"
       >
-        <i class="bi bi-magic me-1"></i> Apply effect
+        <i class="bi bi-lightning-charge me-1"></i> Use Powers
       </button>
       <button
         id="openRollMenu"
@@ -668,6 +671,12 @@
               >
                 <i class="bi bi-person-arms-up me-1"></i> Attribute Check
               </button>
+              <button class="btn btn-outline-light btn-sm text-start" type="button" data-roll-panel="cmb">
+                <i class="bi bi-arrows-collapse me-1"></i> CMB Check
+              </button>
+              <button class="btn btn-outline-light btn-sm text-start" type="button" data-roll-panel="cmd">
+                <i class="bi bi-shield me-1"></i> CMD Check
+              </button>
             </div>
             <div
               id="rollDetailPanel"
@@ -750,7 +759,7 @@
       >
         <div class="modal-content bg-dark text-white border-secondary">
           <div class="modal-header border-secondary">
-            <h5 class="modal-title" id="quickEffectModalLabel">Apply Effect</h5>
+            <h5 class="modal-title" id="quickEffectModalLabel">Use Powers</h5>
           </div>
           <div class="modal-body effect-search-modal-body">
             <nav
@@ -822,7 +831,7 @@
               class="btn btn-success btn-sm"
               type="button"
             >
-              Apply Effect
+              Use Powers
             </button>
           </div>
         </div>
@@ -1284,7 +1293,7 @@
                     class="btn btn-outline-success btn-sm"
                     type="button"
                   >
-                    Apply effect
+                    Use Powers
                   </button>
                   <button
                     id="clearAuraEffect"
@@ -1362,20 +1371,32 @@
     <script src="scripts/navbar.js?v=responsive-navbar-1"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="scripts/supabase-config.js"></script>
-    <script src="scripts/app-supabase.js?v=trained-skills-1"></script>
-    <script src="scripts/effect-mechanics.js?v=trained-skills-1"></script>
-    <script src="scripts/buff-calculator.js?v=negative-levels-1"></script>
-    <script src="scripts/damage-rolls.js?v=metamagic-1"></script>
-    <script src="scripts/metamagic.js?v=trained-skills-1"></script>
+    <script src="scripts/app-supabase.js?v=weapon-damage-size-1"></script>
+    <script src="scripts/effect-mechanics.js?v=spell-save-routing-1"></script>
+    <script src="scripts/buff-calculator.js?v=attribute-contribution-root-1"></script>
+    <script src="scripts/effect-rolls.js?v=duration-formula-1"></script>
+    <script src="scripts/weapon-damage-components.js?v=2"></script>
+    <script src="scripts/effect-healing.js?v=effect-rolls-1"></script>
+    <script src="scripts/damage-rolls.js?v=effect-rolls-1"></script>
+    <script src="scripts/d20-boosts.js?v=1"></script>
+    <script src="scripts/condition-config.js?v=ability-groups-1"></script>
+<script src="scripts/attack-rolls.js?v=effect-saves-1"></script>
+    <script src="scripts/metamagic.js?v=effect-rolls-1"></script>
     <script src="scripts/armor-rules.js?v=1"></script>
-    <script src="scripts/class-data.js"></script>
+    <script src="scripts/class-data.js?v=global-pool-catalogs-1"></script>
+    <script src="scripts/class-resources.js?v=1"></script>
+    <script src="scripts/toast.js?v=1"></script>
     <script src="scripts/race-data.js?v=trained-skills-1"></script>
-    <script src="scripts/feat-data.js?v=trained-skills-1"></script>
+    <script src="scripts/feat-data.js?v=weapon-damage-size-1"></script>
     <script src="scripts/item-data.js?v=catalog-effects-1"></script>
-    <script src="scripts/class-feature-abilities.js?v=trained-skills-1"></script>
-    <script src="modals/effect-duration-editor.js?v=aura-link-1"></script>
-    <script src="scripts/effect-stat-options.js?v=trained-skills-1"></script>
-    <script src="modals/effect-choice-picker.js?v=named-skill-choice-1"></script>
+    <script src="scripts/effect-decisions.js?v=owner-1"></script>
+    <script src="scripts/effect-saves.js?v=hidden-save-result-1"></script>
+    <script src="scripts/effect-activation-orchestrator.js?v=3"></script>
+    <script src="scripts/class-feature-abilities.js?v=target-owned-contributions-1"></script>
+    <script src="modals/effect-duration-editor.js?v=duration-formula-1"></script>
+    <script src="scripts/effect-stat-options.js?v=weapon-damage-size-1"></script>
+    <script src="modals/effect-choice-picker.js?v=activation-queue-2"></script>
+    <script src="modals/aura-delivery-choice.js?v=1"></script>
     <script src="scripts/spell-data.js?v=spells-json-1"></script>
     <script src="modals/metamagic-picker.js?v=details-1"></script>
     <script src="modals/spell-picker.js?v=cast-modal-handoff-1"></script>
@@ -1383,16 +1404,17 @@
     <script src="modals/magic-search.js?v=sla-spell-list-1"></script>
     <script src="modals/class-feature-choice-picker.js"></script>
     <script src="modals/custom-skill-list.js?v=skill-list-options-1"></script>
-    <script src="scripts/effect-editor.js?v=trained-skills-1"></script>
-    <script src="modals/generated-equipment-picker.js?v=effect-labels-white-1"></script>
-    <script src="modals/pending-effect-choices.js?v=trained-skills-1"></script>
+    <script src="scripts/natural-weapons.js?v=3"></script>
+    <script src="scripts/summon-creatures.js?v=1"></script>
+    <script src="scripts/effect-editor.js?v=effect-saves-2"></script>
+    <script src="modals/generated-equipment-picker.js?v=natural-weapons-1"></script>
+    <script src="modals/pending-effect-choices.js?v=effect-saves-1"></script>
     <script src="scripts/effect-catalog.js?v=effect-browser-1"></script>
-    <script src="scripts/condition-config.js?v=active-conditions-3"></script>
-    <script src="scripts/buff-tracker-widget.js?v=effect-browser-shared-1"></script>
+    <script src="scripts/buff-tracker-widget.js?v=condition-routing-1"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="modals/map-hp-editor.js"></script>
     <script src="scripts/wall-patterns.js"></script>
-    <script src="scripts/pages/map.js?v=effect-browser-shared-1"></script>
+    <script src="scripts/pages/map.js?v=hidden-save-result-1"></script>
     <script src="scripts/modal-rules.js?v=mobile-compact-1"></script>
   </body>
 </html>

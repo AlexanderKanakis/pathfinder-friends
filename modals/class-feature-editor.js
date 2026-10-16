@@ -181,10 +181,18 @@
       casterLevelBonuses,
       spellDcBonuses,
       effectiveAttributeBonuses,
+      attributeContributions,
       grantDomains,
       generatedEquipment,
+      summonCreatures,
+      weaponExtraDamage,
+      weaponDamageSizeChanges,
       conditionalVariables,
+      attackRolls,
       damageRolls,
+      d20Boosts,
+      decisionOwner,
+      auraConfig,
       activeMechanics,
     } = mechanicGroups.collect();
     if (effects.length) feature.effects = effects;
@@ -206,12 +214,23 @@
     if (spellDcBonuses.length) feature.spellDcBonuses = spellDcBonuses;
     if (effectiveAttributeBonuses.length)
       feature.effectiveAttributeBonuses = effectiveAttributeBonuses;
+    if (attributeContributions.length)
+      feature.attributeContributions = attributeContributions;
     if (grantDomains.length) feature.grantDomains = grantDomains;
     if (generatedEquipment.length)
       feature.generatedEquipment = generatedEquipment;
+    if (summonCreatures.length) feature.summonCreatures = summonCreatures;
+    if (weaponExtraDamage.length)
+      feature.weaponExtraDamage = weaponExtraDamage;
+    if (weaponDamageSizeChanges.length)
+      feature.weaponDamageSizeChanges = weaponDamageSizeChanges;
     if (conditionalVariables.length)
       feature.conditionalVariables = conditionalVariables;
+    if (attackRolls.length) feature.attackRolls = attackRolls;
     if (damageRolls.length) feature.damageRolls = damageRolls;
+    if (d20Boosts.length) feature.d20Boosts = d20Boosts;
+    if (decisionOwner) feature.decisionOwner = decisionOwner;
+    if (auraConfig) feature.auraConfig = auraConfig;
     if (activeMechanics) feature.activeMechanics = activeMechanics;
     if (editingMode === "option") {
       const requirements = collectRequirements();

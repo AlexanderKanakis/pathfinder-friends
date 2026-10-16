@@ -1,0 +1,16 @@
+{
+  "id": "unchained-rage-powers",
+  "name": "Rage Power",
+  "description": "",
+  "options": [
+    {
+      "name": "Rage Powers",
+      "description": "As a barbarian gains levels, she learns to use her rage in new ways. At 2nd level and every 2 levels thereafter, the barbarian gains a rage power . A barbarian gains the benefits of rage powers only while raging . Some of these powers are always active during a rage, and others require the barbarian to take an action to use them. Unless otherwise noted, a barbarian cannot select an individual power more than once. Unmodified Rage Powers The following rage powers can be used unaltered: Beast totem , beast totem (greater) , beast totem (lesser) , boasting taunt , body bludgeon , brawler , brawler (greater) , chaos totem , chaos totem (greater) , chaos totem (lesser) , disruptive , dragon totem , dragon totem resilience , ferocious mount , ferocious mount (greater) , ferocious trample , ferocious trample (greater) , fiend totem , fiend totem (greater) , fiend totem (lesser) , ghost rager , good for what ails you , guarded life , guarded life (greater) , hive totem , hive totem resilience , hive totem toxicity , hurling , hurling (greater) , hurling (lesser) , hurling charge , liquid courage , overbearing advance , overbearing onslaught , primal scent , roaring drunk , spirit steed , spirit totem , spirit totem (greater) , spirit totem (lesser) , staggering drunk , sunder enchantment , world serpent spirit , world serpent totem , world serpent totem unity . Some of the following rage powers are stances. Activating a stance rage power is a move action . A barbarian can&#8217;t have more than one stance rage power active at a time. If she activates a stance rage power while another one is active, the current stance immediately ends. The stance can be intentionally ended at the beginning of the barbarian&#8217;s turn as a free action ; otherwise, it lasts until the rage ends. ",
+      "requirements": {
+        "minClassLevel": 2,
+        "text": "As a barbarian gains levels, she learns to use her rage in new ways. At 2nd level and every 2 levels thereafter, the barbarian gains a rage power ."
+      },
+      "scrapeConfidence": "medium"
+    }
+  ]
+}

@@ -7,20 +7,13 @@
   let modal = null;
   let resolver = null;
   let multiple = false;
+  let searchable = true;
   let selectedValues = new Set();
 
-  // Resolves once the modal has fully finished hiding and is safe to
-  // show() again. An effect can carry more than one "choice:" bonus (a
-  // mutagen: "+ physical attribute of your choice" AND "- mental
-  // attribute of your choice"), which resolveChoiceBonuses() in
-  // buff-tracker-widget.js resolves by awaiting open() twice in a row.
-  // Bootstrap's Modal.show() silently no-ops if called while the same
-  // instance is still mid fade-out from the previous hide() -- and the
-  // fade-out is still running right after the first pick, since the
-  // click handler resolves the pick promise immediately but the CSS
-  // transition (and "hidden.bs.modal") only finish later. So the next
-  // open() has to wait for that transition to actually complete before
-  // it dares call show() again, or the second picker never appears.
+  // Bootstrap silently drops a modal opened while another modal is still
+  // fading out. Keep this signal for back-to-back picker sessions, and
+  // resolve each pick only from hidden.bs.modal so the activation
+  // orchestrator can safely advance to a different modal too.
   let hideSignal = Promise.resolve();
 
   function escapeHtml(value) {
@@ -148,14 +141,11 @@
 
   function renderList({ resetScroll = false } = {}) {
     pendingNamedSkillOption = null;
-    document.getElementById(`${MODAL_ID}Search`).classList.remove("d-none");
+    const search = document.getElementById(`${MODAL_ID}Search`);
+    search.classList.toggle("d-none", !searchable);
     document.getElementById(`${MODAL_ID}List`).classList.remove("d-none");
     document.getElementById(`${MODAL_ID}NamedSkill`).classList.add("d-none");
-    const term =
-      document
-        .getElementById(`${MODAL_ID}Search`)
-        ?.value.trim()
-        .toLowerCase() || "";
+    const term = searchable ? search.value.trim().toLowerCase() : "";
     const list = document.getElementById(`${MODAL_ID}List`);
     const previousScrollTop = list.scrollTop;
     const matches = currentOptions.filter(
@@ -208,6 +198,7 @@
     allowMultiple = false,
     selected = [],
     confirmLabel = "Continue",
+    searchable: allowSearch = true,
   } = {}) {
     // Wait for any still-closing previous session before touching the
     // (singleton) modal element again -- see hideSignal above.
@@ -219,6 +210,7 @@
           document.getElementById(`${MODAL_ID}Search`).value = "";
           currentOptions = Array.isArray(options) ? options : [];
           multiple = Boolean(allowMultiple);
+          searchable = Boolean(allowSearch);
           selectedValues = new Set(
             (Array.isArray(selected) ? selected : []).map(String),
           );
@@ -230,34 +222,35 @@
           modal = bootstrap.Modal.getOrCreateInstance(modalEl);
 
           let settled = false;
+          let hasPendingResult = false;
+          let pendingResult = null;
           let resolveHideSignal;
           hideSignal = new Promise((res) => {
             resolveHideSignal = res;
           });
 
-          const settle = (value) => {
+          const onHidden = () => {
             if (settled) return;
             settled = true;
-            resolver = null;
-            resolve(value);
-          };
-          const onHidden = () => {
-            // Covers both paths: Cancel/close-button/backdrop (nothing
-            // has settled yet, so this is the real "no pick" answer) and
-            // a normal pick (already settled by the click handler above,
-            // so this is just a no-op confirmation the fade-out is done).
-            settle(null);
             modalEl.removeEventListener("hidden.bs.modal", onHidden);
+            resolver = null;
+            resolve(hasPendingResult ? pendingResult : null);
             resolveHideSignal();
           };
           modalEl.addEventListener("hidden.bs.modal", onHidden);
 
-          resolver = settle;
+          resolver = (value) => {
+            if (settled) return;
+            hasPendingResult = true;
+            pendingResult = value;
+          };
           modal.show();
-          setTimeout(
-            () => document.getElementById(`${MODAL_ID}Search`).focus(),
-            150,
-          );
+          setTimeout(() => {
+            const focusTarget = searchable
+              ? document.getElementById(`${MODAL_ID}Search`)
+              : document.querySelector(`#${MODAL_ID}List [data-choice-index]`);
+            focusTarget?.focus();
+          }, 150);
         }),
     );
   }

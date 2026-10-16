@@ -87,10 +87,10 @@ const quickSpellMobilePanels = {};
 let auraEffectDraft = null;
 let auraEffectDismissed = new Set();
 let auraEffectInside = new Set();
+let auraEffectApplying = new Set();
 let turnAdvanceBusy = false;
 let seenTurnEffectNotices = new Set();
 let dpadJoystickState = null;
-let mapToastTimer = null;
 let shapeFogRenderContext = null;
 let appliedMapBackgroundUrl = null;
 let current3DRenderTokens = [];
@@ -292,7 +292,7 @@ const MAP_CONTEXT_DOCUMENTATION = [
   {
     id: "apply-effect",
     group: "Right-Click Actions",
-    title: "Apply Effect",
+    title: "Use Powers",
     icon: "bi-magic",
     summary:
       "Apply a spell, ability, feat, debuff, or condition to one or more map targets.",
@@ -396,7 +396,11 @@ function el(id) {
   return document.getElementById(id);
 }
 function canViewSelectedDetails(item) {
-  return !(item?.kind === "enemy" && !isGm);
+  return !(
+    item?.kind === "enemy" &&
+    !isGm &&
+    !controlsSummonedCreature(item)
+  );
 }
 function activateSideTab(tabId) {
   const tabButton = el(tabId);
@@ -525,11 +529,12 @@ function durationParts(effect) {
   if (window.PFEffectMeta?.normalizeDurationConfig) {
     const config = window.PFEffectMeta.normalizeDurationConfig(effect);
     return {
-      count: config.count,
+      count: config.staticValue,
       unit: config.unit,
       perLevel:
         config.factors.some((factor) => factor.type === "caster") ||
-        config.durationScale?.source?.type === "caster",
+        config.diceCountScale?.source?.type === "caster" ||
+      config.staticValueScale?.source?.type === "caster",
       config,
     };
   }
@@ -539,7 +544,8 @@ function durationUsesCasterLevel(effect) {
   const config = durationParts(effect).config;
   return config
     ? config.factors.some((factor) => factor.type === "caster") ||
-      config.durationScale?.source?.type === "caster"
+      config.diceCountScale?.source?.type === "caster" ||
+      config.staticValueScale?.source?.type === "caster"
     : durationParts(effect).perLevel;
 }
 function durationLabel(effect) {
@@ -754,6 +760,10 @@ function sizeChangeText(entry = {}) {
   const value = Number(entry.value ?? entry.steps ?? 0);
   return `Size ${fmtSigned(value)}`;
 }
+function weaponDamageSizeChangeText(entry = {}) {
+  return window.PFEffectEditor?.weaponDamageSizeChangeText?.(entry) ||
+    `${entry.weaponName || entry.weaponType || "Weapon"}: damage as one size ${Number(entry.sizeSteps) < 0 ? "smaller" : "larger"}`;
+}
 function generatedEquipmentText(entry = {}) {
   return `${entry.type || "Equipment"}: ${entry.name || entry.item || "Generated item"}`;
 }
@@ -777,6 +787,9 @@ function effectExtraTexts(effect = {}) {
     ...(effect.extraRanksPerLevel || []).map(extraRanksPerLevelText),
     ...(effect.featGrants || []).map(featGrantText),
     ...(effect.sizeChanges || []).map(sizeChangeText),
+    ...(effect.weaponDamageSizeChanges || []).map(
+      weaponDamageSizeChangeText,
+    ),
     ...(effect.spellLikeAbilities || []).map(spellLikeText),
     ...(effect.casterLevelBonuses || []).map(casterLevelBonusText),
     ...(effect.spellDcBonuses || []).map(spellDcBonusText),
@@ -874,7 +887,9 @@ function tokenInitiativeScore(token) {
 function displayTokenName(token) {
   const actual = tokenActualName(token);
   if (!tokenNameIsHidden(token)) return actual;
-  return isGm ? `[?] ${actual}` : "?";
+  return isGm || controlsSummonedCreature(token)
+    ? `[?] ${actual}`
+    : "?";
 }
 function mapLayerItems() {
   return [...state.shapes, ...state.tokens];
@@ -897,7 +912,13 @@ function canSeeToken(token) {
   // state.tokens directly, not this filtered view), so hiding it here
   // only hides the bulb icon/aura, never the illumination itself.
   if (token.kind === "light" && !isGm) return false;
-  if (token.kind === "enemy" && token.visible === false && !isGm) return false;
+  if (
+    token.kind === "enemy" &&
+    token.visible === false &&
+    !isGm &&
+    !controlsSummonedCreature(token)
+  )
+    return false;
   if (token.hidden === true && !canManageMapItem(token)) return false;
   return true;
 }
@@ -951,29 +972,41 @@ function syncInitiativeWithTokens(tokens, rows) {
   });
   return normalized;
 }
+function controlsSummonedCreature(token) {
+  return Boolean(
+    token?.summonedCreature &&
+    token.ownerId &&
+    token.ownerId === currentUserId,
+  );
+}
 function canEditTokenHp(token) {
   if (!token?.kind) return false;
   if (token.panelOnly) return false;
   if (isGm) return true;
+  if (token.summonedCreature) return token.ownerId === currentUserId;
   return token.kind === "character" && token.ownerId === currentUserId;
 }
 function canManageMapItem(item) {
   if (!item) return false;
   if (isGm) return true;
+  if (item.summonedCreature) return controlsSummonedCreature(item);
   if (item.kind === "character") return item.ownerId === currentUserId;
   if (item.kind === "token") return item.ownerId === currentUserId;
+  if (item.kind === "aura") return item.ownerId === currentUserId;
   if (item.shape) return true;
   return false;
 }
 function canManageAura(token) {
   if (!token?.kind || token.kind === "light") return false;
   if (isGm) return true;
+  if (token.summonedCreature) return token.ownerId === currentUserId;
   return token.kind === "character" && token.ownerId === currentUserId;
 }
 function canManageEffects(token) {
   if (!token?.kind || token.kind === "light") return false;
   if (token.panelOnly) return false;
   if (isGm) return true;
+  if (token.summonedCreature) return token.ownerId === currentUserId;
   return token.kind === "character" && token.ownerId === currentUserId;
 }
 
@@ -984,13 +1017,18 @@ function canViewCharacter(character) {
 
 function canViewTokenSheet(token) {
   if (!token?.kind) return false;
-  if (token.kind === "enemy") return isGm;
+  if (token.kind === "enemy")
+    return (
+      isGm ||
+      (controlsSummonedCreature(token))
+    );
   if (token.kind === "character") return canViewCharacter(tokenCharacter(token));
   return false;
 }
 function canRollToken(token) {
   if (!token?.kind) return false;
   if (isGm) return token.kind === "character" || token.kind === "enemy";
+  if (token.summonedCreature) return token.ownerId === currentUserId;
   return token.kind === "character" && token.ownerId === currentUserId;
 }
 function tokenHpText(token) {
@@ -1257,8 +1295,19 @@ async function saveMapWeaponOption(tokenId, weaponIndex, field, checked) {
     return;
   }
 
-  if (token.kind === "enemy" && isGm) {
+  if (token.kind === "enemy" && canViewTokenSheet(token)) {
     token.sheet = nextSheet;
+    if (token.summonedCreature) {
+      const calculatedWeapons = token.sheet.calculated?.weapons;
+      if (Array.isArray(calculatedWeapons))
+        token.sheet.calculated.weapons = nextSheet.weapons.map((weapon, index) => ({
+          ...(calculatedWeapons[index] || {}),
+          name: weapon.name || calculatedWeapons[index]?.name || "Weapon",
+        }));
+      queueSave();
+      renderAll(false);
+      return;
+    }
     renderAll(false);
     const saved = await PFApp.saveEnemy(
       {
@@ -1434,7 +1483,11 @@ function renderCalculatedSheetSummary(token, calculated) {
                 .map((weapon, index) => {
                   const expanded =
                     expandedMapWeaponKey === `${token.id}:${index}`;
-                  return `<div class="mini-sheet-row map-weapon-row" data-map-weapon-expand="${index}"><span><i class="bi ${expanded ? "bi-chevron-down" : "bi-chevron-right"} me-1"></i>${escapeHtml(weapon.name || "Weapon")}</span><span>${escapeHtml([weapon.attack, weapon.damage, weapon.critical].filter(Boolean).join(" | "))}</span></div>${expanded ? renderMapWeaponOptions(token, rawWeapons[index] || {}, index) : ""}${compactConditionalRows([...(weapon.attackConditionals || []), ...(weapon.damageConditionals || [])])}`;
+                  const damage = [
+                    weapon.damage,
+                    ...(weapon.extraDamage || []),
+                  ].filter(Boolean).join(" + ");
+                  return `<div class="mini-sheet-row map-weapon-row" data-map-weapon-expand="${index}"><span><i class="bi ${expanded ? "bi-chevron-down" : "bi-chevron-right"} me-1"></i>${escapeHtml(weapon.name || "Weapon")}</span><span>${escapeHtml([weapon.attack, damage, weapon.critical].filter(Boolean).join(" | "))}</span></div>${expanded ? renderMapWeaponOptions(token, rawWeapons[index] || {}, index) : ""}${compactConditionalRows([...(weapon.attackConditionals || []), ...(weapon.damageConditionals || [])])}`;
                 })
                 .join("")
             : `<div class="small text-secondary">No weapons.</div>`
@@ -1446,9 +1499,9 @@ function renderCalculatedSheetSummary(token, calculated) {
 
 function renderCompactCharacterSheet(token) {
   if (token.kind === "enemy") {
-    return isGm && token.sheet?.calculated
+    return canViewTokenSheet(token) && token.sheet?.calculated
       ? renderCalculatedSheetSummary(token, token.sheet.calculated)
-      : isGm
+      : canViewTokenSheet(token)
         ? `<div class="mini-sheet">${compactSection("Enemy Sheet", `<div class="small text-secondary">No calculated sheet summary found.</div>`)}</div>`
         : "";
   }
@@ -1519,8 +1572,11 @@ function renderCompactCharacterSheet(token) {
         const damage =
           `${weapon.damage || ""}${damageMod ? fmtSigned(damageMod) : ""}` ||
           fmtSigned(damageMod);
+        const damageWithExtras = `${damage}${window.PFWeaponDamage?.format?.(
+          weapon.extraDamage,
+        ) || ""}`;
         const expanded = expandedMapWeaponKey === `${token.id}:${index}`;
-        return `<div class="mini-sheet-row map-weapon-row" data-map-weapon-expand="${index}"><span><i class="bi ${expanded ? "bi-chevron-down" : "bi-chevron-right"} me-1"></i>${escapeHtml(weapon.name || "Weapon")}</span><span>${escapeHtml(attacks || fmtSigned(attack))} | ${escapeHtml(damage)} | ${escapeHtml(weapon.critical || "-")}</span></div>${expanded ? renderMapWeaponOptions(token, weapon, index) : ""}`;
+        return `<div class="mini-sheet-row map-weapon-row" data-map-weapon-expand="${index}"><span><i class="bi ${expanded ? "bi-chevron-down" : "bi-chevron-right"} me-1"></i>${escapeHtml(weapon.name || "Weapon")}</span><span>${escapeHtml(attacks || fmtSigned(attack))} | ${escapeHtml(damageWithExtras)} | ${escapeHtml(weapon.critical || "-")}</span></div>${expanded ? renderMapWeaponOptions(token, weapon, index) : ""}`;
       })
       .join("") || `<div class="small text-secondary">No weapons.</div>`;
 
@@ -2220,7 +2276,7 @@ function showMapContextMenu(event, item) {
         : `<i class="bi bi-eye-slash me-1"></i> Hide`;
   }
   const visibilityButton = el("toggleEnemyVisibility");
-  const canToggleEnemy = item.kind === "enemy" && isGm;
+  const canToggleEnemy = item.kind === "enemy" && (isGm || controlsSummonedCreature(item));
   visibilityButton.classList.toggle("d-none", !canToggleEnemy);
   if (canToggleEnemy) {
     visibilityButton.innerHTML =
@@ -2229,7 +2285,7 @@ function showMapContextMenu(event, item) {
         : `<i class="bi bi-eye-slash me-1"></i> Hide enemy`;
   }
   const nameVisibilityButton = el("toggleTokenNameVisibility");
-  const canToggleName = !isLight && isGm && Boolean(item.kind);
+  const canToggleName = !isLight && (isGm || controlsSummonedCreature(item)) && Boolean(item.kind);
   nameVisibilityButton.classList.toggle("d-none", !canToggleName);
   if (canToggleName) {
     nameVisibilityButton.innerHTML = item.hideName
@@ -2951,14 +3007,25 @@ function renderRevealIndicator(token, field, className, color) {
 function lightRevealCircles() {
   const circles = [];
   state.tokens.forEach((token) => {
-    if (!token.light?.visible) return;
     const center = tokenCenter(token);
-    circles.push({
-      x: center.x,
-      y: center.y,
-      radius: Math.max(1, Number(token.light.radius || 1)),
-      elevationFeet: Number(token.elevationFeet || 0),
-    });
+    if (token.light?.visible) {
+      circles.push({
+        x: center.x,
+        y: center.y,
+        radius: Math.max(1, Number(token.light.radius || 1)),
+        elevationFeet: Number(token.elevationFeet || 0),
+      });
+    }
+    tokenAuraEntries(token)
+      .filter(({ aura }) => aura.revealMode === "light")
+      .forEach(({ aura }) => {
+        circles.push({
+          x: center.x,
+          y: center.y,
+          radius: Math.max(1, Number(aura.radius || 1)),
+          elevationFeet: Number(token.elevationFeet || 0),
+        });
+      });
   });
   return circles;
 }
@@ -2966,18 +3033,26 @@ function lightRevealCircles() {
 function limitedViewRevealCircles() {
   const circles = [];
   state.tokens.forEach((token) => {
-    if (
-      !token.limitedView?.visible ||
-      !(isGm || token.ownerId === currentUserId)
-    )
-      return;
+    if (!(isGm || token.ownerId === currentUserId)) return;
     const center = tokenCenter(token);
-    circles.push({
-      x: center.x,
-      y: center.y,
-      radius: Math.max(1, Number(token.limitedView.radius || 1)),
-      elevationFeet: Number(token.elevationFeet || 0),
-    });
+    if (token.limitedView?.visible) {
+      circles.push({
+        x: center.x,
+        y: center.y,
+        radius: Math.max(1, Number(token.limitedView.radius || 1)),
+        elevationFeet: Number(token.elevationFeet || 0),
+      });
+    }
+    tokenAuraEntries(token)
+      .filter(({ aura }) => aura.revealMode === "specialVision")
+      .forEach(({ aura }) => {
+        circles.push({
+          x: center.x,
+          y: center.y,
+          radius: Math.max(1, Number(aura.radius || 1)),
+          elevationFeet: Number(token.elevationFeet || 0),
+        });
+      });
   });
   return circles;
 }
@@ -3233,6 +3308,8 @@ function renderLimitedViewGrayscale() {
 
 function tokenInAura(token, auraToken, aura = auraToken?.aura || {}) {
   if (!aura.visible || !aura.effect || token.id === auraToken.id) return false;
+  if (String(token.id) === String(aura.emitterTokenId || aura.casterTokenId || ""))
+    return false;
   if (!canSeeToken(token) || !canSeeToken(auraToken)) return false;
   const radius = Math.max(1, Number(aura.radius || 1));
   const a = tokenCenter(auraToken);
@@ -3249,7 +3326,9 @@ function currentAuraEffectEntries() {
     .filter(canSeeToken)
     .flatMap((auraToken) =>
       tokenAuraEntries(auraToken)
-        .filter(({ aura }) => aura.visible && aura.effect)
+        .filter(
+          ({ aura }) => aura.visible && aura.effect && !aura.visualOnly,
+        )
         .map((entry) => ({ ...entry, auraToken })),
     );
   return state.tokens
@@ -3278,6 +3357,7 @@ function auraEffectPrompts() {
     if (!currentKeys.has(key)) {
       auraEffectInside.delete(key);
       auraEffectDismissed.delete(key);
+      auraEffectApplying.delete(key);
     }
   }
   entries.forEach((entry) => auraEffectInside.add(entry.key));
@@ -3319,18 +3399,21 @@ function renderAuraEffectToasts() {
   updateAuraToastPosition();
   const prompts = auraEffectPrompts();
   container.innerHTML = prompts
-    .map(
-      ({ token, auraToken, aura, auraId, key }) => `
-    <div class="aura-effect-toast">
-      <div class="fw-semibold">${escapeHtml(aura.effect?.name || "Effect")} aura</div>
-      <div class="small text-secondary mb-2">${escapeHtml(displayTokenName(token))}</div>
-      <div class="d-flex justify-content-end gap-2">
-        <button class="btn btn-outline-light btn-sm" type="button" data-dismiss-aura="${escapeHtml(key)}">Dismiss</button>
-        <button class="btn btn-success btn-sm" type="button" data-apply-aura="${escapeHtml(token.id)}" data-aura-source="${escapeHtml(auraToken.id)}" data-aura-id="${escapeHtml(auraId)}">Apply</button>
-      </div>
-    </div>
-  `,
-    )
+    .map(({ token, auraToken, aura, auraId, key }) => {
+      const applying = auraEffectApplying.has(key);
+      return `
+        <div class="aura-effect-toast">
+          <div class="fw-semibold">${escapeHtml(aura.effect?.name || "Effect")} aura</div>
+          <div class="small text-secondary mb-2">${escapeHtml(displayTokenName(token))}</div>
+          <div class="d-flex justify-content-end gap-2">
+            <button class="btn btn-outline-light btn-sm" type="button" data-dismiss-aura="${escapeHtml(key)}">Dismiss</button>
+            <button class="btn btn-success btn-sm" type="button" data-apply-aura="${escapeHtml(token.id)}" data-aura-source="${escapeHtml(auraToken.id)}" data-aura-id="${escapeHtml(auraId)}" data-aura-prompt="${escapeHtml(key)}" ${applying ? 'disabled aria-busy="true"' : ""}>
+              ${applying ? '<span class="spinner-border spinner-border-sm" aria-hidden="true"></span><span class="visually-hidden">Applying...</span>' : "Apply"}
+            </button>
+          </div>
+        </div>
+      `;
+    })
     .join("");
   container.querySelectorAll("[data-dismiss-aura]").forEach((button) => {
     button.addEventListener("click", () => {
@@ -3339,13 +3422,22 @@ function renderAuraEffectToasts() {
     });
   });
   container.querySelectorAll("[data-apply-aura]").forEach((button) => {
-    button.addEventListener("click", () =>
-      applyAuraEffectToToken(
-        button.dataset.applyAura,
-        button.dataset.auraSource,
-        button.dataset.auraId,
-      ),
-    );
+    button.addEventListener("click", async () => {
+      const key = button.dataset.auraPrompt;
+      if (!key || auraEffectApplying.has(key)) return;
+      auraEffectApplying.add(key);
+      renderAuraEffectToasts();
+      try {
+        await applyAuraEffectToToken(
+          button.dataset.applyAura,
+          button.dataset.auraSource,
+          button.dataset.auraId,
+        );
+      } finally {
+        auraEffectApplying.delete(key);
+        renderAuraEffectToasts();
+      }
+    });
   });
 }
 
@@ -3356,6 +3448,7 @@ function renderToken(
   const enemyClass = token.kind === "enemy" ? " enemy" : "";
   const genericClass = token.kind === "token" ? " generic-token" : "";
   const lightClass = token.kind === "light" ? " light-token" : "";
+  const auraClass = token.kind === "aura" ? " independent-aura-token" : "";
   const identityHidden = tokenNameIsHidden(token);
   const imageUrl = tokenNameIsHidden(token)
     ? ""
@@ -3385,11 +3478,15 @@ function renderToken(
       : "";
   const ghostClass = ghost ? " map-token-fog-reveal" : "";
   const idAttr = ghost ? "" : ` data-map-id="${escapeHtml(token.id)}"`;
-  const shortLabel = tokenNameIsHidden(token)
-    ? isGm
+  const shortLabel = token.kind === "aura"
+    ? tokenActualName(token)
+    : tokenNameIsHidden(token)
+    ? isGm || controlsSummonedCreature(token)
       ? `? ${tokenInitials(tokenActualName(token))}`
       : "?"
-    : tokenInitials(tokenActualName(token));
+    : token.summonedCreature && token.summonIndex
+      ? `${tokenInitials(tokenActualName(token).replace(/\s+\d+$/, ""))} ${token.summonIndex}`
+      : tokenInitials(tokenActualName(token));
   // opacity/filter < 1 (or != none) force transform-style:preserve-3d
   // to compute as flat on whatever element they're set on (CSS
   // Transforms spec) -- fine for an imageless token (.map-token has no
@@ -3413,6 +3510,8 @@ function renderToken(
   const portraitHtml =
     token.kind === "light"
       ? `<div class="map-token-3d-portrait-anchor"><div class="map-token-3d-portrait map-token-light-bulb" style="${tokenEffectStyle}"><i class="bi bi-lightbulb-fill"></i></div></div>`
+      : token.kind === "aura"
+        ? `<div class="map-token-3d-portrait-anchor"><div class="map-token-3d-portrait map-token-aura-icon" style="${tokenEffectStyle}"><i class="bi ${effectCategoryIcon(token.effectCategory)}"></i></div></div>`
       : imageUrl
         ? `<div class="map-token-3d-portrait-anchor"><img class="map-token-3d-portrait map-token-3d-image" src="${escapeHtml(cssUrl(imageUrl))}" alt="" style="${tokenEffectStyle}"></div>`
         : `<div class="map-token-3d-portrait-anchor"><div class="map-token-3d-portrait map-token-3d-initials" style="${tokenEffectStyle}">${escapeHtml(shortLabel)}</div></div>`;
@@ -3428,12 +3527,13 @@ function renderToken(
           : "",
       ].join("");
   return `
-    <div class="map-token${enemyClass}${genericClass}${lightClass}${imageClass}${identityHiddenClass}${hiddenClass}${tokenHiddenClass}${selectedClass}${activeClass}${ghostClass}"${idAttr} style="--x:${token.x};--y:${token.y};--w:${tokenW};--h:${tokenH};--z:${Number(token.zIndex || 2)};--tz:${tz}px;--portrait-size:${portraitSize}px;--color:${escapeHtml(baseColor)};--token-image:${tokenImage};${containerEffectStyle}">
+    <div class="map-token${enemyClass}${genericClass}${lightClass}${auraClass}${imageClass}${identityHiddenClass}${hiddenClass}${tokenHiddenClass}${selectedClass}${activeClass}${ghostClass}"${idAttr} style="--x:${token.x};--y:${token.y};--w:${tokenW};--h:${tokenH};--z:${Number(token.zIndex || 2)};--tz:${tz}px;--portrait-size:${portraitSize}px;--color:${escapeHtml(baseColor)};--token-image:${tokenImage};${containerEffectStyle}">
       ${baseFogHtml}
       ${token.kind === "light" ? `<i class="bi bi-lightbulb-fill map-token-2d-light-icon"></i>` : ""}
+      ${token.kind === "aura" ? `<i class="bi ${effectCategoryIcon(token.effectCategory)} map-token-2d-aura-icon"></i>` : ""}
       ${portraitHtml}
       <div class="text-center">
-        <div class="token-label">${escapeHtml(shortLabel)}</div>
+        <div class="token-label" title="${escapeHtml(tokenActualName(token))}">${escapeHtml(shortLabel)}</div>
       </div>
     </div>
   `;
@@ -3594,14 +3694,14 @@ function token3DGrayscaleFromContext(token) {
 
 function render3DTokenHover(token, centerX, centerY, portraitSize) {
   const hoverName =
-    token.kind === "character" || token.kind === "token" || (token.kind === "enemy" && isGm)
+    token.kind === "character" || token.kind === "token" || (token.kind === "enemy" && canViewTokenSheet(token))
       ? displayTokenName(token)
       : "";
   if (!hoverName) return "";
   const hoverHp =
     token.kind === "character"
       ? tokenHpText(token)
-      : token.kind === "enemy" && isGm
+      : token.kind === "enemy" && canViewTokenSheet(token)
         ? `${tokenCurrentHp(token) || "?"}/${tokenTotalHp(token) || "?"} HP`
         : "";
   return `
@@ -3667,13 +3767,13 @@ function showTokenHover(tokenId) {
   if (!token || !layer) return;
   const character = token.kind === "character" ? tokenCharacter(token) : null;
   const hoverName =
-    character || token.kind === "token" || (token.kind === "enemy" && isGm)
+    character || token.kind === "token" || (token.kind === "enemy" && canViewTokenSheet(token))
       ? displayTokenName(token)
       : "";
   if (!hoverName) return;
   const hoverHp = character
     ? tokenHpText(token)
-    : token.kind === "enemy" && isGm
+    : token.kind === "enemy" && canViewTokenSheet(token)
       ? `${tokenCurrentHp(token) || "?"}/${tokenTotalHp(token) || "?"} HP`
       : "";
   const centerX =
@@ -3827,18 +3927,7 @@ function heightFeetLabel(feet) {
 }
 
 function showMapToast(message) {
-  let container = el("mapToastContainer");
-  if (!container) {
-    container = document.createElement("div");
-    container.id = "mapToastContainer";
-    container.className = "map-toast-container";
-    document.body.appendChild(container);
-  }
-  container.innerHTML = `<div class="map-toast">${escapeHtml(message)}</div>`;
-  clearTimeout(mapToastTimer);
-  mapToastTimer = setTimeout(() => {
-    container.innerHTML = "";
-  }, 2200);
+  window.PFToast?.show(message, { tone: "info", duration: 2200 });
 }
 
 function shapeDepth(shape) {
@@ -4921,7 +5010,7 @@ function quickActionRows(item) {
   if (canManageAura(item))
     rows.push(["emit-toggle", "bi-broadcast-pin", "btn-outline-info", "Emit"]);
   if (canManageEffects(item))
-    rows.push(["effect", "bi-magic", "btn-outline-success", "Apply effect"]);
+    rows.push(["effect", "bi-lightning-charge", "btn-outline-success", "Use Powers"]);
   if (canRollToken(item)) rows.push(["roll", "bi-dice-5", "btn-outline-primary", "Roll"]);
   rows.push([
     "toggle-visibility",
@@ -4929,7 +5018,7 @@ function quickActionRows(item) {
     "btn-outline-secondary",
     item.hidden === true ? "Unhide" : "Hide",
   ]);
-  if (item.kind === "enemy" && isGm) {
+  if (item.kind === "enemy" && (isGm || controlsSummonedCreature(item))) {
     rows.push([
       "toggle-enemy-visibility",
       item.visible === false ? "bi-eye" : "bi-eye-slash",
@@ -5291,6 +5380,10 @@ function renderSelectedPanel() {
     renderLightPanel(item);
     return;
   }
+  if (item?.kind === "aura") {
+    renderIndependentAuraPanel(item);
+    return;
+  }
   const wasDetailsOpen =
     el("selectedDetailsCollapse")?.classList.contains("show") || false;
   if (item?.kind === "character" && canViewTokenSheet(item)) {
@@ -5333,7 +5426,10 @@ function renderSelectedPanel() {
   const compactSheet = item.kind ? renderCompactCharacterSheet(item) : "";
   const effectsSection =
     item.kind && canManageEffects(item)
-      ? `<button class="btn btn-outline-success btn-sm w-100 mt-2" type="button" data-open-token-effects="${escapeHtml(item.id)}">Effects</button>`
+      ? `<div class="d-flex gap-2 mt-2">
+          <button class="btn btn-outline-success btn-sm flex-fill" type="button" data-open-token-effects="${escapeHtml(item.id)}">Effects</button>
+          <button class="btn btn-outline-success btn-sm flex-fill" type="button" data-open-token-powers="${escapeHtml(item.id)}"><i class="bi bi-lightning-charge me-1"></i>Use Powers</button>
+        </div>`
       : "";
   const textureFields = item.shape
     ? `<div class="mt-2">
@@ -5366,7 +5462,11 @@ function renderSelectedPanel() {
     : "";
   const sizeLinked = item.sizeLinked !== false;
   const sizeLinkIcon = sizeLinked ? "bi-link-45deg" : "bi-unlink";
-  const concealedName = item.kind && tokenNameIsHidden(item) && !isGm;
+  const concealedName =
+    item.kind &&
+    tokenNameIsHidden(item) &&
+    !isGm &&
+    !controlsSummonedCreature(item);
   const nameField =
     item.kind === "character"
       ? ""
@@ -5430,6 +5530,26 @@ function renderSelectedPanel() {
       ? `${renderCharacterPanelBack(selectedCharacterName)}${detailHtml}`
       : detailHtml;
   bindSelectedPanelInteractions(item);
+}
+
+function renderIndependentAuraPanel(item) {
+  const aura = item.automaticAuras?.[0] || {};
+  el("selectedPanel").innerHTML = `
+    <div class="d-flex align-items-center gap-2 mb-2">
+      <i class="bi ${effectCategoryIcon(item.effectCategory)} text-info"></i>
+      <strong class="text-truncate">${escapeHtml(item.name || "Aura")}</strong>
+    </div>
+    <div class="small text-secondary mb-2">
+      ${escapeHtml(String(Number(aura.rangeFeet || aura.radius * 5 || 5)))} ft. | ${escapeHtml(automaticAuraDurationText(aura))}
+    </div>
+    <div class="small mb-3">Move this token to reposition the aura.</div>
+    <button class="btn btn-outline-danger btn-sm w-100" type="button" data-remove-independent-aura>
+      <i class="bi bi-trash"></i> Remove aura
+    </button>
+  `;
+  el("selectedPanel")
+    .querySelector("[data-remove-independent-aura]")
+    ?.addEventListener("click", () => removeMapItem(item.id));
 }
 
 // A dedicated static Light's side panel -- deliberately separate from
@@ -5559,6 +5679,18 @@ function bindSelectedPanelInteractions(item) {
       button.addEventListener("click", () =>
         openMapEffects(button.dataset.openTokenEffects),
       );
+    });
+  el("selectedPanel")
+    .querySelectorAll("[data-open-token-powers]")
+    .forEach((button) => {
+      button.addEventListener("click", async () => {
+        button.disabled = true;
+        try {
+          await openMapPowers(button.dataset.openTokenPowers);
+        } finally {
+          if (button.isConnected) button.disabled = false;
+        }
+      });
     });
   el("selectedPanel")
     .querySelectorAll("[data-map-weapon-expand]")
@@ -5895,7 +6027,10 @@ function updateAuraDragPreview(token) {
     .querySelectorAll(`[data-aura-token-id="${CSS.escape(token.id)}"]`)
     .forEach((node) => {
       const field = node.dataset.auraField || "aura";
-      const data = token[field] || {};
+      const auraId = node.dataset.auraId || "";
+      const data = auraId
+        ? tokenAuraEntry(token, auraId)?.aura || {}
+        : token[field] || {};
       const radius = Math.max(1, Number(data.radius || 1));
       const center = tokenCenter(token);
       node.style.setProperty("--aura-x", center.x - radius);
@@ -6754,11 +6889,30 @@ function removeMapItem(itemId) {
     (entry) => entry.id === itemId,
   );
   if (!item) return;
+  if (item.independentAuraToken) {
+    void removeIndependentAuraToken(item);
+    return;
+  }
+  detachMapItem(item);
+}
+
+function detachMapItem(item) {
+  const itemId = item.id;
   const name = item.name || "Token";
-  state.tokens = state.tokens.filter((token) => token.id !== itemId);
+  const anchoredSummonIds = new Set(
+    state.tokens
+      .filter(
+        (token) =>
+          token.summonedCreature &&
+          String(token.summonAnchorTokenId || "") === String(itemId),
+      )
+      .map((token) => token.id),
+  );
+  anchoredSummonIds.add(itemId);
+  state.tokens = state.tokens.filter((token) => !anchoredSummonIds.has(token.id));
   state.shapes = state.shapes.filter((shape) => shape.id !== itemId);
   state.initiative = state.initiative.filter(
-    (entry) => entry.tokenId !== itemId,
+    (entry) => !anchoredSummonIds.has(entry.tokenId),
   );
   selectedId = "";
   contextMenuTokenId = "";
@@ -6768,6 +6922,23 @@ function removeMapItem(itemId) {
     Math.max(0, state.initiative.length - 1),
   );
   if (item.kind === "character") addTimeline(`${name} left the map.`);
+  renderAll();
+}
+
+async function removeIndependentAuraToken(token) {
+  const casterToken = tokenById(token.auraCasterTokenId);
+  const controllerId = token.auraControllerEffectId || "";
+  detachMapItem(token);
+  if (casterToken && controllerId) {
+    const active = await loadTokenActiveEffects(casterToken);
+    await saveTokenActiveEffects(
+      casterToken,
+      active.filter((effect) => effect.id !== controllerId),
+    );
+  }
+  addTimeline(`${token.name || "Aura"} ends.`);
+  queueSave();
+  await removeOutOfRangeAuraEffects();
   renderAll();
 }
 
@@ -6865,6 +7036,19 @@ async function updateTokenCurrentHp(
   if (!token || !canEditTokenHp(token)) return;
 
   if (token.kind === "enemy") {
+    if (token.summonedCreature) {
+      token.sheet = token.sheet || {};
+      token.sheet.fields = token.sheet.fields || {};
+      token.sheet.calculated = token.sheet.calculated || {};
+      token.sheet.calculated.hp = token.sheet.calculated.hp || {};
+      token.sheet.fields.currentHitPoints = String(value);
+      token.sheet.calculated.hp.current = Number(value);
+      pendingTokenHp.delete(tokenId);
+      updateTokenHpPreview(token, value);
+      queueSave();
+      renderAll(false);
+      return;
+    }
     const saved = await PFApp.updateEnemyCurrentHp(
       token.enemyId,
       value,
@@ -6927,6 +7111,46 @@ async function updateTokenCurrentHp(
   );
 }
 
+async function persistTokenHealing(token, nextHp) {
+  if (!token) return false;
+  const saved =
+    token.kind === "enemy"
+      ? await PFApp.updateEnemyCurrentHp(token.enemyId, nextHp, mapContextKey)
+      : await PFApp.updateCharacterCurrentHp(
+          token.characterId,
+          nextHp,
+          mapContextKey,
+        );
+  if (!saved) return false;
+  pendingTokenHp.delete(token.id);
+  if (token.kind === "enemy") {
+    token.sheet = structuredClone(saved.sheet || token.sheet || {});
+    mapEnemies = mapEnemies.map((enemy) =>
+      enemy.id === saved.id ? saved : enemy,
+    );
+    syncTokenFromSheet(token, saved);
+  } else {
+    const character = tokenCharacter(token);
+    if (character) {
+      character.sheet = structuredClone(saved.sheet || character.sheet || {});
+      syncTokenFromSheet(token, character);
+    }
+  }
+  renderAll(false);
+  return true;
+}
+
+async function applyHealingEffectToToken(token, effect) {
+  if (!window.PFEffectHealing || !token) return false;
+  const result = window.PFEffectHealing.applicationResult(
+    effect,
+    tokenCurrentHp(token),
+    tokenTotalHp(token),
+  );
+  if (!result.changed) return false;
+  return persistTokenHealing(token, result.current);
+}
+
 async function ensureMapClassDefinitions() {
   if (!mapClassDefinitions) {
     mapClassDefinitions = window.PFClassData
@@ -6934,6 +7158,71 @@ async function ensureMapClassDefinitions() {
       : [];
   }
   return mapClassDefinitions;
+}
+
+async function mapClassResourceStatus(token, effect) {
+  const pool = window.PFClassResources?.poolForEffect(effect);
+  if (!pool) return { ok: true, pool: null, resource: null };
+  if (token?.kind !== "character")
+    return { ok: false, pool, resource: null };
+  const character = tokenCharacter(token);
+  if (!character?.id) return { ok: false, pool, resource: null };
+  const latest = await PFApp.loadCharacterSheet(
+    "",
+    mapContextKey,
+    character.id,
+  );
+  const sheet = latest?.sheet || character.sheet || {};
+  const definitions = await ensureMapClassDefinitions();
+  return {
+    ...window.PFClassResources.canSpend(sheet, effect, definitions),
+    character,
+    sheet,
+  };
+}
+
+async function spendMapClassResource(
+  token,
+  effect,
+  { markActivation = true } = {},
+) {
+  const status = await mapClassResourceStatus(token, effect);
+  if (!status.pool) return { ok: true, current: null };
+  if (!status.ok) {
+    const message = window.PFClassResources.insufficientMessage(effect, status);
+    window.PFToast?.show(message, { tone: "warning" });
+    addTimeline(
+      `${displayTokenName(token)}: ${message}`,
+    );
+    renderTimeline();
+    return { ok: false, current: status.resource?.current ?? 0 };
+  }
+  const definitions = await ensureMapClassDefinitions();
+  const spent = window.PFClassResources.spend(
+    status.sheet,
+    effect,
+    definitions,
+  );
+  if (!spent.ok) return { ok: false, current: status.resource.current };
+  const saved = await PFApp.updateCharacterSheetRaw?.(
+    status.character.id,
+    spent.sheet,
+    mapContextKey,
+  );
+  if (!saved?.sheet) return { ok: false, current: status.resource.current };
+  status.character.sheet = saved.sheet;
+  syncTokenFromSheet(token, status.character);
+  if (markActivation) effect.resourceActivationPaid = true;
+  localStorage.setItem(
+    `pf_character_sheet_updated_${mapContextKey}_${status.character.id}`,
+    String(Date.now()),
+  );
+  renderAll(false);
+  return {
+    ok: true,
+    current: spent.current,
+    resource: spent.resource,
+  };
 }
 
 // Every base-30 PF skill plus this character's own homebrew ones --
@@ -7048,6 +7337,7 @@ function mapCharacterAttributeScaleContext(character = {}) {
     1,
     Number(sheet.fields?.characterLevel || 1) || 1,
   );
+  const conditionalGroups = sheet.calculated?.conditionals || {};
   const classLevels = {};
   (Array.isArray(sheet.classProgression) ? sheet.classProgression : []).forEach(
     (entry) => {
@@ -7058,10 +7348,47 @@ function mapCharacterAttributeScaleContext(character = {}) {
   return {
     characterLevel,
     casterLevel: characterLevel,
+    bab: Number(sheet.fields?.bab || 0) || 0,
     classLevels,
     skillRanks: sheet.calculated?.skillRanks || sheet.fields?.skillRanks || {},
     abilityScores,
     abilityMods,
+    attackConditionals: conditionalGroups.attack || [],
+    attackConditionalsByType: {
+      melee: conditionalGroups["melee attack"] || [],
+      ranged: conditionalGroups["ranged attack"] || [],
+      "melee-touch": [
+        ...(conditionalGroups["melee attack"] || []),
+        ...(conditionalGroups["touch attack"] || []),
+      ],
+      "ranged-touch": [
+        ...(conditionalGroups["ranged attack"] || []),
+        ...(conditionalGroups["touch attack"] || []),
+      ],
+    },
+    cmbConditionals: conditionalGroups.cmb || [],
+  };
+}
+
+function mapEffectCastingScaleContext(effect = {}, fallback = {}) {
+  const calculations = effect.spellCalculations || null;
+  return {
+    ...(
+      effect.castRollContext ||
+      effect.attributeScaleContext ||
+      effect.abilityContext ||
+      fallback
+    ),
+    castingAbility:
+      calculations?.castingAbility ||
+      effect.abilityContext?.castingAbility ||
+      "",
+    castingAbilityMod: Number(
+      calculations?.castingAbilityMod ??
+        effect.abilityContext?.castingAbilityMod ??
+        0,
+    ),
+    spellCalculations: calculations,
   };
 }
 
@@ -7096,6 +7423,7 @@ async function characterActivatableAbilities(character) {
       classFeatureChoices: character.sheet.classFeatureChoices || {},
       characterLevel: character.sheet.fields?.characterLevel,
       abilityScores: abilityContext.abilityScores,
+      bab: abilityContext.bab,
     }) || [];
   const loot = await PFApp.loadLootItems(mapContextKey);
   const itemAbilities = (loot || [])
@@ -7170,23 +7498,91 @@ function installAutomaticAura(sourceToken, effect, options = {}) {
   return aura;
 }
 
-function installLinkedAutomaticAura(sourceToken, effect) {
-  const link = window.PFEffectMechanics?.createAuraLink?.(sourceToken, effect);
+function installEmittedAutomaticAuras(sourceToken, effect) {
+  const parentKey =
+    window.PFEffectMechanics?.emittedAuraParentKey?.(effect) || "";
+  const links =
+    window.PFEffectMechanics?.createEmittedAuraLinks?.(
+      sourceToken,
+      effect,
+    ) || [];
+  let current = Array.isArray(sourceToken.automaticAuras)
+    ? sourceToken.automaticAuras
+    : [];
+  if (parentKey) {
+    current = current.filter(
+      (aura) => aura.emittedAuraParentKey !== parentKey,
+    );
+  }
+  links.forEach((link) => {
+    current = window.PFEffectMechanics?.upsertLinkedAura
+      ? window.PFEffectMechanics.upsertLinkedAura(
+          current,
+          link.aura,
+          sourceToken.id,
+        )
+      : [...current, link.aura];
+  });
+  sourceToken.automaticAuras = current;
+  return links;
+}
+
+function installLinkedAutomaticAura(sourceToken, effect, options) {
+  options = options || {};
+  if (effect?.auraConfig?.independentToken) {
+    const created = window.PFEffectMechanics?.createIndependentAuraToken?.(
+      sourceToken,
+      effect,
+      {
+        zIndex: nextMapZIndex(),
+        recipientEffect: options.recipientEffect,
+      },
+    );
+    if (!sourceToken || !created) return null;
+    const matchingTokenIds = new Set(
+      state.tokens
+        .filter((token) => {
+          if (
+            !token.independentAuraToken ||
+            String(token.auraCasterTokenId || "") !== String(sourceToken.id)
+          )
+            return false;
+          const existingAura = token.automaticAuras?.[0];
+          if (!existingAura) return false;
+          const upserted = window.PFEffectMechanics?.upsertLinkedAura?.(
+            [existingAura],
+            created.aura,
+            sourceToken.id,
+          );
+          return upserted?.length === 1 && upserted[0] === created.aura;
+        })
+        .map((token) => token.id),
+    );
+    if (matchingTokenIds.size) {
+      state.tokens = state.tokens.filter(
+        (token) => !matchingTokenIds.has(token.id),
+      );
+      scheduleOutOfRangeAuraCleanup("", 0);
+    }
+    state.tokens.push(created.token);
+    installEmittedAutomaticAuras(sourceToken, created.controller);
+    return created;
+  }
+  const link = window.PFEffectMechanics?.createAuraLink?.(sourceToken, effect, {
+    recipientEffect: options.recipientEffect,
+  });
   if (!sourceToken || !link) return null;
   const current = Array.isArray(sourceToken.automaticAuras)
     ? sourceToken.automaticAuras
     : [];
-  const retained = effect.activationGroup
-    ? current.filter(
-        (aura) =>
-          aura.effect?.activationGroup !== effect.activationGroup ||
-          String(
-            aura.effect?.activationSourceId || aura.effect?.sourceTokenId || "",
-          ) !==
-            String(effect.activationSourceId || effect.sourceTokenId || ""),
+  sourceToken.automaticAuras = window.PFEffectMechanics?.upsertLinkedAura
+    ? window.PFEffectMechanics.upsertLinkedAura(
+        current,
+        link.aura,
+        sourceToken.id,
       )
-    : current;
-  sourceToken.automaticAuras = [...retained, link.aura];
+    : [...current, link.aura];
+  installEmittedAutomaticAuras(sourceToken, link.controller);
   return link;
 }
 
@@ -7195,8 +7591,9 @@ async function syncTokenPassiveAuras(token) {
   const character = tokenCharacter(token);
   if (!character) return false;
   const passives = await characterPassiveEffects(character);
-  const nextPassive = passives
-    .filter((effect) => effect?.auraConfig?.enabled)
+  const passiveAuras = passives.filter((effect) => effect?.auraConfig?.enabled);
+  const nextPassive = passiveAuras
+    .filter((effect) => !effect.auraConfig?.independentToken)
     .map((effect) => {
       const stable = String(effect.id || effect.name || "aura")
         .toLowerCase()
@@ -7208,10 +7605,69 @@ async function syncTokenPassiveAuras(token) {
         { id: `passive:${stable}`, kind: "passive" },
       );
     });
+  const independentPassiveTokens = passiveAuras
+    .filter((effect) => effect.auraConfig?.independentToken)
+    .map((effect) => {
+      const stable = String(effect.id || effect.name || "aura")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "");
+      return window.PFEffectMechanics?.createIndependentAuraToken?.(
+        token,
+        { ...effect, permanent: true },
+        {
+          id: `passive:${stable}`,
+          kind: "passive",
+          tokenId: `passive-aura-token:${token.id}:${stable}`,
+          zIndex: nextMapZIndex(),
+        },
+      )?.token;
+    })
+    .filter(Boolean);
+  const independentIds = new Set(
+    independentPassiveTokens.map((entry) => entry.id),
+  );
+  const priorIndependentState = JSON.stringify(
+    state.tokens.filter(
+      (entry) =>
+        entry.independentAuraToken &&
+        String(entry.auraCasterTokenId || "") === String(token.id),
+    ),
+  );
+  state.tokens = state.tokens.filter(
+    (entry) =>
+      !(
+        entry.independentAuraToken &&
+        entry.automaticAuras?.[0]?.kind === "passive" &&
+        String(entry.auraCasterTokenId || "") === String(token.id) &&
+        !independentIds.has(entry.id)
+      ),
+  );
+  independentPassiveTokens.forEach((nextToken) => {
+    const index = state.tokens.findIndex((entry) => entry.id === nextToken.id);
+    if (index < 0) state.tokens.push(nextToken);
+    else {
+      nextToken.x = state.tokens[index].x;
+      nextToken.y = state.tokens[index].y;
+      nextToken.zIndex = state.tokens[index].zIndex;
+      state.tokens[index] = nextToken;
+    }
+  });
   const active = (Array.isArray(token.automaticAuras) ? token.automaticAuras : [])
     .filter((entry) => entry.kind !== "passive");
   const next = [...active, ...nextPassive];
-  if (JSON.stringify(next) === JSON.stringify(token.automaticAuras || [])) return false;
+  if (
+    JSON.stringify(next) === JSON.stringify(token.automaticAuras || []) &&
+    priorIndependentState ===
+      JSON.stringify(
+        state.tokens.filter(
+          (entry) =>
+            entry.independentAuraToken &&
+            String(entry.auraCasterTokenId || "") === String(token.id),
+        ),
+      )
+  )
+    return false;
   token.automaticAuras = next;
   return true;
 }
@@ -7225,7 +7681,8 @@ function hideMapEffectsForPicker() {
   });
 }
 
-async function openMapEffects(tokenId) {
+async function openMapEffects(tokenId, openOptions = null) {
+  const powersOnly = openOptions?.powersOnly === true;
   const token = tokenById(tokenId);
   const mount = el("mapEffectTracker");
   if (!token || !mount || !canManageEffects(token)) return;
@@ -7233,6 +7690,7 @@ async function openMapEffects(tokenId) {
   const effectTargetId =
     token.kind === "enemy" ? token.enemyId : token.characterId;
   if (!effectTargetId) {
+    if (powersOnly) return;
     mount.innerHTML = `<div class="small text-secondary">Save this token source before adding effects.</div>`;
     mapEffectsModal.show();
     return;
@@ -7241,7 +7699,7 @@ async function openMapEffects(tokenId) {
   el("mapEffectsModalLabel").textContent = `${displayTokenName(token)} Effects`;
   if (!mapEffectTrackerInstance)
     PFEffectTracker.prepareLoading?.(mount);
-  mapEffectsModal.show();
+  if (!powersOnly) mapEffectsModal.show();
   await new Promise((resolve) =>
     requestAnimationFrame(() => window.setTimeout(resolve, 0)),
   );
@@ -7263,7 +7721,9 @@ async function openMapEffects(tokenId) {
     activatableAbilities,
     effectPickerEffects: () => sourceEffectDefinitions(token),
     onEffectPickerOpen: hideMapEffectsForPicker,
-    onEffectPickerCancel: () => mapEffectsModal.show(),
+    onEffectPickerCancel: () => {
+      if (!powersOnly) mapEffectsModal.show();
+    },
     recalculateSpell: async (effect, casterLevel) => {
       const character =
         token.kind === "character" ? tokenCharacter(token) : null;
@@ -7283,6 +7743,21 @@ async function openMapEffects(tokenId) {
       );
       queueSave();
     },
+    onAttackRolled: async (effect, results) => {
+      addTimeline(
+        `${displayTokenName(token)} uses ${effect.name || "an effect"}: ${window.PFAttackRolls.summary(results)}.`,
+      );
+      queueSave();
+    },
+    d20BoostSession: async (rollKind = "attacks") => {
+      const session = await mapD20BoostSession(token, rollKind);
+      if (!session) return null;
+      session.onUsageChange = async (usage) => {
+        session.usage = usage;
+        await saveMapD20BoostUsage(session);
+      };
+      return session;
+    },
     isOwnCharacter,
     choicePoolSkills:
       token.kind === "character"
@@ -7294,16 +7769,32 @@ async function openMapEffects(tokenId) {
       token.kind === "character"
         ? characterFavoredEnemyOptions(tokenCharacter(token))
         : [],
-    onAuraActivate: async (effect) => {
-      const link = installLinkedAutomaticAura(token, effect);
+    onSummonCreatures: async (effect) =>
+      spawnQuickEffectCreatures(effect, token),
+    onAuraActivate: async (effect, { recipientEffect } = {}) => {
+      const link = installLinkedAutomaticAura(token, effect, {
+        recipientEffect,
+      });
       if (!link) return false;
       addTimeline(`${displayTokenName(token)} activates ${effect.name || "an aura"}.`);
+      queueSave();
       renderAll();
       return link.controller;
+    },
+    onTargetedAuraActivate: async (effect) => {
+      quickEffectSourceTokenId = token.id;
+      await openQuickEffectTargets(effect, {
+        casterLevel: effect.casterLevel || tokenLevel(token),
+        turns: effect.turns || 1,
+        permanent: Boolean(effect.permanent),
+      });
+      return true;
     },
     loadActiveEffects:
       token.kind === "enemy"
         ? async () => {
+            if (token.summonedCreature)
+              return token.sheet?.activeBuffs || [];
             const enemy = await PFApp.loadEnemy(token.enemyId, mapContextKey);
             if (enemy?.sheet) token.sheet = structuredClone(enemy.sheet);
             return token.sheet?.activeBuffs || [];
@@ -7313,6 +7804,13 @@ async function openMapEffects(tokenId) {
       token.kind === "character"
         ? async () => effectSources.passives || []
         : undefined,
+    onBeforeApply: async (effect, { replaceIndex } = {}) => {
+      if (Number.isInteger(replaceIndex)) return true;
+      return (await spendMapClassResource(token, effect)).ok;
+    },
+    onHealingApply: async (effect) => {
+      await applyHealingEffectToToken(token, effect);
+    },
     saveActiveEffects: async (effects) => {
       const activeEffects = Array.isArray(effects) ? effects : [];
       if (token.kind === "character") {
@@ -7355,6 +7853,14 @@ async function openMapEffects(tokenId) {
       }
 
       if (token.kind === "enemy") {
+        if (token.summonedCreature) {
+          token.sheet = token.sheet || {};
+          token.sheet.activeBuffs = activeEffects;
+          reconcileTokenLinkedAuras(token, activeEffects);
+          queueSave();
+          renderAll(false);
+          return;
+        }
         const enemy =
           mapEnemies.find((item) => item.id === token.enemyId) || null;
         const sheet = structuredClone(enemy?.sheet || token.sheet || {});
@@ -7412,6 +7918,11 @@ async function openMapEffects(tokenId) {
   } else {
     await mapEffectTrackerInstance.refresh(options);
   }
+  if (powersOnly) await mapEffectTrackerInstance.openPicker();
+}
+
+function openMapPowers(tokenId) {
+  return openMapEffects(tokenId, { powersOnly: true });
 }
 
 function recordQuickSpellCast(effect) {
@@ -7443,8 +7954,17 @@ function effectDamageRolls(effect = {}) {
   return window.PFDamageRolls?.normalizeRolls?.(effect.damageRolls || []) || [];
 }
 
-async function chooseQuickEffectContributions(effect = {}) {
-  if (!window.PFEffectMechanics?.hasContributionOptions?.(effect))
+function effectAttackRolls(effect = {}) {
+  return window.PFAttackRolls?.normalizeAttacks?.(effect.attackRolls || []) || [];
+}
+
+async function resolveQuickCasterDecisions(effect = {}) {
+  if (
+    !window.PFEffectActivationOrchestrator?.shouldResolve?.(
+      effect,
+      window.PFEffectActivationOrchestrator.BEFORE_TARGETS,
+    )
+  )
     return effect;
   const modalElement = el("quickEffectModal");
   const wasOpen = modalElement?.classList.contains("show");
@@ -7454,23 +7974,111 @@ async function chooseQuickEffectContributions(effect = {}) {
       quickEffectModal.hide();
     });
   }
-  const resolved = await window.PFEffectMechanics.chooseContributions(effect, {
-    title: effect.name || "Effect",
+  const sourceToken = tokenById(quickEffectSourceTokenId);
+  if (!sourceToken) return null;
+  const result = await resolveEffectChoicesForToken(sourceToken, effect, {
+    forceLocal: true,
+    stopBeforeTargetOwned: true,
   });
-  if (!resolved && wasOpen) quickEffectModal.show();
-  return resolved;
+  if (!result.effect && wasOpen) quickEffectModal.show();
+  return result.effect;
 }
 
 function effectHasTargetMechanics(effect = {}) {
   if (effect.auraConfig?.enabled) return true;
   if (effect.trackActive) return true;
+  if (effectAttackRolls(effect).length || effectDamageRolls(effect).length)
+    return true;
   if (window.PFEffectMechanics?.hasBranches?.(effect)) return true;
   if (Array.isArray(effect.metamagicRiders) && effect.metamagicRiders.length)
     return true;
   if (Array.isArray(effect.bonuses) && effect.bonuses.length) return true;
   return (window.PFEffectMechanics?.extraKeys?.() || [])
     .filter((key) => key !== "damageRolls")
+    .filter((key) => key !== "attackRolls")
     .some((key) => Array.isArray(effect[key]) && effect[key].length);
+}
+
+function effectHasSummons(effect = {}) {
+  return Array.isArray(effect.summonCreatures) && effect.summonCreatures.length > 0;
+}
+
+function effectOnlySummons(effect = {}) {
+  if (!effectHasSummons(effect)) return false;
+  return !effectHasTargetMechanics({ ...effect, summonCreatures: [], trackActive: false });
+}
+
+async function spawnQuickEffectCreatures(effect = {}, placementToken = null) {
+  const sourceToken = tokenById(
+    effect.sourceTokenId || quickEffectSourceTokenId || placementToken?.id,
+  );
+  if (!sourceToken || !window.PFSummonCreatures) return false;
+  const result = await window.PFSummonCreatures.spawn(effect, {
+    mapState: state,
+    sourceToken: placementToken || sourceToken,
+    durationAnchorToken: sourceToken,
+    context: {
+      ...mapEffectCastingScaleContext(effect),
+      casterLevel: Number(effect.casterLevel || 1),
+      classLevel: Number(effect.casterLevel || 1),
+    },
+    ownerId:
+      (placementToken || sourceToken).ownerId ||
+      ((placementToken || sourceToken).kind === "enemy"
+        ? ""
+        : sourceToken.ownerId || currentUserId),
+  });
+  if (!result.ok) return false;
+  addTimeline(
+    `${displayTokenName(sourceToken)} summons ${result.tokens.map((token) => token.name).join(", ")}.`,
+  );
+  queueSave();
+  renderAll();
+  return true;
+}
+async function rollQuickEffectAttacks(effect = {}, casterLevel = 1) {
+  const attacks = effectAttackRolls(effect);
+  if (!attacks.length) return effect;
+  const sourceToken = tokenById(quickEffectSourceTokenId);
+  const sourceCharacter =
+    sourceToken?.kind === "character" ? tokenCharacter(sourceToken) : null;
+  const context = {
+    ...mapEffectCastingScaleContext(
+      effect,
+      mapCharacterAttributeScaleContext(sourceCharacter || {}),
+    ),
+    casterLevel,
+    classLevel: casterLevel,
+  };
+  const rollKinds = new Set(
+    attacks.map(
+      (attack) =>
+        window.PFAttackRolls?.calculateAttack?.(attack, context)?.rollKind ||
+        "attacks",
+    ),
+  );
+  const rollKind = rollKinds.size === 1 ? [...rollKinds][0] : "attacks";
+  const boostSession = await mapD20BoostSession(sourceToken, rollKind);
+  if (boostSession) {
+    boostSession.onUsageChange = async (usage) => {
+      boostSession.usage = usage;
+      await saveMapD20BoostUsage(boostSession);
+    };
+    context.d20BoostSession = boostSession;
+  }
+  quickEffectModal.hide();
+  await new Promise((resolve) => setTimeout(resolve, 180));
+  const results = await window.PFAttackRolls?.open?.({
+    title: `${effect.name || "Effect"} Attacks`,
+    attacks,
+    context,
+  });
+  if (!results) return null;
+  addTimeline(
+    `${sourceToken ? displayTokenName(sourceToken) : "A character"} uses ${effect.name || "an effect"}: ${window.PFAttackRolls.summary(results)}.`,
+  );
+  queueSave();
+  return window.PFAttackRolls.payloadForSuccessfulAttacks(effect, results);
 }
 
 async function rollQuickEffectDamage(effect = {}, casterLevel = 1) {
@@ -7480,9 +8088,10 @@ async function rollQuickEffectDamage(effect = {}, casterLevel = 1) {
   const sourceCharacter =
     sourceToken?.kind === "character" ? tokenCharacter(sourceToken) : null;
   const context = {
-    ...(effect.attributeScaleContext ||
-      effect.abilityContext ||
-      mapCharacterAttributeScaleContext(sourceCharacter || {})),
+    ...mapEffectCastingScaleContext(
+      effect,
+      mapCharacterAttributeScaleContext(sourceCharacter || {}),
+    ),
     casterLevel,
     classLevel: casterLevel,
   };
@@ -7502,73 +8111,258 @@ async function rollQuickEffectDamage(effect = {}, casterLevel = 1) {
   return results;
 }
 
+async function rollQuickConditionAdjustments(effect = {}, casterLevel = 1) {
+  if (!window.PFConditionConfig?.resolveAdjustments) return effect;
+  const sourceToken = tokenById(quickEffectSourceTokenId);
+  const sourceCharacter = sourceToken ? tokenCharacter(sourceToken) : null;
+  const context = {
+    ...mapEffectCastingScaleContext(
+      effect,
+      mapCharacterAttributeScaleContext(sourceCharacter || {}),
+    ),
+    casterLevel,
+    classLevel: casterLevel,
+  };
+  const hasRandomAdjustment = (effect.applyConditions || []).some((entry) => {
+    if (!window.PFConditionConfig.isAdjustmentEntry?.(entry)) return false;
+    return (
+      window.PFEffectRolls?.calculateFormula?.(
+        window.PFConditionConfig.normalizeAdjustment(entry),
+        context,
+      )?.diceCount || 0
+    ) > 0;
+  });
+  if (hasRandomAdjustment) {
+    quickEffectModal.hide();
+    await new Promise((resolve) => setTimeout(resolve, 180));
+  }
+  return window.PFConditionConfig.resolveAdjustments(effect, {
+    title: effect.name || "Effect",
+    context,
+    deferAbilityChoice: true,
+  });
+}
+
+async function rollQuickHealing(effect = {}, casterLevel = 1) {
+  if (!window.PFEffectHealing?.resolveRolls) return effect;
+  const sourceToken = tokenById(quickEffectSourceTokenId);
+  const sourceCharacter = sourceToken ? tokenCharacter(sourceToken) : null;
+  const context = {
+    ...mapEffectCastingScaleContext(
+      effect,
+      mapCharacterAttributeScaleContext(sourceCharacter || {}),
+    ),
+    casterLevel,
+    classLevel: casterLevel,
+  };
+  const hasRandomHealing = (effect.bonuses || []).some((bonus) => {
+    if (String(bonus?.stat || "").toLowerCase() !== "healing") return false;
+    return (
+      window.PFEffectRolls?.calculateFormula?.(
+        window.PFEffectRolls.healingFormula(bonus),
+        context,
+      )?.diceCount || 0
+    ) > 0;
+  });
+  if (hasRandomHealing) {
+    quickEffectModal.hide();
+    await new Promise((resolve) => setTimeout(resolve, 180));
+  }
+  return window.PFEffectHealing.resolveRolls(effect, {
+    title: effect.name || "Effect",
+    context,
+  });
+}
+
+async function applyQuickSourceAura(
+  effect,
+  selection,
+  recipientEffect = effect,
+) {
+  const sourceToken = tokenById(quickEffectSourceTokenId);
+  if (!sourceToken) return false;
+  const applied = {
+    ...appliedEffectFromQuickSelection(effect, selection),
+    sourceTokenId: sourceToken.id || quickEffectSourceTokenId,
+    ...(effect.activationGroup
+      ? { activationSourceId: sourceToken.id || quickEffectSourceTokenId }
+      : {}),
+  };
+  const appliedRecipient = {
+    ...appliedEffectFromQuickSelection(recipientEffect, selection),
+    sourceTokenId: sourceToken.id || quickEffectSourceTokenId,
+    ...(recipientEffect.activationGroup
+      ? { activationSourceId: sourceToken.id || quickEffectSourceTokenId }
+      : {}),
+  };
+  if (!(await spendMapClassResource(sourceToken, applied)).ok) return false;
+  const previousAuras = structuredClone(sourceToken.automaticAuras || []);
+  const active = await loadTokenActiveEffects(sourceToken);
+  const retained = effect.activationGroup
+    ? active.filter(
+        (entry) =>
+          !(
+            entry.activationGroup === effect.activationGroup &&
+            String(entry.activationSourceId || entry.sourceTokenId || "") ===
+              String(applied.activationSourceId || "")
+          ),
+      )
+    : active;
+  const link = installLinkedAutomaticAura(sourceToken, applied, {
+    recipientEffect: appliedRecipient,
+  });
+  if (!link) return false;
+  const nextActive = window.PFEffectMechanics?.upsertAuraController
+    ? window.PFEffectMechanics.upsertAuraController(
+        retained,
+        link.controller,
+        sourceToken.id,
+      )
+    : [...retained, link.controller];
+  if (!(await saveTokenActiveEffects(sourceToken, nextActive))) {
+    sourceToken.automaticAuras = previousAuras;
+    if (link.token)
+      state.tokens = state.tokens.filter((token) => token.id !== link.token.id);
+    return false;
+  }
+  scheduleOutOfRangeAuraCleanup("", 0);
+  addTimeline(
+    `${displayTokenName(sourceToken)} activates ${effect.name || "an aura"}.`,
+  );
+  queueSave();
+  quickEffectModal.hide();
+  renderAll();
+  return true;
+}
+
 async function chooseQuickEffect(effect, options = {}) {
-  if (!effect) return;
-  effect = await chooseQuickEffectContributions(effect);
   if (!effect) return;
   const selection = {
     casterLevel: Math.max(1, Number(options.casterLevel || 1) || 1),
     turns: Math.max(1, Number(options.turns || 1) || 1),
     permanent: Boolean(options.permanent),
   };
-  if (quickEffectMode === "aura") {
-    auraEffectDraft = appliedEffectFromQuickSelection(effect, selection);
-    updateAuraEffectSummary();
-    quickEffectModal.hide();
-    auraModal.show();
-    return;
-  }
-  const damageRolls = effectDamageRolls(effect);
-  if (damageRolls.length) {
-    const results = await rollQuickEffectDamage(effect, selection.casterLevel);
-    if (!results) {
-      quickEffectModal.show();
-      return;
-    }
-    if (!effectHasTargetMechanics(effect)) {
-      renderAll();
-      return;
-    }
-  }
-  if (effect.auraConfig?.enabled) {
-    const sourceToken = tokenById(quickEffectSourceTokenId);
-    if (!sourceToken) return;
-    const applied = {
-      ...appliedEffectFromQuickSelection(effect, selection),
-      sourceTokenId: sourceToken?.id || quickEffectSourceTokenId,
-      ...(effect.activationGroup
-        ? {
-            activationSourceId:
-              sourceToken?.id || quickEffectSourceTokenId,
-          }
-        : {}),
-    };
-    const previousAuras = structuredClone(sourceToken.automaticAuras || []);
-    const active = await loadTokenActiveEffects(sourceToken);
-    const retained = effect.activationGroup
-      ? active.filter(
-          (entry) =>
-            !(
-              entry.activationGroup === effect.activationGroup &&
-              String(
-                entry.activationSourceId || entry.sourceTokenId || "",
-              ) === String(applied.activationSourceId || "")
-            ),
+  const orchestrator = window.PFEffectActivationOrchestrator;
+  const activation = await orchestrator.run(
+    {
+      ...(options.activation || {}),
+      activationHistory: [...(options.activation?.activationHistory || [])],
+      sourceType: effect.spellMeta ? "spell" : quickEffectGroupFor(effect),
+      surface: "map",
+      effect,
+      selection,
+    },
+    {
+      "caster-decisions": async (state) => {
+        const resolved = await resolveQuickCasterDecisions(state.effect);
+        return resolved ? { ...state, effect: resolved } : null;
+      },
+      "resource-allocation": async (state) => state,
+      "aura-delivery": async (state) => {
+        if (!window.PFAuraDeliveryChoice?.needsChoice?.(state.effect))
+          return state;
+        const resolved = await window.PFAuraDeliveryChoice.choose(state.effect);
+        return resolved ? { ...state, effect: resolved } : null;
+      },
+      targeting: async (state) => {
+        if (quickEffectMode === "aura") {
+          auraEffectDraft = appliedEffectFromQuickSelection(
+            state.effect,
+            selection,
+          );
+          updateAuraEffectSummary();
+          quickEffectModal.hide();
+          auraModal.show();
+          return orchestrator.pause(state, "aura-editor", { handled: true });
+        }
+        if (
+          state.effect.auraConfig?.enabled &&
+          !state.effect.auraConfig?.targetsEmitAura
         )
-      : active;
-    const link = installLinkedAutomaticAura(sourceToken, applied);
-    if (!link) return;
-    if (!(await saveTokenActiveEffects(sourceToken, [...retained, link.controller]))) {
-      sourceToken.automaticAuras = previousAuras;
-      return;
-    }
-    scheduleOutOfRangeAuraCleanup("", 0);
-    addTimeline(`${displayTokenName(sourceToken)} activates ${effect.name || "an aura"}.`);
-    quickEffectModal.hide();
-    renderAll();
-    return;
-  }
-  await openQuickEffectTargets(effect, selection);
+          return {
+            ...state,
+            sourceAura: true,
+            auraRecipientEffect: structuredClone(state.effect),
+          };
+        if (
+          effectOnlySummons(state.effect) &&
+          !window.PFSummonCreatures?.targetChooses?.(state.effect)
+        )
+          return { ...state, sourceSummon: true };
+        const needsTargets = effectHasTargetMechanics(state.effect);
+        if (!needsTargets) return state;
+        const paused = orchestrator.pause(state, "targeting");
+        await openQuickEffectTargets(state.effect, selection, paused);
+        return paused;
+      },
+      "target-decisions": async (state) => {
+        if (!state.sourceAura) return state;
+        const sourceToken = tokenById(quickEffectSourceTokenId);
+        if (!sourceToken) return null;
+        const result = await resolveEffectChoicesForToken(
+          sourceToken,
+          state.effect,
+        );
+        return result.effect ? { ...state, effect: result.effect } : null;
+      },
+      "attack-confirmation": async (state) => {
+        if (state.sourceAura || effectAttackRolls(state.effect).length === 0)
+          return state;
+        const resolved = await rollQuickEffectAttacks(
+          state.effect,
+          selection.casterLevel,
+        );
+        return resolved ? { ...state, effect: resolved, resolvedAction: true } : null;
+      },
+      "effect-rolls": async (state) => {
+        if (state.sourceAura) return state;
+        let resolved = state.effect;
+        let resolvedAction = state.resolvedAction;
+        if (effectDamageRolls(resolved).length) {
+          const damage = await rollQuickEffectDamage(
+            resolved,
+            selection.casterLevel,
+          );
+          if (!damage) return null;
+          resolvedAction = true;
+        }
+        if (!window.PFEffectMechanics?.hasBranches?.(resolved)) {
+          resolved = await rollQuickConditionAdjustments(
+            resolved,
+            selection.casterLevel,
+          );
+          if (!resolved) return null;
+          resolved = await rollQuickHealing(resolved, selection.casterLevel);
+          if (!resolved) return null;
+        }
+        return { ...state, effect: resolved, resolvedAction };
+      },
+      application: async (state) => {
+        if (state.sourceSummon) {
+          const sourceToken = tokenById(quickEffectSourceTokenId);
+          if (!sourceToken) return null;
+          const applied = appliedEffectFromQuickSelection(state.effect, selection);
+          if (!(await spendMapClassResource(sourceToken, applied)).ok) return null;
+          return (await spawnQuickEffectCreatures(applied, sourceToken))
+            ? { ...state, effect: applied, applied: true }
+            : null;
+        }
+        if (state.sourceAura)
+          return (
+            await applyQuickSourceAura(
+              state.effect,
+              selection,
+              state.auraRecipientEffect || state.effect,
+            )
+          )
+            ? { ...state, applied: true }
+            : null;
+        renderAll();
+        return state.resolvedAction ? { ...state, applied: true } : state;
+      },
+    },
+  );
+  if (!activation && quickEffectModal) quickEffectModal.show();
 }
 
 async function openMapOwnedSpellDetails(effect, defaultCl = 1) {
@@ -7595,8 +8389,7 @@ async function openMapOwnedSpellDetails(effect, defaultCl = 1) {
     }
   }
   if (!spell || !window.PFSpellPicker?.openDetails) return;
-  const hasConfiguredEffects =
-    effectHasTargetMechanics(effect) || effectDamageRolls(effect).length > 0;
+  const hasConfiguredEffects = effectHasTargetMechanics(effect);
   let casting = false;
   quickEffectModal.hide();
   await window.PFSpellPicker.openDetails({
@@ -7620,28 +8413,58 @@ async function openMapOwnedSpellDetails(effect, defaultCl = 1) {
       const castEffect = window.PFMetamagic?.decorateQuickEffect
         ? window.PFMetamagic.decorateQuickEffect(effect, castSpell || spell)
         : effect;
+      const resolvedCastEffect = {
+        ...castEffect,
+        spellCalculations:
+          castCalculations || castEffect.spellCalculations || calculations,
+        ...(Number.isFinite(
+          Number(
+            (castCalculations || castEffect.spellCalculations || calculations)
+              ?.spellDc?.total,
+          ),
+        )
+          ? {
+              saveDc: Number(
+                (castCalculations || castEffect.spellCalculations || calculations)
+                  .spellDc.total,
+              ),
+            }
+          : {}),
+      };
       const castHasConfiguredEffects =
-        hasConfiguredEffects ||
-        effectHasTargetMechanics(castEffect) ||
-        effectDamageRolls(castEffect).length > 0;
+        hasConfiguredEffects || effectHasTargetMechanics(resolvedCastEffect);
       casting = true;
       await closeDetails?.();
       const failureChance = Number(
         castCalculations?.arcaneSpellFailure?.chance || 0,
       );
-      if (failureChance > 0) {
-        const castContinues = await window.PFArcaneSpellFailure?.check?.({
-          chance: failureChance,
-          spellName: effect.name || "Spell",
-        });
-        if (!castContinues) return { close: true };
-      }
+      const orchestrator = window.PFEffectActivationOrchestrator;
+      const activation = await orchestrator.run(
+        {
+          sourceType: "spell",
+          surface: "map",
+          effect: resolvedCastEffect,
+        },
+        {
+          "arcane-spell-failure": async (state) => {
+            if (!failureChance) return state;
+            const castContinues = await window.PFArcaneSpellFailure?.check?.({
+              chance: failureChance,
+              spellName: effect.name || "Spell",
+            });
+            return castContinues ? state : null;
+          },
+        },
+        { nodeIds: ["arcane-spell-failure"] },
+      );
+      if (!activation) return { close: true };
       if (!castHasConfiguredEffects) {
-        recordQuickSpellCast(castEffect);
+        recordQuickSpellCast(resolvedCastEffect);
         return { close: true };
       }
-      void chooseQuickEffect(castEffect, {
+      await chooseQuickEffect(resolvedCastEffect, {
         casterLevel: casterLevel || defaultCl,
+        activation,
       });
       return { close: true };
     },
@@ -7857,6 +8680,7 @@ function spellEffectDefinition(spell = {}, metadata = {}) {
     ownedSpell: true,
     spellMeta: metadata,
     spell,
+    ...window.PFEffectMechanics?.copyActivationConfig?.(mechanics),
   };
   (window.PFEffectMechanics?.extraKeys?.() || []).forEach((key) => {
     if (Array.isArray(mechanics[key]) && mechanics[key].length) {
@@ -7881,6 +8705,7 @@ async function characterOwnedSpellEffects(character) {
     console.warn("Could not resolve character spells through the sheet.", error);
   }
   const definitions = await window.PFSpellData?.loadSpells?.();
+  const classDefinitions = await ensureMapClassDefinitions();
   const spellByName = new Map(
     (definitions || []).map((spell) => [
       String(spell.name || "").trim().toLowerCase(),
@@ -7888,6 +8713,12 @@ async function characterOwnedSpellEffects(character) {
     ]),
   );
   const classNames = new Map();
+  const classSpellcasting = new Map(
+    (classDefinitions || []).map((definition) => [
+      String(definition.name || definition.className || "").toLowerCase(),
+      definition.spellcasting || {},
+    ]),
+  );
   (character.sheet.classProgression || []).forEach((row) => {
     if (row?.className) {
       classNames.set(mapSpellcastingStateKey(row.className), row.className);
@@ -7897,6 +8728,7 @@ async function characterOwnedSpellEffects(character) {
   const seen = new Set();
   Object.entries(character.sheet.spells || {}).forEach(([classKey, state]) => {
     const className = classNames.get(classKey) || classKey.replaceAll("_", " ");
+    const spellcasting = classSpellcasting.get(className.toLowerCase()) || {};
     ["known", "book", "prepared"].forEach((bucket) => {
       Object.entries(state?.[bucket] || {}).forEach(([level, names]) => {
         (Array.isArray(names) ? names : []).filter(Boolean).forEach((name) => {
@@ -7912,6 +8744,8 @@ async function characterOwnedSpellEffects(character) {
               className,
               level: Number(level),
               bucket,
+              preparation:
+                spellcasting.preparation || spellcasting.castingType || "",
             }),
           );
         });
@@ -8194,8 +9028,8 @@ function scheduleAccessibleEffectSourcePrefetch() {
 }
 
 // The source token's own class features (Rage, its bundled totems/rage
-// powers, ...) come first, ahead of the general library -- both "Apply
-// Effect" and Aura Options already know their caster unambiguously (the
+// powers, ...) come first, ahead of the general library -- both Use
+// Powers and Aura Options already know their caster unambiguously (the
 // token the menu was opened from), so this is where Share Rage /
 // Inspired Rage style sharing actually belongs, not a separate "cast
 // as" picker.
@@ -8225,7 +9059,7 @@ async function openQuickApplyEffect() {
   quickEffectVisibleLimit = QUICK_EFFECT_BATCH_SIZE;
   quickEffectSourceTokenId = token.id;
   el("quickEffectModalLabel").textContent =
-    `Apply Effect from ${displayTokenName(token)}`;
+    `Use Powers from ${displayTokenName(token)}`;
   el("quickEffectSearch").value = "";
   quickEffectLoading = true;
   renderQuickEffects();
@@ -8274,8 +9108,56 @@ function quickEffectTargets() {
     .map((token) => ({
       token,
       name: displayTokenName(token),
+      group: token.kind === "enemy" ? "enemy" : "ally",
     }))
     .sort((a, b) => a.name.localeCompare(b.name));
+}
+
+function renderQuickEffectTargetGroup(
+  label,
+  group,
+  targets,
+  previousTargetIds,
+) {
+  if (!targets.length) return "";
+  const isSelected = ({ token }) =>
+    token.id === quickEffectSourceTokenId || previousTargetIds.has(token.id);
+  const allSelected = targets.every(isSelected);
+  return `
+    <section class="quick-target-group">
+      <label class="quick-target-group-toggle">
+        <input class="form-check-input" type="checkbox" data-quick-target-group="${escapeHtml(group)}" ${allSelected ? "checked" : ""}>
+        <span>${escapeHtml(label)}</span>
+      </label>
+      <div class="quick-target-grid">
+        ${targets
+          .map(
+            ({ token, name }) => `
+          <label class="quick-target-card">
+            <input class="form-check-input" type="checkbox" data-quick-target-token="${escapeHtml(token.id)}" data-quick-target-token-group="${escapeHtml(group)}" ${isSelected({ token }) ? "checked" : ""}>
+            <span>
+              <strong>${escapeHtml(name)}</strong>
+              <span class="small text-secondary d-block">${escapeHtml(token.kind === "enemy" ? "Enemy" : "Character")}${token.visible === false ? " | hidden" : ""}</span>
+            </span>
+          </label>
+        `,
+          )
+          .join("")}
+      </div>
+    </section>
+  `;
+}
+
+function syncQuickEffectTargetGroup(group) {
+  const modal = el("quickEffectTargetsModal");
+  const targets = [
+    ...modal.querySelectorAll(`[data-quick-target-token-group="${group}"]`),
+  ];
+  const toggle = modal.querySelector(`[data-quick-target-group="${group}"]`);
+  if (!toggle || !targets.length) return;
+  toggle.checked = targets.every((input) => input.checked);
+  toggle.indeterminate =
+    !toggle.checked && targets.some((input) => input.checked);
 }
 
 async function activationGroupTargetIds(effect, targets) {
@@ -8298,7 +9180,7 @@ async function activationGroupTargetIds(effect, targets) {
   return new Set(matches.filter(Boolean));
 }
 
-async function openQuickEffectTargets(effect, options) {
+async function openQuickEffectTargets(effect, options, activation = null) {
   const targets = quickEffectTargets();
   const previousTargetIds = await activationGroupTargetIds(effect, targets);
   quickEffectSelection = {
@@ -8306,6 +9188,7 @@ async function openQuickEffectTargets(effect, options) {
     options,
     sourceTokenId: quickEffectSourceTokenId,
     previousTargetIds: [...previousTargetIds],
+    activation,
   };
   el("quickEffectTargetsModalLabel").textContent =
     `Apply ${effect.name || "Effect"}`;
@@ -8315,29 +9198,33 @@ async function openQuickEffectTargets(effect, options) {
       : "Choose one or more tokens on the current map.";
   el("quickEffectApplyStatus").textContent = "";
   el("quickEffectTargetList").innerHTML = targets.length
-    ? targets
-        .map(
-          ({ token, name }) => `
-      <label class="quick-target-card">
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" data-quick-target-token="${escapeHtml(token.id)}" ${token.id === quickEffectSourceTokenId || previousTargetIds.has(token.id) ? "checked" : ""}>
-          <span class="form-check-label">
-            <strong>${escapeHtml(name)}</strong>
-            <span class="small text-secondary d-block">${escapeHtml(token.kind === "enemy" ? "Enemy" : "Character")}${token.visible === false ? " | hidden" : ""}</span>
-          </span>
-        </div>
-      </label>
-    `,
-        )
-        .join("")
+    ? [
+        renderQuickEffectTargetGroup(
+          "Allies",
+          "ally",
+          targets.filter((target) => target.group === "ally"),
+          previousTargetIds,
+        ),
+        renderQuickEffectTargetGroup(
+          "Enemies",
+          "enemy",
+          targets.filter((target) => target.group === "enemy"),
+          previousTargetIds,
+        ),
+      ].join("")
     : `<div class="small text-secondary">No valid targets on the map.</div>`;
+  ["ally", "enemy"].forEach(syncQuickEffectTargetGroup);
   quickEffectModal.hide();
   quickEffectTargetsModal.show();
 }
 
-function appliedEffectFromQuickSelection(effect, options, targetCount = 1) {
-  const casterAttributeContext =
-    effect.attributeScaleContext || effect.abilityContext || {};
+function appliedEffectFromQuickSelection(
+  effect,
+  options,
+  targetCount = 1,
+  { preserveRolls = false } = {},
+) {
+  const casterAttributeContext = mapEffectCastingScaleContext(effect);
   const casterLevel = Math.max(1, Number(options?.casterLevel || 1) || 1);
   const turns = Math.max(1, Number(options?.turns || 1) || 1);
   const permanent = Boolean(options?.permanent);
@@ -8346,9 +9233,12 @@ function appliedEffectFromQuickSelection(effect, options, targetCount = 1) {
   // modifier") needs the caster's full stat block, not just a typed-in
   // caster level -- same distinction buff-tracker-widget.js's addEffect
   // makes.
-  const durationArg = effect.fromAbility
-    ? { ...(effect.abilityContext || { casterLevel }), targetCount }
-    : { casterLevel, targetCount };
+  const durationArg = {
+    ...casterAttributeContext,
+    ...(effect.fromAbility ? effect.abilityContext || {} : {}),
+    casterLevel,
+    targetCount,
+  };
   const baseDurationLabel = durationLabel(effect);
   let calculatedDuration = trackedTurns
     ? turns
@@ -8391,6 +9281,7 @@ function appliedEffectFromQuickSelection(effect, options, targetCount = 1) {
     attributeScaleContext,
     spell,
     spellCalculations,
+    attackRolls,
     damageRolls,
     ...persistedEffect
   } = effect;
@@ -8413,6 +9304,12 @@ function appliedEffectFromQuickSelection(effect, options, targetCount = 1) {
     computedDuration: calculatedDuration,
     durationTargetCount: splitAmongTargets ? targetCount : undefined,
     durationLabel: appliedDurationLabel,
+    ...(preserveRolls && Array.isArray(attackRolls) && attackRolls.length
+      ? { attackRolls: structuredClone(attackRolls) }
+      : {}),
+    ...(preserveRolls && Array.isArray(damageRolls) && damageRolls.length
+      ? { damageRolls: structuredClone(damageRolls) }
+      : {}),
     ...(resolvedEffect.activationGroup
       ? {
           activationSourceId:
@@ -8424,21 +9321,92 @@ function appliedEffectFromQuickSelection(effect, options, targetCount = 1) {
   };
 }
 
+function sameAuraApplication(existing = {}, incoming = {}) {
+  if (!incoming.auraDefinitionId || !incoming.auraTokenId) return false;
+  const existingDefinition =
+    existing.auraDefinitionId || existing.id || existing.name || "";
+  return (
+    String(existing.auraTokenId || "") === String(incoming.auraTokenId) &&
+    String(existingDefinition) === String(incoming.auraDefinitionId)
+  );
+}
+
 async function applyQuickEffectToToken(token, appliedEffect) {
-  if (appliedEffect.activationGroup) {
+  if (effectHasSummons(appliedEffect)) {
+    const summonSucceeded = await spawnQuickEffectCreatures(appliedEffect, token);
+    if (!summonSucceeded) return false;
+    appliedEffect = { ...appliedEffect, summonCreatures: [] };
+    if (!effectHasTargetMechanics(appliedEffect)) return true;
+  }
+  if (
+    (appliedEffect.applyConditions || []).some(
+      (entry) =>
+        window.PFConditionConfig?.isAdjustmentEntry?.(entry) &&
+        window.PFConditionConfig.normalizeAdjustment(entry).mode === "heal",
+    )
+  ) {
+    const active = await loadTokenActiveEffects(token);
+    const restoration = window.PFConditionConfig.applyRestorations(
+      active,
+      appliedEffect,
+    );
+    if (!(await saveTokenActiveEffects(token, restoration.activeEffects)))
+      return false;
+    appliedEffect = restoration.effect;
+    if (!window.PFConditionConfig.hasPersistableMechanics(appliedEffect))
+      return true;
+  }
+  if (
+    appliedEffect.auraConfig?.enabled &&
+    appliedEffect.auraConfig?.targetsEmitAura
+  ) {
+    const previousAuras = Array.isArray(token.automaticAuras)
+      ? [...token.automaticAuras]
+      : [];
+    const active = await loadTokenActiveEffects(token);
+    const link = installLinkedAutomaticAura(token, appliedEffect);
+    if (!link) return false;
+    const nextActive = window.PFEffectMechanics?.upsertAuraController
+      ? window.PFEffectMechanics.upsertAuraController(
+          active,
+          link.controller,
+          token.id,
+        )
+      : [...active, link.controller];
+    if (!(await saveTokenActiveEffects(token, nextActive))) {
+      token.automaticAuras = previousAuras;
+      return false;
+    }
+    await applyHealingEffectToToken(token, appliedEffect);
+    queueSave();
+    return true;
+  }
+  if (appliedEffect.activationGroup || appliedEffect.auraDefinitionId) {
     const active = await loadTokenActiveEffects(token);
     const sourceId = String(
       appliedEffect.activationSourceId || appliedEffect.sourceTokenId || "",
     );
     const retained = active.filter(
-      (effect) =>
-        !(
-          effect.activationGroup === appliedEffect.activationGroup &&
-          String(effect.activationSourceId || effect.sourceTokenId || "") ===
-            sourceId
-        ),
+      (effect) => {
+        const sameActivationGroup = Boolean(
+          appliedEffect.activationGroup &&
+            effect.activationGroup === appliedEffect.activationGroup &&
+            String(effect.activationSourceId || effect.sourceTokenId || "") ===
+              sourceId,
+        );
+        return !sameActivationGroup && !sameAuraApplication(effect, appliedEffect);
+      },
     );
-    return saveTokenActiveEffects(token, [...retained, appliedEffect]);
+    const saved = await saveTokenActiveEffects(token, [
+      ...retained,
+      appliedEffect,
+    ]);
+    if (saved) {
+      installEmittedAutomaticAuras(token, appliedEffect);
+      queueSave();
+      await applyHealingEffectToToken(token, appliedEffect);
+    }
+    return saved;
   }
   if (token.kind === "character") {
     const savedBuffs = await PFApp.applyCharacterMapEffect?.(
@@ -8447,7 +9415,7 @@ async function applyQuickEffectToToken(token, appliedEffect) {
       mapContextKey,
     );
     if (!savedBuffs || savedBuffs.ok === false) {
-      console.error(savedBuffs?.error || "Could not apply effect");
+      console.error(savedBuffs?.error || "Could not use power");
       return false;
     }
     const character = tokenCharacter(token);
@@ -8471,10 +9439,24 @@ async function applyQuickEffectToToken(token, appliedEffect) {
       character.sheet.calculated = calculated;
       if (syncTokenFromSheet(token, character)) renderAll(false);
     });
+    installEmittedAutomaticAuras(token, appliedEffect);
+    queueSave();
+    await applyHealingEffectToToken(token, appliedEffect);
     return true;
   }
 
   if (token.kind === "enemy") {
+    if (token.summonedCreature) {
+      const active = Array.isArray(token.sheet?.activeBuffs)
+        ? token.sheet.activeBuffs
+        : [];
+      token.sheet = token.sheet || {};
+      token.sheet.activeBuffs = [...active, appliedEffect];
+      installEmittedAutomaticAuras(token, appliedEffect);
+      queueSave();
+      await applyHealingEffectToToken(token, appliedEffect);
+      return true;
+    }
     const saved = await PFApp.applyEnemyMapEffect?.(
       token.enemyId,
       appliedEffect,
@@ -8501,6 +9483,9 @@ async function applyQuickEffectToToken(token, appliedEffect) {
       syncTokenFromSheet(token, enemy || nextEnemy);
       renderAll(false);
     });
+    installEmittedAutomaticAuras(token, appliedEffect);
+    queueSave();
+    await applyHealingEffectToToken(token, appliedEffect);
     return true;
   }
 
@@ -8521,6 +9506,11 @@ function cachedTokenActiveEffects(token) {
 }
 
 async function loadTokenActiveEffects(token) {
+  if (token.summonedCreature) {
+    return Array.isArray(token.sheet?.activeBuffs)
+      ? token.sheet.activeBuffs
+      : [];
+  }
   if (token.kind === "character")
     return (
       (await PFApp.loadCharacterBuffStateForRecalculation?.(
@@ -8544,27 +9534,45 @@ async function loadTokenActiveEffects(token) {
 }
 
 function reconcileTokenLinkedAuras(token, activeEffects = []) {
-  const effectIds = new Set(
+  const current = Array.isArray(token?.automaticAuras)
+    ? token.automaticAuras
+    : [];
+  const next = window.PFEffectMechanics?.reconcileLinkedAuras
+    ? window.PFEffectMechanics.reconcileLinkedAuras(current, activeEffects)
+    : current;
+  let changed = next.length !== current.length;
+  if (changed) token.automaticAuras = next;
+  const activeIds = new Set(
     (Array.isArray(activeEffects) ? activeEffects : [])
       .map((effect) => effect?.id)
       .filter(Boolean),
   );
-  const current = Array.isArray(token?.automaticAuras)
-    ? token.automaticAuras
-    : [];
-  const next = current.filter(
-    (aura) =>
-      aura.kind === "passive" ||
-      !aura.linkedEffectId ||
-      effectIds.has(aura.linkedEffectId),
+  const beforeCount = state.tokens.length;
+  state.tokens = state.tokens.filter(
+    (entry) =>
+      !(
+        entry.independentAuraToken &&
+        entry.automaticAuras?.[0]?.kind !== "passive" &&
+        String(entry.auraCasterTokenId || "") === String(token?.id || "") &&
+        !activeIds.has(entry.auraControllerEffectId)
+      ),
   );
-  if (next.length === current.length) return false;
-  token.automaticAuras = next;
-  return true;
+  if (state.tokens.length !== beforeCount) {
+    changed = true;
+    scheduleOutOfRangeAuraCleanup("", 0);
+  }
+  return changed;
 }
 
 async function saveTokenActiveEffects(token, effects) {
   const activeEffects = Array.isArray(effects) ? effects : [];
+  if (token.summonedCreature) {
+    token.sheet = token.sheet || {};
+    token.sheet.activeBuffs = activeEffects;
+    reconcileTokenLinkedAuras(token, activeEffects);
+    queueSave();
+    return true;
+  }
   if (token.kind === "character") {
     const savedBuffs =
       (await PFApp.updateCharacterEffectState?.(
@@ -8648,17 +9656,35 @@ async function removeOutOfRangeAuraEffects({ tokenIds = null } = {}) {
   );
   const updates = [];
   loaded.forEach(({ token, active }) => {
-    const next = active.filter((effect) => {
-      if (!effect.auraSourceId || !effect.auraTokenId) return true;
-      const auraToken = tokenById(effect.auraTokenId);
-      const auraEntry = tokenAuraEntry(auraToken, effect.auraId || "manual");
-      return Boolean(
-        auraEntry &&
-          (!auraEntry.aura.removeWhenOutOfRange ||
-            tokenInAura(token, auraToken, auraEntry.aura)),
-      );
-    });
-    if (next.length !== active.length) updates.push({ token, next });
+    let changed = false;
+    const next = active
+      .map((effect) => {
+        if (!effect.auraSourceId || !effect.auraTokenId) return effect;
+        const auraToken = tokenById(effect.auraTokenId);
+        const auraEntry = tokenAuraEntry(auraToken, effect.auraId || "manual");
+        const inRange = Boolean(
+          auraEntry &&
+            (!auraEntry.aura.removeWhenOutOfRange ||
+              tokenInAura(token, auraToken, auraEntry.aura)),
+        );
+        if (inRange) {
+          const restored = window.PFEffectMechanics?.restoreAuraBoundEffect?.(
+            effect,
+            auraEntry.aura,
+          );
+          if (restored && restored !== effect) changed = true;
+          return restored || effect;
+        }
+        if (effect.auraLingering) return effect;
+        changed = true;
+        return (
+          window.PFEffectMechanics?.beginAuraLinger?.(effect, {
+            durationAnchorTokenId: token.id,
+          }) || null
+        );
+      })
+      .filter(Boolean);
+    if (changed || next.length !== active.length) updates.push({ token, next });
   });
   if (!updates.length) return;
   await Promise.all(
@@ -8897,39 +9923,90 @@ async function resolveSpellLikeChoicesForToken(entries = [], effect = {}) {
   return resolved;
 }
 
-async function resolveEffectChoicesForToken(token, effect) {
-  const branchNeeded = window.PFEffectMechanics?.hasBranches?.(effect) || false;
+async function resolveEffectChoicesForToken(
+  token,
+  effect,
+  { forceLocal = false, stopBeforeTargetOwned = false } = {},
+) {
+  const contributionNeeded =
+    window.PFEffectMechanics?.hasContributionOptions?.(effect) || false;
+  let branchNeeded = window.PFEffectMechanics?.hasBranches?.(effect) || false;
   let bonuses = Array.isArray(effect.bonuses) ? effect.bonuses : [];
   let variables = effectConditionalVariables(effect);
   if (
+    !contributionNeeded &&
     !branchNeeded &&
     !bonuses.some((bonus) => window.PFEffectStats?.isChoiceStat(bonus.stat)) &&
     !mapChoiceStatEntriesNeedChoice(effect.classSkillGrants) &&
     !mapChoiceStatEntriesNeedChoice(effect.useUntrained) &&
     !mapChoiceStatEntriesNeedChoice(effect.bonusRanks) &&
+    !mapChoiceStatEntriesNeedChoice(effect.weaponExtraDamage) &&
+    !mapChoiceStatEntriesNeedChoice(effect.attributeContributions) &&
     !bonuses.some(needsFavoredEnemyScaleChoice) &&
     !variables.length &&
     !mapSpellLikeEntriesNeedChoice(effect.spellLikeAbilities) &&
     !mapSpellAdjustmentEntriesNeedChoice(effect.casterLevelBonuses) &&
     !mapSpellAdjustmentEntriesNeedChoice(effect.spellDcBonuses) &&
     !mapSpellAdjustmentEntriesNeedChoice(effect.effectiveAttributeBonuses) &&
-    !mapGrantDomainEntriesNeedChoice(effect.grantDomains)
+    !mapGrantDomainEntriesNeedChoice(effect.grantDomains) &&
+    !window.PFSummonCreatures?.hasPendingChoice?.(effect) &&
+    !window.PFConditionConfig?.hasPendingAbilityChoice?.(effect)
   )
     return { effect, queued: false };
 
   const isOwn =
     token.kind === "enemy" ||
     tokenCharacter(token)?.userId === currentUserId;
+  const targetMustAnswer =
+    window.PFEffectActivationOrchestrator?.targetMustAnswer?.(effect) || false;
 
-  if (!isOwn) {
+  if (!forceLocal && targetMustAnswer && !isOwn) {
     if (token.kind !== "character" || !token.characterId)
       return { effect: null, queued: false };
-    const result = await PFApp.createEffectChoiceRequest?.({
-      contextKey: mapContextKey,
-      characterId: token.characterId,
-      ability: effect,
+    const orchestrator = window.PFEffectActivationOrchestrator;
+    const remoteEffect =
+      effect.auraConfig?.enabled && effect.auraConfig?.targetsEmitAura
+        ? {
+            ...effect,
+            targetAuraPlacement: {
+              tokenId: token.id,
+              mapSlot: mapViewSlot,
+            },
+          }
+        : effect;
+    const result = await orchestrator?.waitForRemoteDecision?.({
+      createRequest: PFApp.createEffectChoiceRequest,
+      loadStatus: PFApp.loadEffectChoiceRequestStatus,
+      request: {
+        contextKey: mapContextKey,
+        characterId: token.characterId,
+        ability: orchestrator.remoteDecisionAbility(remoteEffect, {
+          surface: "map",
+          sourceType: quickEffectGroupFor(effect),
+          tokenId: token.id,
+        }),
+      },
+      onStatus: (status) => {
+        const message = el("quickEffectApplyStatus");
+        if (message && status === "pending")
+          message.textContent = `Waiting for ${tokenActualName(token)} to answer...`;
+      },
     });
-    return { effect: null, queued: Boolean(result?.ok) };
+    if (!result?.ok) return { effect: null, queued: false };
+    return { effect: result.effect, queued: false };
+  }
+
+  if (contributionNeeded) {
+    effect = await window.PFEffectMechanics.chooseContributions(effect, {
+      title: effect.name || "Effect",
+    });
+    if (!effect) return { effect: null, queued: false };
+    if (
+      stopBeforeTargetOwned &&
+      window.PFEffectActivationOrchestrator?.targetMustAnswer?.(effect)
+    )
+      return { effect, queued: false };
+    branchNeeded = window.PFEffectMechanics?.hasBranches?.(effect) || false;
   }
 
   if (branchNeeded) {
@@ -8937,8 +10014,24 @@ async function resolveEffectChoicesForToken(token, effect) {
       title: effect.name || "Effect",
     });
     if (!effect) return { effect: null, queued: false };
+    if (
+      stopBeforeTargetOwned &&
+      window.PFEffectActivationOrchestrator?.targetMustAnswer?.(effect)
+    )
+      return { effect, queued: false };
     bonuses = Array.isArray(effect.bonuses) ? effect.bonuses : [];
     variables = effectConditionalVariables(effect);
+  }
+  if (window.PFSummonCreatures?.hasPendingChoice?.(effect)) {
+    effect = await window.PFSummonCreatures.resolveChoices(effect, {
+      title: effect.name || "Effect",
+    });
+    if (!effect) return { effect: null, queued: false };
+    if (
+      stopBeforeTargetOwned &&
+      window.PFEffectActivationOrchestrator?.targetMustAnswer?.(effect)
+    )
+      return { effect, queued: false };
   }
   const character = token.kind === "character" ? tokenCharacter(token) : null;
   const conditionalChoices = { ...(effect.conditionalChoices || {}) };
@@ -9008,6 +10101,20 @@ async function resolveEffectChoicesForToken(token, effect) {
     token,
   );
   if (resolvedBonusRanks === null) return { effect: null, queued: false };
+  const resolvedWeaponExtraDamage = await resolveChoiceStatsForToken(
+    effect.weaponExtraDamage,
+    effect,
+    token,
+  );
+  if (resolvedWeaponExtraDamage === null)
+    return { effect: null, queued: false };
+  const resolvedAttributeContributions = await resolveChoiceStatsForToken(
+    effect.attributeContributions,
+    effect,
+    token,
+  );
+  if (resolvedAttributeContributions === null)
+    return { effect: null, queued: false };
   const resolvedSpellLikeAbilities = await resolveSpellLikeChoicesForToken(
     effect.spellLikeAbilities,
     effect,
@@ -9048,6 +10155,12 @@ async function resolveEffectChoicesForToken(token, effect) {
         ? { useUntrained: resolvedUseUntrained }
         : {}),
       ...(resolvedBonusRanks.length ? { bonusRanks: resolvedBonusRanks } : {}),
+      ...(resolvedWeaponExtraDamage.length
+        ? { weaponExtraDamage: resolvedWeaponExtraDamage }
+        : {}),
+      ...(resolvedAttributeContributions.length
+        ? { attributeContributions: resolvedAttributeContributions }
+        : {}),
       ...(resolvedSpellLikeAbilities.length
         ? { spellLikeAbilities: resolvedSpellLikeAbilities }
         : {}),
@@ -9064,7 +10177,15 @@ async function resolveEffectChoicesForToken(token, effect) {
     },
     conditionalChoices,
   );
-  return { effect: resolvedEffect, queued: false };
+  const abilityResolved = window.PFConditionConfig?.resolveAbilityChoices
+    ? await window.PFConditionConfig.resolveAbilityChoices(resolvedEffect, {
+        title: resolvedEffect.name || "Effect",
+      })
+    : resolvedEffect;
+  return {
+    effect: abilityResolved || null,
+    queued: false,
+  };
 }
 
 async function applyAuraEffectToToken(tokenId, auraTokenId, auraId = "manual") {
@@ -9086,8 +10207,13 @@ async function applyAuraEffectToToken(tokenId, auraTokenId, auraId = "manual") {
     auraSourceId: sourceId,
     auraTokenId,
     auraId,
-    sourceTokenId: auraTokenId,
-    durationAnchorTokenId: auraTokenId,
+    auraDefinitionId: effect.id || effect.name || "effect",
+    sourceTokenId:
+      effect.casterTokenId || auraEntry.aura.casterTokenId || auraTokenId,
+    durationAnchorTokenId:
+      auraEntry.aura.durationAnchorTokenId ||
+      effect.casterTokenId ||
+      auraTokenId,
   };
   const { effect: resolvedEffect, queued } = await resolveEffectChoicesForToken(
     token,
@@ -9146,6 +10272,37 @@ async function endActivationGroupForToken(
     await saveTokenActiveEffects(token, retained);
 }
 
+async function resolveEffectSaveForToken(token, effect) {
+  if (!window.PFEffectSaves?.hasSave?.(effect)) return effect;
+  const character = token?.kind === "character" ? tokenCharacter(token) : null;
+  const remote =
+    character?.userId && String(character.userId) !== String(currentUserId);
+  if (remote) {
+    const orchestrator = window.PFEffectActivationOrchestrator;
+    const result = await orchestrator.waitForRemoteDecision({
+      createRequest: window.PFApp?.createEffectChoiceRequest,
+      loadStatus: window.PFApp?.loadEffectChoiceRequestStatus,
+      request: {
+        contextKey: mapContextKey,
+        characterId: character.id,
+        ability: {
+          ...effect,
+          activationRequest: {
+            mode: orchestrator.REMOTE_SAVE_MODE,
+            version: 1,
+          },
+        },
+      },
+    });
+    return result?.ok ? result.effect : null;
+  }
+  return window.PFEffectSaves.resolve(effect, {
+    sheet: rollTokenSheet(token),
+    title: effect.name || "Effect",
+    targetName: tokenActualName(token),
+  });
+}
+
 async function confirmQuickEffectTargets() {
   if (!quickEffectSelection?.effect) return;
   const selectedTokenIds = [
@@ -9164,6 +10321,30 @@ async function confirmQuickEffectTargets() {
   await hideQuickEffectTargetsBeforeChoices();
   const sourceTokenId =
     quickEffectSelection.sourceTokenId || quickEffectSourceTokenId || "";
+  const sourceToken = tokenById(sourceTokenId);
+  const resourceActivation = await window.PFEffectActivationOrchestrator.run(
+    quickEffectSelection.activation || {
+      sourceType: quickEffectGroupFor(quickEffectSelection.effect),
+      surface: "map",
+      effect: quickEffectSelection.effect,
+    },
+    {
+      "resource-allocation": async (state) => {
+        if (!sourceToken) return state;
+        const spent = await spendMapClassResource(sourceToken, state.effect);
+        return spent.ok ? state : null;
+      },
+    },
+    { nodeIds: ["resource-allocation"] },
+  );
+  if (!resourceActivation) {
+    el("confirmQuickEffectTargets").disabled = false;
+    el("quickEffectApplyStatus").textContent =
+      "The source does not have enough class resource.";
+    quickEffectTargetsModal.show();
+    return;
+  }
+  quickEffectSelection.activation = resourceActivation;
   const selectedTargetIds = new Set(selectedTokenIds);
   const removedTargets = (quickEffectSelection.previousTargetIds || [])
     .filter((tokenId) => !selectedTargetIds.has(tokenId))
@@ -9179,7 +10360,8 @@ async function confirmQuickEffectTargets() {
     ),
   );
   const queuedTargets = [];
-  const readyTargets = [];
+  const readyActivations = [];
+  const orchestrator = window.PFEffectActivationOrchestrator;
   for (const token of targets) {
     const targetEffect = {
       ...structuredClone(quickEffectSelection.effect),
@@ -9198,35 +10380,142 @@ async function confirmQuickEffectTargets() {
         candidate,
         quickEffectSelection.options,
         targets.length,
+        { preserveRolls: true },
       );
-      const { effect: resolvedEffect, queued } =
-        await resolveEffectChoicesForToken(token, appliedEffect);
-      if (queued) queuedTargets.push(tokenActualName(token));
-      else if (resolvedEffect)
-        readyTargets.push({ token, effect: resolvedEffect });
+      if (window.PFEffectMechanics?.hasBranches?.(appliedEffect)) {
+        appliedEffect.castRollContext = {
+          ...mapEffectCastingScaleContext(candidate),
+          casterLevel: Number(quickEffectSelection.options?.casterLevel || 1),
+          classLevel: Number(quickEffectSelection.options?.casterLevel || 1),
+        };
+      }
+      const activation = await orchestrator.resume(
+        {
+          ...(quickEffectSelection.activation || {}),
+          activationHistory: [
+            ...(quickEffectSelection.activation?.activationHistory || []),
+          ],
+          sourceType: quickEffectGroupFor(candidate),
+          surface: "map",
+          effect: appliedEffect,
+          token,
+          resolvedAction: false,
+        },
+        {
+          "target-decisions": async (state) => {
+            const result = await resolveEffectChoicesForToken(
+              state.token,
+              state.effect,
+            );
+            if (result.queued)
+              return { ...state, queued: true, effect: null };
+            return result.effect ? { ...state, effect: result.effect } : null;
+          },
+          "saving-throws": async (state) => {
+            if (state.queued) return state;
+            const effect = await resolveEffectSaveForToken(
+              state.token,
+              state.effect,
+            );
+            return effect ? { ...state, effect } : null;
+          },
+          "attack-confirmation": async (state) => {
+            if (state.queued || !effectAttackRolls(state.effect).length)
+              return state;
+            const effect = await rollQuickEffectAttacks(
+              state.effect,
+              quickEffectSelection.options?.casterLevel,
+            );
+            return effect
+              ? { ...state, effect, resolvedAction: true }
+              : null;
+          },
+          "effect-rolls": async (state) => {
+            if (state.queued) return state;
+            let effect = state.effect;
+            let resolvedAction = state.resolvedAction;
+            if (effectDamageRolls(effect).length) {
+              const damage = await rollQuickEffectDamage(
+                effect,
+                quickEffectSelection.options?.casterLevel,
+              );
+              if (!damage) return null;
+              resolvedAction = true;
+            }
+            effect = await rollQuickConditionAdjustments(
+              effect,
+              quickEffectSelection.options?.casterLevel,
+            );
+            if (!effect) return null;
+            effect = await rollQuickHealing(
+              effect,
+              quickEffectSelection.options?.casterLevel,
+            );
+            if (!effect) return null;
+            const {
+              attackRolls: _attackRolls,
+              damageRolls: _damageRolls,
+              castRollContext: _castRollContext,
+              ...persistableEffect
+            } = effect;
+            return {
+              ...state,
+              effect: persistableEffect,
+              resolvedAction,
+            };
+          },
+        },
+        {
+          nodeIds: [
+            "target-decisions",
+            "saving-throws",
+            "attack-confirmation",
+            "effect-rolls",
+          ],
+        },
+      );
+      if (activation?.queued) queuedTargets.push(tokenActualName(token));
+      else if (activation) readyActivations.push(activation);
     }
   }
-  const appliedTargets = (
+  const completedTargets = (
     await Promise.all(
-      readyTargets.map(async ({ token, effect }) =>
-        (await applyQuickEffectToToken(token, effect))
-          ? tokenActualName(token)
-          : null,
-      ),
+      readyActivations.map(async (activation) => {
+        const applied = await orchestrator.run(
+          activation,
+          {
+            application: async (state) => {
+              if (effectHasTargetMechanics(state.effect)) {
+                const saved = await applyQuickEffectToToken(
+                  state.token,
+                  state.effect,
+                );
+                return saved ? { ...state, applied: true } : null;
+              }
+              return state.resolvedAction
+                ? { ...state, applied: true }
+                : null;
+            },
+          },
+          { nodeIds: ["application"] },
+        );
+        return applied?.applied ? tokenActualName(applied.token) : null;
+      }),
     )
   ).filter(Boolean);
+  const uniqueCompletedTargets = [...new Set(completedTargets)];
 
   el("confirmQuickEffectTargets").disabled = false;
-  if (!appliedTargets.length && !queuedTargets.length) {
-    el("quickEffectApplyStatus").textContent = "Could not apply effect.";
+  if (!uniqueCompletedTargets.length && !queuedTargets.length) {
+    el("quickEffectApplyStatus").textContent = "Could not use power.";
     quickEffectTargetsModal.show();
     return;
   }
 
   const actor = await currentActorName();
   const effectName = quickEffectSelection.effect.name || "Effect";
-  if (appliedTargets.length) {
-    const targetsText = appliedTargets.join(", ");
+  if (uniqueCompletedTargets.length) {
+    const targetsText = uniqueCompletedTargets.join(", ");
     addTimeline(`${actor} applied ${effectName} on ${targetsText}.`, [
       { text: actor, emphasis: true },
       { text: " applied " },
@@ -9257,7 +10546,12 @@ async function confirmQuickEffectTargets() {
 
 function toggleContextEnemyVisibility() {
   const token = tokenById(contextMenuTokenId);
-  if (!token || token.kind !== "enemy" || !isGm) return;
+  if (
+    !token ||
+    token.kind !== "enemy" ||
+    (!isGm && !controlsSummonedCreature(token))
+  )
+    return;
   token.visible = token.visible === false;
   hideContextMenu();
   renderAll();
@@ -9322,6 +10616,7 @@ async function advanceAutomaticAuras(endingTokenId) {
   if (!endingTokenId) return;
   let changed = false;
   const expiredLinks = [];
+  const expiredIndependentTokenIds = new Set();
   state.tokens.forEach((token) => {
     const auras = Array.isArray(token.automaticAuras) ? token.automaticAuras : [];
     const next = auras.flatMap((aura) => {
@@ -9336,8 +10631,15 @@ async function advanceAutomaticAuras(endingTokenId) {
       }
       const remaining = Number(aura.remaining) - 1;
       changed = true;
-      if (remaining <= 0 && aura.linkedEffectId)
-        expiredLinks.push({ token, effectId: aura.linkedEffectId });
+      if (remaining <= 0 && aura.linkedEffectId) {
+        const controllerToken = token.independentAuraToken
+          ? tokenById(token.auraCasterTokenId)
+          : token;
+        if (controllerToken)
+          expiredLinks.push({ token: controllerToken, effectId: aura.linkedEffectId });
+      }
+      if (remaining <= 0 && token.independentAuraToken)
+        expiredIndependentTokenIds.add(token.id);
       return remaining > 0 ? [{ ...aura, remaining }] : [];
     });
     if (next.length !== auras.length || next.some((entry, index) => entry !== auras[index]))
@@ -9350,6 +10652,12 @@ async function advanceAutomaticAuras(endingTokenId) {
       token,
       active.filter((effect) => effect.id !== effectId),
     );
+  }
+  if (expiredIndependentTokenIds.size) {
+    state.tokens = state.tokens.filter(
+      (token) => !expiredIndependentTokenIds.has(token.id),
+    );
+    queueSave();
   }
   renderAll();
   await removeOutOfRangeAuraEffects();
@@ -9470,6 +10778,106 @@ async function processEndedTurnEffects(endingRow, turnEventId) {
   await refreshTurnEffectChanges(result.changes);
 }
 
+async function applyFastHealingForEndedTurn(endingRow) {
+  const token = endingRow?.tokenId ? tokenById(endingRow.tokenId) : null;
+  if (!token || !window.PFEffectHealing) return;
+  const active =
+    cachedTokenActiveEffects(token) || (await loadTokenActiveEffects(token));
+  const amount = window.PFEffectHealing.fastHealingValue(active, {
+    activeBuffs: active,
+  });
+  if (amount <= 0) return;
+  const result = window.PFEffectHealing.healingResult(
+    tokenCurrentHp(token),
+    tokenTotalHp(token),
+    amount,
+  );
+  if (!result.changed || !(await persistTokenHealing(token, result.current)))
+    return;
+  addTimeline(
+    `${displayTokenName(token)} recovers ${result.healed} HP from Fast Healing.`,
+  );
+  queueSave();
+}
+
+async function advanceClassResourcesForEndedTurn(endingRow) {
+  const sourceToken = endingRow?.tokenId ? tokenById(endingRow.tokenId) : null;
+  if (sourceToken?.kind !== "character") return;
+  const active = await loadTokenActiveEffects(sourceToken);
+  const tracked = active.filter(
+    (effect) =>
+      window.PFClassResources?.poolForEffect(effect)?.mode === "per-round",
+  );
+  if (!tracked.length) return;
+  const byPool = new Map();
+  tracked.forEach((effect) => {
+    const pool = window.PFClassResources.poolForEffect(effect);
+    const list = byPool.get(pool.key) || [];
+    list.push(effect);
+    byPool.set(pool.key, list);
+  });
+  let nextActive = active;
+  for (const effects of byPool.values()) {
+    const representative = effects[0];
+    let remaining = null;
+    let resourceName = "";
+    if (effects.some((effect) => effect.resourceActivationPaid)) {
+      const paidPool = window.PFClassResources.poolForEffect(effects[0]);
+      const status = await mapClassResourceStatus(sourceToken, representative);
+      remaining = status.resource?.current ?? 0;
+      resourceName = status.resource?.name || "";
+      if (remaining > 0) {
+        nextActive = nextActive.map((effect) =>
+          window.PFClassResources.poolForEffect(effect)?.key === paidPool.key
+            ? { ...effect, resourceActivationPaid: false }
+            : effect,
+        );
+        continue;
+      }
+    } else {
+      const spent = await spendMapClassResource(sourceToken, representative, {
+        markActivation: false,
+      });
+      if (!spent.ok) continue;
+      remaining = spent.current;
+      resourceName = spent.resource?.name || "";
+      if (remaining > 0) continue;
+    }
+    const pool = window.PFClassResources.poolForEffect(representative);
+    nextActive = nextActive.filter(
+      (effect) =>
+        window.PFClassResources.poolForEffect(effect)?.key !== pool.key,
+    );
+    const groups = new Set(
+      effects.map((effect) => effect.activationGroup).filter(Boolean),
+    );
+    const previousAuras = Array.isArray(sourceToken.automaticAuras)
+      ? sourceToken.automaticAuras
+      : [];
+    sourceToken.automaticAuras = (
+      Array.isArray(sourceToken.automaticAuras)
+        ? sourceToken.automaticAuras
+        : []
+    ).filter(
+      (aura) =>
+        window.PFClassResources.poolForEffect(aura.effect)?.key !== pool.key,
+    );
+    if (sourceToken.automaticAuras.length !== previousAuras.length) queueSave();
+    for (const group of groups) {
+      for (const token of state.tokens) {
+        if (token.kind !== "character" && token.kind !== "enemy") continue;
+        await endActivationGroupForToken(token, group, sourceToken.id);
+      }
+    }
+    addTimeline(
+      `${displayTokenName(sourceToken)} has no ${resourceName || pool.id} remaining; ${representative.name || "the ability"} ends.`,
+    );
+  }
+  if (JSON.stringify(nextActive) !== JSON.stringify(active))
+    await saveTokenActiveEffects(sourceToken, nextActive);
+  renderAll();
+}
+
 function toggleContextTokenNameVisibility() {
   const token = tokenById(contextMenuTokenId);
   if (!token || !isGm || !token.kind) return;
@@ -9586,6 +10994,16 @@ function removeInitiativeRow(entryId) {
   renderAll();
 }
 
+function advanceSummonedCreatures(endingTokenId) {
+  if (!window.PFSummonCreatures || !endingTokenId) return;
+  const result = window.PFSummonCreatures.advance(state, endingTokenId);
+  if (!result.changed) return;
+  if (result.expiredIds.length)
+    addTimeline(
+      `${result.expiredIds.length} summoned creature${result.expiredIds.length === 1 ? "" : "s"} disappeared.`,
+    );
+  queueSave();
+}
 async function nextTurn() {
   if (turnAdvanceBusy || !state.initiative.length) return;
   const enabled = state.initiative
@@ -9624,8 +11042,11 @@ async function nextTurn() {
     }
     renderAll();
     if (endingRow && !endingRow.disabled) {
+      await applyFastHealingForEndedTurn(endingRow);
       await processEndedTurnEffects(endingRow, turnEventId);
       await advanceAutomaticAuras(endingRow.tokenId);
+      advanceSummonedCreatures(endingRow.tokenId);
+      await advanceClassResourcesForEndedTurn(endingRow);
     }
   } catch (error) {
     console.error(error);
@@ -9727,6 +11148,7 @@ function rollWeaponsForToken(token) {
         critical: weapon.critical || raw.critical || "20/x2",
         misfire: raw.misfire || weapon.misfire || "",
         weaponType: raw.weaponType || weapon.weaponType || "",
+        conditionals: weapon.attackConditionals || raw.attackConditionals || [],
         raw,
       };
     })
@@ -9825,7 +11247,130 @@ function rollNoteHtml(notes = []) {
     .join(notes.length > 1 ? ", " : "");
 }
 
-function showRollResultModal(title, rows) {
+function renderRollConditionals(card, row) {
+  const entries = (Array.isArray(row.conditionals) ? row.conditionals : [])
+    .filter((entry) => Number(entry?.value ?? entry?.bonus ?? 0));
+  const host = card.querySelector("[data-roll-conditionals]");
+  if (!host || !entries.length) return;
+  row.appliedConditionals ||= [];
+  host.innerHTML = `<div class="d20-boost-pool-title">Applicable conditionals</div>${entries.map((entry, index) => {
+    const value = Number(entry.value ?? entry.bonus ?? 0);
+    const label = entry.source || entry.name || entry.appliesWhen || "Conditional";
+    return `<label class="form-check"><input class="form-check-input" type="checkbox" data-roll-conditional="${index}"><span class="form-check-label">${escapeHtml(label)} (${signedNumberText(value)})</span></label>`;
+  }).join("")}`;
+  host.querySelectorAll("[data-roll-conditional]").forEach((input) =>
+    input.addEventListener("change", () => {
+      const index = Number(input.dataset.rollConditional);
+      const value = Number(entries[index]?.value ?? entries[index]?.bonus ?? 0);
+      row.total += input.checked ? value : -value;
+      if (input.checked) row.appliedConditionals.push(entries[index]);
+      else row.appliedConditionals = row.appliedConditionals.filter((entry) => entry !== entries[index]);
+      card.querySelector("[data-roll-total]").textContent = row.total;
+    }),
+  );
+}
+
+function mapD20BoostScaleContext(token, source = {}) {
+  const sheet = rollTokenSheet(token);
+  const fields = sheet.fields || {};
+  const characterLevel = firstNumber(fields.characterLevel ?? sheet.characterLevel ?? sheet.calculated?.characterLevel);
+  return { characterLevel, classLevel: characterLevel, casterLevel: firstNumber(source.casterLevel ?? source.castRollContext?.casterLevel, characterLevel), classLevels: sheet.classLevels || {}, sourceEffect: source };
+}
+
+async function mapD20BoostSession(token, rollKind) {
+  if (!window.PFD20Boosts || !token) return null;
+  const activeEffects = await loadTokenActiveEffects(token);
+  let passives = [];
+  if (token.kind === "character") passives = (await characterMapEffectSources(tokenCharacter(token)))?.passives || [];
+  const sources = [...activeEffects, ...passives].filter((source) => Array.isArray(source?.d20Boosts) && source.d20Boosts.length);
+  if (!sources.length) return null;
+  const usage = structuredClone(rollTokenSheet(token).d20BoostUses || {});
+  const context = mapD20BoostScaleContext(token);
+  const resources = window.PFD20Boosts.collectResources({ sources, usage, rollKind, context, activeEffects });
+  return resources.length ? { token, rollKind, sources, activeEffects, usage, context } : null;
+}
+
+async function saveMapD20BoostUsage(session) {
+  const token = session.token;
+  const nextSheet = structuredClone(rollTokenSheet(token));
+  nextSheet.d20BoostUses = structuredClone(session.usage);
+  if (token.kind === "character") {
+    const character = tokenCharacter(token);
+    if (!character?.id) return false;
+    const saved = await PFApp.updateCharacterSheetRaw?.(character.id, nextSheet, mapContextKey);
+    if (!saved?.sheet) return false;
+    character.sheet = saved.sheet;
+    syncTokenFromSheet(token, character);
+    localStorage.setItem(`pf_character_sheet_updated_${mapContextKey}_${character.id}`, String(Date.now()));
+    return true;
+  }
+  if (token.kind === "enemy" && canViewTokenSheet(token)) {
+    if (token.summonedCreature) {
+      token.sheet = nextSheet;
+      queueSave();
+      return true;
+    }
+    const enemy = mapEnemies.find((entry) => entry.id === token.enemyId);
+    const saved = await PFApp.saveEnemy({ id: token.enemyId, name: enemy?.name || token.name || "Enemy", visible: enemy?.visible !== false, sheet: nextSheet }, mapContextKey);
+    if (!saved) return false;
+    token.sheet = saved.sheet || nextSheet;
+    mapEnemies = mapEnemies.map((entry) => entry.id === saved.id ? saved : entry);
+    return true;
+  }
+  return false;
+}
+
+function d20BoostFormula(resource) {
+  const boost = resource.boost;
+  const dice = boost.diceCount ? `${boost.diceCount}d${boost.dieType}` : "";
+  const staticValue = Number(boost.staticValue || 0);
+  return [dice, staticValue ? signedNumberText(staticValue) : ""].filter(Boolean).join(" ") || "+0";
+}
+
+function renderMapD20BoostPools(session, rows) {
+  const resources = window.PFD20Boosts.collectResources({ sources: session.sources, usage: session.usage, rollKind: session.rollKind, context: session.context, activeEffects: session.activeEffects });
+  el("rollResultList").querySelectorAll("[data-roll-result-row]").forEach((card) => {
+    const rowIndex = Number(card.dataset.rollResultRow);
+    const result = rows[rowIndex];
+    let pool = card.querySelector("[data-d20-boost-pool]");
+    if (!pool) { pool = document.createElement("div"); pool.dataset.d20BoostPool = ""; pool.className = "d20-boost-pool"; card.appendChild(pool); }
+    pool.innerHTML = resources.length
+      ? `<div class="d20-boost-pool-title">Available boosts</div>${resources.map((resource, resourceIndex) => `<div class="d20-boost-resource"><button class="btn btn-outline-info btn-sm" type="button" data-apply-d20-boost="${resourceIndex}"><span>${escapeHtml(resource.source.name || resource.boost.label)}</span><small>${escapeHtml(d20BoostFormula(resource))} ${escapeHtml(resource.boost.bonusType)} &middot; ${resource.remaining}/${resource.maxUses}</small></button><button class="btn btn-outline-light btn-sm btn-icon" type="button" data-refill-d20-boost="${resourceIndex}" title="Refill uses" aria-label="Refill ${escapeHtml(resource.boost.label)}"><i class="bi bi-arrow-clockwise"></i></button></div>`).join("")}<div class="d20-boost-applied" data-d20-boost-applied></div>`
+      : "";
+    const applied = pool.querySelector("[data-d20-boost-applied]");
+    if (applied && result.appliedD20Boosts?.length) applied.innerHTML = result.appliedD20Boosts.map((entry) => `<div>${escapeHtml(entry.label)}: ${entry.dice.length ? `${entry.dice.join(" + ")} ${signedNumberText(entry.staticValue)}` : signedNumberText(entry.staticValue)} = ${signedNumberText(entry.value)}${entry.effective !== entry.value ? ` (${signedNumberText(entry.effective)} stacks)` : ""}</div>`).join("");
+    pool.querySelectorAll("[data-apply-d20-boost]").forEach((button) => button.addEventListener("click", async () => {
+      const resource = resources[Number(button.dataset.applyD20Boost)];
+      if (!resource) return;
+      const rolled = window.PFD20Boosts.rollBoost(resource, Math.random, mapD20BoostScaleContext(session.token, resource.source));
+      result.appliedD20Boosts ||= [];
+      const baseline = window.PFD20Boosts.baselineBonuses({
+        sources: session.sources,
+        rollKind: session.rollKind,
+        context: session.context,
+        roll: { label: result.label, attackType: result.attack?.attackType },
+      });
+      const effective = window.PFD20Boosts.stackingValue([...baseline, ...result.appliedD20Boosts], rolled);
+      result.appliedD20Boosts.push({ ...rolled, effective, label: resource.source.name || resource.boost.label });
+      result.total += effective;
+      card.querySelector("[data-roll-total]").textContent = result.total;
+      session.usage = window.PFD20Boosts.spend(session.usage, resource);
+      renderMapD20BoostPools(session, rows);
+      await saveMapD20BoostUsage(session);
+      addTimeline(`${rollTokenName(session.token)} applied ${resource.source.name || resource.boost.label}: ${signedNumberText(effective)} to ${result.label} (total ${result.total}).`);
+      renderTimeline();
+    }));
+    pool.querySelectorAll("[data-refill-d20-boost]").forEach((button) => button.addEventListener("click", async () => {
+      const resource = resources[Number(button.dataset.refillD20Boost)];
+      if (!resource) return;
+      session.usage = window.PFD20Boosts.refill(session.usage, resource);
+      renderMapD20BoostPools(session, rows);
+      await saveMapD20BoostUsage(session);
+    }));
+  });
+}
+
+function showRollResultModal(title, rows, { token = null, rollKind = "" } = {}) {
   clearInterval(rollAnimationTimer);
   el("rollResultModalLabel").textContent = title;
   el("rollResultList").innerHTML = rows
@@ -9840,6 +11385,7 @@ function showRollResultModal(title, rows) {
         <div class="roll-breakdown-row roll-total-row"><span>Total</span><strong data-roll-total>...</strong></div>
       </div>
       <div class="roll-result-note" data-roll-note></div>
+      <div class="d20-boost-pool mt-2" data-roll-conditionals></div>
     </div>
   `,
     )
@@ -9874,7 +11420,9 @@ function showRollResultModal(title, rows) {
       card.querySelector("[data-roll-note]").innerHTML = row.notes?.length
         ? rollNoteHtml(row.notes)
         : "";
+      renderRollConditionals(card, row);
     });
+    if (token && rollKind) void mapD20BoostSession(token, rollKind).then((session) => { if (session) renderMapD20BoostPools(session, rows); });
   }, 1000);
 }
 
@@ -9891,6 +11439,7 @@ function makeAttackRollData(token, weapon, bonus, label = "Attack") {
     bonus: Number(bonus || 0),
     total,
     notes,
+    conditionals: weapon.conditionals || [],
   };
 }
 
@@ -9937,6 +11486,7 @@ function rollAttack(full = false) {
   showRollResultModal(
     `${rollTokenName(token)}: ${full ? "Full Attack" : "Attack"}`,
     rows,
+    { token, rollKind: "attacks" },
   );
   renderAll();
 }
@@ -9974,6 +11524,7 @@ function rollFullAttackByCategory(ranged) {
   showRollResultModal(
     `${rollTokenName(token)}: Full Attack (${categoryLabel})`,
     rows,
+    { token, rollKind: "attacks" },
   );
   renderAll();
 }
@@ -9993,6 +11544,7 @@ function rollSaveOptions(token) {
           sheet.saves?.fort?.total ??
           sheet.saves?.fort?.base,
       ),
+      conditionals: byKey.fort?.conditionals || [],
     },
     {
       key: "reflex",
@@ -10002,6 +11554,7 @@ function rollSaveOptions(token) {
           sheet.saves?.reflex?.total ??
           sheet.saves?.reflex?.base,
       ),
+      conditionals: byKey.reflex?.conditionals || [],
     },
     {
       key: "will",
@@ -10011,6 +11564,7 @@ function rollSaveOptions(token) {
           sheet.saves?.will?.total ??
           sheet.saves?.will?.base,
       ),
+      conditionals: byKey.will?.conditionals || [],
     },
   ];
 }
@@ -10036,7 +11590,19 @@ function rollAbilityOptions(token) {
         calculated[key]?.total?.match(/\(([+-]?\d+)\)/)?.[1] ??
         sheet.abilities?.[key]?.mod,
     ),
+    conditionals: calculated[key]?.conditionals || [],
   }));
+}
+
+function rollCombatOptions(token, kind) {
+  const sheet = rollTokenSheet(token);
+  const fields = sheet.fields || {};
+  return [{
+    key: kind,
+    label: kind === "cmb" ? "CMB" : "CMD",
+    bonus: firstNumber(sheet.calculated?.combat?.[kind] ?? fields[`${kind}Total`] ?? fields[kind]),
+    conditionals: sheet.calculated?.combat?.conditionals?.[kind] || [],
+  }];
 }
 
 function mapSkillId(skill) {
@@ -10082,6 +11648,7 @@ function rollSkillOptions(token) {
         key: row.key || row.label,
         label: row.label || row.key,
         bonus: row.usable === false ? 0 : firstNumber(row.total),
+        conditionals: row.usable === false ? [] : row.conditionals || [],
       }))
       .sort((a, b) => String(a.label).localeCompare(String(b.label)));
   }
@@ -10102,7 +11669,7 @@ function rollSkillOptions(token) {
           : value.total !== undefined && value.total !== ""
           ? firstNumber(value.total)
           : abilityBonus + ranks + Number(value.misc || 0);
-      return { key, label, bonus: total };
+      return { key, label, bonus: total, conditionals: value.conditionals || [] };
     })
     .sort((a, b) => String(a.label).localeCompare(String(b.label)));
 }
@@ -10126,6 +11693,8 @@ function showRollDetail(kind) {
       options: rollAbilityOptions(token),
       crit: true,
     },
+    cmb: { label: "CMB Check", options: rollCombatOptions(token, "cmb"), crit: true },
+    cmd: { label: "CMD Check", options: rollCombatOptions(token, "cmd"), crit: true },
   };
   const config = optionSets[kind];
   if (!config) return;
@@ -10152,7 +11721,9 @@ function confirmDetailRoll() {
       ? rollSaveOptions(token)
       : rollDetailKind === "skill"
         ? rollSkillOptions(token)
-        : rollAbilityOptions(token);
+        : rollDetailKind === "ability"
+          ? rollAbilityOptions(token)
+          : rollCombatOptions(token, rollDetailKind);
   const selected =
     options.find((option) => option.key === el("rollDetailSelect").value) ||
     options[0];
@@ -10172,7 +11743,11 @@ function confirmDetailRoll() {
       ? "Saving Throw"
       : rollDetailKind === "skill"
         ? "Skill Check"
-        : "Attribute Check";
+        : rollDetailKind === "ability"
+          ? "Attribute Check"
+          : rollDetailKind === "cmb"
+            ? "CMB Check"
+            : "CMD Check";
   const text = `${actor} rolled ${label} (${selected.label}): ${die} ${signedNumberText(selected.bonus)} = ${total}${noteText}`;
   rollTimeline(text, [actor, label, selected.label, String(total), ...notes]);
   rollModal?.hide();
@@ -10183,8 +11758,9 @@ function confirmDetailRoll() {
       bonus: Number(selected.bonus || 0),
       total,
       notes,
+      conditionals: selected.conditionals || [],
     },
-  ]);
+  ], { token, rollKind: rollDetailKind === "save" ? "saves" : rollDetailKind === "skill" ? "skills" : rollDetailKind === "ability" ? "abilities" : rollDetailKind });
   renderAll();
 }
 
@@ -10264,7 +11840,7 @@ async function characterSheetBridge() {
   if (characterSheetBridgePromise) return characterSheetBridgePromise;
   characterSheetBridgePromise = new Promise((resolve, reject) => {
     characterSheetBridgeFrame = document.createElement("iframe");
-    characterSheetBridgeFrame.src = "character-sheet.html?bridge=1&v=attribute-scale-source-1";
+    characterSheetBridgeFrame.src = "character-sheet.html?bridge=1&v=weapon-damage-size-1";
     characterSheetBridgeFrame.tabIndex = -1;
     characterSheetBridgeFrame.style.cssText =
       "position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;left:-9999px;top:-9999px;";
@@ -10353,6 +11929,10 @@ function renderAutomaticAuraList(token) {
     : `<div class="small text-secondary">None</div>`;
   list.querySelectorAll("[data-remove-automatic-aura]").forEach((button) => {
     button.addEventListener("click", async () => {
+      if (token.independentAuraToken) {
+        await removeIndependentAuraToken(token);
+        return;
+      }
       const removed = auras.find(
         (aura) => aura.id === button.dataset.removeAutomaticAura,
       );
@@ -10445,6 +12025,10 @@ function saveAuraOptions(event) {
   if (mode === "aura") {
     payload.color = el("auraColor").value || "#8fd19e";
     payload.effect = auraEffectDraft ? structuredClone(auraEffectDraft) : null;
+    const revealMode = auraEffectDraft?.auraConfig?.revealMode;
+    if (["light", "specialVision"].includes(revealMode)) {
+      payload.revealMode = revealMode;
+    }
     payload.removeWhenOutOfRange = Boolean(
       auraEffectDraft && el("auraRemoveOutOfRange").checked,
     );
@@ -10634,7 +12218,12 @@ function startPendingEffectChoicePolling() {
       const character = mapCharacters.find((item) => item.id === id);
       return character ? characterFavoredEnemyOptions(character) : [];
     },
-    onResolved: async () => {
+    onResolved: async (characterId, effect) => {
+      await PFApp.applyCharacterHealingEffect?.(
+        characterId,
+        effect,
+        mapContextKey,
+      );
       await hydrateMapCharacterSheets();
       renderAll(false);
     },
@@ -10665,6 +12254,7 @@ async function loadMapSlot(slot) {
   renderAll(false);
   centerMapViewport();
   subscribeMapRealtime();
+  scheduleOutOfRangeAuraCleanup("", 0);
   scheduleAccessibleEffectSourcePrefetch();
   const syncPassiveAuras = () =>
     void refreshMapTokenSheets({
@@ -10849,6 +12439,20 @@ document.addEventListener("DOMContentLoaded", async () => {
   }, 3000);
   quickEffectModal = new bootstrap.Modal(el("quickEffectModal"));
   quickEffectTargetsModal = new bootstrap.Modal(el("quickEffectTargetsModal"));
+  el("quickEffectTargetsModal").addEventListener("change", (event) => {
+    const groupToggle = event.target.closest("[data-quick-target-group]");
+    if (groupToggle) {
+      const group = groupToggle.dataset.quickTargetGroup;
+      el("quickEffectTargetsModal")
+        .querySelectorAll(`[data-quick-target-token-group="${group}"]`)
+        .forEach((input) => {
+          input.checked = groupToggle.checked;
+        });
+      return;
+    }
+    const target = event.target.closest("[data-quick-target-token]");
+    if (target) syncQuickEffectTargetGroup(target.dataset.quickTargetTokenGroup);
+  });
   window.PFEffectTracker?.browser?.prepare?.();
   rollModal = new bootstrap.Modal(el("rollModal"));
   rollResultModal = new bootstrap.Modal(el("rollResultModal"));
@@ -10952,10 +12556,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       );
     });
   el("removeTokenFromMap").addEventListener("click", removeContextMenuToken);
-  el("confirmQuickCondition").addEventListener(
-    "click",
-    confirmQuickConditionConfig,
-  );
   el("confirmQuickEffectTargets").addEventListener(
     "click",
     confirmQuickEffectTargets,

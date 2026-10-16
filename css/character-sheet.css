@@ -10,6 +10,54 @@ body {
   margin-bottom: 12px;
 }
 
+.class-resource-list {
+  display: grid;
+  gap: 8px;
+}
+
+.class-resource-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.class-resource-name {
+  min-width: 0;
+}
+
+.class-resource-name strong,
+.class-resource-name span {
+  display: block;
+}
+
+.class-resource-name span,
+.class-resource-maximum {
+  color: #aaa;
+  font-size: 12px;
+}
+
+.class-resource-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.class-resource-control .sheet-number-stepper {
+  margin-inline: 0;
+}
+
+@media (max-width: 575.98px) {
+  .class-resource-row {
+    gap: 6px;
+  }
+
+  .class-resource-maximum {
+    max-width: 68px;
+    line-height: 1.1;
+  }
+}
+
 #sheetInfoTabs {
   width: 50%;
   min-width: 520px;
@@ -2785,4 +2833,13 @@ textarea.enemy-header-control.form-control-sm {
   .simple-skills-list .simple-list {
     grid-template-columns: 1fr;
   }
+}
+
+.scale-options .effect-attribute-scale {
+  border-color: var(--bs-info);
+  box-shadow: inset 0 0 0 1px var(--bs-info);
+}
+.scale-options .effect-attribute-replaced {
+  opacity: 0.55;
+  text-decoration: line-through;
 }

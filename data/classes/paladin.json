@@ -2,6 +2,28 @@
   "name": "Paladin",
   "type": "core",
   "sourceUrl": "https://www.d20pfsrd.com/classes/core-classes/paladin/",
+  "classResources": [
+    {
+      "id": "smite-evil",
+      "name": "Smite Evil",
+      "unit": "uses",
+      "unlockLevel": 1,
+      "maximum": {
+        "base": 1,
+        "classLevel": { "offset": -1, "multiplier": 1, "divisor": 3 }
+      }
+    },
+    {
+      "id": "lay-on-hands",
+      "name": "Lay on Hands",
+      "unit": "uses",
+      "unlockLevel": 2,
+      "maximum": {
+        "classLevel": { "multiplier": 1, "divisor": 2 },
+        "ability": "cha"
+      }
+    }
+  ],
   "levelProgression": [
     {
       "level": 1,

@@ -3,7 +3,16 @@
   if (root) root.PFDamageRolls = api;
   if (typeof module === "object" && module.exports) module.exports = api;
 })(typeof window !== "undefined" ? window : globalThis, function (root) {
-  const DIE_SIDES = [2, 3, 4, 6, 8, 10, 12, 20, 100];
+  const effectRolls =
+    root?.PFEffectRolls ||
+    (typeof require === "function" ? require("./effect-rolls.js") : null);
+  const DIE_SIDES = effectRolls?.DIE_SIDES || [2, 3, 4, 6, 8, 10, 12, 20, 100];
+  const DEFAULT_LABELS = Object.freeze({
+    resultNoun: "Damage",
+    rollButton: "Roll Damage",
+    staticLabel: "Bonus",
+  });
+  let activeLabels = DEFAULT_LABELS;
 
   function numberOr(value, fallback = 0) {
     const parsed = Number(value);
@@ -17,6 +26,19 @@
   }
 
   function normalizeProfile(profile = {}, { conditional = false } = {}) {
+    const formula = effectRolls?.damageFormula?.(profile) || {
+      diceCount: Math.max(0, Math.floor(numberOr(profile.diceCount, 0))),
+      dieType: DIE_SIDES.includes(Number(profile.dieType))
+        ? Number(profile.dieType)
+        : Math.max(2, Math.floor(numberOr(profile.dieType, 6))),
+      diceCountMax: optionalMaximum(profile.diceCountMax),
+      staticValue: numberOr(profile.staticDamage, 0),
+      staticValueMax: optionalMaximum(profile.staticDamageMax),
+      diceCountScale: profile.diceCountScale || null,
+      staticValueScale: profile.staticDamageScale || null,
+      maximizeDice: Boolean(profile.maximizeDice),
+      valueMultiplier: Math.max(0, numberOr(profile.damageMultiplier, 1)),
+    };
     return {
       ...(conditional
         ? {
@@ -24,18 +46,16 @@
             appliesWhen: String(profile.appliesWhen || "").trim(),
           }
         : {}),
-      diceCount: Math.max(0, Math.floor(numberOr(profile.diceCount, 0))),
-      dieType: DIE_SIDES.includes(Number(profile.dieType))
-        ? Number(profile.dieType)
-        : Math.max(2, Math.floor(numberOr(profile.dieType, 6))),
-      diceCountMax: optionalMaximum(profile.diceCountMax),
-      staticDamage: numberOr(profile.staticDamage, 0),
-      staticDamageMax: optionalMaximum(profile.staticDamageMax),
+      diceCount: formula.diceCount,
+      dieType: formula.dieType,
+      diceCountMax: formula.diceCountMax,
+      staticDamage: formula.staticValue,
+      staticDamageMax: formula.staticValueMax,
       damageType: String(profile.damageType || "untyped").trim() || "untyped",
-      diceCountScale: profile.diceCountScale || null,
-      staticDamageScale: profile.staticDamageScale || null,
-      maximizeDice: Boolean(profile.maximizeDice),
-      damageMultiplier: Math.max(0, numberOr(profile.damageMultiplier, 1)),
+      diceCountScale: formula.diceCountScale,
+      staticDamageScale: formula.staticValueScale,
+      maximizeDice: formula.maximizeDice,
+      damageMultiplier: formula.valueMultiplier,
     };
   }
 
@@ -59,67 +79,8 @@
     return normalizeRolls(rolls).some((roll) => roll.conditionals.length > 0);
   }
 
-  function fallbackScaledValue(value, scale, context = {}) {
-    if (!scale) return numberOr(value, 0);
-    const source = scale.source || { type: "caster" };
-    const level =
-      source.type === "character"
-        ? numberOr(context.characterLevel, 1)
-        : source.type === "class"
-          ? numberOr(context.classLevels?.[source.className], context.classLevel || 1)
-          : numberOr(context.casterLevel, 1);
-    const multiplier = scale.levelMultiplier;
-    let total = numberOr(value, 0);
-    if (multiplier && numberOr(multiplier.denominator, 0) > 0) {
-      total += Math.floor(
-        (level * numberOr(multiplier.numerator, 0)) /
-          numberOr(multiplier.denominator, 1),
-      );
-    }
-    (Array.isArray(scale.milestones) ? scale.milestones : [])
-      .filter((entry) => numberOr(entry.level, 0) <= level)
-      .sort((a, b) => numberOr(a.level) - numberOr(b.level))
-      .forEach((entry) => {
-        total = numberOr(entry.value, total);
-      });
-    const every = scale.every || {};
-    const from = numberOr(every.fromLevel || every.afterLevel || every.after, 0);
-    const interval = numberOr(every.everyLevels || every.every, 0);
-    if (from > 0 && interval > 0 && level >= from) {
-      total +=
-        (Math.floor((level - from) / interval) + 1) *
-        numberOr(every.increase, 0);
-    }
-    const attributeBonuses = Array.isArray(scale.attributeBonuses)
-      ? scale.attributeBonuses
-      : scale.attributeBonus
-        ? [scale.attributeBonus]
-        : [];
-    attributeBonuses.forEach((entry) => {
-      const key = String(entry.ability || entry.attribute || "").toLowerCase();
-      const modifier = numberOr(context.abilityMods?.[key], 0);
-      total += Math.floor(
-        (modifier * Math.max(1, numberOr(entry.numerator, 1))) /
-          Math.max(1, numberOr(entry.denominator, 1)),
-      );
-    });
-    return scale.minimumOne ? Math.max(1, total) : total;
-  }
-
   function scaledValue(value, scale, context = {}) {
-    if (root?.PFBuffs?.scaledBonusValue) {
-      return root.PFBuffs.scaledBonusValue(
-        { value, bonusScale: scale },
-        {
-          casterLevel: context.casterLevel,
-          characterLevel: context.characterLevel,
-          classLevel: context.classLevel,
-          classLevels: context.classLevels,
-        },
-        context,
-      );
-    }
-    return fallbackScaledValue(value, scale, context);
+    return effectRolls?.scaledValue?.(value, scale, context) ?? numberOr(value, 0);
   }
 
   function selectedProfile(roll, conditionalIndex = -1) {
@@ -137,55 +98,54 @@
 
   function calculateRoll(roll, context = {}, conditionalIndex = -1) {
     const profile = selectedProfile(roll, conditionalIndex);
-    let diceCount = Math.max(
-      0,
-      Math.floor(scaledValue(profile.diceCount, profile.diceCountScale, context)),
-    );
-    let staticDamage = scaledValue(
-      profile.staticDamage,
-      profile.staticDamageScale,
+    const calculated = effectRolls?.calculateFormula?.(
+      effectRolls.damageFormula(profile),
       context,
-    );
-    if (profile.diceCountMax !== null)
-      diceCount = Math.min(diceCount, profile.diceCountMax);
-    if (profile.staticDamageMax !== null)
-      staticDamage = Math.min(staticDamage, profile.staticDamageMax);
-    const diceFormula = diceCount > 0 ? `${diceCount}d${profile.dieType}` : "";
-    const staticFormula = staticDamage
-      ? diceFormula
-        ? ` ${staticDamage >= 0 ? "+" : "-"} ${Math.abs(staticDamage)}`
-        : String(staticDamage)
-      : "";
-    const baseFormula = `${diceFormula}${staticFormula}` || "0";
+    ) || {
+      diceCount: profile.diceCount,
+      dieType: profile.dieType,
+      staticValue: profile.staticDamage,
+      maximizeDice: profile.maximizeDice,
+      valueMultiplier: profile.damageMultiplier,
+      formula: "0",
+    };
     return {
       label: normalizeRoll(roll).label,
       profileLabel: profile.profileLabel,
       appliesWhen: profile.appliesWhen || "",
-      diceCount,
-      dieType: profile.dieType,
-      staticDamage,
+      diceCount: calculated.diceCount,
+      dieType: calculated.dieType,
+      staticDamage: calculated.staticValue,
       damageType: profile.damageType,
-      ...(profile.maximizeDice ? { maximizeDice: true } : {}),
-      ...(profile.damageMultiplier !== 1
-        ? { damageMultiplier: profile.damageMultiplier }
+      ...(calculated.maximizeDice ? { maximizeDice: true } : {}),
+      ...(calculated.valueMultiplier !== 1
+        ? { damageMultiplier: calculated.valueMultiplier }
         : {}),
-      formula: `${baseFormula}${profile.maximizeDice && diceCount ? " (maximized)" : ""}${profile.damageMultiplier !== 1 ? ` x ${profile.damageMultiplier}` : ""}`,
+      formula: calculated.formula,
     };
   }
 
   function rollCalculated(calculated, random = Math.random) {
-    const dice = Array.from({ length: calculated.diceCount }, () =>
-      calculated.maximizeDice
-        ? calculated.dieType
-        : Math.floor(random() * calculated.dieType) + 1,
+    const result = effectRolls?.rollFormula?.(
+      {
+        diceCount: calculated.diceCount,
+        dieType: calculated.dieType,
+        staticValue: calculated.staticDamage,
+        maximizeDice: calculated.maximizeDice,
+        valueMultiplier: calculated.damageMultiplier,
+      },
+      {},
+      random,
     );
-    const subtotal =
-      dice.reduce((sum, value) => sum + value, 0) + calculated.staticDamage;
+    const dice = result?.dice || [];
+    const subtotal = result?.subtotal ?? calculated.staticDamage;
     return {
       ...calculated,
       dice,
       subtotal,
-      total: Math.floor(subtotal * numberOr(calculated.damageMultiplier, 1)),
+      total:
+        result?.total ??
+        Math.floor(subtotal * numberOr(calculated.damageMultiplier, 1)),
     };
   }
 
@@ -264,7 +224,7 @@
       descriptors.push(result.label);
     }
     if (result.profileLabel !== "Standard") descriptors.push(result.profileLabel);
-    return `<div class="damage-roll-result-label">Damage${sequence}${
+    return `<div class="damage-roll-result-label">${escapeHtml(activeLabels.resultNoun)}${sequence}${
       descriptors.length
         ? `<span class="damage-roll-result-descriptor"> &middot; ${escapeHtml(descriptors.join(" · "))}</span>`
         : ""
@@ -286,13 +246,13 @@
         ${
           hasDice
             ? `<div class="damage-roll-result-row"><span>Rolls</span><strong data-damage-roll-dice>${escapeHtml(rolling ? "0" : diceText)}</strong></div>
-              <div class="damage-roll-result-row"><span>Bonus</span><strong>${escapeHtml(signedValue(result.staticDamage))}</strong></div>
+              <div class="damage-roll-result-row"><span>${escapeHtml(activeLabels.staticLabel)}</span><strong>${escapeHtml(signedValue(result.staticDamage))}</strong></div>
               <hr class="damage-roll-total-divider">`
             : ""
         }
         <div class="damage-roll-result-row damage-roll-total-row"><span>Total</span><strong data-damage-roll-total>${escapeHtml(rolling && hasDice ? "..." : result.total)}</strong></div>
       </div>
-      <div class="damage-roll-result-note">${escapeHtml(result.formula)} ${escapeHtml(result.damageType)}</div>
+      <div class="damage-roll-result-note">${escapeHtml(result.formula)}${result.damageType ? ` ${escapeHtml(result.damageType)}` : ""}</div>
     </section>`;
   }
   function rollingHtml(results) {
@@ -324,9 +284,15 @@
       .map((result, index) => resultCardHtml(result, index, results.length))
       .join("")}</div>`;
   }
-  async function open({ title = "Damage", rolls = [], context = {} } = {}) {
+  async function open({
+    title = "Damage",
+    rolls = [],
+    context = {},
+    labels = {},
+  } = {}) {
     const normalized = normalizeRolls(rolls);
     if (!normalized.length || !root?.bootstrap?.Modal) return null;
+    activeLabels = { ...DEFAULT_LABELS, ...labels };
     const needsProfileChoice = requiresProfileChoice(normalized);
     const modalEl = ensureModal();
     const body = modalEl.querySelector("#damageRollModalBody");
@@ -338,7 +304,7 @@
       : "";
     dismiss.textContent = "Cancel";
     dismiss.disabled = false;
-    confirm.textContent = "Roll Damage";
+    confirm.textContent = activeLabels.rollButton;
     confirm.disabled = false;
     confirm.classList.remove("d-none");
     if (needsProfileChoice) {
@@ -441,6 +407,7 @@
     normalizeRoll,
     normalizeRolls,
     requiresProfileChoice,
+    scaledValue,
     calculateRoll,
     rollCalculated,
     open,

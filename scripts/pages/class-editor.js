@@ -3,7 +3,9 @@ let selectedIndex = -1;
 let searchTerm = "";
 let classDirectoryHandle = null;
 let projectDirectoryHandle = null;
+let poolCatalogs = [];
 let dirty = false;
+let decisionsOnly = false;
 
 const CLASS_GROUPS = [
   ["core", "Core"],
@@ -211,9 +213,30 @@ function classIndexEntry(entry) {
 }
 
 function classFilePayload(entry) {
-  const payload = cloneJson(entry);
-  delete payload.__classFile;
+  const {
+    __classFile: _classFile,
+    __classFeaturePoolCatalogs: _poolCatalogs,
+    ...source
+  } = entry;
+  const payload = cloneJson(source);
+  pruneUnusedClassFeaturePools(payload);
   return payload;
+}
+
+function pruneUnusedClassFeaturePools(entry) {
+  if (!entry.classFeaturePools || typeof entry.classFeaturePools !== "object")
+    return;
+  const referenced = new Set();
+  (entry.levelProgression || []).forEach((level) => {
+    (level.classFeatures || []).forEach((feature) => {
+      (feature.poolRefs || []).forEach((poolId) => referenced.add(poolId));
+    });
+  });
+  Object.keys(entry.classFeaturePools).forEach((poolId) => {
+    if (!referenced.has(poolId)) delete entry.classFeaturePools[poolId];
+  });
+  if (!Object.keys(entry.classFeaturePools).length)
+    delete entry.classFeaturePools;
 }
 
 function selectOptions(values, selected = "") {
@@ -399,7 +422,11 @@ function regenerateSpellcastingTablesFromControls() {
 }
 
 async function loadDefaultClasses() {
-  classes = (await PFClassData.loadAllClasses()).map(normalizeClass);
+  [classes, poolCatalogs] = await Promise.all([
+    PFClassData.loadAllClasses(),
+    PFClassData.loadAllPoolCatalogs(),
+  ]);
+  classes = classes.map(normalizeClass);
   ensureClassFiles(classes);
   selectedIndex = classes.length ? 0 : -1;
   setDirty(false);
@@ -414,13 +441,32 @@ async function loadDefaultClasses() {
 async function readClassesFromProjectDirectory(handle) {
   const dataDirectory = await handle.getDirectoryHandle("data");
   classDirectoryHandle = await dataDirectory.getDirectoryHandle("classes");
+  const poolDirectory = await dataDirectory.getDirectoryHandle(
+    "class-feature-pools",
+  );
+  const poolIndexHandle = await poolDirectory.getFileHandle("index.json");
+  const poolIndex = JSON.parse(await (await poolIndexHandle.getFile()).text());
+  poolCatalogs = await Promise.all(
+    (Array.isArray(poolIndex) ? poolIndex : []).map(async (entry) => {
+      const handle = await poolDirectory.getFileHandle(entry.file);
+      return {
+        ...JSON.parse(await (await handle.getFile()).text()),
+        __poolFile: entry.file,
+      };
+    }),
+  );
   const indexHandle = await classDirectoryHandle.getFileHandle("index.json");
   const index = JSON.parse(await (await indexHandle.getFile()).text());
   classes = await Promise.all(
     (Array.isArray(index) ? index : []).map(async (entry) => {
       const classHandle = await classDirectoryHandle.getFileHandle(entry.file);
       const cls = JSON.parse(await (await classHandle.getFile()).text());
-      return normalizeClass({ ...cls, __classFile: entry.file });
+      return normalizeClass(
+        PFClassData.withPoolCatalogs(
+          { ...cls, __classFile: entry.file },
+          poolCatalogs,
+        ),
+      );
     }),
   );
   ensureClassFiles(classes);
@@ -550,10 +596,11 @@ function filteredClassIndexes() {
     .map((entry, index) => ({ entry, index }))
     .filter(
       ({ entry }) =>
-        !term ||
-        String(entry.name || "")
-          .toLowerCase()
-          .includes(term),
+        (!decisionsOnly || classHasDecision(entry)) &&
+        (!term ||
+          String(entry.name || "")
+            .toLowerCase()
+            .includes(term)),
     )
     .sort(
       (a, b) =>
@@ -566,7 +613,7 @@ function filteredClassIndexes() {
 function renderClassList() {
   const indexes = filteredClassIndexes();
   el("classCount").innerHTML =
-    `${classes.length} classes${dirty ? ' <span class="dirty-dot" title="Unsaved changes"></span>' : ""}`;
+    `${indexes.length} of ${classes.length} classes${dirty ? ' <span class="dirty-dot" title="Unsaved changes"></span>' : ""}`;
   el("classList").innerHTML =
     indexes
       .map((index) => {
@@ -576,10 +623,13 @@ function renderClassList() {
           entry.type ||
           "class";
         return `
-      <button class="btn ${index === selectedIndex ? "btn-primary" : "btn-outline-light"} btn-sm" type="button" data-class-index="${index}">
-        <span>${escapeHtml(entry.name || "Unnamed Class")}</span>
-        <span class="class-type">${escapeHtml(group)}</span>
-      </button>
+      <div class="admin-review-list-row">
+        <button class="btn ${index === selectedIndex ? "btn-primary" : "btn-outline-light"} btn-sm" type="button" data-class-index="${index}">
+          <span>${escapeHtml(entry.name || "Unnamed Class")}</span>
+          <span class="class-type">${escapeHtml(group)}</span>
+        </button>
+        ${PFAdminReviewMarker.buttonHtml(entry, `data-review-class-index="${index}"`, "class")}
+      </div>
     `;
       })
       .join("") || `<div class="small-text">No matching classes.</div>`;
@@ -593,6 +643,18 @@ function renderClassList() {
         renderSelectedClass();
       });
     });
+  el("classList")
+    .querySelectorAll("[data-review-class-index]")
+    .forEach((button) => {
+      button.addEventListener("click", (event) => {
+        event.stopPropagation();
+        commitSelectedClass();
+        PFAdminReviewMarker.toggle(
+          classes[Number(button.dataset.reviewClassIndex)],
+        );
+        setDirty(true);
+      });
+    });
 }
 
 function levelFeatureSummary(feature) {
@@ -602,56 +664,58 @@ function levelFeatureSummary(feature) {
     : "";
 }
 
-// How many pools in the whole class currently share this name -- classes
-// with a choice that repeats at every N levels (rage powers, discoveries,
-// talents, ...) end up with one separate pool object per level. Only shown
-// when there's actually something else to sync to.
-function poolNameCount(name) {
-  const cls = classes[selectedIndex];
-  if (!cls || !name) return 0;
-  let count = 0;
-  cls.levelProgression.forEach((level) => {
-    (level.classFeatures || []).forEach((feature) => {
-      featurePools(feature).forEach((pool) => {
-        if (pool.name === name) count += 1;
-      });
-    });
-  });
-  return count;
-}
-
 function levelFeaturePools(feature, levelIndex, featureIndex) {
-  const pools = Array.isArray(feature.pools)
-    ? feature.pools
-    : Array.isArray(feature.choicePools)
-      ? feature.choicePools
-      : [];
+  const pools = featurePools(feature);
   if (!pools.length) return "";
   return `
     <div class="feature-pools">
       ${pools
-        .map((pool, poolIndex) => {
-          const duplicateCount = poolNameCount(pool.name);
-          return `
+        .map(
+          (pool, poolIndex) => `
         <div class="feature-pool-pill-row">
           <button class="btn btn-link p-0 text-decoration-none feature-pool-pill" type="button" data-level-index="${levelIndex}" data-feature-index="${featureIndex}" data-pool-index="${poolIndex}" data-edit-pool>
             <i class="bi bi-list-stars"></i> ${escapeHtml(pool.name || "Pool")} choices (${Array.isArray(pool.options) ? pool.options.length : 0})
           </button>
-          ${
-            duplicateCount > 1
-              ? `
-            <button class="btn btn-outline-info btn-sm feature-pool-sync-btn" type="button" data-level-index="${levelIndex}" data-feature-index="${featureIndex}" data-pool-index="${poolIndex}" data-sync-pool title="Copy this pool's settings and choice effects to the other ${duplicateCount - 1} &quot;${escapeHtml(pool.name || "")}&quot; pool(s) in this class" aria-label="Sync pool to other levels">
-              <i class="bi bi-arrow-repeat"></i>
-            </button>
-          `
-              : ""
-          }
         </div>
-      `;
-        })
+      `,
+        )
         .join("")}
     </div>
   `;
+}
+
+function normalizedDecisionName(value = "") {
+  return String(value || "")
+    .trim()
+    .toLowerCase();
+}
+
+function classFeatureHasDecision(cls, feature) {
+  if (window.PFEffectDecisions.hasDecision(feature)) return true;
+  if (
+    featurePools(feature, cls).some((pool) =>
+      window.PFEffectDecisions.hasDecision(pool),
+    )
+  )
+    return true;
+  const abilityName = normalizedDecisionName(
+    feature.abilityName || feature.name,
+  );
+  return Object.values(cls.classFeaturePools || {}).some(
+    (pool) =>
+      pool?.chooseContributionsOnActivate === true &&
+      normalizedDecisionName(pool.contributesToAbility) === abilityName,
+  );
+}
+
+function classHasDecision(cls) {
+  const { __classFeaturePoolCatalogs: _catalogs, ...definition } = cls;
+  if (window.PFEffectDecisions.hasDecision(definition)) return true;
+  return (cls.levelProgression || []).some((level) =>
+    (level.classFeatures || []).some((feature) =>
+      classFeatureHasDecision(cls, feature),
+    ),
+  );
 }
 
 function renderSelectedClass() {
@@ -795,6 +859,20 @@ function renderSelectedClass() {
       );
     });
   el("classEditorPanel")
+    .querySelectorAll("[data-review-feature]")
+    .forEach((button) => {
+      button.addEventListener("click", () => {
+        commitSelectedClass();
+        const feature =
+          classes[selectedIndex].levelProgression[
+            Number(button.dataset.levelIndex)
+          ].classFeatures[Number(button.dataset.featureIndex)];
+        PFAdminReviewMarker.toggle(feature);
+        setDirty(true);
+        renderSelectedClass();
+      });
+    });
+  el("classEditorPanel")
     .querySelectorAll("[data-edit-feature]")
     .forEach((button) => {
       button.addEventListener("click", () =>
@@ -835,25 +913,18 @@ function renderSelectedClass() {
         ),
       );
     });
-  el("classEditorPanel")
-    .querySelectorAll("[data-sync-pool]")
-    .forEach((button) => {
-      button.addEventListener("click", () =>
-        syncPoolAcrossLevels(
-          Number(button.dataset.levelIndex),
-          Number(button.dataset.featureIndex),
-          Number(button.dataset.poolIndex),
-        ),
-      );
-    });
 }
 
 function renderLevelCard(level, index) {
   const features = Array.isArray(level.classFeatures)
     ? level.classFeatures
     : [];
+  const cls = classes[selectedIndex] || {};
+  const levelHasDecision = features.some((feature) =>
+    classFeatureHasDecision(cls, feature),
+  );
   return `
-    <article class="level-card" data-level-index="${index}">
+    <article class="level-card ${decisionsOnly && !levelHasDecision ? "d-none" : ""}" data-level-index="${index}">
       <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
         <strong>Level ${level.level}</strong>
         <button class="btn btn-outline-info btn-sm" type="button" data-add-feature="${index}">
@@ -871,7 +942,7 @@ function renderLevelCard(level, index) {
           features
             .map(
               (feature, featureIndex) => `
-          <div class="feature-row">
+          <div class="feature-row ${decisionsOnly && !classFeatureHasDecision(cls, feature) ? "d-none" : ""}">
             <div>
               <strong>${escapeHtml(feature.name || "Class Feature")}</strong>
               <div class="small-text">${escapeHtml(String(feature.description || "").slice(0, 180))}${String(feature.description || "").length > 180 ? "..." : ""}</div>
@@ -879,6 +950,7 @@ function renderLevelCard(level, index) {
               ${levelFeaturePools(feature, index, featureIndex)}
             </div>
             <div class="d-flex gap-1">
+              ${PFAdminReviewMarker.buttonHtml(feature, `data-level-index="${index}" data-feature-index="${featureIndex}" data-review-feature`, "class ability")}
               <button class="btn btn-outline-info btn-sm btn-icon" type="button" data-level-index="${index}" data-feature-index="${featureIndex}" data-add-pool aria-label="Add pool"><i class="bi bi-diagram-3"></i></button>
               <button class="btn btn-outline-warning btn-sm btn-icon" type="button" data-level-index="${index}" data-feature-index="${featureIndex}" data-edit-feature aria-label="Edit feature"><i class="bi bi-pencil-square"></i></button>
               <button class="btn btn-outline-danger btn-sm btn-icon" type="button" data-level-index="${index}" data-feature-index="${featureIndex}" data-delete-feature aria-label="Delete feature"><i class="bi bi-trash"></i></button>
@@ -984,10 +1056,12 @@ async function editClassFeature(levelIndex, featureIndex) {
   commitSelectedClass();
   const features =
     classes[selectedIndex].levelProgression[levelIndex].classFeatures;
-  const feature = await PFClassFeatureEditor.open(
-    cloneJson(features[featureIndex]),
-  );
+  const existingFeature = features[featureIndex];
+  const feature = await PFClassFeatureEditor.open(cloneJson(existingFeature));
   if (!feature) return;
+  if (Array.isArray(existingFeature.poolRefs))
+    feature.poolRefs = [...existingFeature.poolRefs];
+  if (existingFeature.needsReview) feature.needsReview = true;
   features[featureIndex] = feature;
   setDirty(true);
   renderSelectedClass();
@@ -1000,17 +1074,33 @@ function deleteClassFeature(levelIndex, featureIndex) {
     featureIndex,
     1,
   );
+  pruneUnusedClassFeaturePools(classes[selectedIndex]);
   setDirty(true);
   renderSelectedClass();
 }
 
-function featurePools(feature) {
-  if (!Array.isArray(feature.pools))
-    feature.pools = Array.isArray(feature.choicePools)
-      ? feature.choicePools
-      : [];
-  delete feature.choicePools;
-  return feature.pools;
+function featurePoolRefs(feature) {
+  if (!Array.isArray(feature.poolRefs)) feature.poolRefs = [];
+  return feature.poolRefs;
+}
+
+function featurePools(feature, cls = classes[selectedIndex]) {
+  return window.PFClassData?.featurePools?.(cls, feature) || [];
+}
+
+function nextPoolCatalogId(cls, feature, pool) {
+  if (!cls.classFeaturePools || typeof cls.classFeaturePools !== "object")
+    cls.classFeaturePools = {};
+  const base = slugifyClassName(
+    `${feature.name || "feature"}-${pool.name || "pool"}`,
+  );
+  let id = base;
+  let suffix = 2;
+  while (cls.classFeaturePools[id]) {
+    id = `${base}-${suffix}`;
+    suffix += 1;
+  }
+  return id;
 }
 
 async function addFeaturePool(levelIndex, featureIndex) {
@@ -1019,9 +1109,24 @@ async function addFeaturePool(levelIndex, featureIndex) {
     classes[selectedIndex].levelProgression[levelIndex].classFeatures[
       featureIndex
     ];
-  const pool = await PFClassFeaturePoolEditor.open({});
+  const pool = await PFClassFeaturePoolPicker.open(poolCatalogs);
   if (!pool) return;
-  featurePools(feature).push(pool);
+  const cls = classes[selectedIndex];
+  if (!cls.classFeaturePools || typeof cls.classFeaturePools !== "object")
+    cls.classFeaturePools = {};
+  const poolId = nextPoolCatalogId(cls, feature, pool);
+  cls.classFeaturePools[poolId] = {
+    name: pool.name || pool.id,
+    description: pool.description || "",
+    requirements: {},
+    catalog: pool.id,
+  };
+  cls.__classFeaturePoolCatalogs = cls.__classFeaturePoolCatalogs || {};
+  cls.__classFeaturePoolCatalogs[pool.id] = PFClassData.withPoolCatalogs(
+    cls,
+    [pool],
+  ).__classFeaturePoolCatalogs[pool.id];
+  featurePoolRefs(feature).push(poolId);
   setDirty(true);
   renderSelectedClass();
 }
@@ -1032,139 +1137,13 @@ async function editFeaturePool(levelIndex, featureIndex, poolIndex) {
     classes[selectedIndex].levelProgression[levelIndex].classFeatures[
       featureIndex
     ];
-  const pools = featurePools(feature);
-  const pool = await PFClassFeaturePoolEditor.open(
-    cloneJson(pools[poolIndex] || {}),
-  );
-  if (!pool) return;
-  pools[poolIndex] = pool;
-  setDirty(true);
-  renderSelectedClass();
-}
-
-// Copies contributesToAbility, plus each choice's effects/DR/activatable/
-// duration (matched by choice name), from this pool onto every other pool
-// in the class sharing its name -- so linking "Rage Power" to Rage, or
-// giving Superstition an effect, doesn't have to be repeated once per
-// level it's re-offered at.
-function syncPoolAcrossLevels(levelIndex, featureIndex, poolIndex) {
-  commitSelectedClass();
   const cls = classes[selectedIndex];
-  const sourceFeature = cls.levelProgression[levelIndex]?.classFeatures?.[featureIndex];
-  const sourcePool = featurePools(sourceFeature || {})[poolIndex];
-  if (!sourcePool?.name) return;
-
-  let syncedPools = 0;
-  let syncedChoices = 0;
-  cls.levelProgression.forEach((level, lvlIdx) => {
-    (level.classFeatures || []).forEach((feature, featIdx) => {
-      featurePools(feature).forEach((pool, poolIdx) => {
-        if (
-          lvlIdx === levelIndex &&
-          featIdx === featureIndex &&
-          poolIdx === poolIndex
-        )
-          return;
-        if (pool.name !== sourcePool.name) return;
-        syncedPools += 1;
-        if (sourcePool.contributesToAbility)
-          pool.contributesToAbility = sourcePool.contributesToAbility;
-        else delete pool.contributesToAbility;
-        if (sourcePool.chooseContributionsOnActivate)
-          pool.chooseContributionsOnActivate = true;
-        else delete pool.chooseContributionsOnActivate;
-        (pool.options || []).forEach((option) => {
-          const match = (sourcePool.options || []).find(
-            (candidate) => candidate.name === option.name,
-          );
-          if (!match) return;
-          let changed = false;
-          [
-            "effects",
-            "damageReduction",
-            "spellResistance",
-            "immunities",
-            "applyConditions",
-            "classSkillGrants",
-            "useUntrained",
-            "bonusRanks",
-            "extraRanksPerLevel",
-            "featGrants",
-            "sizeChanges",
-            "spellLikeAbilities",
-            "casterLevelBonuses",
-            "spellDcBonuses",
-            "effectiveAttributeBonuses",
-            "grantDomains",
-            "generatedEquipment",
-            "conditionalVariables",
-            "damageRolls",
-          ].forEach((key) => {
-            if (Array.isArray(match[key]) && match[key].length) {
-              option[key] = cloneJson(match[key]);
-              changed = true;
-            } else if (option[key]) {
-              delete option[key];
-              changed = true;
-            }
-          });
-          if (match.activatable) {
-            if (!option.activatable) changed = true;
-            option.activatable = true;
-            option.durationConfig = match.durationConfig
-              ? cloneJson(match.durationConfig)
-              : option.durationConfig;
-          } else if (option.activatable) {
-            delete option.activatable;
-            delete option.durationConfig;
-            changed = true;
-          }
-          // A prerequisite (min level, race, required prior choices,
-          // the notes text, the exclusive-group tag) is a property of
-          // the OPTION itself -- "Celestial Totem requires Barbarian 8
-          // and Lesser Celestial Totem" is true everywhere that option
-          // appears, not just at the one level slot someone happened to
-          // fill it in on. Sync the whole requirements object so a gap
-          // at one level (like a missing requiredChoices link) can't
-          // silently make that option look unearned everywhere else.
-          ["minClassLevel", "race", "requiredChoices", "text", "excludesGroup"].forEach(
-            (reqKey) => {
-              const matchVal = match.requirements?.[reqKey];
-              const optionVal = option.requirements?.[reqKey];
-              const matchHas = Array.isArray(matchVal)
-                ? matchVal.length
-                : matchVal !== undefined && matchVal !== null && matchVal !== "";
-              if (matchHas) {
-                if (JSON.stringify(optionVal) !== JSON.stringify(matchVal)) {
-                  option.requirements = option.requirements || {};
-                  option.requirements[reqKey] = cloneJson(matchVal);
-                  changed = true;
-                }
-              } else if (optionVal !== undefined) {
-                delete option.requirements[reqKey];
-                changed = true;
-              }
-            },
-          );
-          if (
-            option.requirements &&
-            !Object.keys(option.requirements).length
-          )
-            delete option.requirements;
-          if (changed) syncedChoices += 1;
-        });
-      });
-    });
-  });
-
-  setDirty(true);
-  renderSelectedClass();
-  setStatus(
-    syncedPools
-      ? `Synced "${sourcePool.name}" to ${syncedPools} other pool${syncedPools === 1 ? "" : "s"} (${syncedChoices} matching choice${syncedChoices === 1 ? "" : "s"} updated).`
-      : `No other "${sourcePool.name}" pools found to sync.`,
-    syncedPools ? "success" : "warning",
-  );
+  const refs = featurePoolRefs(feature);
+  const poolId = refs[poolIndex];
+  if (!poolId) return;
+  const catalogId = cls.classFeaturePools?.[poolId]?.catalog;
+  if (!catalogId) return;
+  window.location.href = `class-feature-pool-editor.html?catalog=${encodeURIComponent(catalogId)}`;
 }
 
 async function initClassEditor() {
@@ -1183,6 +1162,17 @@ el("classSearch").addEventListener("input", (event) => {
   searchTerm = event.target.value;
   renderClassList();
 });
+window.PFEffectDecisions.bindFilterButton(
+  el("classDecisionFilter"),
+  (active) => {
+    commitSelectedClass();
+    decisionsOnly = active;
+    const indexes = filteredClassIndexes();
+    if (!indexes.includes(selectedIndex)) selectedIndex = indexes[0] ?? -1;
+    renderClassList();
+    renderSelectedClass();
+  },
+);
 el("openProjectFolderBtn").addEventListener("click", async () => {
   try {
     await openProjectFolder();

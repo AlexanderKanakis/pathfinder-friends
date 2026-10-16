@@ -49,8 +49,30 @@ const baseSpell = () => ({
     saving_throw: "Reflex half",
   },
   activeMechanics: {
-    effects: [{ stat: "attack", value: 2, type: "morale" }],
-    applyConditions: [],
+    effects: [
+      { stat: "attack", value: 2, type: "morale" },
+      {
+        stat: "healing",
+        value: 2,
+        diceCount: 1,
+        dieType: 8,
+        diceCountScale: null,
+        bonusScale: null,
+      },
+    ],
+    applyConditions: [
+      {
+        conditionAdjustment: {
+          mode: "apply",
+          ability: "constitution",
+          staticValue: 1,
+          diceCount: 1,
+          dieType: 4,
+          diceCountScale: null,
+          staticValueScale: null,
+        },
+      },
+    ],
     auraConfig: { enabled: true, rangeFeet: 20 },
     durationConfig: {
       count: 1,
@@ -106,9 +128,16 @@ assert.equal(transformed.calculations.effectiveSpellLevel, 5);
 assert.equal(transformed.calculations.effectiveSlotLevel, 17);
 assert.equal(transformed.calculations.spellDc.total, 22, "Heighten and Focused should add four to DC.");
 assert.equal(transformed.spell.details.duration, "2 rounds/level");
-assert.equal(transformed.spell.activeMechanics.durationConfig.count, 2);
+assert.equal(transformed.spell.activeMechanics.durationConfig.staticValue, 2);
 assert.equal(transformed.spell.activeMechanics.auraConfig.rangeFeet, 40);
 assert.equal(transformed.spell.activeMechanics.effects[0].value, 3);
+const transformedHealing = transformed.spell.activeMechanics.effects[1];
+assert.equal(transformedHealing.maximizeDice, true);
+assert.equal(transformedHealing.valueMultiplier, 1.5);
+const transformedCondition =
+  transformed.spell.activeMechanics.applyConditions[0].conditionAdjustment;
+assert.equal(transformedCondition.maximizeDice, true);
+assert.equal(transformedCondition.valueMultiplier, 1.5);
 const transformedRoll = transformed.spell.activeMechanics.damageRolls[0];
 assert.equal(transformedRoll.diceCountMax, 15);
 assert.equal(transformedRoll.maximizeDice, true);
@@ -192,7 +221,7 @@ const characterSheet = read(path.join("scripts", "pages", "character-sheet.js"))
 assert(characterSheet.includes("function spellTargetPayloadHasMechanics"));
 assert.equal(
   (characterSheet.match(/spellTargetPayloadHasMechanics\(/g) || []).length,
-  3,
+  4,
   "Runtime metamagic bonuses must be recognized both before target selection and before application.",
 );
 const tracker = read(path.join("scripts", "buff-tracker-widget.js"));

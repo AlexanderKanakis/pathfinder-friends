@@ -1,0 +1,16 @@
+{
+  "id": "investigator-investigator-talent",
+  "name": "Investigator Talent",
+  "description": "",
+  "options": [
+    {
+      "name": "Investigator Talent (Ex) Or",
+      "description": "At 3rd level and every 2 levels thereafter, an investigator gains an investigator talent. Except where otherwise noted, each investigator talent can only be selected once. Investigator talents marked with an asterisk (*) add effects to an investigator&#8217;s studied combat or studied strike. Only one of these talents can be applied to an individual attack, but the decision can be made when the damage is dealt.. A complete listing of investigator talents can be found here: Investigator Talents",
+      "requirements": {
+        "minClassLevel": 2,
+        "text": "At 3rd level and every 2 levels thereafter, an investigator gains an investigator talent. Except where otherwise noted, each investigator talent can only be selected once."
+      },
+      "scrapeConfidence": "medium"
+    }
+  ]
+}

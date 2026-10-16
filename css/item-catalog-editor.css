@@ -31,7 +31,7 @@ body {
   overflow: auto;
 }
 
-.item-list button {
+.item-list [data-item-index] {
   text-align: left;
   display: flex;
   align-items: stretch;

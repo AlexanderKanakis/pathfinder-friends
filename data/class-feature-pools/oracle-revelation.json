@@ -1,0 +1,16 @@
+{
+  "id": "oracle-revelation",
+  "name": "Revelation",
+  "description": "At 1st level, 3rd level, and every four levels thereafter (7th, 11th, and so on), an oracle uncovers a new secret about her mystery that grants her powers and abilities. The oracle must select a revelation from the list of revelations available to her mystery (see FAQ at right). If a revelation is chosen at a later level, the oracle gains all of the abilities and bonuses granted by that revelation based on her current level. Unless otherwise noted, activating the power of a revelation is a standard action . Unless otherwise noted, the DC to save against these revelations is equal to 10 + 1/2 the oracleÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢s level + the oracleÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢s Charisma modifier. Editor's Note Can an oracle select a revelation more than once? No, unless the revelation specifically states you can. [ Source ]",
+  "options": [
+    {
+      "name": "Final Revelation",
+      "description": "At 20th level, an oracle learns the final revelation about her mystery, granting her amazing powers and abilities. The nature of these bonuses depends upon the oracleÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢s mystery.",
+      "requirements": {
+        "minClassLevel": 20,
+        "text": "At 20th level, an oracle learns the final revelation about her mystery, granting her amazing powers and abilities."
+      },
+      "scrapeConfidence": "medium"
+    }
+  ]
+}

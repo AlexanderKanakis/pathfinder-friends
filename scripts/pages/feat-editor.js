@@ -2,6 +2,7 @@ let featData = { source: "", sheet: "", generatedAt: "", types: [], feats: [] };
 let selectedIndex = -1;
 let searchTerm = "";
 let typeFilter = "";
+let decisionsOnly = false;
 let projectDirectoryHandle = null;
 let dataDirectoryHandle = null;
 let dirty = false;
@@ -323,6 +324,7 @@ function filteredFeatIndexes() {
         .toLowerCase();
       return (
         (!typeFilter || (feat.types || []).includes(typeFilter) || feat.type === typeFilter) &&
+        (!decisionsOnly || window.PFEffectDecisions.hasDecision(feat)) &&
         (!term || haystack.includes(term))
       );
     })
@@ -337,16 +339,19 @@ function filteredFeatIndexes() {
 function renderFeatList() {
   const indexes = filteredFeatIndexes();
   el("featCount").innerHTML =
-    `${(featData.feats || []).length} feats${dirty ? ' <span class="dirty-dot" title="Unsaved changes"></span>' : ""}`;
+    `${indexes.length} of ${(featData.feats || []).length} feats${dirty ? ' <span class="dirty-dot" title="Unsaved changes"></span>' : ""}`;
   el("featList").innerHTML =
     indexes
       .map((index) => {
         const feat = featData.feats[index];
         return `
-          <button class="btn ${index === selectedIndex ? "btn-primary" : "btn-outline-light"} btn-sm" type="button" data-feat-index="${index}">
-            <span class="feat-list-name">${escapeHtml(feat.name || "Unnamed Feat")}</span>
-            <span class="feat-type">${escapeHtml(feat.type || "")}</span>
-          </button>
+          <div class="admin-review-list-row">
+            <button class="btn ${index === selectedIndex ? "btn-primary" : "btn-outline-light"} btn-sm" type="button" data-feat-index="${index}">
+              <span class="feat-list-name">${escapeHtml(feat.name || "Unnamed Feat")}</span>
+              <span class="feat-type">${escapeHtml(feat.type || "")}</span>
+            </button>
+            ${PFAdminReviewMarker.buttonHtml(feat, `data-review-feat-index="${index}"`, "feat")}
+          </div>
         `;
       })
       .join("") || `<div class="small-text">No matching feats.</div>`;
@@ -359,6 +364,18 @@ function renderFeatList() {
         selectedIndex = Number(button.dataset.featIndex);
         renderFeatList();
         renderSelectedFeat();
+      });
+    });
+  el("featList")
+    .querySelectorAll("[data-review-feat-index]")
+    .forEach((button) => {
+      button.addEventListener("click", (event) => {
+        event.stopPropagation();
+        commitSelectedFeat();
+        PFAdminReviewMarker.toggle(
+          featData.feats[Number(button.dataset.reviewFeatIndex)],
+        );
+        setDirty(true);
       });
     });
 }
@@ -586,12 +603,22 @@ function commitSelectedFeat() {
     casterLevelBonuses: extras.casterLevelBonuses || [],
     spellDcBonuses: extras.spellDcBonuses || [],
     effectiveAttributeBonuses: extras.effectiveAttributeBonuses || [],
+    attributeContributions: extras.attributeContributions || [],
     grantDomains: extras.grantDomains || [],
     generatedEquipment: extras.generatedEquipment || [],
+    summonCreatures: extras.summonCreatures || [],
+    weaponExtraDamage: extras.weaponExtraDamage || [],
+    weaponDamageSizeChanges: extras.weaponDamageSizeChanges || [],
     conditionalVariables: extras.conditionalVariables || [],
+    attackRolls: extras.attackRolls || [],
     damageRolls: extras.damageRolls || [],
+    d20Boosts: extras.d20Boosts || [],
+    ...(extras.decisionOwner
+      ? { decisionOwner: extras.decisionOwner }
+      : {}),
     activeMechanics: extras.activeMechanics,
   });
+  if (!extras.decisionOwner) delete next.decisionOwner;
 
   featData.feats[selectedIndex] = next;
   rebuildTypeGroups();
@@ -758,6 +785,15 @@ async function initFeatEditor() {
 el("featSearch").addEventListener("input", (event) => {
   searchTerm = event.target.value;
   renderFeatList();
+});
+
+window.PFEffectDecisions.bindFilterButton(el("featDecisionFilter"), (active) => {
+  commitSelectedFeat();
+  decisionsOnly = active;
+  const indexes = filteredFeatIndexes();
+  if (!indexes.includes(selectedIndex)) selectedIndex = indexes[0] ?? -1;
+  renderFeatList();
+  renderSelectedFeat();
 });
 
 el("featTypeFilter").addEventListener("change", (event) => {

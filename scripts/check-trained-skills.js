@@ -11,6 +11,7 @@ global.localStorage = {
 };
 global.window = {};
 require(path.join(rootDir, "scripts", "effect-stat-options.js"));
+require(path.join(rootDir, "scripts", "buff-calculator.js"));
 
 const stats = global.window.PFEffectStats;
 assert(stats, "PFEffectStats did not initialize.");
@@ -62,6 +63,51 @@ async function main() {
   );
   assert(sheetSource.includes('el(`${id}Total`).value = usable'), "Sheet totals must be blanked when unusable.");
   assert(sheetSource.includes('classList.toggle("is-untrained-skill", !usable)'), "Unusable rows must be visually marked.");
+  assert(
+    sheetSource.includes(
+      'if (isKnowledgeSkill(name)) return "knowledge skill checks";',
+    ),
+    "Knowledge-wide bonuses must be included in each Knowledge skill total.",
+  );
+
+  const skald = JSON.parse(
+    fs.readFileSync(path.join(rootDir, "data", "classes", "skald.json"), "utf8"),
+  );
+  const bardicKnowledge = skald.levelProgression
+    .flatMap((level) => level.classFeatures || [])
+    .find((feature) => feature.name === "Bardic Knowledge");
+  assert(bardicKnowledge, "Skald Bardic Knowledge must exist.");
+  const calculation = global.window.PFBuffs.calculateStatsDetailed(
+    [{ name: bardicKnowledge.name, bonuses: bardicKnowledge.effects }],
+    {
+      characterLevel: 11,
+      classLevels: { Skald: 11 },
+      skillRanks: {},
+    },
+  );
+  assert.strictEqual(
+    calculation.bonuses["knowledge skill checks"],
+    5,
+    "An 11th-level Skald must receive +5 on every Knowledge skill check.",
+  );
+  const firstLevelCalculation = global.window.PFBuffs.calculateStatsDetailed(
+    [{ name: bardicKnowledge.name, bonuses: bardicKnowledge.effects }],
+    {
+      characterLevel: 1,
+      classLevels: { Skald: 1 },
+      skillRanks: {},
+    },
+  );
+  assert.strictEqual(
+    firstLevelCalculation.bonuses["knowledge skill checks"],
+    1,
+    "A 1st-level Skald must receive Bardic Knowledge's minimum +1.",
+  );
+  assert.strictEqual(
+    bardicKnowledge.effects[0].bonusScale.minimumOne,
+    true,
+    "Bardic Knowledge must retain its minimum +1 at 1st level.",
+  );
 
   const mapSource = fs.readFileSync(
     path.join(rootDir, "scripts", "pages", "map.js"),

@@ -1,0 +1,122 @@
+[
+  {
+    "id": "rogue-advanced-talents",
+    "name": "Advanced Talents",
+    "file": "rogue-advanced-talents.json"
+  },
+  {
+    "id": "rogue-unchained-advanced-talents",
+    "name": "Advanced Talents",
+    "file": "rogue-unchained-advanced-talents.json"
+  },
+  {
+    "id": "slayer-advanced-talents",
+    "name": "Advanced Talents",
+    "file": "slayer-advanced-talents.json"
+  },
+  {
+    "id": "arcanist-arcanist-exploit",
+    "name": "Arcanist Exploit",
+    "file": "arcanist-arcanist-exploit.json"
+  },
+  {
+    "id": "devoted-muse-deeds",
+    "name": "Deeds",
+    "file": "devoted-muse-deeds.json"
+  },
+  {
+    "id": "gunslinger-deeds",
+    "name": "Deeds",
+    "file": "gunslinger-deeds.json"
+  },
+  {
+    "id": "swashbuckler-deeds",
+    "name": "Deeds",
+    "file": "swashbuckler-deeds.json"
+  },
+  {
+    "id": "alchemist-discovery",
+    "name": "Discovery",
+    "file": "alchemist-discovery.json"
+  },
+  {
+    "id": "inquisitor-exploit-weakness",
+    "name": "Exploit Weakness",
+    "file": "inquisitor-exploit-weakness.json"
+  },
+  {
+    "id": "alchemist-grand-discovery",
+    "name": "Grand Discovery",
+    "file": "alchemist-grand-discovery.json"
+  },
+  {
+    "id": "witch-grand-hex",
+    "name": "Grand Hex",
+    "file": "witch-grand-hex.json"
+  },
+  {
+    "id": "arcanist-greater-exploits",
+    "name": "Greater Exploits",
+    "file": "arcanist-greater-exploits.json"
+  },
+  {
+    "id": "shaman-hex",
+    "name": "Hex",
+    "file": "shaman-hex.json"
+  },
+  {
+    "id": "witch-hex",
+    "name": "Hex",
+    "file": "witch-hex.json"
+  },
+  {
+    "id": "investigator-investigator-talent",
+    "name": "Investigator Talent",
+    "file": "investigator-investigator-talent.json"
+  },
+  {
+    "id": "monk-unchained-ki-power",
+    "name": "Ki Power",
+    "file": "monk-unchained-ki-power.json"
+  },
+  {
+    "id": "student-of-perfection-ki-power",
+    "name": "Ki Power",
+    "file": "student-of-perfection-ki-power.json"
+  },
+  {
+    "id": "witch-major-hex",
+    "name": "Major Hex",
+    "file": "witch-major-hex.json"
+  },
+  {
+    "id": "rage-powers",
+    "name": "Rage Power",
+    "file": "rage-powers.json"
+  },
+  {
+    "id": "unchained-rage-powers",
+    "name": "Rage Power",
+    "file": "unchained-rage-powers.json"
+  },
+  {
+    "id": "oracle-revelation",
+    "name": "Revelation",
+    "file": "oracle-revelation.json"
+  },
+  {
+    "id": "rogue-rogue-talent",
+    "name": "Rogue Talent",
+    "file": "rogue-rogue-talent.json"
+  },
+  {
+    "id": "rogue-unchained-rogue-talent",
+    "name": "Rogue Talent",
+    "file": "rogue-unchained-rogue-talent.json"
+  },
+  {
+    "id": "slayer-slayer-talent",
+    "name": "Slayer Talent",
+    "file": "slayer-slayer-talent.json"
+  }
+]

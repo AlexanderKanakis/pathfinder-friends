@@ -16,10 +16,16 @@
     "casterLevelBonuses",
     "spellDcBonuses",
     "effectiveAttributeBonuses",
+    "attributeContributions",
     "grantDomains",
     "generatedEquipment",
+    "summonCreatures",
+    "weaponExtraDamage",
+    "weaponDamageSizeChanges",
     "conditionalVariables",
+    "attackRolls",
     "damageRolls",
+    "d20Boosts",
   ];
 
   let featDataCache = null;

@@ -1,0 +1,24 @@
+.effect-healing-formula {
+  display: contents;
+}
+
+.effect-healing-formula > div {
+  min-width: 0;
+}
+
+.shared-bonus-row.is-instant-healing .effect-value-field {
+  grid-column: 1;
+}
+
+.shared-effect-number-stepper {
+  width: 100%;
+}
+
+.shared-effect-number-stepper input {
+  min-width: 42px;
+}
+
+.shared-condition-adjustment {
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+}
+

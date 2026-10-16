@@ -3,6 +3,7 @@ let selectedIndex = -1;
 let searchTerm = "";
 let schoolFilter = "";
 let levelFilter = "";
+let decisionsOnly = false;
 let projectDirectoryHandle = null;
 let dataDirectoryHandle = null;
 let dirty = false;
@@ -26,8 +27,13 @@ const SPELL_EFFECT_EXTRA_KEYS = window.PFEffectMechanics?.extraKeys?.() || [
   "effectiveAttributeBonuses",
   "grantDomains",
   "generatedEquipment",
+  "summonCreatures",
+  "weaponExtraDamage",
+  "weaponDamageSizeChanges",
   "conditionalVariables",
+  "attackRolls",
   "damageRolls",
+    "d20Boosts",
 ];
 
 function el(id) {
@@ -178,6 +184,7 @@ function filteredSpellIndexes() {
       return (
         (!schoolFilter || spellSchool(spell) === schoolFilter) &&
         (!levelFilter || levels.includes(Number(levelFilter))) &&
+        (!decisionsOnly || window.PFEffectDecisions.hasDecision(spell)) &&
         (!term || spellSearchHaystack(spell).includes(term))
       );
     })
@@ -197,7 +204,7 @@ function groupLabelFor(spell = {}) {
 function renderSpellList() {
   const indexes = filteredSpellIndexes();
   el("spellCount").innerHTML =
-    `${spellData.length} spells${dirty ? ' <span class="dirty-dot" title="Unsaved changes"></span>' : ""}`;
+    `${indexes.length} of ${spellData.length} spells${dirty ? ' <span class="dirty-dot" title="Unsaved changes"></span>' : ""}`;
   let currentGroup = "";
   const html = indexes
     .map((index) => {
@@ -210,10 +217,13 @@ function renderSpellList() {
             `<div class="spell-group-heading">${escapeHtml(group)}</div>`);
       return `
         ${heading}
-        <button class="btn ${index === selectedIndex ? "btn-primary" : "btn-outline-light"} btn-sm" type="button" data-spell-index="${index}">
-          <span class="spell-list-name">${escapeHtml(spell.name || "Unnamed Spell")}</span>
-          <span class="spell-list-meta">${escapeHtml((spell.details?.descriptors || []).join(", "))}</span>
-        </button>
+        <div class="admin-review-list-row">
+          <button class="btn ${index === selectedIndex ? "btn-primary" : "btn-outline-light"} btn-sm" type="button" data-spell-index="${index}">
+            <span class="spell-list-name">${escapeHtml(spell.name || "Unnamed Spell")}</span>
+            <span class="spell-list-meta">${escapeHtml((spell.details?.descriptors || []).join(", "))}</span>
+          </button>
+          ${PFAdminReviewMarker.buttonHtml(spell, `data-review-spell-index="${index}"`, "spell")}
+        </div>
       `;
     })
     .join("");
@@ -228,6 +238,18 @@ function renderSpellList() {
         selectedIndex = Number(button.dataset.spellIndex);
         renderSpellList();
         renderSelectedSpell();
+      });
+    });
+  el("spellList")
+    .querySelectorAll("[data-review-spell-index]")
+    .forEach((button) => {
+      button.addEventListener("click", (event) => {
+        event.stopPropagation();
+        commitSelectedSpell();
+        PFAdminReviewMarker.toggle(
+          spellData[Number(button.dataset.reviewSpellIndex)],
+        );
+        setDirty(true);
       });
     });
 }
@@ -374,7 +396,7 @@ function commitSelectedSpell() {
     description: el("spellDescription")?.value || "",
     descriptors: splitCommaList(el("spellDescriptors")?.value),
   };
-  spellData[selectedIndex] = compactSpell({
+  const nextSpell = compactSpell({
     ...spell,
     name: el("spellName")?.value.trim() || spell.name || "Unnamed Spell",
     link: el("spellLink")?.value.trim() || "",
@@ -392,14 +414,29 @@ function commitSelectedSpell() {
     sizeChanges: extras.sizeChanges || [],
     spellLikeAbilities: extras.spellLikeAbilities || [],
     generatedEquipment: extras.generatedEquipment || [],
+    summonCreatures: extras.summonCreatures || [],
+    weaponExtraDamage: extras.weaponExtraDamage || [],
+    weaponDamageSizeChanges: extras.weaponDamageSizeChanges || [],
     conditionalVariables: extras.conditionalVariables || [],
+    attackRolls: extras.attackRolls || [],
     damageRolls: extras.damageRolls || [],
+    d20Boosts: extras.d20Boosts || [],
     casterLevelBonuses: extras.casterLevelBonuses || [],
     spellDcBonuses: extras.spellDcBonuses || [],
     effectiveAttributeBonuses: extras.effectiveAttributeBonuses || [],
+    attributeContributions: extras.attributeContributions || [],
     grantDomains: extras.grantDomains || [],
+    ...(window.PFEffectDecisions.hasDecision(extras)
+      ? {
+          decisionOwner:
+            window.PFEffectDecisions.decisionOwner(extras),
+        }
+      : {}),
     activeMechanics: grouped.activeMechanics,
   });
+  if (!window.PFEffectDecisions.hasDecision(extras))
+    delete nextSpell.decisionOwner;
+  spellData[selectedIndex] = nextSpell;
 }
 
 async function loadDefaultSpells() {
@@ -539,6 +576,18 @@ el("spellLevelFilter").addEventListener("change", (event) => {
   levelFilter = event.target.value;
   renderSpellList();
 });
+
+window.PFEffectDecisions.bindFilterButton(
+  el("spellDecisionFilter"),
+  (active) => {
+    commitSelectedSpell();
+    decisionsOnly = active;
+    const indexes = filteredSpellIndexes();
+    if (!indexes.includes(selectedIndex)) selectedIndex = indexes[0] ?? -1;
+    renderSpellList();
+    renderSelectedSpell();
+  },
+);
 
 el("openProjectFolderBtn").addEventListener("click", async () => {
   try {

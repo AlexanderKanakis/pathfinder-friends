@@ -51,6 +51,18 @@ assert(
     sheetPage.includes("await loadClassDefinitions([select.value])"),
   "Saved sheets and newly selected classes must load their full class mechanics on demand.",
 );
+const progressionChangeHandler = sheetPage.slice(
+  sheetPage.indexOf('select.addEventListener("change", async () => {'),
+  sheetPage.indexOf(
+    'root.querySelectorAll("[data-class-duplicate-next]")',
+    sheetPage.indexOf('select.addEventListener("change", async () => {'),
+  ),
+);
+assert(
+  progressionChangeHandler.indexOf("await loadClassDefinitions([select.value])") <
+    progressionChangeHandler.indexOf("renderLevelProgression();"),
+  "Changing a progression class must immediately rerender Copy to Next and Copy to Rest controls.",
+);
 assert(
   sheetPage.includes("function buildSheet(deferDynamicSections = false)") &&
     sheetPage.includes(

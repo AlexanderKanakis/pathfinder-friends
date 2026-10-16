@@ -17,28 +17,8 @@
         {
           "name": "Deeds",
           "description": "This ability functions exactly as the swashbuckler ability of the same name with two exceptions. First, the devoted muse qualifies for and benefits from deeds as if she were a swashbuckler 3 levels lower than her class level (minimum 1). Second, the devoted muse doesnÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢t gain the opportune parry and riposte deed until 4th level. For the purpose of this ability, a devoted museÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s class levels otherwise stack with levels in any other class that grants the deeds ability.",
-          "pools": [
-            {
-              "name": "Deeds",
-              "description": "This ability functions exactly as the swashbuckler ability of the same name with two exceptions. First, the devoted muse qualifies for and benefits from deeds as if she were a swashbuckler 3 levels lower than her class level (minimum 1). Second, the devoted muse doesnÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢t gain the opportune parry and riposte deed until 4th level. For the purpose of this ability, a devoted museÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s class levels otherwise stack with levels in any other class that grants the deeds ability.",
-              "requirements": {
-                "minClassLevel": 3,
-                "text": "First, the devoted muse qualifies for and benefits from deeds as if she were a swashbuckler 3 levels lower than her class level (minimum 1). Second, the devoted muse doesnÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢t gain the opportune parry and riposte deed until 4th level."
-              },
-              "options": [
-                {
-                  "name": "Deeds",
-                  "description": "This ability functions exactly as the swashbuckler ability of the same name with two exceptions. First, the devoted muse qualifies for and benefits from deeds as if she were a swashbuckler 3 levels lower than her class level (minimum 1). Second, the devoted muse doesnÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢t gain the opportune parry and riposte deed until 4th level. For the purpose of this ability, a devoted museÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s class levels otherwise stack with levels in any other class that grants the deeds ability.",
-                  "requirements": {
-                    "minClassLevel": 3,
-                    "text": "First, the devoted muse qualifies for and benefits from deeds as if she were a swashbuckler 3 levels lower than her class level (minimum 1). Second, the devoted muse doesnÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢t gain the opportune parry and riposte deed until 4th level."
-                  },
-                  "scrapeConfidence": "medium"
-                }
-              ],
-              "scrapeSource": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/c-d/devoted-muse/",
-              "scrapeConfidence": "low"
-            }
+          "poolRefs": [
+            "deeds"
           ]
         },
         {
@@ -298,5 +278,18 @@
     }
   ],
   "spellcasting": null,
-  "spellcastingClass": false
+  "spellcastingClass": false,
+  "classFeaturePools": {
+    "deeds": {
+      "name": "Deeds",
+      "description": "This ability functions exactly as the swashbuckler ability of the same name with two exceptions. First, the devoted muse qualifies for and benefits from deeds as if she were a swashbuckler 3 levels lower than her class level (minimum 1). Second, the devoted muse doesnÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢t gain the opportune parry and riposte deed until 4th level. For the purpose of this ability, a devoted museÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s class levels otherwise stack with levels in any other class that grants the deeds ability.",
+      "requirements": {
+        "minClassLevel": 3,
+        "text": "First, the devoted muse qualifies for and benefits from deeds as if she were a swashbuckler 3 levels lower than her class level (minimum 1). Second, the devoted muse doesnÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢t gain the opportune parry and riposte deed until 4th level."
+      },
+      "scrapeSource": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/c-d/devoted-muse/",
+      "scrapeConfidence": "low",
+      "catalog": "devoted-muse-deeds"
+    }
+  }
 }

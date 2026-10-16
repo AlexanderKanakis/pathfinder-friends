@@ -35,6 +35,18 @@ assert(!mapHtml.includes('id="quickConditionModal"'));
 assert(!mapHtml.includes('id="quickEffectInfoModal"'));
 assert(!mapHtml.includes('id="quickEffectMostUsedWrap"'));
 
+const htmlIds = new Set(
+  [...mapHtml.matchAll(/\bid="([^"]+)"/g)].map((match) => match[1]),
+);
+const unconditionalBindings = [
+  ...mapJs.matchAll(/el\("([^"]+)"\)\s*\.addEventListener/g),
+].map((match) => match[1]);
+assert.deepEqual(
+  [...new Set(unconditionalBindings.filter((id) => !htmlIds.has(id)))],
+  [],
+  "Every unconditional map event binding must reference an existing HTML element.",
+);
+
 const controlsBody = functionBody(trackerJs, "effectBrowserControlsHtml");
 assert(controlsBody.includes("data-picker-condition-ability"));
 assert(controlsBody.includes("data-picker-condition-amount"));

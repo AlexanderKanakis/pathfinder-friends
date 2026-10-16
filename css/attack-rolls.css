@@ -1,0 +1,104 @@
+.attack-roll-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 10px;
+  width: 100%;
+}
+
+.attack-roll-card {
+  position: relative;
+  padding: 12px;
+  border: 1px solid #444;
+  border-radius: 8px;
+  background: #202020;
+  text-align: center;
+}
+
+.attack-roll-result-label {
+  color: #f0d58c;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.attack-roll-result-label span {
+  display: block;
+  color: #bbb;
+  font-weight: 400;
+}
+
+.attack-roll-die-value {
+  color: #f0d58c;
+  font-size: 46px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.05;
+}
+
+.attack-roll-die-value.is-rolling {
+  animation: attack-roll-pulse 220ms ease-in-out infinite alternate;
+}
+
+.attack-roll-result-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 8px;
+  color: #ddd;
+}
+
+.attack-roll-result-row strong {
+  color: #fff;
+  font-size: 18px;
+}
+
+.attack-roll-total-divider {
+  width: min(220px, 80%);
+  margin: 8px auto 4px;
+  border-color: #555;
+  opacity: 1;
+}
+
+.attack-roll-total-row {
+  color: #f0d58c;
+  font-size: 16px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.attack-roll-total-row strong {
+  font-size: 30px;
+  line-height: 1.1;
+}
+
+.attack-roll-formula {
+  margin-top: 8px;
+  color: #aaa;
+  font-size: 12px;
+}
+
+.attack-roll-hit {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 12px;
+  padding: 6px 12px;
+  border: 1px solid #666;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+@keyframes attack-roll-pulse {
+  from { opacity: 0.72; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1.02); }
+}
+
+@media (max-width: 640px) {
+  .attack-roll-list { grid-template-columns: 1fr; }
+}
+.d20-boost-pool { margin-top: .75rem; padding-top: .65rem; border-top: 1px solid #495057; }
+.d20-boost-pool-title { margin-bottom: .4rem; color: #adb5bd; font-size: .75rem; text-transform: uppercase; }
+.d20-boost-resource { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .4rem; margin-top: .35rem; }
+.d20-boost-resource > button:first-child { display: flex; justify-content: space-between; align-items: center; gap: .5rem; text-align: left; }
+.d20-boost-resource small { color: #adb5bd; }
+.d20-boost-applied { margin-top: .5rem; color: #9fe6b8; font-size: .78rem; }

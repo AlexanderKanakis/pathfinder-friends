@@ -5,6 +5,7 @@ let groupFilter = "";
 let projectDirectoryHandle = null;
 let dataDirectoryHandle = null;
 let dirty = false;
+let decisionsOnly = false;
 let traitEffectEditors = new Map();
 let traitModifierOverrideEditors = new Map();
 let traitDurationConfigs = new Map();
@@ -69,6 +70,8 @@ function setDirty(value = true) {
 
 function normalizeTrait(trait = {}) {
   return {
+    ...(trait.needsReview ? { needsReview: true } : {}),
+    ...(trait.decisionOwner ? { decisionOwner: trait.decisionOwner } : {}),
     name: trait.name || "Trait",
     category: trait.category || "",
     description: trait.description || "",
@@ -109,6 +112,9 @@ function normalizeTrait(trait = {}) {
       : [],
     featGrants: Array.isArray(trait.featGrants) ? trait.featGrants : [],
     sizeChanges: Array.isArray(trait.sizeChanges) ? trait.sizeChanges : [],
+    weaponDamageSizeChanges: Array.isArray(trait.weaponDamageSizeChanges)
+      ? trait.weaponDamageSizeChanges
+      : [],
     spellLikeAbilities: Array.isArray(trait.spellLikeAbilities)
       ? trait.spellLikeAbilities
       : [],
@@ -120,14 +126,23 @@ function normalizeTrait(trait = {}) {
       : [],
     effectiveAttributeBonuses: Array.isArray(trait.effectiveAttributeBonuses)
       ? trait.effectiveAttributeBonuses
+      : [],    attributeContributions: Array.isArray(trait.attributeContributions)
+      ? trait.attributeContributions
       : [],
     grantDomains: Array.isArray(trait.grantDomains) ? trait.grantDomains : [],
     generatedEquipment: Array.isArray(trait.generatedEquipment)
       ? trait.generatedEquipment
       : [],
+    summonCreatures: Array.isArray(trait.summonCreatures)
+      ? trait.summonCreatures
+      : [],
+    weaponExtraDamage: Array.isArray(trait.weaponExtraDamage)
+      ? trait.weaponExtraDamage
+      : [],
     conditionalVariables: Array.isArray(trait.conditionalVariables)
       ? trait.conditionalVariables
       : [],
+    attackRolls: Array.isArray(trait.attackRolls) ? trait.attackRolls : [],
     damageRolls: Array.isArray(trait.damageRolls) ? trait.damageRolls : [],
     activatableAbilities: Array.isArray(trait.activatableAbilities)
       ? cloneJson(trait.activatableAbilities)
@@ -270,6 +285,7 @@ function filteredRaceIndexes() {
     .filter(
       ({ race }) =>
         (!groupFilter || race.group === groupFilter) &&
+        (!decisionsOnly || window.PFEffectDecisions.hasDecision(race)) &&
         (!term || String(race.name || "").toLowerCase().includes(term)),
     )
     .sort(
@@ -283,16 +299,19 @@ function filteredRaceIndexes() {
 function renderRaceList() {
   const indexes = filteredRaceIndexes();
   el("raceCount").innerHTML =
-    `${raceData.races.length} races${dirty ? ' <span class="dirty-dot" title="Unsaved changes"></span>' : ""}`;
+    `${indexes.length} of ${raceData.races.length} races${dirty ? ' <span class="dirty-dot" title="Unsaved changes"></span>' : ""}`;
   el("raceList").innerHTML =
     indexes
       .map((index) => {
         const race = raceData.races[index];
         return `
-      <button class="btn ${index === selectedIndex ? "btn-primary" : "btn-outline-light"} btn-sm" type="button" data-race-index="${index}">
-        <span>${escapeHtml(race.name || "Unnamed Race")}</span>
-        <span class="race-group">${escapeHtml(race.group || "")}</span>
-      </button>
+      <div class="admin-review-list-row">
+        <button class="btn ${index === selectedIndex ? "btn-primary" : "btn-outline-light"} btn-sm" type="button" data-race-index="${index}">
+          <span>${escapeHtml(race.name || "Unnamed Race")}</span>
+          <span class="race-group">${escapeHtml(race.group || "")}</span>
+        </button>
+        ${PFAdminReviewMarker.buttonHtml(race, `data-review-race-index="${index}"`, "race")}
+      </div>
     `;
       })
       .join("") || `<div class="small-text">No matching races.</div>`;
@@ -304,6 +323,18 @@ function renderRaceList() {
         selectedIndex = Number(button.dataset.raceIndex);
         renderRaceList();
         renderSelectedRace();
+      });
+    });
+  el("raceList")
+    .querySelectorAll("[data-review-race-index]")
+    .forEach((button) => {
+      button.addEventListener("click", (event) => {
+        event.stopPropagation();
+        commitSelectedRace();
+        PFAdminReviewMarker.toggle(
+          raceData.races[Number(button.dataset.reviewRaceIndex)],
+        );
+        setDirty(true);
       });
     });
 }
@@ -351,8 +382,13 @@ const TRAIT_MECHANIC_KEYS = window.PFEffectMechanics?.mechanicKeys?.() || [
   "effectiveAttributeBonuses",
   "grantDomains",
   "generatedEquipment",
+  "summonCreatures",
+  "weaponExtraDamage",
+  "weaponDamageSizeChanges",
   "conditionalVariables",
+  "attackRolls",
   "damageRolls",
+    "d20Boosts",
 ];
 
 const TRAIT_MECHANIC_LABELS = {
@@ -371,9 +407,14 @@ const TRAIT_MECHANIC_LABELS = {
   casterLevelBonuses: "CL",
   spellDcBonuses: "DC",
   effectiveAttributeBonuses: "Attr",
+  attributeContributions: "Attribute Use",
   grantDomains: "Domains",
   generatedEquipment: "Gear",
+  summonCreatures: "Summons",
+  weaponExtraDamage: "Weapon Damage",
+  weaponDamageSizeChanges: "Weapon Damage Size",
   conditionalVariables: "Vars",
+  attackRolls: "Attacks",
   damageRolls: "Damage",
 };
 
@@ -623,13 +664,16 @@ function createMechanicEditorRow(key = "", data = {}, options = {}) {
         rowOptions,
       ),
     effectiveAttributeBonuses: () =>
-      window.PFEffectEditor.createEffectiveAttributeBonusRow(data, rowOptions),
+      window.PFEffectEditor.createEffectiveAttributeBonusRow(data, rowOptions),    attributeContributions: () =>
+      window.PFEffectEditor.createAttributeContributionRow(data, rowOptions),
     grantDomains: () =>
       window.PFEffectEditor.createGrantDomainRow(data, rowOptions),
     generatedEquipment: () =>
       window.PFEffectEditor.createGeneratedEquipmentRow(data, rowOptions),
     conditionalVariables: () =>
       window.PFEffectEditor.createConditionalVariableRow(data, rowOptions),
+    attackRolls: () =>
+      window.PFEffectEditor.createAttackRollRow(data, rowOptions),
     damageRolls: () =>
       window.PFEffectEditor.createDamageRollRow(data, rowOptions),
   };
@@ -781,12 +825,15 @@ function traitCard(kind, trait, index, race = {}) {
   const attributeRequirement = normalizeAttributeRequirement(trait);
   const requirementOpen = hasAttributeRequirement(trait);
   return `
-    <article class="trait-card" data-trait-kind="${kind}" data-trait-index="${index}">
+    <article class="trait-card ${decisionsOnly && !window.PFEffectDecisions.hasDecision(trait) ? "d-none" : ""}" data-trait-kind="${kind}" data-trait-index="${index}">
       <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
         <strong>${escapeHtml(trait.name || "Trait")}</strong>
-        <button class="btn btn-outline-danger btn-sm btn-icon" type="button" data-delete-trait aria-label="Delete trait">
-          <i class="bi bi-trash"></i>
-        </button>
+        <div class="d-flex gap-1">
+          ${PFAdminReviewMarker.buttonHtml(trait, "data-review-trait", "racial ability")}
+          <button class="btn btn-outline-danger btn-sm btn-icon" type="button" data-delete-trait aria-label="Delete trait">
+            <i class="bi bi-trash"></i>
+          </button>
+        </div>
       </div>
       <div class="trait-grid ${isAlternate ? "trait-grid-alternate" : ""}">
         <div>
@@ -868,8 +915,11 @@ function traitCard(kind, trait, index, race = {}) {
 }
 
 function traitSection(title, kind, traits, race = {}) {
+  const hasDecision = traits.some((trait) =>
+    window.PFEffectDecisions.hasDecision(trait),
+  );
   return `
-    <section class="level-card mb-3">
+    <section class="level-card mb-3 ${decisionsOnly && !hasDecision ? "d-none" : ""}">
       <div class="d-flex justify-content-between align-items-center gap-2 flex-wrap mb-2">
         <strong>${escapeHtml(title)}</strong>
         <button class="btn btn-outline-info btn-sm" type="button" data-add-trait="${kind}">
@@ -904,7 +954,7 @@ function favoredBonusRow(bonus, index) {
 function favoredBonusSection(race) {
   const bonuses = race.favoredClassBonuses || [];
   return `
-    <section class="level-card mb-3">
+    <section class="level-card mb-3 ${decisionsOnly ? "d-none" : ""}">
       <div class="d-flex justify-content-between align-items-center gap-2 flex-wrap mb-2">
         <strong>Paizo Favored Class Bonuses</strong>
         <button class="btn btn-outline-info btn-sm" type="button" data-add-favored>
@@ -985,6 +1035,7 @@ function mountTraitEffectEditors(race) {
               if (!rowController) return;
               mount.innerHTML = "";
               mount.appendChild(rowController.element);
+              rowController.initialize?.();
               overrideEditors.replacements.set(
                 `${group}:${mechanicKey}:${rowIndex}`,
                 {
@@ -1297,6 +1348,19 @@ function renderSelectedRace() {
       button.addEventListener("click", () => addTrait(button.dataset.addTrait));
     });
   el("raceEditorPanel")
+    .querySelectorAll("[data-review-trait]")
+    .forEach((button) => {
+      button.addEventListener("click", () => {
+        const card = button.closest("[data-trait-kind]");
+        const kind = card.dataset.traitKind;
+        const index = Number(card.dataset.traitIndex);
+        commitSelectedRace();
+        PFAdminReviewMarker.toggle(raceData.races[selectedIndex][kind][index]);
+        setDirty(true);
+        renderSelectedRace();
+      });
+    });
+  el("raceEditorPanel")
     .querySelectorAll("[data-delete-trait]")
     .forEach((button) => {
       button.addEventListener("click", () => {
@@ -1396,6 +1460,7 @@ function collectTrait(card) {
   const extras = editor?.collect?.() || {};
   const name = card.querySelector('[data-trait-field="name"]').value.trim();
   const trait = {
+    ...(sourceTrait.needsReview ? { needsReview: true } : {}),
     name: name || "Trait",
     category: card.querySelector('[data-trait-field="category"]').value.trim(),
     description: card
@@ -1420,10 +1485,19 @@ function collectTrait(card) {
     casterLevelBonuses: extras.casterLevelBonuses || [],
     spellDcBonuses: extras.spellDcBonuses || [],
     effectiveAttributeBonuses: extras.effectiveAttributeBonuses || [],
+    attributeContributions: extras.attributeContributions || [],
     grantDomains: extras.grantDomains || [],
     generatedEquipment: extras.generatedEquipment || [],
+    summonCreatures: extras.summonCreatures || [],
+    weaponExtraDamage: extras.weaponExtraDamage || [],
+    weaponDamageSizeChanges: extras.weaponDamageSizeChanges || [],
     conditionalVariables: extras.conditionalVariables || [],
+    attackRolls: extras.attackRolls || [],
     damageRolls: extras.damageRolls || [],
+    d20Boosts: extras.d20Boosts || [],
+    ...(extras.decisionOwner
+      ? { decisionOwner: extras.decisionOwner }
+      : {}),
     activeMechanics: extras.activeMechanics,
     activatableAbilities: Array.isArray(sourceTrait.activatableAbilities)
       ? cloneJson(sourceTrait.activatableAbilities)
@@ -1678,6 +1752,15 @@ async function initRaceEditor() {
 el("raceSearch").addEventListener("input", (event) => {
   searchTerm = event.target.value;
   renderRaceList();
+});
+
+window.PFEffectDecisions.bindFilterButton(el("raceDecisionFilter"), (active) => {
+  commitSelectedRace();
+  decisionsOnly = active;
+  const indexes = filteredRaceIndexes();
+  if (!indexes.includes(selectedIndex)) selectedIndex = indexes[0] ?? -1;
+  renderRaceList();
+  renderSelectedRace();
 });
 
 el("raceGroupFilter").addEventListener("change", (event) => {

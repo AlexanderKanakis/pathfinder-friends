@@ -2,6 +2,7 @@ const assert = require("assert");
 const fs = require("fs");
 
 global.window = global;
+require("./effect-rolls.js");
 require("../modals/effect-duration-editor.js");
 
 const config = {
@@ -13,6 +14,7 @@ const config = {
 
 const normalized = global.PFEffectMeta.normalizeDurationConfig(config);
 assert.strictEqual(normalized.splitAmongTargets, true);
+assert.strictEqual(normalized.staticValue, 1);
 assert.match(global.PFEffectMeta.durationLabel(config), /split among targets/);
 assert.strictEqual(
   global.PFEffectMeta.parseDuration(config, { casterLevel: 6 }),
@@ -32,7 +34,9 @@ assert.strictEqual(
 assert.deepStrictEqual(
   global.PFEffectMeta.durationConfigFromSpellText("10 minutes/level"),
   {
-    count: 10,
+    diceCount: 0,
+    dieType: 6,
+    staticValue: 10,
     unit: "minute",
     factors: [{ type: "caster" }],
     factorMode: "multiply",
@@ -45,12 +49,51 @@ assert.strictEqual(
   ),
   2100,
 );
+assert.strictEqual(
+  global.PFEffectMeta.parseDuration(
+    {
+      diceCount: 2,
+      dieType: 4,
+      staticValue: 3,
+      unit: "round",
+      factors: [],
+    },
+    { random: () => 0 },
+  ),
+  5,
+  "Duration must roll XdY and add its static value once at activation.",
+);
+assert.strictEqual(
+  global.PFEffectMeta.parseDuration(
+    {
+      diceCount: 1,
+      dieType: 6,
+      staticValue: 1,
+      diceCountScale: {
+        source: { type: "caster" },
+        levelMultiplier: { numerator: 1, denominator: 3 },
+      },
+      staticValueScale: {
+        source: { type: "caster" },
+        milestones: [{ level: 5, value: 4 }],
+      },
+      unit: "round",
+      factors: [],
+    },
+    { casterLevel: 6, random: () => 0 },
+  ),
+  7,
+  "Duration dice count and static value must scale independently.",
+);
 
 const editor = fs.readFileSync(
   require.resolve("../modals/effect-duration-editor.js"),
   "utf8",
 );
 assert(editor.includes("data-duration-split-targets"));
+assert(editor.includes("data-duration-dice-count"));
+assert(editor.includes("data-duration-scale-dice"));
+assert(editor.includes("data-duration-scale-static"));
 
 const characterSheet = fs.readFileSync(
   require.resolve("./pages/character-sheet.js"),
@@ -60,7 +103,7 @@ assert(characterSheet.includes("targetCount = 1"));
 assert(characterSheet.includes("targets.length,"));
 
 const map = fs.readFileSync(require.resolve("./pages/map.js"), "utf8");
-assert(map.includes("appliedEffectFromQuickSelection(effect, options, targetCount = 1)"));
+assert(/function appliedEffectFromQuickSelection\s*\(\s*effect,\s*options,\s*targetCount = 1,/.test(map));
 assert(map.includes("durationConfigFromSpellText?.(spell.details?.duration)"));
 assert(/quickEffectSelection\.options,\s*targets\.length,/.test(map));
 

@@ -1,0 +1,16 @@
+{
+  "id": "rogue-unchained-advanced-talents",
+  "name": "Advanced Talents",
+  "description": "At 10th level and every 2 levels thereafter, a rogue can choose one of the following advanced talents in place of a rogue talent. A complete listing of rogue advanced talents can be found here: Rogue Advanced Talents",
+  "options": [
+    {
+      "name": "Advanced Talents",
+      "description": "At 10th level and every 2 levels thereafter, a rogue can choose one of the following advanced talents in place of a rogue talent. A complete listing of rogue advanced talents can be found here: Rogue Advanced Talents",
+      "requirements": {
+        "minClassLevel": 2,
+        "text": "At 10th level and every 2 levels thereafter, a rogue can choose one of the following advanced talents in place of a rogue talent."
+      },
+      "scrapeConfidence": "medium"
+    }
+  ]
+}

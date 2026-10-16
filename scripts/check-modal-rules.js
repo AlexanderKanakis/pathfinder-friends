@@ -98,6 +98,34 @@ assert(
   "Shared modal sizing must not be duplicated in the Effects modal.",
 );
 
+const effectEditorStyles = source(path.join(root, "css", "effect-editor.css"));
+assert(
+  effectEditorStyles.includes(
+    '.shared-apply-condition-row > button[aria-label="Delete applied condition"]',
+  ),
+  "Apply Condition must keep its delete control at the shared icon-button size.",
+);
+assert(
+  !effectEditorStyles.includes(".shared-apply-condition-row button,"),
+  "Mobile effect styles must not stretch the Apply Condition delete button.",
+);
+assert(
+  effectEditorStyles.includes(
+    "grid-template-columns: repeat(6, minmax(105px, 1fr));",
+  ),
+  "Configurable conditions must use the shared ordered formula grid.",
+);
+const effectEditorSource = source(path.join(root, "scripts", "effect-editor.js"));
+const applyConditionSource = effectEditorSource.slice(
+  effectEditorSource.indexOf("function createApplyConditionRow"),
+  effectEditorSource.indexOf("function createConditionalVariableRow"),
+);
+assert(
+  applyConditionSource.indexOf("<label>Number of Dice</label>") <
+    applyConditionSource.indexOf("<label>Static</label>"),
+  "Configurable condition dice fields must appear before static fields.",
+);
+
 const allModalSources = [...htmlFiles, ...javascriptFiles]
   .map(source)
   .join("\n");

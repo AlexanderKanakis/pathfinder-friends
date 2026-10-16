@@ -1,0 +1,103 @@
+{
+  "id": "alchemist-grand-discovery",
+  "name": "Grand Discovery",
+  "description": "Grand discoveries selectable through the alchemist Grand Discovery feature.",
+  "options": [
+    {
+      "name": "Awakened Intellect",
+      "summary": "Gain 2 points of Intelligence",
+      "description": "Prerequisite : Grand discovery Benefit : The alchemistÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s constant exposure to strange chemicals has expanded his mind. His Intelligence score permanently increases by 2 points.",
+      "requirements": {
+        "text": "Grand discovery"
+      },
+      "source": "PZO1115",
+      "sourceUrl": "https://www.d20pfsrd.com/classes/base-classes/alchemist/discoveries/paizo-alchemist-grand-discoveries/awakened-intellect/",
+      "publisher": "Paizo",
+      "scrapeSource": "https://www.d20pfsrd.com/classes/base-classes/alchemist/discoveries/",
+      "scrapeConfidence": "high"
+    },
+    {
+      "name": "Change Alignment, Greater",
+      "summary": "Change alignment infusion effects are permanent (but can be removed by wish or miracle.)",
+      "description": "Prerequisites : Alchemist 20, change alignment discovery, infusion discovery Benefits : The effects of the alchemistÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s change alignment infusion become permanent and can only be reversed by a wish or miracle . A permanent, forced change of alignment may be devastating, and some believe it is little better than zealous slavery or mind control. Others consider a good alignment brought about by any means but purity of heart an affront to freedom. This discovery remains controversial at best.",
+      "requirements": {
+        "minClassLevel": 20,
+        "requiredChoices": [
+          "Change Alignment",
+          "Infusion"
+        ],
+        "text": "Grand discovery, alchemist 20, change alignment discovery, infusion discovery"
+      },
+      "source": "CoP",
+      "sourceUrl": "https://www.d20pfsrd.com/classes/base-classes/alchemist/discoveries/paizo-alchemist-discoveries/change-alignment-greater-su",
+      "publisher": "Paizo",
+      "scrapeSource": "https://www.d20pfsrd.com/classes/base-classes/alchemist/discoveries/",
+      "scrapeConfidence": "high"
+    },
+    {
+      "name": "Eternal Youth",
+      "summary": "Stop aging",
+      "description": "Prerequisite : Grand discovery Benefit : The alchemist has discovered a cure for aging, and from this point forward he takes no penalty to his physical ability scores from advanced age. If the alchemist is already taking such penalties, they are removed at this time.",
+      "requirements": {
+        "text": "Grand discovery"
+      },
+      "source": "PZO1115",
+      "sourceUrl": "https://www.d20pfsrd.com/classes/base-classes/alchemist/discoveries/paizo-alchemist-grand-discoveries/eternal-youth",
+      "publisher": "Paizo",
+      "scrapeSource": "https://www.d20pfsrd.com/classes/base-classes/alchemist/discoveries/",
+      "scrapeConfidence": "high"
+    },
+    {
+      "name": "Fast Healing",
+      "summary": "Gain fast healing 5",
+      "description": "Prerequisite : Grand discovery Benefit : The alchemistÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s flesh responds to damage with shocking speedÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Âhe gains fast healing 5.",
+      "requirements": {
+        "text": "Grand discovery"
+      },
+      "source": "PZO1115",
+      "sourceUrl": "https://www.d20pfsrd.com/classes/base-classes/alchemist/discoveries/paizo-alchemist-grand-discoveries/fast-healing",
+      "publisher": "Paizo",
+      "scrapeSource": "https://www.d20pfsrd.com/classes/base-classes/alchemist/discoveries/",
+      "scrapeConfidence": "high"
+    },
+    {
+      "name": "PhilosopherÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Stone",
+      "summary": "Learn how to make a philosopherÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s stone",
+      "description": "Prerequisite : Grand discovery Benefit : The alchemist learns how to create a philosopherÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s stone , and can do so once per month at no cost. Creating a philosopherÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s stone takes 1 day of work.",
+      "requirements": {
+        "text": "Grand discovery"
+      },
+      "source": "PZO1115",
+      "sourceUrl": "https://www.d20pfsrd.com/classes/base-classes/alchemist/discoveries/paizo-alchemist-grand-discoveries/philosopher-s-stone",
+      "publisher": "Paizo",
+      "scrapeSource": "https://www.d20pfsrd.com/classes/base-classes/alchemist/discoveries/",
+      "scrapeConfidence": "high"
+    },
+    {
+      "name": "Poison Touch",
+      "summary": "Gain a poison touch attack",
+      "description": "Prerequisite : Grand discovery Benefit : The alchemist gains a poisonous touch, as if under the effects of a poison spell. He can suppress or activate this ability as a free action . The physical appearance of how the alchemist generates and delivers his poisonous touch varies from alchemist to alchemist .",
+      "requirements": {
+        "text": "Grand discovery"
+      },
+      "source": "PZO1115",
+      "sourceUrl": "https://www.d20pfsrd.com/classes/base-classes/alchemist/discoveries/paizo-alchemist-grand-discoveries/poison-touch",
+      "publisher": "Paizo",
+      "scrapeSource": "https://www.d20pfsrd.com/classes/base-classes/alchemist/discoveries/",
+      "scrapeConfidence": "high"
+    },
+    {
+      "name": "True Mutagen",
+      "summary": "Gain a more powerful mutagen",
+      "description": "Prerequisite : Grand discovery , grand mutagen discovery Benefit : The alchemistÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s mutagen now grants a +8 natural armor bonus and a +8 alchemical bonus to Strength , Dexterity , and Constitution . The alchemist takes a ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“2 penalty to his Intelligence , Wisdom , and Charisma as long as the mutagen persists.",
+      "requirements": {
+        "text": "Grand discovery , grand mutagen"
+      },
+      "source": "PZO1115",
+      "sourceUrl": "https://www.d20pfsrd.com/classes/base-classes/alchemist/discoveries/paizo-alchemist-grand-discoveries/true-mutagen/",
+      "publisher": "Paizo",
+      "scrapeSource": "https://www.d20pfsrd.com/classes/base-classes/alchemist/discoveries/",
+      "scrapeConfidence": "high"
+    }
+  ]
+}

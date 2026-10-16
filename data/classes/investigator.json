@@ -57,25 +57,8 @@
         {
           "name": "Investigator Talent",
           "description": "",
-          "pools": [
-            {
-              "name": "Investigator Talent",
-              "description": "",
-              "requirements": {},
-              "options": [
-                {
-                  "name": "Investigator Talent (Ex) Or",
-                  "description": "At 3rd level and every 2 levels thereafter, an investigator gains an investigator talent. Except where otherwise noted, each investigator talent can only be selected once. Investigator talents marked with an asterisk (*) add effects to an investigator&#8217;s studied combat or studied strike. Only one of these talents can be applied to an individual attack, but the decision can be made when the damage is dealt.. A complete listing of investigator talents can be found here: Investigator Talents",
-                  "requirements": {
-                    "minClassLevel": 2,
-                    "text": "At 3rd level and every 2 levels thereafter, an investigator gains an investigator talent. Except where otherwise noted, each investigator talent can only be selected once."
-                  },
-                  "scrapeConfidence": "medium"
-                }
-              ],
-              "scrapeSource": "https://www.d20pfsrd.com/classes/hybrid-classes/investigator/",
-              "scrapeConfidence": "low"
-            }
+          "poolRefs": [
+            "investigator-talent"
           ]
         },
         {
@@ -125,25 +108,8 @@
         {
           "name": "Investigator Talent",
           "description": "",
-          "pools": [
-            {
-              "name": "Investigator Talent",
-              "description": "",
-              "requirements": {},
-              "options": [
-                {
-                  "name": "Investigator Talent (Ex) Or",
-                  "description": "At 3rd level and every 2 levels thereafter, an investigator gains an investigator talent. Except where otherwise noted, each investigator talent can only be selected once. Investigator talents marked with an asterisk (*) add effects to an investigator&#8217;s studied combat or studied strike. Only one of these talents can be applied to an individual attack, but the decision can be made when the damage is dealt.. A complete listing of investigator talents can be found here: Investigator Talents",
-                  "requirements": {
-                    "minClassLevel": 2,
-                    "text": "At 3rd level and every 2 levels thereafter, an investigator gains an investigator talent. Except where otherwise noted, each investigator talent can only be selected once."
-                  },
-                  "scrapeConfidence": "medium"
-                }
-              ],
-              "scrapeSource": "https://www.d20pfsrd.com/classes/hybrid-classes/investigator/",
-              "scrapeConfidence": "low"
-            }
+          "poolRefs": [
+            "investigator-talent"
           ]
         },
         {
@@ -185,25 +151,8 @@
         {
           "name": "Investigator Talent",
           "description": "",
-          "pools": [
-            {
-              "name": "Investigator Talent",
-              "description": "",
-              "requirements": {},
-              "options": [
-                {
-                  "name": "Investigator Talent (Ex) Or",
-                  "description": "At 3rd level and every 2 levels thereafter, an investigator gains an investigator talent. Except where otherwise noted, each investigator talent can only be selected once. Investigator talents marked with an asterisk (*) add effects to an investigator&#8217;s studied combat or studied strike. Only one of these talents can be applied to an individual attack, but the decision can be made when the damage is dealt.. A complete listing of investigator talents can be found here: Investigator Talents",
-                  "requirements": {
-                    "minClassLevel": 2,
-                    "text": "At 3rd level and every 2 levels thereafter, an investigator gains an investigator talent. Except where otherwise noted, each investigator talent can only be selected once."
-                  },
-                  "scrapeConfidence": "medium"
-                }
-              ],
-              "scrapeSource": "https://www.d20pfsrd.com/classes/hybrid-classes/investigator/",
-              "scrapeConfidence": "low"
-            }
+          "poolRefs": [
+            "investigator-talent"
           ]
         }
       ],
@@ -241,25 +190,8 @@
         {
           "name": "Investigator Talent",
           "description": "",
-          "pools": [
-            {
-              "name": "Investigator Talent",
-              "description": "",
-              "requirements": {},
-              "options": [
-                {
-                  "name": "Investigator Talent (Ex) Or",
-                  "description": "At 3rd level and every 2 levels thereafter, an investigator gains an investigator talent. Except where otherwise noted, each investigator talent can only be selected once. Investigator talents marked with an asterisk (*) add effects to an investigator&#8217;s studied combat or studied strike. Only one of these talents can be applied to an individual attack, but the decision can be made when the damage is dealt.. A complete listing of investigator talents can be found here: Investigator Talents",
-                  "requirements": {
-                    "minClassLevel": 2,
-                    "text": "At 3rd level and every 2 levels thereafter, an investigator gains an investigator talent. Except where otherwise noted, each investigator talent can only be selected once."
-                  },
-                  "scrapeConfidence": "medium"
-                }
-              ],
-              "scrapeSource": "https://www.d20pfsrd.com/classes/hybrid-classes/investigator/",
-              "scrapeConfidence": "low"
-            }
+          "poolRefs": [
+            "investigator-talent"
           ]
         },
         {
@@ -297,25 +229,8 @@
         {
           "name": "Investigator Talent",
           "description": "",
-          "pools": [
-            {
-              "name": "Investigator Talent",
-              "description": "",
-              "requirements": {},
-              "options": [
-                {
-                  "name": "Investigator Talent (Ex) Or",
-                  "description": "At 3rd level and every 2 levels thereafter, an investigator gains an investigator talent. Except where otherwise noted, each investigator talent can only be selected once. Investigator talents marked with an asterisk (*) add effects to an investigator&#8217;s studied combat or studied strike. Only one of these talents can be applied to an individual attack, but the decision can be made when the damage is dealt.. A complete listing of investigator talents can be found here: Investigator Talents",
-                  "requirements": {
-                    "minClassLevel": 2,
-                    "text": "At 3rd level and every 2 levels thereafter, an investigator gains an investigator talent. Except where otherwise noted, each investigator talent can only be selected once."
-                  },
-                  "scrapeConfidence": "medium"
-                }
-              ],
-              "scrapeSource": "https://www.d20pfsrd.com/classes/hybrid-classes/investigator/",
-              "scrapeConfidence": "low"
-            }
+          "poolRefs": [
+            "investigator-talent"
           ]
         },
         {
@@ -357,25 +272,8 @@
         {
           "name": "Investigator Talent",
           "description": "",
-          "pools": [
-            {
-              "name": "Investigator Talent",
-              "description": "",
-              "requirements": {},
-              "options": [
-                {
-                  "name": "Investigator Talent (Ex) Or",
-                  "description": "At 3rd level and every 2 levels thereafter, an investigator gains an investigator talent. Except where otherwise noted, each investigator talent can only be selected once. Investigator talents marked with an asterisk (*) add effects to an investigator&#8217;s studied combat or studied strike. Only one of these talents can be applied to an individual attack, but the decision can be made when the damage is dealt.. A complete listing of investigator talents can be found here: Investigator Talents",
-                  "requirements": {
-                    "minClassLevel": 2,
-                    "text": "At 3rd level and every 2 levels thereafter, an investigator gains an investigator talent. Except where otherwise noted, each investigator talent can only be selected once."
-                  },
-                  "scrapeConfidence": "medium"
-                }
-              ],
-              "scrapeSource": "https://www.d20pfsrd.com/classes/hybrid-classes/investigator/",
-              "scrapeConfidence": "low"
-            }
+          "poolRefs": [
+            "investigator-talent"
           ]
         }
       ],
@@ -409,25 +307,8 @@
         {
           "name": "Investigator Talent",
           "description": "",
-          "pools": [
-            {
-              "name": "Investigator Talent",
-              "description": "",
-              "requirements": {},
-              "options": [
-                {
-                  "name": "Investigator Talent (Ex) Or",
-                  "description": "At 3rd level and every 2 levels thereafter, an investigator gains an investigator talent. Except where otherwise noted, each investigator talent can only be selected once. Investigator talents marked with an asterisk (*) add effects to an investigator&#8217;s studied combat or studied strike. Only one of these talents can be applied to an individual attack, but the decision can be made when the damage is dealt.. A complete listing of investigator talents can be found here: Investigator Talents",
-                  "requirements": {
-                    "minClassLevel": 2,
-                    "text": "At 3rd level and every 2 levels thereafter, an investigator gains an investigator talent. Except where otherwise noted, each investigator talent can only be selected once."
-                  },
-                  "scrapeConfidence": "medium"
-                }
-              ],
-              "scrapeSource": "https://www.d20pfsrd.com/classes/hybrid-classes/investigator/",
-              "scrapeConfidence": "low"
-            }
+          "poolRefs": [
+            "investigator-talent"
           ]
         },
         {
@@ -465,25 +346,8 @@
         {
           "name": "Investigator Talent",
           "description": "",
-          "pools": [
-            {
-              "name": "Investigator Talent",
-              "description": "",
-              "requirements": {},
-              "options": [
-                {
-                  "name": "Investigator Talent (Ex) Or",
-                  "description": "At 3rd level and every 2 levels thereafter, an investigator gains an investigator talent. Except where otherwise noted, each investigator talent can only be selected once. Investigator talents marked with an asterisk (*) add effects to an investigator&#8217;s studied combat or studied strike. Only one of these talents can be applied to an individual attack, but the decision can be made when the damage is dealt.. A complete listing of investigator talents can be found here: Investigator Talents",
-                  "requirements": {
-                    "minClassLevel": 2,
-                    "text": "At 3rd level and every 2 levels thereafter, an investigator gains an investigator talent. Except where otherwise noted, each investigator talent can only be selected once."
-                  },
-                  "scrapeConfidence": "medium"
-                }
-              ],
-              "scrapeSource": "https://www.d20pfsrd.com/classes/hybrid-classes/investigator/",
-              "scrapeConfidence": "low"
-            }
+          "poolRefs": [
+            "investigator-talent"
           ]
         }
       ],
@@ -521,25 +385,8 @@
         {
           "name": "Investigator Talent",
           "description": "",
-          "pools": [
-            {
-              "name": "Investigator Talent",
-              "description": "",
-              "requirements": {},
-              "options": [
-                {
-                  "name": "Investigator Talent (Ex) Or",
-                  "description": "At 3rd level and every 2 levels thereafter, an investigator gains an investigator talent. Except where otherwise noted, each investigator talent can only be selected once. Investigator talents marked with an asterisk (*) add effects to an investigator&#8217;s studied combat or studied strike. Only one of these talents can be applied to an individual attack, but the decision can be made when the damage is dealt.. A complete listing of investigator talents can be found here: Investigator Talents",
-                  "requirements": {
-                    "minClassLevel": 2,
-                    "text": "At 3rd level and every 2 levels thereafter, an investigator gains an investigator talent. Except where otherwise noted, each investigator talent can only be selected once."
-                  },
-                  "scrapeConfidence": "medium"
-                }
-              ],
-              "scrapeSource": "https://www.d20pfsrd.com/classes/hybrid-classes/investigator/",
-              "scrapeConfidence": "low"
-            }
+          "poolRefs": [
+            "investigator-talent"
           ]
         }
       ],
@@ -759,5 +606,15 @@
     ],
     "spellSource": "extracts"
   },
-  "spellcastingClass": true
+  "spellcastingClass": true,
+  "classFeaturePools": {
+    "investigator-talent": {
+      "name": "Investigator Talent",
+      "description": "",
+      "requirements": {},
+      "scrapeSource": "https://www.d20pfsrd.com/classes/hybrid-classes/investigator/",
+      "scrapeConfidence": "low",
+      "catalog": "investigator-investigator-talent"
+    }
+  }
 }

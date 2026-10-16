@@ -59,7 +59,7 @@ for (const group of [
   "items",
   "other",
 ]) {
-  assert(tracker.includes(`data-effect-browser-group="${group}"`));
+  assert(tracker.includes(`["${group}",`));
 }
 assert(!tracker.includes('data-effect-browser-group="personal"'));
 assert(!tracker.includes('data-effect-browser-group="passives"'));
@@ -83,6 +83,7 @@ assert(tracker.includes("bindActiveTabs()"));
 assert(!tracker.includes("ActiveTypeFilter"));
 assert(!tracker.includes("<h6>Active Effects</h6>"));
 assert(!tracker.includes('for="${this.prefix}OpenSearch">Activate'));
+assert(tracker.includes(">Use Powers</button>"));
 assert(
   sheetHtml.includes('class="modal fade modal-workspace"\n      id="effectTrackerModal"'),
 );
@@ -130,6 +131,13 @@ assert(
 );
 
 assert(sheet.includes("effectPickerEffects: loadCurrentEffectPickerDefinitions"));
+assert(sheetHtml.includes('id="openPowersButton"'));
+assert(
+  sheet.includes(
+    'openEffectWorkspace(event.currentTarget, { powersOnly: true })',
+  ),
+);
+assert(sheet.includes("await effectTrackerInstance?.openPicker()"));
 assert(sheet.includes("scheduleEffectPickerPrefetch();"));
 assert(sheet.includes("invalidateEffectPickerDefinitions();"));
 assert(sheet.includes("function effectPickerSourceSignature()"));
@@ -152,13 +160,16 @@ assert(
 );
 
 assert(map.includes("scheduleAccessibleEffectSourcePrefetch();"));
+assert(map.includes("data-open-token-powers"));
+assert(map.includes("function openMapPowers(tokenId)"));
+assert(map.includes("return openMapEffects(tokenId, { powersOnly: true })"));
 assert(map.includes("isGm || character.userId === currentUserId"));
 assert(map.includes("await characterMapEffectSources(character);"));
 assert(map.includes("const QUICK_EFFECT_BATCH_SIZE = 80;"));
-assert(map.includes("matches.slice(0, quickEffectVisibleLimit)"));
-assert(map.includes("data-quick-effect-more"));
+assert(map.includes("rows.slice(0, quickEffectVisibleLimit)"));
+assert(map.includes("data-effect-browser-more"));
 assert(map.includes("mapEffectPrefetchGeneration += 1;"));
-assert(map.includes("function quickEffectLoadingHtml"));
+assert(map.includes("browser.loadingHtml(quickEffectGroup)"));
 assert(map.includes("quickEffectLoading = true;"));
 assert(map.includes("quickEffectLoading = false;"));
 assert(map.includes("window.PFEffectTracker?.preferOwnedPickerEffects?.(effects) || effects"));

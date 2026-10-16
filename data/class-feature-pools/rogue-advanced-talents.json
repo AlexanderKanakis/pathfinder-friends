@@ -1,0 +1,16 @@
+{
+  "id": "rogue-advanced-talents",
+  "name": "Advanced Talents",
+  "description": "At 10th level, and every two levels thereafter, a rogue can choose one of the following advanced talents in place of a rogue talent. A complete listing of advanced rogue talents can be found here: Rogue Advanced Talents",
+  "options": [
+    {
+      "name": "Advanced Talents",
+      "description": "At 10th level, and every two levels thereafter, a rogue can choose one of the following advanced talents in place of a rogue talent. A complete listing of advanced rogue talents can be found here: Rogue Advanced Talents",
+      "requirements": {
+        "minClassLevel": 10,
+        "text": "At 10th level, and every two levels thereafter, a rogue can choose one of the following advanced talents in place of a rogue talent."
+      },
+      "scrapeConfidence": "medium"
+    }
+  ]
+}

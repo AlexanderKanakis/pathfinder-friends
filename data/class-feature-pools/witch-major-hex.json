@@ -1,0 +1,13 @@
+{
+  "id": "witch-major-hex",
+  "name": "Major Hex",
+  "description": "Starting at 10th level, and every two levels thereafter, a witch can choose one of the following major hexes whenever she could select a new hex.",
+  "options": [
+    {
+      "name": "Major Hexes",
+      "description": "Subpages Agony (Su) Animal Skin (Su) Beast Eye (Su) BeastÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Gift (Su) Cook People (Su) Delicious Fright (Su) Drugged (Su) False Hospitality (Su) HagÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Eye (Su) Harrowing Curse (Su) Hidden Home (Sp) Hoarfrost (Su) Ice Tomb (Su) Infected Wounds (Su) Major Ameliorating (Su) Major Healing (Su) Nightmares (Su) Pariah (Su) Prophecy (Su) Regenerative Sinew (Su) Restless Slumber (Su) Retribution (Su) Speak in Dreams (Sp) Steal Voice (Su; Tiefling) Vision (Su) Waxen Image (Su) Weather Control (Su) Witch's Bounty (Su) Witch's Charge (Su) WitchÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Brew (Ex) Withering (Su)",
+      "requirements": {},
+      "scrapeConfidence": "medium"
+    }
+  ]
+}

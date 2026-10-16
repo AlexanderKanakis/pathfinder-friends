@@ -27,8 +27,13 @@
       "effectiveAttributeBonuses",
       "grantDomains",
       "generatedEquipment",
+      "summonCreatures",
+      "weaponExtraDamage",
+      "weaponDamageSizeChanges",
       "conditionalVariables",
+      "attackRolls",
       "damageRolls",
+      "d20Boosts",
     ];
 
   function injectStyles() {
@@ -70,6 +75,8 @@
       .effect-browser-spell-level { border: 1px solid #3d3d3d; border-radius: 7px; display: grid; gap: 12px; grid-template-columns: 46px minmax(0, 1fr); margin-top: 8px; padding: 10px; }
       .effect-browser-level-number { color: #ffd86b; font-size: 24px; font-weight: 700; text-align: center; }
       .effect-browser-spell-columns { display: grid; gap: 14px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .effect-browser-spell-columns.is-single { grid-template-columns: minmax(0, 1fr); }
+      .effect-browser-sla-list { display: grid; gap: 5px; }
       .effect-browser-spell-column-title { color: #aaa; font-size: 11px; margin-bottom: 5px; text-transform: uppercase; }
       .effect-browser-spell-mobile-tabs { display: none; gap: 2px; border-bottom: 1px solid #333; background: #121212; margin-bottom: 8px; }
       .effect-browser-spell-mobile-tab { flex: 1 1 0; min-width: 0; border: 0; border-bottom: 2px solid transparent; border-radius: 0; background: transparent; color: #bbb; padding: 7px 8px 8px; line-height: 1.1; text-align: center; }
@@ -162,7 +169,8 @@
         .effect-browser-spell-level { grid-template-columns: 1fr; gap: 6px; padding: 8px; }
         .effect-browser-spell-mobile-tabs { display: flex; }
         .effect-browser-spell-panel { display: none; }
-        .effect-browser-spell-panel.is-mobile-active { display: block; }
+        .effect-browser-spell-panel.is-mobile-active,
+        .effect-browser-spell-panel.is-single { display: block; }
         .effect-browser-spell-column-title { display: none; }
         .effect-browser-row.is-condition { align-items: start; grid-template-columns: 1fr; }
         .effect-tracker-add-shell { margin-bottom: 6px; }
@@ -209,7 +217,7 @@
       <div class="effect-tracker-add-shell">
         <div class="effect-tracker-add-row">
           <input class="form-control form-control-sm" placeholder="Loading available abilities..." disabled>
-          <button class="btn btn-outline-success btn-sm" type="button" disabled>Apply Effect</button>
+          <button class="btn btn-outline-success btn-sm" type="button" disabled>Use Powers</button>
         </div>
       </div>
       <nav class="nav effect-active-nav" aria-label="Active effect types">
@@ -341,6 +349,20 @@
     return "class";
   }
 
+  function activeEffectVisibleInTab(effect = {}, tab = "") {
+    if (activeEffectTab(effect) === tab) return true;
+    if (
+      tab === "condition" &&
+      Array.isArray(effect.applyConditions) &&
+      effect.applyConditions.length
+    )
+      return true;
+    return (
+      isCondition(effect) &&
+      String(effect.sourceEffectTab || "") === tab
+    );
+  }
+
   function categorizedSourceGroup(effect = {}) {
     const sourceText = [
       effect.category,
@@ -452,11 +474,12 @@
     if (window.PFEffectMeta?.normalizeDurationConfig) {
       const config = window.PFEffectMeta.normalizeDurationConfig(effect);
       return {
-        count: config.count,
+        count: config.staticValue,
         unit: config.unit,
         perLevel:
           config.factors.some((factor) => factor.type === "caster") ||
-          config.durationScale?.source?.type === "caster",
+          config.diceCountScale?.source?.type === "caster" ||
+          config.staticValueScale?.source?.type === "caster",
         config,
       };
     }
@@ -467,7 +490,8 @@
     const config = durationParts(effect).config;
     return config
       ? config.factors.some((factor) => factor.type === "caster") ||
-        config.durationScale?.source?.type === "caster"
+        config.diceCountScale?.source?.type === "caster" ||
+        config.staticValueScale?.source?.type === "caster"
       : durationParts(effect).perLevel;
   }
 
@@ -615,10 +639,23 @@
   }
 
   function bonusText(bonus) {
+    const normalizedStat = String(bonus.stat || "")
+      .toLowerCase()
+      .trim();
+    if (normalizedStat === "healing") {
+      const formula = window.PFEffectRolls?.formulaText?.(
+        window.PFEffectRolls.healingFormula(bonus),
+      ) || String(Number(bonus.value || 0));
+      const diceScale = scaleText(bonus.diceCountScale);
+      const staticScale = scaleText(bonus.bonusScale || bonus.scale);
+      return `Healing ${formula}${diceScale ? `; dice ${diceScale}` : ""}${staticScale ? `; static ${staticScale}` : ""}`;
+    }
+    if (normalizedStat === "fast healing") {
+      const scale = scaleText(bonus.bonusScale || bonus.scale);
+      return `Fast Healing ${Number(bonus.value || 0)}${scale ? `; ${scale}` : ""}`;
+    }
     if (
-      String(bonus.stat || "")
-        .toLowerCase()
-        .trim() === "remove dex bonus to ac"
+      normalizedStat === "remove dex bonus to ac"
     ) {
       const text = "Removes DEX bonus to AC";
       return bonus.appliesWhen ? `${text} (${bonus.appliesWhen})` : text;
@@ -719,6 +756,11 @@
     return `Grant Domain: ${entry.domainName || entry.domainId || "Domain"}`;
   }
 
+  function weaponDamageSizeText(entry = {}) {
+    return window.PFEffectEditor?.weaponDamageSizeChangeText?.(entry) ||
+      `${entry.weaponName || entry.weaponType || "Weapon"}: damage as one size ${Number(entry.sizeSteps) < 0 ? "smaller" : "larger"}`;
+  }
+
   function immunityText(entry = {}) {
     const name = String(entry.name || entry.immunity || entry.type || "")
       .trim()
@@ -797,6 +839,7 @@
       ...(effect.generatedEquipment || []).map(
         (item) => `${item.type || "equipment"} ${item.name || item.item || ""}`,
       ),
+      ...(effect.weaponDamageSizeChanges || []).map(weaponDamageSizeText),
     ]
       .join(" ")
       .toLowerCase();
@@ -865,32 +908,79 @@
       if (!groups.get(className).has(level)) groups.get(className).set(level, []);
       groups.get(className).get(level).push({ effect, index });
     });
+    const buttons = (entries) =>
+      entries
+        .map(
+          ({ effect, index }) => `
+            <button class="btn btn-outline-info btn-sm effect-browser-spell-button" type="button" data-picker-effect-index="${index}">
+              ${escapeHtml(effect.name)}
+            </button>
+          `,
+        )
+        .join("");
     return [...groups.entries()]
-      .map(
-        ([className, levels]) => `
+      .map(([className, levels]) => {
+        const classSpells = [...levels.values()].flat();
+        const spellLikeAbilities = classSpells.every(
+          ({ effect }) => effect.spellMeta?.kind === "sla",
+        );
+        if (spellLikeAbilities) {
+          const sorted = classSpells.sort(
+            (a, b) =>
+              Number(a.effect.spellMeta?.level || 0) -
+                Number(b.effect.spellMeta?.level || 0) ||
+              String(a.effect.name || "").localeCompare(b.effect.name || ""),
+          );
+          return `
+            <section class="effect-browser-spell-class">
+              <div class="effect-browser-spell-class-title fw-bold text-uppercase">${escapeHtml(className)}</div>
+              <div class="effect-browser-sla-list">${buttons(sorted)}</div>
+            </section>
+          `;
+        }
+        const preparation = String(
+          classSpells.find(({ effect }) => effect.spellMeta?.preparation)
+            ?.effect.spellMeta.preparation || "",
+        ).toLowerCase();
+        const usesSpellbook =
+          preparation === "spellbook" ||
+          (!preparation &&
+            classSpells.some(
+              ({ effect }) => effect.spellMeta?.bucket === "book",
+            ));
+        return `
           <section class="effect-browser-spell-class">
             <div class="effect-browser-spell-class-title fw-bold text-uppercase">${escapeHtml(className)}</div>
             ${[...levels.entries()]
               .sort((a, b) => a[0] - b[0])
               .map(([level, spells]) => {
-                const left = spells.filter(
+                const known = spells.filter(
                   ({ effect }) => effect.spellMeta?.bucket !== "prepared",
                 );
-                const right = spells.filter(
+                const prepared = spells.filter(
                   ({ effect }) => effect.spellMeta?.bucket === "prepared",
                 );
+                if (!usesSpellbook) {
+                  const usesDailyList =
+                    preparation === "daily-list" ||
+                    (!preparation && prepared.length > 0 && known.length === 0);
+                  const available = usesDailyList ? prepared : known;
+                  return `
+                    <div class="effect-browser-spell-level">
+                      <div class="effect-browser-level-number">${level}</div>
+                      <div class="effect-browser-spell-columns is-single">
+                        <div class="effect-browser-spell-panel is-single">
+                          <div class="effect-browser-spell-column-title">${usesDailyList ? "Prepared Today" : "Known"}</div>
+                          ${buttons(available.length ? available : spells)}
+                        </div>
+                      </div>
+                    </div>
+                  `;
+                }
                 const mobileGroup = `${className}:${level}`;
-                const activePanel = spellPanels[mobileGroup] || "known";
-                const buttons = (entries) =>
-                  entries
-                    .map(
-                      ({ effect, index }) => `
-                        <button class="btn btn-outline-info btn-sm effect-browser-spell-button" type="button" data-picker-effect-index="${index}">
-                          ${escapeHtml(effect.name)}
-                        </button>
-                      `,
-                    )
-                    .join("");
+                const activePanel =
+                  spellPanels[mobileGroup] ||
+                  (known.length ? "known" : "prepared");
                 return `
                   <div class="effect-browser-spell-level">
                     <div class="effect-browser-level-number">${level}</div>
@@ -901,11 +991,11 @@
                     <div class="effect-browser-spell-columns">
                       <div class="effect-browser-spell-panel${activePanel === "known" ? " is-mobile-active" : ""}" data-effect-browser-spell-panel="known">
                         <div class="effect-browser-spell-column-title">Known / In Book</div>
-                        ${buttons(left)}
+                        ${buttons(known)}
                       </div>
                       <div class="effect-browser-spell-panel${activePanel === "prepared" ? " is-mobile-active" : ""}" data-effect-browser-spell-panel="prepared">
                         <div class="effect-browser-spell-column-title">Prepared Today</div>
-                        ${buttons(right)}
+                        ${buttons(prepared)}
                       </div>
                     </div>
                   </div>
@@ -913,8 +1003,8 @@
               })
               .join("")}
           </section>
-        `,
-      )
+        `;
+      })
       .join("");
   }
 
@@ -928,9 +1018,8 @@
           <span class="effect-browser-loading-line is-title"></span>
           <div class="effect-browser-spell-level">
             <div class="effect-browser-level-number">1</div>
-            <div class="effect-browser-spell-columns">
-              <div><div class="effect-browser-spell-column-title">Known / In Book</div>${spellRows}</div>
-              <div><div class="effect-browser-spell-column-title">Prepared Today</div>${spellRows}</div>
+            <div class="effect-browser-spell-columns is-single">
+              <div>${spellRows}</div>
             </div>
           </div>
         </section>
@@ -986,7 +1075,7 @@
         <div id="${this.prefix}AddShell" class="effect-tracker-add-shell">
           <div class="effect-tracker-add-row">
             <input id="${this.prefix}OpenSearch" class="form-control form-control-sm effect-tracker-search-trigger" placeholder="Search available abilities..." readonly>
-            <button id="${this.prefix}OpenButton" class="btn btn-outline-success btn-sm" type="button">Apply Effect</button>
+            <button id="${this.prefix}OpenButton" class="btn btn-outline-success btn-sm" type="button">Use Powers</button>
           </div>
         </div>
         <div id="${this.prefix}RequestStatus" class="small-text mb-2 d-none"></div>
@@ -995,7 +1084,7 @@
           <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable effect-search-modal-dialog">
             <div class="modal-content bg-dark text-white border-secondary">
               <div class="modal-header border-secondary">
-                <h5 class="modal-title" id="${this.prefix}PickerLabel">Apply Effect</h5>
+                <h5 class="modal-title" id="${this.prefix}PickerLabel">Use Powers</h5>
               </div>
               <div class="modal-body effect-search-modal-body">
                 <nav id="${this.prefix}PickerNav" class="nav nav-pills effect-browser-nav" aria-label="Effect groups" role="tablist">
@@ -1107,6 +1196,12 @@
 
     pickerGroupFor(effect = {}) {
       return effectSourceGroup(effect);
+    }
+
+    showActiveEffectCategory(effect = {}) {
+      const nextTab = activeEffectTab(effect);
+      if (ACTIVE_EFFECT_TABS.some((tab) => tab.key === nextTab))
+        this.activeTypeFilter = nextTab;
     }
 
     waitForModalHidden(modalEl) {
@@ -1312,11 +1407,15 @@
               ? (casterLevel) =>
                   this.options.recalculateSpell(effect, casterLevel)
               : null,
-          onCast: async ({ casterLevel, closeDetails }) => {
+          onCast: async ({ casterLevel, calculations, closeDetails }) => {
             cast = true;
             closeDetails?.();
             await new Promise((resolve) => setTimeout(resolve, 180));
-            await this.addEffectDefinition(configuredEffect, {
+            await this.addEffectDefinition({
+              ...configuredEffect,
+              spellCalculations:
+                calculations || configuredEffect.spellCalculations || null,
+            }, {
               ...selection,
               casterLevel: casterLevel || selection.casterLevel,
             });
@@ -1832,6 +1931,16 @@
         effect,
       );
       if (resolvedBonusRanks === null) return null;
+      const resolvedWeaponExtraDamage = await this.resolveChoiceStats(
+        option.weaponExtraDamage,
+        effect,
+      );
+      if (resolvedWeaponExtraDamage === null) return null;
+      const resolvedAttributeContributions = await this.resolveChoiceStats(
+        option.attributeContributions,
+        effect,
+      );
+      if (resolvedAttributeContributions === null) return null;
       const resolvedSpellLikeAbilities =
         await this.resolveSpellLikeAbilityChoices(
           option.spellLikeAbilities,
@@ -1865,6 +1974,8 @@
         classSkillGrants: resolvedClassSkillGrants,
         useUntrained: resolvedUseUntrained,
         bonusRanks: resolvedBonusRanks,
+        weaponExtraDamage: resolvedWeaponExtraDamage,
+        attributeContributions: resolvedAttributeContributions,
         spellLikeAbilities: resolvedSpellLikeAbilities,
         casterLevelBonuses: resolvedCasterLevelBonuses,
         spellDcBonuses: resolvedSpellDcBonuses,
@@ -1919,6 +2030,8 @@
           (Array.isArray(effect.featGrants) &&
             effect.featGrants.length) ||
           (Array.isArray(effect.sizeChanges) && effect.sizeChanges.length) ||
+          (Array.isArray(effect.weaponDamageSizeChanges) &&
+            effect.weaponDamageSizeChanges.length) ||
           (Array.isArray(effect.spellLikeAbilities) &&
             effect.spellLikeAbilities.length) ||
           (Array.isArray(effect.casterLevelBonuses) &&
@@ -1953,16 +2066,24 @@
             byId.get(String(entry.conditionId || entry.id || "")) ||
             byName.get(conditionName(entry).toLowerCase()) ||
             entry;
-          const name = condition.name || conditionName(entry);
+          const configured = window.PFConditionConfig?.configuredCondition?.({
+            ...entry,
+            condition,
+          });
+          if (configured === null) return null;
+          const appliedCondition = configured || condition;
+          const name = appliedCondition.name || conditionName(entry);
           if (!name) return null;
           return {
-            ...condition,
+            ...appliedCondition,
             id:
               condition.id ||
               entry.conditionId ||
               `applied-condition:${name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`,
             name,
             category: "Condition",
+            appliedCondition: true,
+            sourceEffectTab: activeEffectTab(effect),
             source: effect.name || effect.source || "Effect",
             sourceEffectId: effect.id || effect.sourceEffectId || "",
             casterLevel: effect.casterLevel,
@@ -2049,6 +2170,273 @@
       return next;
     }
 
+    async resolveConditionAdjustments(
+      effect,
+      casterLevel,
+      casterContext = {},
+      { deferAbilityChoice = false } = {},
+    ) {
+      if (!window.PFConditionConfig?.resolveAdjustments) return effect;
+      return window.PFConditionConfig.resolveAdjustments(effect, {
+        title: effect.name || "Effect",
+        deferAbilityChoice,
+        context: {
+          ...casterContext,
+          casterLevel,
+          classLevel: casterLevel,
+        },
+      });
+    }
+
+    async resolveHealingRolls(effect, casterLevel, casterContext = {}) {
+      if (!window.PFEffectHealing?.resolveRolls) return effect;
+      return window.PFEffectHealing.resolveRolls(effect, {
+        title: effect.name || "Effect",
+        context: {
+          ...casterContext,
+          casterLevel,
+          classLevel: casterLevel,
+        },
+      });
+    }
+
+    async resolveAttackRolls(effect, casterLevel, casterContext = {}) {
+      const attacks =
+        window.PFAttackRolls?.normalizeAttacks?.(effect.attackRolls || []) || [];
+      if (!attacks.length) return effect;
+      const context = {
+        ...casterContext,
+        casterLevel,
+        classLevel: casterLevel,
+      };
+      const rollKinds = new Set(attacks.map((attack) =>
+        window.PFAttackRolls?.calculateAttack?.(attack, context)?.rollKind ||
+        "attacks",
+      ));
+      const rollKind = rollKinds.size === 1 ? [...rollKinds][0] : "attacks";
+      const d20BoostSession = await this.options.d20BoostSession?.(rollKind);
+      if (d20BoostSession) context.d20BoostSession = d20BoostSession;
+      const results = await window.PFAttackRolls?.open?.({
+        title: `${effect.name || "Effect"} Attacks`,
+        attacks,
+        context,
+      });
+      if (!results) return null;
+      await this.options.onAttackRolled?.(effect, results);
+      return (
+        window.PFAttackRolls?.payloadForSuccessfulAttacks?.(effect, results) ||
+        effect
+      );
+    }
+
+    async resolveActivationDecisions(effect, casterAttributeContext = {}) {
+      let resolvedEffect = effect;
+      if (window.PFEffectMechanics?.hasContributionOptions?.(resolvedEffect)) {
+        resolvedEffect = await window.PFEffectMechanics.chooseContributions(
+          resolvedEffect,
+          { title: resolvedEffect.name || "Effect" },
+        );
+        if (!resolvedEffect) return null;
+        if (
+          window.PFEffectActivationOrchestrator?.targetMustAnswer?.(
+            resolvedEffect,
+          )
+        )
+          return resolvedEffect;
+      }
+      if (window.PFEffectMechanics?.hasBranches?.(resolvedEffect)) {
+        resolvedEffect = await window.PFEffectMechanics.chooseBranch(
+          resolvedEffect,
+          { title: resolvedEffect.name || "Effect" },
+        );
+        if (!resolvedEffect) return null;
+        if (
+          window.PFEffectActivationOrchestrator?.targetMustAnswer?.(
+            resolvedEffect,
+          )
+        )
+          return resolvedEffect;
+      }
+      if (window.PFSummonCreatures?.hasPendingChoice?.(resolvedEffect)) {
+        resolvedEffect = await window.PFSummonCreatures.resolveChoices(
+          resolvedEffect,
+          { title: resolvedEffect.name || "Effect" },
+        );
+        if (!resolvedEffect) return null;
+      }
+      const choiceResolvedBonuses = await this.resolveChoiceStats(
+        resolvedEffect.bonuses,
+        resolvedEffect,
+      );
+      if (choiceResolvedBonuses === null) return null;
+      const resolvedBonuses = await this.resolveFavoredEnemyScaleTargets(
+        choiceResolvedBonuses,
+        resolvedEffect,
+      );
+      if (resolvedBonuses === null) return null;
+      const resolvedClassSkillGrants = await this.resolveChoiceStats(
+        resolvedEffect.classSkillGrants,
+        resolvedEffect,
+      );
+      if (resolvedClassSkillGrants === null) return null;
+      const resolvedUseUntrained = await this.resolveChoiceStats(
+        resolvedEffect.useUntrained,
+        resolvedEffect,
+      );
+      if (resolvedUseUntrained === null) return null;
+      const resolvedBonusRanks = await this.resolveChoiceStats(
+        resolvedEffect.bonusRanks,
+        resolvedEffect,
+      );
+      if (resolvedBonusRanks === null) return null;
+      const resolvedWeaponExtraDamage = await this.resolveChoiceStats(
+        resolvedEffect.weaponExtraDamage,
+        resolvedEffect,
+      );
+      if (resolvedWeaponExtraDamage === null) return null;
+      const resolvedAttributeContributions = await this.resolveChoiceStats(
+        resolvedEffect.attributeContributions,
+        resolvedEffect,
+      );
+      if (resolvedAttributeContributions === null) return null;
+      const resolvedSpellLikeAbilities =
+        await this.resolveSpellLikeAbilityChoices(
+          resolvedEffect.spellLikeAbilities,
+          resolvedEffect,
+        );
+      if (resolvedSpellLikeAbilities === null) return null;
+      const resolvedCasterLevelBonuses = await this.resolveSpellAdjustmentChoices(
+        resolvedEffect.casterLevelBonuses,
+        resolvedEffect,
+      );
+      if (resolvedCasterLevelBonuses === null) return null;
+      const resolvedSpellDcBonuses = await this.resolveSpellAdjustmentChoices(
+        resolvedEffect.spellDcBonuses,
+        resolvedEffect,
+      );
+      if (resolvedSpellDcBonuses === null) return null;
+      const resolvedEffectiveAttributeBonuses =
+        await this.resolveSpellAdjustmentChoices(
+          resolvedEffect.effectiveAttributeBonuses,
+          resolvedEffect,
+        );
+      if (resolvedEffectiveAttributeBonuses === null) return null;
+      const resolvedGrantDomains = await this.resolveGrantDomainChoices(
+        resolvedEffect.grantDomains,
+        resolvedEffect,
+      );
+      if (resolvedGrantDomains === null) return null;
+      const resolvedChoicePools = await this.resolveChoicePools(resolvedEffect);
+      if (resolvedChoicePools === null) return null;
+      const { choicePools, pools, poolChoices, ...choiceResolvedEffect } =
+        resolvedEffect;
+      const activeEffect = {
+        ...choiceResolvedEffect,
+        bonuses: resolvedBonuses,
+        ...(resolvedClassSkillGrants.length
+          ? { classSkillGrants: resolvedClassSkillGrants }
+          : {}),
+        ...(resolvedUseUntrained.length
+          ? { useUntrained: resolvedUseUntrained }
+          : {}),
+        ...(resolvedBonusRanks.length
+          ? { bonusRanks: resolvedBonusRanks }
+          : {}),
+        ...(resolvedWeaponExtraDamage.length
+          ? { weaponExtraDamage: resolvedWeaponExtraDamage }
+          : {}),
+        ...(resolvedAttributeContributions.length
+          ? { attributeContributions: resolvedAttributeContributions }
+          : {}),
+        ...(resolvedSpellLikeAbilities.length
+          ? { spellLikeAbilities: resolvedSpellLikeAbilities }
+          : {}),
+        ...(resolvedCasterLevelBonuses.length
+          ? { casterLevelBonuses: resolvedCasterLevelBonuses }
+          : {}),
+        ...(resolvedSpellDcBonuses.length
+          ? { spellDcBonuses: resolvedSpellDcBonuses }
+          : {}),
+        ...(resolvedEffectiveAttributeBonuses.length
+          ? { effectiveAttributeBonuses: resolvedEffectiveAttributeBonuses }
+          : {}),
+        ...(resolvedGrantDomains.length
+          ? { grantDomains: resolvedGrantDomains }
+          : {}),
+      };
+      this.appendChoicePoolMechanics(
+        activeEffect,
+        resolvedChoicePools.mechanics || {},
+      );
+      const variableResolvedEffect =
+        await this.resolveConditionalVariables(activeEffect);
+      if (variableResolvedEffect === null) return null;
+      const abilityResolvedEffect =
+        await window.PFConditionConfig?.resolveAbilityChoices?.(
+          variableResolvedEffect,
+          { title: variableResolvedEffect.name || "Effect" },
+        );
+      if (!abilityResolvedEffect) return null;
+      return (
+        window.PFEffectMechanics?.resolveCasterAttributeScales?.(
+          abilityResolvedEffect,
+          casterAttributeContext,
+        ) || abilityResolvedEffect
+      );
+    }
+
+    async persistActivationEffect(finalizedEffect, selection = {}) {
+      await this.options.onHealingApply?.(finalizedEffect);
+      const restoration = window.PFConditionConfig?.applyRestorations?.(
+        this.active,
+        finalizedEffect,
+      );
+      if (restoration) {
+        this.active = restoration.activeEffects;
+        finalizedEffect = restoration.effect;
+      }
+      if (!hasPersistentEffectMechanics(finalizedEffect)) {
+        this.renderActive();
+        this.notifyChange({ collectionChanged: true });
+        this.queueSave();
+        this.finishPicker();
+        return true;
+      }
+      let activeEffects = await this.expandAppliedConditions(finalizedEffect);
+      if (selection.runtime && typeof selection.runtime === "object") {
+        activeEffects = activeEffects.map((nextEffect) => ({
+          ...nextEffect,
+          ...selection.runtime,
+          selectedBranchId: nextEffect.selectedBranchId,
+          selectedBranchName: nextEffect.selectedBranchName,
+          branchSource: nextEffect.branchSource,
+        }));
+      }
+      if (Number.isInteger(selection.replaceIndex)) {
+        this.active.splice(selection.replaceIndex, 1, ...activeEffects);
+      } else {
+        if (finalizedEffect.activationGroup) {
+          const sourceId = String(finalizedEffect.activationSourceId || "");
+          this.active = this.active.filter(
+            (existing) =>
+              !(
+                existing.activationGroup === finalizedEffect.activationGroup &&
+                String(existing.activationSourceId || "") === sourceId
+              ),
+          );
+        }
+        for (const nextEffect of activeEffects) {
+          await this.addActiveEffectWithFearEscalation(nextEffect);
+        }
+      }
+      this.showActiveEffectCategory(activeEffects[0] || finalizedEffect);
+      this.renderActive();
+      this.notifyChange({ collectionChanged: true });
+      this.queueSave();
+      this.finishPicker();
+      return true;
+    }
+
     async addEffectDefinition(effect, selection = {}) {
       const index = selection.index;
       if (!effect || !this.options.characterId) return;
@@ -2066,9 +2454,11 @@
       );
       const permanent = Boolean(selection.permanent);
       const trackedTurns = conditionUsesTurns(effect);
-      const durationArg = effect.fromAbility
-        ? effect.abilityContext || { casterLevel }
-        : casterLevel;
+      const durationArg = {
+        ...casterAttributeContext,
+        ...(effect.fromAbility ? effect.abilityContext || {} : {}),
+        casterLevel,
+      };
       const baseDurationLabel = durationLabel(effect);
       const calculatedDuration = trackedTurns
         ? turns
@@ -2092,12 +2482,27 @@
       // in here, BEFORE the choice is resolved, so a request sent to
       // another player (see requestEffectChoice) only ever needs them to
       // answer "which skill/target", never redo any of this.
-      const casterAttributeContext =
+      const spellCalculations = effect.spellCalculations || null;
+      const baseAttributeContext =
         effect.attributeScaleContext || effect.abilityContext || {};
+      const casterAttributeContext = {
+        ...baseAttributeContext,
+        castingAbility:
+          spellCalculations?.castingAbility ||
+          baseAttributeContext.castingAbility ||
+          "",
+        castingAbilityMod: Number(
+          spellCalculations?.castingAbilityMod ??
+            baseAttributeContext.castingAbilityMod ??
+            0,
+        ),
+        spellCalculations,
+      };
       const {
         fromAbility,
         abilityContext,
         attributeScaleContext,
+        spellCalculations: _spellCalculations,
         ...persistedEffect
       } = effect;
       let finalizedEffect = {
@@ -2128,239 +2533,215 @@
           finalizedEffect,
           casterAttributeContext,
         ) || finalizedEffect;
-
-      if (
-        window.PFEffectMechanics?.hasContributionOptions?.(finalizedEffect)
-      ) {
-        finalizedEffect = await window.PFEffectMechanics.chooseContributions(
-          finalizedEffect,
-          { title: finalizedEffect.name || "Effect" },
-        );
-        if (!finalizedEffect) return;
-      }
-
-      const branchNeeded =
-        window.PFEffectMechanics?.hasBranches?.(finalizedEffect) || false;
-      const nestedChoiceNeeded = (candidate) =>
-        [
-          ...(candidate.bonuses || []),
-          ...(candidate.classSkillGrants || []),
-          ...(candidate.useUntrained || []),
-          ...(candidate.bonusRanks || []),
-        ].some((item) => window.PFEffectStats?.isChoiceStat(item.stat)) ||
-        this.conditionalVariables(candidate).length > 0 ||
-        this.effectNeedsFavoredEnemyScaleChoice(candidate) ||
-        (candidate.spellLikeAbilities || []).some((entry) =>
-          this.spellLikeChoiceList(entry),
-        ) ||
-        this.spellAdjustmentEntriesNeedChoice(candidate.casterLevelBonuses) ||
-        this.spellAdjustmentEntriesNeedChoice(candidate.spellDcBonuses) ||
-        this.spellAdjustmentEntriesNeedChoice(
-          candidate.effectiveAttributeBonuses,
-        ) ||
-        this.grantDomainEntriesNeedChoice(candidate.grantDomains) ||
-        this.choicePools(candidate).length > 0;
-      if (
-        (branchNeeded || nestedChoiceNeeded(finalizedEffect)) &&
-        this.options.isOwnCharacter === false &&
-        !Number.isInteger(selection.replaceIndex)
-      ) {
-        finalizedEffect = await this.resolveDamageRolls(
-          finalizedEffect,
-          casterLevel,
-          casterAttributeContext,
-        );
-        if (!finalizedEffect) return;
-        await this.requestEffectChoice(finalizedEffect);
-        return;
-      }
-      if (branchNeeded) {
-        finalizedEffect = await window.PFEffectMechanics.chooseBranch(
-          finalizedEffect,
-          { title: finalizedEffect.name || "Effect" },
-        );
-        if (!finalizedEffect) return;
-      }
-      if (!Number.isInteger(selection.replaceIndex)) {
-        finalizedEffect = await this.resolveDamageRolls(
-          finalizedEffect,
-          casterLevel,
-          casterAttributeContext,
-        );
-        if (!finalizedEffect) return;
-      }
-      if (!hasPersistentEffectMechanics(finalizedEffect)) {
-        this.finishPicker();
-        return;
-      }
-
-      if (
-        finalizedEffect.auraConfig?.enabled &&
-        typeof this.options.onAuraActivate === "function"
-      ) {
-        const activation = await this.options.onAuraActivate(finalizedEffect);
-        const controller =
-          activation?.controller ||
-          (activation?.auraController ? activation : null);
-        if (controller) {
-          this.active.push(controller);
-          this.renderActive();
-          this.notifyChange({ collectionChanged: true });
-          this.queueSave();
-        }
-        if (activation) {
-          this.finishPicker();
-        }
-        return;
-      }
-
-      const choiceResolvedBonuses = await this.resolveChoiceStats(
-        finalizedEffect.bonuses,
-        finalizedEffect,
-      );
-      if (choiceResolvedBonuses === null) return;
-      const resolvedBonuses = await this.resolveFavoredEnemyScaleTargets(
-        choiceResolvedBonuses,
-        finalizedEffect,
-      );
-      if (resolvedBonuses === null) return;
-      const resolvedClassSkillGrants = await this.resolveChoiceStats(
-        finalizedEffect.classSkillGrants,
-        finalizedEffect,
-      );
-      if (resolvedClassSkillGrants === null) return;
-      const resolvedUseUntrained = await this.resolveChoiceStats(
-        finalizedEffect.useUntrained,
-        finalizedEffect,
-      );
-      if (resolvedUseUntrained === null) return;
-      const resolvedBonusRanks = await this.resolveChoiceStats(
-        finalizedEffect.bonusRanks,
-        finalizedEffect,
-      );
-      if (resolvedBonusRanks === null) return;
-      const resolvedSpellLikeAbilities =
-        await this.resolveSpellLikeAbilityChoices(
-          finalizedEffect.spellLikeAbilities,
-          finalizedEffect,
-        );
-      if (resolvedSpellLikeAbilities === null) return;
-      const resolvedCasterLevelBonuses = await this.resolveSpellAdjustmentChoices(
-        finalizedEffect.casterLevelBonuses,
-        finalizedEffect,
-      );
-      if (resolvedCasterLevelBonuses === null) return;
-      const resolvedSpellDcBonuses = await this.resolveSpellAdjustmentChoices(
-        finalizedEffect.spellDcBonuses,
-        finalizedEffect,
-      );
-      if (resolvedSpellDcBonuses === null) return;
-      const resolvedEffectiveAttributeBonuses =
-        await this.resolveSpellAdjustmentChoices(
-          finalizedEffect.effectiveAttributeBonuses,
-          finalizedEffect,
-        );
-      if (resolvedEffectiveAttributeBonuses === null) return;
-      const resolvedGrantDomains = await this.resolveGrantDomainChoices(
-        finalizedEffect.grantDomains,
-        finalizedEffect,
-      );
-      if (resolvedGrantDomains === null) return;
-      const resolvedChoicePools = await this.resolveChoicePools(finalizedEffect);
-      if (resolvedChoicePools === null) return;
-      const { choicePools, pools, poolChoices, ...choiceResolvedEffect } =
-        finalizedEffect;
-      const activeEffect = {
-        ...choiceResolvedEffect,
-        bonuses: resolvedBonuses,
-        ...(resolvedClassSkillGrants.length
-          ? { classSkillGrants: resolvedClassSkillGrants }
-          : {}),
-        ...(resolvedUseUntrained.length
-          ? { useUntrained: resolvedUseUntrained }
-          : {}),
-        ...(resolvedBonusRanks.length ? { bonusRanks: resolvedBonusRanks } : {}),
-        ...(resolvedSpellLikeAbilities.length
-          ? { spellLikeAbilities: resolvedSpellLikeAbilities }
-          : {}),
-        ...(resolvedCasterLevelBonuses.length
-          ? { casterLevelBonuses: resolvedCasterLevelBonuses }
-          : {}),
-        ...(resolvedSpellDcBonuses.length
-          ? { spellDcBonuses: resolvedSpellDcBonuses }
-          : {}),
-        ...(resolvedEffectiveAttributeBonuses.length
-          ? { effectiveAttributeBonuses: resolvedEffectiveAttributeBonuses }
-          : {}),
-        ...(resolvedGrantDomains.length
-          ? { grantDomains: resolvedGrantDomains }
-          : {}),
+      let applicationCommitted = false;
+      const commitApplication = async () => {
+        if (applicationCommitted || Number.isInteger(selection.replaceIndex))
+          return true;
+        const result = await this.options.onBeforeApply?.(finalizedEffect, {
+          replaceIndex: selection.replaceIndex,
+        });
+        if (result === false) return false;
+        if (result && typeof result === "object")
+          finalizedEffect = { ...finalizedEffect, ...result };
+        applicationCommitted = true;
+        return true;
       };
-      this.appendChoicePoolMechanics(
-        activeEffect,
-        resolvedChoicePools.mechanics || {},
+
+      const orchestrator = window.PFEffectActivationOrchestrator;
+      const activation = await orchestrator.run(
+        {
+          sourceType: activeEffectTab(finalizedEffect),
+          surface: "effect-tracker",
+          effect: finalizedEffect,
+        },
+        {
+          "caster-decisions": async (state) => {
+            if (orchestrator.targetMustAnswer(state.effect)) return state;
+            const resolved = await this.resolveActivationDecisions(
+              state.effect,
+              casterAttributeContext,
+            );
+            return resolved ? { ...state, effect: resolved } : null;
+          },
+          "resource-allocation": async (state) => state,
+          "aura-delivery": async (state) => {
+            if (!window.PFAuraDeliveryChoice?.needsChoice?.(state.effect))
+              return state;
+            const resolved = await window.PFAuraDeliveryChoice.choose(
+              state.effect,
+            );
+            return resolved ? { ...state, effect: resolved } : null;
+          },
+          targeting: async (state) => {
+            const targetedAura = Boolean(
+              state.effect.auraConfig?.enabled &&
+                state.effect.auraConfig?.targetsEmitAura &&
+                typeof this.options.onTargetedAuraActivate === "function",
+            );
+            return {
+              ...state,
+              targetedAura,
+              auraRecipientEffect:
+                state.effect.auraConfig?.enabled && !targetedAura
+                  ? JSON.parse(JSON.stringify(state.effect))
+                  : null,
+            };
+          },
+          "target-decisions": async (state) => {
+            if (state.targetedAura) return state;
+            if (!orchestrator.targetMustAnswer(state.effect)) return state;
+            const resolved =
+              this.options.isOwnCharacter === false &&
+              !Number.isInteger(selection.replaceIndex)
+                ? await this.requestEffectChoice(state.effect)
+                : await this.resolveActivationDecisions(
+                    state.effect,
+                    casterAttributeContext,
+                  );
+            return resolved ? { ...state, effect: resolved } : null;
+          },
+          "saving-throws": async (state) => {
+            if (
+              state.targetedAura ||
+              Number.isInteger(selection.replaceIndex) ||
+              !window.PFEffectSaves?.hasSave?.(state.effect)
+            )
+              return state;
+            const resolved = await window.PFEffectSaves.resolve(state.effect, {
+              sheet:
+                window.PFCharacterSheetBridge?.currentSheetSnapshot?.() || {},
+              title: state.effect.name || "Effect",
+              targetName: "This character",
+            });
+            return resolved ? { ...state, effect: resolved } : null;
+          },
+          "attack-confirmation": async (state) => {
+            if (state.targetedAura || Number.isInteger(selection.replaceIndex))
+              return state;
+            const resolved = await this.resolveAttackRolls(
+              state.effect,
+              casterLevel,
+              casterAttributeContext,
+            );
+            return resolved ? { ...state, effect: resolved } : null;
+          },
+          "effect-rolls": async (state) => {
+            if (state.targetedAura || Number.isInteger(selection.replaceIndex))
+              return state;
+            let resolved = await this.resolveDamageRolls(
+              state.effect,
+              casterLevel,
+              casterAttributeContext,
+            );
+            if (!resolved) return null;
+            resolved = await this.resolveConditionAdjustments(
+              resolved,
+              casterLevel,
+              casterAttributeContext,
+            );
+            if (!resolved) return null;
+            resolved = await this.resolveHealingRolls(
+              resolved,
+              casterLevel,
+              casterAttributeContext,
+            );
+            return resolved ? { ...state, effect: resolved } : null;
+          },
+          application: async (state) => {
+            finalizedEffect = state.effect;
+            if (state.targetedAura) {
+              const result = await this.options.onTargetedAuraActivate(
+                finalizedEffect,
+                { beforeApply: commitApplication },
+              );
+              if (result) this.finishPicker();
+              return result ? { ...state, applied: true } : null;
+            }
+            if (
+              Array.isArray(finalizedEffect.summonCreatures) &&
+              finalizedEffect.summonCreatures.length &&
+              typeof this.options.onSummonCreatures === "function"
+            ) {
+              if (!(await commitApplication())) return null;
+              const summoned = await this.options.onSummonCreatures(finalizedEffect);
+              if (!summoned) return null;
+              finalizedEffect = { ...finalizedEffect, summonCreatures: [] };
+            }
+            if (!hasPersistentEffectMechanics(finalizedEffect)) {
+              this.finishPicker();
+              return { ...state, applied: true };
+            }
+            if (
+              finalizedEffect.auraConfig?.enabled &&
+              typeof this.options.onAuraActivate === "function"
+            ) {
+              if (!(await commitApplication())) return null;
+              const result = await this.options.onAuraActivate(finalizedEffect, {
+                recipientEffect: state.auraRecipientEffect || finalizedEffect,
+              });
+              const controller =
+                result?.controller || (result?.auraController ? result : null);
+              if (controller) {
+                this.active = window.PFEffectMechanics?.upsertAuraController
+                  ? window.PFEffectMechanics.upsertAuraController(
+                      this.active,
+                      controller,
+                      controller.durationAnchorTokenId || "",
+                    )
+                  : [...this.active, controller];
+                this.showActiveEffectCategory(controller);
+                this.renderActive();
+                this.notifyChange({ collectionChanged: true });
+                this.queueSave();
+              }
+              if (result) this.finishPicker();
+              return result ? { ...state, applied: true } : null;
+            }
+            if (!(await commitApplication())) return null;
+            return (await this.persistActivationEffect(
+              finalizedEffect,
+              selection,
+            ))
+              ? { ...state, effect: finalizedEffect, applied: true }
+              : null;
+          },
+        },
       );
-      const variableResolvedEffect =
-        await this.resolveConditionalVariables(activeEffect);
-      if (variableResolvedEffect === null) return;
-      const scaleResolvedEffect =
-        window.PFEffectMechanics?.resolveCasterAttributeScales?.(
-          variableResolvedEffect,
-          casterAttributeContext,
-        ) || variableResolvedEffect;
-      let activeEffects = await this.expandAppliedConditions(
-        scaleResolvedEffect,
-      );
-      if (selection.runtime && typeof selection.runtime === "object") {
-        activeEffects = activeEffects.map((nextEffect) => ({
-          ...nextEffect,
-          ...selection.runtime,
-          selectedBranchId: nextEffect.selectedBranchId,
-          selectedBranchName: nextEffect.selectedBranchName,
-          branchSource: nextEffect.branchSource,
-        }));
-      }
-      if (Number.isInteger(selection.replaceIndex)) {
-        this.active.splice(selection.replaceIndex, 1, ...activeEffects);
-      } else {
-        if (scaleResolvedEffect.activationGroup) {
-          const sourceId = String(
-            scaleResolvedEffect.activationSourceId || "",
-          );
-          this.active = this.active.filter(
-            (existing) =>
-              !(
-                existing.activationGroup ===
-                  scaleResolvedEffect.activationGroup &&
-                String(existing.activationSourceId || "") === sourceId
-              ),
-          );
-        }
-        for (const nextEffect of activeEffects) {
-          await this.addActiveEffectWithFearEscalation(nextEffect);
-        }
-      }
-      this.renderActive();
-      this.notifyChange({ collectionChanged: true });
-      this.queueSave();
-      this.finishPicker();
+      return activation;
+
     }
 
-    // Applying a choice-needing effect to a character someone else
-    // controls doesn't pick for them -- it queues a request that
-    // player's own session picks up (see modals/pending-effect-choices.js)
-    // and resolves on their end, so they're the one choosing which skill
-    // an insight bonus lands on, not whoever cast it.
+    // Pause this activation while the target answers on their own device,
+    // then return the resolved effect to the caster-owned pipeline.
     async requestEffectChoice(finalizedEffect) {
       const status = document.getElementById(`${this.prefix}RequestStatus`);
       if (status) {
         status.textContent = "Sending choice to the player...";
         status.classList.remove("d-none", "text-danger");
       }
-      const result = await window.PFApp?.createEffectChoiceRequest?.({
-        contextKey: this.options.contextKey,
-        characterId: this.options.characterId,
-        ability: finalizedEffect,
+      const orchestrator = window.PFEffectActivationOrchestrator;
+      const result = await orchestrator?.waitForRemoteDecision?.({
+        createRequest: window.PFApp?.createEffectChoiceRequest,
+        loadStatus: window.PFApp?.loadEffectChoiceRequestStatus,
+        request: {
+          contextKey: this.options.contextKey,
+          characterId: this.options.characterId,
+          ability: orchestrator.remoteDecisionAbility(finalizedEffect, {
+            surface: "effect-tracker",
+            sourceType:
+              finalizedEffect.sourceType ||
+              finalizedEffect.type ||
+              finalizedEffect.category ||
+              "other",
+          }),
+        },
+        onStatus: (nextStatus) => {
+          if (!status) return;
+          if (nextStatus === "pending")
+            status.textContent = `Sent "${finalizedEffect.name || "effect"}" to the player -- waiting for them to choose.`;
+          if (nextStatus === "resolved")
+            status.textContent = `The player completed the choices for "${finalizedEffect.name || "effect"}."`;
+        },
       });
       if (!result?.ok) {
         if (status) {
@@ -2368,13 +2749,9 @@
             "Couldn't send this to the player -- try again.";
           status.classList.add("text-danger");
         }
-        return;
+        return null;
       }
-      if (status) {
-        status.textContent = `Sent "${finalizedEffect.name || "effect"}" to the player -- waiting for them to choose.`;
-      }
-      this.finishPicker();
-      this.watchEffectChoiceRequest(result.id, finalizedEffect);
+      return result.effect;
     }
 
     // Polls the request this widget just sent so "waiting for player"
@@ -2411,6 +2788,7 @@
                 this.options.characterId,
               );
           this.active = Array.isArray(saved) ? saved : saved?.buffs || [];
+          this.showActiveEffectCategory(finalizedEffect);
           this.renderActive();
           this.notifyChange({ collectionChanged: true });
           if (status)
@@ -2506,7 +2884,9 @@
         ...visiblePassives.map((effect, index) => ({ effect, index, passive: true })),
       ];
       const filteredActive = activeRows
-        .filter((row) => activeEffectTab(row.effect) === this.activeTypeFilter);
+        .filter((row) =>
+          activeEffectVisibleInTab(row.effect, this.activeTypeFilter),
+        );
       sortActiveRows(filteredActive);
 
       const navigation = `
@@ -2576,6 +2956,9 @@
               `Generates ${item.type || "equipment"}: ${
                 item.name || item.item || "Generated item"
               }`,
+          ),
+          ...(effect.weaponDamageSizeChanges || []).map(
+            weaponDamageSizeText,
           ),
         ];
         const bonuses = detailLines

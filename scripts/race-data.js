@@ -149,6 +149,7 @@
       "casterLevelBonuses",
       "spellDcBonuses",
       "effectiveAttributeBonuses",
+    "attributeContributions",
       "grantDomains",
       "generatedEquipment",
       "conditionalVariables",

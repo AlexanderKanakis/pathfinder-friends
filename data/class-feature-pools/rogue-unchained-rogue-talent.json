@@ -1,0 +1,22 @@
+{
+  "id": "rogue-unchained-rogue-talent",
+  "name": "Rogue Talent",
+  "description": "",
+  "options": [
+    {
+      "name": "Rogue Talents",
+      "description": "As a rogue gains experience, she learns a number of talents that aid her and confound her foes. Starting at 2nd level, a rogue gains one rogue talent. She gains an additional rogue talent for every 2 levels of rogue attained after 2nd level. A rogue cannot select an individual talent more than once. Talents marked with an asterisk add effects to a rogue&#8217;s sneak attack . Only one of these talents can be applied to an individual attack, and the decision must be made before the attack roll is made. A rogue cannot choose a ninja trick with the same name as a rogue talent. A complete listing of unchained rogue talents can be found here: Unchained Rogue Talents",
+      "requirements": {
+        "minClassLevel": 2,
+        "text": "Starting at 2nd level, a rogue gains one rogue talent. She gains an additional rogue talent for every 2 levels of rogue attained after 2nd level."
+      },
+      "scrapeConfidence": "medium"
+    },
+    {
+      "name": "Unmodified Rogue Talents",
+      "description": "The following rogue talents can be used without modification. Rogue Talents : Assault leader , black market connections , canny observer , cunning trigger , deft palm , distracting attack *, fast getaway , firearm training , getaway artist , grit , iron guts , ninja trick , positioning attack , quick disguise , quick trapsmith , rope master , strong impression , strong stroke , survivalist , swift poison , underhanded , wall scramble . Advanced Rogue Talents : Another day , confounding blades *, deadly cocktail , familiar , fast tumble , frugal trapsmith , getaway master , hide in plain sight , hunter&#8217;s surprise , knock-out blow , redirect attack , rumormonger , stealthy sniper , unwitting ally , weapon snatcher .",
+      "requirements": {},
+      "scrapeConfidence": "medium"
+    }
+  ]
+}

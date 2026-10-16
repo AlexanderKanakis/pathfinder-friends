@@ -3,8 +3,10 @@
 // widget.js's requestEffectChoice) queues a row in
 // effect_choice_requests instead of picking for that player. This
 // module polls for pending requests against every character the current
-// user controls and lets them answer -- on whatever device/session they
-// happen to have open -- without the requester ever seeing the picker.
+// user controls and lets them answer on their own device. Orchestrated
+// requests return the resolved effect to the caster so caster-owned
+// attack, roll, and application nodes can resume there. Legacy requests
+// still finish application on the recipient for compatibility.
 //
 // Handles a user controlling multiple characters the same way it
 // handles one: every pending request for every character they control
@@ -18,6 +20,7 @@
       "immunities",
       "applyConditions",
       "classSkillGrants",
+      "useUntrained",
       "bonusRanks",
       "extraRanksPerLevel",
       "featGrants",
@@ -26,10 +29,16 @@
       "casterLevelBonuses",
       "spellDcBonuses",
       "effectiveAttributeBonuses",
+      "attributeContributions",
       "grantDomains",
       "generatedEquipment",
+      "summonCreatures",
+      "weaponExtraDamage",
+      "weaponDamageSizeChanges",
       "conditionalVariables",
+      "attackRolls",
       "damageRolls",
+      "d20Boosts",
     ];
   let pollTimer = null;
   let pollOptions = null;
@@ -533,6 +542,16 @@
       request,
     );
     if (resolvedBonusRanks === null) return null;
+    const resolvedWeaponExtraDamage = await resolveChoiceStats(
+      option.weaponExtraDamage,
+      request,
+    );
+    if (resolvedWeaponExtraDamage === null) return null;
+    const resolvedAttributeContributions = await resolveChoiceStats(
+      option.attributeContributions,
+      request,
+    );
+    if (resolvedAttributeContributions === null) return null;
     const resolvedSpellLikeAbilities = await resolveSpellLikeAbilityChoices(
       option.spellLikeAbilities,
       request,
@@ -565,6 +584,8 @@
       classSkillGrants: resolvedClassSkillGrants,
       useUntrained: resolvedUseUntrained,
       bonusRanks: resolvedBonusRanks,
+      weaponExtraDamage: resolvedWeaponExtraDamage,
+      attributeContributions: resolvedAttributeContributions,
       spellLikeAbilities: resolvedSpellLikeAbilities,
       casterLevelBonuses: resolvedCasterLevelBonuses,
       spellDcBonuses: resolvedSpellDcBonuses,
@@ -601,21 +622,142 @@
     return mechanics;
   }
 
-  // Then saves the finished effect straight into that character's own
-  // buff state and marks the request resolved. Cancelling a pick leaves
-  // the request pending (nothing saved) so it just reappears next poll.
+  // Legacy requests save on the recipient. New decision-only requests
+  // return before this path so the caster's paused activation can resume.
+  async function prepareTargetAura(effect = {}) {
+    const placement = effect.targetAuraPlacement;
+    const cleaned = { ...effect };
+    delete cleaned.targetAuraPlacement;
+    if (!cleaned.auraConfig?.enabled || !cleaned.auraConfig?.targetsEmitAura)
+      return { effect: cleaned, commit: null };
+    if (!placement?.tokenId) return null;
+
+    const mapSlot = Math.max(1, Number(placement.mapSlot || 1) || 1);
+    const mapState = await window.PFApp.loadMapState(
+      pollOptions.contextKey,
+      mapSlot,
+    );
+    const targetToken = (mapState?.tokens || []).find(
+      (token) => String(token.id) === String(placement.tokenId),
+    );
+    const link = window.PFEffectMechanics?.createAuraLink?.(
+      targetToken,
+      cleaned,
+    );
+    if (!targetToken || !link) return null;
+    const current = Array.isArray(targetToken.automaticAuras)
+      ? targetToken.automaticAuras
+      : [];
+    targetToken.automaticAuras = window.PFEffectMechanics?.upsertLinkedAura
+      ? window.PFEffectMechanics.upsertLinkedAura(
+          current,
+          link.aura,
+          targetToken.id,
+        )
+      : [...current, link.aura];
+    const previousMeta = mapState._meta || {};
+    mapState._meta = {
+      ...previousMeta,
+      clientId:
+        globalThis.crypto?.randomUUID?.() || `pending-aura-${Date.now()}`,
+      revision: Math.max(1, Number(previousMeta.revision || 0) + 1),
+      savedAt: Math.max(Date.now(), Number(previousMeta.savedAt || 0) + 1),
+    };
+    return {
+      effect: link.controller,
+      commit: () =>
+        window.PFApp.saveMapState(
+          mapState,
+          pollOptions.contextKey,
+          mapSlot,
+        ),
+    };
+  }
+
+  function pendingRollContext(ability = {}) {
+    const casterLevel = Number(ability.casterLevel || 1);
+    return {
+      ...(ability.castRollContext || {}),
+      casterLevel,
+      classLevel: Number(ability.castRollContext?.classLevel || casterLevel),
+    };
+  }
+
+  async function resolvePendingAttackRolls(ability = {}, request = {}) {
+    const attacks =
+      window.PFAttackRolls?.normalizeAttacks?.(ability.attackRolls || []) || [];
+    if (!attacks.length) return ability;
+    const results = await window.PFAttackRolls.open({
+      title: `${request.effect_name || ability.name || "Effect"} Attacks`,
+      attacks,
+      context: pendingRollContext(ability),
+    });
+    if (!results) return null;
+    return window.PFAttackRolls.payloadForSuccessfulAttacks(ability, results);
+  }
+
+  async function resolvePendingDamageRolls(ability = {}, request = {}) {
+    const rolls =
+      window.PFDamageRolls?.normalizeRolls?.(ability.damageRolls || []) || [];
+    if (rolls.length) {
+      const results = await window.PFDamageRolls.open({
+        title: `${request.effect_name || ability.name || "Effect"} Damage`,
+        rolls,
+        context: pendingRollContext(ability),
+      });
+      if (!results) return null;
+    }
+    const {
+      attackRolls: _attackRolls,
+      damageRolls: _damageRolls,
+      castRollContext: _castRollContext,
+      ...persistableAbility
+    } = ability;
+    return persistableAbility;
+  }
+
   async function resolveRequest(request) {
     if (resolving.has(request.id)) return;
     resolving.add(request.id);
     try {
       let ability = request.ability || {};
+      const decisionOnly =
+        ability.activationRequest?.mode ===
+        window.PFEffectActivationOrchestrator?.REMOTE_DECISION_MODE;
+      const saveOnly =
+        ability.activationRequest?.mode ===
+        window.PFEffectActivationOrchestrator?.REMOTE_SAVE_MODE;
+      if (saveOnly) {
+        const resolved = await window.PFEffectSaves?.resolve?.(ability, {
+          sheet: window.PFCharacterSheetBridge?.currentSheetSnapshot?.() || {},
+          title: request.effect_name || ability.name || "Effect",
+          targetName: "Your character",
+        });
+        if (!resolved) return;
+        const { activationRequest: _activationRequest, ...resolvedEffect } = resolved;
+        await window.PFApp.resolveEffectChoiceRequest(request.id, {
+          effect: resolvedEffect,
+        });
+        return;
+      }
+      if (window.PFEffectMechanics?.hasContributionOptions?.(ability)) {
+        ability = await window.PFEffectMechanics.chooseContributions(ability, {
+          title: ability.name || request.effect_name || "Effect",
+        });
+        if (!ability) return;
+      }
       if (window.PFEffectMechanics?.hasBranches?.(ability)) {
         ability = await window.PFEffectMechanics.chooseBranch(ability, {
           title: ability.name || request.effect_name || "Effect",
         });
         if (!ability) return;
       }
-      const choiceResolved = await resolveChoiceStats(ability.bonuses, request);
+      if (window.PFSummonCreatures?.hasPendingChoice?.(ability)) {
+        ability = await window.PFSummonCreatures.resolveChoices(ability, {
+          title: ability.name || request.effect_name || "Effect",
+        });
+        if (!ability) return;
+      }      const choiceResolved = await resolveChoiceStats(ability.bonuses, request);
       if (choiceResolved === null) return;
       const resolved = await resolveFavoredEnemyScaleTargets(
         choiceResolved,
@@ -637,6 +779,16 @@
         request,
       );
       if (resolvedBonusRanks === null) return;
+      const resolvedWeaponExtraDamage = await resolveChoiceStats(
+        ability.weaponExtraDamage,
+        request,
+      );
+      if (resolvedWeaponExtraDamage === null) return;
+      const resolvedAttributeContributions = await resolveChoiceStats(
+        ability.attributeContributions,
+        request,
+      );
+      if (resolvedAttributeContributions === null) return;
 
       const resolvedSpellLikeAbilities = await resolveSpellLikeAbilityChoices(
         ability.spellLikeAbilities,
@@ -679,6 +831,12 @@
           ? { useUntrained: resolvedUseUntrained }
           : {}),
         ...(resolvedBonusRanks.length ? { bonusRanks: resolvedBonusRanks } : {}),
+        ...(resolvedWeaponExtraDamage.length
+          ? { weaponExtraDamage: resolvedWeaponExtraDamage }
+          : {}),
+        ...(resolvedAttributeContributions.length
+          ? { attributeContributions: resolvedAttributeContributions }
+          : {}),
         ...(resolvedSpellLikeAbilities.length
           ? { spellLikeAbilities: resolvedSpellLikeAbilities }
           : {}),
@@ -701,31 +859,100 @@
         request,
       );
       if (variableResolved === null) return;
+      const abilityResolved =
+        await window.PFConditionConfig?.resolveAbilityChoices?.(
+          variableResolved,
+          { title: request.effect_name || variableResolved.name || "Effect" },
+        );
+      if (!abilityResolved) return;
+      if (decisionOnly) {
+        const {
+          activationRequest: _activationRequest,
+          targetAuraPlacement: _targetAuraPlacement,
+          ...resolvedEffect
+        } = abilityResolved;
+        await window.PFApp.resolveEffectChoiceRequest(request.id, {
+          effect: resolvedEffect,
+        });
+        return;
+      }
+      const attackResolved = await resolvePendingAttackRolls(
+        abilityResolved,
+        request,
+      );
+      if (!attackResolved) return;
+      const conditionResolved = await window.PFConditionConfig?.resolveAdjustments?.(
+        attackResolved,
+        {
+          title: request.effect_name || variableResolved.name || "Effect",
+          context: {
+            casterLevel: Number(variableResolved.casterLevel || 1),
+            classLevel: Number(variableResolved.casterLevel || 1),
+          },
+        },
+      );
+      if (!conditionResolved) return;
+      const healingResolved = window.PFEffectHealing?.resolveRolls
+        ? await window.PFEffectHealing.resolveRolls(conditionResolved, {
+            title: request.effect_name || conditionResolved.name || "Effect",
+            context: {
+              casterLevel: Number(conditionResolved.casterLevel || 1),
+              classLevel: Number(conditionResolved.casterLevel || 1),
+            },
+          })
+        : conditionResolved;
+      if (!healingResolved) return;
+      const rolledEffect = await resolvePendingDamageRolls(
+        healingResolved,
+        request,
+      );
+      if (!rolledEffect) return;
+      const auraPreparation = await prepareTargetAura(rolledEffect);
+      if (!auraPreparation) {
+        alert("Could not place the aura on this character's map token.");
+        return;
+      }
+      let effectToSave = auraPreparation.effect;
       const existing = await window.PFApp.loadBuffState(
         pollOptions.contextKey,
         request.character_id,
       );
       const current = Array.isArray(existing) ? existing : [];
+      const restoration = window.PFConditionConfig?.applyRestorations?.(
+        current,
+        effectToSave,
+      );
+      const restoredCurrent = restoration?.activeEffects || current;
+      if (restoration) effectToSave = restoration.effect;
       const activationSourceId = String(
-        variableResolved.activationSourceId ||
-          variableResolved.sourceTokenId ||
+        effectToSave.activationSourceId ||
+          effectToSave.sourceTokenId ||
           "",
       );
-      const retained = variableResolved.activationGroup
+      const retained = effectToSave.activationGroup
         ? current.filter(
             (effect) =>
               !(
-                effect.activationGroup === variableResolved.activationGroup &&
+                effect.activationGroup === effectToSave.activationGroup &&
                 String(
                   effect.activationSourceId || effect.sourceTokenId || "",
                 ) === activationSourceId
               ),
           )
-        : current;
-      const nextBuffs = [
-        ...retained,
-        variableResolved,
-      ];
+        : restoredCurrent;
+      const nextBuffs = !window.PFConditionConfig?.hasPersistableMechanics?.(
+        effectToSave,
+      )
+        ? retained
+        : window.PFEffectMechanics?.isAuraController?.(
+        effectToSave,
+      )
+        ? window.PFEffectMechanics.upsertAuraController(
+            retained,
+            effectToSave,
+            effectToSave.durationAnchorTokenId || "",
+          )
+        : [...retained, effectToSave];
       const saved = await window.PFApp.saveBuffState(
         nextBuffs,
         pollOptions.contextKey,
@@ -735,8 +962,17 @@
         alert("Could not save your choice -- try again.");
         return;
       }
+      if (auraPreparation.commit && !(await auraPreparation.commit())) {
+        await window.PFApp.saveBuffState(
+          current,
+          pollOptions.contextKey,
+          request.character_id,
+        );
+        alert("Could not place the aura on the map -- try again.");
+        return;
+      }
       await window.PFApp.resolveEffectChoiceRequest(request.id, resolved);
-      pollOptions?.onResolved?.(request.character_id, finalized);
+      pollOptions?.onResolved?.(request.character_id, effectToSave);
     } finally {
       resolving.delete(request.id);
       poll();

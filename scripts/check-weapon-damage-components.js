@@ -15,4 +15,45 @@ assert.equal(damage.format(weapon("Energized Ice Golem", "slam").extraDamage), "
 assert.equal(damage.format(weapon("Black Pudding", "slam").extraDamage), " + 2d6 acid");
 assert.equal(damage.format([{ formula: "2d4", type: "bleed" }, { formula: "1d6+2", type: "fire" }]), " + 2d4 bleed + 1d6+2 fire");
 assert.equal(damage.format(JSON.stringify([{ formula: "1d6", type: "cold" }])), " + 1d6 cold");
+assert.deepEqual(
+  JSON.parse(JSON.stringify(damage.normalize(["1d6 fire"])[0])),
+  {
+    diceCount: 1,
+    dieType: 6,
+    diceCountMax: null,
+    staticDamage: 0,
+    staticDamageMax: null,
+    diceCountScale: null,
+    staticDamageScale: null,
+    damageType: "fire",
+  },
+);
+assert.equal(
+  damage.normalize([
+    {
+      diceCount: 0,
+      dieType: 6,
+      diceCountScale: { milestones: [{ level: 5, value: 1 }] },
+      damageType: "fire",
+    },
+  ]).length,
+  1,
+  "a zero-base component with scaling must remain configurable",
+);
+const mephistopheles = weapon("Mephistopheles", "trident");
+assert.equal(mephistopheles.damage.dice, "2d6");
+assert.equal(mephistopheles.damage.staticModifier, 29);
+assert.equal(damage.formatEntry(mephistopheles.extraDamage[0]), "1d6 fire");
+entries.forEach((monster) => {
+  (monster.weapons || []).forEach((entry) => {
+    (entry.extraDamage || entry.damage?.extra || []).forEach((component) => {
+      if (!/^\s*[+-]?(?:\d+d\d+|\d+)/i.test(String(component))) return;
+      assert.equal(
+        damage.normalize([component]).length,
+        1,
+        `${monster.name}: ${entry.name} must parse ${component}`,
+      );
+    });
+  });
+});
 console.log("Weapon damage component checks passed.");

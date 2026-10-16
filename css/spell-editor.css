@@ -50,7 +50,7 @@ body {
   text-transform: uppercase;
 }
 
-.spell-list button {
+.spell-list [data-spell-index] {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 8px;

@@ -218,28 +218,8 @@
         {
           "name": "Exploit Weakness",
           "description": "At 14th level, the inquisitor learns to take advantage of any opportunity that presents itself. Whenever the inquisitor scores a critical hit, she ignores any damage reduction the target might have. In addition, if the target has regeneration, the creature loses regeneration on the round following the critical hit and can die normally during that round. Creatures whose regeneration always functions are immune to this ability. Finally, if the inquisitor deals energy damage to a creature with vulnerability to that energy type, she deals +1 point of damage per die rolled.",
-          "pools": [
-            {
-              "name": "Exploit Weakness",
-              "description": "At 14th level, the inquisitor learns to take advantage of any opportunity that presents itself. Whenever the inquisitor scores a critical hit, she ignores any damage reduction the target might have. In addition, if the target has regeneration, the creature loses regeneration on the round following the critical hit and can die normally during that round. Creatures whose regeneration always functions are immune to this ability. Finally, if the inquisitor deals energy damage to a creature with vulnerability to that energy type, she deals +1 point of damage per die rolled.",
-              "requirements": {
-                "minClassLevel": 14,
-                "text": "At 14th level, the inquisitor learns to take advantage of any opportunity that presents itself."
-              },
-              "options": [
-                {
-                  "name": "Exploit Weakness",
-                  "description": "At 14th level, the inquisitor learns to take advantage of any opportunity that presents itself. Whenever the inquisitor scores a critical hit, she ignores any damage reduction the target might have. In addition, if the target has regeneration, the creature loses regeneration on the round following the critical hit and can die normally during that round. Creatures whose regeneration always functions are immune to this ability. Finally, if the inquisitor deals energy damage to a creature with vulnerability to that energy type, she deals +1 point of damage per die rolled.",
-                  "requirements": {
-                    "minClassLevel": 14,
-                    "text": "At 14th level, the inquisitor learns to take advantage of any opportunity that presents itself."
-                  },
-                  "scrapeConfidence": "medium"
-                }
-              ],
-              "scrapeSource": "https://www.d20pfsrd.com/classes/base-classes/inquisitor/",
-              "scrapeConfidence": "low"
-            }
+          "poolRefs": [
+            "exploit-weakness"
           ]
         }
       ]
@@ -699,5 +679,18 @@
       ]
     ]
   },
-  "spellcastingClass": true
+  "spellcastingClass": true,
+  "classFeaturePools": {
+    "exploit-weakness": {
+      "name": "Exploit Weakness",
+      "description": "At 14th level, the inquisitor learns to take advantage of any opportunity that presents itself. Whenever the inquisitor scores a critical hit, she ignores any damage reduction the target might have. In addition, if the target has regeneration, the creature loses regeneration on the round following the critical hit and can die normally during that round. Creatures whose regeneration always functions are immune to this ability. Finally, if the inquisitor deals energy damage to a creature with vulnerability to that energy type, she deals +1 point of damage per die rolled.",
+      "requirements": {
+        "minClassLevel": 14,
+        "text": "At 14th level, the inquisitor learns to take advantage of any opportunity that presents itself."
+      },
+      "scrapeSource": "https://www.d20pfsrd.com/classes/base-classes/inquisitor/",
+      "scrapeConfidence": "low",
+      "catalog": "inquisitor-exploit-weakness"
+    }
+  }
 }

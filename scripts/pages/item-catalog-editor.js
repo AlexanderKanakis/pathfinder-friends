@@ -150,6 +150,7 @@ let catalogs = {}; // key -> array of items (in-memory, mutated on commit)
 let activeCatalogKey = "weapons";
 let selectedIndex = -1;
 let searchTerm = "";
+let decisionsOnly = false;
 let dirty = false;
 let projectDirectoryHandle = null;
 let dataDirectoryHandle = null;
@@ -440,8 +441,14 @@ function itemHasEffects(item) {
       (Array.isArray(item.spellDcBonuses) && item.spellDcBonuses.length) ||
       (Array.isArray(item.effectiveAttributeBonuses) &&
         item.effectiveAttributeBonuses.length) ||
+      (Array.isArray(item.attributeContributions) &&
+        item.attributeContributions.length) ||
       (Array.isArray(item.grantDomains) && item.grantDomains.length) ||
-      (Array.isArray(item.generatedEquipment) && item.generatedEquipment.length),
+      (Array.isArray(item.generatedEquipment) && item.generatedEquipment.length) ||
+      (Array.isArray(item.weaponExtraDamage) && item.weaponExtraDamage.length) ||
+      (Array.isArray(item.weaponDamageSizeChanges) &&
+        item.weaponDamageSizeChanges.length) ||
+      (Array.isArray(item.d20Boosts) && item.d20Boosts.length),
   );
 }
 
@@ -451,8 +458,9 @@ function filteredItemIndexes() {
   return items
     .map((_, index) => index)
     .filter((index) => {
-      if (!term) return true;
       const item = items[index] || {};
+      if (decisionsOnly && !window.PFEffectDecisions.hasDecision(item)) return false;
+      if (!term) return true;
       return [item.name, item.requirements, item.details?.requirements]
         .map((value) => String(value || "").toLowerCase())
         .some((value) => value.includes(term));
@@ -469,21 +477,24 @@ function renderItemList() {
   const items = currentItems();
   const indexes = filteredItemIndexes();
   el("itemCount").innerHTML =
-    `${items.length} items${dirty ? ' <span class="dirty-dot" title="Unsaved changes"></span>' : ""}`;
+    `${indexes.length} of ${items.length} items${dirty ? ' <span class="dirty-dot" title="Unsaved changes"></span>' : ""}`;
   el("itemList").innerHTML =
     indexes
       .map((index) => {
         const item = items[index];
         return `
-      <button class="btn ${index === selectedIndex ? "btn-primary" : "btn-outline-light"} btn-sm" type="button" data-item-index="${index}">
-        <span class="item-list-entry">
-          <span class="item-list-name-row">
-            <span>${escapeHtml(item.name || "Unnamed Item")}</span>
-            ${itemHasEffects(item) ? '<span class="item-effects-badge"><i class="bi bi-magic"></i></span>' : ""}
+      <div class="admin-review-list-row">
+        <button class="btn ${index === selectedIndex ? "btn-primary" : "btn-outline-light"} btn-sm" type="button" data-item-index="${index}">
+          <span class="item-list-entry">
+            <span class="item-list-name-row">
+              <span>${escapeHtml(item.name || "Unnamed Item")}</span>
+              ${itemHasEffects(item) ? '<span class="item-effects-badge"><i class="bi bi-magic"></i></span>' : ""}
+            </span>
+            ${itemDescriptionPreview(item) ? `<span class="item-list-description">${escapeHtml(itemDescriptionPreview(item))}</span>` : ""}
           </span>
-          ${itemDescriptionPreview(item) ? `<span class="item-list-description">${escapeHtml(itemDescriptionPreview(item))}</span>` : ""}
-        </span>
-      </button>
+        </button>
+        ${PFAdminReviewMarker.buttonHtml(item, `data-review-item-index="${index}"`, "item")}
+      </div>
     `;
       })
       .join("") || `<div class="small-text">No matching items.</div>`;
@@ -495,6 +506,18 @@ function renderItemList() {
         selectedIndex = Number(button.dataset.itemIndex);
         renderItemList();
         renderSelectedItem();
+      });
+    });
+  el("itemList")
+    .querySelectorAll("[data-review-item-index]")
+    .forEach((button) => {
+      button.addEventListener("click", (event) => {
+        event.stopPropagation();
+        commitSelectedItem();
+        PFAdminReviewMarker.toggle(
+          currentItems()[Number(button.dataset.reviewItemIndex)],
+        );
+        setDirty(true);
       });
     });
 }
@@ -878,10 +901,17 @@ function commitSelectedItem() {
     casterLevelBonuses,
     spellDcBonuses,
     effectiveAttributeBonuses,
+    attributeContributions,
     grantDomains,
     generatedEquipment,
+    summonCreatures,
+    weaponExtraDamage,
+    weaponDamageSizeChanges,
     conditionalVariables,
+    attackRolls,
     damageRolls,
+    d20Boosts,
+    decisionOwner,
     activeMechanics,
   } =
     currentEffectsAccordion.collect();
@@ -902,10 +932,18 @@ function commitSelectedItem() {
   item.casterLevelBonuses = casterLevelBonuses;
   item.spellDcBonuses = spellDcBonuses;
   item.effectiveAttributeBonuses = effectiveAttributeBonuses;
+  item.attributeContributions = attributeContributions;
   item.grantDomains = grantDomains;
   item.generatedEquipment = generatedEquipment;
+  item.summonCreatures = summonCreatures;
+  item.weaponExtraDamage = weaponExtraDamage;
+  item.weaponDamageSizeChanges = weaponDamageSizeChanges;
   item.conditionalVariables = conditionalVariables;
+  item.attackRolls = attackRolls;
   item.damageRolls = damageRolls;
+  item.d20Boosts = d20Boosts;
+  if (decisionOwner) item.decisionOwner = decisionOwner;
+  else delete item.decisionOwner;
   if (activeMechanics) item.activeMechanics = activeMechanics;
   else delete item.activeMechanics;
 }
@@ -991,6 +1029,14 @@ async function saveCatalog() {
 el("itemSearch").addEventListener("input", (event) => {
   searchTerm = event.target.value;
   renderItemList();
+});
+window.PFEffectDecisions.bindFilterButton(el("itemDecisionFilter"), (active) => {
+  commitSelectedItem();
+  decisionsOnly = active;
+  const indexes = filteredItemIndexes();
+  if (!indexes.includes(selectedIndex)) selectedIndex = indexes[0] ?? -1;
+  renderItemList();
+  renderSelectedItem();
 });
 el("openProjectFolderBtn").addEventListener("click", async () => {
   try {

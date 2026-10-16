@@ -828,6 +828,24 @@ function populateLootForm(item, selectedCharacterId = "") {
     details.weaponType === "Natural"
       ? "Natural Weapon"
       : details.weaponType || "Melee Weapon (One-Handed)";
+  el("lootNaturalAttackKind").value =
+    details.naturalAttackKind || "Other";
+  el("lootNaturalAttackRole").value =
+    details.naturalAttackRole || "Secondary";
+  window.PFNaturalWeapons?.setValues(
+    el("lootNaturalDamageBySize"),
+    details.naturalDamageBySize || {},
+  );
+  if (
+    el("lootWeaponType").value === "Natural Weapon" &&
+    !Object.values(details.naturalDamageBySize || {}).some(Boolean)
+  ) {
+    void window.PFNaturalWeapons?.setFromKind(
+      el("lootNaturalDamageBySize"),
+      details.naturalAttackKind || "Other",
+      { force: true },
+    );
+  }
   setLootAttackScale(details.attackScale || "STR");
   el("lootDamageDice").value = details.damage || "";
   el("lootDamageType").value = details.damageType || "";
@@ -950,9 +968,19 @@ function renderLoot() {
 
 function toggleLootDetailFields() {
   const type = el("lootType").value;
+  const natural =
+    type === "Weapon" && el("lootWeaponType").value === "Natural Weapon";
   const firearm =
     type === "Weapon" && isFirearmWeaponType(el("lootWeaponType").value);
   el("lootWeaponFields").classList.toggle("d-none", type !== "Weapon");
+  el("lootNaturalWeaponFields").classList.toggle("d-none", !natural);
+  el("lootStandardDamageField").classList.toggle("d-none", natural);
+  if (natural) {
+    void window.PFNaturalWeapons?.setFromKind(
+      el("lootNaturalDamageBySize"),
+      el("lootNaturalAttackKind").value || "Other",
+    );
+  }
   document
     .querySelectorAll(".loot-firearm-field")
     .forEach((field) => field.classList.toggle("d-none", !firearm));
@@ -1045,11 +1073,17 @@ function collectLootDetails() {
   if (type === "Weapon") {
     const weaponType =
       el("lootWeaponType").value || "Melee Weapon (One-Handed)";
+    const natural = weaponType === "Natural Weapon";
+    const naturalDamageBySize = natural
+      ? window.PFNaturalWeapons?.collect(el("lootNaturalDamageBySize")) || {}
+      : {};
     const details = {
       ...slotDetails,
       weaponType,
       attackScale: el("lootAttackScale").value.trim() || "STR",
-      damage: el("lootDamageDice").value.trim(),
+      damage: natural
+        ? naturalDamageBySize.medium || ""
+        : el("lootDamageDice").value.trim(),
       damageType: el("lootDamageType").value.trim(),
       extraDamage: PFWeaponDamage.collect(el("lootExtraDamage")),
       critical: el("lootWeaponCritical").value.trim(),
@@ -1058,6 +1092,14 @@ function collectLootDetails() {
       enchantment: el("lootWeaponEnchantment").value.trim(),
       specialMaterial: el("lootSpecialMaterial").value,
       details: el("lootWeaponDetails").value.trim(),
+      ...(natural
+        ? {
+            naturalAttackKind: el("lootNaturalAttackKind").value || "Other",
+            naturalAttackRole:
+              el("lootNaturalAttackRole").value || "Secondary",
+            naturalDamageBySize,
+          }
+        : {}),
     };
     if (isFirearmWeaponType(weaponType)) {
       details.capacity = el("lootWeaponCapacity").value.trim();
@@ -1295,10 +1337,16 @@ function lootEffectPayload(item = {}) {
     "casterLevelBonuses",
     "spellDcBonuses",
     "effectiveAttributeBonuses",
+    "attributeContributions",
     "grantDomains",
     "generatedEquipment",
+    "summonCreatures",
+    "weaponExtraDamage",
+    "weaponDamageSizeChanges",
     "conditionalVariables",
+      "attackRolls",
       "damageRolls",
+    "d20Boosts",
   ];
   keys.forEach((key) => {
     payload[key] = Array.isArray(passive[key]) ? passive[key] : [];
@@ -1470,6 +1518,9 @@ function resetLootForm() {
   setLootAttackScale("STR");
   setLootDamageScale("STR");
   el("lootWeaponType").value = "Melee Weapon (One-Handed)";
+  el("lootNaturalAttackKind").value = "Other";
+  el("lootNaturalAttackRole").value = "Secondary";
+  window.PFNaturalWeapons?.setValues(el("lootNaturalDamageBySize"), {});
   el("lootDamageType").value = "";
   PFWeaponDamage.mount(el("lootExtraDamage"));
   el("lootWeaponCritical").value = "";
@@ -1519,10 +1570,16 @@ async function syncEditedLootBuff(item) {
       "casterLevelBonuses",
       "spellDcBonuses",
       "effectiveAttributeBonuses",
+    "attributeContributions",
       "grantDomains",
       "generatedEquipment",
+      "summonCreatures",
+      "weaponExtraDamage",
+      "weaponDamageSizeChanges",
       "conditionalVariables",
+      "attackRolls",
       "damageRolls",
+    "d20Boosts",
     ]).some((key) => extras[key]?.length);
   if (hasExtras) {
     const nextBuff = {
@@ -1545,10 +1602,16 @@ async function syncEditedLootBuff(item) {
       "casterLevelBonuses",
       "spellDcBonuses",
       "effectiveAttributeBonuses",
+    "attributeContributions",
       "grantDomains",
       "generatedEquipment",
+      "summonCreatures",
+      "weaponExtraDamage",
+      "weaponDamageSizeChanges",
       "conditionalVariables",
+      "attackRolls",
       "damageRolls",
+    "d20Boosts",
     ]).forEach((key) => {
       nextBuff[key] = extras[key] || [];
     });
@@ -1747,6 +1810,17 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (!user) return;
   bagCurrentUserId = user.id;
 
+  await window.PFNaturalWeapons?.loadCatalog?.();
+  await window.PFNaturalWeapons?.populateKindSelect?.(
+    el("lootNaturalAttackKind"),
+    "Other",
+  );
+  window.PFNaturalWeapons?.mount(el("lootNaturalDamageBySize"), {}, {
+    onChange: (damageBySize) => {
+      el("lootDamageDice").value = damageBySize.medium || "";
+    },
+  });
+
   lootModal = new bootstrap.Modal(el("lootModal"));
   sourceItemModal = new bootstrap.Modal(el("sourceItemsModal"));
   moveLootModal = new bootstrap.Modal(el("moveLootModal"));
@@ -1777,6 +1851,18 @@ document.addEventListener("DOMContentLoaded", async () => {
   );
   el("lootType").addEventListener("change", toggleLootDetailFields);
   el("lootWeaponType").addEventListener("change", toggleLootDetailFields);
+  el("lootNaturalAttackKind").addEventListener("change", async (event) => {
+    const entry = await window.PFNaturalWeapons?.attack?.(event.target.value);
+    await window.PFNaturalWeapons?.setFromKind(
+      el("lootNaturalDamageBySize"),
+      event.target.value,
+      { force: true },
+    );
+    if (!entry) return;
+    el("lootNaturalAttackRole").value =
+      entry.details?.naturalAttackRole || "Primary";
+    el("lootDamageType").value = entry.details?.damageType || "";
+  });
   setupLootScalingControls();
   lootEffectsAccordion = window.PFEffectEditor.mountMechanicGroups(
     el("lootEffectsAccordion"),

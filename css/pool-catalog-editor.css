@@ -1,0 +1,32 @@
+.pool-catalog-button {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  min-width: 0;
+  width: 100%;
+}
+
+.pool-catalog-button > span:first-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pool-option-list {
+  columns: 2;
+  column-gap: 1rem;
+  margin: 0;
+  padding: 0;
+}
+
+.pool-option-list li {
+  break-inside: avoid;
+  list-style: none;
+  padding: 0.3rem 0;
+}
+
+@media (max-width: 767.98px) {
+  .pool-option-list {
+    columns: 1;
+  }
+}

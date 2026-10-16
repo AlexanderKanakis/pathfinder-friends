@@ -9,10 +9,12 @@
 .shared-extra-ranks-row label,
 .shared-feat-grant-row label,
 .shared-size-change-row label,
+.shared-weapon-damage-size-row label,
 .shared-special-toggle-row label,
 .shared-spell-like-row label,
 .shared-spell-adjustment-row label,
 .shared-generated-equipment-row label,
+.shared-weapon-extra-damage-row label,
 .shared-conditional-variable-row label {
   display: block;
   color: #fff;
@@ -222,6 +224,27 @@
   align-items: end;
 }
 
+.shared-weapon-damage-size-row {
+  align-items: end;
+  background: #242424;
+  border: 1px solid #444;
+  border-radius: 8px;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: minmax(130px, 0.55fr) minmax(200px, 1fr) minmax(180px, 0.8fr) auto;
+  padding: 8px;
+}
+
+.shared-weapon-damage-size-row > div {
+  min-width: 0;
+}
+
+.shared-weapon-damage-size-row > .btn-icon {
+  height: 31px;
+  padding: 0;
+  width: 31px;
+}
+
 .shared-feat-grant-row {
   grid-template-columns: minmax(140px, 0.8fr) minmax(120px, 0.6fr) minmax(180px, 1fr) auto;
   background: #242424;
@@ -282,12 +305,58 @@
 
 .shared-apply-condition-row {
   display: grid;
-  grid-template-columns: minmax(150px, 1fr) auto;
+  grid-template-columns: minmax(180px, 1fr) auto;
   gap: 8px;
   align-items: end;
   border: 1px solid #495057;
   border-radius: 6px;
   padding: 10px;
+}
+
+.shared-apply-condition-row > button[aria-label="Delete applied condition"] {
+  align-items: center;
+  display: inline-flex;
+  height: 31px;
+  justify-content: center;
+  justify-self: end;
+  padding: 0;
+  width: 31px;
+}
+
+.shared-condition-adjustment {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(105px, 1fr));
+  gap: 8px;
+  align-items: end;
+  min-width: 0;
+}
+
+.shared-condition-adjustment > div {
+  min-width: 0;
+}
+
+.shared-condition-adjustment [data-condition-scale-host] {
+  align-content: end;
+  align-self: stretch;
+  display: grid;
+  gap: 4px;
+}
+
+.shared-condition-adjustment [data-condition-scale-button] {
+  width: 100%;
+}
+
+.shared-condition-static-field {
+  grid-column: 1;
+}
+
+.shared-condition-adjustment .modal-number-stepper {
+  width: 100%;
+}
+
+.shared-condition-adjustment .modal-number-stepper input {
+  min-width: 42px;
 }
 
 .shared-conditional-variable-row {
@@ -424,6 +493,33 @@
   padding: 10px;
 }
 
+.shared-weapon-extra-damage-row {
+  align-items: end;
+  background: #242424;
+  border: 1px solid #444;
+  border-radius: 8px;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(3, minmax(120px, 1fr)) auto;
+  padding: 10px;
+}
+
+.shared-weapon-extra-damage-row > .btn-icon {
+  align-self: end;
+  height: 31px;
+  width: 34px;
+}
+
+.shared-effect-weapon-damage {
+  min-width: 0;
+}
+
+.shared-generated-extra-damage {
+  border-top: 1px solid #3f3f3f;
+  margin-top: 12px;
+  padding-top: 12px;
+}
+
 .shared-generated-equipment-header,
 .shared-generated-equipment-fields {
   display: grid;
@@ -441,7 +537,74 @@
   margin-top: 8px;
 }
 
+.shared-generated-equipment-weapon-layout {
+  display: grid;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.shared-generated-equipment-section {
+  min-width: 0;
+  padding: 10px 0 0;
+  border-top: 1px solid #3c4248;
+}
+
+.shared-generated-equipment-section h6 {
+  margin: 0 0 8px;
+  color: #f1c75b;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+}
+
+.shared-generated-equipment-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+  gap: 8px;
+  align-items: end;
+}
+
+.shared-generated-damage-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+@media (max-width: 900px) {
+  .shared-generated-damage-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.shared-generated-wide-field {
+  grid-column: span 2;
+}
+
+.shared-generated-scale-control {
+  display: grid;
+  gap: 4px;
+  align-self: stretch;
+  align-content: end;
+}
+
+.shared-generated-enhancement-summary {
+  grid-column: 1 / -1;
+}
+
+.shared-generated-toggle {
+  min-height: 54px;
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+}
+
 @media (max-width: 640px) {
+  .shared-weapon-extra-damage-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .shared-weapon-extra-damage-row > .btn-icon {
+    grid-column: 2;
+    justify-self: end;
+  }
+
   .shared-bonus-row,
   .shared-bonus-condition-inline {
     grid-template-columns: 1fr;
@@ -479,7 +642,21 @@
   }
 
   .shared-apply-condition-row {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .shared-apply-condition-row .shared-condition-adjustment {
+    grid-column: 1 / -1;
+  }
+
+  .shared-apply-condition-row > button[aria-label="Delete applied condition"] {
+    grid-column: 2;
+    grid-row: 1;
+    width: 31px;
+  }
+
+  .shared-condition-adjustment {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .shared-conditional-variable-row {
@@ -491,12 +668,20 @@
     grid-template-columns: 1fr;
   }
 
+  .shared-generated-equipment-grid,
+  .shared-generated-damage-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .shared-generated-wide-field {
+    grid-column: auto;
+  }
+
   .shared-spell-like-row .btn-icon,
   .shared-spell-like-row button[aria-label="Delete spell-like ability"],
   .shared-spell-adjustment-row button,
-  .shared-apply-condition-row button,
   .shared-conditional-variable-row button,
-  .shared-generated-equipment-row button {
+  .shared-generated-equipment-row > .shared-generated-equipment-header button {
     width: 100%;
   }
 
@@ -506,8 +691,31 @@
   .shared-feat-grant-row button[aria-label="Delete feat grant"],
   .shared-grant-domain-row button[aria-label="Delete domain grant"],
   .shared-size-change-row button[aria-label="Delete size change"],
+  .shared-weapon-damage-size-row button[aria-label="Delete weapon damage size change"],
   .shared-spell-adjustment-target-row button[aria-label="Delete spell target group"] {
     width: 31px;
+  }
+}
+
+@media (max-width: 640px) {
+  .shared-weapon-damage-size-row {
+    grid-template-columns: 1fr;
+  }
+
+  .shared-weapon-damage-size-row > .btn-icon {
+    justify-self: end;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1000px) {
+  .shared-condition-adjustment {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 420px) {
+  .shared-condition-adjustment {
+    grid-template-columns: 1fr;
   }
 }
 .shared-mechanic-group {
@@ -547,6 +755,69 @@
   border-radius: 6px;
   background: #222;
   padding: 10px;
+}
+
+.shared-attack-roll-row {
+  border: 1px solid #495057;
+  border-radius: 6px;
+  background: #222;
+  padding: 10px;
+}
+
+.shared-attack-roll-row label {
+  display: block;
+  margin-bottom: 3px;
+  color: #fff;
+  font-size: 12px;
+}
+
+.shared-attack-roll-heading {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) auto;
+  gap: 8px;
+  align-items: end;
+}
+
+.shared-mechanic-row-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.shared-mechanic-row-actions > .btn-icon {
+  flex: 0 0 auto;
+}
+
+.shared-attack-roll-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(120px, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.shared-attack-scale-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.shared-attack-scale-row > div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.shared-attack-payload-heading {
+  margin: 12px 0 8px;
+  color: #aaa;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.shared-attack-roll-row .shared-extra-accordion .accordion-body {
+  padding: 8px;
 }
 
 .shared-damage-roll-row label {
@@ -606,21 +877,42 @@
   margin-top: 12px;
 }
 
+.shared-d20-boost-row { border: 1px solid #444; border-radius: 6px; padding: 10px; }
+.shared-d20-boost-heading, .shared-d20-boost-grid, .shared-d20-boost-scales { display: grid; gap: 8px; align-items: end; }
+.shared-d20-boost-heading { grid-template-columns: minmax(180px, 1fr) auto; }
+.shared-d20-boost-grid { grid-template-columns: repeat(3, minmax(120px, 1fr)); margin-top: 8px; }
+.shared-d20-boost-scales { grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 8px; }
+.shared-d20-boost-scales > div { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.shared-d20-boost-scope { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 10px; }
+.shared-d20-boost-scope legend { float: none; width: 100%; margin: 0; font-size: 12px; color: #adb5bd; }
+
 @media (max-width: 900px) {
+  .shared-attack-roll-grid {
+    grid-template-columns: repeat(2, minmax(120px, 1fr));
+  }
+
   .shared-damage-profile-grid {
     grid-template-columns: repeat(3, minmax(100px, 1fr));
   }
 }
 
 @media (max-width: 640px) {
-  .shared-damage-roll-heading,
+  .shared-attack-roll-grid,
+  .shared-attack-scale-row,
   .shared-damage-condition-heading,
   .shared-damage-profile-grid,
   .shared-damage-scale-row {
     grid-template-columns: 1fr;
   }
 
+  .shared-d20-boost-grid, .shared-d20-boost-scales { grid-template-columns: 1fr; }
+
   .shared-damage-scale-row > div {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .shared-attack-scale-row > div {
     align-items: flex-start;
     flex-direction: column;
   }
@@ -667,5 +959,124 @@
 
   .shared-mechanic-branch-header label {
     grid-column: 1 / -1;
+  }
+}
+.natural-damage-editor {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.natural-damage-field,
+.natural-damage-editor-wrap {
+  min-width: 0;
+}
+
+.natural-damage-field label,
+.natural-damage-editor-wrap > label {
+  display: block;
+  margin-bottom: 0.2rem;
+}
+
+.natural-damage-controls {
+  display: grid;
+  grid-template-columns: minmax(8rem, 1fr) minmax(4.75rem, 0.55fr);
+  gap: 0.25rem;
+  align-items: stretch;
+}
+
+.natural-damage-stepper {
+  min-width: 0;
+}
+
+.natural-damage-controls .btn,
+.natural-damage-controls input,
+.natural-damage-controls select {
+  min-width: 0;
+  min-height: 2rem;
+}
+
+.natural-damage-controls input {
+  text-align: center;
+}
+
+.natural-damage-editor-wrap {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 575.98px) {
+  .natural-damage-editor {
+    grid-template-columns: 1fr;
+  }
+}
+
+.shared-summon-creature-row {
+  align-items: center;
+  background: #242424;
+  border: 1px solid #444;
+  border-radius: 6px;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  padding: 10px;
+}
+
+.summon-editor-grid,
+.summon-count-grid,
+.summon-hd-grid {
+  align-items: end;
+  display: grid;
+  gap: 8px;
+}
+
+.summon-editor-grid { grid-template-columns: minmax(180px, 1fr) auto; }
+.summon-count-grid { grid-template-columns: repeat(3, minmax(130px, 1fr)); margin-top: 10px; }
+.summon-hd-grid { grid-template-columns: repeat(2, minmax(130px, 1fr)); }
+.summon-target-choice { align-items: center; display: flex; gap: 8px; margin: 0 0 6px; }
+.summon-monster-results { border: 1px solid #444; max-height: min(36vh, 340px); overflow-y: auto; }
+.summon-monster-row { align-items: center; border-bottom: 1px solid #333; display: flex; gap: 10px; padding: 7px 9px; }
+.summon-monster-row:last-child { border-bottom: 0; }
+.summon-monster-row span { min-width: 0; }
+.summon-monster-row small { color: #aaa; display: block; }
+.summon-type-grid { display: grid; gap: 4px 12px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+@media (max-width: 640px) {
+  .summon-editor-grid,
+  .summon-count-grid,
+  .summon-hd-grid { grid-template-columns: 1fr; }
+  .summon-type-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+.shared-attribute-contribution-row {
+  align-items: end;
+  border: 1px solid #444;
+  border-radius: 6px;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: minmax(150px, 0.8fr) minmax(105px, 0.45fr) minmax(220px, 1.35fr) minmax(180px, 1fr) minmax(180px, 1fr) auto;
+  padding: 10px;
+}
+
+.shared-attribute-contribution-row > div {
+  min-width: 0;
+}
+
+.shared-attribute-contribution-row .btn-icon {
+  height: 31px;
+  width: 38px;
+}
+
+@media (max-width: 900px) {
+  .shared-attribute-contribution-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .shared-attribute-contribution-row .shared-attribute-contribution-target {
+    grid-column: 1 / -1;
+  }
+
+  .shared-attribute-contribution-row .btn-icon {
+    justify-self: end;
   }
 }

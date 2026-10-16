@@ -2,6 +2,18 @@
   "name": "Cleric",
   "type": "core",
   "sourceUrl": "https://www.d20pfsrd.com/classes/core-classes/cleric/",
+  "classResources": [
+    {
+      "id": "channel-energy",
+      "name": "Channel Energy",
+      "unit": "uses",
+      "unlockLevel": 1,
+      "maximum": {
+        "base": 3,
+        "ability": "cha"
+      }
+    }
+  ],
   "levelProgression": [
     {
       "level": 1,

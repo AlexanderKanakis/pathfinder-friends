@@ -156,125 +156,6 @@ const WEAPON_TYPES = [
   "Natural Weapon",
   "Improvised",
 ];
-const NATURAL_ATTACK_DAMAGE_BY_SIZE = {
-  Bite: {
-    fine: "1",
-    diminutive: "1d2",
-    tiny: "1d3",
-    small: "1d4",
-    medium: "1d6",
-    large: "1d8",
-    huge: "2d6",
-    gargantuan: "2d8",
-    colossal: "4d6",
-    damageType: "B, P, and S",
-    attackRole: "Primary",
-  },
-  Claw: {
-    fine: "",
-    diminutive: "1",
-    tiny: "1d2",
-    small: "1d3",
-    medium: "1d4",
-    large: "1d6",
-    huge: "1d8",
-    gargantuan: "2d6",
-    colossal: "2d8",
-    damageType: "B and S",
-    attackRole: "Primary",
-  },
-  Gore: {
-    fine: "1",
-    diminutive: "1d2",
-    tiny: "1d3",
-    small: "1d4",
-    medium: "1d6",
-    large: "1d8",
-    huge: "2d6",
-    gargantuan: "2d8",
-    colossal: "4d6",
-    damageType: "P",
-    attackRole: "Primary",
-  },
-  "Hoof, Tentacle, Wing": {
-    fine: "",
-    diminutive: "1",
-    tiny: "1d2",
-    small: "1d3",
-    medium: "1d4",
-    large: "1d6",
-    huge: "1d8",
-    gargantuan: "2d6",
-    colossal: "2d8",
-    damageType: "B",
-    attackRole: "Secondary",
-  },
-  "Pincers, Tail Slap": {
-    fine: "1",
-    diminutive: "1d2",
-    tiny: "1d3",
-    small: "1d4",
-    medium: "1d6",
-    large: "1d8",
-    huge: "2d6",
-    gargantuan: "2d8",
-    colossal: "4d6",
-    damageType: "B",
-    attackRole: "Secondary",
-  },
-  Slam: {
-    fine: "",
-    diminutive: "1",
-    tiny: "1d2",
-    small: "1d3",
-    medium: "1d4",
-    large: "1d6",
-    huge: "1d8",
-    gargantuan: "2d6",
-    colossal: "2d8",
-    damageType: "B",
-    attackRole: "Primary",
-  },
-  Sting: {
-    fine: "",
-    diminutive: "1",
-    tiny: "1d2",
-    small: "1d3",
-    medium: "1d4",
-    large: "1d6",
-    huge: "1d8",
-    gargantuan: "2d6",
-    colossal: "2d8",
-    damageType: "P",
-    attackRole: "Primary",
-  },
-  Talons: {
-    fine: "",
-    diminutive: "1",
-    tiny: "1d2",
-    small: "1d3",
-    medium: "1d4",
-    large: "1d6",
-    huge: "1d8",
-    gargantuan: "2d6",
-    colossal: "2d8",
-    damageType: "S",
-    attackRole: "Primary",
-  },
-  Other: {
-    fine: "",
-    diminutive: "1",
-    tiny: "1d2",
-    small: "1d3",
-    medium: "1d4",
-    large: "1d6",
-    huge: "1d8",
-    gargantuan: "2d6",
-    colossal: "2d8",
-    damageType: "B, P, or S",
-    attackRole: "Secondary",
-  },
-};
 const ALIGNMENTS = [
   ["LG", "Lawful Good"],
   ["NG", "Neutral Good"],
@@ -463,6 +344,7 @@ let currentHitPointsBase = 0;
 let currentHitPointsAdjustment = 0;
 let renderingCurrentHitPoints = false;
 let activeBuffs = [];
+let d20BoostUses = {};
 let equipmentEnhancementCache = new WeakMap();
 let equipmentEnhancementBuffCache = null;
 let lastBuffRefresh = "";
@@ -483,6 +365,8 @@ const loadedClassDefinitions = new Map();
 let domainDefinitions = { domains: [] };
 let bloodlineDefinitions = { bloodlines: [] };
 let classProgression = [];
+let classResourceValues = {};
+let classResourceRenderSignature = "";
 let featDefinitions = { types: [], feats: [] };
 let characterFeats = {};
 let activeSheetInfoTab = "character";
@@ -520,6 +404,7 @@ const spellCastMapClientId = `character-sheet-${
 let spellCastMapRevision = 0;
 let spellCastBridgeFrame = null;
 let spellCastBridgePromise = null;
+let spellCastInFlight = false;
 let inventoryItemModal = null;
 let deleteInventoryItemModal = null;
 let editingInventoryItemId = null;
@@ -626,6 +511,55 @@ function abilityModFor(key, buffed) {
   return buffed?.abilityMods?.[ABILITY_STAT_NAMES[key]] ?? abilityMod(key);
 }
 
+function resolvedAttributeContribution(
+  stat,
+  baseAbilities,
+  buffed,
+  context = {},
+) {
+  const abilityMods = Object.fromEntries(
+    Object.entries(ABILITY_STAT_NAMES).flatMap(([key, name]) => [
+      [key, abilityModFor(key, buffed)],
+      [name, abilityModFor(key, buffed)],
+    ]),
+  );
+  return (
+    window.PFEffectMechanics?.resolveAttributeContributions?.({
+      effects: calculationBuffs(),
+      stat,
+      baseAbilities,
+      abilityMods,
+      context,
+    }) || {
+      entries: [],
+      terms: baseAbilities.map((ability) => ({
+        ability,
+        mode: "base",
+        source: "Base",
+        value: abilityMods[ability] || 0,
+      })),
+      total: baseAbilities.reduce(
+        (sum, ability) => sum + Number(abilityMods[ability] || 0),
+        0,
+      ),
+      replaced: false,
+    }
+  );
+}
+
+function attributeContributionBreakdown(result = {}, targetLabel = "") {
+  return (result.terms || [])
+    .filter((term) => term.mode !== "base")
+    .map((term) => ({
+      source: term.source || "Effect",
+      value: Number(term.value || 0),
+      type: "attribute",
+      applied: true,
+      stat: "attribute contribution",
+      targetLabel,
+      detail: `${term.mode === "replace" ? "replaces existing attributes with" : "adds"} ${String(term.ability || "").toUpperCase()}`,
+    }));
+}
 function currentAttributeScaleContext() {
   const baseline = sheetToBaseline();
   const buffed = window.PFBuffs?.calculateStatsDetailed?.(
@@ -642,13 +576,40 @@ function currentAttributeScaleContext() {
     );
   });
   const characterLevel = Math.max(1, num("characterLevel") || 1);
+  const conditionalGroups = simpleConditionalsByStat();
   return {
     characterLevel,
     casterLevel: characterLevel,
+    bab: Number(baseline.bab || 0) || 0,
     classLevels: progressionClassCounts(),
     skillRanks: baseline.skillRanks || {},
     abilityScores,
     abilityMods,
+    attackConditionals: conditionalGroups.attack || [],
+    attackConditionalsByType: {
+      melee: conditionalGroups["melee attack"] || [],
+      ranged: conditionalGroups["ranged attack"] || [],
+      "melee-touch": [
+        ...(conditionalGroups["melee attack"] || []),
+        ...(conditionalGroups["touch attack"] || []),
+      ],
+      "ranged-touch": [
+        ...(conditionalGroups["ranged attack"] || []),
+        ...(conditionalGroups["touch attack"] || []),
+      ],
+    },
+    cmbConditionals: conditionalGroups.cmb || [],
+  };
+}
+
+function spellCastingScaleContext(calculations = null, casterLevel = 1) {
+  return {
+    ...currentAttributeScaleContext(),
+    casterLevel,
+    classLevel: casterLevel,
+    castingAbility: calculations?.castingAbility || "",
+    castingAbilityMod: Number(calculations?.castingAbilityMod || 0),
+    spellCalculations: calculations || null,
   };
 }
 
@@ -1393,19 +1354,32 @@ function naturalAttackData(card) {
   const explicitKind =
     card.querySelector('[data-field="naturalAttackKind"]')?.value || "";
   const name = card.querySelector('[data-field="name"]')?.value || "";
-  const kind = NATURAL_ATTACK_DAMAGE_BY_SIZE[explicitKind]
-    ? explicitKind
-    : naturalAttackKindFromName(name);
+  const kind = explicitKind || naturalAttackKindFromName(name);
+  const storedDamage = window.PFNaturalWeapons?.normalizeDamageBySize(
+    card.querySelector('[data-field="naturalDamageBySize"]')?.value || {},
+  );
+  const catalogDetails =
+    window.PFNaturalWeapons?.cachedAttack(kind)?.details || {};
+  const damageBySize = Object.values(storedDamage || {}).some(Boolean)
+    ? storedDamage
+    : window.PFNaturalWeapons?.normalizeDamageBySize(
+        catalogDetails.naturalDamageBySize,
+      );
   return {
     kind,
-    ...(NATURAL_ATTACK_DAMAGE_BY_SIZE[kind] || NATURAL_ATTACK_DAMAGE_BY_SIZE.Other),
+    ...damageBySize,
+    damageType: catalogDetails.damageType || "",
+    attackRole:
+      card.querySelector('[data-field="naturalAttackRole"]')?.value ||
+      catalogDetails.naturalAttackRole ||
+      "",
   };
 }
 
-function naturalAttackDice(card) {
+function naturalAttackDice(card, sizeName = finalCreatureSize().name) {
   const data = naturalAttackData(card);
   if (!data) return "";
-  const sizeKey = String(finalCreatureSize().name || "Medium").toLowerCase();
+  const sizeKey = String(sizeName || "Medium").toLowerCase();
   return data[sizeKey] || "";
 }
 
@@ -1747,6 +1721,7 @@ function skillStatKey(skill) {
 
 function skillFamilyBonusKey(skill) {
   const name = String(skill || "").trim();
+  if (isKnowledgeSkill(name)) return "knowledge skill checks";
   if (/^craft(?:\s*\(|\b)/i.test(name)) return "craft skill checks";
   if (/^profession(?:\s*\(|\b)/i.test(name)) return "profession skill checks";
   if (/^perform(?:\s*\(|\b)/i.test(name)) return "perform skill checks";
@@ -1786,6 +1761,7 @@ function skillFamilyLabel(stat) {
       "perform skill checks": "Perform skills",
       "class skill checks": "Class skills",
       "class knowledge skill checks": "Class Knowledge skills",
+      "knowledge skill checks": "Knowledge skills",
       "trained skill checks": "Trained skills",
       "untrained skill checks": "Untrained skills",
     }[stat] || ""
@@ -1992,6 +1968,9 @@ function resolvedRacialTrait(trait = {}) {
     bonusRanks: Array.isArray(choices.bonusRanks)
       ? choices.bonusRanks
       : trait.bonusRanks,
+    weaponExtraDamage: Array.isArray(choices.weaponExtraDamage)
+      ? choices.weaponExtraDamage
+      : trait.weaponExtraDamage,
     extraRanksPerLevel: Array.isArray(choices.extraRanksPerLevel)
       ? choices.extraRanksPerLevel
       : trait.extraRanksPerLevel,
@@ -2016,12 +1995,18 @@ function resolvedRacialTrait(trait = {}) {
     effectiveAttributeBonuses: Array.isArray(choices.effectiveAttributeBonuses)
       ? choices.effectiveAttributeBonuses
       : trait.effectiveAttributeBonuses,
+    attributeContributions: Array.isArray(choices.attributeContributions)
+      ? choices.attributeContributions
+      : trait.attributeContributions,
     grantDomains: Array.isArray(choices.grantDomains)
       ? choices.grantDomains
       : trait.grantDomains,
     generatedEquipment: Array.isArray(choices.generatedEquipment)
       ? choices.generatedEquipment
       : trait.generatedEquipment,
+    summonCreatures: Array.isArray(choices.summonCreatures)
+      ? choices.summonCreatures
+      : trait.summonCreatures,
     conditionalVariables: Array.isArray(choices.conditionalVariables)
       ? choices.conditionalVariables
       : trait.conditionalVariables,
@@ -2510,6 +2495,12 @@ async function resolveRacialTraitMechanicChoices(
     );
     if (!item) return false;
   }
+  if (window.PFSummonCreatures?.hasPendingChoice?.(item)) {
+    item = await window.PFSummonCreatures.resolveChoices(item, {
+      title: trait.name || item.name || "Effect",
+    });
+    if (!item) return false;
+  }
   const choiceResolvedEffects = await resolveRacialTraitChoiceStats(
     item.effects,
     trait,
@@ -2535,6 +2526,16 @@ async function resolveRacialTraitMechanicChoices(
     trait,
   );
   if (!resolvedBonusRanks) return false;
+  const resolvedWeaponExtraDamage = await resolveRacialTraitChoiceStats(
+    item.weaponExtraDamage,
+    trait,
+  );
+  if (!resolvedWeaponExtraDamage) return false;
+  const resolvedAttributeContributions = await resolveRacialTraitChoiceStats(
+    item.attributeContributions,
+    trait,
+  );
+  if (!resolvedAttributeContributions) return false;
   const resolvedSpellLikeAbilities = await resolveRacialTraitSpellLikeChoices(
     item.spellLikeAbilities,
     trait,
@@ -2568,6 +2569,8 @@ async function resolveRacialTraitMechanicChoices(
     classSkillGrants: resolvedClassSkillGrants,
     useUntrained: resolvedUseUntrained,
     bonusRanks: resolvedBonusRanks,
+    weaponExtraDamage: resolvedWeaponExtraDamage,
+    attributeContributions: resolvedAttributeContributions,
     spellLikeAbilities: resolvedSpellLikeAbilities,
     casterLevelBonuses: resolvedCasterLevelBonuses,
     spellDcBonuses: resolvedSpellDcBonuses,
@@ -2628,7 +2631,9 @@ async function resolveRacialTraitOperationValueChoice(
     key === "effects" ||
     key === "classSkillGrants" ||
     key === "useUntrained" ||
-    key === "bonusRanks"
+    key === "bonusRanks" ||
+    key === "weaponExtraDamage" ||
+    key === "attributeContributions"
   ) {
     const resolved = await resolveRacialTraitChoiceStats([value], trait);
     if (!resolved) return null;
@@ -2711,6 +2716,14 @@ function racialTraitMechanicsHaveChoiceStats(item = {}) {
       item.bonusRanks.some((grant) =>
         window.PFEffectStats?.isChoiceStat(grant.stat),
       )) ||
+    (Array.isArray(item.weaponExtraDamage) &&
+      item.weaponExtraDamage.some((entry) =>
+        window.PFEffectStats?.isChoiceStat(entry.stat),
+      )) ||
+    (Array.isArray(item.attributeContributions) &&
+      item.attributeContributions.some((entry) =>
+        window.PFEffectStats?.isChoiceStat(entry.stat),
+      )) ||
     (Array.isArray(item.spellLikeAbilities) &&
       item.spellLikeAbilities.some(spellLikeAbilityHasChoiceList)) ||
     spellAdjustmentEntriesNeedChoice(item.casterLevelBonuses) ||
@@ -2735,6 +2748,8 @@ function racialTraitOverrideHasChoiceStats(override = {}) {
             "classSkillGrants",
             "useUntrained",
             "bonusRanks",
+            "weaponExtraDamage",
+            "attributeContributions",
             "spellLikeAbilities",
             "casterLevelBonuses",
             "spellDcBonuses",
@@ -2808,14 +2823,21 @@ async function resolveRacialTraitChoicesBeforeApply(trait = {}) {
       extraRanksPerLevel: cloneJson(variableResolvedTrait.extraRanksPerLevel),
       featGrants: cloneJson(variableResolvedTrait.featGrants),
       sizeChanges: cloneJson(variableResolvedTrait.sizeChanges),
+      weaponDamageSizeChanges: cloneJson(
+        variableResolvedTrait.weaponDamageSizeChanges,
+      ),
       spellLikeAbilities: cloneJson(variableResolvedTrait.spellLikeAbilities),
       casterLevelBonuses: cloneJson(variableResolvedTrait.casterLevelBonuses),
       spellDcBonuses: cloneJson(variableResolvedTrait.spellDcBonuses),
       effectiveAttributeBonuses: cloneJson(
         variableResolvedTrait.effectiveAttributeBonuses,
       ),
+      attributeContributions: cloneJson(
+        variableResolvedTrait.attributeContributions,
+      ),
       grantDomains: cloneJson(variableResolvedTrait.grantDomains),
       generatedEquipment: cloneJson(variableResolvedTrait.generatedEquipment),
+      summonCreatures: cloneJson(variableResolvedTrait.summonCreatures),
       conditionalVariables: cloneJson(variableResolvedTrait.conditionalVariables),
       conditionalChoices: cloneJson(variableResolvedTrait.conditionalChoices),
       activeMechanics: cloneJson(variableResolvedTrait.activeMechanics),
@@ -2880,8 +2902,12 @@ const RACIAL_TRAIT_MECHANIC_KEYS =
     "casterLevelBonuses",
     "spellDcBonuses",
     "effectiveAttributeBonuses",
+    "attributeContributions",
     "grantDomains",
     "generatedEquipment",
+    "summonCreatures",
+    "weaponExtraDamage",
+    "weaponDamageSizeChanges",
     "conditionalVariables",
   ];
 
@@ -3275,6 +3301,9 @@ function collectSelectedRaceBuffs() {
     const hasFeatGrants = featGrants.length;
     const hasSizeChanges =
       Array.isArray(trait.sizeChanges) && trait.sizeChanges.length;
+    const hasWeaponDamageSizeChanges =
+      Array.isArray(trait.weaponDamageSizeChanges) &&
+      trait.weaponDamageSizeChanges.length;
     const spellLikeAbilities = Array.isArray(trait.spellLikeAbilities)
       ? trait.spellLikeAbilities
       : [];
@@ -3293,6 +3322,10 @@ function collectSelectedRaceBuffs() {
       ? trait.effectiveAttributeBonuses
       : [];
     const hasEffectiveAttributeBonuses = effectiveAttributeBonuses.length;
+    const attributeContributions = Array.isArray(trait.attributeContributions)
+      ? trait.attributeContributions
+      : [];
+    const hasAttributeContributions = attributeContributions.length;
     const grantDomains = Array.isArray(trait.grantDomains)
       ? trait.grantDomains
       : [];
@@ -3301,6 +3334,12 @@ function collectSelectedRaceBuffs() {
       ? trait.generatedEquipment
       : [];
     const hasGeneratedEquipment = generatedEquipment.length;
+    const weaponExtraDamage = Array.isArray(trait.weaponExtraDamage)
+      ? trait.weaponExtraDamage
+      : [];
+    const hasWeaponExtraDamage = weaponExtraDamage.length;
+    const d20Boosts = Array.isArray(trait.d20Boosts) ? trait.d20Boosts : [];
+    const hasD20Boosts = d20Boosts.length;
     const conditionalVariables = Array.isArray(trait.conditionalVariables)
       ? trait.conditionalVariables
       : [];
@@ -3318,12 +3357,16 @@ function collectSelectedRaceBuffs() {
       !hasExtraRanks &&
       !hasFeatGrants &&
       !hasSizeChanges &&
+      !hasWeaponDamageSizeChanges &&
       !hasSpellLikeAbilities &&
       !hasCasterLevelBonuses &&
       !hasSpellDcBonuses &&
       !hasEffectiveAttributeBonuses &&
+      !hasAttributeContributions &&
       !hasGrantDomains &&
       !hasGeneratedEquipment &&
+      !hasWeaponExtraDamage &&
+      !hasD20Boosts &&
       !hasConditionalVariables
     )
       return;
@@ -3344,14 +3387,25 @@ function collectSelectedRaceBuffs() {
       extraRanksPerLevel: hasExtraRanks ? trait.extraRanksPerLevel : [],
       featGrants: hasFeatGrants ? featGrants : [],
       sizeChanges: hasSizeChanges ? trait.sizeChanges : [],
+      weaponDamageSizeChanges: Array.isArray(trait.weaponDamageSizeChanges)
+        ? trait.weaponDamageSizeChanges
+        : [],
       spellLikeAbilities: hasSpellLikeAbilities ? spellLikeAbilities : [],
       casterLevelBonuses: hasCasterLevelBonuses ? casterLevelBonuses : [],
       spellDcBonuses: hasSpellDcBonuses ? spellDcBonuses : [],
       effectiveAttributeBonuses: hasEffectiveAttributeBonuses
         ? effectiveAttributeBonuses
         : [],
+      attributeContributions: hasAttributeContributions
+        ? attributeContributions
+        : [],
       grantDomains: hasGrantDomains ? grantDomains : [],
       generatedEquipment: hasGeneratedEquipment ? generatedEquipment : [],
+      summonCreatures: Array.isArray(trait.summonCreatures)
+        ? trait.summonCreatures
+        : [],
+      weaponExtraDamage: hasWeaponExtraDamage ? weaponExtraDamage : [],
+      d20Boosts: hasD20Boosts ? d20Boosts : [],
       conditionalVariables: hasConditionalVariables ? conditionalVariables : [],
       auraConfig: trait.auraConfig || null,
     });
@@ -3382,6 +3436,9 @@ function racialTraitAbilityFromTrait(trait, race, sourceLabel, options = {}) {
       : [];
   const generatedEquipment = Array.isArray(trait.generatedEquipment)
     ? trait.generatedEquipment
+    : [];
+  const summonCreatures = Array.isArray(trait.summonCreatures)
+    ? trait.summonCreatures
     : [];
   const choicePools = racialTraitChoicePools(trait);
   const ability = {
@@ -3416,6 +3473,9 @@ function racialTraitAbilityFromTrait(trait, race, sourceLabel, options = {}) {
       : [],
     featGrants: Array.isArray(trait.featGrants) ? trait.featGrants : [],
     sizeChanges: Array.isArray(trait.sizeChanges) ? trait.sizeChanges : [],
+    weaponDamageSizeChanges: Array.isArray(trait.weaponDamageSizeChanges)
+      ? trait.weaponDamageSizeChanges
+      : [],
     spellLikeAbilities: Array.isArray(trait.spellLikeAbilities)
       ? trait.spellLikeAbilities
       : [],
@@ -3428,8 +3488,16 @@ function racialTraitAbilityFromTrait(trait, race, sourceLabel, options = {}) {
     effectiveAttributeBonuses: Array.isArray(trait.effectiveAttributeBonuses)
       ? trait.effectiveAttributeBonuses
       : [],
+    attributeContributions: Array.isArray(trait.attributeContributions)
+      ? trait.attributeContributions
+      : [],
     grantDomains: Array.isArray(trait.grantDomains) ? trait.grantDomains : [],
     generatedEquipment,
+    summonCreatures,
+    weaponExtraDamage: Array.isArray(trait.weaponExtraDamage)
+      ? trait.weaponExtraDamage
+      : [],
+    d20Boosts: Array.isArray(trait.d20Boosts) ? trait.d20Boosts : [],
     conditionalVariables: Array.isArray(trait.conditionalVariables)
       ? trait.conditionalVariables
       : [],
@@ -3470,13 +3538,16 @@ function racialTraitAbilityFromTrait(trait, race, sourceLabel, options = {}) {
     (ability.extraRanksPerLevel || []).length ||
     (ability.featGrants || []).length ||
     (ability.sizeChanges || []).length ||
+    (ability.weaponDamageSizeChanges || []).length ||
     (ability.spellLikeAbilities || []).length ||
     (ability.casterLevelBonuses || []).length ||
     (ability.spellDcBonuses || []).length ||
     (ability.effectiveAttributeBonuses || []).length ||
     (ability.grantDomains || []).length ||
     (ability.generatedEquipment || []).length ||
+    (ability.weaponExtraDamage || []).length ||
     (ability.conditionalVariables || []).length ||
+    (ability.attackRolls || []).length ||
     (ability.damageRolls || []).length ||
     (ability.choicePools || []).length;
   return hasAny ? ability : null;
@@ -4370,6 +4441,11 @@ function simpleConditionalListRows(label, currentTotal, stats, groups) {
       sub: "",
       detail: row.source,
       conditional: true,
+      label: row.label,
+      source: row.source,
+      value: row.value,
+      type: row.type,
+      appliesWhen: row.appliesWhen,
     })),
   );
 }
@@ -4566,6 +4642,9 @@ function normalizeWondrousSourceItem(item, index) {
       : [],
     featGrants: Array.isArray(item.featGrants) ? item.featGrants : [],
     sizeChanges: Array.isArray(item.sizeChanges) ? item.sizeChanges : [],
+    weaponDamageSizeChanges: Array.isArray(item.weaponDamageSizeChanges)
+      ? item.weaponDamageSizeChanges
+      : [],
     spellLikeAbilities: Array.isArray(item.spellLikeAbilities)
       ? item.spellLikeAbilities
       : [],
@@ -4578,9 +4657,15 @@ function normalizeWondrousSourceItem(item, index) {
     effectiveAttributeBonuses: Array.isArray(item.effectiveAttributeBonuses)
       ? item.effectiveAttributeBonuses
       : [],
+    attributeContributions: Array.isArray(item.attributeContributions)
+      ? item.attributeContributions
+      : [],
     grantDomains: Array.isArray(item.grantDomains) ? item.grantDomains : [],
     generatedEquipment: Array.isArray(item.generatedEquipment)
       ? item.generatedEquipment
+      : [],
+    summonCreatures: Array.isArray(item.summonCreatures)
+      ? item.summonCreatures
       : [],
     conditionalVariables: Array.isArray(item.conditionalVariables)
       ? item.conditionalVariables
@@ -4663,6 +4748,9 @@ function normalizeMundaneSourceItem(item, index) {
       : [],
     featGrants: Array.isArray(item.featGrants) ? item.featGrants : [],
     sizeChanges: Array.isArray(item.sizeChanges) ? item.sizeChanges : [],
+    weaponDamageSizeChanges: Array.isArray(item.weaponDamageSizeChanges)
+      ? item.weaponDamageSizeChanges
+      : [],
     spellLikeAbilities: Array.isArray(item.spellLikeAbilities)
       ? item.spellLikeAbilities
       : [],
@@ -4675,9 +4763,15 @@ function normalizeMundaneSourceItem(item, index) {
     effectiveAttributeBonuses: Array.isArray(item.effectiveAttributeBonuses)
       ? item.effectiveAttributeBonuses
       : [],
+    attributeContributions: Array.isArray(item.attributeContributions)
+      ? item.attributeContributions
+      : [],
     grantDomains: Array.isArray(item.grantDomains) ? item.grantDomains : [],
     generatedEquipment: Array.isArray(item.generatedEquipment)
       ? item.generatedEquipment
+      : [],
+    summonCreatures: Array.isArray(item.summonCreatures)
+      ? item.summonCreatures
       : [],
     conditionalVariables: Array.isArray(item.conditionalVariables)
       ? item.conditionalVariables
@@ -4746,6 +4840,9 @@ function normalizeWeaponSourceItem(item, index) {
       : [],
     featGrants: Array.isArray(item.featGrants) ? item.featGrants : [],
     sizeChanges: Array.isArray(item.sizeChanges) ? item.sizeChanges : [],
+    weaponDamageSizeChanges: Array.isArray(item.weaponDamageSizeChanges)
+      ? item.weaponDamageSizeChanges
+      : [],
     spellLikeAbilities: Array.isArray(item.spellLikeAbilities)
       ? item.spellLikeAbilities
       : [],
@@ -4758,9 +4855,15 @@ function normalizeWeaponSourceItem(item, index) {
     effectiveAttributeBonuses: Array.isArray(item.effectiveAttributeBonuses)
       ? item.effectiveAttributeBonuses
       : [],
+    attributeContributions: Array.isArray(item.attributeContributions)
+      ? item.attributeContributions
+      : [],
     grantDomains: Array.isArray(item.grantDomains) ? item.grantDomains : [],
     generatedEquipment: Array.isArray(item.generatedEquipment)
       ? item.generatedEquipment
+      : [],
+    summonCreatures: Array.isArray(item.summonCreatures)
+      ? item.summonCreatures
       : [],
     conditionalVariables: Array.isArray(item.conditionalVariables)
       ? item.conditionalVariables
@@ -4831,6 +4934,9 @@ function normalizeArmorShieldSourceItem(item, index) {
       : [],
     featGrants: Array.isArray(item.featGrants) ? item.featGrants : [],
     sizeChanges: Array.isArray(item.sizeChanges) ? item.sizeChanges : [],
+    weaponDamageSizeChanges: Array.isArray(item.weaponDamageSizeChanges)
+      ? item.weaponDamageSizeChanges
+      : [],
     spellLikeAbilities: Array.isArray(item.spellLikeAbilities)
       ? item.spellLikeAbilities
       : [],
@@ -4843,9 +4949,15 @@ function normalizeArmorShieldSourceItem(item, index) {
     effectiveAttributeBonuses: Array.isArray(item.effectiveAttributeBonuses)
       ? item.effectiveAttributeBonuses
       : [],
+    attributeContributions: Array.isArray(item.attributeContributions)
+      ? item.attributeContributions
+      : [],
     grantDomains: Array.isArray(item.grantDomains) ? item.grantDomains : [],
     generatedEquipment: Array.isArray(item.generatedEquipment)
       ? item.generatedEquipment
+      : [],
+    summonCreatures: Array.isArray(item.summonCreatures)
+      ? item.summonCreatures
       : [],
     conditionalVariables: Array.isArray(item.conditionalVariables)
       ? item.conditionalVariables
@@ -5338,18 +5450,21 @@ function collectClassFeatureBuffs() {
           extraRanksPerLevel: passiveFeature.extraRanksPerLevel,
           featGrants: passiveFeature.featGrants,
           sizeChanges: passiveFeature.sizeChanges,
+          weaponDamageSizeChanges: passiveFeature.weaponDamageSizeChanges,
           immunities: passiveFeature.immunities,
           applyConditions: passiveFeature.applyConditions,
           spellLikeAbilities: passiveFeature.spellLikeAbilities,
           casterLevelBonuses: passiveFeature.casterLevelBonuses,
           spellDcBonuses: passiveFeature.spellDcBonuses,
           effectiveAttributeBonuses: passiveFeature.effectiveAttributeBonuses,
+          attributeContributions: passiveFeature.attributeContributions,
           grantDomains: passiveFeature.grantDomains,
           generatedEquipment: passiveFeature.generatedEquipment,
+          d20Boosts: passiveFeature.d20Boosts,
           auraConfig: passiveFeature.auraConfig || null,
         });
       }
-      featurePools(feature).forEach((pool) => {
+      featurePools(feature, definition).forEach((pool) => {
         // Choices whose pool contributes to an activatable ability (e.g.
         // rage powers into Rage) get bundled in at cast time instead of
         // applying as their own always-on buff.
@@ -5390,6 +5505,8 @@ function collectClassFeatureBuffs() {
             (Array.isArray(option.featGrants) &&
               option.featGrants.length) ||
             (Array.isArray(option.sizeChanges) && option.sizeChanges.length) ||
+            (Array.isArray(option.weaponDamageSizeChanges) &&
+              option.weaponDamageSizeChanges.length) ||
             (Array.isArray(option.immunities) && option.immunities.length) ||
             (Array.isArray(option.applyConditions) &&
               option.applyConditions.length) ||
@@ -5401,10 +5518,15 @@ function collectClassFeatureBuffs() {
               option.spellDcBonuses.length) ||
             (Array.isArray(option.effectiveAttributeBonuses) &&
               option.effectiveAttributeBonuses.length) ||
+            (Array.isArray(option.attributeContributions) &&
+              option.attributeContributions.length) ||
             (Array.isArray(option.grantDomains) &&
               option.grantDomains.length) ||
             (Array.isArray(option.generatedEquipment) &&
-              option.generatedEquipment.length))
+              option.generatedEquipment.length) ||
+            (Array.isArray(option.weaponExtraDamage) &&
+              option.weaponExtraDamage.length) ||
+            (Array.isArray(option.d20Boosts) && option.d20Boosts.length))
         ) {
           buffs.push({
             ...context,
@@ -5424,14 +5546,19 @@ function collectClassFeatureBuffs() {
             extraRanksPerLevel: option.extraRanksPerLevel,
             featGrants: option.featGrants,
             sizeChanges: option.sizeChanges,
+            weaponDamageSizeChanges: option.weaponDamageSizeChanges,
             immunities: option.immunities,
             applyConditions: option.applyConditions,
             spellLikeAbilities: option.spellLikeAbilities,
             casterLevelBonuses: option.casterLevelBonuses,
             spellDcBonuses: option.spellDcBonuses,
             effectiveAttributeBonuses: option.effectiveAttributeBonuses,
+            attributeContributions: option.attributeContributions,
             grantDomains: option.grantDomains,
             generatedEquipment: option.generatedEquipment,
+            summonCreatures: option.summonCreatures,
+            weaponExtraDamage: option.weaponExtraDamage,
+            d20Boosts: option.d20Boosts,
             auraConfig: option.auraConfig || null,
           });
         }
@@ -5489,7 +5616,7 @@ function collectClassFeatureDamageReduction() {
         context,
         feature.name || "Class Feature",
       );
-      featurePools(feature).forEach((pool) => {
+      featurePools(feature, definition).forEach((pool) => {
         if (pool.contributesToAbility) return;
         const key = classFeatureChoiceKey(
           { ...feature, className, classLevel, characterLevel: row.level },
@@ -5887,7 +6014,7 @@ function collectClassFeatureImmunities() {
         window.PFEffectMechanics?.passiveMechanics?.(feature)?.immunities || [],
         feature.name || "Class Feature",
       );
-      featurePools(feature).forEach((pool) => {
+      featurePools(feature, definition).forEach((pool) => {
         if (pool.contributesToAbility) return;
         const key = classFeatureChoiceKey(
           { ...feature, className, classLevel, characterLevel: row.level },
@@ -6134,7 +6261,7 @@ function collectClassFeatureSpellResistance() {
         context,
         feature.name || "Class Feature",
       );
-      featurePools(feature).forEach((pool) => {
+      featurePools(feature, definition).forEach((pool) => {
         if (pool.contributesToAbility) return;
         const key = classFeatureChoiceKey(
           { ...feature, className, classLevel, characterLevel: row.level },
@@ -6287,6 +6414,7 @@ function collectActivatableAbilities() {
       classFeatureChoices,
       characterLevel: num("characterLevel"),
       abilityScores: attributeScaleContext.abilityScores,
+      bab: attributeScaleContext.bab,
     }) || [];
   const mechanicAbility = (source, mechanics, category, sourceLabel, id) => {
     if (!window.PFEffectMechanics?.hasAnyMechanics?.(mechanics)) return null;
@@ -6381,10 +6509,20 @@ function appliedConditionName(entry = {}) {
 }
 
 function conditionBuffFromApplyCondition(entry = {}, sourceBuff = {}) {
-  const condition =
+  const rawCondition =
     entry.condition && typeof entry.condition === "object"
       ? entry.condition
       : entry;
+  const condition =
+    window.PFConditionConfig?.configuredCondition?.({
+      ...entry,
+      condition: rawCondition,
+    }) || rawCondition;
+  if (
+    window.PFConditionConfig?.isAdjustmentEntry?.(entry) &&
+    window.PFConditionConfig.normalizeAdjustment(entry).mode === "heal"
+  )
+    return null;
   const name = condition.name || appliedConditionName(entry);
   if (!name) return null;
   return {
@@ -6419,6 +6557,9 @@ function conditionBuffFromApplyCondition(entry = {}, sourceBuff = {}) {
     sizeChanges: Array.isArray(condition.sizeChanges)
       ? condition.sizeChanges
       : [],
+    weaponDamageSizeChanges: Array.isArray(condition.weaponDamageSizeChanges)
+      ? condition.weaponDamageSizeChanges
+      : [],
     spellLikeAbilities: Array.isArray(condition.spellLikeAbilities)
       ? condition.spellLikeAbilities
       : [],
@@ -6431,11 +6572,17 @@ function conditionBuffFromApplyCondition(entry = {}, sourceBuff = {}) {
     effectiveAttributeBonuses: Array.isArray(condition.effectiveAttributeBonuses)
       ? condition.effectiveAttributeBonuses
       : [],
+    attributeContributions: Array.isArray(condition.attributeContributions)
+      ? condition.attributeContributions
+      : [],
     grantDomains: Array.isArray(condition.grantDomains)
       ? condition.grantDomains
       : [],
     generatedEquipment: Array.isArray(condition.generatedEquipment)
       ? condition.generatedEquipment
+      : [],
+    summonCreatures: Array.isArray(condition.summonCreatures)
+      ? condition.summonCreatures
       : [],
   };
 }
@@ -6859,7 +7006,7 @@ function collectClassFeatureClassSkillGrants() {
         window.PFEffectMechanics?.passiveMechanics?.(feature)
           ?.classSkillGrants || [],
       );
-      featurePools(feature).forEach((pool) => {
+      featurePools(feature, definition).forEach((pool) => {
         if (pool.contributesToAbility) return;
         const key = classFeatureChoiceKey(
           { ...feature, className, classLevel, characterLevel: row.level },
@@ -6972,6 +7119,7 @@ function renderLevelProgression() {
       select.disabled = true;
       try {
         await loadClassDefinitions([select.value]);
+        renderLevelProgression();
         updateClassDerivedViews();
         recalculateSheet();
         queueSheetSave();
@@ -7281,7 +7429,7 @@ function renderClassFeatureGeneratedEquipment(feature) {
   `;
 }
 
-function featurePools(feature) {
+function featurePools(feature, definition = null) {
   const choiceSource = String(feature.choiceSource || "").toLowerCase();
   if (
     choiceSource === "sorcerer-bloodlines" ||
@@ -7316,11 +7464,9 @@ function featurePools(feature) {
       },
     ];
   }
-  return Array.isArray(feature.pools)
-    ? feature.pools
-    : Array.isArray(feature.choicePools)
-      ? feature.choicePools
-      : [];
+  const owner =
+    definition || classDefinitionByName(feature.className || feature.sourceClass);
+  return window.PFClassData?.featurePools?.(owner, feature) || [];
 }
 
 function selectedBloodlineForClass(className = "") {
@@ -7367,7 +7513,7 @@ function chosenOptionsForPoolName(poolName, excludeKey) {
     features.forEach((feature) => {
       if (typeof feature === "string") return;
       const context = { className, classLevel, characterLevel: row.level };
-      featurePools(feature).forEach((pool) => {
+      featurePools(feature, definition).forEach((pool) => {
         if (pool.name !== poolName) return;
         const key = classFeatureChoiceKey(
           { ...feature, ...context },
@@ -7578,6 +7724,14 @@ function classFeatureMechanicsNeedChoice(item = {}) {
     (Array.isArray(item.bonusRanks) &&
       item.bonusRanks.some((grant) =>
         window.PFEffectStats?.isChoiceStat(grant.stat),
+      )) ||
+    (Array.isArray(item.weaponExtraDamage) &&
+      item.weaponExtraDamage.some((entry) =>
+        window.PFEffectStats?.isChoiceStat(entry.stat),
+      )) ||
+    (Array.isArray(item.attributeContributions) &&
+      item.attributeContributions.some((entry) =>
+        window.PFEffectStats?.isChoiceStat(entry.stat),
       )) ||
     (Array.isArray(item.spellLikeAbilities) &&
       item.spellLikeAbilities.some(spellLikeAbilityHasChoiceList)) ||
@@ -8137,7 +8291,7 @@ function collectClassFeatureFeatGrantSlots(limit = 20) {
           level,
         });
       });
-      featurePools(feature).forEach((pool, poolIndex) => {
+      featurePools(feature, definition).forEach((pool, poolIndex) => {
         if (pool.contributesToAbility) return;
         const key = classFeatureChoiceKey(
           { ...feature, className, classLevel, characterLevel: row.level },
@@ -8505,6 +8659,8 @@ function featHasChoiceBearingMechanics(feat = {}) {
     hasChoiceStats(feat.classSkillGrants) ||
     hasChoiceStats(feat.useUntrained) ||
     hasChoiceStats(feat.bonusRanks) ||
+    hasChoiceStats(feat.weaponExtraDamage) ||
+    hasChoiceStats(feat.attributeContributions) ||
     (Array.isArray(feat.spellLikeAbilities) &&
       feat.spellLikeAbilities.some(spellLikeAbilityHasChoiceList)) ||
     spellAdjustmentEntriesNeedChoice(feat.casterLevelBonuses) ||
@@ -8559,9 +8715,14 @@ const FEAT_MECHANIC_KEYS = window.PFEffectMechanics?.mechanicKeys?.() || [
   "casterLevelBonuses",
   "spellDcBonuses",
   "effectiveAttributeBonuses",
+  "attributeContributions",
   "grantDomains",
   "generatedEquipment",
+  "summonCreatures",
+  "weaponExtraDamage",
+  "weaponDamageSizeChanges",
   "conditionalVariables",
+  "d20Boosts",
 ];
 
 function featHasAnyMechanics(feat = {}) {
@@ -8632,6 +8793,9 @@ function collectSelectedFeatBuffs() {
         : [],
       featGrants: Array.isArray(feat.featGrants) ? feat.featGrants : [],
       sizeChanges: Array.isArray(feat.sizeChanges) ? feat.sizeChanges : [],
+      weaponDamageSizeChanges: Array.isArray(feat.weaponDamageSizeChanges)
+        ? feat.weaponDamageSizeChanges
+        : [],
       spellLikeAbilities: Array.isArray(feat.spellLikeAbilities)
         ? feat.spellLikeAbilities
         : [],
@@ -8644,13 +8808,23 @@ function collectSelectedFeatBuffs() {
       effectiveAttributeBonuses: Array.isArray(feat.effectiveAttributeBonuses)
         ? feat.effectiveAttributeBonuses
         : [],
+      attributeContributions: Array.isArray(feat.attributeContributions)
+        ? feat.attributeContributions
+        : [],
       grantDomains: Array.isArray(feat.grantDomains) ? feat.grantDomains : [],
       generatedEquipment: Array.isArray(feat.generatedEquipment)
         ? feat.generatedEquipment
         : [],
+      summonCreatures: Array.isArray(feat.summonCreatures)
+        ? feat.summonCreatures
+        : [],
+      weaponExtraDamage: Array.isArray(feat.weaponExtraDamage)
+        ? feat.weaponExtraDamage
+        : [],
       conditionalVariables: Array.isArray(feat.conditionalVariables)
         ? feat.conditionalVariables
         : [],
+      d20Boosts: Array.isArray(feat.d20Boosts) ? feat.d20Boosts : [],
       auraConfig: feat.auraConfig || null,
     }));
 }
@@ -8952,6 +9126,7 @@ function renderClassFeatures() {
                 description: "",
               }
             : {
+                ...feature,
                 className: row.className,
                 classLevel,
                 characterLevel: row.level,
@@ -8988,6 +9163,11 @@ function renderClassFeatures() {
                 sizeChanges: Array.isArray(feature.sizeChanges)
                   ? feature.sizeChanges
                   : [],
+                weaponDamageSizeChanges: Array.isArray(
+                  feature.weaponDamageSizeChanges,
+                )
+                  ? feature.weaponDamageSizeChanges
+                  : [],
                 spellLikeAbilities: Array.isArray(feature.spellLikeAbilities)
                   ? feature.spellLikeAbilities
                   : [],
@@ -9002,16 +9182,23 @@ function renderClassFeatures() {
                 )
                   ? feature.effectiveAttributeBonuses
                   : [],
+                attributeContributions: Array.isArray(
+                  feature.attributeContributions,
+                )
+                  ? feature.attributeContributions
+                  : [],
                 grantDomains: Array.isArray(feature.grantDomains)
                   ? feature.grantDomains
                   : [],
                 generatedEquipment: Array.isArray(feature.generatedEquipment)
                   ? feature.generatedEquipment
                   : [],
+                summonCreatures: Array.isArray(feature.summonCreatures)
+                  ? feature.summonCreatures
+                  : [],
                 conditionalVariables: Array.isArray(feature.conditionalVariables)
                   ? feature.conditionalVariables
                   : [],
-                pools: featurePools(feature),
               };
         groups.get(row.level).push(nextFeature);
       });
@@ -9853,6 +10040,66 @@ function currentSheetMapSlot() {
   return Math.max(1, Math.min(maxSlot, stored || 1));
 }
 
+function normalizedMapActorName(value) {
+  return String(value || "")
+    .trim()
+    .replace(/\s+/g, " ")
+    .toLowerCase();
+}
+
+function currentSheetSourceToken(mapState = {}) {
+  const tokens = Array.isArray(mapState.tokens) ? mapState.tokens : [];
+  const exact = tokens.find((token) =>
+    isEnemySheetMode
+      ? token.kind === "enemy" && String(token.enemyId) === String(enemySheetId)
+      : token.kind === "character" &&
+        String(token.characterId) === String(currentSheetId),
+  );
+  if (exact) return exact;
+
+  const currentName = normalizedMapActorName(el("characterName")?.value);
+  if (!currentName) return null;
+  const sameName = tokens.filter(
+    (token) =>
+      token.kind === (isEnemySheetMode ? "enemy" : "character") &&
+      normalizedMapActorName(token.name) === currentName,
+  );
+  return sameName.length === 1 ? sameName[0] : null;
+}
+
+async function loadCurrentSheetMapState() {
+  const preferredSlot = currentSheetMapSlot();
+  const preferredState =
+    (await PFApp.loadMapState?.(sheetContextKey, preferredSlot)) || {
+      tokens: [],
+    };
+  if (currentSheetSourceToken(preferredState))
+    return { state: preferredState, slot: preferredSlot };
+
+  const maxSlot = Number(PFApp.MAP_SLOT_COUNT || 6) || 6;
+  const otherSlots = Array.from(
+    { length: maxSlot },
+    (_, index) => index + 1,
+  ).filter((slot) => slot !== preferredSlot);
+  const otherStates = await Promise.all(
+    otherSlots.map(async (slot) => ({
+      slot,
+      state: (await PFApp.loadMapState?.(sheetContextKey, slot)) || {
+        tokens: [],
+      },
+    })),
+  );
+  const located = otherStates.find(({ state }) =>
+    currentSheetSourceToken(state),
+  );
+  if (!located) return { state: preferredState, slot: preferredSlot };
+  localStorage.setItem(
+    `pf_map_slot_${sheetContextKey}`,
+    String(located.slot),
+  );
+  return located;
+}
+
 async function saveSpellCastMapState() {
   if (!spellCastTargetMapState || !PFApp.saveMapState) return null;
   const previousMeta = spellCastTargetMapState._meta || {};
@@ -9886,9 +10133,13 @@ function spellEffectPayloads(spell = {}) {
     "sizeChanges",
     "spellLikeAbilities",
     "generatedEquipment",
+    "summonCreatures",
+    "weaponExtraDamage",
+    "weaponDamageSizeChanges",
     "casterLevelBonuses",
     "spellDcBonuses",
     "effectiveAttributeBonuses",
+    "attributeContributions",
     "grantDomains",
     "conditionalVariables",
   ];
@@ -9900,7 +10151,9 @@ function spellEffectPayloads(spell = {}) {
     : Array.isArray(mechanics.bonuses)
       ? mechanics.bonuses
       : [];
-  const targetKeys = keys.filter((key) => key !== "damageRolls");
+  const targetKeys = keys.filter((key) => key !== "damageRolls").filter(
+    (key) => key !== "attackRolls",
+  );
   const hasInlineEffect = targetKeys.some(
     (key) => Array.isArray(mechanics[key]) && mechanics[key].length,
   );
@@ -9908,7 +10161,13 @@ function spellEffectPayloads(spell = {}) {
   const metamagicRiders = Array.isArray(mechanics.metamagicRiders)
     ? mechanics.metamagicRiders
     : [];
-  const hasBasePayload = bonusRows.length || hasInlineEffect || hasBranches;
+  const hasSave = Boolean(window.PFEffectSaves?.hasSave?.(mechanics));
+  const hasBasePayload =
+    bonusRows.length ||
+    hasInlineEffect ||
+    hasBranches ||
+    hasSave ||
+    Boolean(mechanics.auraConfig?.enabled);
   if (!hasBasePayload && !metamagicRiders.length) return [];
   const payload = {
     name: spell.name || "Spell Effect",
@@ -9918,6 +10177,7 @@ function spellEffectPayloads(spell = {}) {
     auraConfig: mechanics.auraConfig || spell.auraConfig || null,
     metamagicDurationMultiplier: mechanics.metamagicDurationMultiplier || 1,
     duration: spell.duration || spell.details?.duration || "",
+    ...window.PFEffectMechanics?.copyActivationConfig?.(mechanics),
     ...(window.PFEffectMechanics?.hasBranches?.(mechanics)
       ? { branches: mechanics.branches }
       : {}),
@@ -9925,6 +10185,11 @@ function spellEffectPayloads(spell = {}) {
   targetKeys.forEach((key) => {
     payload[key] = Array.isArray(mechanics[key]) ? mechanics[key] : [];
   });
+  if (hasSave) {
+    payload.damageRolls = Array.isArray(mechanics.damageRolls)
+      ? mechanics.damageRolls
+      : [];
+  }
   return [
     ...(hasBasePayload ? [payload] : []),
     ...metamagicRiders.map((rider) => cloneJson(rider)),
@@ -9938,6 +10203,13 @@ function spellDamageRolls(spell = {}) {
   return window.PFDamageRolls?.normalizeRolls?.(mechanics.damageRolls || []) || [];
 }
 
+function spellAttackRolls(spell = {}) {
+  const mechanics = window.PFEffectMechanics?.activeMechanics?.(spell, {
+    activeOnly: true,
+  }) || spell;
+  return window.PFAttackRolls?.normalizeAttacks?.(mechanics.attackRolls || []) || [];
+}
+
 function spellTargetPayloadHasMechanics(payload = {}) {
   return Boolean(
     (Array.isArray(payload.bonuses) && payload.bonuses.length) ||
@@ -9945,6 +10217,54 @@ function spellTargetPayloadHasMechanics(payload = {}) {
   );
 }
 
+function spellEffectHasSummons(effect = {}) {
+  return Array.isArray(effect.summonCreatures) && effect.summonCreatures.length > 0;
+}
+
+function spellEffectOnlySummons(effect = {}) {
+  if (!spellEffectHasSummons(effect)) return false;
+  return !spellTargetPayloadHasMechanics({
+    ...effect,
+    summonCreatures: [],
+    trackActive: false,
+  });
+}
+
+async function spawnSpellCreaturesOnCurrentMap(
+  effect = {},
+  placementToken = null,
+  controllerOwnerId = "",
+) {
+  await spellCastTargetsFromCurrentMap();
+  const sourceToken = currentSheetSourceToken(spellCastTargetMapState);
+  if (!sourceToken || !window.PFSummonCreatures) return false;
+  const result = await window.PFSummonCreatures.spawn(effect, {
+    mapState: spellCastTargetMapState,
+    sourceToken: placementToken || sourceToken,
+    durationAnchorToken: sourceToken,
+    context: effect.castRollContext || {
+      casterLevel: Number(effect.casterLevel || 1),
+      classLevel: Number(effect.casterLevel || 1),
+    },
+    ownerId:
+      controllerOwnerId ||
+      (placementToken || sourceToken).ownerId ||
+      ((placementToken || sourceToken).kind === "enemy"
+        ? ""
+        : sourceToken.ownerId || currentSheetOwnerId || currentUserId),
+  });
+  if (!result.ok) return false;
+  if (!Array.isArray(spellCastTargetMapState.timeline))
+    spellCastTargetMapState.timeline = [];
+  spellCastTargetMapState.timeline.push({
+    id: globalThis.crypto?.randomUUID?.() || `summon-${Date.now()}`,
+    text: `${sourceToken.name || el("characterName")?.value || "Caster"} summons ${result.tokens.map((token) => token.name).join(", ")}.`,
+    time: new Date().toLocaleString(),
+  });
+  spellCastTargetMapState.timeline = spellCastTargetMapState.timeline.slice(-20);
+  await saveSpellCastMapState();
+  return true;
+}
 async function recordSpellDamageTimeline(spell = {}, results = []) {
   if (!results.length || !window.PFDamageRolls) return;
   await spellCastTargetsFromCurrentMap();
@@ -9954,6 +10274,22 @@ async function recordSpellDamageTimeline(spell = {}, results = []) {
     spellCastTargetMapState.timeline = [];
   spellCastTargetMapState.timeline.push({
     id: globalThis.crypto?.randomUUID?.() || `spell-damage-${Date.now()}`,
+    text,
+    time: new Date().toLocaleString(),
+  });
+  spellCastTargetMapState.timeline = spellCastTargetMapState.timeline.slice(-20);
+  await saveSpellCastMapState();
+}
+
+async function recordSpellAttackTimeline(spell = {}, results = []) {
+  if (!results.length || !window.PFAttackRolls) return;
+  await spellCastTargetsFromCurrentMap();
+  const actor = el("characterName")?.value?.trim() || (isEnemySheetMode ? "Enemy" : "Character");
+  const text = `${actor} casts ${spell.name || "a spell"}: ${window.PFAttackRolls.summary(results)}.`;
+  if (!Array.isArray(spellCastTargetMapState.timeline))
+    spellCastTargetMapState.timeline = [];
+  spellCastTargetMapState.timeline.push({
+    id: globalThis.crypto?.randomUUID?.() || `spell-attack-${Date.now()}`,
     text,
     time: new Date().toLocaleString(),
   });
@@ -9981,16 +10317,13 @@ async function rollSpellDamageFromDetails(
   spell = {},
   casterLevel = 1,
   authoredRolls = null,
+  calculations = null,
 ) {
   const damageRolls = authoredRolls
     ? window.PFDamageRolls?.normalizeRolls?.(authoredRolls) || []
     : spellDamageRolls(spell);
   if (!damageRolls.length) return [];
-  const context = {
-    ...currentAttributeScaleContext(),
-    casterLevel,
-    classLevel: casterLevel,
-  };
+  const context = spellCastingScaleContext(calculations, casterLevel);
   const results = await window.PFDamageRolls?.open?.({
     title: `${spell.name || "Spell"} Damage`,
     rolls: damageRolls,
@@ -9998,6 +10331,71 @@ async function rollSpellDamageFromDetails(
   });
   if (results) await recordSpellDamageTimeline(spell, results);
   return results;
+}
+
+async function resolveSpellHealingRolls(
+  effect = {},
+  spell = {},
+  casterLevel = 1,
+  calculations = null,
+) {
+  if (!window.PFEffectHealing?.resolveRolls) return effect;
+  return window.PFEffectHealing.resolveRolls(effect, {
+    title: spell.name || effect.name || "Spell",
+    context: spellCastingScaleContext(calculations, casterLevel),
+  });
+}
+
+async function rollSpellAttacksFromDetails(
+  spell = {},
+  casterLevel = 1,
+  authoredAttacks = null,
+  calculations = null,
+) {
+  const attacks = authoredAttacks
+    ? window.PFAttackRolls?.normalizeAttacks?.(authoredAttacks) || []
+    : spellAttackRolls(spell);
+  if (!attacks.length) return [];
+  const context = spellCastingScaleContext(calculations, casterLevel);
+  const boostSources = calculationBuffs().filter(
+    (source) => Array.isArray(source?.d20Boosts) && source.d20Boosts.length,
+  );
+  if (boostSources.length && window.PFD20Boosts) {
+    context.d20BoostSession = {
+      sources: boostSources,
+      activeEffects: activeBuffs,
+      usage: structuredClone(d20BoostUses),
+      onUsageChange: async (usage) => {
+        d20BoostUses = structuredClone(usage);
+        await saveSheetNow(true);
+      },
+    };
+  }
+  const results = await window.PFAttackRolls?.open?.({
+    title: `${spell.name || "Spell"} Attacks`,
+    attacks,
+    context,
+  });
+  if (results) await recordSpellAttackTimeline(spell, results);
+  return results;
+}
+
+function spellAttackTargetPayload(spell = {}, resolved = {}) {
+  const mechanics = window.PFEffectMechanics?.activeMechanics?.(spell, {
+    activeOnly: true,
+  }) || spell;
+  const payload = {
+    name: spell.name || "Spell Effect",
+    description: spell.details?.description || spell.description || "",
+    bonuses: Array.isArray(resolved.effects) ? resolved.effects : [],
+    durationConfig: mechanics.durationConfig || spell.durationConfig || null,
+    duration: spell.duration || spell.details?.duration || "",
+  };
+  (window.PFEffectMechanics?.extraKeys?.() || []).forEach((key) => {
+    if (["attackRolls", "damageRolls"].includes(key)) return;
+    payload[key] = Array.isArray(resolved[key]) ? resolved[key] : [];
+  });
+  return spellTargetPayloadHasMechanics(payload) ? payload : null;
 }
 
 function spellCastDurationLabel(effect = {}) {
@@ -10011,7 +10409,8 @@ function spellCastDurationUsesCasterLevel(effect = {}) {
   if (config)
     return (
       (config.factors || []).some((factor) => factor.type === "caster") ||
-      config.durationScale?.source?.type === "caster"
+      config.diceCountScale?.source?.type === "caster" ||
+      config.staticValueScale?.source?.type === "caster"
     );
   return /\/\s*level|per\s+level/i.test(String(effect.duration || ""));
 }
@@ -10020,13 +10419,11 @@ function spellCastParseDuration(
   effect = {},
   casterLevel = 1,
   targetCount = 1,
+  calculations = null,
 ) {
   if (window.PFEffectMeta?.parseDuration)
     return window.PFEffectMeta.parseDuration(effect, {
-      casterLevel,
-      characterLevel: num("characterLevel"),
-      classLevel: casterLevel,
-      classLevels: progressionClassCounts(),
+      ...spellCastingScaleContext(calculations, casterLevel),
       targetCount,
     });
   return null;
@@ -10045,43 +10442,47 @@ function spellCastFormatDuration(rounds) {
 async function resolveSpellCastEffectChoices(
   effect = {},
   spell = {},
-  { resolveBranch = true } = {},
+  { resolveBranch = true, stopBeforeTargetOwned = false } = {},
 ) {
-  if (resolveBranch) {
+  if (window.PFEffectMechanics?.hasContributionOptions?.(effect)) {
+    effect = await window.PFEffectMechanics.chooseContributions(effect, {
+      title: spell.name || effect.name || "Spell",
+    });
+    if (!effect) return null;
+  }
+  if (
+    stopBeforeTargetOwned &&
+    window.PFEffectActivationOrchestrator?.targetMustAnswer?.(effect)
+  )
+    return effect;
+  if (resolveBranch && window.PFEffectMechanics?.hasBranches?.(effect)) {
     effect = await resolveMechanicBranchChoice(
       effect,
       spell.name || effect.name || "Spell",
     );
     if (!effect) return null;
+    if (
+      stopBeforeTargetOwned &&
+      window.PFEffectActivationOrchestrator?.targetMustAnswer?.(effect)
+    )
+      return effect;
   }
-  const resolvedGrantDomains = await resolveRacialTraitGrantDomainChoices(
-    effect.grantDomains,
+  const resolved = await resolveRacialTraitMechanicChoices(
+    effect,
     { name: spell.name || effect.name || "Spell" },
+    { resolveBranch: false },
   );
-  if (!resolvedGrantDomains) return null;
-  const resolvedCasterLevelBonuses =
-    await resolveRacialTraitSpellAdjustmentChoices(effect.casterLevelBonuses, {
-      name: spell.name || effect.name || "Spell",
-    });
-  if (!resolvedCasterLevelBonuses) return null;
-  const resolvedSpellDcBonuses = await resolveRacialTraitSpellAdjustmentChoices(
-    effect.spellDcBonuses,
-    { name: spell.name || effect.name || "Spell" },
+  if (!resolved) return null;
+  const variableResolved = await resolveConditionalVariablesForItem(
+    resolved,
+    spell.name || effect.name || "Spell",
   );
-  if (!resolvedSpellDcBonuses) return null;
-  const resolvedEffectiveAttributeBonuses =
-    await resolveRacialTraitSpellAdjustmentChoices(
-      effect.effectiveAttributeBonuses,
-      { name: spell.name || effect.name || "Spell" },
-    );
-  if (!resolvedEffectiveAttributeBonuses) return null;
-  return {
-    ...effect,
-    grantDomains: resolvedGrantDomains,
-    casterLevelBonuses: resolvedCasterLevelBonuses,
-    spellDcBonuses: resolvedSpellDcBonuses,
-    effectiveAttributeBonuses: resolvedEffectiveAttributeBonuses,
-  };
+  if (!variableResolved) return null;
+  return window.PFConditionConfig?.resolveAbilityChoices
+    ? window.PFConditionConfig.resolveAbilityChoices(variableResolved, {
+        title: spell.name || effect.name || "Spell",
+      })
+    : variableResolved;
 }
 
 function appliedSpellEffect(
@@ -10090,11 +10491,12 @@ function appliedSpellEffect(
   casterLevel = 1,
   index = 0,
   targetCount = 1,
+  calculations = null,
 ) {
   const cloned =
     window.PFEffectMechanics?.resolveCasterAttributeScales?.(
       effect,
-      currentAttributeScaleContext(),
+      spellCastingScaleContext(calculations, casterLevel),
     ) || cloneJson(effect);
   const hasOwnDuration =
     cloned.durationConfig ||
@@ -10112,6 +10514,7 @@ function appliedSpellEffect(
     cloned,
     casterLevel,
     targetCount,
+    calculations,
   );
   const durationMultiplier = Number(cloned.metamagicDurationMultiplier || 1);
   if (
@@ -10148,6 +10551,9 @@ function appliedSpellEffect(
     category: cloned.category || "Spell",
     sourceSpellName: spell.name || "",
     casterLevel,
+    ...(Number.isFinite(Number(calculations?.spellDc?.total))
+      ? { saveDc: Number(calculations.spellDc.total) }
+      : {}),
     permanent: Boolean(cloned.permanent),
     remaining: cloned.permanent ? null : computedDuration,
     computedDuration,
@@ -10292,15 +10698,14 @@ function renderSpellCastTargetGroup(label, group, targets = []) {
 }
 
 async function spellCastTargetsFromCurrentMap() {
-  const mapSlot = currentSheetMapSlot();
-  const [mapState, characters, enemies, isGm] = await Promise.all([
-    PFApp.loadMapState?.(sheetContextKey, mapSlot),
+  const [mapSelection, characters, enemies, isGm] = await Promise.all([
+    loadCurrentSheetMapState(),
     PFApp.loadContextCharacters?.(sheetContextKey),
     PFApp.loadEnemies?.(sheetContextKey),
     PFApp.isGameManager?.(sheetContextKey),
   ]);
-  spellCastTargetMapState = mapState || { tokens: [] };
-  spellCastTargetMapSlot = mapSlot;
+  spellCastTargetMapState = mapSelection.state;
+  spellCastTargetMapSlot = mapSelection.slot;
   const characterMap = new Map(
     (characters || []).map((character) => [character.id, character]),
   );
@@ -10361,6 +10766,55 @@ async function openSpellCastTargetModal(spell = {}) {
           ? targets.filter((target) => selectedIds.includes(target.key))
           : null,
       );
+  });
+}
+
+async function spellTargetSheet(target) {
+  if (target.group === "ally") {
+    const saved = await PFApp.loadCharacterSheet(
+      "",
+      sheetContextKey,
+      target.targetId,
+    );
+    return saved?.sheet || {};
+  }
+  const enemy =
+    (await PFApp.loadEnemyForEffectApplication?.(
+      target.targetId,
+      sheetContextKey,
+    )) || (await PFApp.loadEnemy?.(target.targetId, sheetContextKey));
+  return enemy?.sheet || target.token?.sheet || {};
+}
+
+async function resolveSpellTargetSave(target, effect, title = "Effect") {
+  if (!window.PFEffectSaves?.hasSave?.(effect)) return effect;
+  const remote =
+    target.group === "ally" &&
+    target.ownerId &&
+    String(target.ownerId) !== String(currentUserId);
+  if (remote) {
+    const orchestrator = window.PFEffectActivationOrchestrator;
+    const result = await orchestrator.waitForRemoteDecision({
+      createRequest: window.PFApp?.createEffectChoiceRequest,
+      loadStatus: window.PFApp?.loadEffectChoiceRequestStatus,
+      request: {
+        contextKey: sheetContextKey,
+        characterId: target.targetId,
+        ability: {
+          ...effect,
+          activationRequest: {
+            mode: orchestrator.REMOTE_SAVE_MODE,
+            version: 1,
+          },
+        },
+      },
+    });
+    return result?.ok ? result.effect : null;
+  }
+  return window.PFEffectSaves.resolve(effect, {
+    sheet: await spellTargetSheet(target),
+    title,
+    targetName: target.name || "Target",
   });
 }
 
@@ -10475,13 +10929,25 @@ async function refreshSpellCastTargetOnMap(target) {
   );
 }
 
+function effectForRemoteTargetChoice(target, effect = {}) {
+  if (!effect.auraConfig?.targetsEmitAura) return effect;
+  return {
+    ...effect,
+    targetAuraPlacement: {
+      tokenId: target?.token?.id || target?.key || "",
+      mapSlot: spellCastTargetMapSlot || currentSheetMapSlot(),
+    },
+  };
+}
+
 async function resolveSpellCastEffectForTarget(
   target,
   effect,
   spell,
   metamagicSaveResults = null,
+  { skipMetamagic = false } = {},
 ) {
-  if (window.PFMetamagic?.resolveTargetEffect) {
+  if (!skipMetamagic && window.PFMetamagic?.resolveTargetEffect) {
     effect = await window.PFMetamagic.resolveTargetEffect(effect, {
       targetName: target.name || "the target",
       saveResults: metamagicSaveResults,
@@ -10494,91 +10960,529 @@ async function resolveSpellCastEffectForTarget(
     target.group === "ally" &&
     target.ownerId &&
     target.ownerId !== currentUserId;
-  if (branchNeeded && remoteCharacter) {
-    const result = await PFApp.createEffectChoiceRequest?.({
-      contextKey: sheetContextKey,
-      characterId: target.targetId,
-      ability: effect,
+  const playerAbilityChoiceNeeded =
+    window.PFConditionConfig?.hasPendingAbilityChoice?.(effect) || false;
+  const targetMustAnswer =
+    window.PFEffectActivationOrchestrator?.targetMustAnswer?.(effect) || false;
+  if (
+    targetMustAnswer &&
+    (window.PFEffectDecisions?.hasDecision?.(effect) ||
+      branchNeeded ||
+      playerAbilityChoiceNeeded) &&
+    remoteCharacter
+  ) {
+    const orchestrator = window.PFEffectActivationOrchestrator;
+    const result = await orchestrator?.waitForRemoteDecision?.({
+      createRequest: PFApp.createEffectChoiceRequest,
+      loadStatus: PFApp.loadEffectChoiceRequestStatus,
+      request: {
+        contextKey: sheetContextKey,
+        characterId: target.targetId,
+        ability: orchestrator.remoteDecisionAbility(
+          effectForRemoteTargetChoice(target, effect),
+          { surface: "character-sheet", sourceType: "spell" },
+        ),
+      },
+      onStatus: (status) => {
+        if (status === "pending")
+          setStatus(
+            `Waiting for ${target.name || "the target"} to answer ${effect.name || spell?.name || "the effect"}.`,
+            "info",
+          );
+      },
     });
-    if (!result?.ok) console.error(result?.error || "Could not queue effect choice.");
-    return { effect: null, queued: Boolean(result?.ok) };
+    if (!result?.ok) {
+      console.error(result?.error || "Could not resolve the target's choice.");
+      return { effect: null, queued: false };
+    }
+    return { effect: result.effect, queued: false };
   }
-  const resolved = await resolveSpellCastEffectChoices(effect, spell);
+  const resolved =
+    targetMustAnswer || window.PFEffectDecisions?.hasDecision?.(effect)
+      ? await resolveSpellCastEffectChoices(effect, spell)
+      : effect;
   return { effect: resolved, queued: false };
 }
 
-async function applySpellEffectToTarget(target, effect) {
+async function applyHealingAfterSpellTarget(target, effect) {
+  if (!window.PFEffectHealing?.hasHealing?.(effect)) return;
+  const saved =
+    target.group === "ally"
+      ? await PFApp.applyCharacterHealingEffect?.(
+          target.targetId,
+          effect,
+          sheetContextKey,
+        )
+      : await PFApp.applyEnemyHealingEffect?.(
+          target.targetId,
+          effect,
+          sheetContextKey,
+        );
+  if (!saved || String(target.targetId) !== String(currentSheetId)) return;
+  applyHealingEffectToCurrentSheet(effect, { persist: false });
+}
+
+async function loadSpellTargetActiveEffects(target) {
   if (target.group === "ally") {
-    if (!PFApp.applyCharacterMapEffect) return false;
-    const result = await PFApp.applyCharacterMapEffect?.(
-      target.targetId,
-      effect,
-      sheetContextKey,
+    return (
+      (await PFApp.loadCharacterBuffStateForRecalculation?.(
+        target.targetId,
+        sheetContextKey,
+      )) ||
+      (await PFApp.loadBuffState?.(sheetContextKey, target.targetId)) ||
+      []
     );
-    if (result?.ok === false) {
-      console.error(result.error);
-      return false;
-    }
-    return true;
   }
-  if (!PFApp.applyEnemyMapEffect) return false;
-  const saved = await PFApp.applyEnemyMapEffect?.(
+  const enemy =
+    (await PFApp.loadEnemyForEffectApplication?.(
+      target.targetId,
+      sheetContextKey,
+    )) || (await PFApp.loadEnemy?.(target.targetId, sheetContextKey));
+  return Array.isArray(enemy?.sheet?.activeBuffs) ? enemy.sheet.activeBuffs : [];
+}
+
+async function saveSpellTargetActiveEffects(target, effects) {
+  if (target.group === "ally") {
+    const saved =
+      (await PFApp.updateCharacterEffectState?.(
+        target.targetId,
+        effects,
+        sheetContextKey,
+      )) ||
+      (await PFApp.saveBuffState?.(
+        effects,
+        sheetContextKey,
+        target.targetId,
+      ));
+    return saved?.ok !== false;
+  }
+  const saved = await PFApp.updateEnemyEffectSummary?.(
     target.targetId,
-    effect,
+    effects,
+    target.token?.sheet?.calculated || {},
     sheetContextKey,
   );
   return Boolean(saved);
 }
 
-async function createAuraOnCurrentMap(effect) {
-  await spellCastTargetsFromCurrentMap();
-  const sourceToken = (spellCastTargetMapState?.tokens || []).find((token) =>
-    isEnemySheetMode
-      ? token.kind === "enemy" && String(token.enemyId) === String(enemySheetId)
-      : token.kind === "character" && String(token.characterId) === String(currentSheetId),
+async function prepareConditionEffectForSpellTarget(target, effect) {
+  const healingEntries = (effect.applyConditions || []).filter(
+    (entry) =>
+      window.PFConditionConfig?.isAdjustmentEntry?.(entry) &&
+      window.PFConditionConfig.normalizeAdjustment(entry).mode === "heal",
   );
-  if (!sourceToken) return null;
-  const link = window.PFEffectMechanics?.createAuraLink?.(sourceToken, effect);
+  if (!healingEntries.length) return effect;
+  const active = await loadSpellTargetActiveEffects(target);
+  const restoration = window.PFConditionConfig.applyRestorations(active, effect);
+  if (!(await saveSpellTargetActiveEffects(target, restoration.activeEffects)))
+    return null;
+  return restoration.effect;
+}
+
+async function applySpellEffectToTarget(target, effect) {
+  if (spellEffectHasSummons(effect)) {
+    const summoned = await spawnSpellCreaturesOnCurrentMap(
+      effect,
+      target?.token,
+      target?.ownerId || "",
+    );
+    if (!summoned) return false;
+    effect = { ...effect, summonCreatures: [] };
+    if (!spellTargetPayloadHasMechanics(effect)) return true;
+  }
+  effect = await prepareConditionEffectForSpellTarget(target, effect);
+  if (!effect) return false;
+  if (!window.PFConditionConfig?.hasPersistableMechanics?.(effect)) return true;
+  let storedEffect = effect;
+  let previousAuras = null;
+  if (effect.auraConfig?.enabled && effect.auraConfig?.targetsEmitAura) {
+    const targetToken = target?.token;
+    const link = window.PFEffectMechanics?.createAuraLink?.(targetToken, effect);
+    if (!targetToken || !link) return false;
+    previousAuras = Array.isArray(targetToken.automaticAuras)
+      ? [...targetToken.automaticAuras]
+      : [];
+    targetToken.automaticAuras = window.PFEffectMechanics?.upsertLinkedAura
+      ? window.PFEffectMechanics.upsertLinkedAura(
+          previousAuras,
+          link.aura,
+          targetToken.id,
+        )
+      : [...previousAuras, link.aura];
+    storedEffect = link.controller;
+  }
+  const restoreAura = () => {
+    if (previousAuras) target.token.automaticAuras = previousAuras;
+  };
+  if (target.group === "ally") {
+    if (!PFApp.applyCharacterMapEffect) {
+      restoreAura();
+      return false;
+    }
+    const result = await PFApp.applyCharacterMapEffect?.(
+      target.targetId,
+      storedEffect,
+      sheetContextKey,
+    );
+    if (result?.ok === false) {
+      restoreAura();
+      console.error(result.error);
+      return false;
+    }
+    installEmittedAurasInSpellCastMap(target.token, storedEffect);
+    await applyHealingAfterSpellTarget(target, effect);
+    return true;
+  }
+  if (!PFApp.applyEnemyMapEffect) {
+    restoreAura();
+    return false;
+  }
+  const saved = await PFApp.applyEnemyMapEffect?.(
+    target.targetId,
+    storedEffect,
+    sheetContextKey,
+  );
+  if (!saved) restoreAura();
+  else {
+    installEmittedAurasInSpellCastMap(target.token, storedEffect);
+    await applyHealingAfterSpellTarget(target, effect);
+  }
+  return Boolean(saved);
+}
+
+function nextSpellCastMapZIndex() {
+  return (
+    Math.max(
+      1,
+      ...(spellCastTargetMapState?.tokens || []).map((token) =>
+        Number(token.zIndex || 1),
+      ),
+    ) + 1
+  );
+}
+
+function installEmittedAurasInSpellCastMap(sourceToken, effect) {
+  if (!sourceToken) return [];
+  const parentKey =
+    window.PFEffectMechanics?.emittedAuraParentKey?.(effect) || "";
+  const links =
+    window.PFEffectMechanics?.createEmittedAuraLinks?.(
+      sourceToken,
+      effect,
+    ) || [];
+  let current = Array.isArray(sourceToken.automaticAuras)
+    ? sourceToken.automaticAuras
+    : [];
+  if (parentKey) {
+    current = current.filter(
+      (aura) => aura.emittedAuraParentKey !== parentKey,
+    );
+  }
+  links.forEach((link) => {
+    current = window.PFEffectMechanics?.upsertLinkedAura
+      ? window.PFEffectMechanics.upsertLinkedAura(
+          current,
+          link.aura,
+          sourceToken.id,
+        )
+      : [...current, link.aura];
+  });
+  sourceToken.automaticAuras = current;
+  return links;
+}
+
+function installAuraInSpellCastMap(sourceToken, effect, options) {
+  options = options || {};
+  if (effect?.auraConfig?.independentToken) {
+    const created = window.PFEffectMechanics?.createIndependentAuraToken?.(
+      sourceToken,
+      effect,
+      {
+        zIndex: nextSpellCastMapZIndex(),
+        recipientEffect: options.recipientEffect,
+      },
+    );
+    if (!created) return null;
+    const tokens = spellCastTargetMapState.tokens || [];
+    const matchingIds = new Set(
+      tokens
+        .filter((token) => {
+          if (
+            !token.independentAuraToken ||
+            String(token.auraCasterTokenId || "") !== String(sourceToken.id)
+          )
+            return false;
+          const existingAura = token.automaticAuras?.[0];
+          if (!existingAura) return false;
+          const upserted = window.PFEffectMechanics?.upsertLinkedAura?.(
+            [existingAura],
+            created.aura,
+            sourceToken.id,
+          );
+          return upserted?.length === 1 && upserted[0] === created.aura;
+        })
+        .map((token) => token.id),
+    );
+    spellCastTargetMapState.tokens = tokens.filter(
+      (token) => !matchingIds.has(token.id),
+    );
+    spellCastTargetMapState.tokens.push(created.token);
+    installEmittedAurasInSpellCastMap(sourceToken, created.controller);
+    return created;
+  }
+  const link = window.PFEffectMechanics?.createAuraLink?.(sourceToken, effect, {
+    recipientEffect: options.recipientEffect,
+  });
   if (!link) return null;
   const current = Array.isArray(sourceToken.automaticAuras)
     ? sourceToken.automaticAuras
     : [];
-  sourceToken.automaticAuras = [
-    ...current,
-    link.aura,
-  ];
-  return (await saveSpellCastMapState()) ? link.controller : null;
+  sourceToken.automaticAuras = window.PFEffectMechanics?.upsertLinkedAura
+    ? window.PFEffectMechanics.upsertLinkedAura(
+        current,
+        link.aura,
+        sourceToken.id,
+      )
+    : [...current, link.aura];
+  installEmittedAurasInSpellCastMap(sourceToken, link.controller);
+  return link;
 }
 
-async function createSpellAurasOnCurrentMap(spell, payloads, casterLevel) {
+async function createAuraOnCurrentMap(effect, options) {
+  const { beforeCreate, recipientEffect } = options || {};
   await spellCastTargetsFromCurrentMap();
-  const sourceToken = (spellCastTargetMapState?.tokens || []).find((token) =>
-    isEnemySheetMode
-      ? token.kind === "enemy" && String(token.enemyId) === String(enemySheetId)
-      : token.kind === "character" && String(token.characterId) === String(currentSheetId),
-  );
+  const sourceToken = currentSheetSourceToken(spellCastTargetMapState);
+  if (!sourceToken) {
+    console.warn("Aura source token was not found on any map slot.", {
+      characterId: currentSheetId,
+      characterName: el("characterName")?.value || "",
+      contextKey: sheetContextKey,
+      mapSlot: spellCastTargetMapSlot,
+      tokens: (spellCastTargetMapState?.tokens || []).map((token) => ({
+        id: token.id,
+        kind: token.kind,
+        characterId: token.characterId,
+        enemyId: token.enemyId,
+        name: token.name,
+      })),
+    });
+    return { ok: false, reason: "source-token" };
+  }
+  if (beforeCreate && !(await beforeCreate(effect)))
+    return { ok: false, reason: "resource" };
+  const link = installAuraInSpellCastMap(sourceToken, effect, {
+    recipientEffect,
+  });
+  if (!link) return { ok: false, reason: "aura-build" };
+  if (!(await saveSpellCastMapState()))
+    return { ok: false, reason: "map-save" };
+  return { ok: true, controller: link.controller };
+}
+
+async function createSpellAurasOnCurrentMap(
+  spell,
+  payloads,
+  casterLevel,
+  calculations = null,
+) {
+  await spellCastTargetsFromCurrentMap();
+  const sourceToken = currentSheetSourceToken(spellCastTargetMapState);
   if (!sourceToken) return null;
-  const current = Array.isArray(sourceToken.automaticAuras)
-    ? sourceToken.automaticAuras
-    : [];
   const links = payloads
     .map((payload, index) =>
-      window.PFEffectMechanics?.createAuraLink?.(
+      installAuraInSpellCastMap(
         sourceToken,
-        appliedSpellEffect(payload, spell, casterLevel, index),
+        appliedSpellEffect(
+          payload,
+          spell,
+          casterLevel,
+          index,
+          1,
+          calculations,
+        ),
       ),
     )
     .filter(Boolean);
-  sourceToken.automaticAuras = [...current, ...links.map((link) => link.aura)];
   return (await saveSpellCastMapState())
     ? links.map((link) => link.controller)
     : null;
 }
 
+async function activateTargetedAuraFromCharacterSheet(
+  effect,
+  { beforeApply } = {},
+) {
+  const targets = await openSpellCastTargetModal({ name: effect.name || "Effect" });
+  if (!targets) return false;
+  if (beforeApply && !(await beforeApply())) return false;
+
+  const sourceToken = currentSheetSourceToken(spellCastTargetMapState);
+  let appliedCount = 0;
+  let queuedCount = 0;
+  const locallyAppliedTargets = new Set();
+  const orchestrator = window.PFEffectActivationOrchestrator;
+  const casterLevel = Math.max(1, Number(effect.casterLevel || 1) || 1);
+  for (const target of targets) {
+    const targetEffect = {
+      ...cloneJson(effect),
+      sourceTokenId: sourceToken?.id || effect.sourceTokenId || "",
+    };
+    const activation = await orchestrator.run(
+      {
+        sourceType:
+          window.PFEffectTracker?.sourceGroup?.(effect) ||
+          effect.sourceType ||
+          "other",
+        surface: "character-sheet",
+        effect: targetEffect,
+        target,
+      },
+      {
+        "target-decisions": async (state) => {
+          const result = await resolveSpellCastEffectForTarget(
+            state.target,
+            state.effect,
+            { name: effect.name || "Effect" },
+            null,
+            { skipMetamagic: true },
+          );
+          if (result.queued) return { ...state, queued: true, effect: null };
+          return result.effect ? { ...state, effect: result.effect } : null;
+        },
+        "saving-throws": async (state) => {
+          if (state.queued) return state;
+          const resolved = await resolveSpellTargetSave(
+            state.target,
+            state.effect,
+            effect.name || "Effect",
+          );
+          return resolved ? { ...state, effect: resolved } : null;
+        },
+        "attack-confirmation": async (state) => {
+          if (state.queued) return state;
+          const attacks =
+            window.PFAttackRolls?.normalizeAttacks?.(
+              state.effect.attackRolls || [],
+            ) || [];
+          if (!attacks.length) return state;
+          const results = await rollSpellAttacksFromDetails(
+            { name: effect.name || "Effect" },
+            casterLevel,
+            attacks,
+            effect.spellCalculations || null,
+          );
+          if (!results) return null;
+          const resolved =
+            window.PFAttackRolls?.payloadForSuccessfulAttacks?.(
+              state.effect,
+              results,
+            ) || state.effect;
+          return { ...state, effect: resolved, resolvedAction: true };
+        },
+        "effect-rolls": async (state) => {
+          if (state.queued) return state;
+          let resolved =
+            await window.PFConditionConfig?.resolveAdjustments?.(state.effect, {
+              title: effect.name || "Effect",
+              context: spellCastingScaleContext(
+                effect.spellCalculations || null,
+                casterLevel,
+              ),
+            });
+          if (!resolved) return null;
+          resolved = await resolveSpellHealingRolls(
+            resolved,
+            { name: effect.name || "Effect" },
+            casterLevel,
+            effect.spellCalculations || null,
+          );
+          if (!resolved) return null;
+          const damageRolls = Array.isArray(resolved.damageRolls)
+            ? resolved.damageRolls
+            : [];
+          let resolvedAction = state.resolvedAction;
+          if (damageRolls.length) {
+            const damage = await rollSpellDamageFromDetails(
+              { name: effect.name || "Effect" },
+              casterLevel,
+              damageRolls,
+              effect.spellCalculations || null,
+            );
+            if (!damage) return null;
+            resolvedAction = true;
+          }
+          const {
+            attackRolls: _attackRolls,
+            damageRolls: _damageRolls,
+            castRollContext: _castRollContext,
+            ...persistableEffect
+          } = resolved;
+          return { ...state, effect: persistableEffect, resolvedAction };
+        },
+        application: async (state) => {
+          if (state.queued) return state;
+          if (!spellTargetPayloadHasMechanics(state.effect))
+            return state.resolvedAction ? { ...state, applied: true } : null;
+          const applied = await applySpellEffectToTarget(
+            state.target,
+            state.effect,
+          );
+          return applied || state.resolvedAction
+            ? { ...state, applied: true }
+            : null;
+        },
+      },
+      {
+        nodeIds: [
+          "target-decisions",
+          "saving-throws",
+          "attack-confirmation",
+          "effect-rolls",
+          "application",
+        ],
+      },
+    );
+    if (activation?.queued) {
+      queuedCount += 1;
+      continue;
+    }
+    if (activation?.applied) {
+      appliedCount += 1;
+      locallyAppliedTargets.add(target.key);
+    }
+  }
+  for (const target of targets) {
+    if (locallyAppliedTargets.has(target.key))
+      await refreshSpellCastTargetOnMap(target);
+  }
+  if (spellCastTargetMapState?.tokens) await saveSpellCastMapState();
+
+  const completedCount = appliedCount + queuedCount;
+  setStatus(
+    completedCount
+      ? queuedCount
+        ? `${effect.name || "Effect"} applied locally; ${queuedCount} choice${queuedCount === 1 ? "" : "s"} sent to the selected player${queuedCount === 1 ? "" : "s"}.`
+        : `${effect.name || "Effect"} applied to ${targets.length} target${targets.length === 1 ? "" : "s"}.`
+      : `Could not apply ${effect.name || "effect"}.`,
+    completedCount ? "success" : "warning",
+  );
+  return completedCount > 0;
+}
+
 async function saveAuraControllerEffects(controllers = []) {
   const additions = Array.isArray(controllers) ? controllers : [controllers];
   if (!additions.length) return true;
-  const next = [...activeBuffs, ...additions];
+  const next = additions.reduce(
+    (effects, controller) =>
+      window.PFEffectMechanics?.upsertAuraController
+        ? window.PFEffectMechanics.upsertAuraController(
+            effects,
+            controller,
+            controller.durationAnchorTokenId || "",
+          )
+        : [...effects, controller],
+    activeBuffs,
+  );
   if (isEnemySheetMode) {
     const name = el("characterName").value.trim();
     if (!name) return false;
@@ -10605,87 +11509,287 @@ async function saveAuraControllerEffects(controllers = []) {
   return true;
 }
 
+async function removeAuraApplicationsForMapTokens(tokenIds = new Set()) {
+  if (!tokenIds.size) return;
+  const targets = (spellCastTargetMapState?.tokens || []).filter(
+    (token) => token.kind === "character" || token.kind === "enemy",
+  );
+  await Promise.all(
+    targets.map(async (token) => {
+      if (token.kind === "character" && token.characterId) {
+        const active = await PFApp.loadBuffState?.(
+          sheetContextKey,
+          token.characterId,
+        );
+        const current = Array.isArray(active) ? active : [];
+        const next = current
+          .map((effect) =>
+            tokenIds.has(effect.auraTokenId)
+              ? window.PFEffectMechanics?.beginAuraLinger?.(effect, {
+                  durationAnchorTokenId: token.id,
+                }) || null
+              : effect,
+          )
+          .filter(Boolean);
+        if (
+          next.length !== current.length ||
+          next.some((effect, index) => effect !== current[index])
+        )
+          await PFApp.updateCharacterEffectState?.(
+            token.characterId,
+            next,
+            sheetContextKey,
+          );
+        return;
+      }
+      if (token.kind === "enemy" && token.enemyId) {
+        const enemy = await PFApp.loadEnemy?.(token.enemyId, sheetContextKey);
+        const active = Array.isArray(enemy?.sheet?.activeBuffs)
+          ? enemy.sheet.activeBuffs
+          : [];
+        const next = active
+          .map((effect) =>
+            tokenIds.has(effect.auraTokenId)
+              ? window.PFEffectMechanics?.beginAuraLinger?.(effect, {
+                  durationAnchorTokenId: token.id,
+                }) || null
+              : effect,
+          )
+          .filter(Boolean);
+        if (
+          enemy &&
+          (next.length !== active.length ||
+            next.some((effect, index) => effect !== active[index]))
+        ) {
+          enemy.sheet.activeBuffs = next;
+          await PFApp.saveEnemy?.(enemy, sheetContextKey);
+        }
+      }
+    }),
+  );
+}
+
 async function syncCurrentMapLinkedAuras(activeEffects = []) {
-  const mapSlot = currentSheetMapSlot();
-  spellCastTargetMapState =
-    (await PFApp.loadMapState?.(sheetContextKey, mapSlot)) || { tokens: [] };
-  spellCastTargetMapSlot = mapSlot;
-  const sourceToken = (spellCastTargetMapState?.tokens || []).find((token) =>
-    isEnemySheetMode
-      ? token.kind === "enemy" && String(token.enemyId) === String(enemySheetId)
-      : token.kind === "character" && String(token.characterId) === String(currentSheetId),
-  );
+  const mapSelection = await loadCurrentSheetMapState();
+  spellCastTargetMapState = mapSelection.state;
+  spellCastTargetMapSlot = mapSelection.slot;
+  const sourceToken = currentSheetSourceToken(spellCastTargetMapState);
   if (!sourceToken) return false;
-  const effectIds = new Set(
-    activeEffects.map((effect) => effect?.id).filter(Boolean),
-  );
   const current = Array.isArray(sourceToken.automaticAuras)
     ? sourceToken.automaticAuras
     : [];
-  const next = current.filter(
-    (aura) =>
-      aura.kind === "passive" ||
-      !aura.linkedEffectId ||
-      effectIds.has(aura.linkedEffectId),
+  const next = window.PFEffectMechanics?.reconcileLinkedAuras
+    ? window.PFEffectMechanics.reconcileLinkedAuras(current, activeEffects)
+    : current;
+  const activeIds = new Set(
+    (Array.isArray(activeEffects) ? activeEffects : [])
+      .map((effect) => effect?.id)
+      .filter(Boolean),
   );
-  if (next.length === current.length) return false;
+  const removedIndependentTokenIds = new Set(
+    spellCastTargetMapState.tokens
+      .filter(
+        (token) =>
+          token.independentAuraToken &&
+          token.automaticAuras?.[0]?.kind !== "passive" &&
+          String(token.auraCasterTokenId || "") === String(sourceToken.id) &&
+          !activeIds.has(token.auraControllerEffectId),
+      )
+      .map((token) => token.id),
+  );
+  const priorTokenCount = spellCastTargetMapState.tokens.length;
+  spellCastTargetMapState.tokens = spellCastTargetMapState.tokens.filter(
+    (token) =>
+      !(
+        token.independentAuraToken &&
+        token.automaticAuras?.[0]?.kind !== "passive" &&
+        String(token.auraCasterTokenId || "") === String(sourceToken.id) &&
+        !activeIds.has(token.auraControllerEffectId)
+      ),
+  );
+  if (next.length === current.length && priorTokenCount === spellCastTargetMapState.tokens.length)
+    return false;
   sourceToken.automaticAuras = next;
-  return Boolean(await saveSpellCastMapState());
+  const saved = Boolean(await saveSpellCastMapState());
+  if (saved) await removeAuraApplicationsForMapTokens(removedIndependentTokenIds);
+  return saved;
 }
 
-async function castSpellFromDetails({
+async function performCastSpellFromDetails({
   spell,
   casterLevel = 1,
   calculations = null,
   closeDetails,
 } = {}) {
   const effectPayloads = spellEffectPayloads(spell);
-  let damageRolls = spellDamageRolls(spell);
+  const attackRolls = spellAttackRolls(spell);
+  const spellMechanics = window.PFEffectMechanics?.activeMechanics?.(spell, {
+    activeOnly: true,
+  }) || spell;
+  let damageRolls = window.PFEffectSaves?.hasSave?.(spellMechanics)
+    ? []
+    : spellDamageRolls(spell);
   const failureChance = Number(
     calculations?.arcaneSpellFailure?.chance || 0,
   );
-  if (failureChance > 0) {
-    await closeDetails?.();
-    const castContinues = await window.PFArcaneSpellFailure?.check?.({
-      chance: failureChance,
-      spellName: spell?.name || "Spell",
-    });
-    if (!castContinues) return { close: true };
-  }
-  let resolvedPayloads = [];
-  for (const payload of effectPayloads) {
-    if (window.PFEffectMechanics?.hasBranches?.(payload)) {
-      resolvedPayloads.push(payload);
-      continue;
-    }
-    const resolved = await resolveSpellCastEffectChoices(payload, spell);
-    if (!resolved) return { close: false };
-    resolvedPayloads.push(resolved);
-  }
-  damageRolls = [
-    ...damageRolls,
-    ...resolvedPayloads.flatMap((payload) =>
-      window.PFEffectMechanics?.hasBranches?.(payload)
-        ? []
-        : Array.isArray(payload.damageRolls)
-          ? payload.damageRolls
-          : [],
-    ),
-  ];
-  resolvedPayloads = resolvedPayloads
-    .map((payload) => {
-      if (window.PFEffectMechanics?.hasBranches?.(payload)) return payload;
-      const { damageRolls: _damageRolls, ...effectPayload } = payload;
-      return effectPayload;
-    })
-    .filter(
-      (payload) =>
-        payload.auraConfig?.enabled ||
-        window.PFEffectMechanics?.hasBranches?.(payload) ||
-        spellTargetPayloadHasMechanics(payload),
+  const orchestrator = window.PFEffectActivationOrchestrator;
+  let cancelResult = { close: false };
+  const prepared = await orchestrator.run(
+    {
+      sourceType: "spell",
+      surface: "character-sheet",
+      spell,
+      payloads: effectPayloads,
+      damageRolls,
+      detailsClosed: false,
+    },
+    {
+      "arcane-spell-failure": async (state) => {
+        if (!failureChance) return state;
+        await closeDetails?.();
+        const castContinues = await window.PFArcaneSpellFailure?.check?.({
+          chance: failureChance,
+          spellName: spell?.name || "Spell",
+        });
+        if (!castContinues) {
+          cancelResult = { close: true };
+          return null;
+        }
+        return { ...state, detailsClosed: true };
+      },
+      "caster-decisions": async (state) => {
+        const payloads = [];
+        for (const payload of state.payloads) {
+          const resolved =
+            orchestrator.shouldResolve(payload, orchestrator.BEFORE_TARGETS)
+              ? await resolveSpellCastEffectChoices(payload, spell, {
+                  stopBeforeTargetOwned: true,
+                })
+              : payload;
+          if (!resolved) return null;
+          payloads.push(resolved);
+        }
+        const rolls = [
+          ...state.damageRolls,
+          ...payloads.flatMap((payload) =>
+            window.PFEffectMechanics?.hasBranches?.(payload) ||
+            window.PFEffectSaves?.hasSave?.(payload)
+              ? []
+              : Array.isArray(payload.damageRolls)
+                ? payload.damageRolls
+                : [],
+          ),
+        ];
+        const persistablePayloads = payloads
+          .map((payload) => {
+            if (
+              window.PFEffectMechanics?.hasBranches?.(payload) ||
+              window.PFEffectSaves?.hasSave?.(payload)
+            )
+              return payload;
+            const { damageRolls: _damageRolls, ...effectPayload } = payload;
+            return effectPayload;
+          })
+          .filter(
+            (payload) =>
+              payload.auraConfig?.enabled ||
+              window.PFEffectMechanics?.hasBranches?.(payload) ||
+              spellTargetPayloadHasMechanics(payload),
+          );
+        return {
+          ...state,
+          payloads: persistablePayloads,
+          damageRolls: rolls,
+        };
+      },
+      "aura-delivery": async (state) => {
+        if (!state.detailsClosed) await closeDetails?.();
+        const payloads = [];
+        for (const payload of state.payloads) {
+          if (!window.PFAuraDeliveryChoice?.needsChoice?.(payload)) {
+            payloads.push(payload);
+            continue;
+          }
+          const resolved = await window.PFAuraDeliveryChoice.choose(payload);
+          if (!resolved) {
+            cancelResult = { close: true };
+            return null;
+          }
+          payloads.push(resolved);
+        }
+        return { ...state, payloads, detailsClosed: true };
+      },
+    },
+    {
+      nodeIds: [
+        "arcane-spell-failure",
+        "caster-decisions",
+        "aura-delivery",
+      ],
+    },
+  );
+  if (!prepared) return cancelResult;
+  let activationState = prepared;
+  let resolvedPayloads = prepared.payloads;
+  damageRolls = prepared.damageRolls;
+  let targets = null;
+  if (attackRolls.length) {
+    activationState = await orchestrator.run(
+      activationState,
+      {
+        targeting: async (state) => {
+          const selectedTargets = await openSpellCastTargetModal(spell);
+          return selectedTargets
+            ? { ...state, targets: selectedTargets }
+            : null;
+        },
+      },
+      { nodeIds: ["targeting"] },
     );
-  if (!failureChance) {
-    await closeDetails?.();
+    if (!activationState) return { close: true };
+    targets = activationState.targets;
+  }
+  if (attackRolls.length) {
+    activationState = await orchestrator.run(
+      {
+        ...activationState,
+        payloads: resolvedPayloads,
+        damageRolls,
+      },
+      {
+        "attack-confirmation": async (state) => {
+          const attackResults = await rollSpellAttacksFromDetails(
+            spell,
+            casterLevel,
+            attackRolls,
+            calculations,
+          );
+          if (!attackResults) return null;
+          const resolvedAttacks =
+            window.PFAttackRolls?.payloadForSuccessfulAttacks?.(
+              { attackRolls },
+              attackResults,
+            ) || {};
+          const payloads = [...state.payloads];
+          const attackPayload = spellAttackTargetPayload(spell, resolvedAttacks);
+          if (attackPayload) payloads.push(attackPayload);
+          return {
+            ...state,
+            payloads,
+            damageRolls: [
+              ...state.damageRolls,
+              ...(Array.isArray(resolvedAttacks.damageRolls)
+                ? resolvedAttacks.damageRolls
+                : []),
+            ],
+          };
+        },
+      },
+      { nodeIds: ["attack-confirmation"] },
+    );
+    if (!activationState) return { close: true };
+    resolvedPayloads = activationState.payloads;
+    damageRolls = activationState.damageRolls;
   }
   if (!damageRolls.length && !resolvedPayloads.length) {
     await recordSpellCastTimeline(spell);
@@ -10697,6 +11801,7 @@ async function castSpellFromDetails({
       spell,
       casterLevel,
       damageRolls,
+      calculations,
     );
     if (!damageResults) return { close: true };
     if (!resolvedPayloads.length) {
@@ -10704,14 +11809,72 @@ async function castSpellFromDetails({
       return { close: true };
     }
   }
-  const auraPayloads = resolvedPayloads.filter(
-    (payload) => payload.auraConfig?.enabled,
+  for (let index = 0; index < resolvedPayloads.length; index += 1) {
+    if (window.PFEffectMechanics?.hasBranches?.(resolvedPayloads[index]))
+      continue;
+    const conditionResolved = await window.PFConditionConfig?.resolveAdjustments?.(
+      resolvedPayloads[index],
+      {
+        title: spell.name || "Spell",
+        context: spellCastingScaleContext(calculations, casterLevel),
+        deferAbilityChoice: true,
+      },
+    );
+    if (!conditionResolved) return { close: true };
+    const healingResolved = await resolveSpellHealingRolls(
+      conditionResolved,
+      spell,
+      casterLevel,
+      calculations,
+    );
+    if (!healingResolved) return { close: true };
+    resolvedPayloads[index] = healingResolved;
+  }
+  const casterSummonPayloads = resolvedPayloads.filter(
+    (payload) =>
+      spellEffectOnlySummons(payload) &&
+      !window.PFSummonCreatures?.targetChooses?.(payload),
+  );
+  for (const payload of casterSummonPayloads) {
+    let summonEffect = appliedSpellEffect(
+      payload,
+      spell,
+      casterLevel,
+      resolvedPayloads.indexOf(payload),
+      1,
+      calculations,
+    );
+    if (window.PFSummonCreatures?.hasPendingChoice?.(summonEffect)) {
+      summonEffect = await window.PFSummonCreatures.resolveChoices(summonEffect, {
+        title: spell.name || summonEffect.name || "Spell",
+      });
+    }
+    if (!summonEffect || !(await spawnSpellCreaturesOnCurrentMap(summonEffect))) {
+      setStatus(
+        `Place ${isEnemySheetMode ? "this enemy" : "this character"} on the current map before summoning.`,
+        "warning",
+      );
+      return { close: true };
+    }
+  }
+  if (casterSummonPayloads.length) {
+    const handled = new Set(casterSummonPayloads);
+    resolvedPayloads = resolvedPayloads.filter((payload) => !handled.has(payload));
+    if (!resolvedPayloads.length) {
+      setStatus(`${spell.name || "Spell"} summoned creatures.`, "success");
+      return { close: true };
+    }
+  }  const auraPayloads = resolvedPayloads.filter(
+    (payload) =>
+      payload.auraConfig?.enabled &&
+      !payload.auraConfig?.targetsEmitAura,
   );
   if (auraPayloads.length) {
     const controllers = await createSpellAurasOnCurrentMap(
       spell,
       auraPayloads,
       casterLevel,
+      calculations,
     );
     if (!controllers) {
       setStatus(
@@ -10726,15 +11889,31 @@ async function castSpellFromDetails({
       return { close: true };
     }
     resolvedPayloads = resolvedPayloads.filter(
-      (payload) => !payload.auraConfig?.enabled,
+      (payload) =>
+        !payload.auraConfig?.enabled ||
+        payload.auraConfig?.targetsEmitAura,
     );
     if (!resolvedPayloads.length) {
       setStatus(`${spell.name || "Spell"} aura activated.`, "success");
       return { close: true };
     }
   }
-  const targets = await openSpellCastTargetModal(spell);
-  if (!targets) return { close: true };
+  if (!targets) {
+    activationState = await orchestrator.run(
+      activationState,
+      {
+        targeting: async (state) => {
+          const selectedTargets = await openSpellCastTargetModal(spell);
+          return selectedTargets
+            ? { ...state, targets: selectedTargets }
+            : null;
+        },
+      },
+      { nodeIds: ["targeting"] },
+    );
+    if (!activationState) return { close: true };
+    targets = activationState.targets;
+  }
   let appliedCount = 0;
   let queuedCount = 0;
   const locallyAppliedTargets = new Set();
@@ -10747,33 +11926,140 @@ async function castSpellFromDetails({
         casterLevel,
         index,
         targets.length,
+        calculations,
       );
-      const { effect: resolvedEffect, queued } =
-        await resolveSpellCastEffectForTarget(
-          target,
-          unresolvedEffect,
-          spell,
-          metamagicSaveResults,
-        );
-      if (queued) {
-        queuedCount += 1;
-        continue;
-      }
-      if (!resolvedEffect) continue;
-      const branchDamageRolls = Array.isArray(resolvedEffect.damageRolls)
-        ? resolvedEffect.damageRolls
-        : [];
-      if (branchDamageRolls.length) {
-        const damageResults = await rollSpellDamageFromDetails(
-          spell,
+      if (window.PFEffectMechanics?.hasBranches?.(unresolvedEffect)) {
+        unresolvedEffect.castRollContext = spellCastingScaleContext(
+          calculations,
           casterLevel,
-          branchDamageRolls,
         );
-        if (!damageResults) continue;
       }
-      const { damageRolls: _damageRolls, ...effect } = resolvedEffect;
-      if (!spellTargetPayloadHasMechanics(effect)) continue;
-      if (await applySpellEffectToTarget(target, effect)) {
+      const orchestrator = window.PFEffectActivationOrchestrator;
+      const activation = await orchestrator.run(
+        {
+          ...activationState,
+          activationHistory: [...(activationState.activationHistory || [])],
+          sourceType: "spell",
+          surface: "character-sheet",
+          effect: unresolvedEffect,
+          target,
+          resolvedAction: false,
+        },
+        {
+          "target-decisions": async (state) => {
+            const result = await resolveSpellCastEffectForTarget(
+              state.target,
+              state.effect,
+              spell,
+              metamagicSaveResults,
+              { skipMetamagic: true },
+            );
+            if (result.queued)
+              return { ...state, queued: true, effect: null };
+            return result.effect ? { ...state, effect: result.effect } : null;
+          },
+          "saving-throws": async (state) => {
+            if (state.queued) return state;
+            const metamagicEffect = window.PFMetamagic?.resolveTargetEffect
+              ? await window.PFMetamagic.resolveTargetEffect(state.effect, {
+                  targetName: state.target.name || "the target",
+                  saveResults: metamagicSaveResults,
+                })
+              : state.effect;
+            if (!metamagicEffect) return null;
+            const resolved = await resolveSpellTargetSave(
+              state.target,
+              metamagicEffect,
+              spell.name || "Spell",
+            );
+            return resolved ? { ...state, effect: resolved } : null;
+          },
+          "attack-confirmation": async (state) => {
+            if (state.queued) return state;
+            const attacks =
+              window.PFAttackRolls?.normalizeAttacks?.(
+                state.effect.attackRolls || [],
+              ) || [];
+            if (!attacks.length) return state;
+            const results = await rollSpellAttacksFromDetails(
+              spell,
+              casterLevel,
+              attacks,
+              calculations,
+            );
+            if (!results) return null;
+            const effect =
+              window.PFAttackRolls?.payloadForSuccessfulAttacks?.(
+                state.effect,
+                results,
+              ) || state.effect;
+            return { ...state, effect, resolvedAction: true };
+          },
+          "effect-rolls": async (state) => {
+            if (state.queued) return state;
+            let effect =
+              await window.PFConditionConfig?.resolveAdjustments?.(
+                state.effect,
+                {
+                  title: spell.name || "Spell",
+                  context: spellCastingScaleContext(calculations, casterLevel),
+                },
+              );
+            if (!effect) return null;
+            effect = await resolveSpellHealingRolls(
+              effect,
+              spell,
+              casterLevel,
+              calculations,
+            );
+            if (!effect) return null;
+            const rolls = Array.isArray(effect.damageRolls)
+              ? effect.damageRolls
+              : [];
+            let resolvedAction = state.resolvedAction;
+            if (rolls.length) {
+              const damage = await rollSpellDamageFromDetails(
+                spell,
+                casterLevel,
+                rolls,
+                calculations,
+              );
+              if (!damage) return null;
+              resolvedAction = true;
+            }
+            const {
+              attackRolls: _attackRolls,
+              damageRolls: _damageRolls,
+              castRollContext: _castRollContext,
+              ...persistableEffect
+            } = effect;
+            return { ...state, effect: persistableEffect, resolvedAction };
+          },
+          application: async (state) => {
+            if (state.queued) return state;
+            if (!spellTargetPayloadHasMechanics(state.effect))
+              return state.resolvedAction
+                ? { ...state, applied: true }
+                : null;
+            const applied = await applySpellEffectToTarget(
+              state.target,
+              state.effect,
+            );
+            return applied ? { ...state, applied: true } : null;
+          },
+        },
+        {
+          nodeIds: [
+            "target-decisions",
+            "saving-throws",
+            "attack-confirmation",
+            "effect-rolls",
+            "application",
+          ],
+        },
+      );
+      if (activation?.queued) queuedCount += 1;
+      if (activation?.applied) {
         appliedCount += 1;
         locallyAppliedTargets.add(target.key);
       }
@@ -10814,6 +12100,17 @@ async function castSpellFromDetails({
   );
   return { close: true };
 }
+
+async function castSpellFromDetails(options = {}) {
+  if (spellCastInFlight) return { close: false };
+  spellCastInFlight = true;
+  try {
+    return await performCastSpellFromDetails(options);
+  } finally {
+    spellCastInFlight = false;
+  }
+}
+
 function spellExtraSlots(className, bucket, spellLevel) {
   const key = spellcastingStateKey(className);
   return Number(
@@ -11334,6 +12631,7 @@ function renderSpellProgression() {
 function updateClassDerivedViews() {
   applyClassProgressionStats();
   updateClassLevelText();
+  renderClassResources();
   renderClassFeatures();
   renderFeatProgression();
   renderSpellProgression();
@@ -11341,6 +12639,104 @@ function updateClassDerivedViews() {
   updateResistanceSummary();
   updateClassFeatureImmunitySummary();
   updateClassFeatureSpellResistanceSummary();
+}
+
+function derivedClassResources() {
+  if (!window.PFClassResources) return [];
+  return window.PFClassResources.derive({
+    classDefinitions,
+    classProgression,
+    characterLevel: Math.max(1, num("characterLevel") || 1),
+    abilityScores: Object.fromEntries(
+      ABILITIES.map(([key]) => [key, num(`${key}Score`)]),
+    ),
+    values: classResourceValues,
+  });
+}
+
+function renderClassResources(force = false) {
+  const section = el("classResourcesSection");
+  const root = el("classResourceRows");
+  if (!section || !root) return;
+  const resources = isEnemySheetMode ? [] : derivedClassResources();
+  section.classList.toggle("d-none", resources.length === 0);
+  const signature = JSON.stringify(
+    resources.map(({ key, current, maximum }) => [key, current, maximum]),
+  );
+  if (!force && signature === classResourceRenderSignature) return;
+  classResourceRenderSignature = signature;
+  root.innerHTML = resources
+    .map(
+      (resource) => `
+        <div class="class-resource-row">
+          <div class="class-resource-name">
+            <strong>${escapeHtml(resource.name)}</strong>
+            <span>${escapeHtml(resource.className)}</span>
+          </div>
+          <div class="class-resource-control">
+            <div class="ability-score-stepper sheet-number-stepper">
+              <button class="btn btn-outline-light btn-sm ability-stepper-btn" type="button" data-class-resource-step="-1" data-class-resource-key="${escapeHtml(resource.key)}" aria-label="Decrease ${escapeHtml(resource.name)}">-</button>
+              <input class="form-control form-control-sm no-spinner" type="number" min="0" max="${resource.maximum}" value="${resource.current}" inputmode="numeric" data-class-resource-input="${escapeHtml(resource.key)}" aria-label="Current ${escapeHtml(resource.name)}">
+              <button class="btn btn-outline-light btn-sm ability-stepper-btn" type="button" data-class-resource-step="1" data-class-resource-key="${escapeHtml(resource.key)}" aria-label="Increase ${escapeHtml(resource.name)}">+</button>
+            </div>
+            <span class="class-resource-maximum">/ ${resource.maximum} ${escapeHtml(resource.unit || "uses")}</span>
+          </div>
+        </div>`,
+    )
+    .join("");
+  root.querySelectorAll("[data-class-resource-step]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const resource = resources.find(
+        (entry) => entry.key === button.dataset.classResourceKey,
+      );
+      if (!resource) return;
+      classResourceValues[resource.key] = Math.max(
+        0,
+        Math.min(
+          resource.maximum,
+          resource.current + Number(button.dataset.classResourceStep || 0),
+        ),
+      );
+      renderClassResources(true);
+      queueSheetSave();
+    });
+  });
+  root.querySelectorAll("[data-class-resource-input]").forEach((input) => {
+    input.addEventListener("change", () => {
+      const resource = resources.find(
+        (entry) => entry.key === input.dataset.classResourceInput,
+      );
+      if (!resource) return;
+      classResourceValues[resource.key] = Math.max(
+        0,
+        Math.min(resource.maximum, Math.floor(Number(input.value) || 0)),
+      );
+      renderClassResources(true);
+      void saveSheetNow(true);
+    });
+  });
+}
+
+function spendCurrentCharacterResource(effect) {
+  const pool = window.PFClassResources?.poolForEffect(effect);
+  if (!pool) return true;
+  const resource = derivedClassResources().find(
+    (entry) => entry.key === pool.key,
+  );
+  if (!resource || resource.current < pool.cost) {
+    const message = window.PFClassResources.insufficientMessage(effect, {
+      pool,
+      resource,
+    });
+    if (window.PFToast) window.PFToast.show(message, { tone: "warning" });
+    else setStatus(message, "warning");
+    return false;
+  }
+  classResourceValues[resource.key] = resource.current - pool.cost;
+  effect.resourceActivationPaid = true;
+  renderClassResources(true);
+  queueSheetSave();
+  return true;
 }
 
 function updateCharacterLevelProgression() {
@@ -11732,7 +13128,14 @@ function addWeapon(data = {}) {
   const weaponType = data.weaponType || "Melee Weapon (One-Handed)";
   const naturalAttackKind =
     data.naturalAttackKind || naturalAttackKindFromName(name);
-  const naturalAttackRole = data.naturalAttackRole || "";
+  const naturalCatalogDetails =
+    window.PFNaturalWeapons?.cachedAttack(naturalAttackKind)?.details || {};
+  const naturalAttackRole =
+    data.naturalAttackRole || naturalCatalogDetails.naturalAttackRole || "";
+  const naturalDamageBySize =
+    window.PFNaturalWeapons?.normalizeDamageBySize(
+      data.naturalDamageBySize || naturalCatalogDetails.naturalDamageBySize,
+    ) || {};
   const enhancement = data.enhancement || "0";
   const enchantment = data.enchantment || "";
   const specialMaterial = data.specialMaterial || "";
@@ -11773,13 +13176,25 @@ function addWeapon(data = {}) {
     <input data-field="weaponType" class="sheet-input" type="hidden" value="${escapeHtml(weaponType)}">
     <input data-field="naturalAttackKind" class="sheet-input" type="hidden" value="${escapeHtml(naturalAttackKind)}">
     <input data-field="naturalAttackRole" class="sheet-input" type="hidden" value="${escapeHtml(naturalAttackRole)}">
+    <input data-field="naturalDamageBySize" class="sheet-input" type="hidden" value="${escapeHtml(JSON.stringify(naturalDamageBySize))}">
     <input data-field="attackScale" class="sheet-input" type="hidden" value="${escapeHtml(attackScale)}">
     <input data-field="attackMisc" class="sheet-input" type="hidden" value="${data.attackMisc || "0"}">
     <input data-field="damage" class="sheet-input" type="hidden" value="${escapeHtml(data.damage || "")}">
+    <input data-field="damageBase" class="sheet-input" type="hidden" value="${escapeHtml(data.damageBase || data.damage || "")}">
+    <input data-field="damageSmall" class="sheet-input" type="hidden" value="${escapeHtml(data.damageSmall || "")}">
+    <input data-field="scaleDamageBySize" class="sheet-input" type="hidden" value="${isYes(data.scaleDamageBySize) ? "yes" : "no"}">
     <input data-field="damageType" class="sheet-input" type="hidden" value="${escapeHtml(data.damageType || "")}">
     <input data-field="extraDamage" class="sheet-input" type="hidden" value="${escapeHtml(JSON.stringify(PFWeaponDamage.normalize(data.extraDamage)))}">
     <input data-field="damageScale" class="sheet-input" type="hidden" value="${escapeHtml(damageScale)}">
     <input data-field="damageMisc" class="sheet-input" type="hidden" value="${data.damageMisc || "0"}">
+    <input data-field="babMode" class="sheet-input" type="hidden" value="${escapeHtml(data.babMode || "standard")}">
+    <input data-field="standardBabBonus" class="sheet-input" type="hidden" value="${data.standardBabBonus || "0"}">
+    <input data-field="customBab" class="sheet-input" type="hidden" value="${data.customBab || "0"}">
+    <input data-field="awardProficiency" class="sheet-input" type="hidden" value="${isYes(data.awardProficiency) ? "yes" : "no"}">
+    <input data-field="proficiencyMode" class="sheet-input" type="hidden" value="${escapeHtml(data.proficiencyMode || "name")}">
+    <input data-field="proficiency" class="sheet-input" type="hidden" value="${escapeHtml(data.proficiency || "")}">
+    <input data-field="maximizeDice" class="sheet-input" type="hidden" value="${data.maximizeDice ? "yes" : "no"}">
+    <input data-field="damageMultiplier" class="sheet-input" type="hidden" value="${data.damageMultiplier || "1"}">
     <input data-field="details" class="sheet-input" type="hidden" value="${escapeHtml(detailsText)}">
     <input data-field="range" class="sheet-input" type="hidden" value="${escapeHtml(data.range || "")}">
     <input data-field="capacity" class="sheet-input" type="hidden" value="${escapeHtml(data.capacity || "")}">
@@ -11884,6 +13299,17 @@ function addGear(data = {}) {
   attachInputListeners(card);
 }
 
+function generatedEquipmentScaleValue(value, scale, buff) {
+  if (!scale) return Number(value || 0);
+  return window.PFBuffs?.scaledBonusValue
+    ? window.PFBuffs.scaledBonusValue(
+        { value, bonusScale: scale },
+        buff,
+        { activeBuffs: calculationBuffs() },
+      )
+    : Number(value || 0);
+}
+
 function generatedEquipmentCardData(entry = {}, buff = {}, index = 0) {
   const details = entry.details && typeof entry.details === "object"
     ? entry.details
@@ -11901,6 +13327,62 @@ function generatedEquipmentCardData(entry = {}, buff = {}, index = 0) {
     JSON.stringify(details),
   ].join("|");
   if (type === "Weapon") {
+    const formula = window.PFEffectRolls?.calculateFormula
+      ? window.PFEffectRolls.calculateFormula(
+          window.PFEffectRolls.weaponFormula(details),
+          { effect: buff },
+        )
+      : {
+          diceCount: Number(details.diceCount || 0),
+          dieType: Number(details.dieType || 6),
+          staticValue: Number(details.staticDamage ?? details.damageMisc ?? 0),
+          maximizeDice: Boolean(details.maximizeDice),
+          valueMultiplier: Number(details.damageMultiplier || 1),
+        };
+    const resolvedDamage = formula.diceCount
+      ? `${formula.diceCount}d${formula.dieType}`
+      : details.damage || "";
+    const legacySmallFormula = window.PFEffectRolls?.parseDiceFormula?.(
+      details.damageSmall,
+    );
+    const smallFormula = window.PFEffectRolls?.calculateFormula
+      ? window.PFEffectRolls.calculateFormula(
+          {
+            diceCount:
+              details.smallDiceCount ?? legacySmallFormula?.diceCount ?? 0,
+            dieType:
+              details.smallDieType ?? legacySmallFormula?.dieType ?? 6,
+            diceCountMax: details.diceCountMax,
+            diceCountScale: details.diceCountScale,
+          },
+          { effect: buff },
+        )
+      : {
+          diceCount: Number(
+            details.smallDiceCount ?? legacySmallFormula?.diceCount ?? 0,
+          ),
+          dieType: Number(
+            details.smallDieType ?? legacySmallFormula?.dieType ?? 6,
+          ),
+        };
+    const resolvedSmallDamage = smallFormula.diceCount
+      ? `${smallFormula.diceCount}d${smallFormula.dieType}`
+      : "";
+    const standardBabBonus = generatedEquipmentScaleValue(
+      details.standardBabBonus,
+      details.standardBabBonusScale,
+      buff,
+    );
+    const customBab = generatedEquipmentScaleValue(
+      details.customBab,
+      details.customBabScale,
+      buff,
+    );
+    const enhancement = generatedEquipmentScaleValue(
+      details.enhancement,
+      details.enhancementScale,
+      buff,
+    );
     return {
       kind: "Weapon",
       data: {
@@ -11912,18 +13394,40 @@ function generatedEquipmentCardData(entry = {}, buff = {}, index = 0) {
           details.naturalAttackKind || naturalAttackKindFromName(name),
         naturalAttackRole:
           details.naturalAttackRole ||
-          NATURAL_ATTACK_DAMAGE_BY_SIZE[
-            details.naturalAttackKind ||
-              naturalAttackKindFromName(name)
-          ]?.attackRole ||
+          window.PFNaturalWeapons?.cachedAttack(
+            details.naturalAttackKind || naturalAttackKindFromName(name),
+          )?.details?.naturalAttackRole ||
           "",
+        naturalDamageBySize:
+          details.naturalDamageBySize ||
+          window.PFNaturalWeapons?.cachedAttack(
+            details.naturalAttackKind || naturalAttackKindFromName(name),
+          )?.details?.naturalDamageBySize ||
+          {},
         attackScale: details.attackScale || "STR",
         attackMisc: details.attackMisc || "0",
-        damage: details.damage || "",
+        damage: resolvedDamage,
+        damageBase: details.damage || resolvedDamage,
+        damageSmall: resolvedSmallDamage,
+        scaleDamageBySize: "yes",
+        damageType: details.damageType || "",
+        extraDamage: PFWeaponDamage.normalize(details.extraDamage)
+          .map((component) =>
+            calculatedWeaponDamageComponent(component, { effect: buff }),
+          )
+          .filter(Boolean),
         damageScale: details.damageScale || "STR",
-        damageMisc: details.damageMisc || "0",
-        enhancement: details.enhancement || "0",
+        damageMisc: formula.staticValue || "0",
+        enhancement,
         enchantment: details.enchantment || "",
+        babMode: details.babMode || "standard",
+        standardBabBonus,
+        customBab,
+        awardProficiency: details.awardProficiency ? "yes" : "no",
+        proficiencyMode: details.proficiencyMode || "name",
+        proficiency: details.proficiency || "",
+        maximizeDice: formula.maximizeDice,
+        damageMultiplier: formula.valueMultiplier,
         specialMaterial: details.specialMaterial || "",
         details: details.details || details.summary || "",
         range: details.range || "",
@@ -11937,6 +13441,11 @@ function generatedEquipmentCardData(entry = {}, buff = {}, index = 0) {
       },
     };
   }
+  const enhancement = generatedEquipmentScaleValue(
+    details.enhancement,
+    details.enhancementScale,
+    buff,
+  );
   return {
     kind: "Armor",
     data: {
@@ -11945,7 +13454,7 @@ function generatedEquipmentCardData(entry = {}, buff = {}, index = 0) {
       generatedSource: source,
       type,
       bonus: details.bonus ?? 0,
-      enhancement: details.enhancement ?? 0,
+      enhancement,
       enchantment: details.enchantment || "",
       specialMaterial: details.specialMaterial || "",
       armorGroup: details.armorGroup || type,
@@ -12067,6 +13576,11 @@ function inventoryItemFromEquipmentCard(card) {
       ...item.details,
       weaponType:
         equipmentField(card, "weaponType") || item.details.weaponType,
+      naturalAttackKind: equipmentField(card, "naturalAttackKind"),
+      naturalAttackRole: equipmentField(card, "naturalAttackRole"),
+      naturalDamageBySize: window.PFNaturalWeapons?.normalizeDamageBySize(
+        equipmentField(card, "naturalDamageBySize"),
+      ),
       attackScale:
         equipmentField(card, "attackScale") || item.details.attackScale,
       damage: equipmentField(card, "damage"),
@@ -12215,6 +13729,16 @@ function updateWornCardFromLoot(item) {
     weaponCard.querySelector('[data-field="name"]').value = item.name || "";
     weaponCard.querySelector('[data-field="damage"]').value =
       details.damage || "";
+    weaponCard.querySelector('[data-field="naturalAttackKind"]').value =
+      details.naturalAttackKind || naturalAttackKindFromName(item.name);
+    weaponCard.querySelector('[data-field="naturalAttackRole"]').value =
+      details.naturalAttackRole || "";
+    weaponCard.querySelector('[data-field="naturalDamageBySize"]').value =
+      JSON.stringify(
+        window.PFNaturalWeapons?.normalizeDamageBySize(
+          details.naturalDamageBySize,
+        ) || {},
+      );
     weaponCard.querySelector('[data-field="damageType"]').value = details.damageType || "";
     weaponCard.querySelector('[data-field="extraDamage"]').value =
       JSON.stringify(PFWeaponDamage.normalize(details.extraDamage));
@@ -12301,6 +13825,9 @@ function updateWornCardFromLoot(item) {
       name: item.name,
       sourceLootId: item.id,
       weaponType: details.weaponType || "Melee Weapon (One-Handed)",
+      naturalAttackKind: details.naturalAttackKind || "",
+      naturalAttackRole: details.naturalAttackRole || "",
+      naturalDamageBySize: details.naturalDamageBySize || {},
       attackScale: details.attackScale || "STR",
       attackMisc: details.attackMisc || "0",
       damage: details.damage || "",
@@ -12401,6 +13928,9 @@ function syncEquippedLootBuffFromItem(item) {
   const effectiveAttributeBonuses = Array.isArray(item.effectiveAttributeBonuses)
     ? item.effectiveAttributeBonuses
     : [];
+  const attributeContributions = Array.isArray(item.attributeContributions)
+    ? item.attributeContributions
+    : [];
   const grantDomains = Array.isArray(item.grantDomains) ? item.grantDomains : [];
   const generatedEquipment = Array.isArray(item.generatedEquipment)
     ? item.generatedEquipment
@@ -12426,6 +13956,7 @@ function syncEquippedLootBuffFromItem(item) {
     !casterLevelBonuses.length &&
     !spellDcBonuses.length &&
     !effectiveAttributeBonuses.length &&
+    !attributeContributions.length &&
     !grantDomains.length &&
     !generatedEquipment.length
   ) {
@@ -12469,6 +14000,7 @@ function syncEquippedLootBuffFromItem(item) {
     ...(casterLevelBonuses.length ? { casterLevelBonuses } : {}),
     ...(spellDcBonuses.length ? { spellDcBonuses } : {}),
     ...(effectiveAttributeBonuses.length ? { effectiveAttributeBonuses } : {}),
+    ...(attributeContributions.length ? { attributeContributions } : {}),
     ...(grantDomains.length ? { grantDomains } : {}),
     ...(generatedEquipment.length ? { generatedEquipment } : {}),
   };
@@ -12716,6 +14248,141 @@ function weaponFeatAdjustments(card) {
   return result;
 }
 
+function calculatedWeaponDamageComponent(entry, context = {}) {
+  const normalized = PFWeaponDamage.normalizeEntry(entry);
+  if (!normalized) return null;
+  const formula = PFWeaponDamage.formulaFor(normalized, context);
+  return {
+    ...normalized,
+    diceCount: formula?.diceCount ?? normalized.diceCount,
+    staticDamage: formula?.staticValue ?? normalized.staticDamage,
+    diceCountScale: null,
+    staticDamageScale: null,
+  };
+}
+
+function weaponExtraDamageForCard(card, entries = []) {
+  const weaponContainer = card.parentElement;
+  const weaponIndex = weaponContainer
+    ? [...weaponContainer.querySelectorAll(":scope > .sheet-card")].indexOf(card)
+    : 0;
+  const item = equipmentCardData(card);
+  const context = equipmentEnhancementBuffs();
+  const scaleContext = {
+    ...context.baseline,
+    abilityScores: context.abilityScores,
+    characterLevel: context.baseline.characterLevel,
+    classLevels: context.baseline.classLevels,
+  };
+  const base = PFWeaponDamage.normalize(entries)
+    .map((entry) => calculatedWeaponDamageComponent(entry, scaleContext))
+    .filter(Boolean);
+  const granted = context.buffs.flatMap((buff) =>
+    (Array.isArray(buff.weaponExtraDamage) ? buff.weaponExtraDamage : [])
+      .filter((entry) => {
+        const target = window.PFEffectStats?.equipmentTargetFromBonus?.(entry);
+        return (
+          target &&
+          window.PFEffectStats?.equipmentTargetMatchesItem?.(
+            target,
+            item,
+            "weapon",
+            Math.max(0, weaponIndex),
+          )
+        );
+      })
+      .map((entry) =>
+        calculatedWeaponDamageComponent(entry, {
+          ...scaleContext,
+          effect: buff,
+          casterLevel: buff.casterLevel,
+          classLevel: buff.casterLevel,
+          classLevels: buff.classLevels || scaleContext.classLevels,
+        }),
+      )
+      .filter(Boolean),
+  );
+  return [...base, ...granted];
+}
+
+function weaponDamageSizeForCard(weaponType, weaponName) {
+  const actualSize = finalCreatureSize().name;
+  const matches =
+    window.PFEffectMechanics?.weaponDamageSizeChangesForWeapon?.(
+      equipmentEnhancementBuffs().buffs,
+      weaponType,
+      weaponName,
+    ) || [];
+  const requestedSteps = matches.reduce(
+    (total, entry) => total + Number(entry.sizeSteps || 0),
+    0,
+  );
+  const damageSize =
+    window.PFEffectMechanics?.shiftWeaponDamageSize?.(
+      actualSize,
+      requestedSteps,
+    ) || actualSize;
+  const actualIndex = CREATURE_SIZES.findIndex(
+    (entry) => entry.name === actualSize,
+  );
+  const damageIndex = CREATURE_SIZES.findIndex(
+    (entry) => entry.name === damageSize,
+  );
+  return {
+    actualSize,
+    damageSize,
+    steps:
+      actualIndex >= 0 && damageIndex >= 0
+        ? damageIndex - actualIndex
+        : requestedSteps,
+    matches,
+  };
+}
+
+function weaponAttributeScalingTerms(
+  card,
+  stat,
+  baseTerms,
+  buffed,
+  weaponType,
+  weaponName,
+) {
+  const resolved = resolvedAttributeContribution(
+    stat,
+    baseTerms.map((term) => term.key),
+    buffed,
+    { weaponType, weaponName },
+  );
+  const retainedBase = resolved.replaced ? [] : baseTerms;
+  const effectTerms = resolved.terms
+    .filter((term) => term.mode !== "base")
+    .map((term) => ({
+      key: term.ability,
+      multiplier: 1,
+      mode: term.mode,
+      source: term.source,
+      value: term.value,
+    }));
+  return {
+    ...resolved,
+    terms: [...retainedBase, ...effectTerms],
+  };
+}
+
+function syncWeaponEffectScalingGrid(card, attackScaling, damageScaling) {
+  if (!card) return;
+  const set = (kind, result) => {
+    card.dataset[`${kind}EffectScaling`] = (result.terms || [])
+      .map((term) => String(term.key || term.ability || "").toUpperCase())
+      .filter(Boolean)
+      .join(" + ");
+    card.dataset[`${kind}EffectScalingSources`] = (result.entries || [])
+      .map((entry) => `${entry.source}: ${entry.mode} ${entry.ability.toUpperCase()}`)
+      .join("; ");
+  };
+  set("attack", attackScaling);
+  set("damage", damageScaling);
+}
 function calculateWeaponDamage(card, buffed, buffBonuses) {
   const field = (name) => {
     const input = card.querySelector(`[data-field="${name}"]`);
@@ -12723,13 +14390,45 @@ function calculateWeaponDamage(card, buffed, buffBonuses) {
     if (input.type === "checkbox") return input.checked ? "yes" : "no";
     return input.value || "";
   };
-  const scalingTerms = parseScalingTerms(field("damageScale"), "STR");
+  let scalingTerms = parseScalingTerms(field("damageScale"), "STR");
   const weaponType = field("weaponType") || "Melee Weapon (One-Handed)";
   const weaponName = field("name");
+  const attributeScaling = weaponAttributeScalingTerms(
+    card,
+    "damage",
+    scalingTerms,
+    buffed,
+    weaponType,
+    weaponName,
+  );
+  scalingTerms = attributeScaling.terms;
   const naturalData = naturalAttackData(card);
-  const dice = naturalData
-    ? naturalAttackDice(card) || stripDamageModifier(field("damage"))
+  const damageSize = weaponDamageSizeForCard(weaponType, weaponName);
+  let dice = naturalData
+    ? naturalAttackDice(card, damageSize.damageSize) ||
+      stripDamageModifier(field("damage"))
     : stripDamageModifier(field("damage"));
+  if (
+    !naturalData &&
+    isYes(field("scaleDamageBySize")) &&
+    window.PFEffectRolls?.resizeWeaponDice
+  ) {
+    dice = window.PFEffectRolls.resizeWeaponDice(
+      dice,
+      finalCreatureSize().name,
+      {
+        smallDice: field("damageSmall"),
+        baseDice: field("damageBase"),
+      },
+    );
+  }
+  if (
+    !naturalData &&
+    damageSize.steps &&
+    window.PFEffectRolls?.shiftWeaponDice
+  ) {
+    dice = window.PFEffectRolls.shiftWeaponDice(dice, damageSize.steps);
+  }
   const isRanged =
     isRangedWeaponType(weaponType) ||
     Boolean(field("range").trim()) ||
@@ -12764,7 +14463,10 @@ function calculateWeaponDamage(card, buffed, buffBonuses) {
   const buffBonus = weaponBuffs.total;
   const totalBonus =
     scalingBonus + enhancement + miscBonus + buffBonus + feat.damageBonus;
-  const extraDamage = PFWeaponDamage.normalize(field("extraDamage"));
+  const extraDamage = weaponExtraDamageForCard(
+    card,
+    PFWeaponDamage.normalize(field("extraDamage")),
+  );
   const damageType = field("damageType").trim();
   const totalText = `${dice || "0"}${signed(totalBonus)}${damageType ? ` ${damageType}` : ""}`;
   const statItems = scalingTerms.flatMap((term) => {
@@ -12787,9 +14489,22 @@ function calculateWeaponDamage(card, buffed, buffBonuses) {
     ),
     ...weaponBuffBreakdown(weaponBuffs, "damage"),
     ...feat.breakdown.filter((item) => item.targetLabel === "Damage"),
+    ...damageSize.matches.map((entry) => ({
+      source: entry.source,
+      value: Number(entry.sizeSteps || 0),
+      type: "size",
+      applied: true,
+      targetLabel: "Damage die size",
+      detail: `${weaponName || "Weapon"} deals damage as a ${damageSize.damageSize} weapon`,
+    })),
   ];
-  const naturalSize = naturalData ? ` (${finalCreatureSize().name} ${naturalData.kind})` : "";
-  const formula = `${dice || "0"}${naturalSize} + scaling ${signed(scalingBonus)} + enhancement ${signed(enhancement)} + misc ${signed(miscBonus)} + buffs ${signed(buffBonus)} + feats ${signed(feat.damageBonus)}`;
+  const naturalSize = naturalData
+    ? ` (${damageSize.damageSize} ${naturalData.kind})`
+    : "";
+  const weaponSize = damageSize.steps
+    ? ` + damage size ${damageSize.damageSize}`
+    : "";
+  const formula = `${dice || "0"}${naturalSize}${weaponSize} + scaling ${signed(scalingBonus)} + enhancement ${signed(enhancement)} + misc ${signed(miscBonus)} + buffs ${signed(buffBonus)} + feats ${signed(feat.damageBonus)}`;
   return {
     buffBonus,
     scalingBonus,
@@ -12797,7 +14512,8 @@ function calculateWeaponDamage(card, buffed, buffBonuses) {
     totalText,
     extraDamage,
     formula,
-    breakdown: [...statItems, ...directItems],
+    breakdown: [...statItems, ...directItems, ...attributeContributionBreakdown(attributeScaling, "Damage scaling")],
+    attributeScaling,
   };
 }
 
@@ -12814,6 +14530,18 @@ function calculateWeaponAttack(card, buffed, buffBonuses) {
     isRangedWeaponType(weaponType) ||
     Boolean(field("range").trim()) ||
     parseScalingKeys(field("attackScale")).includes("dex");
+  const baseScalingTerms = parseScalingTerms(
+    field("attackScale"),
+    String(isRanged ? "DEX" : "STR"),
+  );
+  const attributeScaling = weaponAttributeScalingTerms(
+    card,
+    "attack",
+    baseScalingTerms,
+    buffed,
+    weaponType,
+    weaponName,
+  );
   const size = finalCreatureSize();
   const sizeAttack = Number(size.modifier || 0);
   const miscBonus = Number(field("attackMisc") || 0);
@@ -12830,12 +14558,24 @@ function calculateWeaponAttack(card, buffed, buffBonuses) {
   const enhancementDelta = enhancement - enhancementResult.base;
   const templateAttack = field("templateAttack");
   if (templateAttack) {
+    const baseAttributeBonus = baseScalingTerms.reduce(
+      (total, term) =>
+        total + Math.floor(abilityModFor(term.key, buffed) * term.multiplier),
+      0,
+    );
+    const effectiveAttributeBonus = attributeScaling.terms.reduce(
+      (total, term) =>
+        total + Math.floor(abilityModFor(term.key, buffed) * term.multiplier),
+      0,
+    );
+    const attributeDelta = effectiveAttributeBonus - baseAttributeBonus;
     const attackValues =
       String(templateAttack)
-        .match(/[+\-]?\d+/g)
+        .match(/[+-]?d+/g)
         ?.map((value) =>
           signed(
             Number(value) +
+              attributeDelta +
               enhancementDelta +
               sizeAttack +
               miscBonus +
@@ -12846,7 +14586,7 @@ function calculateWeaponAttack(card, buffed, buffBonuses) {
       ...(sizeAttack
         ? [
             {
-              source: `${size.name} size`,
+              source: size.name + " size",
               value: sizeAttack,
               type: "size",
               applied: true,
@@ -12859,25 +14599,41 @@ function calculateWeaponAttack(card, buffed, buffBonuses) {
         "Weapon enhancement",
       ),
       ...weaponBuffBreakdown(weaponBuffs, "attack"),
+      ...attributeContributionBreakdown(attributeScaling, "Attack scaling"),
     ];
-    const formula = `template ${templateAttack} + enhancement override ${signed(enhancementDelta)} + size ${signed(sizeAttack)} + misc ${signed(miscBonus)} + buffs ${signed(buffBonus)}`;
+    const formula =
+      "template " +
+      templateAttack +
+      " + attribute change " +
+      signed(attributeDelta) +
+      " + enhancement override " +
+      signed(enhancementDelta) +
+      " + size " +
+      signed(sizeAttack) +
+      " + misc " +
+      signed(miscBonus) +
+      " + buffs " +
+      signed(buffBonus);
     return {
       buffBonus,
       attacks: attackValues.join("/"),
       formula,
       breakdown: directItems,
+      attributeScaling,
     };
   }
-  const scalingTerms = parseScalingTerms(
-    field("attackScale"),
-    String(isRanged ? "DEX" : "STR"),
-  );
-  const scalingBonus = scalingTerms.reduce(
+  let scalingTerms = attributeScaling.terms;  const scalingBonus = scalingTerms.reduce(
     (total, term) =>
       total + Math.floor(abilityModFor(term.key, buffed) * term.multiplier),
     0,
   );
   const feat = weaponFeatAdjustments(card);
+  const babMode = field("babMode") || "standard";
+  const standardBabBonus = Number(field("standardBabBonus") || 0);
+  const babValue =
+    babMode === "custom"
+      ? Number(field("customBab") || 0)
+      : num("bab") + standardBabBonus;
   const naturalData = naturalAttackData(card);
   if (naturalData) {
     const role = String(
@@ -12886,7 +14642,7 @@ function calculateWeaponAttack(card, buffed, buffBonuses) {
     const secondaryPenalty =
       role.toLowerCase() === "secondary" ? -5 : 0;
     const totalBonus =
-      num("bab") +
+      babValue +
       scalingBonus +
       enhancement +
       sizeAttack +
@@ -12929,12 +14685,13 @@ function calculateWeaponAttack(card, buffed, buffBonuses) {
         targetLabel: "Attack",
       });
     }
-    const formula = `BAB ${signed(num("bab"))} + scaling ${signed(scalingBonus)} + enhancement ${signed(enhancement)} + size ${signed(sizeAttack)} + misc ${signed(miscBonus)} + buffs ${signed(buffBonus)} + feats ${signed(feat.attackPenalty)} + ${role} ${signed(secondaryPenalty)}`;
+    const formula = `${babMode === "custom" ? "custom BAB" : "BAB"} ${signed(babValue)} + scaling ${signed(scalingBonus)} + enhancement ${signed(enhancement)} + size ${signed(sizeAttack)} + misc ${signed(miscBonus)} + buffs ${signed(buffBonus)} + feats ${signed(feat.attackPenalty)} + ${role} ${signed(secondaryPenalty)}`;
     return {
       buffBonus,
       attacks: signed(totalBonus),
       formula,
-      breakdown: [...statItems, ...directItems],
+      breakdown: [...statItems, ...directItems, ...attributeContributionBreakdown(attributeScaling, "Attack scaling")],
+      attributeScaling,
     };
   }
   const extraAttacks = Math.max(
@@ -12971,7 +14728,7 @@ function calculateWeaponAttack(card, buffed, buffBonuses) {
     feat.attackPenalty +
     twfAttackPenalty +
     rapidShotPenalty;
-  const baseIteratives = iterativeBabBonuses(num("bab"));
+  const baseIteratives = iterativeBabBonuses(babValue);
   const attackValues =
     twf.offhand && hasPrimaryWeapon
       ? [
@@ -13071,12 +14828,13 @@ function calculateWeaponAttack(card, buffed, buffBonuses) {
       applied: true,
       targetLabel: "Extra off-hand attack",
     });
-  const formula = `BAB ${twf.offhand && hasPrimaryWeapon ? "off-hand" : "iteratives"} + extra attacks ${effectExtraAttacks + (rapidShotOnThisWeapon ? 1 : 0)} + scaling ${signed(scalingBonus)} + enhancement ${signed(enhancement)} + size ${signed(sizeAttack)} + misc ${signed(miscBonus)} + buffs ${signed(buffBonus)} + feats ${signed(feat.attackPenalty)} + TWF ${signed(twfAttackPenalty)} + Rapid Shot ${signed(rapidShotPenalty)}`;
+  const formula = `${babMode === "custom" ? "custom BAB" : "BAB"} ${signed(babValue)} ${twf.offhand && hasPrimaryWeapon ? "off-hand" : "iteratives"} + extra attacks ${effectExtraAttacks + (rapidShotOnThisWeapon ? 1 : 0)} + scaling ${signed(scalingBonus)} + enhancement ${signed(enhancement)} + size ${signed(sizeAttack)} + misc ${signed(miscBonus)} + buffs ${signed(buffBonus)} + feats ${signed(feat.attackPenalty)} + TWF ${signed(twfAttackPenalty)} + Rapid Shot ${signed(rapidShotPenalty)}`;
   return {
     buffBonus,
     attacks,
     formula,
-    breakdown: [...statItems, ...directItems],
+    breakdown: [...statItems, ...directItems, ...attributeContributionBreakdown(attributeScaling, "Attack scaling")],
+    attributeScaling,
   };
 }
 
@@ -13086,6 +14844,7 @@ function recalculateWeapons(buffed, buffBonuses) {
     .forEach((card) => {
       const attack = calculateWeaponAttack(card, buffed, buffBonuses);
       const damage = calculateWeaponDamage(card, buffed, buffBonuses);
+      syncWeaponEffectScalingGrid(card, attack.attributeScaling, damage.attributeScaling);
       const attackField = card.querySelector("[data-attack-total]");
       const attackBuffField = card.querySelector("[data-attack-buff]");
       const damageBuffField = card.querySelector("[data-damage-buff]");
@@ -13102,12 +14861,15 @@ function recalculateWeapons(buffed, buffBonuses) {
       if (totalField) totalField.value = damage.totalText;
       const extraResults = card.querySelector("[data-extra-damage-results]");
       if (extraResults) {
-        extraResults.replaceChildren(...damage.extraDamage.map(({ formula, type }) => {
+        extraResults.replaceChildren(...damage.extraDamage.map((component) => {
           const output = document.createElement("output");
           output.className = "sheet-output sheet-output-sm";
           output.dataset.extraDamageValue = "true";
-          output.value = `${formula}${type ? ` ${type}` : ""}`;
-          output.setAttribute("aria-label", `Additional ${type || "weapon"} damage`);
+          output.value = PFWeaponDamage.formatEntry(component);
+          output.setAttribute(
+            "aria-label",
+            `Additional ${component.damageType || "weapon"} damage`,
+          );
           return output;
         }));
       }
@@ -13496,9 +15258,16 @@ function recalculateSheet() {
   allSkills().forEach(([skill]) => {
     const id = skillId(skill);
     const abilityKey = el(`${id}Ability`)?.dataset.ability;
-    const abilityValue = abilityModFor(abilityKey, buffed);
-    const skillAbilityBuffKey = skillBuffKeyForAbility(abilityKey);
     const specificSkillKey = skillStatKey(skill);
+    const skillAttributeContribution = resolvedAttributeContribution(
+      specificSkillKey,
+      [abilityKey],
+      buffed,
+      { skillAbility: abilityKey, skillName: skill },
+    );
+    const abilityValue = skillAttributeContribution.total;
+    const skillAbilityBuffKey = skillBuffKeyForAbility(abilityKey);
+
     const familyKey = skillFamilyBonusKey(skill);
     const trainingKey = skillTrainingBonusKey(skill);
     const skillBuff =
@@ -13591,6 +15360,12 @@ function recalculateSheet() {
         : []),
       { stat: specificSkillKey, target: skill },
     ]);
+    skillBreakdownItems.push(
+      ...attributeContributionBreakdown(
+        skillAttributeContribution,
+        `${skill} scaling`,
+      ),
+    );
     if (classSkillBonus)
       skillBreakdownItems.push({
         source: "Class Skill",
@@ -13610,6 +15385,7 @@ function recalculateSheet() {
     setCalc(`${id}Total`, "", usable ? skillBreakdownItems : []);
   });
   renderCharacterSpellLikeAbilities();
+  renderClassResources();
   if (sheetViewMode === "simplified") renderSimplifiedSheet();
 }
 
@@ -13636,6 +15412,22 @@ async function refreshBuffsIfChanged(force = false, saveAfterRefresh = false) {
   recalculateSheet();
   if (saveAfterRefresh && currentSheetId && !isEnemySheetMode)
     await saveSheetNow(true);
+}
+
+function applyHealingEffectToCurrentSheet(effect, { persist = true } = {}) {
+  if (!window.PFEffectHealing) return false;
+  const result = window.PFEffectHealing.applicationResult(
+    effect,
+    el("currentHitPoints")?.value,
+    el("hitPointsTotal")?.value || el("hitPoints")?.value,
+  );
+  if (!result.changed) return false;
+  currentHitPointsBase = result.current - currentHitPointsAdjustment;
+  renderingCurrentHitPoints = true;
+  el("currentHitPoints").value = result.current;
+  renderingCurrentHitPoints = false;
+  if (persist) queueSheetSave();
+  return true;
 }
 
 async function openEffectTrackerModal() {
@@ -13684,20 +15476,56 @@ async function openEffectTrackerModal() {
       );
       return detail?.calculations || effect.spellCalculations || null;
     },
+    onAttackRolled: async (effect, results) => {
+      await recordSpellAttackTimeline(effect, results);
+    },
+    d20BoostSession: async () => {
+      const sources = calculationBuffs().filter(
+        (source) => Array.isArray(source?.d20Boosts) && source.d20Boosts.length,
+      );
+      if (!sources.length || !window.PFD20Boosts) return null;
+      return {
+        sources,
+        activeEffects: activeBuffs,
+        usage: structuredClone(d20BoostUses),
+        onUsageChange: async (usage) => {
+          d20BoostUses = structuredClone(usage);
+          await saveSheetNow(true);
+        },
+      };
+    },
     effectPickerEffects: loadCurrentEffectPickerDefinitions,
     choicePoolSkills: effectChoiceSkills(),
     choicePoolEquipment: currentEffectChoiceEquipment,
     favoredEnemyOptions: characterFavoredEnemyOptions,
-    onAuraActivate: async (effect) => {
-      const controller = await createAuraOnCurrentMap(effect);
-      setStatus(
-        controller
-          ? `${effect.name || "Aura"} activated on the current map.`
-          : `Place ${isEnemySheetMode ? "this enemy" : "this character"} on the current map before activating an aura.`,
-        controller ? "success" : "warning",
-      );
-      return controller;
+    onSummonCreatures: async (effect) => {
+      const summoned = await spawnSpellCreaturesOnCurrentMap(effect);
+      if (!summoned)
+        setStatus(
+          `Place ${isEnemySheetMode ? "this enemy" : "this character"} on the current map before summoning.`,
+          "warning",
+        );
+      return summoned;
+    },    onAuraActivate: async (effect, { recipientEffect } = {}) => {
+      const result = await createAuraOnCurrentMap(effect, {
+        beforeCreate: spendCurrentCharacterResource,
+        recipientEffect,
+      });
+      if (!result.ok && result.reason === "source-token") {
+        setStatus(
+          `Place ${isEnemySheetMode ? "this enemy" : "this character"} on the current map before activating an aura.`,
+          "warning",
+        );
+      }
+      if (!result.ok && result.reason === "aura-build") {
+        setStatus("The aura could not be created from this effect.", "danger");
+      }
+      if (!result.ok && result.reason === "map-save") {
+        setStatus("The aura could not be saved to the current map.", "danger");
+      }
+      return result.controller || null;
     },
+    onTargetedAuraActivate: activateTargetedAuraFromCharacterSheet,
     // Enemies aren't "controlled" by a separate real person the way a
     // PC is -- only route PC effects-with-a-choice through the request
     // flow when someone other than that character's own owner is the
@@ -13707,6 +15535,14 @@ async function openEffectTrackerModal() {
       : !currentSheetOwnerId || currentSheetOwnerId === currentUserId,
     loadActiveEffects: async () => activeBuffs,
     loadPassiveEffects: async () => collectBridgePassiveEffectSources(),
+    onBeforeApply: async (effect, { replaceIndex } = {}) =>
+      Number.isInteger(replaceIndex) ||
+      (effect.auraConfig?.enabled &&
+        !effect.auraConfig?.targetsEmitAura) ||
+      spendCurrentCharacterResource(effect),
+    onHealingApply: async (effect) => {
+      applyHealingEffectToCurrentSheet(effect);
+    },
     saveActiveEffects: enemySaveActiveEffects || undefined,
     onChange: (buffs, { collectionChanged = false } = {}) => {
       activeBuffs = Array.isArray(buffs) ? buffs : [];
@@ -13731,6 +15567,30 @@ async function openEffectTrackerModal() {
     await effectTrackerInstance.ready;
   } else {
     await effectTrackerInstance.refresh(options);
+  }
+}
+
+async function openEffectWorkspace(button, { powersOnly = false } = {}) {
+  if (powersOnly && !currentSheetId) {
+    setStatus(
+      `Select or create a ${isEnemySheetMode ? "saved enemy" : "character"} before using powers.`,
+      "warning",
+    );
+    return;
+  }
+  button.disabled = true;
+  if (!effectTrackerInstance)
+    PFEffectTracker.prepareLoading?.(el("sheetEffectTracker"));
+  if (!powersOnly) effectTrackerModal.show();
+  try {
+    await new Promise((resolve) =>
+      requestAnimationFrame(() => window.setTimeout(resolve, 0)),
+    );
+    await openEffectTrackerModal();
+    if (powersOnly) await effectTrackerInstance?.openPicker();
+    else void refreshBuffsIfChanged(false);
+  } finally {
+    button.disabled = false;
   }
 }
 
@@ -13810,6 +15670,9 @@ function renderInventoryEffects(item) {
     : [];
   const effectiveAttributeBonuses = Array.isArray(item.effectiveAttributeBonuses)
     ? item.effectiveAttributeBonuses
+    : [];
+  const attributeContributions = Array.isArray(item.attributeContributions)
+    ? item.attributeContributions
     : [];
   const grantDomains = Array.isArray(item.grantDomains) ? item.grantDomains : [];
   const generatedEquipment = Array.isArray(item.generatedEquipment)
@@ -13927,6 +15790,11 @@ function renderInventoryEffects(item) {
           : "Effective attribute bonus",
       ),
     ),
+    ...attributeContributions.map((entry) => {
+      const action = entry.mode === "replace" ? "Replace with" : "Add";
+      const target = window.PFEffectStats?.choiceStatLabel?.(entry.stat) || titleCaseStat(entry.stat || "stat");
+      return `${action} ${String(entry.ability || "").toUpperCase()} for ${escapeHtml(target)}${entry.weaponType && entry.weaponType !== "all" ? ` (${escapeHtml(window.PFEffectStats?.weaponTypeRestrictionLabel?.(entry.weaponType) || entry.weaponType)})` : ""}${entry.weaponName ? ` (${escapeHtml(entry.weaponName)})` : ""}`;
+    }),
     ...grantDomains.map((entry) =>
       escapeHtml(
         window.PFEffectEditor?.grantDomainText
@@ -13984,16 +15852,20 @@ function makeEnemyInventoryItem(source) {
     extraRanksPerLevel: cloneJson(source.extraRanksPerLevel || []),
     featGrants: cloneJson(source.featGrants || []),
     sizeChanges: cloneJson(source.sizeChanges || []),
+    weaponDamageSizeChanges: cloneJson(source.weaponDamageSizeChanges || []),
     spellLikeAbilities: cloneJson(source.spellLikeAbilities || []),
     casterLevelBonuses: cloneJson(source.casterLevelBonuses || []),
     spellDcBonuses: cloneJson(source.spellDcBonuses || []),
     effectiveAttributeBonuses: cloneJson(
       source.effectiveAttributeBonuses || [],
     ),
+    attributeContributions: cloneJson(source.attributeContributions || []),
     grantDomains: cloneJson(source.grantDomains || []),
     generatedEquipment: cloneJson(source.generatedEquipment || []),
     conditionalVariables: cloneJson(source.conditionalVariables || []),
+    attackRolls: cloneJson(source.attackRolls || []),
     damageRolls: cloneJson(source.damageRolls || []),
+    d20Boosts: cloneJson(source.d20Boosts || []),
     activeMechanics: cloneJson(source.activeMechanics || null),
   };
 }
@@ -14030,9 +15902,18 @@ async function addEnemySourceItemToInventory(sourceItemId) {
 function toggleInventoryDetailFields(resetAttackOptions = false) {
   const type = el("inventoryItemType")?.value || "Item";
   const weaponType = el("inventoryWeaponType")?.value;
+  const natural = type === "Weapon" && weaponType === "Natural Weapon";
   const firearm =
     type === "Weapon" && isFirearmWeaponType(weaponType);
   el("inventoryWeaponFields")?.classList.toggle("d-none", type !== "Weapon");
+  el("inventoryNaturalWeaponFields")?.classList.toggle("d-none", !natural);
+  el("inventoryStandardDamageField")?.classList.toggle("d-none", natural);
+  if (natural) {
+    void window.PFNaturalWeapons?.setFromKind(
+      el("inventoryNaturalDamageBySize"),
+      el("inventoryNaturalAttackKind").value || "Other",
+    );
+  }
   document
     .querySelectorAll(".inventory-firearm-field")
     .forEach((field) => field.classList.toggle("d-none", !firearm));
@@ -14078,6 +15959,58 @@ function setInventoryAttackScale(value = "STR") {
     });
 }
 
+function showInventoryEffectScaling(item = {}) {
+  const card = [...el("weaponRows").querySelectorAll(".sheet-card")].find(
+    (candidate) =>
+      candidate.querySelector('[data-field="sourceLootId"]')?.value === item.id,
+  );
+  const sync = (kind, groupId, abilityDataset) => {
+    const group = el(groupId);
+    if (!group) return;
+    group.querySelectorAll(`[${abilityDataset}]`).forEach((button) => {
+      button.classList.remove("effect-attribute-scale");
+      button.classList.remove("effect-attribute-replaced");
+      button.removeAttribute("data-effect-attribute-scale");
+      button.title = "";
+    });
+    let summary = group.parentElement.querySelector(
+      `[data-inventory-effect-scaling="${kind}"]`,
+    );
+    if (!summary) {
+      summary = document.createElement("div");
+      summary.className = "small text-info mt-1";
+      summary.dataset.inventoryEffectScaling = kind;
+      group.insertAdjacentElement("afterend", summary);
+    }
+    const effective = card?.dataset[`${kind}EffectScaling`] || "";
+    const sources = card?.dataset[`${kind}EffectScalingSources`] || "";
+    const base = kind === "attack"
+      ? item.details?.attackScale || "STR"
+      : item.details?.damageScale || "STR";
+    if (!sources) {
+      summary.textContent = "";
+      summary.classList.add("d-none");
+      return;
+    }
+    const effectiveSet = new Set(parseScalingKeys(effective).map((key) => key.toUpperCase()));
+    const baseSet = new Set(parseScalingKeys(base).map((key) => key.toUpperCase()));
+    group.querySelectorAll(`[${abilityDataset}]`).forEach((button) => {
+      const ability = kind === "attack"
+        ? button.dataset.inventoryAttackScaleAbility
+        : button.dataset.inventoryScaleAbility;
+      if (baseSet.has(ability) && !effectiveSet.has(ability))
+        button.classList.add("effect-attribute-replaced");
+      if (!effectiveSet.has(ability)) return;
+      button.classList.add("effect-attribute-scale");
+      button.dataset.effectAttributeScale = "true";
+      button.title = sources;
+    });
+    summary.textContent = `Effects: ${effective || base} (${sources})`;
+    summary.classList.remove("d-none");
+  };
+  sync("attack", "inventoryAttackScaleOptions", "data-inventory-attack-scale-ability");
+  sync("damage", "inventoryDamageScaleOptions", "data-inventory-scale-ability");
+}
 function setupInventoryScalingControls() {
   el("inventoryDamageScaleOptions")
     ?.querySelectorAll("[data-inventory-scale-ability]")
@@ -14239,11 +16172,19 @@ function collectInventoryDetails() {
   if (type === "Weapon") {
     const weaponType =
       el("inventoryWeaponType").value || "Melee Weapon (One-Handed)";
+    const natural = weaponType === "Natural Weapon";
+    const naturalDamageBySize = natural
+      ? window.PFNaturalWeapons?.collect(
+          el("inventoryNaturalDamageBySize"),
+        ) || {}
+      : {};
     const details = {
       ...slotDetails,
       weaponType,
       attackScale: el("inventoryAttackScale").value.trim() || "STR",
-      damage: el("inventoryDamageDice").value.trim(),
+      damage: natural
+        ? naturalDamageBySize.medium || ""
+        : el("inventoryDamageDice").value.trim(),
       damageType: el("inventoryDamageType").value.trim(),
       extraDamage: PFWeaponDamage.collect(el("inventoryExtraDamage")),
       critical: el("inventoryWeaponCritical").value.trim(),
@@ -14264,6 +16205,15 @@ function collectInventoryDetails() {
       twfFeatOff: inventoryAttackCheckboxValue("twfFeatOff"),
       improvedTwf: inventoryAttackCheckboxValue("improvedTwf"),
       greaterTwf: inventoryAttackCheckboxValue("greaterTwf"),
+      ...(natural
+        ? {
+            naturalAttackKind:
+              el("inventoryNaturalAttackKind").value || "Other",
+            naturalAttackRole:
+              el("inventoryNaturalAttackRole").value || "Secondary",
+            naturalDamageBySize,
+          }
+        : {}),
     };
     if (isFirearmWeaponType(weaponType)) {
       details.capacity = el("inventoryWeaponCapacity").value.trim();
@@ -14301,6 +16251,24 @@ function openInventoryItemEditor(itemId) {
   PFItemEditor.refreshDescription(inventoryEditorConfig());
   el("inventoryWeaponType").value =
     details.weaponType || "Melee Weapon (One-Handed)";
+  el("inventoryNaturalAttackKind").value =
+    details.naturalAttackKind || "Other";
+  el("inventoryNaturalAttackRole").value =
+    details.naturalAttackRole || "Secondary";
+  window.PFNaturalWeapons?.setValues(
+    el("inventoryNaturalDamageBySize"),
+    details.naturalDamageBySize || {},
+  );
+  if (
+    el("inventoryWeaponType").value === "Natural Weapon" &&
+    !Object.values(details.naturalDamageBySize || {}).some(Boolean)
+  ) {
+    void window.PFNaturalWeapons?.setFromKind(
+      el("inventoryNaturalDamageBySize"),
+      details.naturalAttackKind || "Other",
+      { force: true },
+    );
+  }
   setInventoryAttackScale(details.attackScale || "STR");
   el("inventoryDamageDice").value = details.damage || "";
   el("inventoryDamageType").value = details.damageType || "";
@@ -14309,6 +16277,7 @@ function openInventoryItemEditor(itemId) {
   el("inventoryWeaponCapacity").value = details.capacity || "";
   el("inventoryWeaponMisfire").value = details.misfire || "";
   setInventoryDamageScale(details.damageScale || "STR");
+  showInventoryEffectScaling(item);
   el("inventoryWeaponEnhancement").value = details.enhancement || "0";
   el("inventoryWeaponEnchantment").value = details.enchantment || "";
   el("inventoryWeaponDetails").value = details.details || "";
@@ -14648,6 +16617,9 @@ async function wearLootItem(item) {
       name: item.name,
       sourceLootId: item.id,
       weaponType: details.weaponType || "Melee Weapon (One-Handed)",
+      naturalAttackKind: details.naturalAttackKind || "",
+      naturalAttackRole: details.naturalAttackRole || "",
+      naturalDamageBySize: details.naturalDamageBySize || {},
       attackScale: details.attackScale || "STR",
       damage: details.damage || "",
       damageType: details.damageType || "",
@@ -14952,6 +16924,9 @@ function collectCalculatedSummary() {
         name: card.querySelector('[data-field="name"]')?.value || "Weapon",
         attack,
         damage,
+        extraDamage: [...card.querySelectorAll("[data-extra-damage-value]")].map(
+          (output) => output.value,
+        ),
         critical: card.querySelector('[data-field="critical"]')?.value || "",
         attackConditionals: simpleConditionalListRows(
           "Attack",
@@ -15198,6 +17173,7 @@ function collectSheet() {
     gear: collectPersistedCards("gearRows"),
   };
   sheet.preferences = { showAppliedBuffs: showCalculations };
+  sheet.d20BoostUses = structuredClone(d20BoostUses);
   sheet.customSkills = customSkills;
   sheet.classFeatureChoices = classFeatureChoices;
   sheet.classFeatureVariableChoices = classFeatureVariableChoices;
@@ -15209,6 +17185,15 @@ function collectSheet() {
     level: row.level,
     className: row.className,
   }));
+  const availableClassResources = derivedClassResources();
+  sheet.classResources = availableClassResources.length
+    ? Object.fromEntries(
+        availableClassResources.map((resource) => [
+          resource.key,
+          resource.current,
+        ]),
+      )
+    : { ...classResourceValues };
   sheet.feats = normalizeCharacterFeatsForSave(characterFeats);
   sheet.spells = characterSpells;
   sheet.spellLikeChoices = normalizeSpellLikeChoicesForSave(
@@ -15246,6 +17231,9 @@ function collectSheet() {
 function restoreSheet(sheet) {
   isRestoringSheet = true;
   const data = sheet || {};
+  d20BoostUses = data.d20BoostUses && typeof data.d20BoostUses === "object"
+    ? structuredClone(data.d20BoostUses)
+    : {};
   const restoredSizeValue = data.fields?.size ?? "";
   showCalculations = Boolean(
     data.preferences?.showAppliedBuffs ?? true,
@@ -15312,6 +17300,11 @@ function restoreSheet(sheet) {
   classProgression = normalizeClassProgression(
     data.classProgression || [],
   );
+  classResourceValues =
+    data.classResources && typeof data.classResources === "object"
+      ? { ...data.classResources }
+      : {};
+  classResourceRenderSignature = "";
   ["babMisc", "initMisc", "acNaturalMisc", "acMisc", "cmbMisc", "cmdMisc"].forEach((id) => {
     if (el(id) && el(id).value === "") el(id).value = "0";
   });
@@ -15719,6 +17712,7 @@ function bridgeSpellEffectDefinition(spell = {}, metadata = {}) {
     spellMeta: metadata,
     spell,
     attributeScaleContext: currentAttributeScaleContext(),
+    ...window.PFEffectMechanics?.copyActivationConfig?.(mechanics),
   };
   (window.PFEffectMechanics?.extraKeys?.() || []).forEach((key) => {
     if (Array.isArray(mechanics[key]) && mechanics[key].length) {
@@ -15746,6 +17740,7 @@ async function collectBridgeOwnedSpellEffects() {
   const seen = new Set();
   Object.entries(characterSpells || {}).forEach(([classKey, state]) => {
     const className = classNames.get(classKey) || classKey.replaceAll("_", " ");
+    const spellcasting = classDefinitionByName(className)?.spellcasting || {};
     ["known", "book", "prepared"].forEach((bucket) => {
       Object.entries(state?.[bucket] || {}).forEach(([level, names]) => {
         (Array.isArray(names) ? names : []).filter(Boolean).forEach((name) => {
@@ -15759,6 +17754,8 @@ async function collectBridgeOwnedSpellEffects() {
             className,
             level: Number(level),
             bucket,
+            preparation:
+              spellcasting.preparation || spellcasting.castingType || "",
           };
           const effect = bridgeSpellEffectDefinition(spell, metadata);
           effect.spellCalculations = safeSpellDetailCalculations(
@@ -16205,6 +18202,8 @@ async function recalculateAndSaveEnemySheetNow(contextKey, enemyId) {
 }
 
 window.PFCharacterSheetBridge = {
+  currentSheetSnapshot: () => collectSheet(),
+  currentSheetSnapshot: () => collectSheet(),
   recalculateAndSaveCharacter: recalculateAndSaveCharacterSheet,
   recalculateAndSaveEnemy: recalculateAndSaveEnemySheet,
   recalculateCharacterSnapshot: recalculateAndSaveCharacterSnapshot,
@@ -16271,8 +18270,17 @@ async function startPendingEffectChoicePolling() {
       !isEnemySheetMode && id === currentSheetId
         ? characterFavoredEnemyOptions()
         : [],
-    onResolved: async (characterId) => {
-      if (isEnemySheetMode || characterId !== currentSheetId) return;
+    onResolved: async (characterId, effect) => {
+      if (isEnemySheetMode) return;
+      if (characterId !== currentSheetId) {
+        await PFApp.applyCharacterHealingEffect?.(
+          characterId,
+          effect,
+          sheetContextKey,
+        );
+        return;
+      }
+      applyHealingEffectToCurrentSheet(effect);
       await loadActiveBuffs(currentSheetId);
       await effectTrackerInstance?.refresh?.();
       recalculateSheet();
@@ -16318,6 +18326,7 @@ async function initCharacterSheet() {
     loadFeatDefinitions(),
     loadDomainDefinitions(),
     loadBloodlineDefinitions(),
+    window.PFNaturalWeapons?.loadCatalog?.(),
   ]);
   const initialCharacter = await initialCharacterPromise;
   await Promise.all([
@@ -16451,22 +18460,12 @@ async function initCharacterSheet() {
   effectTrackerModal = bootstrap.Modal.getOrCreateInstance(
     el("effectTrackerModal"),
   );
-  el("openEffectTrackerButton").addEventListener("click", async (event) => {
-    const button = event.currentTarget;
-    button.disabled = true;
-    if (!effectTrackerInstance)
-      PFEffectTracker.prepareLoading?.(el("sheetEffectTracker"));
-    effectTrackerModal.show();
-    try {
-      await new Promise((resolve) =>
-        requestAnimationFrame(() => window.setTimeout(resolve, 0)),
-      );
-      await openEffectTrackerModal();
-      void refreshBuffsIfChanged(false);
-    } finally {
-      button.disabled = false;
-    }
-  });
+  el("openEffectTrackerButton").addEventListener("click", (event) =>
+    openEffectWorkspace(event.currentTarget),
+  );
+  el("openPowersButton").addEventListener("click", (event) =>
+    openEffectWorkspace(event.currentTarget, { powersOnly: true }),
+  );
   window.addEventListener("beforeunload", unsubscribeCharacterBuffRealtime);
   el("characterName").addEventListener("change", async () => {
     if (isEnemySheetMode) return;
@@ -16488,6 +18487,30 @@ async function initCharacterSheet() {
   el("inventoryWeaponType").innerHTML = optionList(
     WEAPON_TYPES,
     "Melee Weapon (One-Handed)",
+  );
+  await window.PFNaturalWeapons?.populateKindSelect?.(
+    el("inventoryNaturalAttackKind"),
+    "Other",
+  );
+  window.PFNaturalWeapons?.mount(el("inventoryNaturalDamageBySize"), {}, {
+    onChange: (damageBySize) => {
+      el("inventoryDamageDice").value = damageBySize.medium || "";
+    },
+  });
+  el("inventoryNaturalAttackKind").addEventListener(
+    "change",
+    async (event) => {
+      const entry = await window.PFNaturalWeapons?.attack?.(event.target.value);
+      await window.PFNaturalWeapons?.setFromKind(
+        el("inventoryNaturalDamageBySize"),
+        event.target.value,
+        { force: true },
+      );
+      if (!entry) return;
+      el("inventoryNaturalAttackRole").value =
+        entry.details?.naturalAttackRole || "Primary";
+      el("inventoryDamageType").value = entry.details?.damageType || "";
+    },
   );
   el("inventoryWeaponEnchantment").innerHTML = optionList(WEAPON_ENCHANTMENTS);
   el("inventoryArmorEnchantment").innerHTML = armorEnchantmentOptions();

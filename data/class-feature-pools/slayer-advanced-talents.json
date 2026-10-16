@@ -1,0 +1,16 @@
+{
+  "id": "slayer-advanced-talents",
+  "name": "Advanced Talents",
+  "description": "At 10th level and every 2 levels thereafter, a slayer can select one of the following advanced talents in place of a slayer talent. A complete listing of slayer advanced talents can be found here: Slayer Advanced Talents",
+  "options": [
+    {
+      "name": "Advanced Talents",
+      "description": "At 10th level and every 2 levels thereafter, a slayer can select one of the following advanced talents in place of a slayer talent. A complete listing of slayer advanced talents can be found here: Slayer Advanced Talents",
+      "requirements": {
+        "minClassLevel": 2,
+        "text": "At 10th level and every 2 levels thereafter, a slayer can select one of the following advanced talents in place of a slayer talent."
+      },
+      "scrapeConfidence": "medium"
+    }
+  ]
+}

@@ -96,6 +96,7 @@
     "Stalwart Defender",
   ];
   const ABILITIES = ["STR", "DEX", "CON", "INT", "WIS", "CHA"];
+  const DURATION_DICE_SIDES = [2, 3, 4, 6, 8, 10, 12, 20, 100];
 
   function escapeHtml(value) {
     return String(value ?? "")
@@ -119,33 +120,55 @@
 
   function normalizeDurationConfig(effectOrConfig) {
     const raw = effectOrConfig?.durationConfig || effectOrConfig || {};
-    const count = raw.count ?? null;
+    const staticValue = raw.staticValue ?? raw.count ?? null;
     const unit = raw.unit || "variable";
     const factors = Array.isArray(raw.factors) ? raw.factors : [];
-    const durationScale = normalizeDurationScale(
-      raw?.durationScale || raw?.scale || null,
-    );
+    const diceCountScale = raw.diceCountScale || null;
+    const staticValueScale =
+      raw.staticValueScale || raw.durationScale || raw.scale || null;
     return {
-      count:
-        unit === "variable" ||
-        count === null ||
-        count === undefined ||
-        count === ""
+      diceCount:
+        unit === "variable"
+          ? 0
+          : Math.max(0, Math.floor(Number(raw.diceCount) || 0)),
+      dieType: Math.max(2, Math.floor(Number(raw.dieType) || 6)),
+      diceCountMax:
+        raw.diceCountMax === null ||
+        raw.diceCountMax === undefined ||
+        raw.diceCountMax === ""
           ? null
-          : Math.max(1, Number(count) || 1),
+          : Math.max(0, Math.floor(Number(raw.diceCountMax) || 0)),
+      staticValue:
+        unit === "variable" ||
+        staticValue === null ||
+        staticValue === undefined ||
+        staticValue === ""
+          ? null
+          : Number(staticValue) || 0,
+      staticValueMax:
+        raw.staticValueMax === null ||
+        raw.staticValueMax === undefined ||
+        raw.staticValueMax === ""
+          ? null
+          : Math.max(0, Number(raw.staticValueMax) || 0),
+      maximizeDice: Boolean(raw.maximizeDice),
+      valueMultiplier: Math.max(0, Number(raw.valueMultiplier) || 1),
       unit,
       factors:
         unit === "variable" ? [] : factors.map(normalizeFactor).filter(Boolean),
-      // "multiply" (default) is the existing behavior: count * sum(factors),
-      // e.g. "1 round per level". "add" is count + sum(factors), e.g. Rage's
-      // "4 rounds + CON modifier" -- a flat base plus a modifier, not a
+      // "multiply" applies the factor to the whole XdY + static formula,
+      // e.g. "1 round per level". "add" adds the factor after the formula, e.g.
+      // "1d4 rounds + caster level" -- a rolled base plus a modifier, not a
       // per-level scale. Defaulting to "multiply" keeps every duration
       // already configured the old way behaving identically.
       factorMode: raw?.factorMode === "add" ? "add" : "multiply",
       splitAmongTargets:
         unit !== "variable" &&
         Boolean(raw?.splitAmongTargets),
-      ...(unit !== "variable" && durationScale ? { durationScale } : {}),
+      ...(unit !== "variable" && diceCountScale ? { diceCountScale } : {}),
+      ...(unit !== "variable" && staticValueScale
+        ? { staticValueScale }
+        : {}),
     };
   }
 
@@ -225,16 +248,40 @@
 
   function durationLabel(effectOrConfig) {
     const config = normalizeDurationConfig(effectOrConfig);
-    if (!config.count || config.unit === "variable") return "variable";
-    const unit = `${config.unit}${config.count === 1 ? "" : "s"}`;
+    if (config.unit === "variable") return "variable";
+    const dice = config.diceCount ? `${config.diceCount}d${config.dieType}` : "";
+    const flat = Number(config.staticValue || 0);
+    const formula =
+      window.PFEffectRolls?.formulaText?.({
+        diceCount: config.diceCount,
+        dieType: config.dieType,
+        staticValue: flat,
+        maximizeDice: config.maximizeDice,
+        valueMultiplier: config.valueMultiplier,
+      }) ||
+      [
+        dice,
+        flat
+          ? `${dice && flat > 0 ? "+ " : flat < 0 ? "- " : ""}${dice ? Math.abs(flat) : flat}`
+          : "",
+      ].filter(Boolean).join(" ") ||
+      "0";
+    const unit = `${config.unit}${config.diceCount || flat !== 1 ? "s" : ""}`;
     const factors = config.factors.map(factorLabel).filter(Boolean);
     const baseLabel = !factors.length
-      ? `${config.count} ${unit}`
+      ? `${formula} ${unit}`
       : config.factorMode === "add"
-      ? `${config.count} ${unit} + ${factors.join(" + ")}`
-      : `${config.count} ${unit} / ${factors.join(" + ")}`;
-    const scaleLabel = durationScaleLabel(config.durationScale);
-    const labels = [baseLabel, scaleLabel].filter(Boolean);
+      ? `${formula} ${unit} + ${factors.join(" + ")}`
+      : `${formula} ${unit} / ${factors.join(" + ")}`;
+    const scaleLabel = (scale) =>
+      window.PFEffectEditor?.scaleText?.(scale) || durationScaleLabel(scale);
+    const diceScaleLabel = scaleLabel(config.diceCountScale);
+    const staticScaleLabel = scaleLabel(config.staticValueScale);
+    const labels = [
+      baseLabel,
+      diceScaleLabel ? `dice: ${diceScaleLabel}` : "",
+      staticScaleLabel ? `static: ${staticScaleLabel}` : "",
+    ].filter(Boolean);
     if (config.splitAmongTargets) labels.push("split among targets");
     return labels.join("; ");
   }
@@ -253,7 +300,9 @@
           ? "day"
           : "round";
     return {
-      count: Math.max(1, Number(match[1] || 1) || 1),
+      diceCount: 0,
+      dieType: 6,
+      staticValue: Math.max(1, Number(match[1] || 1) || 1),
       unit,
       factors: [{ type: "caster" }],
       factorMode: "multiply",
@@ -369,16 +418,62 @@
 
   function parseDuration(effect, context = {}) {
     const config = normalizeDurationConfig(effect);
-    if (!config.count || config.unit === "variable") return null;
+    if (config.unit === "variable") return null;
+    const formula = {
+      diceCount: config.diceCount,
+      dieType: config.dieType,
+      staticValue: config.staticValue || 0,
+      diceCountMax: config.diceCountMax,
+      staticValueMax: config.staticValueMax,
+      diceCountScale: config.diceCountScale || null,
+      staticValueScale: config.staticValueScale || null,
+      maximizeDice: config.maximizeDice,
+      valueMultiplier: config.valueMultiplier,
+    };
+    const random =
+      typeof context.random === "function" ? context.random : Math.random;
+    const rolled = window.PFEffectRolls?.rollFormula
+      ? window.PFEffectRolls.rollFormula(formula, context, random)
+      : null;
+    const calculated = rolled || {
+          ...formula,
+          diceCount: Math.max(
+            0,
+            Math.floor(
+              applyDurationScale(
+                formula.diceCount,
+                formula.diceCountScale,
+                context,
+              ),
+            ),
+          ),
+          staticValue: applyDurationScale(
+            formula.staticValue,
+            formula.staticValueScale,
+            context,
+          ),
+        };
+    const formulaAmount = Math.max(
+      1,
+      rolled
+        ? rolled.total
+        : Math.floor(
+            (Array.from(
+              { length: calculated.diceCount },
+              () =>
+                calculated.maximizeDice
+                  ? calculated.dieType
+                  : Math.floor(random() * calculated.dieType) + 1,
+            ).reduce((sum, value) => sum + value, 0) +
+              calculated.staticValue) *
+              Math.max(0, Number(calculated.valueMultiplier) || 1),
+          ),
+    );
     const baseAmount =
       config.factorMode === "add"
-        ? config.count + factorsSum(config, context)
-        : config.count * durationMultiplier(config, context);
-    const amount = applyDurationScale(
-      baseAmount,
-      config.durationScale,
-      context,
-    );
+        ? formulaAmount + factorsSum(config, context)
+        : formulaAmount * durationMultiplier(config, context);
+    const amount = Math.max(1, baseAmount);
     let rounds = null;
     if (config.unit === "turn" || config.unit === "round") rounds = amount;
     if (config.unit === "minute") rounds = amount * 10;
@@ -403,6 +498,7 @@
     return `
       <option value="caster" ${selectedType === "caster" ? "selected" : ""}>Caster level</option>
       <option value="character" ${selectedType === "character" ? "selected" : ""}>Character level</option>
+      <option value="class:$sourceClass" ${selectedType === "class" && selectedClass === "$sourceClass" ? "selected" : ""}>Source class level</option>
       ${CLASS_GROUPS.map(
         ([label, names]) => `
         <optgroup label="${escapeHtml(label)} class level">
@@ -463,18 +559,38 @@
                 <h5 class="modal-title">Duration</h5>
               </div>
               <div class="modal-body">
-                <div class="row g-2 mb-3">
-                  <div class="col-sm-4">
-                    <label class="small">Count</label>
-                    <input class="form-control form-control-sm" type="number" min="1" data-duration-count>
+                <div class="row g-2 mb-2" data-duration-formula>
+                  <div class="col-sm-3">
+                    <label class="small">Number of Dice</label>
+                    <input class="form-control form-control-sm" type="number" min="0" data-duration-dice-count>
                   </div>
-                  <div class="col-sm-4">
+                  <div class="col-sm-3">
+                    <label class="small">Die</label>
+                    <select class="form-select form-select-sm" data-duration-die-type>
+                      ${DURATION_DICE_SIDES.map((sides) => `<option value="${sides}">d${sides}</option>`).join("")}
+                    </select>
+                  </div>
+                  <div class="col-sm-3">
+                    <label class="small">Static</label>
+                    <input class="form-control form-control-sm" type="number" data-duration-static>
+                  </div>
+                  <div class="col-sm-3">
                     <label class="small">UOM</label>
                     <select class="form-select form-select-sm" data-duration-unit>
                       ${DURATION_UNITS.map((unit) => `<option value="${unit}">${unit}</option>`).join("")}
                     </select>
                   </div>
-                  <div class="col-sm-4 d-flex align-items-end">
+                </div>
+                <div class="row g-2 mb-3" data-duration-formula-scales>
+                  <div class="col-sm-4">
+                    <button class="btn btn-outline-info btn-sm w-100" type="button" data-duration-scale-dice>Scale Dice</button>
+                    <div class="small text-secondary mt-1" data-duration-dice-scale-summary></div>
+                  </div>
+                  <div class="col-sm-4">
+                    <button class="btn btn-outline-info btn-sm w-100" type="button" data-duration-scale-static>Scale Static</button>
+                    <div class="small text-secondary mt-1" data-duration-static-scale-summary></div>
+                  </div>
+                  <div class="col-sm-4">
                     <button class="btn btn-outline-light btn-sm w-100" type="button" data-duration-add-level>Add Level Factor</button>
                   </div>
                 </div>
@@ -487,43 +603,14 @@
                   <div class="flex-grow-1">
                     <label class="small">Factors</label>
                     <select class="form-select form-select-sm" data-duration-factor-mode>
-                      <option value="multiply">Multiply count (e.g. 1 round per level)</option>
-                      <option value="add">Add to count (e.g. 4 rounds + CON modifier)</option>
+                      <option value="multiply">Multiply formula (e.g. 1 round per level)</option>
+                      <option value="add">Add factors (e.g. 1d4 rounds + caster level)</option>
                     </select>
                   </div>
                 </div>
                 <div class="small-text mb-2" data-duration-factor-hint></div>
                 <div class="vstack gap-2 mb-3" data-duration-factors></div>
-                <div class="border-top border-secondary pt-3" data-duration-scaling>
-                  <div class="row g-2 mb-3">
-                    <div class="col-sm-8">
-                      <label class="small">Scaling Level Source</label>
-                      <select class="form-select form-select-sm" data-duration-scale-source>
-                        ${levelSourceOptions({ type: "caster" }, { includeSpecial: true })}
-                      </select>
-                    </div>
-                    <div class="col-sm-4 d-flex align-items-end">
-                      <button class="btn btn-outline-info btn-sm w-100" type="button" data-duration-add-milestone>Add Milestone</button>
-                    </div>
-                  </div>
-                  <div class="small text-secondary mb-2">Milestones</div>
-                  <div class="vstack gap-2 mb-3" data-duration-milestones></div>
-                  <div class="small text-secondary mb-2">Repeater</div>
-                  <div class="row g-2">
-                    <div class="col-sm-4">
-                      <label class="small">From Level</label>
-                      <input class="form-control form-control-sm" type="number" min="1" data-duration-repeat-from>
-                    </div>
-                    <div class="col-sm-4">
-                      <label class="small">Every Levels</label>
-                      <input class="form-control form-control-sm" type="number" min="1" data-duration-repeat-every>
-                    </div>
-                    <div class="col-sm-4">
-                      <label class="small">Duration Increase</label>
-                      <input class="form-control form-control-sm" type="number" data-duration-repeat-increase>
-                    </div>
-                  </div>
-                </div>
+
               </div>
               <div class="modal-footer">
                 <button class="btn btn-outline-light btn-sm" type="button" data-bs-dismiss="modal">Cancel</button>
@@ -535,8 +622,20 @@
       `,
       );
       this.modal = document.getElementById(this.prefix);
-      this.countEl = this.modal.querySelector("[data-duration-count]");
+      this.diceCountEl = this.modal.querySelector("[data-duration-dice-count]");
+      this.dieTypeEl = this.modal.querySelector("[data-duration-die-type]");
+      this.staticValueEl = this.modal.querySelector("[data-duration-static]");
       this.unitEl = this.modal.querySelector("[data-duration-unit]");
+      this.formulaEl = this.modal.querySelector("[data-duration-formula]");
+      this.formulaScalesEl = this.modal.querySelector(
+        "[data-duration-formula-scales]",
+      );
+      this.diceScaleSummaryEl = this.modal.querySelector(
+        "[data-duration-dice-scale-summary]",
+      );
+      this.staticScaleSummaryEl = this.modal.querySelector(
+        "[data-duration-static-scale-summary]",
+      );
       this.factorsEl = this.modal.querySelector("[data-duration-factors]");
       this.factorModeEl = this.modal.querySelector(
         "[data-duration-factor-mode]",
@@ -547,22 +646,8 @@
       this.factorHintEl = this.modal.querySelector(
         "[data-duration-factor-hint]",
       );
-      this.scalingEl = this.modal.querySelector("[data-duration-scaling]");
-      this.scaleSourceEl = this.modal.querySelector(
-        "[data-duration-scale-source]",
-      );
-      this.milestonesEl = this.modal.querySelector(
-        "[data-duration-milestones]",
-      );
-      this.repeatFromEl = this.modal.querySelector(
-        "[data-duration-repeat-from]",
-      );
-      this.repeatEveryEl = this.modal.querySelector(
-        "[data-duration-repeat-every]",
-      );
-      this.repeatIncreaseEl = this.modal.querySelector(
-        "[data-duration-repeat-increase]",
-      );
+      this.diceCountScale = null;
+      this.staticValueScale = null;
       this.modal
         .querySelector("[data-duration-add-level]")
         .addEventListener("click", () => this.addFactor({ type: "caster" }));
@@ -572,8 +657,11 @@
           this.addFactor({ type: "ability", ability: "CON" }),
         );
       this.modal
-        .querySelector("[data-duration-add-milestone]")
-        .addEventListener("click", () => this.addMilestone());
+        .querySelector("[data-duration-scale-dice]")
+        .addEventListener("click", () => this.openFormulaScale("dice"));
+      this.modal
+        .querySelector("[data-duration-scale-static]")
+        .addEventListener("click", () => this.openFormulaScale("static"));
       this.modal
         .querySelector("[data-duration-save]")
         .addEventListener("click", () => this.save());
@@ -588,24 +676,17 @@
     open(config, onSave) {
       this.config = normalizeDurationConfig(config);
       this.onSave = onSave;
-      this.countEl.value = this.config.count || "";
+      this.diceCountEl.value = this.config.diceCount || 0;
+      this.dieTypeEl.value = this.config.dieType || 6;
+      this.staticValueEl.value = this.config.staticValue ?? "";
+      this.diceCountScale = this.config.diceCountScale || null;
+      this.staticValueScale = this.config.staticValueScale || null;
       this.unitEl.value = this.config.unit || "variable";
       this.factorModeEl.value = this.config.factorMode || "multiply";
       this.splitTargetsEl.checked = Boolean(this.config.splitAmongTargets);
       this.factorsEl.innerHTML = "";
       this.config.factors.forEach((factor) => this.addFactor(factor));
-      const scale = this.config.durationScale || {};
-      this.scaleSourceEl.innerHTML = levelSourceOptions(
-        scale.source || { type: "caster" },
-        { includeSpecial: true },
-      );
-      this.milestonesEl.innerHTML = "";
-      (scale.milestones || []).forEach((milestone) =>
-        this.addMilestone(milestone),
-      );
-      this.repeatFromEl.value = scale.every?.fromLevel || "";
-      this.repeatEveryEl.value = scale.every?.everyLevels || "";
-      this.repeatIncreaseEl.value = scale.every?.increase ?? "";
+      this.syncScaleSummaries();
       this.sync();
       this.syncFactorHint();
       bootstrap.Modal.getOrCreateInstance(this.modal).show();
@@ -613,7 +694,9 @@
 
     sync() {
       const variable = this.unitEl.value === "variable";
-      this.countEl.disabled = variable;
+      this.diceCountEl.disabled = variable;
+      this.dieTypeEl.disabled = variable;
+      this.staticValueEl.disabled = variable;
       this.modal
         .querySelectorAll(
           "[data-duration-add-level], [data-duration-add-ability]",
@@ -622,15 +705,39 @@
       this.factorModeEl.disabled = variable;
       this.splitTargetsEl.disabled = variable;
       this.factorsEl.classList.toggle("d-none", variable);
-      this.scalingEl.classList.toggle("d-none", variable);
-      if (variable) this.countEl.value = "";
+      this.formulaScalesEl.classList.toggle("d-none", variable);
+      if (variable) {
+        this.diceCountEl.value = 0;
+        this.staticValueEl.value = "";
+      }
     }
 
     syncFactorHint() {
       this.factorHintEl.textContent =
         this.factorModeEl.value === "add"
-          ? "Factors are added together, then added to the duration count -- for a flat base plus a modifier, like Rage's 4 rounds + CON modifier."
-          : "Factors are added together, then multiplied by the duration count -- for scaling with level, like 1 minute per caster level.";
+          ? "Factors are added to the rolled duration formula, like 1d4 rounds + caster level."
+          : "The rolled duration formula is multiplied by the factors, like 1 round per caster level.";
+    }
+
+    syncScaleSummaries() {
+      const scaleText = (scale) =>
+        window.PFEffectEditor?.scaleText?.(scale) ||
+        durationScaleLabel(scale) ||
+        "No scaling";
+      this.diceScaleSummaryEl.textContent = scaleText(this.diceCountScale);
+      this.staticScaleSummaryEl.textContent = scaleText(this.staticValueScale);
+    }
+
+    async openFormulaScale(kind) {
+      if (!window.PFEffectEditor?.openScaleModal) return;
+      const property = kind === "dice" ? "diceCountScale" : "staticValueScale";
+      const current = this[property] || null;
+      const scale = await window.PFEffectEditor.openScaleModal(current, {
+        title: kind === "dice" ? "Duration Dice Scale" : "Duration Static Scale",
+        preserveOnCancel: true,
+      });
+      this[property] = scale || null;
+      this.syncScaleSummaries();
     }
 
     addFactor(factor) {
@@ -675,29 +782,17 @@
       this.factorsEl.appendChild(row);
     }
 
-    addMilestone(milestone = {}) {
-      const row = document.createElement("div");
-      row.className = "row g-2 align-items-end";
-      row.innerHTML = `
-        <div class="col-sm-5">
-          <label class="small">Level</label>
-          <input class="form-control form-control-sm" type="number" min="1" value="${milestone.level || ""}" data-duration-milestone-level>
-        </div>
-        <div class="col-sm-5">
-          <label class="small">Duration</label>
-          <input class="form-control form-control-sm" type="number" min="1" value="${milestone.value ?? ""}" data-duration-milestone-value>
-        </div>
-        <div class="col-sm-2">
-          <button class="btn btn-outline-danger btn-sm w-100" type="button" aria-label="Delete duration milestone"><i class="bi bi-trash"></i></button>
-        </div>`;
-      row.querySelector("button").addEventListener("click", () => row.remove());
-      this.milestonesEl.appendChild(row);
-    }
-
     collect() {
       const unit = this.unitEl.value || "variable";
       if (unit === "variable")
-        return { count: null, unit: "variable", factors: [], factorMode: "multiply" };
+        return {
+          diceCount: 0,
+          dieType: 6,
+          staticValue: null,
+          unit: "variable",
+          factors: [],
+          factorMode: "multiply",
+        };
       const factors = [...this.factorsEl.children]
         .map((row) => {
           const level = row.querySelector("[data-factor-level]");
@@ -722,46 +817,23 @@
           return null;
         })
         .filter(Boolean);
-      const milestones = [...this.milestonesEl.children]
-        .map((row) => ({
-          level: Number.parseInt(
-            row.querySelector("[data-duration-milestone-level]").value,
-            10,
-          ),
-          value: Number(
-            row.querySelector("[data-duration-milestone-value]").value,
-          ),
-        }))
-        .filter(
-          (milestone) =>
-            milestone.level > 0 && Number.isFinite(milestone.value),
-        )
-        .sort((a, b) => a.level - b.level);
-      const fromLevel = Number.parseInt(this.repeatFromEl.value, 10);
-      const everyLevels = Number.parseInt(this.repeatEveryEl.value, 10);
-      const increase = Number(this.repeatIncreaseEl.value);
-      const every =
-        fromLevel > 0 &&
-        everyLevels > 0 &&
-        Number.isFinite(increase) &&
-        increase !== 0
-          ? { fromLevel, everyLevels, increase }
-          : null;
-      const durationScale =
-        milestones.length || every
-          ? {
-              source: sourceFromSelect(this.scaleSourceEl.value),
-              milestones,
-              every,
-            }
-          : null;
       return {
-        count: Math.max(1, Number.parseInt(this.countEl.value, 10) || 1),
+        diceCount: Math.max(
+          0,
+          Math.floor(Number(this.diceCountEl.value) || 0),
+        ),
+        dieType: Math.max(2, Math.floor(Number(this.dieTypeEl.value) || 6)),
+        staticValue: Number(this.staticValueEl.value) || 0,
+        ...(this.diceCountScale
+          ? { diceCountScale: this.diceCountScale }
+          : {}),
+        ...(this.staticValueScale
+          ? { staticValueScale: this.staticValueScale }
+          : {}),
         unit,
         factors,
         factorMode: this.factorModeEl.value === "add" ? "add" : "multiply",
         ...(this.splitTargetsEl.checked ? { splitAmongTargets: true } : {}),
-        ...(durationScale ? { durationScale } : {}),
       };
     }
 

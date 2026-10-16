@@ -151,9 +151,9 @@ const castBody = characterSheet.slice(
   characterSheet.indexOf("function spellExtraSlots", castStart),
 );
 assert(
-  castBody.indexOf("await rollSpellDamageFromDetails") <
-    castBody.indexOf("await openSpellCastTargetModal"),
-  "Spell damage must finish before target-effect selection opens.",
+  castBody.indexOf('"target-decisions"') <
+    castBody.lastIndexOf('"effect-rolls"'),
+  "Target-specific spell damage must roll after target decisions.",
 );
 assert(
   characterSheet.includes('keys.filter((key) => key !== "damageRolls")'),
@@ -183,9 +183,9 @@ const quickBody = map.slice(
   map.indexOf("function renderOwnedSpellEffects", quickStart),
 );
 assert(
-  quickBody.indexOf("await rollQuickEffectDamage") <
-    quickBody.indexOf("openQuickEffectTargets"),
-  "Map damage must finish before target-effect selection opens.",
+  quickBody.indexOf('targeting: async (state)') <
+    quickBody.indexOf('"effect-rolls": async (state)'),
+  "Targeted map damage must roll after target selection.",
 );
 assert(
   map.includes("damageRolls,") && map.includes('key !== "damageRolls"'),

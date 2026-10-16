@@ -28,12 +28,8 @@
     );
   }
 
-  function featurePools(feature) {
-    return Array.isArray(feature.pools)
-      ? feature.pools
-      : Array.isArray(feature.choicePools)
-        ? feature.choicePools
-        : [];
+  function featurePools(definition, feature) {
+    return window.PFClassData?.featurePools?.(definition, feature) || [];
   }
 
   function progressionClassCounts(classProgression, limit) {
@@ -119,6 +115,67 @@
     return result;
   }
 
+  function contributionChain(option, options, seen = new Set()) {
+    const optionKey = normalizedClassFeatureChoice(option?.name);
+    if (!optionKey || seen.has(optionKey)) return [];
+    seen.add(optionKey);
+    const required = Array.isArray(option?.requirements?.requiredChoices)
+      ? option.requirements.requiredChoices
+      : [];
+    const prerequisites = options.filter(
+      (candidate) =>
+        candidate !== option &&
+        required.some((requirement) =>
+          classFeatureChoiceMatchesRequirement(requirement, candidate.name),
+        ),
+    );
+    return [
+      ...prerequisites.flatMap((candidate) =>
+        contributionChain(candidate, options, seen),
+      ),
+      option,
+    ];
+  }
+
+  function contributionMechanics(option, options) {
+    const chain = contributionChain(option, options);
+    const keys = window.PFEffectMechanics?.mechanicKeys?.() || ["effects"];
+    const mechanics = Object.fromEntries(
+      keys.map((key) => {
+        const populated = chain.filter(
+          (entry) => Array.isArray(entry?.[key]) && entry[key].length,
+        );
+        // Equipment represents the current form of a granted item or natural
+        // attack. A later tier replaces the earlier version instead of adding
+        // another copy, while ordinary effects remain cumulative and rely on
+        // the normal bonus stacking rules.
+        const rows =
+          key === "generatedEquipment"
+            ? populated.at(-1)?.[key] || []
+            : populated.flatMap((entry) => entry[key]);
+        return [key, rows];
+      }),
+    );
+    const targetOwnsDecision = chain.some(
+      (entry) =>
+        String(entry?.decisionOwner || "").toLowerCase() === "target" &&
+        window.PFEffectDecisions?.hasDecision?.(entry),
+    );
+    const emittedAuras = chain
+      .filter((entry) => entry?.auraConfig?.enabled)
+      .map((entry, index) => ({
+        id: String(entry.id || entry.name || `aura-${index + 1}`),
+        name: entry.name || option.name || "Aura",
+        category: "Class Feature",
+        auraConfig: JSON.parse(JSON.stringify(entry.auraConfig)),
+      }));
+    return {
+      ...mechanics,
+      ...(emittedAuras.length ? { emittedAuras } : {}),
+      ...(targetOwnsDecision ? { decisionOwner: "target" } : {}),
+    };
+  }
+
   // classDefinitions: array of loaded class JSON (window.PFClassData.loadAllClasses())
   // classProgression: [{level, className}, ...] for ONE character
   // classFeatureChoices: {key: selectedOptionName} for that SAME character
@@ -130,6 +187,7 @@
     classFeatureChoices = {},
     characterLevel = 1,
     abilityScores = {},
+    bab = 0,
   } = {}) {
     const limit = Math.max(1, Number(characterLevel) || 1);
     const counts = {};
@@ -146,6 +204,7 @@
       features.forEach((feature) => {
         if (typeof feature === "string") return;
         entries.push({
+          definition,
           feature,
           context: {
             className,
@@ -158,8 +217,8 @@
     });
 
     const optionEntries = [];
-    entries.forEach(({ feature, context }) => {
-      featurePools(feature).forEach((pool) => {
+    entries.forEach(({ definition, feature, context }) => {
+      featurePools(definition, feature).forEach((pool) => {
         if (pool.contributesToAbility) return;
         const key = classFeatureChoiceKey(
           { ...feature, ...context },
@@ -172,7 +231,7 @@
           option &&
           window.PFEffectMechanics?.hasActiveMechanics?.(option)
         ) {
-          optionEntries.push({ feature: option, context });
+          optionEntries.push({ definition, feature: option, context });
         }
       });
     });
@@ -180,8 +239,9 @@
 
     const contributedOptions = new Map();
     const optionalContributedOptions = new Map();
-    entries.forEach(({ feature, context }) => {
-      featurePools(feature).forEach((pool) => {
+    const optionalContributionOwners = new Map();
+    entries.forEach(({ definition, feature, context }) => {
+      featurePools(definition, feature).forEach((pool) => {
         const target = String(pool.contributesToAbility || "").trim();
         if (!target) return;
         const key = classFeatureChoiceKey(
@@ -201,6 +261,19 @@
         const list = targetMap.get(targetKey) || [];
         list.push(option);
         targetMap.set(targetKey, list);
+        if (pool.chooseContributionsOnActivate) {
+          const currentOwner = optionalContributionOwners.get(targetKey);
+          const poolOwner =
+            String(pool.decisionOwner || "").toLowerCase() === "target"
+              ? "target"
+              : "caster";
+          optionalContributionOwners.set(
+            targetKey,
+            currentOwner === "target" || poolOwner === "target"
+              ? "target"
+              : "caster",
+          );
+        }
       });
     });
 
@@ -212,7 +285,7 @@
           id: String(option.id || option.name || `contribution-${index + 1}`),
           name: option.name || `Option ${index + 1}`,
           description: option.description || option.summary || "",
-          ...(window.PFEffectMechanics?.copyMechanics?.(option) || {}),
+          ...contributionMechanics(option, options),
         })),
       );
     });
@@ -234,6 +307,7 @@
     const contributedGrantDomains = new Map();
     const contributedGeneratedEquipment = new Map();
     const contributedConditionalVariables = new Map();
+    const contributedD20Boosts = new Map();
     const contributedNames = new Map();
     contributedOptions.forEach((options, targetKey) => {
       const finalOptions = terminalOptions(options);
@@ -254,6 +328,7 @@
       const grantDomains = [];
       const generatedEquipment = [];
       const conditionalVariables = [];
+      const d20Boosts = [];
       const names = [];
       finalOptions.forEach((option) => {
         if (Array.isArray(option.effects) && option.effects.length)
@@ -323,6 +398,8 @@
           option.conditionalVariables.length
         )
           conditionalVariables.push(...option.conditionalVariables);
+        if (Array.isArray(option.d20Boosts) && option.d20Boosts.length)
+          d20Boosts.push(...option.d20Boosts);
         names.push(option.name);
       });
       if (effects.length) contributedEffects.set(targetKey, effects);
@@ -358,6 +435,7 @@
         contributedGeneratedEquipment.set(targetKey, generatedEquipment);
       if (conditionalVariables.length)
         contributedConditionalVariables.set(targetKey, conditionalVariables);
+      if (d20Boosts.length) contributedD20Boosts.set(targetKey, d20Boosts);
       if (names.length) contributedNames.set(targetKey, names);
     });
 
@@ -373,18 +451,24 @@
       characterLevel: limit,
       classLevels,
       casterLevel: limit,
+      bab: Number(bab || 0) || 0,
       abilityMods,
     };
 
     const abilities = new Map();
-    entries.forEach(({ feature, context }) => {
+    entries.forEach(({ definition, feature, context }) => {
       const activeFeature =
         window.PFEffectMechanics?.activeMechanics?.(feature) ||
         (feature.activatable ? feature : {});
       if (!feature.activatable && !feature.activeMechanics) return;
-      const key = `${context.className}:${feature.name}`;
+      const abilityName =
+        activeFeature.abilityName ||
+        feature.abilityName ||
+        feature.name ||
+        "Class Feature";
+      const key = `${context.className}:${abilityName}`;
       if (abilities.has(key)) return;
-      const targetKey = String(feature.name || "")
+      const targetKey = String(abilityName)
         .trim()
         .toLowerCase();
       const bundled = contributedEffects.get(targetKey) || [];
@@ -410,8 +494,15 @@
         contributedGeneratedEquipment.get(targetKey) || [];
       const bundledConditionalVariables =
         contributedConditionalVariables.get(targetKey) || [];
+      const bundledD20Boosts = contributedD20Boosts.get(targetKey) || [];
       const bundledNames = contributedNames.get(targetKey) || [];
       const contributionOptions = selectableContributions.get(targetKey) || [];
+      const contributionDecisionOwner =
+        optionalContributionOwners.get(targetKey) || "caster";
+      const activeDecisionOwner =
+        String(activeFeature.decisionOwner || "").toLowerCase() === "target"
+          ? "target"
+          : "caster";
       const durationConfig = activeFeature.durationConfig || feature.durationConfig || {
         count: null,
         unit: "variable",
@@ -511,9 +602,26 @@
           : []),
         ...bundledConditionalVariables,
       ];
+      const d20Boosts = [
+        ...(Array.isArray(activeFeature.d20Boosts) ? activeFeature.d20Boosts : []),
+        ...bundledD20Boosts,
+      ];
+      const activationGroup =
+        activeFeature.activationGroup ||
+        feature.activeMechanics?.activationGroup ||
+        feature.activationGroup;
+      const resourcePool =
+        activeFeature.resourcePool ||
+        feature.activeMechanics?.resourcePool ||
+        feature.resourcePool;
+      const trackActive = Boolean(
+        activeFeature.trackActive ||
+          feature.activeMechanics?.trackActive ||
+          feature.trackActive,
+      );
       abilities.set(key, {
         id: `ability:${key}`,
-        name: feature.name || "Class Feature",
+        name: abilityName,
         category: "Class Feature",
         source: bundledNames.length
           ? `${context.className} -- with ${bundledNames.join(", ")}`
@@ -548,26 +656,36 @@
         ...(grantDomains.length ? { grantDomains } : {}),
         ...(generatedEquipment.length ? { generatedEquipment } : {}),
         ...(conditionalVariables.length ? { conditionalVariables } : {}),
+        ...(d20Boosts.length ? { d20Boosts } : {}),
+        ...(Array.isArray(activeFeature.attackRolls) && activeFeature.attackRolls.length
+          ? { attackRolls: activeFeature.attackRolls }
+          : {}),
+        ...(Array.isArray(activeFeature.damageRolls) && activeFeature.damageRolls.length
+          ? { damageRolls: activeFeature.damageRolls }
+          : {}),
         ...(contributionOptions.length ? { contributionOptions } : {}),
+        ...(
+          contributionOptions.length ||
+          window.PFEffectDecisions?.hasDecision?.(activeFeature)
+            ? {
+                decisionOwner:
+                  contributionOptions.length &&
+                  contributionDecisionOwner === "target"
+                    ? "target"
+                    : activeDecisionOwner,
+              }
+            : {}
+        ),
         durationConfig,
         auraConfig: activeFeature.auraConfig || null,
-        ...(activeFeature.activationGroup || feature.activationGroup
-          ? {
-              activationGroup:
-                activeFeature.activationGroup || feature.activationGroup,
-            }
-          : {}),
+        ...(activationGroup ? { activationGroup } : {}),
         ...(activeFeature.abilityFamily || feature.abilityFamily
           ? {
               abilityFamily: activeFeature.abilityFamily || feature.abilityFamily,
             }
           : {}),
-        ...(activeFeature.resourcePool || feature.resourcePool
-          ? { resourcePool: activeFeature.resourcePool || feature.resourcePool }
-          : {}),
-        ...(activeFeature.trackActive || feature.trackActive
-          ? { trackActive: true }
-          : {}),
+        ...(resourcePool ? { resourcePool } : {}),
+        ...(trackActive ? { trackActive: true } : {}),
         ...(window.PFEffectMechanics?.hasBranches?.(activeFeature)
           ? { branches: activeFeature.branches }
           : {}),
@@ -575,7 +693,17 @@
           ? window.PFEffectMeta.durationLabel(durationConfig)
           : "variable",
         fromAbility: true,
-        abilityContext: castContext,
+        abilityContext: {
+          ...castContext,
+          sourceClass: context.className,
+          castingAbility: String(
+            definition?.spellcasting?.ability || "",
+          ).toUpperCase(),
+          castingAbilityMod:
+            abilityMods[
+              String(definition?.spellcasting?.ability || "").toUpperCase()
+            ] ?? 0,
+        },
       });
     });
     return [...abilities.values()];

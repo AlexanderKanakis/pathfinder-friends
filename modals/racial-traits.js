@@ -120,7 +120,9 @@
       ((key === "bonusRanks" ||
         key === "effects" ||
         key === "classSkillGrants" ||
-        key === "useUntrained") &&
+        key === "useUntrained" ||
+        key === "attributeContributions" ||
+        key === "weaponExtraDamage") &&
         window.PFEffectStats?.isChoiceStat?.(value?.stat)) ||
       mechanicFavoredEnemyScaleChoices([value]) ||
       (key === "spellLikeAbilities" && spellLikeChoiceList(value)) ||
@@ -140,6 +142,8 @@
           "classSkillGrants",
           "useUntrained",
           "bonusRanks",
+          "attributeContributions",
+          "weaponExtraDamage",
           "spellLikeAbilities",
           "casterLevelBonuses",
           "spellDcBonuses",
@@ -159,6 +163,8 @@
       mechanicChoiceStats(trait.classSkillGrants) ||
       mechanicChoiceStats(trait.useUntrained) ||
       mechanicChoiceStats(trait.bonusRanks) ||
+      mechanicChoiceStats(trait.attributeContributions) ||
+      mechanicChoiceStats(trait.weaponExtraDamage) ||
       mechanicSpellLikeChoices(trait.spellLikeAbilities) ||
       mechanicSpellAdjustmentChoices(trait.casterLevelBonuses) ||
       mechanicSpellAdjustmentChoices(trait.spellDcBonuses) ||

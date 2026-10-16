@@ -1,7 +1,11 @@
 const fs = require("fs");
 
-const map = fs.readFileSync("scripts/pages/map.js", "utf8");
-const sheet = fs.readFileSync("scripts/pages/character-sheet.js", "utf8");
+const map = fs
+  .readFileSync("scripts/pages/map.js", "utf8")
+  .replace(/\r\n/g, "\n");
+const sheet = fs
+  .readFileSync("scripts/pages/character-sheet.js", "utf8")
+  .replace(/\r\n/g, "\n");
 
 function requireText(source, text, message) {
   if (!source.includes(text)) throw new Error(message);
@@ -38,6 +42,11 @@ requireText(
 );
 requireText(
   map,
+  "tokenAuraEntry(token, auraId)?.aura",
+  "Token drag previews must position each linked aura with its authored radius.",
+);
+requireText(
+  map,
   "void recalculateCharacterSheetFromMap(\n      token.characterId,\n      character,\n      nextActiveBuffs,",
   "Map effect application must not wait for character recalculation.",
 );
@@ -58,7 +67,7 @@ rejectText(
 );
 requireText(
   map,
-  "readyTargets.map(async ({ token, effect })",
+  "readyActivations.map(async (activation)",
   "Resolved multi-target effects must apply concurrently.",
 );
 requireText(

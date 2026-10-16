@@ -591,6 +591,7 @@
       "melee-weapon-one-handed": "melee-one-handed",
       "melee-weapon-two-handed": "melee-two-handed",
       "ranged-weapon": "ranged",
+      "thrown-weapon": "thrown",
       natural: "natural",
       "natural-weapon": "natural",
     };
@@ -700,11 +701,29 @@
     if (entry.resolvedModifier !== undefined)
       return Number(entry.resolvedModifier || 0);
     const raw = String(entry.ability || entry.attribute || "").toLowerCase();
+    if (["casting", "casting modifier", "castingmodifier"].includes(raw)) {
+      const explicit =
+        context.castingAbilityMod ??
+        context.spellCalculations?.castingAbilityMod;
+      if (explicit !== undefined) return Number(explicit || 0);
+      const castingAbility = String(
+        context.castingAbility ||
+          context.spellCalculations?.castingAbility ||
+          "",
+      ).toLowerCase();
+      if (!castingAbility) return 0;
+      return scaleAttributeModifier(
+        { ability: castingAbility },
+        { ...context, castingAbility: "" },
+      );
+    }
     const ability = SCALE_ABILITY_ALIASES[raw];
     if (!ability) return 0;
     const shortKey = SCALE_ABILITY_BASELINE_KEYS[ability];
     const explicitModifier =
-      context.abilityMods?.[ability] ?? context.abilityMods?.[shortKey];
+      context.abilityMods?.[ability] ??
+      context.abilityMods?.[shortKey] ??
+      context.abilityMods?.[shortKey.toUpperCase()];
     if (explicitModifier !== undefined) return Number(explicitModifier || 0);
     const score =
       context.abilityScores?.[ability] ??
@@ -1721,6 +1740,50 @@
       bonuses[stat] = applied.total;
     });
 
+    const attributeContribution = (stat, baseAbilities, context = {}) => {
+      const mods = {
+        str: abilityMods.strength,
+        dex: abilityMods.dexterity,
+        con: abilityMods.constitution,
+        int: abilityMods.intelligence,
+        wis: abilityMods.wisdom,
+        cha: abilityMods.charisma,
+        ...abilityMods,
+      };
+      const result = window.PFEffectMechanics?.resolveAttributeContributions?.({
+        effects: enrichedBuffs,
+        stat,
+        baseAbilities,
+        abilityMods: mods,
+        context,
+      }) || {
+        entries: [],
+        terms: baseAbilities.map((ability) => ({
+          ability,
+          mode: "base",
+          source: "Base",
+          value: Number(mods[ability] || 0),
+        })),
+        total: baseAbilities.reduce(
+          (sum, ability) => sum + Number(mods[ability] || 0),
+          0,
+        ),
+        replaced: false,
+      };
+      result.terms
+        .filter((term) => term.mode !== "base")
+        .forEach((term) =>
+          addBreakdown(
+            breakdown,
+            stat,
+            term.source || "Effect",
+            term.value,
+            "attribute",
+            `${term.mode === "replace" ? "replaces existing attributes with" : "adds"} ${String(term.ability || "").toUpperCase()}`,
+          ),
+        );
+      return result;
+    };
     const direct = {};
     const directCauses = {};
     Object.keys(buffMap).forEach((stat) => {
@@ -1785,15 +1848,20 @@
       Number(baseline.deflection || 0) + deflectionFromDedicated;
     const acMisc = Number(baseline.acMisc || 0) + acMiscBuffs;
     const dexMod = abilityMods.dexterity;
+    const acAttribute = attributeContribution("ac", ["dex"]);
+    const touchAttribute = attributeContribution("touch ac", ["dex"]);
+    const flatAttribute = attributeContribution("flat-footed ac", ["dex"]);
     const maxDex =
       baseline.maxDex === null || baseline.maxDex === undefined || baseline.maxDex === ""
         ? null
         : Number(baseline.maxDex);
-    const armorDexMod =
-      maxDex === null || !Number.isFinite(maxDex) || dexMod <= 0
-        ? dexMod
-        : Math.min(dexMod, maxDex);
-    const positiveDex = Math.max(0, armorDexMod);
+    const cappedAttribute = (value) =>
+      maxDex === null || !Number.isFinite(maxDex) || value <= 0
+        ? value
+        : Math.min(value, maxDex);
+    const armorDexMod = cappedAttribute(acAttribute.total);
+    const touchDexMod = cappedAttribute(touchAttribute.total);
+    const positiveDex = Math.max(0, dexMod);
     const dexDeniedApplied = applyDexDenialToAc(
       buffMap["remove dex bonus to ac"] || [],
       positiveDex,
@@ -1820,7 +1888,9 @@
     const cmdAcBonus = cmdAcApplied.total + deflectionFromDedicated;
 
     const acDexMod = armorDexMod + dexDeniedApplied.total;
-    const flatDexMod = Math.min(0, dexMod);
+    const flatDexMod = flatAttribute.entries.length
+      ? flatAttribute.total
+      : Math.min(0, dexMod);
     const dodgeAcBuffs = applyActiveBonuses(
       (buffMap.ac || []).filter((b) => b.type === "dodge"),
     ).total;
@@ -1833,7 +1903,8 @@
       naturalArmor +
       deflection +
       acMisc;
-    totals["touch ac"] = 10 + acDexMod + acSize + deflection + acMisc;
+    totals["touch ac"] =
+      10 + touchDexMod + dexDeniedApplied.total + acSize + deflection + acMisc;
     totals["flat-footed ac"] =
       10 +
       armor +
@@ -2005,35 +2076,38 @@
 
     totals.fortitude =
       Number(baseline.fortBase || 0) +
-      abilityMods.constitution +
+      attributeContribution("fortitude", ["con"]).total +
       (direct.fortitude || 0);
     totals.reflex =
       Number(baseline.reflexBase || 0) +
-      abilityMods.dexterity +
+      attributeContribution("reflex", ["dex"]).total +
       (direct.reflex || 0);
     totals.will =
-      Number(baseline.willBase || 0) + abilityMods.wisdom + (direct.will || 0);
+      Number(baseline.willBase || 0) +
+      attributeContribution("will", ["wis"]).total +
+      (direct.will || 0);
 
     totals.initiative =
-      abilityMods.dexterity +
+      attributeContribution("initiative", ["dex"]).total +
       Number(baseline.initMisc || 0) +
       (direct.initiative || 0);
     totals["melee attack"] =
       Number(baseline.bab || 0) +
-      abilityMods.strength +
+      attributeContribution("attack", ["str"]).total +
       acSize +
       (direct.attack || 0) +
       (direct["melee attack"] || 0);
     totals["ranged attack"] =
       Number(baseline.bab || 0) +
-      abilityMods.dexterity +
+      attributeContribution("attack", ["dex"]).total +
       acSize +
       (direct.attack || 0) +
       (direct["ranged attack"] || 0);
-    totals.damage = abilityMods.strength + (direct.damage || 0);
+    totals.damage =
+      attributeContribution("damage", ["str"]).total + (direct.damage || 0);
     totals.cmb =
       Number(baseline.bab || 0) +
-      abilityMods.strength +
+      attributeContribution("cmb", ["str"]).total +
       combatSize +
       Number(baseline.cmbMisc || 0) +
       (direct.cmb || 0) +
@@ -2041,8 +2115,7 @@
     totals.cmd =
       10 +
       Number(baseline.bab || 0) +
-      abilityMods.strength +
-      abilityMods.dexterity +
+      attributeContribution("cmd", ["str", "dex"]).total +
       combatSize +
       Number(baseline.cmdMisc || 0) +
       cmdAcBonus +
@@ -2050,7 +2123,10 @@
     totals["hit points"] =
       Number(baseline.hitPoints || 0) +
       Number(baseline.hitDice || 0) *
-        (abilityMods.constitution - abilityMod(baseline.con)) +
+        (
+          attributeContribution("hit points", ["con"]).total -
+          abilityMod(baseline.con)
+        ) +
       (direct["hit points"] || 0);
     totals["current hit points"] =
       Number(baseline.currentHitPoints || 0) +

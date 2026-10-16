@@ -35,25 +35,8 @@
         {
           "name": "Ki Power",
           "description": "",
-          "pools": [
-            {
-              "name": "Ki Power",
-              "description": "",
-              "requirements": {},
-              "options": [
-                {
-                  "name": "Ki Powers",
-                  "description": "At 2nd level and every 2 levels thereafter, a student of perfection can select one ki power chosen from the unchained monk options listed directly below or from the new ki powers detailed afterward. This ki power must be open to all students of perfection or appropriate to his chosen school. If an &#8220;unchained&#8221; ki power is followed by a level in parentheses, use that as the minimum character level (instead of the level given in the Unchained rules). All other prerequisites must be met. Unless otherwise noted, a student of perfection cannot select an individual ki power more than once. Any student of perfection can choose elemental fury, elemental burst (10th), or genie&#8217;s blade (see below). If he belongs to the Monastery of Unblinking Flame, a student of perfection can also choose furious defense, ki hurricane (4th), sudden speed, or any of the powers below for that monastery. If he belongs to the Monastery of Unfolding Wind, the student of perfection can also choose high jump, ki range, wind jump, or any of the powers below for that monastery. If he belongs to the Monastery of Untwisting Iron, a student of perfection can also choose diamond body , diamond resilience (6th), diamond soul (6th), or any of the powers below for that monastery. Genie&#8217;s Blade (Su; any) : The student of perfection is proficient with the falchion , kukri , and scimitar and treats these weapons as if they had the monk special quality. The student of perfection can spend 1 ki point as a swift action to give a falchion , kukri , or scimitar he wields the ki strike special ability and have it deal damage equal to that of his unarmed strikes (if greater than its base damage). The student of perfection applies his full Strength modifier to his damage rolls for these attacks. Thes",
-                  "requirements": {
-                    "minClassLevel": 2,
-                    "text": "At 2nd level and every 2 levels thereafter, a student of perfection can select one ki power chosen from the unchained monk options listed directly below or from the new ki powers detailed afterward. This ki power must be open to all students of perfection or appropriate to his chosen school."
-                  },
-                  "scrapeConfidence": "medium"
-                }
-              ],
-              "scrapeSource": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/s-z/student-of-perfection/",
-              "scrapeConfidence": "low"
-            }
+          "poolRefs": [
+            "ki-power"
           ]
         }
       ],
@@ -83,25 +66,8 @@
         {
           "name": "Ki Power",
           "description": "",
-          "pools": [
-            {
-              "name": "Ki Power",
-              "description": "",
-              "requirements": {},
-              "options": [
-                {
-                  "name": "Ki Powers",
-                  "description": "At 2nd level and every 2 levels thereafter, a student of perfection can select one ki power chosen from the unchained monk options listed directly below or from the new ki powers detailed afterward. This ki power must be open to all students of perfection or appropriate to his chosen school. If an &#8220;unchained&#8221; ki power is followed by a level in parentheses, use that as the minimum character level (instead of the level given in the Unchained rules). All other prerequisites must be met. Unless otherwise noted, a student of perfection cannot select an individual ki power more than once. Any student of perfection can choose elemental fury, elemental burst (10th), or genie&#8217;s blade (see below). If he belongs to the Monastery of Unblinking Flame, a student of perfection can also choose furious defense, ki hurricane (4th), sudden speed, or any of the powers below for that monastery. If he belongs to the Monastery of Unfolding Wind, the student of perfection can also choose high jump, ki range, wind jump, or any of the powers below for that monastery. If he belongs to the Monastery of Untwisting Iron, a student of perfection can also choose diamond body , diamond resilience (6th), diamond soul (6th), or any of the powers below for that monastery. Genie&#8217;s Blade (Su; any) : The student of perfection is proficient with the falchion , kukri , and scimitar and treats these weapons as if they had the monk special quality. The student of perfection can spend 1 ki point as a swift action to give a falchion , kukri , or scimitar he wields the ki strike special ability and have it deal damage equal to that of his unarmed strikes (if greater than its base damage). The student of perfection applies his full Strength modifier to his damage rolls for these attacks. Thes",
-                  "requirements": {
-                    "minClassLevel": 2,
-                    "text": "At 2nd level and every 2 levels thereafter, a student of perfection can select one ki power chosen from the unchained monk options listed directly below or from the new ki powers detailed afterward. This ki power must be open to all students of perfection or appropriate to his chosen school."
-                  },
-                  "scrapeConfidence": "medium"
-                }
-              ],
-              "scrapeSource": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/s-z/student-of-perfection/",
-              "scrapeConfidence": "low"
-            }
+          "poolRefs": [
+            "ki-power"
           ]
         }
       ],
@@ -131,25 +97,8 @@
         {
           "name": "Ki Power",
           "description": "",
-          "pools": [
-            {
-              "name": "Ki Power",
-              "description": "",
-              "requirements": {},
-              "options": [
-                {
-                  "name": "Ki Powers",
-                  "description": "At 2nd level and every 2 levels thereafter, a student of perfection can select one ki power chosen from the unchained monk options listed directly below or from the new ki powers detailed afterward. This ki power must be open to all students of perfection or appropriate to his chosen school. If an &#8220;unchained&#8221; ki power is followed by a level in parentheses, use that as the minimum character level (instead of the level given in the Unchained rules). All other prerequisites must be met. Unless otherwise noted, a student of perfection cannot select an individual ki power more than once. Any student of perfection can choose elemental fury, elemental burst (10th), or genie&#8217;s blade (see below). If he belongs to the Monastery of Unblinking Flame, a student of perfection can also choose furious defense, ki hurricane (4th), sudden speed, or any of the powers below for that monastery. If he belongs to the Monastery of Unfolding Wind, the student of perfection can also choose high jump, ki range, wind jump, or any of the powers below for that monastery. If he belongs to the Monastery of Untwisting Iron, a student of perfection can also choose diamond body , diamond resilience (6th), diamond soul (6th), or any of the powers below for that monastery. Genie&#8217;s Blade (Su; any) : The student of perfection is proficient with the falchion , kukri , and scimitar and treats these weapons as if they had the monk special quality. The student of perfection can spend 1 ki point as a swift action to give a falchion , kukri , or scimitar he wields the ki strike special ability and have it deal damage equal to that of his unarmed strikes (if greater than its base damage). The student of perfection applies his full Strength modifier to his damage rolls for these attacks. Thes",
-                  "requirements": {
-                    "minClassLevel": 2,
-                    "text": "At 2nd level and every 2 levels thereafter, a student of perfection can select one ki power chosen from the unchained monk options listed directly below or from the new ki powers detailed afterward. This ki power must be open to all students of perfection or appropriate to his chosen school."
-                  },
-                  "scrapeConfidence": "medium"
-                }
-              ],
-              "scrapeSource": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/s-z/student-of-perfection/",
-              "scrapeConfidence": "low"
-            }
+          "poolRefs": [
+            "ki-power"
           ]
         }
       ],
@@ -179,25 +128,8 @@
         {
           "name": "Ki Power",
           "description": "",
-          "pools": [
-            {
-              "name": "Ki Power",
-              "description": "",
-              "requirements": {},
-              "options": [
-                {
-                  "name": "Ki Powers",
-                  "description": "At 2nd level and every 2 levels thereafter, a student of perfection can select one ki power chosen from the unchained monk options listed directly below or from the new ki powers detailed afterward. This ki power must be open to all students of perfection or appropriate to his chosen school. If an &#8220;unchained&#8221; ki power is followed by a level in parentheses, use that as the minimum character level (instead of the level given in the Unchained rules). All other prerequisites must be met. Unless otherwise noted, a student of perfection cannot select an individual ki power more than once. Any student of perfection can choose elemental fury, elemental burst (10th), or genie&#8217;s blade (see below). If he belongs to the Monastery of Unblinking Flame, a student of perfection can also choose furious defense, ki hurricane (4th), sudden speed, or any of the powers below for that monastery. If he belongs to the Monastery of Unfolding Wind, the student of perfection can also choose high jump, ki range, wind jump, or any of the powers below for that monastery. If he belongs to the Monastery of Untwisting Iron, a student of perfection can also choose diamond body , diamond resilience (6th), diamond soul (6th), or any of the powers below for that monastery. Genie&#8217;s Blade (Su; any) : The student of perfection is proficient with the falchion , kukri , and scimitar and treats these weapons as if they had the monk special quality. The student of perfection can spend 1 ki point as a swift action to give a falchion , kukri , or scimitar he wields the ki strike special ability and have it deal damage equal to that of his unarmed strikes (if greater than its base damage). The student of perfection applies his full Strength modifier to his damage rolls for these attacks. Thes",
-                  "requirements": {
-                    "minClassLevel": 2,
-                    "text": "At 2nd level and every 2 levels thereafter, a student of perfection can select one ki power chosen from the unchained monk options listed directly below or from the new ki powers detailed afterward. This ki power must be open to all students of perfection or appropriate to his chosen school."
-                  },
-                  "scrapeConfidence": "medium"
-                }
-              ],
-              "scrapeSource": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/s-z/student-of-perfection/",
-              "scrapeConfidence": "low"
-            }
+          "poolRefs": [
+            "ki-power"
           ]
         }
       ],
@@ -227,25 +159,8 @@
         {
           "name": "Ki Power",
           "description": "",
-          "pools": [
-            {
-              "name": "Ki Power",
-              "description": "",
-              "requirements": {},
-              "options": [
-                {
-                  "name": "Ki Powers",
-                  "description": "At 2nd level and every 2 levels thereafter, a student of perfection can select one ki power chosen from the unchained monk options listed directly below or from the new ki powers detailed afterward. This ki power must be open to all students of perfection or appropriate to his chosen school. If an &#8220;unchained&#8221; ki power is followed by a level in parentheses, use that as the minimum character level (instead of the level given in the Unchained rules). All other prerequisites must be met. Unless otherwise noted, a student of perfection cannot select an individual ki power more than once. Any student of perfection can choose elemental fury, elemental burst (10th), or genie&#8217;s blade (see below). If he belongs to the Monastery of Unblinking Flame, a student of perfection can also choose furious defense, ki hurricane (4th), sudden speed, or any of the powers below for that monastery. If he belongs to the Monastery of Unfolding Wind, the student of perfection can also choose high jump, ki range, wind jump, or any of the powers below for that monastery. If he belongs to the Monastery of Untwisting Iron, a student of perfection can also choose diamond body , diamond resilience (6th), diamond soul (6th), or any of the powers below for that monastery. Genie&#8217;s Blade (Su; any) : The student of perfection is proficient with the falchion , kukri , and scimitar and treats these weapons as if they had the monk special quality. The student of perfection can spend 1 ki point as a swift action to give a falchion , kukri , or scimitar he wields the ki strike special ability and have it deal damage equal to that of his unarmed strikes (if greater than its base damage). The student of perfection applies his full Strength modifier to his damage rolls for these attacks. Thes",
-                  "requirements": {
-                    "minClassLevel": 2,
-                    "text": "At 2nd level and every 2 levels thereafter, a student of perfection can select one ki power chosen from the unchained monk options listed directly below or from the new ki powers detailed afterward. This ki power must be open to all students of perfection or appropriate to his chosen school."
-                  },
-                  "scrapeConfidence": "medium"
-                }
-              ],
-              "scrapeSource": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/s-z/student-of-perfection/",
-              "scrapeConfidence": "low"
-            }
+          "poolRefs": [
+            "ki-power"
           ]
         },
         {
@@ -347,5 +262,15 @@
     }
   ],
   "spellcasting": null,
-  "spellcastingClass": false
+  "spellcastingClass": false,
+  "classFeaturePools": {
+    "ki-power": {
+      "name": "Ki Power",
+      "description": "",
+      "requirements": {},
+      "scrapeSource": "https://www.d20pfsrd.com/classes/prestige-classes/other-paizo/s-z/student-of-perfection/",
+      "scrapeConfidence": "low",
+      "catalog": "student-of-perfection-ki-power"
+    }
+  }
 }

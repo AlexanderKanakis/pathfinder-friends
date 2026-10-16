@@ -24,7 +24,7 @@ body {
   overflow: auto;
 }
 
-.race-list button {
+.race-list [data-race-index] {
   text-align: left;
   display: flex;
   justify-content: space-between;

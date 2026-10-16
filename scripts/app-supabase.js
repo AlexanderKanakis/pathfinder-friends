@@ -829,13 +829,9 @@
     return { ok: true };
   }
 
-  // Queues a "choose a skill/target" request instead of applying an
-  // effect straight to a character's buffs -- used when the effect has
-  // an unresolved choice: stat and the caller isn't that character's
-  // owner (e.g. a GM casting something at a player's token from the
-  // map). ability should already have duration/casterLevel/etc fully
-  // resolved (see buff-tracker-widget.js's addEffect) -- only its
-  // "choice:" bonus stats are still unresolved.
+  // Queues target-owned authored decisions for the character's owner.
+  // The ability JSON also carries the orchestrator continuation mode;
+  // no separate request schema is required for pause/resume.
   async function createEffectChoiceRequest({
     contextKey = getSelectedContextKey(),
     characterId,
@@ -1237,6 +1233,26 @@
     }
 
     return data;
+  }
+
+  async function applyCharacterHealingEffect(
+    sheetId,
+    effect,
+    contextKey = getSelectedContextKey(),
+  ) {
+    if (!window.PFEffectHealing?.hasHealing?.(effect)) return null;
+    const current = await loadCharacterSheet("", contextKey, sheetId);
+    if (!current?.sheet) return null;
+    const fields = current.sheet.fields || {};
+    const result = window.PFEffectHealing.applicationResult(
+      effect,
+      current.sheet.calculated?.hp?.current ?? fields.currentHitPoints,
+      current.sheet.calculated?.hp?.total ??
+        fields.hitPointsTotal ??
+        fields.hitPoints,
+    );
+    if (!result.changed) return current;
+    return updateCharacterCurrentHp(sheetId, result.current, contextKey);
   }
 
   async function updateCharacterSheetRaw(
@@ -1647,6 +1663,26 @@
     return saveEnemy({ ...enemy, sheet }, contextKey);
   }
 
+  async function applyEnemyHealingEffect(
+    enemyId,
+    effect,
+    contextKey = getSelectedContextKey(),
+  ) {
+    if (!window.PFEffectHealing?.hasHealing?.(effect)) return null;
+    const enemy = await loadEnemy(enemyId, contextKey);
+    if (!enemy?.sheet) return null;
+    const fields = enemy.sheet.fields || {};
+    const result = window.PFEffectHealing.applicationResult(
+      effect,
+      enemy.sheet.calculated?.hp?.current ?? fields.currentHitPoints,
+      enemy.sheet.calculated?.hp?.total ??
+        fields.hitPointsTotal ??
+        fields.hitPoints,
+    );
+    if (!result.changed) return enemy;
+    return updateEnemyCurrentHp(enemyId, result.current, contextKey);
+  }
+
   async function duplicateEnemy(enemyId, contextKey = getSelectedContextKey()) {
     const enemies = await loadEnemies(contextKey);
     const source = enemies.find((enemy) => enemy.id === enemyId);
@@ -1742,10 +1778,16 @@
     "casterLevelBonuses",
     "spellDcBonuses",
     "effectiveAttributeBonuses",
+    "attributeContributions",
     "grantDomains",
     "generatedEquipment",
+    "summonCreatures",
+    "weaponExtraDamage",
+    "weaponDamageSizeChanges",
     "conditionalVariables",
+    "attackRolls",
     "damageRolls",
+    "d20Boosts",
   ];
 
   function storedLootMechanics(row = {}) {
@@ -2227,6 +2269,7 @@
     updateCharacterSheetRaw,
     updateCharacterCalculatedSummary,
     updateCharacterCurrentHp,
+    applyCharacterHealingEffect,
     loadContextMembers,
     loadContextCharacters,
     loadEnemies,
@@ -2236,6 +2279,7 @@
     updateEnemyEffectSummary,
     saveEnemy,
     updateEnemyCurrentHp,
+    applyEnemyHealingEffect,
     duplicateEnemy,
     deleteEnemy,
     loadLootItems,

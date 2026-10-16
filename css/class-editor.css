@@ -34,7 +34,7 @@ body {
   overflow: auto;
 }
 
-.class-list button {
+.class-list [data-class-index] {
   text-align: left;
   display: flex;
   justify-content: space-between;

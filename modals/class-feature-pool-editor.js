@@ -1,6 +1,34 @@
 (function () {
   let modal = null;
   let resolver = null;
+  let optionEditorOpen = false;
+
+  function waitForModalHidden(element) {
+    if (!element || element.style.display === "none") return Promise.resolve();
+    return new Promise((resolve) => {
+      element.addEventListener("hidden.bs.modal", resolve, { once: true });
+    });
+  }
+
+  async function openOptionEditor(option = {}) {
+    const parent = document.getElementById("classFeaturePoolEditorModal");
+    optionEditorOpen = true;
+    try {
+      const parentHidden = waitForModalHidden(parent);
+      modal?.hide();
+      await parentHidden;
+      const edited = await window.PFClassFeatureEditor.open(option, {
+        mode: "option",
+      });
+      await waitForModalHidden(
+        document.getElementById("classFeatureEditorModal"),
+      );
+      return edited;
+    } finally {
+      optionEditorOpen = false;
+      modal?.show();
+    }
+  }
 
   function escapeHtml(value) {
     return String(value ?? "")
@@ -74,7 +102,14 @@
                 <div class="small-text">If set, a selected choice's effects are bundled into that active feature when it's used (e.g. rage powers into Rage) instead of applying on their own.</div>
                 <div class="form-check form-switch mt-2">
                   <input id="classFeaturePoolChooseOnActivate" class="form-check-input" type="checkbox">
-                  <label class="form-check-label" for="classFeaturePoolChooseOnActivate">Caster chooses contributions when activating</label>
+                  <label class="form-check-label" for="classFeaturePoolChooseOnActivate">Choose contributions when activating</label>
+                </div>
+                <div id="classFeaturePoolDecisionOwnerWrap" class="mt-2 d-none">
+                  <label for="classFeaturePoolDecisionOwner">Decision Owner</label>
+                  <select id="classFeaturePoolDecisionOwner" class="form-select form-select-sm">
+                    <option value="caster">Caster decides</option>
+                    <option value="target">Target decides</option>
+                  </select>
                 </div>
               </div>
               <div class="mb-3">
@@ -107,16 +142,16 @@
     document
       .getElementById("addClassFeaturePoolOption")
       .addEventListener("click", async () => {
-        const created = await window.PFClassFeatureEditor.open(
-          {},
-          { mode: "option" },
-        );
+        const created = await openOptionEditor({});
         if (!created || !created.name) return;
         addOptionRow(created);
       });
     document
       .getElementById("classFeaturePoolOptionSearch")
       .addEventListener("input", filterOptionRows);
+    document
+      .getElementById("classFeaturePoolChooseOnActivate")
+      .addEventListener("change", syncDecisionOwnerVisibility);
     document
       .getElementById("classFeaturePoolEditorForm")
       .addEventListener("submit", (event) => {
@@ -130,6 +165,7 @@
     document
       .getElementById("classFeaturePoolEditorModal")
       .addEventListener("hidden.bs.modal", () => {
+        if (optionEditorOpen) return;
         resolver?.(null);
         resolver = null;
       });
@@ -144,6 +180,15 @@
         : [],
       text: requirements.text || requirements.notes || "",
     };
+  }
+
+  function syncDecisionOwnerVisibility() {
+    document
+      .getElementById("classFeaturePoolDecisionOwnerWrap")
+      ?.classList.toggle(
+        "d-none",
+        !document.getElementById("classFeaturePoolChooseOnActivate")?.checked,
+      );
   }
 
   function searchableOption(option = {}) {
@@ -237,10 +282,7 @@
     row
       .querySelector("[data-edit-pool-option]")
       .addEventListener("click", async () => {
-        const edited = await window.PFClassFeatureEditor.open(
-          row.__poolOption,
-          { mode: "option" },
-        );
+        const edited = await openOptionEditor(row.__poolOption);
         if (!edited || !edited.name) return;
         // Keep scraped metadata (source/sourceUrl/publisher/summary/...)
         // that the editor doesn't know about; everything it does edit
@@ -253,7 +295,9 @@
           "description",
           "activatable",
           "durationConfig",
+          "auraConfig",
           "activeMechanics",
+          "decisionOwner",
           "requirements",
           ...(window.PFEffectMechanics?.mechanicKeys?.() || [
             "effects",
@@ -327,7 +371,12 @@
       ...(contributesToAbility ? { contributesToAbility } : {}),
       ...(contributesToAbility &&
       document.getElementById("classFeaturePoolChooseOnActivate").checked
-        ? { chooseContributionsOnActivate: true }
+        ? {
+            chooseContributionsOnActivate: true,
+            decisionOwner:
+              document.getElementById("classFeaturePoolDecisionOwner").value ||
+              "caster",
+          }
         : {}),
       options,
     };
@@ -350,6 +399,9 @@
       pool.contributesToAbility || "";
     document.getElementById("classFeaturePoolChooseOnActivate").checked =
       Boolean(pool.chooseContributionsOnActivate);
+    document.getElementById("classFeaturePoolDecisionOwner").value =
+      window.PFEffectDecisions?.decisionOwner?.(pool) || "caster";
+    syncDecisionOwnerVisibility();
     document.getElementById("classFeaturePoolOptionSearch").value = "";
     document.getElementById("classFeaturePoolOptions").innerHTML = "";
     (Array.isArray(pool.options) ? pool.options : []).forEach((option) =>

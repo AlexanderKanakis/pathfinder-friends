@@ -38,6 +38,18 @@
     { value: "reflex", label: "Reflex" },
     { value: "will", label: "Will" },
   ];
+  const DERIVED_STAT_OPTIONS = [
+    { value: "initiative", label: "Initiative" },
+    { value: "ac", label: "Armor Class" },
+    { value: "touch ac", label: "Touch AC" },
+    { value: "flat-footed ac", label: "Flat-Footed AC" },
+    ...SAVE_OPTIONS,
+    { value: "cmb", label: "CMB" },
+    { value: "cmd", label: "CMD" },
+    { value: "hit points", label: "Hit Points" },
+    { value: "attack", label: "Weapon Attack Rolls" },
+    { value: "damage", label: "Weapon Damage Rolls" },
+  ];
 
   // Pathfinder's standard fighter "weapon training" groups.
   const WEAPON_TYPE_OPTIONS = [
@@ -65,6 +77,7 @@
     { value: "melee-one-handed", label: "Melee Weapon (One-Handed)" },
     { value: "melee-two-handed", label: "Melee Weapon (Two-Handed)" },
     { value: "ranged", label: "Ranged Weapon" },
+    { value: "thrown", label: "Thrown Weapon" },
     { value: "firearm-one-handed", label: "Firearm (One-Handed)" },
     { value: "firearm-two-handed", label: "Firearm (Two-Handed)" },
     { value: "natural", label: "Natural Weapon" },
@@ -84,6 +97,7 @@
       "melee-weapon-one-handed": "melee-one-handed",
       "melee-weapon-two-handed": "melee-two-handed",
       "ranged-weapon": "ranged",
+      "thrown-weapon": "thrown",
       "firearm-one-handed": "firearm-one-handed",
       "firearm-two-handed": "firearm-two-handed",
       natural: "natural",
@@ -307,6 +321,32 @@
 
   const STATIC_POOLS = [
     { id: "saving-throws", label: "Saving Throws", options: SAVE_OPTIONS },
+    {
+      id: "attribute-derived-stats",
+      label: "Attribute-Derived Stats",
+      options: DERIVED_STAT_OPTIONS,
+    },
+    {
+      id: "armor-class-stats",
+      label: "Armor Class Stats",
+      options: DERIVED_STAT_OPTIONS.filter((option) =>
+        ["ac", "touch ac", "flat-footed ac"].includes(option.value),
+      ),
+    },
+    {
+      id: "combat-maneuver-stats",
+      label: "Combat Maneuver Stats",
+      options: DERIVED_STAT_OPTIONS.filter((option) =>
+        ["cmb", "cmd"].includes(option.value),
+      ),
+    },
+    {
+      id: "weapon-roll-stats",
+      label: "Weapon Attack or Damage",
+      options: DERIVED_STAT_OPTIONS.filter((option) =>
+        ["attack", "damage"].includes(option.value),
+      ),
+    },
     { id: "attributes-all", label: "All Attributes", options: ABILITY_OPTIONS },
     {
       id: "attributes-physical",
@@ -1188,6 +1228,29 @@
     `;
   }
 
+  const HEALING_STAT_OPTIONS = [
+    { value: "healing", label: "Healing" },
+    { value: "fast healing", label: "Fast Healing" },
+  ];
+
+  function healingOptgroupHtml(selected, escapeHtml) {
+    const esc = escapeHtml || ((value) => String(value ?? ""));
+    return `
+      <optgroup label="Healing">
+        ${HEALING_STAT_OPTIONS.map(
+          (option) =>
+            `<option value="${esc(option.value)}" ${selected === option.value ? "selected" : ""}>${esc(option.label)}</option>`,
+        ).join("")}
+      </optgroup>
+    `;
+  }
+
+  function isHealingStat(value) {
+    return HEALING_STAT_OPTIONS.some(
+      (option) => option.value === String(value || "").trim().toLowerCase(),
+    );
+  }
+
   function choiceOptgroupHtml(selected, escapeHtml) {
     const esc = escapeHtml || ((value) => String(value ?? ""));
     refreshAllPools();
@@ -1245,6 +1308,7 @@
     CONDITIONAL_VARIABLE_POOLS,
     PF_SKILLS_WITH_ABILITY,
     ENERGY_RESISTANCE_STAT_OPTIONS,
+    HEALING_STAT_OPTIONS,
     WEAPON_RESTRICTION_OPTIONS,
     NATURAL_WEAPON_NAME_OPTIONS,
     CREATE_SKILL_LIST_STAT_VALUE,
@@ -1263,6 +1327,8 @@
     resolveConditionalVariableOptions,
     choiceOptgroupHtml,
     energyResistanceOptgroupHtml,
+    healingOptgroupHtml,
+    isHealingStat,
     choiceStatLabel,
     customSkillLists,
     customSkillListIsSkillOnly,

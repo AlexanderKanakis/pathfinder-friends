@@ -23,6 +23,37 @@
       .replaceAll("'", "&#39;");
   }
 
+  function numberStepperMarkup({
+    id,
+    value = 0,
+    min = "",
+    max = "",
+    step = 1,
+    inputAttributes = "",
+    label = "value",
+  }) {
+    const bounds = `${min !== "" ? ` min="${escapeHtml(min)}"` : ""}${max !== "" ? ` max="${escapeHtml(max)}"` : ""}`;
+    return `<div class="modal-number-stepper shared-effect-number-stepper">
+      <button class="btn btn-outline-light btn-sm modal-number-stepper-button" type="button" data-effect-number-step="-1" data-effect-number-target="${escapeHtml(id)}" aria-label="Decrease ${escapeHtml(label)}">-</button>
+      <input class="form-control form-control-sm text-center" type="number"${bounds} step="${escapeHtml(step)}" value="${escapeHtml(value)}" data-effect-number-input="${escapeHtml(id)}" ${inputAttributes}>
+      <button class="btn btn-outline-light btn-sm modal-number-stepper-button" type="button" data-effect-number-step="1" data-effect-number-target="${escapeHtml(id)}" aria-label="Increase ${escapeHtml(label)}">+</button>
+    </div>`;
+  }
+
+  function wireNumberSteppers(scope) {
+    scope.querySelectorAll("[data-effect-number-step]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const input = scope.querySelector(
+          `[data-effect-number-input="${button.dataset.effectNumberTarget}"]`,
+        );
+        if (!input) return;
+        if (Number(button.dataset.effectNumberStep) < 0) input.stepDown();
+        else input.stepUp();
+        input.dispatchEvent(new Event("change", { bubbles: true }));
+      });
+    });
+  }
+
   // ---------------------------------------------------------------
   // Plain stat bonus row (Stat/Value/Type/Stacks/Bonus Scale/
   // Conditional/Applies When) -- every effect-authoring surface in the
@@ -139,6 +170,18 @@
   ];
   const SIZE_CHANGE_VALUES = [-2, -1, 1, 2];
   const GENERATED_EQUIPMENT_TYPES = ["Weapon", "Armor", "Shield"];
+  const GENERATED_WEAPON_ENCHANTMENTS = [
+    "Adaptive", "Allying", "Anarchic", "Anchoring", "Axiomatic", "Bane",
+    "Brilliant Energy", "Called", "Conductive", "Corrosive",
+    "Corrosive Burst", "Cruel", "Cunning", "Dancing", "Defending",
+    "Disruption", "Distance", "Flaming", "Flaming Burst", "Frost",
+    "Furious", "Ghost Touch", "Holy", "Icy Burst", "Impact", "Keen",
+    "Merciful", "Returning", "Seeking", "Shock", "Shocking Burst", "Speed",
+    "Spell Storing", "Throwing", "Thundering", "Unholy", "Vicious",
+    "Vorpal", "Wounding",
+  ];
+  let generatedEquipmentRowId = 0;
+  let weaponDamageSizeRowId = 0;
   const GENERATED_WEAPON_TYPES = [
     "Melee Weapon (Light)",
     "Melee Weapon (One-Handed)",
@@ -192,17 +235,6 @@
   let spellAdjustmentRowId = 0;
   let domainOptionsPromise = null;
   let bloodlineOptionsPromise = null;
-  const NATURAL_ATTACK_KINDS = [
-    "Bite",
-    "Claw",
-    "Gore",
-    "Hoof, Tentacle, Wing",
-    "Pincers, Tail Slap",
-    "Slam",
-    "Sting",
-    "Talons",
-    "Other",
-  ];
   const NATURAL_ATTACK_ROLES = ["Primary", "Secondary"];
 
   function slugifyOption(text) {
@@ -433,6 +465,7 @@
       .join("");
     return `
       <optgroup label="Stats">${stats.map((stat) => option(stat)).join("")}</optgroup>
+      ${window.PFEffectStats?.healingOptgroupHtml?.(selected, escapeHtml) || ""}
       <optgroup label="Skills">
         ${SKILL_STATS.map((stat) => option(stat)).join("")}
         <option value="skill:craft" ${selected === "skill:craft" ? "selected" : ""}>Skill: Craft</option>
@@ -588,13 +621,31 @@
           <input data-effect-field="customWeaponName" class="form-control form-control-sm mt-1 d-none" placeholder="Weapon name">
         </div>
       </div>
+      <div class="effect-healing-formula d-none" data-healing-formula>
+        <div>
+          <label>Number of Dice</label>
+          ${numberStepperMarkup({ id: "healing-dice-count", value: Math.max(0, Number(data.diceCount || 0)), min: 0, inputAttributes: 'data-effect-field="diceCount"', label: "number of healing dice" })}
+        </div>
+        <div>
+          <label>Die</label>
+          <select class="form-select form-select-sm" data-effect-field="dieType">${damageDieOptions(data.dieType || 6)}</select>
+        </div>
+        <div>
+          <label>Maximum Dice</label>
+          ${numberStepperMarkup({ id: "healing-dice-maximum", value: data.diceCountMax ?? "", min: 0, inputAttributes: 'data-effect-field="diceCountMax" placeholder="No maximum"', label: "maximum healing dice" })}
+        </div>
+        <div data-healing-scale-host="dice">
+          <button class="btn btn-outline-info btn-sm" type="button" data-healing-dice-scale>Scale Dice</button>
+          <span class="small text-secondary" data-healing-dice-scale-summary></span>
+        </div>
+      </div>
       <div class="effect-value-field">
-        <label>Value</label>
-        <input data-effect-field="value" class="form-control form-control-sm" type="number" value="${data.value ?? 0}">
+        <label data-effect-value-label>Value</label>
+        ${numberStepperMarkup({ id: "bonus-value", value: data.value ?? 0, inputAttributes: 'data-effect-field="value"', label: "value" })}
       </div>
       <div class="effect-maximum-field">
-        <label>Maximum</label>
-        <input data-effect-field="maximum" class="form-control form-control-sm" type="number" value="${data.maximum ?? data.max ?? ""}" placeholder="No maximum">
+        <label data-effect-maximum-label>Maximum</label>
+        ${numberStepperMarkup({ id: "bonus-maximum", value: data.maximum ?? data.max ?? "", min: 0, inputAttributes: 'data-effect-field="maximum" placeholder="No maximum"', label: "maximum" })}
       </div>
       <div class="effect-type-field">
         <label>Type</label>
@@ -602,7 +653,7 @@
           ${BONUS_TYPES.map((type) => `<option value="${escapeHtml(type)}" ${(data.type || "untyped") === type ? "selected" : ""}>${escapeHtml(type)}</option>`).join("")}
         </select>
       </div>
-      <div>
+      <div class="effect-stacks-field">
         <label>Stacks</label>
         <div class="form-check form-switch">
           <input data-effect-field="stacks" class="form-check-input" type="checkbox" ${data.stacks ? "checked" : ""}>
@@ -621,6 +672,7 @@
           <input data-effect-field="appliesWhen" class="form-control form-control-sm" value="${escapeHtml(appliesWhen)}" placeholder="vs undead">
         </div>
       </div>
+      <button class="btn btn-outline-info btn-sm btn-icon" type="button" data-effect-save aria-label="Configure effect save" title="Configure save"><i class="bi bi-shield-check"></i></button>
       <button class="btn btn-outline-danger btn-sm" type="button" aria-label="Delete effect"><i class="bi bi-trash"></i></button>
       <div class="small text-secondary" data-scale-summary></div>
     `;
@@ -633,6 +685,7 @@
     );
     const weaponNameSelect = row.querySelector('[data-effect-field="weaponNameRestriction"]');
     const customWeaponName = row.querySelector('[data-effect-field="customWeaponName"]');
+    wireNumberSteppers(row);
     weaponNameSelect.addEventListener("change", () => {
       customWeaponName.classList.toggle("d-none", weaponNameSelect.value !== "__custom__");
     });
@@ -655,6 +708,35 @@
         ? window.PFEffectStats.isAttackOrDamageStat(statSelect.value)
         : /^(?:(?:melee|ranged) )?(?:attack|damage)$/i.test(statSelect.value);
       weaponRestrictionsField.classList.toggle("d-none", !weaponRestricted);
+      const healing = window.PFEffectStats?.isHealingStat?.(statSelect.value);
+      const instantHealing = String(statSelect.value || "").toLowerCase() === "healing";
+      row.classList.toggle("is-instant-healing", instantHealing);
+      row.querySelector(".effect-type-field")?.classList.toggle(
+        "d-none",
+        Boolean(healing),
+      );
+      row.querySelector(".effect-stacks-field")?.classList.toggle(
+        "d-none",
+        Boolean(healing),
+      );
+      row.querySelector(".shared-bonus-condition-inline")?.classList.toggle(
+        "d-none",
+        Boolean(healing),
+      );
+      row.querySelector("[data-healing-formula]")?.classList.toggle(
+        "d-none",
+        !instantHealing,
+      );
+      const valueLabel = row.querySelector("[data-effect-value-label]");
+      if (valueLabel) valueLabel.textContent = instantHealing ? "Static" : "Value";
+      const maximumLabel = row.querySelector("[data-effect-maximum-label]");
+      if (maximumLabel)
+        maximumLabel.textContent = instantHealing ? "Maximum Static" : "Maximum";
+      const staticScaleButton = row.querySelector("[data-scale-bonus]");
+      if (staticScaleButton)
+        staticScaleButton.textContent = instantHealing
+          ? "Scale Static"
+          : "Bonus Scale";
     };
     wireCustomSkillListSelect(statSelect, {
       skills: options.skills,
@@ -670,11 +752,44 @@
       row.querySelector("[data-scale-summary]"),
       row.querySelector("[data-scale-bonus]"),
     );
+    const healingDiceHost = row.querySelector('[data-healing-scale-host="dice"]');
+    wireScaleButton(
+      healingDiceHost,
+      data.diceCountScale || null,
+      healingDiceHost.querySelector("[data-healing-dice-scale-summary]"),
+      healingDiceHost.querySelector("[data-healing-dice-scale]"),
+    );
     wireConditionalFromAppliesWhen(
       row,
       '[data-effect-field="conditional"]',
       '[data-effect-field="appliesWhen"]',
     );
+    let saveMode = data.saveMode || (data.saveConfig?.enabled ? "custom" : "shared");
+    let saveConfig = data.saveConfig?.enabled
+      ? JSON.parse(JSON.stringify(data.saveConfig))
+      : null;
+    const saveButton = row.querySelector("[data-effect-save]");
+    const syncSaveButton = () => {
+      saveButton.classList.toggle("btn-info", saveMode === "custom");
+      saveButton.classList.toggle("btn-outline-info", saveMode !== "custom");
+      saveButton.classList.toggle("text-secondary", saveMode === "none");
+      saveButton.title =
+        saveMode === "none"
+          ? "No save for this effect"
+          : saveMode === "custom"
+            ? "This effect uses a custom save"
+            : "This effect uses the ability save";
+    };
+    saveButton.addEventListener("click", async () => {
+      const updated = await openSaveConfigEditor(saveConfig, {
+        rowMode: saveMode,
+      });
+      if (!updated) return;
+      saveMode = updated.mode;
+      saveConfig = updated.config;
+      syncSaveButton();
+    });
+    syncSaveButton();
     row
       .querySelector('button[aria-label="Delete effect"]')
       .addEventListener("click", () => {
@@ -689,18 +804,23 @@
       const appliesWhen = row
         .querySelector('[data-effect-field="appliesWhen"]')
         .value.trim();
+      const healing = window.PFEffectStats?.isHealingStat?.(selected);
       const effect = {
         stat: skillName ? skillKey(skillName) : selected,
         value: Number(
           row.querySelector('[data-effect-field="value"]').value || 0,
         ),
-        type:
-          row.querySelector('[data-effect-field="type"]').value || "untyped",
-        stacks: row.querySelector('[data-effect-field="stacks"]').checked,
-        conditional:
-          row.querySelector('[data-effect-field="conditional"]').checked ||
-          Boolean(appliesWhen),
-        appliesWhen,
+        type: healing
+          ? "untyped"
+          : row.querySelector('[data-effect-field="type"]').value || "untyped",
+        stacks: healing
+          ? false
+          : row.querySelector('[data-effect-field="stacks"]').checked,
+        conditional: healing
+          ? false
+          : row.querySelector('[data-effect-field="conditional"]').checked ||
+            Boolean(appliesWhen),
+        appliesWhen: healing ? "" : appliesWhen,
       };
       const maximum = row
         .querySelector('[data-effect-field="maximum"]')
@@ -728,6 +848,32 @@
         if (choicePool) effect.choicePool = choicePool;
       }
       if (row._bonusScale) effect.bonusScale = row._bonusScale;
+      if (String(effect.stat || "").toLowerCase() === "healing") {
+        effect.diceCount = Math.max(
+          0,
+          Math.floor(
+            Number(row.querySelector('[data-effect-field="diceCount"]')?.value) ||
+              0,
+          ),
+        );
+        effect.dieType = Math.max(
+          2,
+          Math.floor(
+            Number(row.querySelector('[data-effect-field="dieType"]')?.value) ||
+              6,
+          ),
+        );
+        const diceCountMax = row
+          .querySelector('[data-effect-field="diceCountMax"]')
+          ?.value.trim();
+        if (diceCountMax !== "" && Number.isFinite(Number(diceCountMax)))
+          effect.diceCountMax = Math.max(0, Math.floor(Number(diceCountMax)));
+        if (healingDiceHost._bonusScale)
+          effect.diceCountScale = healingDiceHost._bonusScale;
+      }
+      if (saveMode === "none") effect.saveMode = "none";
+      if (saveMode === "custom" && saveConfig?.enabled)
+        effect.saveConfig = JSON.parse(JSON.stringify(saveConfig));
       return effect;
     };
     row._collect = collect;
@@ -917,7 +1063,7 @@
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
           <div class="modal-content bg-dark text-white border-secondary">
             <div class="modal-header">
-              <h5 class="modal-title">Bonus Scale</h5>
+              <h5 id="${SCALE_MODAL_ID}Title" class="modal-title">Bonus Scale</h5>
             </div>
             <div class="modal-body">
               <div class="row g-2 mb-3">
@@ -1081,8 +1227,16 @@
       <div class="col-sm-5">
         <label>Attribute Bonus</label>
         <select data-scale-attribute-field="ability" class="form-select form-select-sm">
-          ${["STR", "DEX", "CON", "INT", "WIS", "CHA"]
-            .map((option) => `<option value="${option}" ${ability === option ? "selected" : ""}>${option}</option>`)
+          ${[
+            ["CASTING", "Casting Modifier"],
+            ["STR", "STR"],
+            ["DEX", "DEX"],
+            ["CON", "CON"],
+            ["INT", "INT"],
+            ["WIS", "WIS"],
+            ["CHA", "CHA"],
+          ]
+            .map(([value, label]) => `<option value="${value}" ${ability === value ? "selected" : ""}>${label}</option>`)
             .join("")}
         </select>
       </div>
@@ -1228,12 +1382,14 @@
   }
 
   // Resolves to the collected scale object, or null if cleared/cancelled.
-  function openScaleModal(existingScale) {
+  function openScaleModal(existingScale, options = {}) {
     return scaleHideSignal.then(
       () =>
         new Promise((resolve) => {
           ensureScaleModal();
           const scale = existingScale || {};
+          document.getElementById(`${SCALE_MODAL_ID}Title`).textContent =
+            options.title || "Bonus Scale";
           const source = scale.source || { type: "caster" };
           const sourceSelect = document.getElementById(`${SCALE_MODAL_ID}Source`);
           if (sourceSelect && window.PFEffectMeta?.levelSourceOptions) {
@@ -1252,7 +1408,11 @@
             scale.minimumOne,
           );
           document.getElementById(`${SCALE_MODAL_ID}AttributeSource`).value =
-            window.PFEffectMechanics?.attributeScaleSource?.(scale) || "caster";
+            options.attributeSource ||
+            window.PFEffectMechanics?.attributeScaleSource?.(scale) ||
+            "caster";
+          document.getElementById(`${SCALE_MODAL_ID}AttributeSource`).disabled =
+            Boolean(options.attributeSource);
           document.getElementById(`${SCALE_MODAL_ID}AttributeRows`).innerHTML =
             "";
           document.getElementById(`${SCALE_MODAL_ID}Rows`).innerHTML = "";
@@ -1296,7 +1456,7 @@
             resolve(value);
           };
           const onHidden = () => {
-            settle(null);
+            settle(options.preserveOnCancel ? existingScale || null : null);
             modalEl.removeEventListener("hidden.bs.modal", onHidden);
             resolveHideSignal();
           };
@@ -1330,7 +1490,11 @@
   function scaleSourceLabel(source = {}) {
     if (source.type === "character") return "character level";
     if (source.type === "class")
-      return source.className ? `${source.className} level` : "class level";
+      return source.className === "$sourceClass"
+        ? "source class level"
+        : source.className
+          ? `${source.className} level`
+          : "class level";
     if (source.type === "special")
       return (
         window.PFEffectMeta?.factorLabel?.(source) ||
@@ -1356,12 +1520,15 @@
         : "caster's";
     attributeBonuses.forEach((entry) => {
       const ability = String(entry.ability || entry.attribute || "CON").toUpperCase();
+      const castingModifier = ability === "CASTING";
+      const owner = castingModifier ? "caster's" : attributeOwner;
+      const label = castingModifier ? "casting" : ability;
       const numerator = Math.max(1, Number(entry.numerator ?? 1) || 1);
       const denominator = Math.max(1, Number(entry.denominator ?? 1) || 1);
       parts.push(
         numerator === 1 && denominator === 1
-          ? `${attributeOwner} ${ability} modifier`
-          : `${attributeOwner} ${ability} modifier x ${numerator}/${denominator}`,
+          ? `${owner} ${label} modifier`
+          : `${owner} ${label} modifier x ${numerator}/${denominator}`,
       );
     });
     if (scale.levelMultiplier) {
@@ -1404,6 +1571,266 @@
     return parts.join("; ");
   }
 
+  const AURA_DETAILS_MODAL_ID = "sharedAuraDetailsModal";
+  let auraDetailsModal = null;
+  let auraDetailsHideSignal = Promise.resolve();
+  let auraDetailsSaveAction = null;
+  let auraDetailsScaleAction = null;
+  let auraDetailsDurationAction = null;
+  let auraDetailsLingerToggleAction = null;
+
+  function ensureAuraDetailsModal() {
+    if (document.getElementById(AURA_DETAILS_MODAL_ID)) return;
+    const wrapper = document.createElement("div");
+    wrapper.innerHTML = `
+      <div class="modal fade" id="${AURA_DETAILS_MODAL_ID}" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+          <div class="modal-content bg-dark text-white border-secondary">
+            <div class="modal-header">
+              <h5 class="modal-title">Aura Details</h5>
+            </div>
+            <div class="modal-body">
+              <div class="mb-3">
+                <label for="${AURA_DETAILS_MODAL_ID}Range" class="form-label">Range (ft.)</label>
+                <input id="${AURA_DETAILS_MODAL_ID}Range" class="form-control form-control-sm" type="number" min="5" step="5" value="5">
+              </div>
+              <div class="d-flex align-items-center gap-2 flex-wrap mb-3">
+                <button id="${AURA_DETAILS_MODAL_ID}Scale" class="btn btn-outline-info btn-sm" type="button">Range Scaling</button>
+                <span id="${AURA_DETAILS_MODAL_ID}ScaleSummary" class="small text-secondary"></span>
+              </div>
+              <div class="form-check form-switch mb-2">
+                <input id="${AURA_DETAILS_MODAL_ID}Linger" class="form-check-input" type="checkbox">
+                <label class="form-check-label" for="${AURA_DETAILS_MODAL_ID}Linger">Effect Persists Outside Aura</label>
+              </div>
+              <div id="${AURA_DETAILS_MODAL_ID}LingerWrap" class="d-none align-items-center gap-2 flex-wrap mb-3">
+                <button id="${AURA_DETAILS_MODAL_ID}LingerDuration" class="btn btn-outline-info btn-sm" type="button">Lingering Duration</button>
+                <span id="${AURA_DETAILS_MODAL_ID}LingerSummary" class="small text-secondary"></span>
+              </div>
+              <div class="form-check form-switch mb-3">
+                <input id="${AURA_DETAILS_MODAL_ID}AffectsSource" class="form-check-input" type="checkbox">
+                <label class="form-check-label" for="${AURA_DETAILS_MODAL_ID}AffectsSource">Affects Source</label>
+              </div>
+              <div class="form-check form-switch mb-3">
+                <input id="${AURA_DETAILS_MODAL_ID}IndependentToken" class="form-check-input" type="checkbox">
+                <label class="form-check-label" for="${AURA_DETAILS_MODAL_ID}IndependentToken">Independent Map Token</label>
+              </div>
+              <div class="row g-2 mb-3">
+                <div class="col-sm-6">
+                  <div class="form-check form-switch mb-0">
+                    <input id="${AURA_DETAILS_MODAL_ID}Light" class="form-check-input" type="checkbox">
+                    <label class="form-check-label" for="${AURA_DETAILS_MODAL_ID}Light">Light</label>
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="form-check form-switch mb-0">
+                    <input id="${AURA_DETAILS_MODAL_ID}SpecialVision" class="form-check-input" type="checkbox">
+                    <label class="form-check-label" for="${AURA_DETAILS_MODAL_ID}SpecialVision">Special Vision</label>
+                  </div>
+                </div>
+              </div>
+              <div id="${AURA_DETAILS_MODAL_ID}TargetsEmitWrap" class="form-check form-switch mb-0">
+                <input id="${AURA_DETAILS_MODAL_ID}TargetsEmit" class="form-check-input" type="checkbox">
+                <label class="form-check-label" for="${AURA_DETAILS_MODAL_ID}TargetsEmit">Targets Emit Aura</label>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-light btn-sm" data-bs-dismiss="modal">Cancel</button>
+              <button id="${AURA_DETAILS_MODAL_ID}Save" type="button" class="btn btn-primary btn-sm">Save Aura Details</button>
+            </div>
+          </div>
+        </div>
+      </div>`;
+    document.body.appendChild(wrapper.firstElementChild);
+    document
+      .getElementById(`${AURA_DETAILS_MODAL_ID}Scale`)
+      .addEventListener("click", () => auraDetailsScaleAction?.());
+    document
+      .getElementById(`${AURA_DETAILS_MODAL_ID}LingerDuration`)
+      .addEventListener("click", () => auraDetailsDurationAction?.());
+    document
+      .getElementById(`${AURA_DETAILS_MODAL_ID}Linger`)
+      .addEventListener("change", () => auraDetailsLingerToggleAction?.());
+    document
+      .getElementById(`${AURA_DETAILS_MODAL_ID}Save`)
+      .addEventListener("click", () => auraDetailsSaveAction?.());
+    const light = document.getElementById(`${AURA_DETAILS_MODAL_ID}Light`);
+    const specialVision = document.getElementById(
+      `${AURA_DETAILS_MODAL_ID}SpecialVision`,
+    );
+    light.addEventListener("change", () => {
+      if (light.checked) specialVision.checked = false;
+    });
+    specialVision.addEventListener("change", () => {
+      if (specialVision.checked) light.checked = false;
+    });
+  }
+
+  function openAuraDetailsModal(existingConfig = {}, { allowTargetsEmit = false } = {}) {
+    return auraDetailsHideSignal.then(
+      () =>
+        new Promise((resolve) => {
+          ensureAuraDetailsModal();
+          const modalEl = document.getElementById(AURA_DETAILS_MODAL_ID);
+          const rangeInput = document.getElementById(
+            `${AURA_DETAILS_MODAL_ID}Range`,
+          );
+          const affectsSource = document.getElementById(
+            `${AURA_DETAILS_MODAL_ID}AffectsSource`,
+          );
+          const independentToken = document.getElementById(
+            `${AURA_DETAILS_MODAL_ID}IndependentToken`,
+          );
+          const light = document.getElementById(
+            `${AURA_DETAILS_MODAL_ID}Light`,
+          );
+          const specialVision = document.getElementById(
+            `${AURA_DETAILS_MODAL_ID}SpecialVision`,
+          );
+          const targetsEmit = document.getElementById(
+            `${AURA_DETAILS_MODAL_ID}TargetsEmit`,
+          );
+          const targetsEmitWrap = document.getElementById(
+            `${AURA_DETAILS_MODAL_ID}TargetsEmitWrap`,
+          );
+          const scaleSummary = document.getElementById(
+            `${AURA_DETAILS_MODAL_ID}ScaleSummary`,
+          );
+          const linger = document.getElementById(
+            `${AURA_DETAILS_MODAL_ID}Linger`,
+          );
+          const lingerWrap = document.getElementById(
+            `${AURA_DETAILS_MODAL_ID}LingerWrap`,
+          );
+          const lingerSummary = document.getElementById(
+            `${AURA_DETAILS_MODAL_ID}LingerSummary`,
+          );
+          rangeInput.value = Math.max(5, Number(existingConfig.rangeFeet || 5));
+          affectsSource.checked = Boolean(existingConfig.affectsSource);
+          independentToken.checked = Boolean(existingConfig.independentToken);
+          light.checked = existingConfig.revealMode === "light";
+          specialVision.checked = existingConfig.revealMode === "specialVision";
+          targetsEmit.checked = Boolean(
+            allowTargetsEmit && existingConfig.targetsEmitAura,
+          );
+          targetsEmitWrap.classList.toggle("d-none", !allowTargetsEmit);
+          let rangeScale = existingConfig.rangeScale || null;
+          let lingerDurationConfig = existingConfig.lingerDurationConfig || {
+            diceCount: 0,
+            dieType: 6,
+            staticValue: 1,
+            unit: "round",
+            factors: [],
+            factorMode: "multiply",
+          };
+          linger.checked = Boolean(existingConfig.lingerDurationConfig);
+          let settled = false;
+          let internalTransition = false;
+          let scaling = false;
+          const updateScaleSummary = () => {
+            const text = scaleText(rangeScale);
+            scaleSummary.textContent = text ? `Scales: ${text}` : "No scaling";
+          };
+          const updateLingerUi = () => {
+            lingerWrap.classList.toggle("d-none", !linger.checked);
+            lingerWrap.classList.toggle("d-flex", linger.checked);
+            lingerSummary.textContent = window.PFEffectMeta?.durationLabel
+              ? window.PFEffectMeta.durationLabel(lingerDurationConfig)
+              : "Configured";
+          };
+          updateScaleSummary();
+          updateLingerUi();
+
+          auraDetailsModal = bootstrap.Modal.getOrCreateInstance(modalEl);
+          let resolveHideSignal;
+          auraDetailsHideSignal = new Promise((res) => {
+            resolveHideSignal = res;
+          });
+          const settle = (value) => {
+            if (settled) return;
+            settled = true;
+            auraDetailsSaveAction = null;
+            auraDetailsScaleAction = null;
+            auraDetailsDurationAction = null;
+            auraDetailsLingerToggleAction = null;
+            resolve(value);
+          };
+          const onHidden = () => {
+            if (internalTransition) return;
+            settle(null);
+            modalEl.removeEventListener("hidden.bs.modal", onHidden);
+            resolveHideSignal();
+          };
+          modalEl.addEventListener("hidden.bs.modal", onHidden);
+
+          auraDetailsSaveAction = () => {
+            settle({
+              enabled: true,
+              rangeFeet: Math.max(5, Number(rangeInput.value || 5)),
+              ...(rangeScale ? { rangeScale } : {}),
+              ...(linger.checked ? { lingerDurationConfig } : {}),
+              affectsSource: affectsSource.checked,
+              independentToken: independentToken.checked,
+              ...(light.checked
+                ? { revealMode: "light" }
+                : specialVision.checked
+                  ? { revealMode: "specialVision" }
+                  : {}),
+              targetsEmitAura: Boolean(allowTargetsEmit && targetsEmit.checked),
+            });
+            auraDetailsModal.hide();
+          };
+          auraDetailsLingerToggleAction = updateLingerUi;
+          auraDetailsDurationAction = async () => {
+            if (scaling || settled || !window.PFEffectDurationEditor) return;
+            scaling = true;
+            internalTransition = true;
+            const hidden = new Promise((res) =>
+              modalEl.addEventListener("hidden.bs.modal", res, { once: true }),
+            );
+            auraDetailsModal.hide();
+            await hidden;
+            const durationEditor = new window.PFEffectDurationEditor(
+              `${AURA_DETAILS_MODAL_ID}Linger`,
+            );
+            const durationHidden = new Promise((res) =>
+              durationEditor.modal.addEventListener("hidden.bs.modal", res, {
+                once: true,
+              }),
+            );
+            durationEditor.open(lingerDurationConfig, (config) => {
+              lingerDurationConfig = config;
+              updateLingerUi();
+            });
+            await durationHidden;
+            internalTransition = false;
+            scaling = false;
+            if (!settled) auraDetailsModal.show();
+          };
+          auraDetailsScaleAction = async () => {
+            if (scaling || settled) return;
+            scaling = true;
+            internalTransition = true;
+            const hidden = new Promise((res) =>
+              modalEl.addEventListener("hidden.bs.modal", res, { once: true }),
+            );
+            auraDetailsModal.hide();
+            await hidden;
+            internalTransition = false;
+            rangeScale = await openScaleModal(rangeScale, {
+              title: "Aura Range Scale",
+              attributeSource: "caster",
+              preserveOnCancel: true,
+            });
+            await scaleHideSignal;
+            updateScaleSummary();
+            scaling = false;
+            if (!settled) auraDetailsModal.show();
+          };
+          auraDetailsModal.show();
+        }),
+    );
+  }
+
   // ---------------------------------------------------------------
   // Row builders. Each returns { element, collect(), destroy() }.
   // onDelete lets the caller run its own bookkeeping (accordion
@@ -1416,11 +1843,19 @@
       const text = scaleText(row._bonusScale);
       summaryEl.textContent = text ? `Scales: ${text}` : "";
     };
-    scaleBtn.addEventListener("click", async () => {
+    row._setBonusScale = (scale) => {
+      row._bonusScale = scale || null;
+      updateSummary();
+    };
+    if (scaleBtn._effectScaleClickHandler) {
+      scaleBtn.removeEventListener("click", scaleBtn._effectScaleClickHandler);
+    }
+    scaleBtn._effectScaleClickHandler = async () => {
       const result = await openScaleModal(row._bonusScale);
       row._bonusScale = result;
       updateSummary();
-    });
+    };
+    scaleBtn.addEventListener("click", scaleBtn._effectScaleClickHandler);
     updateSummary();
   }
 
@@ -2031,6 +2466,113 @@
     return { element: row, collect };
   }
 
+  function createWeaponDamageSizeChangeRow(data = {}, { onDelete } = {}) {
+    const row = document.createElement("div");
+    row.className = "shared-weapon-damage-size-row";
+    const rowId = ++weaponDamageSizeRowId;
+    const matchBy = data.matchBy === "type" ? "type" : "name";
+    const weaponName = String(data.weaponName || "").trim();
+    const weaponType =
+      window.PFEffectStats?.normalizeWeaponTypeRestriction?.(
+        data.weaponType || "melee-one-handed",
+      ) || data.weaponType || "melee-one-handed";
+    const sizeSteps = Number(data.sizeSteps) < 0 ? -1 : 1;
+    const weaponTypes = (
+      window.PFEffectStats?.WEAPON_RESTRICTION_OPTIONS || []
+    ).filter((option) => option.value !== "all");
+    row.innerHTML = `
+      <div>
+        <label>Match Weapon By</label>
+        <select data-weapon-damage-size-field="matchBy" class="form-select form-select-sm">
+          <option value="name" ${matchBy === "name" ? "selected" : ""}>Name</option>
+          <option value="type" ${matchBy === "type" ? "selected" : ""}>Type</option>
+        </select>
+      </div>
+      <div data-weapon-damage-size-name>
+        <label>Weapon Name</label>
+        <input data-weapon-damage-size-field="weaponName" class="form-control form-control-sm" list="weaponDamageSizeNames${rowId}" value="${escapeHtml(weaponName)}" placeholder="Dagger">
+        <datalist id="weaponDamageSizeNames${rowId}"></datalist>
+      </div>
+      <div data-weapon-damage-size-type>
+        <label>Weapon Type</label>
+        <select data-weapon-damage-size-field="weaponType" class="form-select form-select-sm">
+          ${weaponTypes
+            .map(
+              (option) =>
+                `<option value="${escapeHtml(option.value)}" ${weaponType === option.value ? "selected" : ""}>${escapeHtml(option.label)}</option>`,
+            )
+            .join("")}
+        </select>
+      </div>
+      <div>
+        <label>Damage Die Size</label>
+        <select data-weapon-damage-size-field="sizeSteps" class="form-select form-select-sm">
+          <option value="1" ${sizeSteps > 0 ? "selected" : ""}>One size larger</option>
+          <option value="-1" ${sizeSteps < 0 ? "selected" : ""}>One size smaller</option>
+        </select>
+      </div>
+      <button class="btn btn-outline-danger btn-sm btn-icon" type="button" aria-label="Delete weapon damage size change"><i class="bi bi-trash"></i></button>
+    `;
+    const matchSelect = row.querySelector(
+      '[data-weapon-damage-size-field="matchBy"]',
+    );
+    const nameWrap = row.querySelector("[data-weapon-damage-size-name]");
+    const typeWrap = row.querySelector("[data-weapon-damage-size-type]");
+    const syncMatch = () => {
+      const byName = matchSelect.value === "name";
+      nameWrap.classList.toggle("d-none", !byName);
+      typeWrap.classList.toggle("d-none", byName);
+    };
+    matchSelect.addEventListener("change", syncMatch);
+    syncMatch();
+    void loadWeaponNameCatalog().then((names) => {
+      const datalist = row.querySelector(`#weaponDamageSizeNames${rowId}`);
+      if (!datalist) return;
+      datalist.innerHTML = names
+        .map((name) => `<option value="${escapeHtml(name)}"></option>`)
+        .join("");
+    });
+    row
+      .querySelector('button[aria-label="Delete weapon damage size change"]')
+      .addEventListener("click", () => {
+        row.remove();
+        onDelete?.();
+      });
+    const collect = () => {
+      const selectedMatch = matchSelect.value === "type" ? "type" : "name";
+      const selectedName = row
+        .querySelector('[data-weapon-damage-size-field="weaponName"]')
+        .value.trim();
+      const selectedType = row.querySelector(
+        '[data-weapon-damage-size-field="weaponType"]',
+      ).value;
+      if (selectedMatch === "name" && !selectedName) return null;
+      return {
+        matchBy: selectedMatch,
+        ...(selectedMatch === "name"
+          ? { weaponName: selectedName }
+          : { weaponType: selectedType }),
+        sizeSteps: Number(
+          row.querySelector('[data-weapon-damage-size-field="sizeSteps"]')
+            .value,
+        ),
+      };
+    };
+    row._collect = collect;
+    return { element: row, collect };
+  }
+
+  function weaponDamageSizeChangeText(entry = {}) {
+    const direction = Number(entry.sizeSteps) < 0 ? "smaller" : "larger";
+    const target =
+      entry.matchBy === "type"
+        ? window.PFEffectStats?.weaponTypeRestrictionLabel?.(
+            entry.weaponType,
+          ) || entry.weaponType
+        : entry.weaponName;
+    return `${target || "Weapon"}: damage as one size ${direction}`;
+  }
+
   function createSpecialEffectToggleRow(config, data = {}, { onChange } = {}) {
     const row = document.createElement("div");
     row.className = "shared-special-toggle-row";
@@ -2306,6 +2848,11 @@
       category: condition.category || "Condition",
       duration: condition.duration || "",
       durationConfig: condition.durationConfig || null,
+      adjustableCondition:
+        condition.adjustableCondition &&
+        typeof condition.adjustableCondition === "object"
+          ? condition.adjustableCondition
+          : null,
       bonuses: Array.isArray(condition.bonuses) ? condition.bonuses : [],
       damageReduction: Array.isArray(condition.damageReduction)
         ? condition.damageReduction
@@ -2353,6 +2900,13 @@
   }
 
   function applyConditionText(entry = {}) {
+    if (window.PFConditionConfig?.isAdjustmentEntry?.(entry)) {
+      const adjustment = window.PFConditionConfig.normalizeAdjustment(entry);
+      const formula = `${adjustment.diceCount ? `${adjustment.diceCount}d${adjustment.dieType}` : ""}${adjustment.staticValue ? `${adjustment.diceCount ? " + " : ""}${adjustment.staticValue}` : ""}` || "0";
+      const diceScale = scaleText(adjustment.diceCountScale);
+      const staticScale = scaleText(adjustment.staticValueScale);
+      return `${adjustment.mode === "heal" ? "Heals" : "Applies"} ${applyConditionName(entry) || "Condition"}: ${formula}${diceScale ? `; dice ${diceScale}` : ""}${staticScale ? `; static ${staticScale}` : ""}`;
+    }
     return `Applies condition: ${applyConditionName(entry) || "Condition"}`;
   }
 
@@ -2361,6 +2915,20 @@
     row.className = "shared-apply-condition-row";
     const selectedId = data.conditionId || data.id || data.condition?.id || "";
     const selectedName = applyConditionName(data);
+    const initialAdjustment =
+      window.PFConditionConfig?.normalizeAdjustment?.(data) || {
+        mode: "apply",
+        ability: "strength",
+        staticValue: 0,
+        diceCount: 0,
+        dieType: 6,
+      };
+    const abilityOptions = (window.PFConditionConfig?.ABILITIES || [])
+      .map(
+        ([value, label]) =>
+          `<option value="${escapeHtml(value)}" ${value === initialAdjustment.ability ? "selected" : ""}>${escapeHtml(label)}</option>`,
+      )
+      .join("");
     row._condition =
       data.condition && typeof data.condition === "object" ? data.condition : null;
     row.innerHTML = `
@@ -2375,9 +2943,81 @@
           }
         </select>
       </div>
+      <div class="shared-condition-adjustment d-none" data-condition-adjustment>
+        <div>
+          <label>Operation</label>
+          <select class="form-select form-select-sm" data-condition-adjustment-field="mode">
+            <option value="apply" ${initialAdjustment.mode === "apply" ? "selected" : ""}>Apply</option>
+            <option value="heal" ${initialAdjustment.mode === "heal" ? "selected" : ""}>Heal</option>
+          </select>
+        </div>
+        <div data-condition-ability-wrap>
+          <label>Ability</label>
+          <select class="form-select form-select-sm" data-condition-adjustment-field="ability">${abilityOptions}</select>
+        </div>
+        <div>
+          <label>Number of Dice</label>
+          ${numberStepperMarkup({ id: "condition-dice", value: initialAdjustment.diceCount, min: 0, inputAttributes: 'data-condition-adjustment-field="diceCount"', label: "number of dice" })}
+        </div>
+        <div>
+          <label>Die</label>
+          <select class="form-select form-select-sm" data-condition-adjustment-field="dieType">${damageDieOptions(initialAdjustment.dieType)}</select>
+        </div>
+        <div>
+          <label>Maximum Dice</label>
+          ${numberStepperMarkup({ id: "condition-dice-maximum", value: initialAdjustment.diceCountMax ?? "", min: 0, inputAttributes: 'data-condition-adjustment-field="diceCountMax" placeholder="No maximum"', label: "maximum condition dice" })}
+        </div>
+        <div data-condition-scale-host="dice">
+          <button class="btn btn-outline-info btn-sm" type="button" data-condition-scale-button>Scale Dice</button>
+          <span class="small text-secondary" data-condition-scale-summary></span>
+        </div>
+        <div class="shared-condition-static-field">
+          <label>Static</label>
+          ${numberStepperMarkup({ id: "condition-static", value: initialAdjustment.staticValue, min: 0, inputAttributes: 'data-condition-adjustment-field="staticValue"', label: "static value" })}
+        </div>
+        <div>
+          <label>Maximum Static</label>
+          ${numberStepperMarkup({ id: "condition-static-maximum", value: initialAdjustment.staticValueMax ?? "", min: 0, inputAttributes: 'data-condition-adjustment-field="staticValueMax" placeholder="No maximum"', label: "maximum condition static value" })}
+        </div>
+        <div data-condition-scale-host="static">
+          <button class="btn btn-outline-info btn-sm" type="button" data-condition-scale-button>Scale Static</button>
+          <span class="small text-secondary" data-condition-scale-summary></span>
+        </div>
+      </div>
       <button class="btn btn-outline-danger btn-sm" type="button" aria-label="Delete applied condition"><i class="bi bi-trash"></i></button>
     `;
     const select = row.querySelector('[data-apply-condition-field="condition"]');
+    const adjustmentWrap = row.querySelector("[data-condition-adjustment]");
+    wireNumberSteppers(row);
+    const conditionDiceScaleHost = row.querySelector(
+      '[data-condition-scale-host="dice"]',
+    );
+    const conditionStaticScaleHost = row.querySelector(
+      '[data-condition-scale-host="static"]',
+    );
+    [
+      [conditionDiceScaleHost, initialAdjustment.diceCountScale],
+      [conditionStaticScaleHost, initialAdjustment.staticValueScale],
+    ].forEach(([host, scale]) =>
+      wireScaleButton(
+        host,
+        scale || null,
+        host.querySelector("[data-condition-scale-summary]"),
+        host.querySelector("[data-condition-scale-button]"),
+      ),
+    );
+    const syncAdjustment = () => {
+      const configurable = window.PFConditionConfig?.isConfigurable?.(
+        row._condition || {},
+      );
+      adjustmentWrap.classList.toggle("d-none", !configurable);
+      row
+        .querySelector("[data-condition-ability-wrap]")
+        ?.classList.toggle(
+          "d-none",
+          !window.PFConditionConfig?.needsAbility?.(row._condition || {}),
+        );
+    };
     loadConditionCatalog()
       .then((conditions) => {
         const selectedValue = selectedId || selectedName;
@@ -2395,6 +3035,7 @@
               return `<option value="${escapeHtml(value)}" ${selected ? "selected" : ""}>${escapeHtml(condition.name)}</option>`;
             })
             .join("");
+        syncAdjustment();
         if (selectedValue && !row._condition) {
           select.insertAdjacentHTML(
             "beforeend",
@@ -2412,7 +3053,9 @@
             String(condition.name).toLowerCase() ===
               String(select.value).toLowerCase(),
         ) || null;
+      syncAdjustment();
     });
+    syncAdjustment();
     row
       .querySelector('button[aria-label="Delete applied condition"]')
       .addEventListener("click", () => {
@@ -2424,11 +3067,33 @@
       const condition = row._condition;
       const name = condition?.name || selectedName || value;
       if (!value && !name) return null;
-      return {
+      const result = {
         conditionId: condition?.id || value || "",
         name,
         condition: compactConditionPayload(condition || data.condition || data),
       };
+      if (window.PFConditionConfig?.isConfigurable?.(condition || {})) {
+        const field = (name) =>
+          row.querySelector(`[data-condition-adjustment-field="${name}"]`);
+        const optionalMaximum = (name) => {
+          const value = field(name)?.value.trim();
+          return value !== "" && Number.isFinite(Number(value))
+            ? Math.max(0, Math.floor(Number(value)))
+            : null;
+        };
+        result.conditionAdjustment = {
+          mode: field("mode").value === "heal" ? "heal" : "apply",
+          ability: field("ability")?.value || "",
+          staticValue: Math.max(0, Math.floor(Number(field("staticValue").value) || 0)),
+          diceCount: Math.max(0, Math.floor(Number(field("diceCount").value) || 0)),
+          dieType: Math.max(2, Math.floor(Number(field("dieType").value) || 6)),
+          diceCountMax: optionalMaximum("diceCountMax"),
+          staticValueMax: optionalMaximum("staticValueMax"),
+          diceCountScale: conditionDiceScaleHost._bonusScale || null,
+          staticValueScale: conditionStaticScaleHost._bonusScale || null,
+        };
+      }
+      return result;
     };
     row._collect = collect;
     return { element: row, collect };
@@ -2500,6 +3165,45 @@
     };
     row._collect = collect;
     return { element: row, collect };
+  }
+
+  function createWeaponExtraDamageRow(data = {}, { onDelete } = {}) {
+    const element = document.createElement("div");
+    element.className = "shared-effect-weapon-damage";
+    element.innerHTML = `
+      <div class="small text-secondary mb-2">
+        The recipient chooses one equipped weapon when this effect is applied.
+      </div>
+      <div data-effect-weapon-damage-editor></div>
+    `;
+    const editor = element.querySelector("[data-effect-weapon-damage-editor]");
+    window.PFWeaponDamage?.mount(editor, [data], { addButton: false });
+    editor.addEventListener(
+      "click",
+      (event) => {
+        if (!event.target.closest("[data-remove-extra-damage]")) return;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        element.remove();
+        onDelete?.();
+      },
+      { capture: true },
+    );
+    element._collect = () => {
+      const damage = window.PFWeaponDamage?.collect(editor)?.[0];
+      if (!damage) return null;
+      return {
+        ...damage,
+        stat: data.stat || "choice:equipped-weapons",
+        ...(data.equipmentTarget
+          ? { equipmentTarget: { ...data.equipmentTarget } }
+          : {}),
+        ...(data.selectedChoiceLabel
+          ? { selectedChoiceLabel: data.selectedChoiceLabel }
+          : {}),
+      };
+    };
+    return { element, collect: element._collect };
   }
 
   function generatedEquipmentType(data = {}) {
@@ -3774,6 +4478,148 @@
     return { element: row, collect: row._collect };
   }
 
+  function attributeContributionTargetOptions(selected = "initiative") {
+    const direct = [
+      ["initiative", "Initiative"],
+      ["ac", "Armor Class"],
+      ["touch ac", "Touch AC"],
+      ["flat-footed ac", "Flat-Footed AC"],
+      ["fortitude", "Fortitude"],
+      ["reflex", "Reflex"],
+      ["will", "Will"],
+      ["cmb", "CMB"],
+      ["cmd", "CMD"],
+      ["hit points", "Hit Points"],
+      ["attack", "Weapon Attack Rolls"],
+      ["damage", "Weapon Damage Rolls"],
+    ];
+    const groups = [
+      ["group:all", "All Attribute-Derived Stats"],
+      ["group:armor-class", "All Armor Class Stats"],
+      ["group:saving-throws", "All Saving Throws"],
+      ["group:combat-maneuvers", "CMB and CMD"],
+      ["group:attacks", "All Weapon Attack Rolls"],
+      ["group:damage", "All Weapon Damage Rolls"],
+      ["group:weapon-rolls", "All Weapon Attack and Damage Rolls"],
+      ["group:skills", "All Skills"],
+      ["group:skills-str", "All STR Skills"],
+      ["group:skills-dex", "All DEX Skills"],
+      ["group:skills-con", "All CON Skills"],
+      ["group:skills-int", "All INT Skills"],
+      ["group:skills-wis", "All WIS Skills"],
+      ["group:skills-cha", "All CHA Skills"],
+    ];
+    const choices = [
+      ["choice:attribute-derived-stats", "Any Attribute-Derived Stat"],
+      ["choice:armor-class-stats", "Any Armor Class Stat"],
+      ["choice:saving-throws", "Any Saving Throw"],
+      ["choice:combat-maneuver-stats", "CMB or CMD"],
+      ["choice:weapon-roll-stats", "Weapon Attack or Damage"],
+      ["choice:skills-all", "Any Skill"],
+      ["choice:skills-str", "Any STR Skill"],
+      ["choice:skills-dex", "Any DEX Skill"],
+      ["choice:skills-con", "Any CON Skill"],
+      ["choice:skills-int", "Any INT Skill"],
+      ["choice:skills-wis", "Any WIS Skill"],
+      ["choice:skills-cha", "Any CHA Skill"],
+    ];
+    const skills = (window.PFEffectStats?.PF_SKILLS_WITH_ABILITY || []).map(
+      (skill) => {
+        const name = Array.isArray(skill) ? skill[0] : skill.name;
+        return [window.PFEffectStats.skillStatValue(name), name];
+      },
+    );
+    const option = ([value, label]) =>
+      `<option value="${escapeHtml(value)}" ${selected === value ? "selected" : ""}>${escapeHtml(label)}</option>`;
+    return `
+      <optgroup label="Specific Stat">${direct.map(option).join("")}</optgroup>
+      <optgroup label="Specific Skill">${skills.map(option).join("")}</optgroup>
+      <optgroup label="Groups">${groups.map(option).join("")}</optgroup>
+      <optgroup label="Player Chooses">${choices.map(option).join("")}</optgroup>
+    `;
+  }
+
+  function createAttributeContributionRow(data = {}, { onDelete, onChange } = {}) {
+    const row = document.createElement("div");
+    row.className = "shared-attribute-contribution-row";
+    const normalized = window.PFEffectMechanics?.normalizeAttributeContribution?.(data) || data;
+    const stat = normalized.stat || "initiative";
+    const weaponTypes = window.PFEffectStats?.WEAPON_RESTRICTION_OPTIONS || [];
+    const nameListId = `attributeContributionWeapons${++weaponDamageSizeRowId}`;
+    row.innerHTML = `
+      <div>
+        <label>Operation</label>
+        <select data-attribute-contribution-field="mode" class="form-select form-select-sm">
+          <option value="add" ${normalized.mode !== "replace" ? "selected" : ""}>Add Attribute</option>
+          <option value="replace" ${normalized.mode === "replace" ? "selected" : ""}>Replace Existing Attributes</option>
+        </select>
+      </div>
+      <div>
+        <label>Attribute</label>
+        <select data-attribute-contribution-field="ability" class="form-select form-select-sm">
+          ${[["str", "STR"], ["dex", "DEX"], ["con", "CON"], ["int", "INT"], ["wis", "WIS"], ["cha", "CHA"]]
+            .map(([value, label]) => `<option value="${value}" ${normalized.ability === value ? "selected" : ""}>${label}</option>`)
+            .join("")}
+        </select>
+      </div>
+      <div class="shared-attribute-contribution-target">
+        <label>Applies To</label>
+        <select data-attribute-contribution-field="stat" class="form-select form-select-sm">
+          ${attributeContributionTargetOptions(stat)}
+        </select>
+      </div>
+      <div data-attribute-contribution-weapon>
+        <label>Weapon Type</label>
+        <select data-attribute-contribution-field="weaponType" class="form-select form-select-sm">
+          ${weaponTypes.map((option) => `<option value="${escapeHtml(option.value)}" ${(normalized.weaponType || "all") === option.value ? "selected" : ""}>${escapeHtml(option.label)}</option>`).join("")}
+        </select>
+      </div>
+      <div data-attribute-contribution-weapon>
+        <label>Weapon Name</label>
+        <input data-attribute-contribution-field="weaponName" class="form-control form-control-sm" list="${nameListId}" value="${escapeHtml(normalized.weaponName || "")}" placeholder="Any weapon">
+        <datalist id="${nameListId}"></datalist>
+      </div>
+      <button class="btn btn-outline-danger btn-sm btn-icon" type="button" aria-label="Delete attribute contribution"><i class="bi bi-trash"></i></button>
+    `;
+    const statSelect = row.querySelector('[data-attribute-contribution-field="stat"]');
+    const syncWeaponFields = () => {
+      const target = statSelect.value;
+      const weaponTarget = ["attack", "damage", "group:attacks", "group:damage", "group:weapon-rolls", "group:all", "choice:attribute-derived-stats", "choice:weapon-roll-stats"].includes(target);
+      row.querySelectorAll("[data-attribute-contribution-weapon]").forEach((field) =>
+        field.classList.toggle("d-none", !weaponTarget),
+      );
+      onChange?.();
+    };
+    statSelect.addEventListener("change", syncWeaponFields);
+    row.addEventListener("input", () => onChange?.());
+    row.addEventListener("change", () => onChange?.());
+    row.querySelector('button[aria-label="Delete attribute contribution"]').addEventListener("click", () => {
+      row.remove();
+      onDelete?.();
+    });
+    void loadWeaponNameCatalog().then((names) => {
+      const datalist = row.querySelector(`#${nameListId}`);
+      if (datalist)
+        datalist.innerHTML = names.map((name) => `<option value="${escapeHtml(name)}"></option>`).join("");
+    });
+    row._collect = () => {
+      const target = statSelect.value;
+      const weaponTarget = ["attack", "damage", "group:attacks", "group:damage", "group:weapon-rolls", "group:all", "choice:attribute-derived-stats", "choice:weapon-roll-stats"].includes(target);
+      return {
+        mode: row.querySelector('[data-attribute-contribution-field="mode"]').value,
+        ability: row.querySelector('[data-attribute-contribution-field="ability"]').value,
+        stat: target,
+        ...(weaponTarget
+          ? {
+              weaponType: row.querySelector('[data-attribute-contribution-field="weaponType"]').value || "all",
+              weaponName: row.querySelector('[data-attribute-contribution-field="weaponName"]').value.trim(),
+            }
+          : {}),
+      };
+    };
+    syncWeaponFields();
+    return { element: row, collect: row._collect };
+  }
   function effectiveAttributeBonusText(entry = {}) {
     const attribute = normalizeAttributeKey(
       entry.attribute || entry.ability || entry.stat || "CHA",
@@ -3847,42 +4693,114 @@
     return { element, collect: element._collect };
   }
 
+  function generatedWeaponFormula(details = {}) {
+    if (window.PFEffectRolls?.weaponFormula)
+      return window.PFEffectRolls.weaponFormula(details);
+    const match = String(details.damage || "").match(
+      /^(\d+)d(\d+)(?:\s*([+-])\s*(\d+))?/i,
+    );
+    return {
+      diceCount: Number(details.diceCount ?? match?.[1] ?? 0),
+      dieType: Number(details.dieType ?? match?.[2] ?? 6),
+      diceCountMax: details.diceCountMax ?? null,
+      staticValue: Number(
+        details.staticDamage ??
+          Number(details.damageMisc || 0) +
+            (match?.[4]
+              ? Number(match[4]) * (match[3] === "-" ? -1 : 1)
+              : 0),
+      ),
+      staticValueMax: details.staticDamageMax ?? null,
+      diceCountScale: details.diceCountScale || null,
+      staticValueScale: details.staticDamageScale || null,
+    };
+  }
+
+  function generatedSmallWeaponFormula(details = {}) {
+    const match = String(details.damageSmall || "").match(/^(\d+)d(\d+)/i);
+    return {
+      diceCount: Number(details.smallDiceCount ?? match?.[1] ?? 0),
+      dieType: Number(details.smallDieType ?? match?.[2] ?? 6),
+    };
+  }
+
   function fillGeneratedEquipmentRow(row, item = {}) {
     const details = generatedEquipmentDetails(item);
+    const formula = generatedWeaponFormula(details);
     const type = generatedEquipmentType(item);
-    row.querySelector('[data-generated-equipment-field="type"]').value = type;
-    row.querySelector('[data-generated-equipment-field="name"]').value =
-      item.name || item.item || "";
-    row.querySelector('[data-generated-equipment-field="weaponType"]').value =
-      details.weaponType || "Natural Weapon";
-    row.querySelector('[data-generated-equipment-field="naturalAttackKind"]').value =
-      details.naturalAttackKind || "Other";
-    row.querySelector('[data-generated-equipment-field="naturalAttackRole"]').value =
-      details.naturalAttackRole || "Primary";
-    row.querySelector('[data-generated-equipment-field="attackScale"]').value =
-      details.attackScale || "STR";
-    row.querySelector('[data-generated-equipment-field="damageScale"]').value =
-      details.damageScale || "STR";
-    row.querySelector('[data-generated-equipment-field="damage"]').value =
-      details.damage || "";
-    row.querySelector('[data-generated-equipment-field="critical"]').value =
-      details.critical || "";
-    row.querySelector('[data-generated-equipment-field="attackMisc"]').value =
-      details.attackMisc || "0";
-    row.querySelector('[data-generated-equipment-field="damageMisc"]').value =
-      details.damageMisc || "0";
-    row.querySelector('[data-generated-equipment-field="range"]').value =
-      details.range || "";
-    row.querySelector('[data-generated-equipment-field="armorBonus"]').value =
-      details.bonus || item.bonus || "";
-    row.querySelector('[data-generated-equipment-field="enhancement"]').value =
-      details.enhancement || item.enhancement || "0";
-    row.querySelector('[data-generated-equipment-field="penalty"]').value =
-      details.penalty || item.penalty || "";
-    row.querySelector('[data-generated-equipment-field="failure"]').value =
-      details.failure || item.failure || "";
-    row.querySelector('[data-generated-equipment-field="weight"]').value =
-      details.weight || item.weight || "";
+    const set = (field, value) => {
+      const input = row.querySelector(
+        `[data-generated-equipment-field="${field}"]`,
+      );
+      if (!input) return;
+      if (input.type === "checkbox") input.checked = Boolean(value);
+      else input.value = value ?? "";
+    };
+    set("type", type);
+    set("name", item.name || item.item || "");
+    set("weaponType", details.weaponType || "Natural Weapon");
+    set("naturalAttackKind", details.naturalAttackKind || "Other");
+    set("naturalAttackRole", details.naturalAttackRole || "Primary");
+    set("attackScale", details.attackScale || "STR");
+    set("damageScale", details.damageScale || "STR");
+    set("diceCount", formula.diceCount);
+    set("dieType", formula.dieType);
+    set("diceCountMax", formula.diceCountMax);
+    set("staticDamage", formula.staticValue);
+    set("staticDamageMax", formula.staticValueMax);
+    const smallFormula = generatedSmallWeaponFormula(details);
+    set("smallDiceCount", smallFormula.diceCount);
+    set("smallDieType", smallFormula.dieType);
+    set("damageType", details.damageType || "");
+    set("critical", details.critical || "");
+    set("attackMisc", details.attackMisc ?? details.attack_misc ?? 0);
+    set("range", details.range || "");
+    set("enhancement", details.enhancement ?? item.enhancement ?? 0);
+    set("armorEnhancement", details.enhancement ?? item.enhancement ?? 0);
+    set("enchantment", details.enchantment || item.enchantment || "");
+    set("awardProficiency", details.awardProficiency);
+    set("proficiencyMode", details.proficiencyMode || "name");
+    set("proficiency", details.proficiency || "");
+    set("babMode", details.babMode || "standard");
+    set("standardBabBonus", details.standardBabBonus ?? 0);
+    set("customBab", details.customBab ?? 0);
+    set("armorBonus", details.bonus ?? item.bonus ?? "");
+    set("penalty", details.penalty ?? item.penalty ?? "");
+    set("failure", details.failure ?? item.failure ?? "");
+    set("weight", details.weight ?? item.weight ?? "");
+    window.PFWeaponDamage?.mount(
+      row.querySelector("[data-generated-extra-damage]"),
+      details.extraDamage,
+    );
+    const naturalDamageHost = row.querySelector("[data-generated-natural-damage]");
+    naturalDamageHost?._setNaturalDamage?.(details.naturalDamageBySize || {});
+    if (
+      naturalDamageHost &&
+      !Object.values(details.naturalDamageBySize || {}).some(Boolean)
+    ) {
+      void naturalDamageHost._setNaturalDamageFromKind?.(
+        details.naturalAttackKind || "Other",
+        { force: true },
+      );
+    }
+    row.querySelector('[data-generated-scale="dice"]')?._setBonusScale?.(
+      formula.diceCountScale,
+    );
+    row.querySelector('[data-generated-scale="static"]')?._setBonusScale?.(
+      formula.staticValueScale,
+    );
+    row.querySelector('[data-generated-scale="enhancement"]')?._setBonusScale?.(
+      details.enhancementScale,
+    );
+    row.querySelector('[data-generated-scale="armor-enhancement"]')?._setBonusScale?.(
+      details.enhancementScale,
+    );
+    row.querySelector('[data-generated-scale="standard-bab"]')?._setBonusScale?.(
+      details.standardBabBonusScale,
+    );
+    row.querySelector('[data-generated-scale="custom-bab"]')?._setBonusScale?.(
+      details.customBabScale,
+    );
     row._sourceItem = item.name
       ? {
           name: item.name,
@@ -3902,6 +4820,8 @@
     row.className = "shared-generated-equipment-row";
     const type = generatedEquipmentType(data);
     const details = generatedEquipmentDetails(data);
+    const smallFormula = generatedSmallWeaponFormula(details);
+    const enchantmentListId = `generatedWeaponEnchantments${++generatedEquipmentRowId}`;
     row.innerHTML = `
       <div class="shared-generated-equipment-header">
         <div>
@@ -3923,57 +4843,181 @@
         </button>
         <button class="btn btn-outline-danger btn-sm" type="button" aria-label="Delete generated equipment"><i class="bi bi-trash"></i></button>
       </div>
-      <div class="shared-generated-equipment-fields" data-generated-equipment-weapon-fields>
-        <div>
-          <label>Weapon Type</label>
-          <select data-generated-equipment-field="weaponType" class="form-select form-select-sm">
-            ${weaponTypeOptionsHtml(details.weaponType || "Natural Weapon")}
-          </select>
-        </div>
-        <div data-generated-equipment-natural-field>
-          <label>Natural Attack</label>
-          <select data-generated-equipment-field="naturalAttackKind" class="form-select form-select-sm">
-            ${simpleOptionsHtml(NATURAL_ATTACK_KINDS, details.naturalAttackKind || "Other")}
-          </select>
-        </div>
-        <div data-generated-equipment-natural-field>
-          <label>Attack Type</label>
-          <select data-generated-equipment-field="naturalAttackRole" class="form-select form-select-sm">
-            ${simpleOptionsHtml(NATURAL_ATTACK_ROLES, details.naturalAttackRole || "Primary")}
-          </select>
-        </div>
-        <div>
-          <label>Damage</label>
-          <input data-generated-equipment-field="damage" class="form-control form-control-sm" value="${escapeHtml(details.damage || "")}" placeholder="1d6">
-        </div>
-        <div>
-          <label>Critical</label>
-          <input data-generated-equipment-field="critical" class="form-control form-control-sm" value="${escapeHtml(details.critical || "")}" placeholder="x2">
-        </div>
-        <div>
-          <label>Attack Scale</label>
-          <select data-generated-equipment-field="attackScale" class="form-select form-select-sm">
-            ${scaleOptionsHtml(details.attackScale || "STR")}
-          </select>
-        </div>
-        <div>
-          <label>Damage Scale</label>
-          <select data-generated-equipment-field="damageScale" class="form-select form-select-sm">
-            ${scaleOptionsHtml(details.damageScale || "STR")}
-          </select>
-        </div>
-        <div>
-          <label>Attack Misc</label>
-          <input data-generated-equipment-field="attackMisc" class="form-control form-control-sm" type="number" value="${details.attackMisc ?? details.attack_misc ?? 0}">
-        </div>
-        <div>
-          <label>Damage Misc</label>
-          <input data-generated-equipment-field="damageMisc" class="form-control form-control-sm" type="number" value="${details.damageMisc ?? details.damage_misc ?? 0}">
-        </div>
-        <div>
-          <label>Range</label>
-          <input data-generated-equipment-field="range" class="form-control form-control-sm" value="${escapeHtml(details.range || "")}">
-        </div>
+      <div class="shared-generated-equipment-weapon-layout" data-generated-equipment-weapon-fields>
+        <section class="shared-generated-equipment-section">
+          <h6>Weapon</h6>
+          <div class="shared-generated-equipment-grid">
+            <div>
+              <label>Weapon Type</label>
+              <select data-generated-equipment-field="weaponType" class="form-select form-select-sm">
+                ${weaponTypeOptionsHtml(details.weaponType || "Natural Weapon")}
+              </select>
+            </div>
+            <div data-generated-equipment-natural-field>
+              <label>Natural Attack</label>
+              <select data-generated-equipment-field="naturalAttackKind" class="form-select form-select-sm">
+                <option value="${escapeHtml(details.naturalAttackKind || "Other")}">${escapeHtml(details.naturalAttackKind || "Other")}</option>
+              </select>
+            </div>
+            <div data-generated-equipment-natural-field>
+              <label>Attack Type</label>
+              <select data-generated-equipment-field="naturalAttackRole" class="form-select form-select-sm">
+                ${simpleOptionsHtml(NATURAL_ATTACK_ROLES, details.naturalAttackRole || "Primary")}
+              </select>
+            </div>
+            <div>
+              <label>Critical</label>
+              <input data-generated-equipment-field="critical" class="form-control form-control-sm" value="${escapeHtml(details.critical || "")}" placeholder="20/x2">
+            </div>
+            <div>
+              <label>Range</label>
+              <input data-generated-equipment-field="range" class="form-control form-control-sm" value="${escapeHtml(details.range || "")}">
+            </div>
+            <div>
+              <label>Damage Type</label>
+              <input data-generated-equipment-field="damageType" class="form-control form-control-sm" value="${escapeHtml(details.damageType || "")}" placeholder="Slashing">
+            </div>
+          </div>
+        </section>
+
+        <section class="shared-generated-equipment-section">
+          <h6>Damage</h6>
+          <div class="shared-generated-equipment-grid shared-generated-damage-grid">
+            <div data-generated-equipment-standard-size-field>
+              <label>Number of Dice</label>
+              ${numberStepperMarkup({ id: "generated-weapon-dice", value: generatedWeaponFormula(details).diceCount, min: 0, inputAttributes: 'data-generated-equipment-field="diceCount"', label: "number of weapon dice" })}
+            </div>
+            <div data-generated-equipment-standard-size-field>
+              <label>Die</label>
+              <select data-generated-equipment-field="dieType" class="form-select form-select-sm">${damageDieOptions(generatedWeaponFormula(details).dieType)}</select>
+            </div>
+            <div>
+              <label>Maximum Dice</label>
+              ${numberStepperMarkup({ id: "generated-weapon-dice-max", value: generatedWeaponFormula(details).diceCountMax ?? "", min: 0, inputAttributes: 'data-generated-equipment-field="diceCountMax" placeholder="No maximum"', label: "maximum weapon dice" })}
+            </div>
+            <div class="shared-generated-scale-control" data-generated-scale="dice">
+              <button class="btn btn-outline-info btn-sm" type="button" data-generated-scale-button>Scale Dice</button>
+              <span class="small text-secondary" data-generated-scale-summary></span>
+            </div>
+            <div>
+              <label>Static Damage</label>
+              ${numberStepperMarkup({ id: "generated-weapon-static", value: generatedWeaponFormula(details).staticValue, inputAttributes: 'data-generated-equipment-field="staticDamage"', label: "static weapon damage" })}
+            </div>
+            <div>
+              <label>Maximum Static</label>
+              ${numberStepperMarkup({ id: "generated-weapon-static-max", value: generatedWeaponFormula(details).staticValueMax ?? "", min: 0, inputAttributes: 'data-generated-equipment-field="staticDamageMax" placeholder="No maximum"', label: "maximum static weapon damage" })}
+            </div>
+            <div class="shared-generated-scale-control" data-generated-scale="static">
+              <button class="btn btn-outline-info btn-sm" type="button" data-generated-scale-button>Scale Static</button>
+              <span class="small text-secondary" data-generated-scale-summary></span>
+            </div>
+            <div>
+              <label>Damage Ability</label>
+              <select data-generated-equipment-field="damageScale" class="form-select form-select-sm">
+                ${scaleOptionsHtml(details.damageScale || "STR")}
+              </select>
+            </div>
+            <div data-generated-equipment-standard-size-field>
+              <label>Small Number of Dice</label>
+              ${numberStepperMarkup({ id: "generated-small-weapon-dice", value: smallFormula.diceCount, min: 0, inputAttributes: 'data-generated-equipment-field="smallDiceCount"', label: "number of small weapon dice" })}
+            </div>
+            <div data-generated-equipment-standard-size-field>
+              <label>Small Die</label>
+              <select data-generated-equipment-field="smallDieType" class="form-select form-select-sm">${damageDieOptions(smallFormula.dieType)}</select>
+            </div>
+            <div class="natural-damage-editor-wrap" data-generated-equipment-natural-field>
+              <label>Natural Damage by Size</label>
+              <div data-generated-natural-damage></div>
+            </div>
+          </div>
+          <div class="shared-generated-extra-damage">
+            <h6>Extra Damage</h6>
+            <div data-generated-extra-damage></div>
+          </div>
+        </section>
+
+        <section class="shared-generated-equipment-section">
+          <h6>Magic</h6>
+          <div class="shared-generated-equipment-grid shared-generated-enhancement-grid">
+            <div>
+              <label>Enhancement</label>
+              ${numberStepperMarkup({ id: "generated-weapon-enhancement", value: details.enhancement ?? 0, min: 0, inputAttributes: 'data-generated-equipment-field="enhancement"', label: "weapon enhancement" })}
+            </div>
+            <div class="shared-generated-scale-control" data-generated-scale="enhancement">
+              <button class="btn btn-outline-info btn-sm" type="button" data-generated-scale-button>Scale Enhancement</button>
+            </div>
+            <div class="shared-generated-wide-field">
+              <label>Enchantments</label>
+              <input data-generated-equipment-field="enchantment" class="form-control form-control-sm" list="${enchantmentListId}" value="${escapeHtml(details.enchantment || "")}" placeholder="Start typing an enchantment" autocomplete="off">
+              <datalist id="${enchantmentListId}">
+                ${GENERATED_WEAPON_ENCHANTMENTS.map((enchantment) => `<option value="${escapeHtml(enchantment)}"></option>`).join("")}
+              </datalist>
+            </div>
+            <div class="small text-secondary shared-generated-enhancement-summary" data-generated-scale-summary-for="enhancement"></div>
+          </div>
+        </section>
+
+        <section class="shared-generated-equipment-section">
+          <h6>Attack Basis</h6>
+          <div class="shared-generated-equipment-grid">
+            <div>
+              <label>Attack Ability</label>
+              <select data-generated-equipment-field="attackScale" class="form-select form-select-sm">
+                ${scaleOptionsHtml(details.attackScale || "STR")}
+              </select>
+            </div>
+            <div>
+              <label>BAB Source</label>
+              <select data-generated-equipment-field="babMode" class="form-select form-select-sm">
+                <option value="standard" ${(details.babMode || "standard") === "standard" ? "selected" : ""}>Standard BAB + Bonus</option>
+                <option value="custom" ${details.babMode === "custom" ? "selected" : ""}>Custom BAB</option>
+              </select>
+            </div>
+            <div data-generated-standard-bab-field>
+              <label>Standard BAB Bonus</label>
+              ${numberStepperMarkup({ id: "generated-standard-bab", value: details.standardBabBonus ?? 0, inputAttributes: 'data-generated-equipment-field="standardBabBonus"', label: "standard BAB bonus" })}
+            </div>
+            <div class="shared-generated-scale-control" data-generated-scale="standard-bab" data-generated-standard-bab-field>
+              <button class="btn btn-outline-info btn-sm" type="button" data-generated-scale-button>Scale BAB Bonus</button>
+              <span class="small text-secondary" data-generated-scale-summary></span>
+            </div>
+            <div data-generated-custom-bab-field>
+              <label>Custom BAB</label>
+              ${numberStepperMarkup({ id: "generated-custom-bab", value: details.customBab ?? 0, min: 0, inputAttributes: 'data-generated-equipment-field="customBab"', label: "custom BAB" })}
+            </div>
+            <div class="shared-generated-scale-control" data-generated-scale="custom-bab" data-generated-custom-bab-field>
+              <button class="btn btn-outline-info btn-sm" type="button" data-generated-scale-button>Scale Custom BAB</button>
+              <span class="small text-secondary" data-generated-scale-summary></span>
+            </div>
+            <div>
+              <label>Attack Misc</label>
+              ${numberStepperMarkup({ id: "generated-attack-misc", value: details.attackMisc ?? details.attack_misc ?? 0, inputAttributes: 'data-generated-equipment-field="attackMisc"', label: "weapon attack misc" })}
+            </div>
+          </div>
+        </section>
+
+        <section class="shared-generated-equipment-section">
+          <h6>Proficiency</h6>
+          <div class="shared-generated-equipment-grid">
+            <div class="shared-generated-toggle">
+              <label>Award Proficiency</label>
+              <div class="form-check form-switch">
+                <input data-generated-equipment-field="awardProficiency" class="form-check-input" type="checkbox" ${details.awardProficiency ? "checked" : ""}>
+              </div>
+            </div>
+            <div data-generated-proficiency-field>
+              <label>Award For</label>
+              <select data-generated-equipment-field="proficiencyMode" class="form-select form-select-sm">
+                <option value="name" ${(details.proficiencyMode || "name") === "name" ? "selected" : ""}>This Weapon</option>
+                <option value="type" ${details.proficiencyMode === "type" ? "selected" : ""}>Proficiency Type</option>
+              </select>
+            </div>
+            <div data-generated-proficiency-field data-generated-proficiency-type-field>
+              <label>Proficiency Type</label>
+              <input data-generated-equipment-field="proficiency" class="form-control form-control-sm" value="${escapeHtml(details.proficiency || "")}" placeholder="Simple, Martial, Exotic">
+            </div>
+          </div>
+        </section>
       </div>
       <div class="shared-generated-equipment-fields" data-generated-equipment-armor-fields>
         <div>
@@ -3982,8 +5026,12 @@
         </div>
         <div>
           <label>Enhancement</label>
-          <input data-generated-equipment-field="enhancement" class="form-control form-control-sm" type="number" value="${details.enhancement ?? data.enhancement ?? 0}">
+          ${numberStepperMarkup({ id: "generated-armor-enhancement", value: details.enhancement ?? data.enhancement ?? 0, min: 0, inputAttributes: 'data-generated-equipment-field="armorEnhancement"', label: "armor enhancement" })}
         </div>
+        <div class="shared-generated-scale-control" data-generated-scale="armor-enhancement">
+          <button class="btn btn-outline-info btn-sm" type="button" data-generated-scale-button>Scale Enhancement</button>
+        </div>
+        <div class="small text-secondary shared-generated-enhancement-summary" data-generated-scale-summary-for="armor-enhancement"></div>
         <div>
           <label>Penalty</label>
           <input data-generated-equipment-field="penalty" class="form-control form-control-sm" value="${escapeHtml(details.penalty || data.penalty || "")}">
@@ -3998,6 +5046,59 @@
         </div>
       </div>
     `;
+    wireNumberSteppers(row);
+    const naturalDamageHost = row.querySelector("[data-generated-natural-damage]");
+    window.PFNaturalWeapons?.mount(
+      naturalDamageHost,
+      details.naturalDamageBySize,
+      {
+        onChange: (damageBySize) => {
+          const match = String(damageBySize.medium || "").match(/^(\d+)d(\d+)$/i);
+          if (!match) return;
+          const diceCountInput = row.querySelector(
+            '[data-generated-equipment-field="diceCount"]',
+          );
+          const dieTypeInput = row.querySelector(
+            '[data-generated-equipment-field="dieType"]',
+          );
+          if (diceCountInput) diceCountInput.value = match[1];
+          if (dieTypeInput) dieTypeInput.value = match[2];
+        },
+      },
+    );
+    void window.PFNaturalWeapons?.populateKindSelect?.(
+      row.querySelector('[data-generated-equipment-field="naturalAttackKind"]'),
+      details.naturalAttackKind || "Other",
+    );
+    if (!Object.values(details.naturalDamageBySize || {}).some(Boolean)) {
+      void naturalDamageHost?._setNaturalDamageFromKind?.(
+        details.naturalAttackKind || "Other",
+        { force: true },
+      );
+    }
+    window.PFWeaponDamage?.mount(
+      row.querySelector("[data-generated-extra-damage]"),
+      details.extraDamage,
+    );
+    const scaleDefinitions = [
+      ["dice", generatedWeaponFormula(details).diceCountScale],
+      ["static", generatedWeaponFormula(details).staticValueScale],
+      ["enhancement", details.enhancementScale],
+      ["armor-enhancement", details.enhancementScale],
+      ["standard-bab", details.standardBabBonusScale],
+      ["custom-bab", details.customBabScale],
+    ];
+    scaleDefinitions.forEach(([key, scale]) => {
+      const host = row.querySelector(`[data-generated-scale="${key}"]`);
+      if (!host) return;
+      wireScaleButton(
+        host,
+        scale || null,
+        host.querySelector("[data-generated-scale-summary]") ||
+          row.querySelector(`[data-generated-scale-summary-for="${key}"]`),
+        host.querySelector("[data-generated-scale-button]"),
+      );
+    });
     const syncType = () => {
       const selected = row.querySelector(
         '[data-generated-equipment-field="type"]',
@@ -4015,6 +5116,40 @@
       row
         .querySelectorAll("[data-generated-equipment-natural-field]")
         .forEach((field) => field.classList.toggle("d-none", !natural));
+      row
+        .querySelectorAll("[data-generated-equipment-standard-size-field]")
+        .forEach((field) => field.classList.toggle("d-none", natural));
+      const customBab =
+        row.querySelector('[data-generated-equipment-field="babMode"]')?.value ===
+        "custom";
+      row
+        .querySelectorAll("[data-generated-standard-bab-field]")
+        .forEach((field) => field.classList.toggle("d-none", customBab));
+      row
+        .querySelectorAll("[data-generated-custom-bab-field]")
+        .forEach((field) => field.classList.toggle("d-none", !customBab));
+      const awardsProficiency = Boolean(
+        row.querySelector(
+          '[data-generated-equipment-field="awardProficiency"]',
+        )?.checked,
+      );
+      row
+        .querySelectorAll("[data-generated-proficiency-field]")
+        .forEach((field) =>
+          field.classList.toggle("d-none", !awardsProficiency),
+        );
+      const proficiencyByType =
+        row.querySelector(
+          '[data-generated-equipment-field="proficiencyMode"]',
+        )?.value === "type";
+      row
+        .querySelectorAll("[data-generated-proficiency-type-field]")
+        .forEach((field) =>
+          field.classList.toggle(
+            "d-none",
+            !awardsProficiency || !proficiencyByType,
+          ),
+        );
     };
     row.addEventListener("generated-equipment:typechange", syncType);
     row
@@ -4022,6 +5157,31 @@
       .addEventListener("change", syncType);
     row
       .querySelector('[data-generated-equipment-field="weaponType"]')
+      .addEventListener("change", syncType);
+    row
+      .querySelector('[data-generated-equipment-field="naturalAttackKind"]')
+      .addEventListener("change", async (event) => {
+        const entry = await window.PFNaturalWeapons?.attack?.(event.target.value);
+        await naturalDamageHost?._setNaturalDamageFromKind?.(
+          event.target.value,
+          { force: true },
+        );
+        if (!entry) return;
+        row.querySelector(
+          '[data-generated-equipment-field="naturalAttackRole"]',
+        ).value = entry.details?.naturalAttackRole || "Primary";
+        row.querySelector(
+          '[data-generated-equipment-field="damageType"]',
+        ).value = entry.details?.damageType || "";
+      });
+    row
+      .querySelector('[data-generated-equipment-field="babMode"]')
+      .addEventListener("change", syncType);
+    row
+      .querySelector('[data-generated-equipment-field="awardProficiency"]')
+      .addEventListener("change", syncType);
+    row
+      .querySelector('[data-generated-equipment-field="proficiencyMode"]')
       .addEventListener("change", syncType);
     row
       .querySelector("[data-generated-equipment-search]")
@@ -4048,38 +5208,88 @@
         .value.trim();
       if (!name) return null;
       if (selectedType === "Weapon") {
+        const value = (field) =>
+          row.querySelector(
+            `[data-generated-equipment-field="${field}"]`,
+          )?.value ?? "";
+        const checked = (field) =>
+          Boolean(
+            row.querySelector(
+              `[data-generated-equipment-field="${field}"]`,
+            )?.checked,
+          );
+        const optionalNumber = (field) =>
+          value(field) === "" ? null : Number(value(field));
+        const natural = value("weaponType") === "Natural Weapon";
+        const naturalDamageBySize = natural
+          ? window.PFNaturalWeapons?.collect(naturalDamageHost) || {}
+          : {};
+        const naturalMediumMatch = String(
+          naturalDamageBySize.medium || "",
+        ).match(/^(\d+)d(\d+)$/i);
+        const diceCount = natural
+          ? Number(naturalMediumMatch?.[1] || 0)
+          : Number(value("diceCount") || 0);
+        const dieType = natural
+          ? Number(naturalMediumMatch?.[2] || value("dieType") || 6)
+          : Number(value("dieType") || 6);
+        const smallDiceCount = Number(value("smallDiceCount") || 0);
+        const smallDieType = Number(value("smallDieType") || 6);
         return {
           type: "Weapon",
           name,
           details: {
-            weaponType: row.querySelector(
-              '[data-generated-equipment-field="weaponType"]',
-            ).value,
-            naturalAttackKind: row.querySelector(
-              '[data-generated-equipment-field="naturalAttackKind"]',
-            ).value,
-            naturalAttackRole: row.querySelector(
-              '[data-generated-equipment-field="naturalAttackRole"]',
-            ).value,
-            attackScale: row.querySelector(
-              '[data-generated-equipment-field="attackScale"]',
-            ).value,
-            damageScale: row.querySelector(
-              '[data-generated-equipment-field="damageScale"]',
-            ).value,
-            damage: row.querySelector('[data-generated-equipment-field="damage"]')
-              .value,
-            critical: row.querySelector(
-              '[data-generated-equipment-field="critical"]',
-            ).value,
-            attackMisc: row.querySelector(
-              '[data-generated-equipment-field="attackMisc"]',
-            ).value,
-            damageMisc: row.querySelector(
-              '[data-generated-equipment-field="damageMisc"]',
-            ).value,
-            range: row.querySelector('[data-generated-equipment-field="range"]')
-              .value,
+            weaponType: value("weaponType"),
+            naturalAttackKind: value("naturalAttackKind"),
+            naturalAttackRole: value("naturalAttackRole"),
+            attackScale: value("attackScale"),
+            damageScale: value("damageScale"),
+            damage: natural
+              ? naturalDamageBySize.medium || ""
+              : diceCount
+                ? `${diceCount}d${dieType}`
+                : "",
+            ...(natural ? { naturalDamageBySize } : {}),
+            diceCount,
+            dieType,
+            diceCountMax: optionalNumber("diceCountMax"),
+            diceCountScale:
+              row.querySelector('[data-generated-scale="dice"]')
+                ?._bonusScale || null,
+            staticDamage: Number(value("staticDamage") || 0),
+            staticDamageMax: optionalNumber("staticDamageMax"),
+            staticDamageScale:
+              row.querySelector('[data-generated-scale="static"]')
+                ?._bonusScale || null,
+            damageSmall: smallDiceCount
+              ? `${smallDiceCount}d${smallDieType}`
+              : "",
+            smallDiceCount,
+            smallDieType,
+            damageType: value("damageType"),
+            extraDamage: window.PFWeaponDamage?.collect(
+              row.querySelector("[data-generated-extra-damage]"),
+            ) || [],
+            critical: value("critical"),
+            attackMisc: Number(value("attackMisc") || 0),
+            range: value("range"),
+            enhancement: Number(value("enhancement") || 0),
+            enhancementScale:
+              row.querySelector('[data-generated-scale="enhancement"]')
+                ?._bonusScale || null,
+            enchantment: value("enchantment"),
+            awardProficiency: checked("awardProficiency"),
+            proficiencyMode: value("proficiencyMode") || "name",
+            proficiency: value("proficiency"),
+            babMode: value("babMode") || "standard",
+            standardBabBonus: Number(value("standardBabBonus") || 0),
+            standardBabBonusScale:
+              row.querySelector('[data-generated-scale="standard-bab"]')
+                ?._bonusScale || null,
+            customBab: Number(value("customBab") || 0),
+            customBabScale:
+              row.querySelector('[data-generated-scale="custom-bab"]')
+                ?._bonusScale || null,
           },
         };
       }
@@ -4090,8 +5300,17 @@
           bonus: row.querySelector('[data-generated-equipment-field="armorBonus"]')
             .value,
           enhancement: row.querySelector(
-            '[data-generated-equipment-field="enhancement"]',
-          ).value,
+            '[data-generated-equipment-field="armorEnhancement"]',
+          ).value === ""
+            ? 0
+            : Number(
+                row.querySelector(
+                  '[data-generated-equipment-field="armorEnhancement"]',
+                ).value,
+              ),
+          enhancementScale:
+            row.querySelector('[data-generated-scale="armor-enhancement"]')
+              ?._bonusScale || null,
           penalty: row.querySelector('[data-generated-equipment-field="penalty"]')
             .value,
           failure: row.querySelector('[data-generated-equipment-field="failure"]')
@@ -4251,11 +5470,11 @@ function damageProfileMarkup(data = {}, { conditional = false } = {}) {
           : `<div class="small text-secondary mb-2">Standard damage</div>`
       }
       <div class="shared-damage-profile-grid">
-        <div><label>Number of Dice</label><input class="form-control form-control-sm" type="number" min="0" data-damage-field="diceCount" value="${Math.max(0, Number(data.diceCount || 0))}"></div>
+        <div><label>Number of Dice</label>${numberStepperMarkup({ id: "damage-dice-count", value: Math.max(0, Number(data.diceCount || 0)), min: 0, inputAttributes: 'data-damage-field="diceCount"', label: "number of damage dice" })}</div>
         <div><label>Die</label><select class="form-select form-select-sm" data-damage-field="dieType">${damageDieOptions(data.dieType || 6)}</select></div>
-        <div><label>Maximum Dice</label><input class="form-control form-control-sm" type="number" min="0" data-damage-field="diceCountMax" value="${maximum(data.diceCountMax)}" placeholder="No maximum"></div>
-        <div><label>Static Damage</label><input class="form-control form-control-sm" type="number" data-damage-field="staticDamage" value="${Number(data.staticDamage || 0)}"></div>
-        <div><label>Maximum Static</label><input class="form-control form-control-sm" type="number" min="0" data-damage-field="staticDamageMax" value="${maximum(data.staticDamageMax)}" placeholder="No maximum"></div>
+        <div><label>Maximum Dice</label>${numberStepperMarkup({ id: "damage-dice-max", value: maximum(data.diceCountMax), min: 0, inputAttributes: 'data-damage-field="diceCountMax" placeholder="No maximum"', label: "maximum damage dice" })}</div>
+        <div><label>Static Damage</label>${numberStepperMarkup({ id: "damage-static", value: Number(data.staticDamage || 0), inputAttributes: 'data-damage-field="staticDamage"', label: "static damage" })}</div>
+        <div><label>Maximum Static</label>${numberStepperMarkup({ id: "damage-static-max", value: maximum(data.staticDamageMax), min: 0, inputAttributes: 'data-damage-field="staticDamageMax" placeholder="No maximum"', label: "maximum static damage" })}</div>
         <div><label>Damage Type</label><input class="form-control form-control-sm" list="sharedDamageTypes" data-damage-field="damageType" value="${escapeHtml(data.damageType || "untyped")}" placeholder="fire"></div>
       </div>
       <div class="shared-damage-scale-row">
@@ -4266,6 +5485,7 @@ function damageProfileMarkup(data = {}, { conditional = false } = {}) {
 }
 
 function wireDamageProfile(profile, data = {}) {
+  wireNumberSteppers(profile);
   const diceHost = profile.querySelector('[data-damage-scale-host="dice"]');
   const staticHost = profile.querySelector('[data-damage-scale-host="static"]');
   wireScaleButton(
@@ -4315,7 +5535,9 @@ function createDamageRollRow(data = {}, { onDelete, onChange } = {}) {
   row.innerHTML = `
     <div class="shared-damage-roll-heading">
       <div><label>Roll Name</label><input class="form-control form-control-sm" data-damage-roll-label value="${escapeHtml(data.label || "Damage")}" placeholder="Ray damage"></div>
-      <button class="btn btn-outline-danger btn-sm btn-icon" type="button" data-delete-damage-roll aria-label="Delete damage roll"><i class="bi bi-trash"></i></button>
+      <div class="shared-mechanic-row-actions">
+        <button class="btn btn-outline-danger btn-sm btn-icon" type="button" data-delete-damage-roll aria-label="Delete damage roll"><i class="bi bi-trash"></i></button>
+      </div>
     </div>
     <div data-damage-standard>${damageProfileMarkup(data)}</div>
     <div class="shared-damage-conditionals">
@@ -4362,6 +5584,211 @@ function createDamageRollRow(data = {}, { onDelete, onChange } = {}) {
   return { element: row, collect: row._collect };
 }
 
+let attackEditorSequence = 0;
+
+function createAttackRollRow(
+  data = {},
+  { onDelete, onChange, skills, effectStats, titleCaseStat: formatStat } = {},
+) {
+  const row = document.createElement("div");
+  const sequence = ++attackEditorSequence;
+  const editorPrefix = `SharedAttack${sequence}`;
+  const hasStoredCustomBab =
+    data.customBab !== null &&
+    data.customBab !== undefined &&
+    (Number(data.customBab) !== 0 || Boolean(data.customBabScale));
+  const customBab = hasStoredCustomBab ? Number(data.customBab) : "";
+  row.className = "shared-attack-roll-row";
+  row.innerHTML = `
+    <div class="shared-attack-roll-heading">
+      <div><label>Attack Name</label><input class="form-control form-control-sm" data-attack-field="label" value="${escapeHtml(data.label || "Attack")}" placeholder="Ray attack"></div>
+      <div class="shared-mechanic-row-actions">
+        <button class="btn btn-outline-danger btn-sm btn-icon" type="button" data-delete-attack-roll aria-label="Delete attack roll"><i class="bi bi-trash"></i></button>
+      </div>
+    </div>
+    <div class="shared-attack-roll-grid">
+      <div><label>Number of Attacks</label><input class="form-control form-control-sm" type="number" min="1" data-attack-field="attackCount" value="${Math.max(1, Number(data.attackCount || 1))}"></div>
+      <div><label>Roll Type</label><select class="form-select form-select-sm" data-attack-field="attackType">
+        <option value="melee"${data.attackType === "melee" ? " selected" : ""}>Melee Attack</option>
+        <option value="ranged"${data.attackType === "ranged" ? " selected" : ""}>Ranged Attack</option>
+        <option value="melee-touch"${!data.attackType || data.attackType === "melee-touch" ? " selected" : ""}>Melee Touch Attack</option>
+        <option value="ranged-touch"${data.attackType === "ranged-touch" ? " selected" : ""}>Ranged Touch Attack</option>
+        <option value="cmb-bull-rush"${data.attackType === "cmb-bull-rush" ? " selected" : ""}>Bull Rush</option>
+        <option value="cmb-dirty-trick"${data.attackType === "cmb-dirty-trick" ? " selected" : ""}>Dirty Trick</option>
+        <option value="cmb-disarm"${data.attackType === "cmb-disarm" ? " selected" : ""}>Disarm</option>
+        <option value="cmb-drag"${data.attackType === "cmb-drag" ? " selected" : ""}>Drag</option>
+        <option value="cmb-grapple"${data.attackType === "cmb-grapple" ? " selected" : ""}>Grapple</option>
+        <option value="cmb-overrun"${data.attackType === "cmb-overrun" ? " selected" : ""}>Overrun</option>
+        <option value="cmb-reposition"${data.attackType === "cmb-reposition" ? " selected" : ""}>Reposition</option>
+        <option value="cmb-steal"${data.attackType === "cmb-steal" ? " selected" : ""}>Steal</option>
+        <option value="cmb-sunder"${data.attackType === "cmb-sunder" ? " selected" : ""}>Sunder</option>
+        <option value="cmb-trip"${data.attackType === "cmb-trip" ? " selected" : ""}>Trip</option>
+      </select></div>
+      <div><label>Ability</label><select class="form-select form-select-sm" data-attack-field="attackAbility">
+        <option value="default"${!data.attackAbility || data.attackAbility === "default" ? " selected" : ""}>Default for Roll</option>
+        <option value="casting"${data.attackAbility === "casting" ? " selected" : ""}>Casting Modifier</option>
+        <option value="str"${data.attackAbility === "str" ? " selected" : ""}>Strength</option>
+        <option value="dex"${data.attackAbility === "dex" ? " selected" : ""}>Dexterity</option>
+        <option value="con"${data.attackAbility === "con" ? " selected" : ""}>Constitution</option>
+        <option value="int"${data.attackAbility === "int" ? " selected" : ""}>Intelligence</option>
+        <option value="wis"${data.attackAbility === "wis" ? " selected" : ""}>Wisdom</option>
+        <option value="cha"${data.attackAbility === "cha" ? " selected" : ""}>Charisma</option>
+      </select></div>
+      <div><label>Custom BAB</label><input class="form-control form-control-sm" type="number" data-attack-field="customBab" value="${escapeHtml(customBab)}" placeholder="Use caster BAB"></div>
+    </div>
+    <div class="shared-attack-scale-row">
+      <div data-attack-scale-host="count"><button class="btn btn-outline-info btn-sm" type="button" data-attack-scale-button>Scale Attacks</button><span class="small text-secondary" data-attack-scale-summary></span></div>
+      <div data-attack-scale-host="original-bab"><button class="btn btn-outline-info btn-sm" type="button" data-attack-scale-button>Scale Original BAB</button><span class="small text-secondary" data-attack-scale-summary></span></div>
+      <div data-attack-scale-host="bab"><button class="btn btn-outline-info btn-sm" type="button" data-attack-scale-button>Scale Custom BAB</button><span class="small text-secondary" data-attack-scale-summary></span></div>
+    </div>
+    <div class="shared-attack-payload-heading">On Success</div>
+    <div data-attack-payload></div>`;
+
+  const countHost = row.querySelector('[data-attack-scale-host="count"]');
+  const originalBabHost = row.querySelector('[data-attack-scale-host="original-bab"]');
+  const babHost = row.querySelector('[data-attack-scale-host="bab"]');
+  wireScaleButton(
+    countHost,
+    data.attackCountScale || null,
+    countHost.querySelector("[data-attack-scale-summary]"),
+    countHost.querySelector("[data-attack-scale-button]"),
+  );
+  wireScaleButton(
+    originalBabHost,
+    data.originalBabScale || null,
+    originalBabHost.querySelector("[data-attack-scale-summary]"),
+    originalBabHost.querySelector("[data-attack-scale-button]"),
+  );
+  wireScaleButton(
+    babHost,
+    data.customBabScale || null,
+    babHost.querySelector("[data-attack-scale-summary]"),
+    babHost.querySelector("[data-attack-scale-button]"),
+  );
+  const syncBabScaleMode = () => {
+    const usesCustomBab =
+      row.querySelector('[data-attack-field="customBab"]').value !== "";
+    originalBabHost.classList.toggle("d-none", usesCustomBab);
+    babHost.classList.toggle("d-none", !usesCustomBab);
+  };
+  row
+    .querySelector('[data-attack-field="customBab"]')
+    .addEventListener("input", syncBabScaleMode);
+  syncBabScaleMode();
+
+  let payloadEditor = null;
+  const initialize = () => {
+    payloadEditor = mountEffectsAccordion(row.querySelector("[data-attack-payload]"), {
+      idPrefix: editorPrefix,
+      skills,
+      effectStats,
+      titleCaseStat: formatStat,
+      allowAttackRolls: false,
+      onChange,
+    });
+    payloadEditor.reset(data);
+  };
+  row.querySelector("[data-delete-attack-roll]").addEventListener("click", () => {
+    row.remove();
+    onDelete?.();
+  });
+  row.addEventListener("input", () => onChange?.());
+  row.addEventListener("change", () => onChange?.());
+  row._collect = () => {
+    const customBabInput = row.querySelector('[data-attack-field="customBab"]');
+    const hasCustomBab = customBabInput.value !== "";
+    return {
+      id: String(data.id || `attack-${sequence}`),
+      label:
+        row.querySelector('[data-attack-field="label"]').value.trim() ||
+        "Attack",
+      attackCount: Math.max(
+        1,
+        Number(row.querySelector('[data-attack-field="attackCount"]').value) || 1,
+      ),
+      attackCountScale: countHost._bonusScale || null,
+      attackType: row.querySelector('[data-attack-field="attackType"]').value,
+      attackAbility: row.querySelector('[data-attack-field="attackAbility"]').value,
+      originalBabScale: hasCustomBab
+        ? null
+        : originalBabHost._bonusScale || null,
+      customBab: hasCustomBab ? Number(customBabInput.value) : null,
+      customBabScale: hasCustomBab ? babHost._bonusScale || null : null,
+      ...(payloadEditor?.collect?.() || {}),
+    };
+  };
+  return { element: row, collect: row._collect, initialize };
+}
+
+let d20BoostEditorSequence = 0;
+
+function createD20BoostRow(data = {}, { onDelete, onChange } = {}) {
+  const row = document.createElement("div");
+  const sequence = ++d20BoostEditorSequence;
+  const appliesTo = new Set(
+    Array.isArray(data.appliesTo) && data.appliesTo.length ? data.appliesTo : ["all"],
+  );
+  const scopeOptions = [
+    ["all", "All"], ["attacks", "Attacks"], ["saves", "Saves"],
+    ["skills", "Skill Checks"], ["cmb", "CMB Checks"],
+    ["cmd", "CMD Checks"], ["abilities", "Ability Checks"],
+  ];
+  row.className = "shared-d20-boost-row";
+  row.innerHTML = `
+    <div class="shared-d20-boost-heading">
+      <div><label>Name</label><input class="form-control form-control-sm" data-d20-boost-field="label" value="${escapeHtml(data.label || "Boost d20")}"></div>
+      <div class="shared-mechanic-row-actions">
+        <button class="btn btn-outline-danger btn-sm btn-icon" type="button" data-delete-d20-boost aria-label="Delete d20 boost"><i class="bi bi-trash"></i></button>
+      </div>
+    </div>
+    <div class="shared-d20-boost-grid">
+      <div><label>Number of Dice</label>${numberStepperMarkup({ id: `d20-boost-dice-${sequence}`, value: Math.max(0, Number(data.diceCount || 0)), min: 0, inputAttributes: 'data-d20-boost-field="diceCount"', label: "number of boost dice" })}</div>
+      <div><label>Die</label><select class="form-select form-select-sm" data-d20-boost-field="dieType">${damageDieOptions(data.dieType || 6)}</select></div>
+      <div><label>Static</label>${numberStepperMarkup({ id: `d20-boost-static-${sequence}`, value: Number(data.staticValue || 0), inputAttributes: 'data-d20-boost-field="staticValue"', label: "static boost" })}</div>
+      <div><label>Uses</label>${numberStepperMarkup({ id: `d20-boost-uses-${sequence}`, value: Math.max(0, Number(data.uses ?? 1)), min: 0, inputAttributes: 'data-d20-boost-field="uses"', label: "boost uses" })}</div>
+      <div><label>Times Per</label><select class="form-select form-select-sm" data-d20-boost-field="usesPeriod"><option value="day"${(data.usesPeriod || "day") === "day" ? " selected" : ""}>Day</option><option value="effect"${data.usesPeriod === "effect" ? " selected" : ""}>Effect</option><option value="rage"${data.usesPeriod === "rage" ? " selected" : ""}>Rage / Raging Song</option></select></div>
+      <div><label>Bonus Type</label><select class="form-select form-select-sm" data-d20-boost-field="bonusType">${BONUS_TYPES.map((type) => `<option value="${escapeHtml(type)}" ${(data.bonusType || "untyped") === type ? " selected" : ""}>${escapeHtml(type)}</option>`).join("")}</select></div>
+    </div>
+    <div class="shared-d20-boost-scales">
+      <div data-d20-boost-scale-host="dice"><button class="btn btn-outline-info btn-sm" type="button" data-d20-boost-scale>Scale Dice</button><span class="small text-secondary" data-d20-boost-scale-summary></span></div>
+      <div data-d20-boost-scale-host="static"><button class="btn btn-outline-info btn-sm" type="button" data-d20-boost-scale>Scale Static</button><span class="small text-secondary" data-d20-boost-scale-summary></span></div>
+      <div data-d20-boost-scale-host="uses"><button class="btn btn-outline-info btn-sm" type="button" data-d20-boost-scale>Scale Uses</button><span class="small text-secondary" data-d20-boost-scale-summary></span></div>
+    </div>
+    <fieldset class="shared-d20-boost-scope"><legend>Applies To</legend>${scopeOptions.map(([value, label]) => `<label class="form-check"><input class="form-check-input" type="checkbox" data-d20-boost-scope="${value}" ${appliesTo.has(value) ? "checked" : ""}><span class="form-check-label">${label}</span></label>`).join("")}</fieldset>`;
+  wireNumberSteppers(row);
+  const scaleHosts = Object.fromEntries(["dice", "static", "uses"].map((key) => [key, row.querySelector(`[data-d20-boost-scale-host="${key}"]`)]));
+  [["dice", data.diceCountScale], ["static", data.staticValueScale], ["uses", data.usesScale]].forEach(([key, scale]) => {
+    const host = scaleHosts[key];
+    wireScaleButton(host, scale || null, host.querySelector("[data-d20-boost-scale-summary]"), host.querySelector("[data-d20-boost-scale]"));
+  });
+  const all = row.querySelector('[data-d20-boost-scope="all"]');
+  const scopes = [...row.querySelectorAll("[data-d20-boost-scope]")];
+  scopes.forEach((input) => input.addEventListener("change", () => {
+    if (input === all && all.checked) scopes.forEach((candidate) => { if (candidate !== all) candidate.checked = false; });
+    if (input !== all && input.checked) all.checked = false;
+    if (!scopes.some((candidate) => candidate.checked)) all.checked = true;
+    onChange?.();
+  }));
+  row.querySelector("[data-delete-d20-boost]").addEventListener("click", () => { row.remove(); onDelete?.(); });
+  row.addEventListener("input", () => onChange?.());
+  row.addEventListener("change", () => onChange?.());
+  row._collect = () => ({
+    id: String(data.id || `d20-boost-${sequence}`),
+    label: row.querySelector('[data-d20-boost-field="label"]').value.trim() || "Boost d20",
+    diceCount: Math.max(0, Number(row.querySelector('[data-d20-boost-field="diceCount"]').value) || 0),
+    dieType: Math.max(2, Number(row.querySelector('[data-d20-boost-field="dieType"]').value) || 6),
+    diceCountScale: scaleHosts.dice._bonusScale || null,
+    staticValue: Number(row.querySelector('[data-d20-boost-field="staticValue"]').value) || 0,
+    staticValueScale: scaleHosts.static._bonusScale || null,
+    uses: Math.max(0, Number(row.querySelector('[data-d20-boost-field="uses"]').value) || 0),
+    usesScale: scaleHosts.uses._bonusScale || null,
+    usesPeriod: row.querySelector('[data-d20-boost-field="usesPeriod"]').value,
+    appliesTo: scopes.filter((input) => input.checked).map((input) => input.dataset.d20BoostScope),
+    bonusType: row.querySelector('[data-d20-boost-field="bonusType"]').value || "untyped",
+  });
+  return { element: row, collect: row._collect };
+}
+
   // DR, Immunities, SR, applied conditions, Class Skill grants, bonus feats,
   // Size Changes, caster level/DC bonuses, Spell-Like Abilities, and generated equipped weapons/armor
   // are separate things but they're always authored together and rarely
@@ -4402,12 +5829,44 @@ function createDamageRollRow(data = {}, { onDelete, onChange } = {}) {
         <div id="${prefix}Panel" class="accordion-collapse collapse"${parentAttr}>
           <div class="accordion-body">
             <datalist id="sharedDamageTypes"><option value="acid"><option value="bludgeoning"><option value="cold"><option value="electricity"><option value="fire"><option value="force"><option value="light"><option value="negative energy"><option value="piercing"><option value="positive energy"><option value="precision"><option value="slashing"><option value="sonic"><option value="untyped"></datalist>
+            ${options.allowAttackRolls === false ? "" : `<div class="shared-extra-subsection">
+              <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
+                <div class="small text-secondary">Attacks</div>
+                <button id="${prefix}AddAttackRoll" class="btn btn-outline-info btn-sm" type="button">Add Attack</button>
+              </div>
+              <div id="${prefix}AttackRollRows" class="vstack gap-2"></div>
+            </div>`}
+            <div class="shared-extra-subsection">
+              <div class="d-flex justify-content-between align-items-center gap-2 mb-2"><div class="small text-secondary">Boost d20s</div><button id="${prefix}AddD20Boost" class="btn btn-outline-info btn-sm" type="button">Add d20 Boost</button></div>
+              <div id="${prefix}D20BoostRows" class="vstack gap-2"></div>
+            </div>
             <div class="shared-extra-subsection">
               <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
                 <div class="small text-secondary">Damage</div>
                 <button id="${prefix}AddDamageRoll" class="btn btn-outline-info btn-sm" type="button">Add Damage Roll</button>
               </div>
               <div id="${prefix}DamageRollRows" class="vstack gap-2"></div>
+            </div>
+            <div class="shared-extra-subsection">
+              <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
+                <div class="small text-secondary">Equipped Weapon Extra Damage</div>
+                <button id="${prefix}AddWeaponExtraDamage" class="btn btn-outline-info btn-sm" type="button">Add Weapon Damage</button>
+              </div>
+              <div id="${prefix}WeaponExtraDamageRows" class="vstack gap-2"></div>
+            </div>
+            <div class="shared-extra-subsection">
+              <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
+                <div class="small text-secondary">Weapon Damage Size</div>
+                <button id="${prefix}AddWeaponDamageSize" class="btn btn-outline-info btn-sm" type="button">Add Size Rule</button>
+              </div>
+              <div id="${prefix}WeaponDamageSizeRows" class="vstack gap-2"></div>
+            </div>
+            <div class="shared-extra-subsection">
+              <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
+                <div class="small text-secondary">Summoned Creatures</div>
+                <button id="${prefix}AddSummonCreatures" class="btn btn-outline-info btn-sm" type="button">Add Summon</button>
+              </div>
+              <div id="${prefix}SummonCreatureRows" class="vstack gap-2"></div>
             </div>
             <div class="shared-extra-subsection">
               <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
@@ -4516,6 +5975,12 @@ function createDamageRollRow(data = {}, { onDelete, onChange } = {}) {
                 <button id="${prefix}AddEffectiveAttributeBonus" class="btn btn-outline-info btn-sm" type="button">Add Attribute</button>
               </div>
               <div id="${prefix}EffectiveAttributeBonusRows" class="vstack gap-2"></div>
+            </div>            <div class="shared-extra-subsection">
+              <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
+                <div class="small text-secondary">Attributes Applied to Stats</div>
+                <button id="${prefix}AddAttributeContribution" class="btn btn-outline-info btn-sm" type="button">Add Attribute Rule</button>
+              </div>
+              <div id="${prefix}AttributeContributionRows" class="vstack gap-2"></div>
             </div>
             <div class="shared-extra-subsection">
               <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
@@ -4539,7 +6004,16 @@ function createDamageRollRow(data = {}, { onDelete, onChange } = {}) {
       </div>
     `;
 
+    const attackRollRowsEl = document.getElementById(`${prefix}AttackRollRows`);
+    const d20BoostRowsEl = document.getElementById(`${prefix}D20BoostRows`);
     const damageRollRowsEl = document.getElementById(`${prefix}DamageRollRows`);
+    const weaponExtraDamageRowsEl = document.getElementById(
+      `${prefix}WeaponExtraDamageRows`,
+    );
+    const weaponDamageSizeRowsEl = document.getElementById(
+      `${prefix}WeaponDamageSizeRows`,
+    );
+    const summonCreatureRowsEl = document.getElementById(`${prefix}SummonCreatureRows`);
     const drRowsEl = document.getElementById(`${prefix}DrRows`);
     const srRowsEl = document.getElementById(`${prefix}SrRows`);
     const immunityRowsEl = document.getElementById(`${prefix}ImmunityRows`);
@@ -4566,6 +6040,8 @@ function createDamageRollRow(data = {}, { onDelete, onChange } = {}) {
     const spellDcRowsEl = document.getElementById(`${prefix}SpellDcBonusRows`);
     const effectiveAttributeRowsEl = document.getElementById(
       `${prefix}EffectiveAttributeBonusRows`,
+    );    const attributeContributionRowsEl = document.getElementById(
+      `${prefix}AttributeContributionRows`,
     );
     const generatedEquipmentRowsEl = document.getElementById(
       `${prefix}GeneratedEquipmentRows`,
@@ -4585,7 +6061,12 @@ function createDamageRollRow(data = {}, { onDelete, onChange } = {}) {
 
     const updateCount = () => {
       const count =
+        (attackRollRowsEl?.children.length || 0) +
+        d20BoostRowsEl.children.length +
         damageRollRowsEl.children.length +
+        weaponExtraDamageRowsEl.children.length +
+        weaponDamageSizeRowsEl.children.length +
+        summonCreatureRowsEl.children.length +
         drRowsEl.children.length +
         srRowsEl.children.length +
         immunityRowsEl.children.length +
@@ -4601,6 +6082,7 @@ function createDamageRollRow(data = {}, { onDelete, onChange } = {}) {
         casterLevelRowsEl.children.length +
         spellDcRowsEl.children.length +
         effectiveAttributeRowsEl.children.length +
+        attributeContributionRowsEl.children.length +
         generatedEquipmentRowsEl.children.length +
         conditionalVariableRowsEl.children.length +
         collectRows(specialToggleRowsEl).length;
@@ -4611,34 +6093,128 @@ function createDamageRollRow(data = {}, { onDelete, onChange } = {}) {
       options.onChange?.();
     };
 
+    const appendSavedRow = (rowsElement, element, data = {}) => {
+      if (!element || !rowsElement) return;
+      const deleteButton = element.querySelector(
+        'button[aria-label^="Delete"], button[data-delete-d20-boost], button[data-delete-summon]',
+      );
+      if (deleteButton && typeof element._collect === "function") {
+        let saveMode = data.saveMode || (data.saveConfig?.enabled ? "custom" : "shared");
+        let saveConfig = data.saveConfig?.enabled
+          ? JSON.parse(JSON.stringify(data.saveConfig))
+          : null;
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "btn btn-outline-info btn-sm btn-icon";
+        button.innerHTML = '<i class="bi bi-shield-check"></i>';
+        button.setAttribute("aria-label", "Configure mechanic save");
+        const sync = () => {
+          button.classList.toggle("btn-info", saveMode === "custom");
+          button.classList.toggle("btn-outline-info", saveMode !== "custom");
+          button.classList.toggle("text-secondary", saveMode === "none");
+          button.title = saveMode === "none"
+            ? "No save for this mechanic"
+            : saveMode === "custom"
+              ? "This mechanic uses a custom save"
+              : "This mechanic uses the ability save";
+        };
+        button.addEventListener("click", async () => {
+          const updated = await openSaveConfigEditor(saveConfig, { rowMode: saveMode });
+          if (!updated) return;
+          saveMode = updated.mode;
+          saveConfig = updated.config;
+          sync();
+          options.onChange?.();
+        });
+        deleteButton.before(button);
+        const collect = element._collect.bind(element);
+        element._collect = () => {
+          const value = collect();
+          if (!value || typeof value !== "object") return value;
+          const next = { ...value };
+          delete next.saveMode;
+          delete next.saveConfig;
+          if (saveMode === "none") next.saveMode = "none";
+          if (saveMode === "custom" && saveConfig?.enabled)
+            next.saveConfig = JSON.parse(JSON.stringify(saveConfig));
+          return next;
+        };
+        sync();
+      }
+      rowsElement.appendChild(element);
+    };
+
+    const addAttackRoll = (data = {}) => {
+      if (!attackRollRowsEl) return;
+      const { element, initialize } = createAttackRollRow(data, {
+        onDelete: updateCount,
+        onChange: updateCount,
+        skills: options.skills,
+        effectStats: options.effectStats,
+        titleCaseStat: options.titleCaseStat,
+      });
+      appendSavedRow(attackRollRowsEl, element, data);
+      initialize();
+      updateCount();
+    };
+
     const addDamageRoll = (data = {}) => {
       const { element } = createDamageRollRow(data, {
         onDelete: updateCount,
         onChange: updateCount,
       });
-      damageRollRowsEl.appendChild(element);
+      appendSavedRow(damageRollRowsEl, element, data);
       updateCount();
+    };
+    const addD20Boost = (data = {}) => {
+      const { element } = createD20BoostRow(data, { onDelete: updateCount, onChange: updateCount });
+      appendSavedRow(d20BoostRowsEl, element, data);
+      updateCount();
+    };
+    const addWeaponExtraDamage = (data = {}) => {
+      const { element } = createWeaponExtraDamageRow(data, {
+        onDelete: updateCount,
+      });
+      appendSavedRow(weaponExtraDamageRowsEl, element, data);
+      updateCount();
+    };
+    const addWeaponDamageSize = (data = {}) => {
+      const { element } = createWeaponDamageSizeChangeRow(data, {
+        onDelete: updateCount,
+      });
+      appendSavedRow(weaponDamageSizeRowsEl, element, data);
+      updateCount();
+    };
+    const addSummonCreatures = (data = {}, { edit = false } = {}) => {
+      const created = window.PFSummonCreatures?.createEditorRow?.(data, {
+        onDelete: updateCount,
+        onChange: updateCount,
+      });
+      if (!created?.element) return;
+      appendSavedRow(summonCreatureRowsEl, created.element, data);
+      updateCount();
+      if (edit) created.element._edit?.();
     };
     const addDr = (data = {}) => {
       const { element } = createDrRow(data, { onDelete: updateCount });
-      drRowsEl.appendChild(element);
+      appendSavedRow(drRowsEl, element, data);
       updateCount();
     };
     const addSr = (data = {}) => {
       const { element } = createSrRow(data, { onDelete: updateCount });
-      srRowsEl.appendChild(element);
+      appendSavedRow(srRowsEl, element, data);
       updateCount();
     };
     const addImmunity = (data = {}) => {
       const { element } = createImmunityRow(data, { onDelete: updateCount });
-      immunityRowsEl.appendChild(element);
+      appendSavedRow(immunityRowsEl, element, data);
       updateCount();
     };
     const addApplyCondition = (data = {}) => {
       const { element } = createApplyConditionRow(data, {
         onDelete: updateCount,
       });
-      applyConditionRowsEl.appendChild(element);
+      appendSavedRow(applyConditionRowsEl, element, data);
       updateCount();
     };
     const addClassSkill = (data = {}) => {
@@ -4646,7 +6222,7 @@ function createDamageRollRow(data = {}, { onDelete, onChange } = {}) {
         onDelete: updateCount,
         skills: options.skills,
       });
-      csRowsEl.appendChild(element);
+      appendSavedRow(csRowsEl, element, data);
       updateCount();
     };
     const addUseUntrained = (data = {}) => {
@@ -4654,14 +6230,14 @@ function createDamageRollRow(data = {}, { onDelete, onChange } = {}) {
         onDelete: updateCount,
         skills: options.skills,
       });
-      useUntrainedRowsEl.appendChild(element);
+      appendSavedRow(useUntrainedRowsEl, element, data);
       updateCount();
     };
     const addExtraRanksPerLevel = (data = {}) => {
       const { element } = createExtraRanksPerLevelRow(data, {
         onDelete: updateCount,
       });
-      extraRanksRowsEl.appendChild(element);
+      appendSavedRow(extraRanksRowsEl, element, data);
       updateCount();
     };
     const addBonusRanks = (data = {}) => {
@@ -4669,70 +6245,78 @@ function createDamageRollRow(data = {}, { onDelete, onChange } = {}) {
         onDelete: updateCount,
         skills: options.skills,
       });
-      bonusRanksRowsEl.appendChild(element);
+      appendSavedRow(bonusRanksRowsEl, element, data);
       updateCount();
     };
     const addGrantDomain = (data = {}) => {
       const { element } = createGrantDomainRow(data, {
         onDelete: updateCount,
       });
-      grantDomainRowsEl.appendChild(element);
+      appendSavedRow(grantDomainRowsEl, element, data);
       updateCount();
     };
     const addFeatGrant = (data = {}) => {
       const { element } = createFeatGrantRow(data, {
         onDelete: updateCount,
       });
-      featGrantRowsEl.appendChild(element);
+      appendSavedRow(featGrantRowsEl, element, data);
       updateCount();
     };
     const addSizeChange = (data = {}) => {
       const { element } = createSizeChangeRow(data, {
         onDelete: updateCount,
       });
-      sizeRowsEl.appendChild(element);
+      appendSavedRow(sizeRowsEl, element, data);
       updateCount();
     };
     const addSpellLikeAbility = (data = {}) => {
       const { element } = createSpellLikeAbilityRow(data, {
         onDelete: updateCount,
       });
-      slaRowsEl.appendChild(element);
+      appendSavedRow(slaRowsEl, element, data);
       updateCount();
     };
     const addCasterLevelBonus = (data = {}) => {
       const { element } = createSpellAdjustmentRow("casterLevel", data, {
         onDelete: updateCount,
       });
-      casterLevelRowsEl.appendChild(element);
+      appendSavedRow(casterLevelRowsEl, element, data);
       updateCount();
     };
     const addSpellDcBonus = (data = {}) => {
       const { element } = createSpellAdjustmentRow("spellDc", data, {
         onDelete: updateCount,
       });
-      spellDcRowsEl.appendChild(element);
+      appendSavedRow(spellDcRowsEl, element, data);
       updateCount();
     };
     const addEffectiveAttributeBonus = (data = {}) => {
       const { element } = createEffectiveAttributeBonusRow(data, {
         onDelete: updateCount,
       });
-      effectiveAttributeRowsEl.appendChild(element);
+      appendSavedRow(effectiveAttributeRowsEl, element, data);
+      updateCount();
+    };
+    const addAttributeContribution = (data = {}) => {
+      const { element } = createAttributeContributionRow(data, {
+        onDelete: updateCount,
+        onChange: updateCount,
+      });
+      appendSavedRow(attributeContributionRowsEl, element, data);
       updateCount();
     };
     const addGeneratedEquipment = (data = {}) => {
       const { element } = createGeneratedEquipmentRow(data, {
         onDelete: updateCount,
       });
-      generatedEquipmentRowsEl.appendChild(element);
+      appendSavedRow(generatedEquipmentRowsEl, element, data);
       updateCount();
     };
     const addConditionalVariable = (data = {}) => {
       const { element } = createConditionalVariableRow(data, {
         onDelete: updateCount,
       });
-      conditionalVariableRowsEl.appendChild(element);
+      appendSavedRow(conditionalVariableRowsEl, element, data);
       updateCount();
     };
     const resetSpecialEffectToggles = (items = []) => {
@@ -4751,8 +6335,21 @@ function createDamageRollRow(data = {}, { onDelete, onChange } = {}) {
     };
 
     document
+      .getElementById(`${prefix}AddAttackRoll`)
+      ?.addEventListener("click", () => addAttackRoll());
+    document
       .getElementById(`${prefix}AddDamageRoll`)
       .addEventListener("click", () => addDamageRoll());
+    document.getElementById(`${prefix}AddD20Boost`).addEventListener("click", () => addD20Boost());
+    document
+      .getElementById(`${prefix}AddWeaponExtraDamage`)
+      .addEventListener("click", () => addWeaponExtraDamage());
+    document
+      .getElementById(`${prefix}AddWeaponDamageSize`)
+      .addEventListener("click", () => addWeaponDamageSize());
+    document
+      .getElementById(`${prefix}AddSummonCreatures`)
+      .addEventListener("click", () => addSummonCreatures({}, { edit: true }));
     document
       .getElementById(`${prefix}AddDr`)
       .addEventListener("click", () => addDr());
@@ -4799,6 +6396,9 @@ function createDamageRollRow(data = {}, { onDelete, onChange } = {}) {
       .getElementById(`${prefix}AddEffectiveAttributeBonus`)
       .addEventListener("click", () => addEffectiveAttributeBonus());
     document
+      .getElementById(`${prefix}AddAttributeContribution`)
+      .addEventListener("click", () => addAttributeContribution());
+    document
       .getElementById(`${prefix}AddBonusRanks`)
       .addEventListener("click", () => addBonusRanks());
     document
@@ -4809,7 +6409,12 @@ function createDamageRollRow(data = {}, { onDelete, onChange } = {}) {
       .addEventListener("click", () => addConditionalVariable());
 
     return {
+      addAttackRoll,
+      addD20Boost,
       addDamageRoll,
+      addWeaponExtraDamage,
+      addWeaponDamageSize,
+      addSummonCreatures,
       addDr,
       addSr,
       addImmunity,
@@ -4825,10 +6430,16 @@ function createDamageRollRow(data = {}, { onDelete, onChange } = {}) {
       addCasterLevelBonus,
       addSpellDcBonus,
       addEffectiveAttributeBonus,
+      addAttributeContribution,
       addGeneratedEquipment,
       addConditionalVariable,
       reset(item = {}) {
+        if (attackRollRowsEl) attackRollRowsEl.innerHTML = "";
+        d20BoostRowsEl.innerHTML = "";
         damageRollRowsEl.innerHTML = "";
+        weaponExtraDamageRowsEl.innerHTML = "";
+        weaponDamageSizeRowsEl.innerHTML = "";
+        summonCreatureRowsEl.innerHTML = "";
         drRowsEl.innerHTML = "";
         srRowsEl.innerHTML = "";
         immunityRowsEl.innerHTML = "";
@@ -4844,11 +6455,27 @@ function createDamageRollRow(data = {}, { onDelete, onChange } = {}) {
         casterLevelRowsEl.innerHTML = "";
         spellDcRowsEl.innerHTML = "";
         effectiveAttributeRowsEl.innerHTML = "";
+        attributeContributionRowsEl.innerHTML = "";
         generatedEquipmentRowsEl.innerHTML = "";
         conditionalVariableRowsEl.innerHTML = "";
         specialToggleRowsEl.innerHTML = "";
+        (Array.isArray(item.attackRolls) ? item.attackRolls : []).forEach(
+          addAttackRoll,
+        );
+        (Array.isArray(item.d20Boosts) ? item.d20Boosts : []).forEach(addD20Boost);
         (Array.isArray(item.damageRolls) ? item.damageRolls : []).forEach(
           addDamageRoll,
+        );
+        (Array.isArray(item.weaponExtraDamage)
+          ? item.weaponExtraDamage
+          : []
+        ).forEach(addWeaponExtraDamage);
+        (Array.isArray(item.weaponDamageSizeChanges)
+          ? item.weaponDamageSizeChanges
+          : []
+        ).forEach(addWeaponDamageSize);
+        (Array.isArray(item.summonCreatures) ? item.summonCreatures : []).forEach(
+          addSummonCreatures,
         );
         (Array.isArray(item.damageReduction) ? item.damageReduction : []).forEach(
           addDr,
@@ -4901,6 +6528,10 @@ function createDamageRollRow(data = {}, { onDelete, onChange } = {}) {
           ? item.effectiveAttributeBonuses
           : []
         ).forEach(addEffectiveAttributeBonus);
+        (Array.isArray(item.attributeContributions)
+          ? item.attributeContributions
+          : []
+        ).forEach(addAttributeContribution);
         (Array.isArray(item.generatedEquipment)
           ? item.generatedEquipment
           : []
@@ -4918,7 +6549,12 @@ function createDamageRollRow(data = {}, { onDelete, onChange } = {}) {
       },
       collect() {
         return {
+          attackRolls: attackRollRowsEl ? collectRows(attackRollRowsEl) : [],
+          d20Boosts: collectRows(d20BoostRowsEl),
           damageRolls: collectRows(damageRollRowsEl),
+          weaponExtraDamage: collectRows(weaponExtraDamageRowsEl),
+          weaponDamageSizeChanges: collectRows(weaponDamageSizeRowsEl),
+          summonCreatures: collectRows(summonCreatureRowsEl),
           damageReduction: collectRows(drRowsEl),
           spellResistance: collectRows(srRowsEl),
           immunities: collectRows(immunityRowsEl),
@@ -4934,6 +6570,7 @@ function createDamageRollRow(data = {}, { onDelete, onChange } = {}) {
           casterLevelBonuses: collectRows(casterLevelRowsEl),
           spellDcBonuses: collectRows(spellDcRowsEl),
           effectiveAttributeBonuses: collectRows(effectiveAttributeRowsEl),
+          attributeContributions: collectRows(attributeContributionRowsEl),
           generatedEquipment: collectRows(generatedEquipmentRowsEl),
           conditionalVariables: collectRows(conditionalVariableRowsEl),
           specialEffectToggles: collectRows(specialToggleRowsEl),
@@ -5028,6 +6665,9 @@ function createDamageRollRow(data = {}, { onDelete, onChange } = {}) {
         idPrefix: `${prefix}Extra`,
         accordionParentId: parentId,
         skills: options.skills,
+        effectStats: options.effectStats,
+        titleCaseStat: options.titleCaseStat,
+        allowAttackRolls: options.allowAttackRolls,
         onChange: options.onChange,
         onIncreaseSr: () => {
           const row = addEffect({
@@ -5056,6 +6696,8 @@ function createDamageRollRow(data = {}, { onDelete, onChange } = {}) {
 
     return {
       addEffect,
+      addAttackRoll: extra.addAttackRoll,
+      addD20Boost: extra.addD20Boost,
       addDamageRoll: extra.addDamageRoll,
       addDr: extra.addDr,
       addSr: extra.addSr,
@@ -5100,27 +6742,127 @@ function createDamageRollRow(data = {}, { onDelete, onChange } = {}) {
     };
   }
 
+  let saveEditorSequence = 0;
+  function ensureSaveConfigModal() {
+    let modal = document.getElementById("sharedSaveConfigModal");
+    if (modal) return modal;
+    modal = document.createElement("div");
+    modal.id = "sharedSaveConfigModal";
+    modal.className = "modal fade";
+    modal.tabIndex = -1;
+    modal.innerHTML = `
+      <div class="modal-dialog modal-dialog-centered modal-lg"><div class="modal-content bg-dark text-light">
+        <div class="modal-header"><h5 class="modal-title">Apply Effect on Save</h5></div>
+        <div class="modal-body">
+          <div data-save-row-mode class="mb-3 d-none"><label>Effect Save</label><select class="form-select form-select-sm" data-save-mode><option value="shared">Uses Ability Save</option><option value="none">No Save</option><option value="custom">Custom Save</option></select></div>
+          <div data-save-config-fields>
+            <div class="row g-2">
+              <div class="col-md-6"><label>Roll</label><select class="form-select form-select-sm" data-save-check>${(window.PFEffectSaves?.CHECKS || []).map(([value, label]) => `<option value="${escapeHtml(value)}">${escapeHtml(label)}</option>`).join("")}</select></div>
+              <div class="col-md-6"><label>Skill or Attack</label><input class="form-control form-control-sm" data-save-detail placeholder="Optional skill or weapon name"></div>
+            </div>
+            <label class="form-check form-switch mt-3"><input class="form-check-input" type="checkbox" data-save-partial><span class="form-check-label">Successful save applies a partial effect</span></label>
+            <div class="mt-3 d-none" data-save-partial-wrap><div class="small text-secondary mb-2">Applied only when the target selects Apply Partial</div><div data-save-partial-editor></div></div>
+          </div>
+        </div>
+        <div class="modal-footer"><button class="btn btn-outline-danger" type="button" data-save-remove>Remove Save</button><button class="btn btn-outline-light" type="button" data-save-cancel>Cancel</button><button class="btn btn-primary" type="button" data-save-confirm>Save</button></div>
+      </div></div>`;
+    document.body.appendChild(modal);
+    return modal;
+  }
+
+  function openSaveConfigEditor(existing = null, { rowMode = null } = {}) {
+    const modal = ensureSaveConfigModal();
+    const instance = bootstrap.Modal.getOrCreateInstance(modal, {
+      backdrop: "static",
+      keyboard: false,
+    });
+    const sequence = ++saveEditorSequence;
+    const config = window.PFEffectSaves?.normalize?.(existing || {}) || {
+      enabled: Boolean(existing?.enabled),
+      check: existing?.check || "fortitude",
+      checkDetail: existing?.checkDetail || "",
+      partial: Boolean(existing?.partial),
+      partialMechanics: existing?.partialMechanics || {},
+    };
+    const rowModeWrap = modal.querySelector("[data-save-row-mode]");
+    const modeSelect = modal.querySelector("[data-save-mode]");
+    rowModeWrap.classList.toggle("d-none", rowMode === null);
+    modeSelect.value = rowMode || "shared";
+    modal.querySelector("[data-save-check]").value = config.check || "fortitude";
+    modal.querySelector("[data-save-detail]").value = config.checkDetail || "";
+    modal.querySelector("[data-save-partial]").checked = Boolean(config.partial);
+    const partialMount = modal.querySelector("[data-save-partial-editor]");
+    partialMount.innerHTML = "";
+    const partialEditor = mountEffectsAccordion(partialMount, {
+      idPrefix: `SavePartial${sequence}`,
+      allowBranches: false,
+    });
+    partialEditor.reset(config.partialMechanics || {});
+    const sync = () => {
+      const custom = rowMode === null || modeSelect.value === "custom";
+      modal.querySelector("[data-save-config-fields]").classList.toggle("d-none", !custom);
+      modal.querySelector("[data-save-partial-wrap]").classList.toggle(
+        "d-none",
+        !custom || !modal.querySelector("[data-save-partial]").checked,
+      );
+    };
+    modeSelect.onchange = sync;
+    modal.querySelector("[data-save-partial]").onchange = sync;
+    sync();
+    instance.show();
+    return new Promise((resolve) => {
+      const finish = (value) => {
+        instance.hide();
+        resolve(value);
+      };
+      modal.querySelector("[data-save-cancel]").onclick = () => finish(null);
+      modal.querySelector("[data-save-remove]").onclick = () =>
+        finish({ mode: "none", config: null });
+      modal.querySelector("[data-save-confirm]").onclick = () => {
+        const mode = rowMode === null ? "custom" : modeSelect.value;
+        if (mode !== "custom") return finish({ mode, config: null });
+        const partial = modal.querySelector("[data-save-partial]").checked;
+        finish({
+          mode,
+          config: {
+            enabled: true,
+            check: modal.querySelector("[data-save-check]").value,
+            checkDetail: modal.querySelector("[data-save-detail]").value.trim(),
+            partial,
+            ...(partial ? { partialMechanics: partialEditor.collect() } : {}),
+          },
+        });
+      };
+    });
+  }
+
   function mountMechanicGroups(container, options = {}) {
     const prefix = options.idPrefix;
     const activeOnly = Boolean(options.activeOnly);
+    const decisionOwnerControl = (group) => `
+      <div id="${prefix}${group}DecisionOwnerWrap" class="d-none">
+        <label class="visually-hidden" for="${prefix}${group}DecisionOwner">Decision owner</label>
+        <select id="${prefix}${group}DecisionOwner" class="form-select form-select-sm" title="Who answers the configured decisions">
+          <option value="caster">Caster decides</option>
+          <option value="target">Target decides</option>
+        </select>
+      </div>`;
     const auraControls = (group) => `
-      <div class="d-flex align-items-center gap-2">
+      <div class="d-flex align-items-center gap-2 flex-wrap">
         <label class="form-check form-switch mb-0 d-flex align-items-center gap-2">
           <input id="${prefix}${group}Aura" class="form-check-input" type="checkbox">
           <span class="form-check-label">Aura</span>
         </label>
-        <label id="${prefix}${group}AuraRangeWrap" class="d-none d-flex align-items-center gap-1 mb-0">
-          <span class="small-text">Range</span>
-          <input id="${prefix}${group}AuraRange" class="form-control form-control-sm" type="number" min="5" step="5" value="5" style="width:5.5rem">
-          <span class="small-text">ft.</span>
-        </label>
+        <button id="${prefix}${group}AuraDetails" class="btn btn-outline-info btn-sm d-none" type="button">Aura Details</button>
       </div>`;
     container.innerHTML = `
-      ${activeOnly ? "" : `<section class="shared-mechanic-group"><div class="d-flex justify-content-between align-items-center gap-2 mb-2"><strong>Passive</strong><div class="d-flex align-items-center gap-2">${auraControls("Passive")}${options.allowBranches === false ? "" : `<button id="${prefix}PassiveCreateBranch" class="btn btn-outline-info btn-sm" type="button">Create Branch</button>`}</div></div><div id="${prefix}Passive"></div></section>`}
+      ${activeOnly ? "" : `<section class="shared-mechanic-group"><div class="d-flex justify-content-between align-items-center gap-2 mb-2"><strong>Passive</strong><div class="d-flex align-items-center gap-2 flex-wrap justify-content-end">${decisionOwnerControl("Passive")}${auraControls("Passive")}${options.allowBranches === false ? "" : `<button id="${prefix}PassiveCreateBranch" class="btn btn-outline-info btn-sm" type="button">Create Branch</button>`}</div></div><div id="${prefix}Passive"></div></section>`}
       <section class="shared-mechanic-group">
         <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
           <strong>Active</strong>
           <div class="d-flex align-items-center gap-2 flex-wrap justify-content-end">
+            ${decisionOwnerControl("Active")}
+            <button id="${prefix}ActiveSave" class="btn btn-outline-info btn-sm" type="button"><i class="bi bi-shield-check me-1"></i>Save</button>
             ${auraControls("Active")}
             <button id="${prefix}EditDuration" class="btn btn-outline-light btn-sm" type="button">Edit Duration</button>
             ${options.allowBranches === false ? "" : `<button id="${prefix}ActiveCreateBranch" class="btn btn-outline-info btn-sm" type="button">Create Branch</button>`}
@@ -5135,6 +6877,7 @@ function createDamageRollRow(data = {}, { onDelete, onChange } = {}) {
       `branch-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
     const mechanicsOnly = (item = {}) =>
       window.PFEffectMechanics?.copyMechanics?.(item) || item;
+    let syncDecisionOwnerControls = () => {};
 
     function mountBranchingGroup(group, hostId) {
       const host = document.getElementById(hostId);
@@ -5147,6 +6890,10 @@ function createDamageRollRow(data = {}, { onDelete, onChange } = {}) {
         mountEffectsAccordion(mount, {
           ...options,
           idPrefix: `${prefix}${group}Mechanics${suffix}`,
+          onChange: () => {
+            syncDecisionOwnerControls();
+            options.onChange?.();
+          },
         });
 
       const currentBranches = () =>
@@ -5166,6 +6913,7 @@ function createDamageRollRow(data = {}, { onDelete, onChange } = {}) {
           `Base${renderSequence}`,
         );
         baseEditor.reset(data);
+        syncDecisionOwnerControls();
       };
 
       const renderBranches = (rows = []) => {
@@ -5204,6 +6952,7 @@ function createDamageRollRow(data = {}, { onDelete, onChange } = {}) {
           nameInput.addEventListener("input", () => options.onChange?.());
           branchEditors.push({ id: branch.id, nameInput, editor });
         });
+        syncDecisionOwnerControls();
         host.querySelectorAll("[data-delete-branch]").forEach((button) => {
           button.addEventListener("click", () => {
             const rows = currentBranches();
@@ -5246,7 +6995,12 @@ function createDamageRollRow(data = {}, { onDelete, onChange } = {}) {
           else renderBase(item);
         },
         collect() {
-          if (branchEditors.length > 1) return { branches: currentBranches() };
+          if (branchEditors.length > 1) {
+            return {
+              ...mechanicsOnly({}),
+              branches: currentBranches(),
+            };
+          }
           return baseEditor?.collect() || mechanicsOnly({});
         },
       };
@@ -5256,38 +7010,86 @@ function createDamageRollRow(data = {}, { onDelete, onChange } = {}) {
       ? null
       : mountBranchingGroup("Passive", `${prefix}Passive`);
     const active = mountBranchingGroup("Active", `${prefix}Active`);
+    const groupEditors = { Passive: passive, Active: active };
+    const decisionOwnerSelect = (group) =>
+      document.getElementById(`${prefix}${group}DecisionOwner`);
+    const groupHasDecision = (group) =>
+      Boolean(
+        groupEditors[group] &&
+          window.PFEffectDecisions?.hasDecision?.(
+            groupEditors[group].collect(),
+          ),
+      );
+    syncDecisionOwnerControls = () => {
+      [activeOnly ? null : "Passive", "Active"]
+        .filter(Boolean)
+        .forEach((group) => {
+          document
+            .getElementById(`${prefix}${group}DecisionOwnerWrap`)
+            ?.classList.toggle("d-none", !groupHasDecision(group));
+        });
+    };
+    container.addEventListener("input", syncDecisionOwnerControls);
+    container.addEventListener("change", syncDecisionOwnerControls);
+    [activeOnly ? null : "Passive", "Active"]
+      .filter(Boolean)
+      .forEach((group) => {
+        decisionOwnerSelect(group)?.addEventListener("change", () =>
+          options.onChange?.(),
+        );
+      });
     let durationConfig = null;
+    let activeSaveConfig = null;
     let durationEditor = null;
+    const auraConfigs = {
+      Passive: { enabled: true, rangeFeet: 5 },
+      Active: { enabled: true, rangeFeet: 5 },
+    };
     const auraConfigFor = (group) => {
       const enabled = document.getElementById(`${prefix}${group}Aura`).checked;
       if (!enabled) return null;
-      return {
-        enabled: true,
-        rangeFeet: Math.max(
-          5,
-          Number(document.getElementById(`${prefix}${group}AuraRange`).value || 5),
-        ),
-      };
+      return JSON.parse(JSON.stringify(auraConfigs[group]));
     };
     const resetAura = (group, config = null) => {
       const toggle = document.getElementById(`${prefix}${group}Aura`);
-      const range = document.getElementById(`${prefix}${group}AuraRange`);
-      const wrap = document.getElementById(`${prefix}${group}AuraRangeWrap`);
+      const details = document.getElementById(`${prefix}${group}AuraDetails`);
       toggle.checked = Boolean(config?.enabled);
-      range.value = Math.max(5, Number(config?.rangeFeet || 5));
-      wrap.classList.toggle("d-none", !toggle.checked);
+      auraConfigs[group] = {
+        enabled: true,
+        rangeFeet: Math.max(5, Number(config?.rangeFeet || 5)),
+        ...(config?.rangeScale ? { rangeScale: config.rangeScale } : {}),
+        ...(config?.lingerDurationConfig
+          ? { lingerDurationConfig: config.lingerDurationConfig }
+          : {}),
+        affectsSource: Boolean(config?.affectsSource),
+        independentToken: Boolean(config?.independentToken),
+        ...(["light", "specialVision"].includes(config?.revealMode)
+          ? { revealMode: config.revealMode }
+          : {}),
+        targetsEmitAura: Boolean(
+          group === "Active" && config?.targetsEmitAura,
+        ),
+      };
+      details.classList.toggle("d-none", !toggle.checked);
     };
     [activeOnly ? null : "Passive", "Active"].filter(Boolean).forEach((group) => {
       const toggle = document.getElementById(`${prefix}${group}Aura`);
       toggle.addEventListener("change", () => {
         document
-          .getElementById(`${prefix}${group}AuraRangeWrap`)
+          .getElementById(`${prefix}${group}AuraDetails`)
           .classList.toggle("d-none", !toggle.checked);
         options.onChange?.();
       });
       document
-        .getElementById(`${prefix}${group}AuraRange`)
-        .addEventListener("input", () => options.onChange?.());
+        .getElementById(`${prefix}${group}AuraDetails`)
+        .addEventListener("click", async () => {
+          const updated = await openAuraDetailsModal(auraConfigs[group], {
+            allowTargetsEmit: group === "Active",
+          });
+          if (!updated) return;
+          auraConfigs[group] = updated;
+          options.onChange?.();
+        });
     });
     const summary = document.getElementById(`${prefix}DurationSummary`);
     const updateDuration = () => {
@@ -5308,30 +7110,68 @@ function createDamageRollRow(data = {}, { onDelete, onChange } = {}) {
           options.onChange?.();
         });
       });
+    const saveButton = document.getElementById(`${prefix}ActiveSave`);
+    const syncSaveButton = () => {
+      saveButton.classList.toggle("btn-info", Boolean(activeSaveConfig?.enabled));
+      saveButton.classList.toggle("btn-outline-info", !activeSaveConfig?.enabled);
+    };
+    saveButton.addEventListener("click", async () => {
+      const result = await openSaveConfigEditor(activeSaveConfig);
+      if (!result) return;
+      activeSaveConfig = result.mode === "custom" ? result.config : null;
+      syncSaveButton();
+      options.onChange?.();
+    });
 
     return {
       reset(item = {}) {
         const mechanics = window.PFEffectMechanics;
+        const passiveData = mechanics?.passiveMechanics?.(item) || item;
         passive?.reset(
           mechanics?.passiveMechanics?.(item) ||
             (item.activatable ? {} : item),
         );
         if (!activeOnly) {
-          const passiveData = mechanics?.passiveMechanics?.(item) || item;
           resetAura("Passive", passiveData.auraConfig);
         }
         const activeData =
           mechanics?.activeMechanics?.(item, { activeOnly }) ||
           (item.activatable || activeOnly ? item : item.activeMechanics || {});
         active.reset(activeData);
+        if (!activeOnly)
+          decisionOwnerSelect("Passive").value =
+            window.PFEffectDecisions?.decisionOwner?.(passiveData) || "caster";
+        decisionOwnerSelect("Active").value =
+          window.PFEffectDecisions?.decisionOwner?.(activeData) || "caster";
         durationConfig = activeData.durationConfig || null;
+        activeSaveConfig = activeData.saveConfig?.enabled
+          ? JSON.parse(JSON.stringify(activeData.saveConfig))
+          : null;
+        syncSaveButton();
         resetAura("Active", activeData.auraConfig);
         updateDuration();
+        syncDecisionOwnerControls();
       },
       collect() {
-        const passiveData = passive?.collect() || {};
+        const collectedPassive = passive?.collect() || {};
+        const passiveData =
+          !activeOnly &&
+          window.PFEffectDecisions?.hasDecision?.(collectedPassive)
+            ? {
+                ...collectedPassive,
+                decisionOwner: decisionOwnerSelect("Passive").value || "caster",
+              }
+            : collectedPassive;
         const passiveAura = activeOnly ? null : auraConfigFor("Passive");
-        const activeData = active.collect();
+        const collectedActive = active.collect();
+        const activeData = window.PFEffectDecisions?.hasDecision?.(
+          collectedActive,
+        )
+          ? {
+              ...collectedActive,
+              decisionOwner: decisionOwnerSelect("Active").value || "caster",
+            }
+          : collectedActive;
         const activeAura = auraConfigFor("Active");
         const hasActive = window.PFEffectMechanics?.hasAnyMechanics
           ? window.PFEffectMechanics.hasAnyMechanics(activeData)
@@ -5345,6 +7185,7 @@ function createDamageRollRow(data = {}, { onDelete, onChange } = {}) {
             ? {
                 activeMechanics: {
                   ...activeData,
+                  ...(activeSaveConfig ? { saveConfig: activeSaveConfig } : {}),
                   ...(durationConfig ? { durationConfig } : {}),
                   ...(activeAura ? { auraConfig: activeAura } : {}),
                 },
@@ -5359,6 +7200,7 @@ function createDamageRollRow(data = {}, { onDelete, onChange } = {}) {
     titleCaseStat,
     bonusStatOptionsHtml,
     createBonusRow,
+    createAttackRollRow,
     attributeRequirementText,
     skillStatOptionsHtml,
     namedSkill,
@@ -5384,10 +7226,13 @@ function createDamageRollRow(data = {}, { onDelete, onChange } = {}) {
     createFeatGrantRow,
     featGrantText,
     createSizeChangeRow,
+    createWeaponDamageSizeChangeRow,
+    weaponDamageSizeChangeText,
     createSpellLikeAbilityRow,
     createSpellAdjustmentRow,
     createEffectiveAttributeBonusRow,
     effectiveAttributeBonusText,
+    createAttributeContributionRow,
     spellAdjustmentSourceValues,
     spellAdjustmentSourceValue,
     spellAdjustmentSourceLabel,
@@ -5397,6 +7242,8 @@ function createDamageRollRow(data = {}, { onDelete, onChange } = {}) {
     casterLevelBonusText,
     spellDcBonusText,
     createGeneratedEquipmentRow,
+    createWeaponExtraDamageRow,
+    createD20BoostRow,
     mountExtraAccordion,
     mountEffectsAccordion,
     mountMechanicGroups,

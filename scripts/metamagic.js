@@ -3,6 +3,9 @@
   if (root) root.PFMetamagic = api;
   if (typeof module === "object" && module.exports) module.exports = api;
 })(typeof window !== "undefined" ? window : globalThis, function (root) {
+  const effectRolls =
+    root?.PFEffectRolls ||
+    (typeof require === "function" ? require("./effect-rolls.js") : null);
   const MECHANIC_ARRAYS = [
     "bonuses",
     "damageReduction",
@@ -22,6 +25,7 @@
     "grantDomains",
     "generatedEquipment",
     "conditionalVariables",
+    "attackRolls",
     "damageRolls",
   ];
   const DESCRIPTORS = new Map([
@@ -185,9 +189,42 @@
 
   function transformDamageRolls(mechanics, transform) {
     mechanics.damageRolls = mapDamageProfiles(mechanics.damageRolls, transform);
+    mechanics.attackRolls = (Array.isArray(mechanics.attackRolls)
+      ? mechanics.attackRolls
+      : []
+    ).map((attack) => ({
+      ...attack,
+      damageRolls: mapDamageProfiles(attack.damageRolls, transform),
+    }));
     mechanics.metamagicRiders.forEach((rider) => {
       rider.damageRolls = mapDamageProfiles(rider.damageRolls, transform);
     });
+  }
+
+  function transformVariableRolls(mechanics, transform) {
+    if (!effectRolls?.mapEffectFormulas) {
+      transformDamageRolls(mechanics, transform);
+      return;
+    }
+    Object.assign(mechanics, effectRolls.mapEffectFormulas(mechanics, transform));
+  }
+
+  function flatMapDamageRolls(mechanics, transform) {
+    mechanics.damageRolls = (mechanics.damageRolls || []).flatMap(transform);
+    mechanics.attackRolls = (Array.isArray(mechanics.attackRolls)
+      ? mechanics.attackRolls
+      : []
+    ).map((attack) => ({
+      ...attack,
+      damageRolls: (attack.damageRolls || []).flatMap(transform),
+    }));
+  }
+
+  function hasDamageRolls(mechanics = {}) {
+    return Boolean(
+      mechanics.damageRolls?.length ||
+        mechanics.attackRolls?.some((attack) => attack.damageRolls?.length),
+    );
   }
 
   function multiplyDamageRoll(roll, multiplier, overrides = {}) {
@@ -232,7 +269,7 @@
   }
 
   function addConditionRider(mechanics, definition, rule, spell, context) {
-    if (rule.requiresDamage && !mechanics.damageRolls.length) return;
+    if (rule.requiresDamage && !hasDamageRolls(mechanics)) return;
     const rider = mechanicShell(
       `${definition.name}: ${rule.condition}`,
       definition.benefits,
@@ -326,7 +363,7 @@
       const type = String(optionFor(selection, "damageType", "fire"));
       const mode = optionFor(selection, "mode", "replace");
       if (mode === "split") {
-        mechanics.damageRolls = mechanics.damageRolls.flatMap((roll) => [
+        flatMapDamageRolls(mechanics, (roll) => [
           multiplyDamageRoll(roll, 0.5, { label: `${roll.label || "Damage"} (normal half)` }),
           multiplyDamageRoll(roll, 0.5, { id: `${roll.id || "damage"}-${type}`, label: `${roll.label || "Damage"} (${type} half)`, damageType: type }),
         ]);
@@ -338,7 +375,7 @@
     if (name === "Benthic Spell") {
       const mode = optionFor(selection, "mode", "replace");
       if (mode === "split") {
-        mechanics.damageRolls = mechanics.damageRolls.flatMap((roll) => [
+        flatMapDamageRolls(mechanics, (roll) => [
           multiplyDamageRoll(roll, 0.5, { label: `${roll.label || "Damage"} (normal half)` }),
           multiplyDamageRoll(roll, 0.5, { id: `${roll.id || "damage"}-bludgeoning`, label: `${roll.label || "Damage"} (bludgeoning half)`, damageType: "bludgeoning" }),
         ]);
@@ -348,10 +385,16 @@
       addDescriptor(spell, "water");
     }
     if (["Maximize Spell", "Consecrate Spell"].includes(name))
-      transformDamageRolls(mechanics, (profile) => ({ ...profile, maximizeDice: true }));
+      transformVariableRolls(mechanics, (formula) => ({
+        ...formula,
+        maximizeDice: true,
+      }));
     if (name === "Empower Spell")
-      transformDamageRolls(mechanics, (profile) => ({ ...profile, damageMultiplier: number(profile.damageMultiplier, 1) * 1.5 }));
-    if (name === "Furious Spell" && mechanics.damageRolls.length) {
+      transformVariableRolls(mechanics, (formula) => ({
+        ...formula,
+        valueMultiplier: number(formula.valueMultiplier, 1) * 1.5,
+      }));
+    if (name === "Furious Spell" && hasDamageRolls(mechanics)) {
       const bonus = context.originalSpellLevel * 2;
       transformDamageRolls(mechanics, (profile) => ({ ...profile, staticDamage: number(profile.staticDamage) + bonus }));
     }
@@ -427,7 +470,7 @@
       rider.metamagicSelfOnly = true;
       mechanics.metamagicRiders.push(rider);
     }
-    if (name === "Cherry Blossom Spell" && mechanics.damageRolls.length) {
+    if (name === "Cherry Blossom Spell" && hasDamageRolls(mechanics)) {
       const mental = optionFor(selection, "abilityGroup", "physical") === "mental";
       const abilities = mental ? ["intelligence", "wisdom", "charisma"] : ["strength", "dexterity", "constitution"];
       abilities.forEach((stat) => {

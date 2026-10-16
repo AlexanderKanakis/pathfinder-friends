@@ -35,25 +35,8 @@
         {
           "name": "Rogue Talent",
           "description": "",
-          "pools": [
-            {
-              "name": "Rogue Talent",
-              "description": "",
-              "requirements": {},
-              "options": [
-                {
-                  "name": "Rogue Talents",
-                  "description": "As a rogue gains experience, she learns a number of talents that aid her and confound her foes. Starting at 2nd level, a rogue gains one rogue talent. She gains an additional rogue talent for every 2 levels of rogue attained after 2nd level. A rogue cannot select an individual talent more than once. Talents marked with an asterisk add effects to a rogue&#8217;s sneak attack. Only one of these talents can be applied to an individual attack and the decision must be made before the attack roll is made. A rogue cannot choose a ninja trick with the same name as a rogue talent. A complete listing of rogue talents can be found here: Rogue Talents",
-                  "requirements": {
-                    "minClassLevel": 2,
-                    "text": "Starting at 2nd level, a rogue gains one rogue talent. She gains an additional rogue talent for every 2 levels of rogue attained after 2nd level."
-                  },
-                  "scrapeConfidence": "medium"
-                }
-              ],
-              "scrapeSource": "https://www.d20pfsrd.com/classes/core-classes/rogue/",
-              "scrapeConfidence": "low"
-            }
+          "poolRefs": [
+            "rogue-talent"
           ]
         }
       ],
@@ -87,25 +70,8 @@
         {
           "name": "Rogue Talent",
           "description": "",
-          "pools": [
-            {
-              "name": "Rogue Talent",
-              "description": "",
-              "requirements": {},
-              "options": [
-                {
-                  "name": "Rogue Talents",
-                  "description": "As a rogue gains experience, she learns a number of talents that aid her and confound her foes. Starting at 2nd level, a rogue gains one rogue talent. She gains an additional rogue talent for every 2 levels of rogue attained after 2nd level. A rogue cannot select an individual talent more than once. Talents marked with an asterisk add effects to a rogue&#8217;s sneak attack. Only one of these talents can be applied to an individual attack and the decision must be made before the attack roll is made. A rogue cannot choose a ninja trick with the same name as a rogue talent. A complete listing of rogue talents can be found here: Rogue Talents",
-                  "requirements": {
-                    "minClassLevel": 2,
-                    "text": "Starting at 2nd level, a rogue gains one rogue talent. She gains an additional rogue talent for every 2 levels of rogue attained after 2nd level."
-                  },
-                  "scrapeConfidence": "medium"
-                }
-              ],
-              "scrapeSource": "https://www.d20pfsrd.com/classes/core-classes/rogue/",
-              "scrapeConfidence": "low"
-            }
+          "poolRefs": [
+            "rogue-talent"
           ]
         },
         {
@@ -139,25 +105,8 @@
         {
           "name": "Rogue Talent",
           "description": "",
-          "pools": [
-            {
-              "name": "Rogue Talent",
-              "description": "",
-              "requirements": {},
-              "options": [
-                {
-                  "name": "Rogue Talents",
-                  "description": "As a rogue gains experience, she learns a number of talents that aid her and confound her foes. Starting at 2nd level, a rogue gains one rogue talent. She gains an additional rogue talent for every 2 levels of rogue attained after 2nd level. A rogue cannot select an individual talent more than once. Talents marked with an asterisk add effects to a rogue&#8217;s sneak attack. Only one of these talents can be applied to an individual attack and the decision must be made before the attack roll is made. A rogue cannot choose a ninja trick with the same name as a rogue talent. A complete listing of rogue talents can be found here: Rogue Talents",
-                  "requirements": {
-                    "minClassLevel": 2,
-                    "text": "Starting at 2nd level, a rogue gains one rogue talent. She gains an additional rogue talent for every 2 levels of rogue attained after 2nd level."
-                  },
-                  "scrapeConfidence": "medium"
-                }
-              ],
-              "scrapeSource": "https://www.d20pfsrd.com/classes/core-classes/rogue/",
-              "scrapeConfidence": "low"
-            }
+          "poolRefs": [
+            "rogue-talent"
           ]
         },
         {
@@ -195,25 +144,8 @@
         {
           "name": "Rogue Talent",
           "description": "",
-          "pools": [
-            {
-              "name": "Rogue Talent",
-              "description": "",
-              "requirements": {},
-              "options": [
-                {
-                  "name": "Rogue Talents",
-                  "description": "As a rogue gains experience, she learns a number of talents that aid her and confound her foes. Starting at 2nd level, a rogue gains one rogue talent. She gains an additional rogue talent for every 2 levels of rogue attained after 2nd level. A rogue cannot select an individual talent more than once. Talents marked with an asterisk add effects to a rogue&#8217;s sneak attack. Only one of these talents can be applied to an individual attack and the decision must be made before the attack roll is made. A rogue cannot choose a ninja trick with the same name as a rogue talent. A complete listing of rogue talents can be found here: Rogue Talents",
-                  "requirements": {
-                    "minClassLevel": 2,
-                    "text": "Starting at 2nd level, a rogue gains one rogue talent. She gains an additional rogue talent for every 2 levels of rogue attained after 2nd level."
-                  },
-                  "scrapeConfidence": "medium"
-                }
-              ],
-              "scrapeSource": "https://www.d20pfsrd.com/classes/core-classes/rogue/",
-              "scrapeConfidence": "low"
-            }
+          "poolRefs": [
+            "rogue-talent"
           ]
         }
       ],
@@ -247,52 +179,15 @@
         {
           "name": "Advanced Talents",
           "description": "At 10th level, and every two levels thereafter, a rogue can choose one of the following advanced talents in place of a rogue talent. A complete listing of advanced rogue talents can be found here: Rogue Advanced Talents",
-          "pools": [
-            {
-              "name": "Advanced Talents",
-              "description": "At 10th level, and every two levels thereafter, a rogue can choose one of the following advanced talents in place of a rogue talent. A complete listing of advanced rogue talents can be found here: Rogue Advanced Talents",
-              "requirements": {
-                "minClassLevel": 10,
-                "text": "At 10th level, and every two levels thereafter, a rogue can choose one of the following advanced talents in place of a rogue talent."
-              },
-              "options": [
-                {
-                  "name": "Advanced Talents",
-                  "description": "At 10th level, and every two levels thereafter, a rogue can choose one of the following advanced talents in place of a rogue talent. A complete listing of advanced rogue talents can be found here: Rogue Advanced Talents",
-                  "requirements": {
-                    "minClassLevel": 10,
-                    "text": "At 10th level, and every two levels thereafter, a rogue can choose one of the following advanced talents in place of a rogue talent."
-                  },
-                  "scrapeConfidence": "medium"
-                }
-              ],
-              "scrapeSource": "https://www.d20pfsrd.com/classes/core-classes/rogue/",
-              "scrapeConfidence": "low"
-            }
+          "poolRefs": [
+            "advanced-talents"
           ]
         },
         {
           "name": "Rogue Talent",
           "description": "",
-          "pools": [
-            {
-              "name": "Rogue Talent",
-              "description": "",
-              "requirements": {},
-              "options": [
-                {
-                  "name": "Rogue Talents",
-                  "description": "As a rogue gains experience, she learns a number of talents that aid her and confound her foes. Starting at 2nd level, a rogue gains one rogue talent. She gains an additional rogue talent for every 2 levels of rogue attained after 2nd level. A rogue cannot select an individual talent more than once. Talents marked with an asterisk add effects to a rogue&#8217;s sneak attack. Only one of these talents can be applied to an individual attack and the decision must be made before the attack roll is made. A rogue cannot choose a ninja trick with the same name as a rogue talent. A complete listing of rogue talents can be found here: Rogue Talents",
-                  "requirements": {
-                    "minClassLevel": 2,
-                    "text": "Starting at 2nd level, a rogue gains one rogue talent. She gains an additional rogue talent for every 2 levels of rogue attained after 2nd level."
-                  },
-                  "scrapeConfidence": "medium"
-                }
-              ],
-              "scrapeSource": "https://www.d20pfsrd.com/classes/core-classes/rogue/",
-              "scrapeConfidence": "low"
-            }
+          "poolRefs": [
+            "rogue-talent"
           ]
         }
       ],
@@ -322,25 +217,8 @@
         {
           "name": "Rogue Talent",
           "description": "",
-          "pools": [
-            {
-              "name": "Rogue Talent",
-              "description": "",
-              "requirements": {},
-              "options": [
-                {
-                  "name": "Rogue Talents",
-                  "description": "As a rogue gains experience, she learns a number of talents that aid her and confound her foes. Starting at 2nd level, a rogue gains one rogue talent. She gains an additional rogue talent for every 2 levels of rogue attained after 2nd level. A rogue cannot select an individual talent more than once. Talents marked with an asterisk add effects to a rogue&#8217;s sneak attack. Only one of these talents can be applied to an individual attack and the decision must be made before the attack roll is made. A rogue cannot choose a ninja trick with the same name as a rogue talent. A complete listing of rogue talents can be found here: Rogue Talents",
-                  "requirements": {
-                    "minClassLevel": 2,
-                    "text": "Starting at 2nd level, a rogue gains one rogue talent. She gains an additional rogue talent for every 2 levels of rogue attained after 2nd level."
-                  },
-                  "scrapeConfidence": "medium"
-                }
-              ],
-              "scrapeSource": "https://www.d20pfsrd.com/classes/core-classes/rogue/",
-              "scrapeConfidence": "low"
-            }
+          "poolRefs": [
+            "rogue-talent"
           ]
         },
         {
@@ -374,25 +252,8 @@
         {
           "name": "Rogue Talent",
           "description": "",
-          "pools": [
-            {
-              "name": "Rogue Talent",
-              "description": "",
-              "requirements": {},
-              "options": [
-                {
-                  "name": "Rogue Talents",
-                  "description": "As a rogue gains experience, she learns a number of talents that aid her and confound her foes. Starting at 2nd level, a rogue gains one rogue talent. She gains an additional rogue talent for every 2 levels of rogue attained after 2nd level. A rogue cannot select an individual talent more than once. Talents marked with an asterisk add effects to a rogue&#8217;s sneak attack. Only one of these talents can be applied to an individual attack and the decision must be made before the attack roll is made. A rogue cannot choose a ninja trick with the same name as a rogue talent. A complete listing of rogue talents can be found here: Rogue Talents",
-                  "requirements": {
-                    "minClassLevel": 2,
-                    "text": "Starting at 2nd level, a rogue gains one rogue talent. She gains an additional rogue talent for every 2 levels of rogue attained after 2nd level."
-                  },
-                  "scrapeConfidence": "medium"
-                }
-              ],
-              "scrapeSource": "https://www.d20pfsrd.com/classes/core-classes/rogue/",
-              "scrapeConfidence": "low"
-            }
+          "poolRefs": [
+            "rogue-talent"
           ]
         }
       ],
@@ -426,25 +287,8 @@
         {
           "name": "Rogue Talent",
           "description": "",
-          "pools": [
-            {
-              "name": "Rogue Talent",
-              "description": "",
-              "requirements": {},
-              "options": [
-                {
-                  "name": "Rogue Talents",
-                  "description": "As a rogue gains experience, she learns a number of talents that aid her and confound her foes. Starting at 2nd level, a rogue gains one rogue talent. She gains an additional rogue talent for every 2 levels of rogue attained after 2nd level. A rogue cannot select an individual talent more than once. Talents marked with an asterisk add effects to a rogue&#8217;s sneak attack. Only one of these talents can be applied to an individual attack and the decision must be made before the attack roll is made. A rogue cannot choose a ninja trick with the same name as a rogue talent. A complete listing of rogue talents can be found here: Rogue Talents",
-                  "requirements": {
-                    "minClassLevel": 2,
-                    "text": "Starting at 2nd level, a rogue gains one rogue talent. She gains an additional rogue talent for every 2 levels of rogue attained after 2nd level."
-                  },
-                  "scrapeConfidence": "medium"
-                }
-              ],
-              "scrapeSource": "https://www.d20pfsrd.com/classes/core-classes/rogue/",
-              "scrapeConfidence": "low"
-            }
+          "poolRefs": [
+            "rogue-talent"
           ]
         }
       ],
@@ -474,25 +318,8 @@
         {
           "name": "Rogue Talent",
           "description": "",
-          "pools": [
-            {
-              "name": "Rogue Talent",
-              "description": "",
-              "requirements": {},
-              "options": [
-                {
-                  "name": "Rogue Talents",
-                  "description": "As a rogue gains experience, she learns a number of talents that aid her and confound her foes. Starting at 2nd level, a rogue gains one rogue talent. She gains an additional rogue talent for every 2 levels of rogue attained after 2nd level. A rogue cannot select an individual talent more than once. Talents marked with an asterisk add effects to a rogue&#8217;s sneak attack. Only one of these talents can be applied to an individual attack and the decision must be made before the attack roll is made. A rogue cannot choose a ninja trick with the same name as a rogue talent. A complete listing of rogue talents can be found here: Rogue Talents",
-                  "requirements": {
-                    "minClassLevel": 2,
-                    "text": "Starting at 2nd level, a rogue gains one rogue talent. She gains an additional rogue talent for every 2 levels of rogue attained after 2nd level."
-                  },
-                  "scrapeConfidence": "medium"
-                }
-              ],
-              "scrapeSource": "https://www.d20pfsrd.com/classes/core-classes/rogue/",
-              "scrapeConfidence": "low"
-            }
+          "poolRefs": [
+            "rogue-talent"
           ]
         },
         {
@@ -530,25 +357,8 @@
         {
           "name": "Rogue Talent",
           "description": "",
-          "pools": [
-            {
-              "name": "Rogue Talent",
-              "description": "",
-              "requirements": {},
-              "options": [
-                {
-                  "name": "Rogue Talents",
-                  "description": "As a rogue gains experience, she learns a number of talents that aid her and confound her foes. Starting at 2nd level, a rogue gains one rogue talent. She gains an additional rogue talent for every 2 levels of rogue attained after 2nd level. A rogue cannot select an individual talent more than once. Talents marked with an asterisk add effects to a rogue&#8217;s sneak attack. Only one of these talents can be applied to an individual attack and the decision must be made before the attack roll is made. A rogue cannot choose a ninja trick with the same name as a rogue talent. A complete listing of rogue talents can be found here: Rogue Talents",
-                  "requirements": {
-                    "minClassLevel": 2,
-                    "text": "Starting at 2nd level, a rogue gains one rogue talent. She gains an additional rogue talent for every 2 levels of rogue attained after 2nd level."
-                  },
-                  "scrapeConfidence": "medium"
-                }
-              ],
-              "scrapeSource": "https://www.d20pfsrd.com/classes/core-classes/rogue/",
-              "scrapeConfidence": "low"
-            }
+          "poolRefs": [
+            "rogue-talent"
           ]
         }
       ],
@@ -556,5 +366,26 @@
     }
   ],
   "spellcasting": null,
-  "spellcastingClass": false
+  "spellcastingClass": false,
+  "classFeaturePools": {
+    "rogue-talent": {
+      "name": "Rogue Talent",
+      "description": "",
+      "requirements": {},
+      "scrapeSource": "https://www.d20pfsrd.com/classes/core-classes/rogue/",
+      "scrapeConfidence": "low",
+      "catalog": "rogue-rogue-talent"
+    },
+    "advanced-talents": {
+      "name": "Advanced Talents",
+      "description": "At 10th level, and every two levels thereafter, a rogue can choose one of the following advanced talents in place of a rogue talent. A complete listing of advanced rogue talents can be found here: Rogue Advanced Talents",
+      "requirements": {
+        "minClassLevel": 10,
+        "text": "At 10th level, and every two levels thereafter, a rogue can choose one of the following advanced talents in place of a rogue talent."
+      },
+      "scrapeSource": "https://www.d20pfsrd.com/classes/core-classes/rogue/",
+      "scrapeConfidence": "low",
+      "catalog": "rogue-advanced-talents"
+    }
+  }
 }

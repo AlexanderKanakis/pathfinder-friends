@@ -2,6 +2,18 @@
   "name": "Monk",
   "type": "core",
   "sourceUrl": "https://www.d20pfsrd.com/classes/core-classes/monk/",
+  "classResources": [
+    {
+      "id": "ki-pool",
+      "name": "Ki Pool",
+      "unit": "points",
+      "unlockLevel": 4,
+      "maximum": {
+        "classLevel": { "multiplier": 1, "divisor": 2 },
+        "ability": "wis"
+      }
+    }
+  ],
   "levelProgression": [
     {
       "level": 1,
