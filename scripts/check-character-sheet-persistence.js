@@ -31,6 +31,35 @@ assert(
     sheetPage.includes("sheetSaveQueue = sheetSaveQueue.then(run, run)"),
   "Character-sheet saves must be serialized to prevent stale writes.",
 );
+const saveRequestBody = sheetPage.slice(
+  sheetPage.indexOf("function createSheetSaveRequest"),
+  sheetPage.indexOf("\nfunction saveSheetNow", sheetPage.indexOf("function createSheetSaveRequest")),
+);
+const saveSnapshotBody = sheetPage.slice(
+  sheetPage.indexOf("async function saveSheetSnapshot"),
+  sheetPage.indexOf("\nasync function loadEnemySheet", sheetPage.indexOf("async function saveSheetSnapshot")),
+);
+assert(
+  saveRequestBody.includes("const targetSheetId = currentSheetId;") &&
+    saveRequestBody.includes("sheet,") &&
+    saveSnapshotBody.includes("targetSheetId,") &&
+    saveSnapshotBody.includes("request.sheet") &&
+    !saveSnapshotBody.includes("currentSheetId = saved.id") &&
+    !saveSnapshotBody.includes("loadCharacterInventory()"),
+  "Queued saves must retain an immutable character target and sheet snapshot.",
+);
+assert(
+  !sheetPage.includes('el("characterName").addEventListener("change", async () =>') &&
+    !sheetPage.includes('PFApp.loadCharacterSheet(\n      el("characterName").value.trim()'),
+  "Editing a character name must never switch the save target by name.",
+);
+assert(
+  sheetPage.includes("if (!saved?.id && sheetToSave.powerIndex)") &&
+    sheetPage.includes("delete sheetToSave.powerIndex;") &&
+    sheetPage.includes("PFApp.getLastCharacterSaveError?.()") &&
+    app.includes("getLastCharacterSaveError: () => lastCharacterSaveError"),
+  "A rejected derived index must not prevent the underlying character sheet from saving.",
+);
 assert(
   sheetPage.includes("void saveSheetNow(true)") &&
     sheetPage.includes("Refreshing now would discard them."),

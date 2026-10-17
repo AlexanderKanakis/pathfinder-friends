@@ -728,6 +728,7 @@ async function saveFeatsFile() {
     const writable = await handle.createWritable();
     await writable.write(`${JSON.stringify(payload, null, 2)}\n`);
     await writable.close();
+    await window.PFCatalogCache?.invalidate?.("data/feats.json");
     window.PFFeatData?.reset?.();
     setDirty(false);
     setStatus("Saved feat data inside data/feats.json.", "success");
@@ -743,6 +744,7 @@ async function saveFeatsFile() {
   link.download = "feats.json";
   link.click();
   URL.revokeObjectURL(url);
+  await window.PFCatalogCache?.invalidate?.("data/feats.json");
   setDirty(false);
   setStatus(
     "Downloaded feats.json because direct project saving is unavailable.",

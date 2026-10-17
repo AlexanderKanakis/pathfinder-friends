@@ -355,6 +355,8 @@ let effectPickerDefinitionsPromise = null;
 let effectPickerDefinitionsKey = "";
 let effectPickerPrefetchTimer = null;
 let effectPickerPrefetchIdleCallback = null;
+let currentPowerIndex = null;
+let powerIndexPersistenceEnabled = true;
 let currentUserId = "";
 let currentSheetOwnerId = "";
 let currentUserIsAdmin = false;
@@ -7838,9 +7840,36 @@ function spellAdjustmentChoiceSummary(entries = []) {
   return (Array.isArray(entries) ? entries : [])
     .flatMap((entry) =>
       (entry.targetFilters || entry.filters || [])
-        .filter((filter) => filter.chooseOnApply || filter.choice || filter.pickOne)
+        .filter(
+          (filter) =>
+            filter.resolvedChoice ||
+            filter.chooseOnApply ||
+            filter.choice ||
+            filter.pickOne,
+        )
         .flatMap((filter) => filter.targets || filter.values || []),
     )
+    .map(firstChoiceLabel)
+    .filter(Boolean);
+}
+
+function legacySpellAdjustmentChoiceSummary(entries = [], sourceEntries = []) {
+  return (Array.isArray(entries) ? entries : [])
+    .flatMap((entry, entryIndex) => {
+      const filters = entry.targetFilters || entry.filters || [];
+      const source = Array.isArray(sourceEntries)
+        ? sourceEntries[entryIndex] || {}
+        : {};
+      const sourceFilters = source.targetFilters || source.filters || [];
+      return filters.flatMap((filter, filterIndex) => {
+        const sourceFilter = sourceFilters[filterIndex] || {};
+        const wasChoice =
+          sourceFilter.chooseOnApply ||
+          sourceFilter.choice ||
+          sourceFilter.pickOne;
+        return wasChoice ? filter.targets || filter.values || [] : [];
+      });
+    })
     .map(firstChoiceLabel)
     .filter(Boolean);
 }
@@ -7897,8 +7926,26 @@ function mechanicsChoiceSummary(mechanics = {}) {
   return [...new Set(labels.map(String).filter(Boolean))].join(", ");
 }
 
-function featChoiceSummary(selection) {
-  return mechanicsChoiceSummary(featSelectionMechanics(selection)).replace(
+function featChoiceSummary(selection, feat = {}) {
+  const mechanics = featSelectionMechanics(selection);
+  let summary = mechanicsChoiceSummary(mechanics);
+  if (!summary && mechanics) {
+    summary = [
+      ...legacySpellAdjustmentChoiceSummary(
+        mechanics.casterLevelBonuses,
+        feat.casterLevelBonuses,
+      ),
+      ...legacySpellAdjustmentChoiceSummary(
+        mechanics.spellDcBonuses,
+        feat.spellDcBonuses,
+      ),
+      ...legacySpellAdjustmentChoiceSummary(
+        mechanics.effectiveAttributeBonuses,
+        feat.effectiveAttributeBonuses,
+      ),
+    ].join(", ");
+  }
+  return summary.replace(
     /\b(Craft|Knowledge|Perform|Profession) \(([^)]+)\)/g,
     "$1: $2",
   );
@@ -8860,7 +8907,7 @@ function renderFeatProgression() {
     const hasChoiceButton =
       selectedFeat && featHasChoiceBearingMechanics(selectedFeat);
     const choiceSummary = hasChoiceButton
-      ? featChoiceSummary(selection)
+      ? featChoiceSummary(selection, selectedFeat)
       : "";
     const displayName =
       selectedName && hasChoiceButton
@@ -9836,25 +9883,26 @@ function spellDetailCalculations(
       ? requestedCasterLevel
       : calculatedCasterLevel,
   );
-  const withEffectiveCasterLevel = (result = {}) => {
-    const base = Number(result.base || 0);
-    if (effectiveCasterLevel === Number(result.total ?? base)) return result;
-    const calculatedTotal = Number(result.total ?? base);
-    return {
-      ...result,
-      total: effectiveCasterLevel,
-      bonus: effectiveCasterLevel - base,
-      calculatedTotal,
-      calculatedBonus: calculatedTotal - base,
-      miscCasterLevelBonus: Math.max(0, effectiveCasterLevel - calculatedCasterLevel),
-      downcastBy: Math.max(0, calculatedCasterLevel - effectiveCasterLevel),
-      downcastFrom: calculatedCasterLevel,
-    };
-  };
-  const effectiveClResult = withEffectiveCasterLevel(casterLevel);
-  const effectiveDurationClResult =
-    withEffectiveCasterLevel(durationCasterLevel);
-  const effectiveRangeClResult = withEffectiveCasterLevel(rangeCasterLevel);
+  const adjustCasterLevelResult =
+    window.PFSpellData?.adjustCasterLevelResult ||
+    ((result = {}) => result);
+  const effectiveClResult = adjustCasterLevelResult(
+    casterLevel,
+    calculatedCasterLevel,
+    effectiveCasterLevel,
+  );
+  const effectiveDurationClResult = adjustCasterLevelResult(
+    durationCasterLevel,
+    calculatedCasterLevel,
+    effectiveCasterLevel,
+    { preservePartModifiers: true },
+  );
+  const effectiveRangeClResult = adjustCasterLevelResult(
+    rangeCasterLevel,
+    calculatedCasterLevel,
+    effectiveCasterLevel,
+    { preservePartModifiers: true },
+  );
   return {
     className,
     spellLevel,
@@ -10576,7 +10624,6 @@ function ensureSpellCastTargetModal() {
             <h5 class="modal-title" id="spellCastTargetModalLabel">Choose Targets</h5>
           </div>
           <div class="modal-body">
-            <div id="spellCastTargetHint" class="small text-secondary mb-3"></div>
             <div id="spellCastTargetList" class="spell-cast-target-list"></div>
           </div>
           <div class="modal-footer border-secondary">
@@ -10682,11 +10729,11 @@ function renderSpellCastTargetGroup(label, group, targets = []) {
         ${targets
           .map(
             (target) => `
-          <label class="spell-cast-target-card">
+          <label class="spell-cast-target-card${target.isCaster ? " is-caster" : ""}">
             <input class="form-check-input" type="checkbox" value="${escapeHtml(target.key)}" data-spell-cast-target data-spell-cast-target-group="${escapeHtml(group)}">
             <span>
               <strong>${escapeHtml(target.name)}</strong>
-              <span class="small text-secondary d-block">${escapeHtml(target.subtitle)}</span>
+              <span class="small text-secondary d-block">${escapeHtml(target.isCaster ? `Caster | ${target.subtitle}` : target.subtitle)}</span>
             </span>
           </label>
         `,
@@ -10711,13 +10758,20 @@ async function spellCastTargetsFromCurrentMap() {
   );
   const enemyMap = new Map((enemies || []).map((enemy) => [enemy.id, enemy]));
   const canSeeHiddenEnemies = Boolean(isGm || currentUserIsAdmin);
+  const sourceToken = currentSheetSourceToken(spellCastTargetMapState);
   const entries = (spellCastTargetMapState.tokens || [])
     .filter((token) => token.kind === "character" || token.kind === "enemy")
     .filter((token) => token.kind !== "enemy" || token.visible !== false || canSeeHiddenEnemies)
     .map((token) => ({
       key: token.id,
       token,
-      group: token.kind === "enemy" ? "enemy" : "ally",
+      isCaster: String(token.id) === String(sourceToken?.id || ""),
+      group:
+        String(token.id) === String(sourceToken?.id || "")
+          ? "ally"
+          : token.kind === "enemy"
+            ? "enemy"
+            : "ally",
       name: spellCastTokenName(token, characterMap, enemyMap),
       subtitle:
         token.kind === "enemy"
@@ -10730,7 +10784,11 @@ async function spellCastTargetsFromCurrentMap() {
           : "",
     }))
     .filter((entry) => entry.targetId)
-    .sort((a, b) => a.name.localeCompare(b.name));
+    .sort(
+      (a, b) =>
+        Number(b.isCaster) - Number(a.isCaster) ||
+        a.name.localeCompare(b.name),
+    );
   return entries;
 }
 
@@ -10739,8 +10797,6 @@ async function openSpellCastTargetModal(spell = {}) {
   const targets = await spellCastTargetsFromCurrentMap();
   document.getElementById("spellCastTargetModalLabel").textContent =
     `Cast ${spell.name || "Spell"}`;
-  document.getElementById("spellCastTargetHint").textContent =
-    "Choose one or more tokens on the current map.";
   document.getElementById("spellCastTargetStatus").textContent = "";
   document.getElementById("spellCastTargetList").innerHTML = targets.length
     ? [
@@ -10846,7 +10902,7 @@ async function spellCastRecalculationBridge() {
   if (spellCastBridgePromise) return spellCastBridgePromise;
   spellCastBridgePromise = new Promise((resolve, reject) => {
     spellCastBridgeFrame = document.createElement("iframe");
-    spellCastBridgeFrame.src = "character-sheet.html?bridge=1&v=spell-cast-targets-1";
+    spellCastBridgeFrame.src = "character-sheet.html?bridge=1&v=bridge-loader-1";
     spellCastBridgeFrame.tabIndex = -1;
     spellCastBridgeFrame.style.cssText =
       "position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;left:-9999px;top:-9999px;";
@@ -15466,7 +15522,7 @@ async function openEffectTrackerModal() {
     contextKey: sheetContextKey,
     characterId: currentSheetId,
     effectStats: LOOT_EFFECT_STATS,
-    activatableAbilities: collectActivatableAbilities(),
+    activatableAbilities: [],
     recalculateSpell: async (effect, casterLevel) => {
       const detail = await spellDetailsForCharacter(
         sheetContextKey,
@@ -15495,6 +15551,8 @@ async function openEffectTrackerModal() {
       };
     },
     effectPickerEffects: loadCurrentEffectPickerDefinitions,
+    loadEffectPickerGroup: loadCurrentEffectPickerGroup,
+    hydratePickerEffect: hydrateCurrentPickerEffect,
     choicePoolSkills: effectChoiceSkills(),
     choicePoolEquipment: currentEffectChoiceEquipment,
     favoredEnemyOptions: characterFavoredEnemyOptions,
@@ -17199,6 +17257,15 @@ function collectSheet() {
   sheet.spellLikeChoices = normalizeSpellLikeChoicesForSave(
     selectedSpellLikeChoices,
   );
+  if (
+    powerIndexPersistenceEnabled &&
+    window.PFPowerIndex?.isUsable?.(
+      currentPowerIndex,
+      effectPickerSourceSignature(),
+    )
+  ) {
+    sheet.powerIndex = structuredClone(currentPowerIndex);
+  }
   if (isEnemySheetMode)
     sheet.enemyInventory = characterInventoryItems.map((item) => ({
       ...item,
@@ -17231,6 +17298,12 @@ function collectSheet() {
 function restoreSheet(sheet) {
   isRestoringSheet = true;
   const data = sheet || {};
+  currentPowerIndex = window.PFPowerIndex?.isUsableForSheet?.(
+    data.powerIndex,
+    data,
+  )
+    ? structuredClone(data.powerIndex)
+    : null;
   d20BoostUses = data.d20BoostUses && typeof data.d20BoostUses === "object"
     ? structuredClone(data.d20BoostUses)
     : {};
@@ -17436,6 +17509,42 @@ function isSheetEditable() {
   return currentSheetOwnerId === currentUserId || currentUserIsAdmin;
 }
 
+function createSheetSaveRequest(silent = false) {
+  if (!isSheetEditable()) {
+    setStatus(
+      "You can view this campaign character, but only its owner or an admin can save changes.",
+      "warning",
+    );
+    return null;
+  }
+  const name = el("characterName").value.trim();
+  if (!name) {
+    if (!silent)
+      setStatus("Character name is required before saving.", "warning");
+    return null;
+  }
+  const targetSheetId = currentSheetId;
+  const targetEnemyId = enemySheetId;
+  const enemyMode = isEnemySheetMode;
+  if (!enemyMode && !targetSheetId) {
+    setStatus("Select or create a character before saving.", "warning");
+    return null;
+  }
+  recalculateSheet();
+  refreshCurrentSpellPowerIndex();
+  const sheet = collectSheet();
+  if (enemyMode) sheet.activeBuffs = structuredClone(activeBuffs);
+  return {
+    silent,
+    name,
+    sheet,
+    contextKey: sheetContextKey,
+    targetSheetId,
+    targetEnemyId,
+    enemyMode,
+  };
+}
+
 function saveSheetNow(silent = false) {
   clearTimeout(sheetSaveTimer);
   sheetSaveTimer = null;
@@ -17444,43 +17553,33 @@ function saveSheetNow(silent = false) {
 
 function enqueueSheetSave(silent = false) {
   scheduleEffectPickerPrefetch();
-  const run = () => saveSheetSnapshot(silent);
+  const request = createSheetSaveRequest(silent);
+  if (!request) return Promise.resolve(null);
+  const run = () => saveSheetSnapshot(request);
   sheetSaveQueue = sheetSaveQueue.then(run, run);
   return sheetSaveQueue;
 }
 
-async function saveSheetSnapshot(silent = false) {
-  if (!isSheetEditable()) {
-    setStatus(
-      "You can view this campaign character, but only its owner or an admin can save changes.",
-      "warning",
-    );
-    return null;
-  }
-
-  const name = el("characterName").value.trim();
-  if (!name) {
-    if (!silent)
-      setStatus("Character name is required before saving.", "warning");
-    return;
-  }
-  recalculateSheet();
-  if (isEnemySheetMode) {
-    const sheet = collectSheet();
-    sheet.activeBuffs = activeBuffs;
+async function saveSheetSnapshot(request) {
+  const {
+    silent,
+    name,
+    contextKey,
+    targetSheetId,
+    targetEnemyId,
+    enemyMode,
+  } = request;
+  if (enemyMode) {
     const savedEnemy = await PFApp.saveEnemy(
       {
-        id: enemySheetId,
+        id: targetEnemyId,
         name,
         visible: true,
-        sheet,
+        sheet: request.sheet,
       },
-      sheetContextKey,
+      contextKey,
     );
-    if (savedEnemy?.id) {
-      enemySheetId = savedEnemy.id;
-      currentSheetId = savedEnemy.id;
-    } else {
+    if (!savedEnemy?.id || String(savedEnemy.id) !== String(targetEnemyId)) {
       setStatus(
         "Changes could not be saved. Refreshing now would discard them.",
         "danger",
@@ -17488,35 +17587,49 @@ async function saveSheetSnapshot(silent = false) {
       return null;
     }
     localStorage.setItem(
-      `pf_enemy_sheet_updated_${sheetContextKey}_${enemySheetId}`,
+      `pf_enemy_sheet_updated_${contextKey}_${targetEnemyId}`,
       String(Date.now()),
     );
-    if (!silent) setStatus("Enemy sheet saved.", "success");
+    if (!silent && String(enemySheetId) === String(targetEnemyId))
+      setStatus("Enemy sheet saved.", "success");
     return savedEnemy;
   }
 
-  const saved = await PFApp.saveCharacterSheet(
+  let sheetToSave = request.sheet;
+  let saved = await PFApp.saveCharacterSheet(
     name,
-    collectSheet(),
-    sheetContextKey,
-    currentSheetId,
+    sheetToSave,
+    contextKey,
+    targetSheetId,
   );
-  if (!saved?.id) {
+  if (!saved?.id && sheetToSave.powerIndex) {
+    powerIndexPersistenceEnabled = false;
+    sheetToSave = { ...sheetToSave };
+    delete sheetToSave.powerIndex;
+    saved = await PFApp.saveCharacterSheet(
+      name,
+      sheetToSave,
+      contextKey,
+      targetSheetId,
+    );
+  }
+  if (!saved?.id || String(saved.id) !== String(targetSheetId)) {
+    const saveError = PFApp.getLastCharacterSaveError?.();
+    const detail = String(saveError?.message || "").trim();
     setStatus(
-      "Changes could not be saved. Refreshing now would discard them.",
+      detail
+        ? `Changes could not be saved: ${detail}`
+        : "Changes could not be saved. Refreshing now would discard them.",
       "danger",
     );
     return null;
   }
-  currentSheetId = saved.id;
-  if (currentSheetId) rememberSelectedCharacter(currentSheetId);
-  await loadCharacterInventory();
-  if (currentSheetId)
-    localStorage.setItem(
-      `pf_character_sheet_updated_${sheetContextKey}_${currentSheetId}`,
-      String(Date.now()),
-    );
-  if (!silent) setStatus("Character sheet saved.", "success");
+  localStorage.setItem(
+    `pf_character_sheet_updated_${contextKey}_${targetSheetId}`,
+    String(Date.now()),
+  );
+  if (!silent && String(currentSheetId) === String(targetSheetId))
+    setStatus("Character sheet saved.", "success");
   return saved;
 }
 
@@ -17585,6 +17698,8 @@ async function loadCurrentSheet(
 
 let sheetBridgeRecalculationQueue = Promise.resolve();
 let sheetBridgeSummarySaveQueue = Promise.resolve();
+let sheetBridgePreparedKey = "";
+let sheetBridgePreparedCharacter = null;
 
 function effectPickerSourceSignature() {
   const itemSources = (characterInventoryItems || []).map((item) => ({
@@ -17637,18 +17752,95 @@ function invalidateEffectPickerDefinitions() {
   }
 }
 
+function currentClassPowerAbilities() {
+  const attributeScaleContext = currentAttributeScaleContext();
+  return (
+    window.PFClassFeatureAbilities?.collectActivatableAbilities({
+      classDefinitions,
+      classProgression,
+      classFeatureChoices,
+      characterLevel: num("characterLevel"),
+      abilityScores: attributeScaleContext.abilityScores,
+      bab: attributeScaleContext.bab,
+    }) || []
+  );
+}
+
+async function currentPowerIndexResolutionContext() {
+  const [catalog, spellDefinitions] = await Promise.all([
+    window.PFEffectCatalog?.load?.() || [],
+    window.PFSpellData?.loadSpells?.() || [],
+  ]);
+  return {
+    catalog,
+    spellDefinitions,
+    classAbilities: currentClassPowerAbilities(),
+  };
+}
+
+function refreshCurrentSpellPowerIndex() {
+  const signature = effectPickerSourceSignature();
+  if (
+    currentPowerIndex?.scope === "spells" &&
+    window.PFPowerIndex?.isUsable?.(currentPowerIndex, signature)
+  ) {
+    return currentPowerIndex;
+  }
+  const index = window.PFPowerIndex?.build?.({
+    signature,
+    spells: collectOwnedSpellPlaceholders(),
+  }) || null;
+  currentPowerIndex = index ? { ...index, scope: "spells" } : null;
+  return currentPowerIndex;
+}
+
+async function ensureCurrentPowerIndex() {
+  const signature = effectPickerSourceSignature();
+  const catalog = await (window.PFEffectCatalog?.load?.() || []);
+  if (
+    window.PFPowerIndex?.isUsable?.(
+      currentPowerIndex,
+      signature,
+      catalog,
+    )
+  ) {
+    return currentPowerIndex;
+  }
+  const spells = await collectBridgeOwnedSpellEffects();
+  currentPowerIndex = window.PFPowerIndex?.build?.({
+    signature,
+    activatable: collectActivatableAbilities(),
+    spells,
+    passives: collectBridgePassiveEffectSources(),
+    catalog,
+  }) || null;
+  return currentPowerIndex;
+}
+
+async function resolvedCurrentPowerSources() {
+  const index = await ensureCurrentPowerIndex();
+  const context = await currentPowerIndexResolutionContext();
+  return (
+    window.PFPowerIndex?.resolve?.(index, context) || {
+      activatable: collectActivatableAbilities(),
+      spells: await collectBridgeOwnedSpellEffects(),
+      passives: collectBridgePassiveEffectSources(),
+    }
+  );
+}
+
 function loadCurrentEffectPickerDefinitions() {
   const key = currentEffectPickerDefinitionsKey();
   if (effectPickerDefinitionsPromise && effectPickerDefinitionsKey === key)
     return effectPickerDefinitionsPromise;
   effectPickerDefinitionsKey = key;
   effectPickerDefinitionsPromise = Promise.all([
-    collectBridgeOwnedSpellEffects(),
+    resolvedCurrentPowerSources(),
     window.PFEffectCatalog?.load?.() || [],
   ])
-    .then(([spells, catalog]) => [
-      ...collectActivatableAbilities(),
-      ...spells,
+    .then(([sources, catalog]) => [
+      ...(sources.activatable || []),
+      ...(sources.spells || []),
       ...catalog,
     ])
     .catch((error) => {
@@ -17674,9 +17866,7 @@ function scheduleEffectPickerPrefetch() {
   const prefetch = () => {
     effectPickerPrefetchTimer = null;
     effectPickerPrefetchIdleCallback = null;
-    void loadCurrentEffectPickerDefinitions().catch((error) =>
-      console.warn("Could not prefetch character effects.", error),
-    );
+    currentSpellPickerSources();
   };
   if (window.requestIdleCallback) {
     effectPickerPrefetchIdleCallback = window.requestIdleCallback(prefetch, {
@@ -17720,6 +17910,107 @@ function bridgeSpellEffectDefinition(spell = {}, metadata = {}) {
     }
   });
   return effect;
+}
+
+function collectOwnedSpellPlaceholders() {
+  const classNames = new Map();
+  classProgression.forEach((row) => {
+    if (row?.className) {
+      classNames.set(spellcastingStateKey(row.className), row.className);
+    }
+  });
+  const results = [];
+  const seen = new Set();
+  Object.entries(characterSpells || {}).forEach(([classKey, state]) => {
+    const className = classNames.get(classKey) || classKey.replaceAll("_", " ");
+    const spellcasting = classDefinitionByName(className)?.spellcasting || {};
+    ["known", "book", "prepared"].forEach((bucket) => {
+      Object.entries(state?.[bucket] || {}).forEach(([level, names]) => {
+        (Array.isArray(names) ? names : []).filter(Boolean).forEach((name) => {
+          const key = `${classKey}:${bucket}:${level}:${String(name).toLowerCase()}`;
+          if (seen.has(key)) return;
+          seen.add(key);
+          results.push(
+            bridgeSpellEffectDefinition(
+              { name },
+              {
+                kind: "spell",
+                className,
+                level: Number(level),
+                bucket,
+                preparation:
+                  spellcasting.preparation || spellcasting.castingType || "",
+              },
+            ),
+          );
+        });
+      });
+    });
+  });
+  collectCharacterSpellLikeRows();
+  spellLikeDetailConfigs.forEach((config) => {
+    const name = String(config.spellName || "").trim();
+    if (!name) return;
+    const key = `sla:${name.toLowerCase()}:${config.source || ""}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+    const spellLevel = Number(config.entry?.spellLevel ?? config.entry?.level ?? 0);
+    results.push(
+      bridgeSpellEffectDefinition(
+        { name },
+        {
+          kind: "sla",
+          className: "Spell-Like Abilities",
+          level: spellLevel,
+          frequency: config.entry?.frequency || "At will",
+          source: config.source || "Spell-Like Ability",
+          calculationOptions: {
+            spellSource: "spell-like-abilities",
+            baseCasterLevel: Math.max(1, Number(num("characterLevel") || 1)),
+            castingAbility: spellLikeCastingAttrKey(config.entry || {}) || "cha",
+            spellLevel,
+          },
+        },
+      ),
+    );
+  });
+  return results;
+}
+
+function currentSpellPickerSources() {
+  const signature = effectPickerSourceSignature();
+  if (window.PFPowerIndex?.isUsable?.(currentPowerIndex, signature)) {
+    return window.PFPowerIndex.resolveSpells(currentPowerIndex);
+  }
+  return collectOwnedSpellPlaceholders();
+}
+
+async function hydrateCurrentPickerEffect(effect = {}) {
+  if (!effect.ownedSpell) return effect;
+  const metadata = effect.spellMeta || {};
+  const spell = await spellByNameForClass(effect.name, metadata.className || "");
+  if (!spell) return effect;
+  const hydrated = bridgeSpellEffectDefinition(spell, metadata);
+  hydrated.spellCalculations = safeSpellDetailCalculations(
+    spell,
+    metadata.kind === "sla" ? "" : metadata.className || "",
+    Number(metadata.level || 0),
+    metadata.calculationOptions || {},
+  );
+  return hydrated;
+}
+
+async function loadCurrentEffectPickerGroup(group = "spells") {
+  if (group === "spells") return currentSpellPickerSources();
+  if (group === "conditions") {
+    return window.PFEffectCatalog?.loadConditions?.() || [];
+  }
+  if (group === "class") return currentClassPowerAbilities();
+  const definitions = await loadCurrentEffectPickerDefinitions();
+  const sourceGroup = window.PFEffectTracker?.sourceGroup;
+  return sourceGroup
+    ? definitions.filter((effect) => sourceGroup(effect) === group)
+    : definitions;
 }
 
 async function collectBridgeOwnedSpellEffects() {
@@ -17881,10 +18172,21 @@ function collectBridgePassiveEffectSources() {
 async function prepareBridgeCharacterSheet(
   contextKey,
   characterId,
-  { inventory = false } = {},
+  { inventory = false, revision = "" } = {},
 ) {
   await characterSheetReady;
   if (!contextKey || !characterId) return null;
+  const preparedKey = revision
+    ? `${contextKey}:${characterId}:${revision}`
+    : "";
+  if (
+    preparedKey &&
+    preparedKey === sheetBridgePreparedKey &&
+    String(currentSheetId) === String(characterId) &&
+    sheetContextKey === contextKey
+  ) {
+    return sheetBridgePreparedCharacter;
+  }
   isEnemySheetMode = false;
   enemySheetId = "";
   el("enemySourceItemButton")?.classList.add("d-none");
@@ -17908,6 +18210,8 @@ async function prepareBridgeCharacterSheet(
   await syncCharacterInventoryWithEquipment();
   if (inventory) renderCharacterInventory(characterInventoryItems);
   recalculateSheet();
+  sheetBridgePreparedKey = preparedKey;
+  sheetBridgePreparedCharacter = saved;
   return saved;
 }
 
@@ -17926,23 +18230,14 @@ async function spellDetailsForCharacter(
   characterId,
   spellMeta = {},
   casterLevel = null,
+  revision = "",
 ) {
   return queueSheetBridgeRecalculation(async () => {
-    await characterSheetReady;
     if (!contextKey || !characterId || !spellMeta?.name) return null;
-    sheetContextKey = contextKey;
-    const saved =
-      (await PFApp.loadCharacterSheetForRecalculation?.(characterId, sheetContextKey)) ||
-      (await PFApp.loadCharacterSheet("", sheetContextKey, characterId));
-    if (!saved?.sheet || String(saved.id) !== String(characterId)) return null;
-    currentSheetId = saved.id;
-    currentSheetOwnerId = saved.user_id || currentUserId;
-    activeBuffs =
-      (await PFApp.loadCharacterBuffStateForRecalculation?.(saved.id, sheetContextKey)) || [];
-    await restoreSheetWithClassDefinitions(saved.sheet);
-    el("characterName").value = saved.character_name;
-    await syncCharacterInventoryWithEquipment();
-    recalculateSheet();
+    const saved = await prepareBridgeCharacterSheet(contextKey, characterId, {
+      revision,
+    });
+    if (!saved) return null;
     const isSla = spellMeta.kind === "sla";
     const className = isSla ? "" : spellMeta.className || "";
     const spell = await spellByNameForClass(spellMeta.name, className);
@@ -18001,6 +18296,13 @@ async function mapEffectSourcesForCharacter(contextKey, characterId) {
       spells: await collectBridgeOwnedSpellEffects(),
       passives: collectBridgePassiveEffectSources(),
     };
+  });
+}
+
+async function saveRollSheetForCharacter(contextKey, characterId) {
+  return queueSheetBridgeRecalculation(async () => {
+    const saved = await prepareBridgeCharacterSheet(contextKey, characterId);
+    return saved ? collectSheet() : null;
   });
 }
 
@@ -18203,7 +18505,7 @@ async function recalculateAndSaveEnemySheetNow(contextKey, enemyId) {
 
 window.PFCharacterSheetBridge = {
   currentSheetSnapshot: () => collectSheet(),
-  currentSheetSnapshot: () => collectSheet(),
+  saveRollSheetForCharacter,
   recalculateAndSaveCharacter: recalculateAndSaveCharacterSheet,
   recalculateAndSaveEnemy: recalculateAndSaveEnemySheet,
   recalculateCharacterSnapshot: recalculateAndSaveCharacterSnapshot,
@@ -18214,6 +18516,11 @@ window.PFCharacterSheetBridge = {
   mapEffectSourcesForCharacter,
   spellDetailsForCharacter,
 };
+
+window.PFCharacterSheetBridgeLoader =
+  new URLSearchParams(window.location.search).get("bridge") === "1"
+    ? async () => window.PFCharacterSheetBridge
+    : spellCastRecalculationBridge;
 
 function inventoryEditorConfig() {
   return {
@@ -18467,15 +18774,6 @@ async function initCharacterSheet() {
     openEffectWorkspace(event.currentTarget, { powersOnly: true }),
   );
   window.addEventListener("beforeunload", unsubscribeCharacterBuffRealtime);
-  el("characterName").addEventListener("change", async () => {
-    if (isEnemySheetMode) return;
-    const saved = await PFApp.loadCharacterSheet(
-      el("characterName").value.trim(),
-      sheetContextKey,
-    );
-    currentSheetId = saved?.id || null;
-    if (saved?.sheet) await loadCurrentSheet(saved.id);
-  });
   el("inventoryItemType").addEventListener(
     "change",
     () => toggleInventoryDetailFields(true),

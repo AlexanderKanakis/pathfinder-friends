@@ -3,6 +3,123 @@ body {
   color: #fff;
 }
 
+
+.map-startup-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483647;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: #121212;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 240ms ease, visibility 240ms ease;
+}
+
+.map-startup-loader.is-ready {
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.map-startup-loader-content {
+  display: grid;
+  justify-items: center;
+  width: min(360px, 100%);
+}
+
+.map-startup-loader-content h1 {
+  margin: 22px 0 5px;
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+.map-startup-loader-content p {
+  min-height: 24px;
+  margin: 0 0 14px;
+  color: #b9c1c7;
+  text-align: center;
+}
+
+.map-startup-icon-stage {
+  width: 96px;
+  height: 96px;
+  display: grid;
+  place-items: center;
+  perspective: 480px;
+}
+
+.map-startup-icon {
+  width: 82px;
+  height: 82px;
+  image-rendering: auto;
+  transform-style: preserve-3d;
+  animation: map-startup-spin 1.35s linear infinite;
+  filter: drop-shadow(0 0 14px rgba(13, 202, 240, 0.32));
+}
+
+.map-startup-progress {
+  width: 100%;
+  height: 8px;
+  overflow: hidden;
+  border: 1px solid #4b555c;
+  border-radius: 4px;
+  background: #25292c;
+}
+
+.map-startup-progress-bar {
+  width: 0;
+  height: 100%;
+  background: #0dcaf0;
+  transition: width 180ms ease;
+}
+
+.map-startup-percent {
+  min-height: 22px;
+  margin-top: 7px;
+  color: #dce3e7;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.82rem;
+}
+
+.map-startup-loader.is-error .map-startup-icon {
+  animation-play-state: paused;
+}
+
+.map-startup-loader.is-error .map-startup-progress-bar {
+  background: #dc3545;
+}
+
+.map-startup-loader.is-error .map-startup-loader-content p {
+  color: #ff9ca5;
+}
+
+body.map-booting #appNavbar,
+body.map-booting .map-shell {
+  visibility: hidden;
+}
+
+@keyframes map-startup-spin {
+  from {
+    transform: rotateY(0deg) rotateX(10deg);
+  }
+  to {
+    transform: rotateY(360deg) rotateX(10deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .map-startup-icon {
+    animation-duration: 3s;
+  }
+
+  .map-startup-loader,
+  .map-startup-progress-bar {
+    transition: none;
+  }
+}
+
 .map-shell {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 320px;
@@ -293,8 +410,20 @@ body {
   display: none;
 }
 
-.map-stage-wrap {
+.map-stage-viewport {
+  grid-column: 1;
+  grid-row: 2;
   position: relative;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  isolation: isolate;
+  z-index: 0;
+}
+
+.map-stage-wrap {
+  position: absolute;
+  inset: 0;
   overflow: auto;
   padding: 12px;
 }
@@ -353,32 +482,97 @@ body {
   background-repeat: repeat, repeat, no-repeat;
 }
 
-.map-weather-layer {
+.map-weather-viewport {
   position: absolute;
   inset: 0;
-  z-index: 2147482500;
+  z-index: 100;
   pointer-events: none;
   overflow: hidden;
+  min-width: 0;
+  min-height: 0;
+  visibility: hidden;
+}
+
+.map-weather-viewport.has-map-weather {
+  visibility: visible;
+  opacity: 0.49;
+  contain: strict;
+}
+
+.map-weather-drift-x,
+.map-weather-drift-y {
+  position: absolute;
+  pointer-events: none;
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+.map-weather-drift-x {
+  inset: 0 auto auto 0;
+  width: calc(100% + var(--map-weather-tile-width));
+  height: 100%;
+  animation: map-weather-drift-x var(--map-weather-duration-x) linear infinite;
+}
+
+.map-weather-drift-y {
+  left: 0;
+  top: calc(-1 * var(--map-weather-tile-height));
+  width: 100%;
+  height: calc(100% + var(--map-weather-tile-height));
   background-image: var(--map-weather-image);
   background-repeat: repeat;
   background-size: var(--map-weather-tile-width) var(--map-weather-tile-height);
-  opacity: 0.7;
-  animation: map-weather-drift 30s linear infinite;
-  will-change: background-position;
+  animation: map-weather-drift-y var(--map-weather-duration-y) linear infinite;
 }
 
-@keyframes map-weather-drift {
-  from {
-    background-position: 0 0;
-  }
+@keyframes map-weather-drift-x {
   to {
-    background-position: calc(-1 * var(--map-weather-tile-width))
-      var(--map-weather-tile-height);
+    transform: translate3d(calc(-1 * var(--map-weather-tile-width)), 0, 0);
   }
+}
+
+@keyframes map-weather-drift-y {
+  to {
+    transform: translate3d(0, var(--map-weather-tile-height), 0);
+  }
+}
+
+.map-weather-label-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 101;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.map-weather-hover-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 102;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.map-weather-label-content,
+.map-weather-hover-content {
+  position: absolute;
+  inset: 0 auto auto 0;
+  will-change: transform;
+}
+
+.map-weather-token-label {
+  position: absolute;
+  display: grid;
+  place-items: center;
+}
+
+.map-stage-viewport.weather-labels-active .map-stage .token-label {
+  visibility: hidden;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .map-weather-layer {
+  .map-weather-drift-x,
+  .map-weather-drift-y {
     animation: none;
   }
 }
@@ -2314,6 +2508,12 @@ body {
   min-height: 64px;
 }
 
+.quick-target-card.is-caster {
+  border-color: #35c7d8;
+  background: #202b2c;
+  box-shadow: inset 3px 0 0 #35c7d8;
+}
+
 .selected-collapse .accordion-button {
   background: #242424;
   color: #ddd;
@@ -3065,7 +3265,7 @@ textarea {
   min-width: 100%;
   min-height: 100%;
   pointer-events: none;
-  z-index: 2147482500;
+  z-index: 103;
 }
 
 .token-3d-hover-card {
@@ -3172,6 +3372,10 @@ textarea {
     border: 0;
     border-radius: 0;
     position: relative;
+  }
+
+  .map-stage-viewport {
+    height: 100%;
   }
 
   /* Hides #mapToolbar in its normal desktop spot at the top of

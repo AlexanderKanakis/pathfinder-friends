@@ -1696,6 +1696,7 @@ async function saveRacesFile() {
     const writable = await handle.createWritable();
     await writable.write(`${JSON.stringify(payload, null, 2)}\n`);
     await writable.close();
+    await window.PFCatalogCache?.invalidate?.("data/races.json");
     window.PFRaceData?.reset?.();
     setDirty(false);
     setStatus("Saved race data inside data/races.json.", "success");
@@ -1710,6 +1711,7 @@ async function saveRacesFile() {
   link.download = "races.json";
   link.click();
   URL.revokeObjectURL(url);
+  await window.PFCatalogCache?.invalidate?.("data/races.json");
   setDirty(false);
   setStatus(
     "Downloaded races.json because direct project saving is unavailable.",

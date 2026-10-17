@@ -265,4 +265,30 @@ assert(
   "The recipient must choose a branch before the effect is saved.",
 );
 
+const pendingChoices = fs.readFileSync(
+  "modals/pending-effect-choices.js",
+  "utf8",
+);
+assert(
+  pendingChoices.includes("if (!requestFinished)") &&
+    pendingChoices.includes("cancelEffectChoiceRequest?.(request.id)"),
+  "Cancelling any remote decision stage must terminate the activation request.",
+);
+const appSupabase = fs.readFileSync("scripts/app-supabase.js", "utf8");
+const cancelStart = appSupabase.indexOf(
+  "async function cancelEffectChoiceRequest",
+);
+const cancelBody = appSupabase.slice(
+  cancelStart,
+  appSupabase.indexOf(
+    "async function loadCharacterBuffStateForRecalculation",
+    cancelStart,
+  ),
+);
+assert(
+  cancelBody.includes('status: "cancelled"') &&
+    !cancelBody.includes(".delete()"),
+  "Remote cancellation must remain visible to the waiting caster.",
+);
+
 console.log("Effect choice ordering checks passed.");

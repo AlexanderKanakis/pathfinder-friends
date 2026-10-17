@@ -1060,6 +1060,7 @@
       this.activeTypeFilter = "spell";
       this.pickerGroup = "spells";
       this.pickerEffects = [];
+      this.pickerLoadedGroups = new Set();
       this.passiveEffects = [];
       this.pickerClosingForSelection = false;
       this.pickerFinishing = false;
@@ -1067,6 +1068,7 @@
       this.pickerReturnModalEl = null;
       this.pickerSpellPanels = {};
       this.pickerVisibleLimit = PICKER_RESULT_BATCH_SIZE;
+      this.refreshGeneration = 0;
     }
 
     async mount() {
@@ -1115,10 +1117,10 @@
         this.renderResults();
       });
       this.pickerNavEl.querySelectorAll("[data-effect-browser-group]").forEach((button) => {
-        button.addEventListener("click", () => {
+        button.addEventListener("click", async () => {
           this.pickerGroup = button.dataset.effectBrowserGroup || "spells";
           this.pickerVisibleLimit = PICKER_RESULT_BATCH_SIZE;
-          this.renderResults();
+          await this.loadPickerGroup(this.pickerGroup);
         });
       });
       this.openSearchEl.addEventListener("click", () => this.openPicker());
@@ -1136,7 +1138,10 @@
     }
 
     async refresh(options = this.options) {
+      const generation = ++this.refreshGeneration;
       this.options = { ...this.options, ...options };
+      this.pickerEffects = [];
+      this.pickerLoadedGroups.clear();
       if (!this.options.characterId) {
         this.effects = [];
         this.active = [];
@@ -1150,22 +1155,31 @@
         ? this.options.activatableAbilities
         : [];
       this.effects = abilities;
-      const [saved, passives] = await Promise.all([
-        this.options.loadActiveEffects
-          ? this.options.loadActiveEffects()
-          : PFApp.loadBuffState(
-              this.options.contextKey,
-              this.options.characterId,
-            ),
-        this.options.loadPassiveEffects
-          ? this.options.loadPassiveEffects()
-          : Promise.resolve([]),
-      ]);
+      const saved = await (this.options.loadActiveEffects
+        ? this.options.loadActiveEffects()
+        : PFApp.loadBuffState(
+            this.options.contextKey,
+            this.options.characterId,
+          ));
+      if (generation !== this.refreshGeneration) return;
       this.active = Array.isArray(saved) ? saved : saved?.buffs || [];
-      this.passiveEffects = Array.isArray(passives) ? passives : [];
+      this.passiveEffects = [];
       this.updateSearchVisibility();
       this.renderResults();
       this.renderActive();
+      if (this.options.loadPassiveEffects) {
+        const loadPassives = async () => {
+          try {
+            const passives = await this.options.loadPassiveEffects();
+            if (generation !== this.refreshGeneration) return;
+            this.passiveEffects = Array.isArray(passives) ? passives : [];
+            this.renderActive();
+          } catch (error) {
+            console.error("Could not load passive effects.", error);
+          }
+        };
+        requestAnimationFrame(() => window.setTimeout(() => void loadPassives(), 0));
+      }
     }
 
     setActiveEffects(effects = []) {
@@ -1248,24 +1262,63 @@
       await this.options.onEffectPickerOpen?.();
       await this.hidePickerParent();
       bootstrap.Modal.getOrCreateInstance(this.pickerModalEl).show();
-      try {
-        const source = this.options.effectPickerEffects;
-        const loaded = typeof source === "function" ? await source() : source;
-        this.pickerEffects = preferOwnedPickerEffects(
-          Array.isArray(loaded) ? loaded : this.effects,
-        );
-      } catch (error) {
-        console.error(error);
-        this.pickerEffects = [...this.effects];
-      } finally {
-        this.pickerLoading = false;
-      }
-      this.renderResults();
+      await this.loadPickerGroup("spells");
       this.pickerModalEl.addEventListener(
         "shown.bs.modal",
         () => this.searchEl?.focus(),
         { once: true },
       );
+    }
+
+    mergePickerEffects(effects = []) {
+      const merged = new Map(
+        this.pickerEffects.map((effect) => [
+          [effect.id, effect.category, effect.name, effect.source]
+            .map((value) => String(value || "").toLowerCase())
+            .join("::"),
+          effect,
+        ]),
+      );
+      effects.forEach((effect) => {
+        const key = [effect.id, effect.category, effect.name, effect.source]
+          .map((value) => String(value || "").toLowerCase())
+          .join("::");
+        merged.set(key, effect);
+      });
+      this.pickerEffects = preferOwnedPickerEffects([...merged.values()]);
+    }
+
+    async loadPickerGroup(group = this.pickerGroup) {
+      if (this.pickerLoadedGroups.has(group)) {
+        this.pickerLoading = false;
+        this.renderResults();
+        return;
+      }
+      this.pickerLoading = true;
+      this.renderResults();
+      try {
+        const lazySource = this.options.loadEffectPickerGroup;
+        if (typeof lazySource === "function") {
+          const loaded = await lazySource(group);
+          this.mergePickerEffects(Array.isArray(loaded) ? loaded : []);
+          this.pickerLoadedGroups.add(group);
+        } else {
+          const source = this.options.effectPickerEffects;
+          const loaded = typeof source === "function" ? await source() : source;
+          this.pickerEffects = preferOwnedPickerEffects(
+            Array.isArray(loaded) ? loaded : this.effects,
+          );
+          EFFECT_BROWSER_GROUPS.forEach(([value]) =>
+            this.pickerLoadedGroups.add(value),
+          );
+        }
+      } catch (error) {
+        console.error(error);
+        if (!this.pickerEffects.length) this.pickerEffects = [...this.effects];
+      } finally {
+        this.pickerLoading = false;
+      }
+      this.renderResults();
     }
 
     renderPickerNav() {
@@ -1360,8 +1413,17 @@
     }
 
     async choosePickerEffect(index, row) {
-      const effect = this.pickerEffects[index];
+      let effect = this.pickerEffects[index];
       if (!effect) return;
+      if (effect.ownedSpell && this.options.hydratePickerEffect) {
+        row?.classList.add("effect-browser-loading-pulse");
+        try {
+          effect = (await this.options.hydratePickerEffect(effect)) || effect;
+          this.pickerEffects[index] = effect;
+        } finally {
+          row?.classList.remove("effect-browser-loading-pulse");
+        }
+      }
       const configuredEffect = window.PFConditionConfig?.isConfigurable?.(effect)
         ? window.PFConditionConfig.configure(effect, {
             ability: row?.querySelector?.("[data-picker-condition-ability]")?.value,

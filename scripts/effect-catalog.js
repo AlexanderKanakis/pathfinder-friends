@@ -1,5 +1,25 @@
 (function (root) {
   let catalogPromise = null;
+  let conditionsPromise = null;
+
+  function loadConditions() {
+    if (!conditionsPromise) {
+      conditionsPromise = Promise.resolve()
+        .then(() => root.PFApp?.loadConditionDefinitions?.() || [])
+        .then((conditions) =>
+          (Array.isArray(conditions) ? conditions : []).map((condition) => ({
+            ...condition,
+            catalogEffect: true,
+          })),
+        )
+        .catch((error) => {
+          conditionsPromise = null;
+          console.warn("Could not load condition definitions.", error);
+          return [];
+        });
+    }
+    return conditionsPromise;
+  }
 
   function catalogEffectFromMechanics(entry, mechanics, { category, source, id, variant = "" }) {
     const effect = {
@@ -78,7 +98,7 @@
     };
     const itemCatalogKeys = Object.keys(root.PFItemData?.CATALOGS || {});
     const [conditions, classes, races, feats, spells, itemCatalogs] = await Promise.all([
-      safeLoad(() => root.PFApp?.loadConditionDefinitions?.(), []),
+      loadConditions(),
       safeLoad(() => root.PFClassData?.loadAllClasses?.(), []),
       safeLoad(() => root.PFRaceData?.loadRaces?.(), { races: [] }),
       safeLoad(() => root.PFFeatData?.loadFeats?.(), { feats: [] }),
@@ -86,7 +106,7 @@
       Promise.all(itemCatalogKeys.map((key) => safeLoad(() => root.PFItemData.loadCatalog(key), []))),
     ]);
     const authored = [
-      ...(conditions || []).map((condition) => ({ ...condition, catalogEffect: true })),
+      ...(conditions || []),
       ...collect(classes, { category: "Class Ability", source: "Class", idPrefix: "class" }),
       ...collect(races?.races || races, { category: "Racial Trait", source: "Race", idPrefix: "race" }),
       ...collect(feats?.feats || feats, { category: "Feat", source: "Feat", idPrefix: "feat" }),
@@ -107,6 +127,10 @@
       if (!catalogPromise) catalogPromise = loadCatalog().catch((error) => { catalogPromise = null; throw error; });
       return catalogPromise;
     },
-    clear() { catalogPromise = null; },
+    loadConditions,
+    clear() {
+      catalogPromise = null;
+      conditionsPromise = null;
+    },
   };
 })(window);

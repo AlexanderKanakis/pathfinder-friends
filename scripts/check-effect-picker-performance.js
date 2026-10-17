@@ -2,6 +2,7 @@ const assert = require("assert");
 const fs = require("fs");
 
 const tracker = fs.readFileSync("scripts/buff-tracker-widget.js", "utf8");
+const catalog = fs.readFileSync("scripts/effect-catalog.js", "utf8");
 const sheet = fs.readFileSync("scripts/pages/character-sheet.js", "utf8");
 const map = fs.readFileSync("scripts/pages/map.js", "utf8");
 const sheetHtml = fs.readFileSync("character-sheet.html", "utf8");
@@ -115,6 +116,8 @@ assert(tracker.includes("const rounds = effect.remaining ?? effect.computedDurat
 assert(tracker.includes("function preferOwnedPickerEffects(effects = [])"));
 assert(tracker.includes("this.pickerEffects = preferOwnedPickerEffects("));
 assert(tracker.includes("this.options.loadPassiveEffects"));
+assert(tracker.includes("requestAnimationFrame(() => window.setTimeout(() => void loadPassives(), 0))"));
+assert(tracker.includes("if (generation !== this.refreshGeneration) return;"));
 assert(tracker.includes("this.passiveEffects = Array.isArray(passives) ? passives : [];"));
 assert(tracker.includes("...visiblePassives.map((effect, index) => ({ effect, index, passive: true }))"));
 assert(tracker.includes('if (effect.passiveSource) return "Permanent";'));
@@ -131,6 +134,12 @@ assert(
 );
 
 assert(sheet.includes("effectPickerEffects: loadCurrentEffectPickerDefinitions"));
+assert(sheet.includes("loadEffectPickerGroup: loadCurrentEffectPickerGroup"));
+assert(sheet.includes("hydratePickerEffect: hydrateCurrentPickerEffect"));
+assert(sheet.includes('if (group === "conditions") {'));
+assert(sheet.includes("window.PFEffectCatalog?.loadConditions?.() || []"));
+assert(catalog.includes("function loadConditions()"));
+assert(catalog.includes("conditionsPromise"));
 assert(sheetHtml.includes('id="openPowersButton"'));
 assert(
   sheet.includes(
@@ -149,6 +158,14 @@ const enqueueSheetSave = sheet.slice(
 assert(enqueueSheetSave.includes("scheduleEffectPickerPrefetch();"));
 assert(!enqueueSheetSave.includes("invalidateEffectPickerDefinitions();"));
 assert(sheet.includes("cancelIdleCallback?.(effectPickerPrefetchIdleCallback)"));
+assert(sheet.includes("currentSpellPickerSources();"));
+assert(!sheet.includes('void loadCurrentEffectPickerDefinitions().catch((error) =>'));
+const saveRequest = sheet.slice(
+  sheet.indexOf("function createSheetSaveRequest"),
+  sheet.indexOf("\nfunction saveSheetNow", sheet.indexOf("function createSheetSaveRequest")),
+);
+assert(saveRequest.includes("refreshCurrentSpellPowerIndex();"));
+assert(!saveRequest.includes("ensureCurrentPowerIndex"));
 assert(sheet.includes("loadActiveEffects: async () => activeBuffs"));
 assert(sheet.includes("loadPassiveEffects: async () => collectBridgePassiveEffectSources()"));
 assert(!sheet.includes("...collectBridgePassiveEffectSources(),\n    ])"));
@@ -164,7 +181,7 @@ assert(map.includes("data-open-token-powers"));
 assert(map.includes("function openMapPowers(tokenId)"));
 assert(map.includes("return openMapEffects(tokenId, { powersOnly: true })"));
 assert(map.includes("isGm || character.userId === currentUserId"));
-assert(map.includes("await characterMapEffectSources(character);"));
+assert(map.includes("indexedCharacterSpellSources(character);"));
 assert(map.includes("const QUICK_EFFECT_BATCH_SIZE = 80;"));
 assert(map.includes("rows.slice(0, quickEffectVisibleLimit)"));
 assert(map.includes("data-effect-browser-more"));
@@ -172,14 +189,37 @@ assert(map.includes("mapEffectPrefetchGeneration += 1;"));
 assert(map.includes("browser.loadingHtml(quickEffectGroup)"));
 assert(map.includes("quickEffectLoading = true;"));
 assert(map.includes("quickEffectLoading = false;"));
+assert(map.includes("quickEffectLoadedGroups"));
+assert(map.includes('await loadQuickEffectGroup("spells")'));
+assert(map.includes("loadEffectPickerGroup: (group) => sourceEffectDefinitions(token, group)"));
+assert(map.includes("hydratePickerEffect: (effect) => hydrateMapPickerEffect(token, effect)"));
+const mapSourceDefinitions = map.slice(
+  map.indexOf("async function sourceEffectDefinitions"),
+  map.indexOf("async function hydrateMapPickerEffect"),
+);
+assert(mapSourceDefinitions.includes('if (group === "conditions")'));
+assert(
+  mapSourceDefinitions.indexOf('if (group === "conditions")') <
+    mapSourceDefinitions.indexOf("authoredCatalogEffects()"),
+);
 assert(map.includes("window.PFEffectTracker?.preferOwnedPickerEffects?.(effects) || effects"));
 assert(map.includes("loadPassiveEffects:"));
 assert(
   map.indexOf("mapEffectsModal.show();") <
-    map.indexOf("await characterMapEffectSources(sourceCharacter)"),
-  "The map Effects modal must open before its character sources load.",
+    map.indexOf("const activatableAbilities = [];"),
+  "The map Effects modal must open before tracker setup.",
 );
-assert(map.includes("const activatableAbilities = effectSources.activatable || [];"));
-assert(map.includes("? async () => effectSources.passives || []"));
+assert(map.includes("const activatableAbilities = [];"));
+assert(map.includes("(await characterMapEffectSources(sourceCharacter)).passives || []"));
+assert(map.includes("let mapSpellDetailCache = new Map();"));
+assert(map.includes("function mapSpellDetailRevision(character = {})"));
+assert(map.includes("async function mapSpellDetailsForEffect("));
+assert(map.includes("if (mapSpellDetailCache.has(key)) return mapSpellDetailCache.get(key);"));
+assert(map.includes("mapSpellDetailCache.set(key, pending);"));
+assert(map.includes("await mapSpellDetailsForEffect(sourceToken, effect)"));
+assert(sheet.includes('let sheetBridgePreparedKey = "";'));
+assert(sheet.includes("preparedKey === sheetBridgePreparedKey"));
+assert(sheet.includes("sheetBridgePreparedKey = preparedKey;"));
+assert(sheet.includes("revision = \"\","));
 
 console.log("Effect picker lifecycle and prefetch checks passed.");

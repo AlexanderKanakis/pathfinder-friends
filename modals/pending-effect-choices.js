@@ -716,9 +716,33 @@
     return persistableAbility;
   }
 
+  async function pendingSaveSheet(request = {}) {
+    const contextKey =
+      request.context_key ||
+      pollOptions?.contextKey ||
+      window.PFApp?.getSelectedContextKey?.() ||
+      "general";
+    const bridge = await window.PFCharacterSheetBridgeLoader?.();
+    return (
+      (await bridge?.saveRollSheetForCharacter?.(
+        contextKey,
+        request.character_id,
+      )) || {}
+    );
+  }
+
   async function resolveRequest(request) {
     if (resolving.has(request.id)) return;
     resolving.add(request.id);
+    let requestFinished = false;
+    const completeRequest = async (payload) => {
+      const result = await window.PFApp.resolveEffectChoiceRequest(
+        request.id,
+        payload,
+      );
+      requestFinished = Boolean(result?.ok);
+      return result;
+    };
     try {
       let ability = request.ability || {};
       const decisionOnly =
@@ -729,15 +753,13 @@
         window.PFEffectActivationOrchestrator?.REMOTE_SAVE_MODE;
       if (saveOnly) {
         const resolved = await window.PFEffectSaves?.resolve?.(ability, {
-          sheet: window.PFCharacterSheetBridge?.currentSheetSnapshot?.() || {},
+          sheet: await pendingSaveSheet(request),
           title: request.effect_name || ability.name || "Effect",
-          targetName: "Your character",
+          targetName: request.characterName || "Your character",
         });
         if (!resolved) return;
         const { activationRequest: _activationRequest, ...resolvedEffect } = resolved;
-        await window.PFApp.resolveEffectChoiceRequest(request.id, {
-          effect: resolvedEffect,
-        });
+        await completeRequest({ effect: resolvedEffect });
         return;
       }
       if (window.PFEffectMechanics?.hasContributionOptions?.(ability)) {
@@ -871,9 +893,7 @@
           targetAuraPlacement: _targetAuraPlacement,
           ...resolvedEffect
         } = abilityResolved;
-        await window.PFApp.resolveEffectChoiceRequest(request.id, {
-          effect: resolvedEffect,
-        });
+        await completeRequest({ effect: resolvedEffect });
         return;
       }
       const attackResolved = await resolvePendingAttackRolls(
@@ -971,9 +991,12 @@
         alert("Could not place the aura on the map -- try again.");
         return;
       }
-      await window.PFApp.resolveEffectChoiceRequest(request.id, resolved);
+      await completeRequest(resolved);
       pollOptions?.onResolved?.(request.character_id, effectToSave);
     } finally {
+      if (!requestFinished) {
+        await window.PFApp?.cancelEffectChoiceRequest?.(request.id);
+      }
       resolving.delete(request.id);
       poll();
     }

@@ -270,6 +270,7 @@ async function savePools() {
     await writable.write(`${JSON.stringify(poolPayload(pool), null, 2)}\n`);
     await writable.close();
   }
+  await window.PFCatalogCache?.invalidatePrefix?.("data/class-feature-pools/");
   setDirty(false);
   setStatus("Saved option pools inside data/class-feature-pools.", "success");
 }
@@ -287,6 +288,10 @@ function exportSelectedPool() {
   link.download = pool.__poolFile;
   link.click();
   URL.revokeObjectURL(url);
+  void window.PFCatalogCache?.invalidate?.([
+    `data/class-feature-pools/${pool.__poolFile}`,
+    "data/class-feature-pools/index.json",
+  ]);
 }
 
 async function initPoolEditor() {

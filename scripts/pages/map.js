@@ -68,14 +68,18 @@ let hpSaveTimers = new Map();
 let hpSaveSeq = new Map();
 let characterSheetBridgeFrame = null;
 let characterSheetBridgePromise = null;
+let mapStartupGeneration = 0;
 let authoredCatalogEffectsPromise = null;
 let mapSheetRefreshTimer = null;
+const targetedSheetRefreshTimers = new Map();
 let auraCleanupTimer = null;
 let pendingAuraCleanupTokenIds = new Set();
 let currentActorNamePromise = null;
 let mapEffectSourceCache = new Map();
+let mapSpellDetailCache = new Map();
 let mapEffectPrefetchGeneration = 0;
 let quickEffectDefinitions = [];
+const quickEffectLoadedGroups = new Set();
 let quickEffectLoading = false;
 let quickEffectSourceTokenId = "";
 let quickEffectSelection = null;
@@ -126,6 +130,9 @@ const MAP_WEATHER_OPTIONS = Object.freeze([
     imageUrl: "assets/weather%20drops/rain.png",
     tileWidth: 1920,
     tileHeight: 1080,
+    renderScale: 0.7,
+    horizontalLoops: 5,
+    verticalLoops: 12,
   },
 ]);
 const defaultState = {
@@ -429,7 +436,8 @@ function relocateMapToolbar(isMobile) {
   if (isMobile) {
     mobileSlot.appendChild(toolbar);
   } else {
-    stageWrap.parentElement.insertBefore(toolbar, stageWrap);
+    const stageViewport = stageWrap.closest(".map-stage-viewport") || stageWrap;
+    stageViewport.parentElement.insertBefore(toolbar, stageViewport);
   }
 }
 
@@ -1809,6 +1817,57 @@ function scheduleMapSheetRefresh(delay = 120) {
   }, Math.max(0, Number(delay) || 0));
 }
 
+async function refreshMapSheetTarget(targetType, targetId) {
+  const id = String(targetId || "");
+  if (!id) return false;
+  let source = null;
+  let token = null;
+  if (targetType === "character") {
+    source = await PFApp.loadCharacterSheet("", mapContextKey, id);
+    if (!source?.sheet || String(source.id) !== id) return false;
+    const index = mapCharacters.findIndex((entry) => String(entry.id) === id);
+    if (index >= 0) mapCharacters[index] = source;
+    else mapCharacters.push(source);
+    token = state.tokens.find(
+      (entry) => entry.kind === "character" && String(entry.characterId) === id,
+    );
+  } else if (targetType === "enemy") {
+    source = await PFApp.loadEnemy(id, mapContextKey);
+    if (!source?.sheet || String(source.id) !== id) return false;
+    const index = mapEnemies.findIndex((entry) => String(entry.id) === id);
+    if (index >= 0) mapEnemies[index] = source;
+    else mapEnemies.push(source);
+    token = state.tokens.find(
+      (entry) => entry.kind === "enemy" && String(entry.enemyId) === id,
+    );
+  }
+  if (!token || !source) return false;
+  mapEffectSourceCache.delete(id);
+  let changed = syncTokenFromSheet(token, source);
+  const auraChanged = await syncTokenPassiveAuras(token);
+  changed = auraChanged || changed;
+  renderAll(auraChanged);
+  if (auraChanged) scheduleOutOfRangeAuraCleanup();
+  return changed;
+}
+
+function scheduleTargetedMapSheetRefresh(targetType, targetId, delay = 120) {
+  const id = String(targetId || "");
+  if (!id) {
+    scheduleMapSheetRefresh(delay);
+    return;
+  }
+  const key = String(targetType) + ":" + id;
+  clearTimeout(targetedSheetRefreshTimers.get(key));
+  targetedSheetRefreshTimers.set(
+    key,
+    window.setTimeout(() => {
+      targetedSheetRefreshTimers.delete(key);
+      void refreshMapSheetTarget(targetType, id);
+    }, Math.max(0, Number(delay) || 0)),
+  );
+}
+
 async function determineGm(contextKey) {
   return PFApp.isGameManager(contextKey);
 }
@@ -2811,7 +2870,6 @@ function renderMap() {
       renderMapBackgroundLayer(),
       ...state.heightShapes.map(renderHeightShape),
       `<div id="heightPaintPreview" class="height-paint-preview"></div>`,
-      `<div id="tokenHoverLayer" class="token-hover-layer"></div>`,
     ].join("");
   } else {
     stage.innerHTML = [
@@ -2844,10 +2902,11 @@ function renderMap() {
       is3D ? "" : renderFogLayer(false),
       is3D ? "" : renderLimitedViewGrayscale(),
       is3D ? "" : renderOwnTokenFogReveal(visibleTokens),
-      renderMapWeatherLayer(),
-      `<div id="tokenHoverLayer" class="token-hover-layer"></div>`,
     ].join("");
   }
+
+  syncMapWeatherViewport();
+  renderWeatherTokenLabels(is3D);
 
   // stage.innerHTML above just wiped out any in-progress 3D hit-test
   // grid (see build3DHitGrid()) along with everything else -- move
@@ -2972,17 +3031,14 @@ function populateMapWeatherOptions() {
   ).join("");
 }
 
-function renderMapWeatherLayer() {
-  return currentMapWeather().imageUrl
-    ? `<div class="map-weather-layer" aria-hidden="true"></div>`
-    : "";
-}
-
 function applyMapStageVars() {
   const stage = el("mapStage");
   if (!stage) return;
   const { cols, rows, backgroundUrl } = state.settings;
   const weather = currentMapWeather();
+  const weatherViewport = el("mapWeatherViewport");
+  const weatherVisible = Boolean(weather.imageUrl) && !heightEditMode;
+  weatherViewport?.classList.toggle("has-map-weather", weatherVisible);
   stage.style.setProperty("--cell", `${localGridSize}px`);
   stage.style.setProperty("--cols", cols);
   stage.style.setProperty("--rows", rows);
@@ -2996,12 +3052,71 @@ function applyMapStageVars() {
   const weatherImageUrl = weather.imageUrl
     ? new URL(weather.imageUrl, window.location.href).href
     : "";
-  stage.style.setProperty(
+  const weatherZoomScale = clamp(localGridSize / 96, 0.125, 1);
+  const weatherRenderScale = (weather.renderScale || 1) * weatherZoomScale;
+  const weatherTileWidth = (weather.tileWidth || 1) * weatherRenderScale;
+  const weatherTileHeight = (weather.tileHeight || 1) * weatherRenderScale;
+  weatherViewport?.style.setProperty(
     "--map-weather-image",
     weatherImageUrl ? `url("${weatherImageUrl.replaceAll('"', "%22")}")` : "none",
   );
-  stage.style.setProperty("--map-weather-tile-width", `${weather.tileWidth || 1}px`);
-  stage.style.setProperty("--map-weather-tile-height", `${weather.tileHeight || 1}px`);
+  weatherViewport?.style.setProperty("--map-weather-tile-width", `${weatherTileWidth}px`);
+  weatherViewport?.style.setProperty("--map-weather-tile-height", `${weatherTileHeight}px`);
+  weatherViewport?.style.setProperty(
+    "--map-weather-duration-x",
+    `${30 / (weather.horizontalLoops || 1)}s`,
+  );
+  weatherViewport?.style.setProperty(
+    "--map-weather-duration-y",
+    `${30 / (weather.verticalLoops || 1)}s`,
+  );
+}
+
+function syncMapWeatherViewport() {
+  const wrap = el("mapStageWrap");
+  const weather = el("mapWeatherViewport");
+  const labels = el("mapWeatherLabelLayer");
+  const hover = el("mapWeatherHoverLayer");
+  if (!wrap || !weather || !labels || !hover) return;
+  const scrollbarWidth = Math.max(0, wrap.offsetWidth - wrap.clientWidth);
+  const scrollbarHeight = Math.max(0, wrap.offsetHeight - wrap.clientHeight);
+  for (const layer of [weather, labels, hover]) {
+    layer.style.right = `${scrollbarWidth}px`;
+    layer.style.bottom = `${scrollbarHeight}px`;
+  }
+  const transform = `translate3d(${-wrap.scrollLeft}px, ${-wrap.scrollTop}px, 0)`;
+  for (const content of [el("mapWeatherLabelContent"), el("mapWeatherHoverContent")]) {
+    content?.style.setProperty("transform", transform);
+    content?.style.setProperty("width", `${wrap.scrollWidth}px`);
+    content?.style.setProperty("height", `${wrap.scrollHeight}px`);
+  }
+}
+
+function renderWeatherTokenLabels(is3D = view3DMode && !heightEditMode) {
+  const viewport = document.querySelector(".map-stage-viewport");
+  const layer = el("mapWeatherLabelLayer");
+  const content = el("mapWeatherLabelContent");
+  const weatherVisible = el("mapWeatherViewport")?.classList.contains("has-map-weather");
+  const active = Boolean(weatherVisible && !is3D && layer && content);
+  viewport?.classList.toggle("weather-labels-active", active);
+  layer?.classList.toggle("d-none", !active);
+  if (!active) {
+    if (content) content.innerHTML = "";
+    return;
+  }
+  const padding = mapWrapPadding();
+  content.innerHTML = Array.from(el("mapStage").querySelectorAll(".map-token[data-map-id]"))
+    .map((node) => {
+      const label = node.querySelector(".token-label");
+      if (!label || getComputedStyle(label).display === "none") return "";
+      const token = tokenById(node.dataset.mapId);
+      if (!token) return "";
+      const width = Number(token.w || 1) * localGridSize;
+      const height = Number(token.h || 1) * localGridSize;
+      return `<div class="map-weather-token-label" style="left:${padding.left + Number(token.x || 0) * localGridSize}px;top:${padding.top + Number(token.y || 0) * localGridSize}px;width:${width}px;height:${height}px"><div class="token-label" title="${escapeHtml(label.title || "")}">${escapeHtml(label.textContent || "")}</div></div>`;
+    })
+    .join("");
+  syncMapWeatherViewport();
 }
 
 function auraRangeCells(config = {}) {
@@ -3675,13 +3790,14 @@ function setMapZoom(value, { render = true } = {}) {
 
 function render3DTokenBillboards(tokens) {
   const wrap = el("mapStageWrap");
+  const viewport = document.querySelector(".map-stage-viewport");
   let layer = el("token3DBillboardLayer");
-  if (!wrap) return;
+  if (!wrap || !viewport) return;
   if (!layer) {
     layer = document.createElement("div");
     layer.id = "token3DBillboardLayer";
     layer.className = "token-3d-billboard-layer";
-    wrap.appendChild(layer);
+    viewport.appendChild(layer);
   }
   if (!view3DMode || heightEditMode) {
     layer.innerHTML = "";
@@ -3700,7 +3816,7 @@ function render3DTokenBillboards(tokens) {
     return;
   }
   layer.classList.remove("d-none");
-  const wrapRect = wrap.getBoundingClientRect();
+  const viewportRect = viewport.getBoundingClientRect();
   const node = wrap.querySelector(
     `.map-token[data-map-id="${CSS.escape(token.id)}"]`,
   );
@@ -3710,8 +3826,8 @@ function render3DTokenBillboards(tokens) {
     return;
   }
   const rect = node.getBoundingClientRect();
-  const centerX = rect.left - wrapRect.left + wrap.scrollLeft + rect.width / 2;
-  const centerY = rect.top - wrapRect.top + wrap.scrollTop + rect.height / 2;
+  const centerX = rect.left - viewportRect.left + rect.width / 2;
+  const centerY = rect.top - viewportRect.top + rect.height / 2;
   const tokenBasePx =
     Math.min(Number(token.w || 1), Number(token.h || 1)) *
     Number(localGridSize || 48);
@@ -3827,9 +3943,11 @@ function showTokenHover(tokenId) {
       ? `${tokenCurrentHp(token) || "?"}/${tokenTotalHp(token) || "?"} HP`
       : "";
   const centerX =
+    mapWrapPadding().left +
     (Number(token.x || 0) + Number(token.w || 1) / 2) *
     Number(localGridSize || 48);
-  const top = Number(token.y || 0) * Number(localGridSize || 48) - 7;
+  const top =
+    mapWrapPadding().top + Number(token.y || 0) * Number(localGridSize || 48) - 7;
   layer.innerHTML = `
     <div class="token-hover-card" style="left:${centerX}px;top:${top}px;transform:translate(-50%, -100%);">
       <div class="token-hover-name">${escapeHtml(hoverName)}</div>
@@ -7420,6 +7538,67 @@ function mapCharacterAttributeScaleContext(character = {}) {
   };
 }
 
+function hashMapSpellDetailRevision(value = "") {
+  let hash = 2166136261;
+  for (let index = 0; index < value.length; index += 1) {
+    hash ^= value.charCodeAt(index);
+    hash = Math.imul(hash, 16777619);
+  }
+  return (hash >>> 0).toString(36);
+}
+
+function mapSpellDetailRevision(character = {}) {
+  const characterId = String(character.id || "");
+  const sheetStamp = localStorage.getItem(
+    `pf_character_sheet_updated_${mapContextKey}_${characterId}`,
+  ) || "";
+  const buffStamp = localStorage.getItem(
+    `pf_buffs_updated_${mapContextKey}_${characterId}`,
+  ) || "";
+  const payload = JSON.stringify({
+    updatedAt: character.updatedAt || "",
+    sheetStamp,
+    buffStamp,
+    sheet: character.sheet || {},
+  });
+  return hashMapSpellDetailRevision(payload);
+}
+
+async function mapSpellDetailsForEffect(sourceToken, effect = {}, casterLevel = null) {
+  const character =
+    sourceToken?.kind === "character" ? tokenCharacter(sourceToken) : null;
+  if (!character || !effect?.name) return null;
+  const revision = mapSpellDetailRevision(character);
+  const metadata = { ...(effect.spellMeta || {}), name: effect.name };
+  const key = JSON.stringify([
+    mapContextKey,
+    character.id,
+    revision,
+    metadata,
+    casterLevel,
+  ]);
+  if (mapSpellDetailCache.has(key)) return mapSpellDetailCache.get(key);
+  if (mapSpellDetailCache.size >= 250) mapSpellDetailCache.clear();
+  const pending = characterSheetBridge().then((bridge) =>
+    bridge?.spellDetailsForCharacter?.(
+      mapContextKey,
+      character.id,
+      metadata,
+      casterLevel,
+      revision,
+    ),
+  );
+  mapSpellDetailCache.set(key, pending);
+  try {
+    const detail = await pending;
+    if (!detail) mapSpellDetailCache.delete(key);
+    return detail || null;
+  } catch (error) {
+    mapSpellDetailCache.delete(key);
+    throw error;
+  }
+}
+
 function mapEffectCastingScaleContext(effect = {}, fallback = {}) {
   const calculations = effect.spellCalculations || null;
   return {
@@ -7761,15 +7940,14 @@ async function openMapEffects(tokenId, openOptions = null) {
     tokenCharacter(token)?.userId === currentUserId;
   const sourceCharacter =
     token.kind === "character" ? tokenCharacter(token) : null;
-  const effectSources = sourceCharacter
-    ? await characterMapEffectSources(sourceCharacter)
-    : { activatable: [], spells: [], passives: [] };
-  const activatableAbilities = effectSources.activatable || [];
+  const activatableAbilities = [];
   const options = {
     contextKey: mapContextKey,
     characterId: effectTargetId,
     activatableAbilities,
     effectPickerEffects: () => sourceEffectDefinitions(token),
+    loadEffectPickerGroup: (group) => sourceEffectDefinitions(token, group),
+    hydratePickerEffect: (effect) => hydrateMapPickerEffect(token, effect),
     onEffectPickerOpen: hideMapEffectsForPicker,
     onEffectPickerCancel: () => {
       if (!powersOnly) mapEffectsModal.show();
@@ -7778,11 +7956,9 @@ async function openMapEffects(tokenId, openOptions = null) {
       const character =
         token.kind === "character" ? tokenCharacter(token) : null;
       if (!character) return effect.spellCalculations || null;
-      const bridge = await characterSheetBridge();
-      const detail = await bridge?.spellDetailsForCharacter?.(
-        mapContextKey,
-        character.id,
-        { ...effect.spellMeta, name: effect.name },
+      const detail = await mapSpellDetailsForEffect(
+        token,
+        effect,
         casterLevel,
       );
       return detail?.calculations || effect.spellCalculations || null;
@@ -7851,8 +8027,9 @@ async function openMapEffects(tokenId, openOptions = null) {
           }
         : undefined,
     loadPassiveEffects:
-      token.kind === "character"
-        ? async () => effectSources.passives || []
+      token.kind === "character" && !powersOnly
+        ? async () =>
+            (await characterMapEffectSources(sourceCharacter)).passives || []
         : undefined,
     onBeforeApply: async (effect, { replaceIndex } = {}) => {
       if (Number.isInteger(replaceIndex)) return true;
@@ -8423,15 +8600,9 @@ async function openMapOwnedSpellDetails(effect, defaultCl = 1) {
     : null;
   let spell = effect.spell || null;
   let calculations = effect.spellCalculations || null;
-  let bridge = null;
   if (character) {
     try {
-      bridge = await characterSheetBridge();
-      const detail = await bridge?.spellDetailsForCharacter?.(
-        mapContextKey,
-        character.id,
-        { ...effect.spellMeta, name: effect.name },
-      );
+      const detail = await mapSpellDetailsForEffect(sourceToken, effect);
       if (detail?.spell) spell = detail.spell;
       if (detail?.calculations) calculations = detail.calculations;
     } catch (error) {
@@ -8450,11 +8621,10 @@ async function openMapOwnedSpellDetails(effect, defaultCl = 1) {
     spellLevel: Number(effect.spellMeta?.level || 0),
     calculations,
     recalculate: async (casterLevel) => {
-      if (!bridge || !character) return calculations;
-      const detail = await bridge.spellDetailsForCharacter?.(
-        mapContextKey,
-        character.id,
-        { ...effect.spellMeta, name: effect.name },
+      if (!character) return calculations;
+      const detail = await mapSpellDetailsForEffect(
+        sourceToken,
+        effect,
         casterLevel,
       );
       return detail?.calculations || calculations;
@@ -8522,12 +8692,12 @@ async function openMapOwnedSpellDetails(effect, defaultCl = 1) {
   if (!casting) quickEffectModal.show();
 }
 
-function selectQuickEffectGroup(group) {
+async function selectQuickEffectGroup(group) {
   const groups = window.PFEffectTracker?.browser?.groups || [];
   if (!groups.some((entry) => entry.value === group)) return;
   quickEffectGroup = group;
   quickEffectVisibleLimit = QUICK_EFFECT_BATCH_SIZE;
-  renderQuickEffects();
+  await loadQuickEffectGroup(group);
 }
 
 function appendQuickEffectMore(visibleCount, totalCount) {
@@ -8574,9 +8744,21 @@ function bindQuickEffectBrowser() {
       });
     });
   results.querySelectorAll("[data-picker-effect-index]").forEach((row) => {
-    const choose = () => {
-      const effect = quickEffectDefinitions[Number(row.dataset.pickerEffectIndex)];
+    const choose = async () => {
+      let effect = quickEffectDefinitions[Number(row.dataset.pickerEffectIndex)];
       if (!effect) return;
+      if (effect.ownedSpell) {
+        row.classList.add("effect-browser-loading-pulse");
+        try {
+          effect = await hydrateMapPickerEffect(
+            tokenById(quickEffectSourceTokenId),
+            effect,
+          );
+          quickEffectDefinitions[Number(row.dataset.pickerEffectIndex)] = effect;
+        } finally {
+          row.classList.remove("effect-browser-loading-pulse");
+        }
+      }
       const container = row.closest(".effect-browser-row") || row;
       const configuredEffect = window.PFConditionConfig?.isConfigurable?.(effect)
         ? window.PFConditionConfig.configure(effect, {
@@ -8605,12 +8787,12 @@ function bindQuickEffectBrowser() {
     };
     row.addEventListener("click", (event) => {
       if (event.target.closest(".effect-browser-controls")) return;
-      choose();
+      void choose();
     });
     row.addEventListener("keydown", (event) => {
       if (event.key !== "Enter" && event.key !== " ") return;
       event.preventDefault();
-      choose();
+      void choose();
     });
   });
 }
@@ -9023,12 +9205,85 @@ async function authoredCatalogEffects() {
   return authoredCatalogEffectsPromise;
 }
 
+function indexedCharacterAbilityScores(sheet = {}) {
+  return Object.fromEntries(
+    ["str", "dex", "con", "int", "wis", "cha"].map((key) => [
+      key,
+      Number(sheet.abilities?.[key]?.score || 10),
+    ]),
+  );
+}
+
+async function indexedCharacterClassAbilities(character) {
+  const sheet = character?.sheet || {};
+  const classDefinitions = await (window.PFClassData?.loadAllClasses?.() || []);
+  return (
+    window.PFClassFeatureAbilities?.collectActivatableAbilities({
+      classDefinitions,
+      classProgression: Array.isArray(sheet.classProgression)
+        ? sheet.classProgression
+        : [],
+      classFeatureChoices: sheet.classFeatureChoices || {},
+      characterLevel: Math.max(
+        1,
+        Number(sheet.fields?.characterLevel || sheet.classProgression?.length || 1),
+      ),
+      abilityScores: indexedCharacterAbilityScores(sheet),
+      bab: Number(sheet.fields?.bab || 0),
+    }) || []
+  );
+}
+
+function indexedCharacterSpellSources(character) {
+  const sheet = character?.sheet || {};
+  if (window.PFPowerIndex?.isUsableForSheet?.(sheet.powerIndex, sheet)) {
+    return window.PFPowerIndex.resolveSpells(sheet.powerIndex);
+  }
+  return window.PFPowerIndex?.spellsFromSheet?.(sheet) || [];
+}
+
+async function resolveIndexedCharacterPowerSources(character) {
+  const sheet = character?.sheet || {};
+  const index = sheet.powerIndex;
+  if (index?.scope === "spells") return null;
+  if (!window.PFPowerIndex?.isUsableForSheet?.(index, sheet)) return null;
+  const [catalog, classAbilities, spellDefinitions] = await Promise.all([
+    authoredCatalogEffects(),
+    indexedCharacterClassAbilities(character),
+    window.PFSpellData?.loadSpells?.() || [],
+  ]);
+  return window.PFPowerIndex.resolve(index, {
+    catalog,
+    classAbilities,
+    spellDefinitions,
+  });
+}
+
 async function characterMapEffectSources(character) {
   if (!character?.sheet) return { activatable: [], spells: [], passives: [] };
-  const signature = JSON.stringify(character.sheet);
+  const powerIndex = character.sheet.powerIndex;
+  const signature = window.PFPowerIndex?.isUsableForSheet?.(
+    powerIndex,
+    character.sheet,
+  )
+    ? [
+        "power-index",
+        powerIndex.version,
+        powerIndex.signature,
+        powerIndex.generatedAt,
+      ].join(":")
+    : JSON.stringify(character.sheet);
   const cached = mapEffectSourceCache.get(character.id);
   if (cached?.signature === signature) return cached.sources;
   try {
+    const indexedSources = await resolveIndexedCharacterPowerSources(character);
+    if (indexedSources) {
+      mapEffectSourceCache.set(character.id, {
+        signature,
+        sources: indexedSources,
+      });
+      return indexedSources;
+    }
     const bridge = await characterSheetBridge();
     if (bridge?.mapEffectSourcesForCharacter) {
       const sources = await bridge.mapEffectSourcesForCharacter(
@@ -9059,15 +9314,10 @@ function scheduleAccessibleEffectSourcePrefetch() {
     (character) => isGm || character.userId === currentUserId,
   );
   const prefetch = async () => {
-    try {
-      await authoredCatalogEffects();
-      for (const character of characters) {
-        if (generation !== mapEffectPrefetchGeneration) return;
-        await characterMapEffectSources(character);
-        await new Promise((resolve) => window.setTimeout(resolve, 0));
-      }
-    } catch (error) {
-      console.warn("Could not prefetch map effect sources.", error);
+    for (const character of characters) {
+      if (generation !== mapEffectPrefetchGeneration) return;
+      indexedCharacterSpellSources(character);
+      await new Promise((resolve) => window.setTimeout(resolve, 0));
     }
   };
   if (window.requestIdleCallback) {
@@ -9083,9 +9333,18 @@ function scheduleAccessibleEffectSourcePrefetch() {
 // token the menu was opened from), so this is where Share Rage /
 // Inspired Rage style sharing actually belongs, not a separate "cast
 // as" picker.
-async function sourceEffectDefinitions(sourceToken) {
+async function sourceEffectDefinitions(sourceToken, group = "") {
   const sourceCharacter =
     sourceToken?.kind === "character" ? tokenCharacter(sourceToken) : null;
+  if (group === "conditions") {
+    return window.PFEffectCatalog?.loadConditions?.() || [];
+  }
+  if (sourceCharacter && group === "spells") {
+    return indexedCharacterSpellSources(sourceCharacter);
+  }
+  if (sourceCharacter && group === "class") {
+    return indexedCharacterClassAbilities(sourceCharacter);
+  }
   const [catalog, sources] = await Promise.all([
     authoredCatalogEffects(),
     sourceCharacter
@@ -9097,7 +9356,55 @@ async function sourceEffectDefinitions(sourceToken) {
     ...(sources.spells || []),
     ...catalog,
   ];
-  return window.PFEffectTracker?.preferOwnedPickerEffects?.(effects) || effects;
+  const preferred =
+    window.PFEffectTracker?.preferOwnedPickerEffects?.(effects) || effects;
+  const sourceGroup = window.PFEffectTracker?.sourceGroup;
+  return group && sourceGroup
+    ? preferred.filter((effect) => sourceGroup(effect) === group)
+    : preferred;
+}
+
+async function hydrateMapPickerEffect(sourceToken, effect = {}) {
+  if (!effect.ownedSpell) return effect;
+  const character =
+    sourceToken?.kind === "character" ? tokenCharacter(sourceToken) : null;
+  if (!character) return effect;
+  const detail = await mapSpellDetailsForEffect(sourceToken, effect);
+  if (!detail?.spell) return effect;
+  return {
+    ...spellEffectDefinition(detail.spell, effect.spellMeta || {}),
+    spellCalculations: detail.calculations || effect.spellCalculations || null,
+  };
+}
+
+function mergeQuickEffectDefinitions(effects = []) {
+  const identity = (effect = {}) =>
+    String(effect.id || `${effect.category || "Effect"}:${effect.source || ""}:${effect.name || ""}`);
+  const merged = new Map(
+    quickEffectDefinitions.map((effect) => [identity(effect), effect]),
+  );
+  effects.forEach((effect) => merged.set(identity(effect), effect));
+  quickEffectDefinitions = [...merged.values()];
+}
+
+async function loadQuickEffectGroup(group = quickEffectGroup) {
+  if (quickEffectLoadedGroups.has(group)) {
+    renderQuickEffects();
+    return;
+  }
+  const token = tokenById(quickEffectSourceTokenId);
+  if (!token) return;
+  quickEffectLoading = true;
+  renderQuickEffects();
+  try {
+    mergeQuickEffectDefinitions(await sourceEffectDefinitions(token, group));
+    quickEffectLoadedGroups.add(group);
+  } catch (error) {
+    console.error("Could not load effect category.", error);
+  } finally {
+    quickEffectLoading = false;
+  }
+  renderQuickEffects();
 }
 
 async function openQuickApplyEffect() {
@@ -9108,6 +9415,8 @@ async function openQuickApplyEffect() {
   quickEffectGroup = "spells";
   quickEffectVisibleLimit = QUICK_EFFECT_BATCH_SIZE;
   quickEffectSourceTokenId = token.id;
+  quickEffectDefinitions = [];
+  quickEffectLoadedGroups.clear();
   el("quickEffectModalLabel").textContent =
     `Use Powers from ${displayTokenName(token)}`;
   el("quickEffectSearch").value = "";
@@ -9115,12 +9424,8 @@ async function openQuickApplyEffect() {
   renderQuickEffects();
   quickEffectModal.show();
   setTimeout(() => el("quickEffectSearch").focus(), 150);
-  try {
-    quickEffectDefinitions = await sourceEffectDefinitions(token);
-  } finally {
-    quickEffectLoading = false;
-  }
-  renderQuickEffects();
+  quickEffectLoading = false;
+  await loadQuickEffectGroup("spells");
 }
 
 async function openAuraEffectPicker() {
@@ -9130,6 +9435,8 @@ async function openAuraEffectPicker() {
   quickEffectGroup = "spells";
   quickEffectVisibleLimit = QUICK_EFFECT_BATCH_SIZE;
   quickEffectSourceTokenId = token.id;
+  quickEffectDefinitions = [];
+  quickEffectLoadedGroups.clear();
   el("quickEffectModalLabel").textContent =
     `Aura Effect for ${displayTokenName(token)}`;
   el("quickEffectSearch").value = "";
@@ -9138,12 +9445,8 @@ async function openAuraEffectPicker() {
   auraModal.hide();
   quickEffectModal.show();
   setTimeout(() => el("quickEffectSearch").focus(), 150);
-  try {
-    quickEffectDefinitions = await sourceEffectDefinitions(token);
-  } finally {
-    quickEffectLoading = false;
-  }
-  renderQuickEffects();
+  quickEffectLoading = false;
+  await loadQuickEffectGroup("spells");
 }
 
 function quickEffectTargets() {
@@ -9158,9 +9461,19 @@ function quickEffectTargets() {
     .map((token) => ({
       token,
       name: displayTokenName(token),
-      group: token.kind === "enemy" ? "enemy" : "ally",
+      isCaster: token.id === quickEffectSourceTokenId,
+      group:
+        token.id === quickEffectSourceTokenId
+          ? "ally"
+          : token.kind === "enemy"
+            ? "enemy"
+            : "ally",
     }))
-    .sort((a, b) => a.name.localeCompare(b.name));
+    .sort(
+      (a, b) =>
+        Number(b.isCaster) - Number(a.isCaster) ||
+        a.name.localeCompare(b.name),
+    );
 }
 
 function renderQuickEffectTargetGroup(
@@ -9170,8 +9483,7 @@ function renderQuickEffectTargetGroup(
   previousTargetIds,
 ) {
   if (!targets.length) return "";
-  const isSelected = ({ token }) =>
-    token.id === quickEffectSourceTokenId || previousTargetIds.has(token.id);
+  const isSelected = ({ token }) => previousTargetIds.has(token.id);
   const allSelected = targets.every(isSelected);
   return `
     <section class="quick-target-group">
@@ -9182,12 +9494,12 @@ function renderQuickEffectTargetGroup(
       <div class="quick-target-grid">
         ${targets
           .map(
-            ({ token, name }) => `
-          <label class="quick-target-card">
+            ({ token, name, isCaster }) => `
+          <label class="quick-target-card${isCaster ? " is-caster" : ""}">
             <input class="form-check-input" type="checkbox" data-quick-target-token="${escapeHtml(token.id)}" data-quick-target-token-group="${escapeHtml(group)}" ${isSelected({ token }) ? "checked" : ""}>
             <span>
               <strong>${escapeHtml(name)}</strong>
-              <span class="small text-secondary d-block">${escapeHtml(token.kind === "enemy" ? "Enemy" : "Character")}${token.visible === false ? " | hidden" : ""}</span>
+              <span class="small text-secondary d-block">${isCaster ? "Caster | " : ""}${escapeHtml(token.kind === "enemy" ? "Enemy" : "Character")}${token.visible === false ? " | hidden" : ""}</span>
             </span>
           </label>
         `,
@@ -9242,10 +9554,11 @@ async function openQuickEffectTargets(effect, options, activation = null) {
   };
   el("quickEffectTargetsModalLabel").textContent =
     `Apply ${effect.name || "Effect"}`;
-  el("quickEffectTargetHint").textContent =
-    previousTargetIds.size > 0
-      ? "Choose the current recipients. Previous recipients are selected; uncheck one to end this source's earlier option."
-      : "Choose one or more tokens on the current map.";
+  const targetHint = el("quickEffectTargetHint");
+  targetHint.textContent = previousTargetIds.size > 0
+    ? "Previous recipients are selected; uncheck one to end this source's earlier option."
+    : "";
+  targetHint.classList.toggle("d-none", !targetHint.textContent);
   el("quickEffectApplyStatus").textContent = "";
   el("quickEffectTargetList").innerHTML = targets.length
     ? [
@@ -9614,7 +9927,7 @@ function reconcileTokenLinkedAuras(token, activeEffects = []) {
   return changed;
 }
 
-async function saveTokenActiveEffects(token, effects) {
+async function saveTokenActiveEffects(token, effects, { recalculate = true } = {}) {
   const activeEffects = Array.isArray(effects) ? effects : [];
   if (token.summonedCreature) {
     token.sheet = token.sheet || {};
@@ -9641,12 +9954,14 @@ async function saveTokenActiveEffects(token, effects) {
       ? savedBuffs.activeBuffs
       : activeEffects;
     if (character) character.sheet.activeBuffs = nextActiveBuffs;
-    mapEffectSourceCache.delete(token.characterId);
-    const calculated = await recalculateCharacterSheetFromMap(
-      token.characterId,
-      character,
-      nextActiveBuffs,
-    );
+    if (recalculate) mapEffectSourceCache.delete(token.characterId);
+    const calculated = recalculate
+      ? await recalculateCharacterSheetFromMap(
+          token.characterId,
+          character,
+          nextActiveBuffs,
+        )
+      : null;
     if (character) {
       if (calculated) character.sheet.calculated = calculated;
       syncTokenFromSheet(token, character);
@@ -9663,7 +9978,9 @@ async function saveTokenActiveEffects(token, effects) {
     );
     if (!saved) return false;
     token.sheet = saved.sheet || token.sheet || {};
-    const calculated = await recalculateEnemySheetFromMap(token.enemyId, saved);
+    const calculated = recalculate
+      ? await recalculateEnemySheetFromMap(token.enemyId, saved)
+      : null;
     if (calculated) token.sheet.calculated = calculated;
     if (reconcileTokenLinkedAuras(token, activeEffects)) queueSave();
     return true;
@@ -10698,6 +11015,10 @@ async function advanceAutomaticAuras(endingTokenId) {
   if (!changed) return;
   for (const { token, effectId } of expiredLinks) {
     const active = await loadTokenActiveEffects(token);
+    if (!active.some((effect) => effect.id === effectId)) {
+      if (reconcileTokenLinkedAuras(token, active)) queueSave();
+      continue;
+    }
     await saveTokenActiveEffects(
       token,
       active.filter((effect) => effect.id !== effectId),
@@ -10756,12 +11077,12 @@ async function processEndedTurnEffectsLegacy(endingRow) {
       next.every((effect, index) => effect === active[index])
     )
       continue;
-    if (await saveTokenActiveEffects(token, next)) {
+    if (await saveTokenActiveEffects(token, next, { recalculate: expired.length > 0 })) {
       changed = true;
       expired.forEach((effect) => showExpiredEffectNotice(token, effect));
     }
   }
-  if (changed) await refetchMapSheetState();
+  if (changed) renderAll(false);
 }
 
 function tokenForEffectChange(change) {
@@ -10781,24 +11102,70 @@ function tokenForEffectChange(change) {
 }
 
 async function refreshTurnEffectChanges(changes) {
-  const unique = new Map();
-  (Array.isArray(changes) ? changes : []).forEach((change) => {
-    if (change?.target_type && change?.target_id)
-      unique.set(`${change.target_type}:${change.target_id}`, change);
-  });
-  await Promise.all(
-    [...unique.values()].map((change) => {
-      if (change.target_type === "character")
-        return recalculateCharacterSheetFromMap(change.target_id);
-      if (change.target_type === "enemy")
-        return recalculateEnemySheetFromMap(change.target_id);
-      return Promise.resolve();
+  const classifier = window.PFTurnEffectChanges;
+  const grouped = classifier?.coalesce
+    ? classifier.coalesce(changes)
+    : Array.isArray(changes)
+      ? changes
+      : [];
+  if (!grouped.length) return;
+
+  const prepared = await Promise.all(
+    grouped.map(async (change) => {
+      const token = tokenForEffectChange(change);
+      if (!token) return null;
+      const returned = classifier?.activeBuffs?.(change);
+      const active = returned || (await loadTokenActiveEffects(token));
+      if (token.kind === "character") {
+        const character = tokenCharacter(token);
+        if (character?.sheet) character.sheet.activeBuffs = active;
+      } else if (token.kind === "enemy") {
+        token.sheet = token.sheet || {};
+        token.sheet.activeBuffs = active;
+        const enemy = mapEnemies.find((entry) => entry.id === token.enemyId);
+        if (enemy?.sheet) enemy.sheet.activeBuffs = active;
+      }
+      if (reconcileTokenLinkedAuras(token, active)) queueSave();
+      return { change, token, active };
     }),
   );
-  if (unique.size) {
-    await refetchMapSheetState();
-    renderAll(false);
-  }
+
+  await Promise.all(
+    prepared.filter(Boolean).map(async ({ change, token, active }) => {
+      const expired = Array.isArray(change.expired_effects)
+        ? change.expired_effects
+        : [];
+      const shouldRecalculate = classifier?.requiresRecalculation
+        ? classifier.requiresRecalculation(change)
+        : expired.length > 0;
+      if (!shouldRecalculate) return;
+      if (token.kind === "character") {
+        const character = tokenCharacter(token);
+        if (!character) return;
+        mapEffectSourceCache.delete(token.characterId);
+        const calculated = await recalculateCharacterSheetFromMap(
+          token.characterId,
+          character,
+          active,
+        );
+        if (calculated) character.sheet.calculated = calculated;
+        syncTokenFromSheet(token, character);
+      } else if (token.kind === "enemy") {
+        const enemy = mapEnemies.find((entry) => entry.id === token.enemyId) || {
+          id: token.enemyId,
+          name: token.name,
+          sheet: token.sheet || {},
+        };
+        const calculated = await recalculateEnemySheetFromMap(token.enemyId, enemy);
+        if (calculated) {
+          enemy.sheet.calculated = calculated;
+          token.sheet.calculated = calculated;
+        }
+        syncTokenFromSheet(token, enemy);
+      }
+    }),
+  );
+  renderAll(false);
 }
 
 async function processEndedTurnEffects(endingRow, turnEventId) {
@@ -11890,7 +12257,7 @@ async function characterSheetBridge() {
   if (characterSheetBridgePromise) return characterSheetBridgePromise;
   characterSheetBridgePromise = new Promise((resolve, reject) => {
     characterSheetBridgeFrame = document.createElement("iframe");
-    characterSheetBridgeFrame.src = "character-sheet.html?bridge=1&v=weapon-damage-size-1";
+    characterSheetBridgeFrame.src = "character-sheet.html?bridge=1&v=bridge-loader-1";
     characterSheetBridgeFrame.tabIndex = -1;
     characterSheetBridgeFrame.style.cssText =
       "position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;left:-9999px;top:-9999px;";
@@ -11910,6 +12277,8 @@ async function characterSheetBridge() {
   });
   return characterSheetBridgePromise;
 }
+
+window.PFCharacterSheetBridgeLoader = characterSheetBridge;
 
 async function recalculateCharacterSheetFromMap(
   characterId,
@@ -12222,7 +12591,133 @@ function rememberMapSlot(contextKey, slot) {
   localStorage.setItem(mapSlotStorageKey(contextKey), String(slot));
 }
 
-async function loadMap(contextKey) {
+
+function setMapStartupProgress(percent, status) {
+  const value = clamp(Math.round(Number(percent) || 0), 0, 100);
+  const progress = el("mapStartupProgress");
+  const bar = el("mapStartupProgressBar");
+  const label = el("mapStartupPercent");
+  if (progress) progress.setAttribute("aria-valuenow", String(value));
+  if (bar) bar.style.width = value + "%";
+  if (label) label.textContent = value + "%";
+  if (status && el("mapStartupStatus")) el("mapStartupStatus").textContent = status;
+}
+
+function showMapStartup() {
+  const loader = el("mapStartupLoader");
+  document.body.classList.add("map-booting");
+  loader?.classList.remove("is-ready", "is-error");
+  loader?.setAttribute("aria-busy", "true");
+  el("mapStartupRetry")?.classList.add("d-none");
+  setMapStartupProgress(0, "Preparing map");
+}
+
+function failMapStartup(error) {
+  console.error("Could not initialize the map.", error);
+  const loader = el("mapStartupLoader");
+  loader?.classList.add("is-error");
+  loader?.setAttribute("aria-busy", "false");
+  if (el("mapStartupStatus")) {
+    el("mapStartupStatus").textContent = "The map could not finish loading.";
+  }
+  el("mapStartupRetry")?.classList.remove("d-none");
+}
+
+function nextPaint() {
+  return new Promise((resolve) => requestAnimationFrame(resolve));
+}
+
+function preloadMapImage(url, timeoutMs = 6000) {
+  const sourceUrl = String(url || "").trim();
+  if (!sourceUrl) return Promise.resolve();
+  return new Promise((resolve) => {
+    const image = new Image();
+    const timeout = window.setTimeout(resolve, timeoutMs);
+    const finish = () => {
+      window.clearTimeout(timeout);
+      resolve();
+    };
+    image.addEventListener("load", finish, { once: true });
+    image.addEventListener("error", finish, { once: true });
+    image.src = sourceUrl;
+    if (image.complete) finish();
+  });
+}
+
+async function preloadCurrentMapVisuals() {
+  const weather = currentMapWeather();
+  const urls = new Set([
+    state.settings.backgroundUrl,
+    weather.imageUrl,
+    ...state.tokens.map((token) => token.imageUrl),
+  ]);
+  await Promise.all([...urls].filter(Boolean).map((url) => preloadMapImage(url)));
+}
+
+async function runMapStartup(contextKey) {
+  const generation = ++mapStartupGeneration;
+  showMapStartup();
+  const tasks = [
+    {
+      label: "Map and characters",
+      weight: 30,
+      run: () => loadMap(contextKey, { eagerPassiveAuras: true }),
+    },
+    {
+      label: "Powers and equipment",
+      weight: 25,
+      run: () => window.PFEffectCatalog?.load?.(),
+    },
+    {
+      label: "Character calculations",
+      weight: 20,
+      run: () => characterSheetBridge(),
+    },
+    {
+      label: "Class feature options",
+      weight: 10,
+      run: () => window.PFClassData?.loadAllPoolCatalogs?.(),
+    },
+    {
+      label: "Weapon rules",
+      weight: 5,
+      run: () => window.PFNaturalWeapons?.loadCatalog?.(),
+    },
+  ];
+  let completedWeight = 0;
+  await Promise.all(
+    tasks.map(async (task) => {
+      try {
+        await task.run();
+      } catch (error) {
+        throw new Error(task.label + " failed: " + (error?.message || error), {
+          cause: error,
+        });
+      }
+      completedWeight += task.weight;
+      if (generation === mapStartupGeneration) {
+        setMapStartupProgress(completedWeight, task.label + " ready");
+      }
+    }),
+  );
+  if (generation !== mapStartupGeneration) return;
+  setMapStartupProgress(92, "Preparing map images");
+  await preloadCurrentMapVisuals();
+  if (generation !== mapStartupGeneration) return;
+  setMapStartupProgress(97, "Drawing map");
+  renderAll(false);
+  centerMapViewport();
+  await nextPaint();
+  await nextPaint();
+  if (generation !== mapStartupGeneration) return;
+  setMapStartupProgress(100, "Ready");
+  document.body.classList.remove("map-booting");
+  const loader = el("mapStartupLoader");
+  loader?.classList.add("is-ready");
+  loader?.setAttribute("aria-busy", "false");
+}
+
+async function loadMap(contextKey, { eagerPassiveAuras = false } = {}) {
   if (!contextKey || contextKey === "general") return;
   unsubscribeMapRealtime();
   mapContextKey = contextKey;
@@ -12240,7 +12735,7 @@ async function loadMap(contextKey) {
   el("openMapDocumentationIcon").classList.toggle("d-none", isGm);
   el("gmHint").textContent = isGm ? "GM tools enabled" : "Player view";
   mapEnemies = isGm ? await PFApp.loadEnemies(mapContextKey) : [];
-  await loadMapSlot(loadRememberedMapSlot(mapContextKey));
+  await loadMapSlot(loadRememberedMapSlot(mapContextKey), { eagerPassiveAuras });
 }
 
 // Same idea as character-sheet.js's poller: whoever's viewing the map
@@ -12283,7 +12778,7 @@ function startPendingEffectChoicePolling() {
 
 // Loads one of the 6 map slots into the current view. Every user picks
 // their own slot independently -- this never affects what anyone else sees.
-async function loadMapSlot(slot) {
+async function loadMapSlot(slot, { eagerPassiveAuras = false } = {}) {
   unsubscribeMapRealtime();
   mapViewSlot = clamp(Number(slot) || 1, 1, MAP_SLOT_COUNT);
   state = normalizeState(await PFApp.loadMapState(mapContextKey, mapViewSlot));
@@ -12308,14 +12803,18 @@ async function loadMapSlot(slot) {
   scheduleOutOfRangeAuraCleanup("", 0);
   scheduleAccessibleEffectSourcePrefetch();
   const syncPassiveAuras = () =>
-    void refreshMapTokenSheets({
+    refreshMapTokenSheets({
       save: false,
       reloadCharacters: false,
       reloadEnemies: false,
     });
-  if (window.requestIdleCallback)
+  if (eagerPassiveAuras) {
+    await syncPassiveAuras();
+  } else if (window.requestIdleCallback) {
     window.requestIdleCallback(syncPassiveAuras, { timeout: 3000 });
-  else window.setTimeout(syncPassiveAuras, 1500);
+  } else {
+    window.setTimeout(syncPassiveAuras, 1500);
+  }
 }
 
 async function switchMapSlot(slot) {
@@ -12353,7 +12852,11 @@ function subscribeMapRealtime() {
         table: "character_sheets",
         filter: `context_key=eq.${mapContextKey}`,
       },
-      () => scheduleMapSheetRefresh(),
+      (payload) => {
+        const row = payload.new || payload.old;
+        if (payload.eventType === "DELETE") scheduleMapSheetRefresh();
+        else scheduleTargetedMapSheetRefresh("character", row?.id);
+      },
     )
     .on(
       "postgres_changes",
@@ -12363,7 +12866,11 @@ function subscribeMapRealtime() {
         table: "enemies",
         filter: `context_key=eq.${mapContextKey}`,
       },
-      () => scheduleMapSheetRefresh(),
+      (payload) => {
+        const row = payload.new || payload.old;
+        if (payload.eventType === "DELETE") scheduleMapSheetRefresh();
+        else scheduleTargetedMapSheetRefresh("enemy", row?.id);
+      },
     )
     .subscribe();
 }
@@ -12376,10 +12883,13 @@ function unsubscribeMapRealtime() {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
+  el("mapStartupRetry")?.addEventListener("click", () => window.location.reload());
+  setMapStartupProgress(2, "Checking access");
   const user = await PFApp.requireAuth();
   if (!user) return;
   currentUserId = user.id;
   currentUserEmail = user.email || "";
+  setMapStartupProgress(5, "Preparing controls");
 
   setupMobileLayout();
   bindNumberSteppers();
@@ -12647,6 +13157,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   window.addEventListener("resize", () => {
     hideContextMenu();
     updateAuraToastPosition();
+    syncMapWeatherViewport();
     if (view3DMode && !heightEditMode) {
       schedule3DTokenBillboards();
     }
@@ -12656,6 +13167,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     () => {
       hideContextMenu();
       updateAuraToastPosition();
+      syncMapWeatherViewport();
       if (view3DMode && !heightEditMode) {
         schedule3DTokenBillboards();
       }
@@ -12664,10 +13176,18 @@ document.addEventListener("DOMContentLoaded", async () => {
   );
 
   const requiredContext = await PFApp.requireGameContext();
-  if (!requiredContext) return;
-  await loadMap(requiredContext);
+  if (!requiredContext) {
+    document.body.classList.remove("map-booting");
+    el("mapStartupLoader")?.classList.add("is-ready");
+    return;
+  }
+  try {
+    await runMapStartup(requiredContext);
+  } catch (error) {
+    failMapStartup(error);
+  }
   window.addEventListener("pf-context-change", (event) => {
-    if (event.detail.contextKey && event.detail.contextKey !== "general")
-      loadMap(event.detail.contextKey);
+    if (!event.detail.contextKey || event.detail.contextKey === "general") return;
+    runMapStartup(event.detail.contextKey).catch(failMapStartup);
   });
 });

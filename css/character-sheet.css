@@ -2495,6 +2495,12 @@ textarea.enemy-header-control.form-control-sm {
   min-height: 64px;
 }
 
+.spell-cast-target-card.is-caster {
+  border-color: #35c7d8;
+  background: #202b2c;
+  box-shadow: inset 3px 0 0 #35c7d8;
+}
+
 .source-result-icon {
   position: absolute;
   top: 10px;

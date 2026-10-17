@@ -32,6 +32,7 @@ Thumbs.db
 # Local-only project documentation and database migrations
 *.md
 supabase/migrations/
+.local-tests/
 
 supabase-schema.sql
 

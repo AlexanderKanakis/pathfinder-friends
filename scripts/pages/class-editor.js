@@ -535,6 +535,7 @@ async function saveClassesFile() {
       );
       await writable.close();
     }
+    await window.PFCatalogCache?.invalidatePrefix?.("data/classes/");
     setDirty(false);
     setStatus("Saved split class data inside data/classes.", "success");
     return;
@@ -552,6 +553,7 @@ async function saveClassesFile() {
   link.download = "classes-export.json";
   link.click();
   URL.revokeObjectURL(url);
+  await window.PFCatalogCache?.invalidatePrefix?.("data/classes/");
   setDirty(false);
   setStatus(
     "Downloaded a split-class export because direct project saving is unavailable.",
@@ -582,6 +584,10 @@ function exportSelectedClass() {
   link.download = filename;
   link.click();
   URL.revokeObjectURL(url);
+  void window.PFCatalogCache?.invalidate?.([
+    `data/classes/${filename}`,
+    "data/classes/index.json",
+  ]);
   // Only this one class was exported -- other unsaved edits (if any) are
   // still pending, so the dirty flag is intentionally left alone.
   setStatus(

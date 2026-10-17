@@ -508,6 +508,7 @@ async function saveSpellsFile() {
     const writable = await handle.createWritable();
     await writable.write(`${JSON.stringify(payload, null, 2)}\n`);
     await writable.close();
+    await window.PFCatalogCache?.invalidate?.("data/spells.json");
     window.PFSpellData?.reset?.();
     setDirty(false);
     setStatus("Saved spell data inside data/spells.json.", "success");
@@ -523,6 +524,7 @@ async function saveSpellsFile() {
   link.download = "spells.json";
   link.click();
   URL.revokeObjectURL(url);
+  await window.PFCatalogCache?.invalidate?.("data/spells.json");
   setDirty(false);
   setStatus(
     "Downloaded spells.json because direct project saving is unavailable.",

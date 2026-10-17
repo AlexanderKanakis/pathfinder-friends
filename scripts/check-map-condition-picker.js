@@ -68,9 +68,11 @@ assert(renderBody.includes("browser.loadingHtml"));
 
 for (const entryPoint of ["openQuickApplyEffect", "openAuraEffectPicker"]) {
   const body = functionBody(mapJs, entryPoint);
-  assert(body.includes("sourceEffectDefinitions"));
+  assert(body.includes("loadQuickEffectGroup"));
   assert(body.includes("renderQuickEffects"));
 }
+const groupLoaderBody = functionBody(mapJs, "loadQuickEffectGroup");
+assert(groupLoaderBody.includes("sourceEffectDefinitions"));
 const effectsBody = functionBody(mapJs, "openMapEffects");
 assert(effectsBody.includes("PFEffectTracker.mount"));
 assert(effectsBody.includes("choicePoolEquipment"));

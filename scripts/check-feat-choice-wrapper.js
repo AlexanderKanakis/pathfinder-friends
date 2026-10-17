@@ -21,9 +21,48 @@ assert(renderFeatProgression.includes('<article class="feat-choice-entry">'));
 assert(renderFeatProgression.includes('class-feature-choice-row feat-choice-row'));
 assert(renderFeatProgression.includes('feat-choice-reselect'));
 assert(renderFeatProgression.includes('feat-choice-remove'));
-assert(renderFeatProgression.includes('featChoiceSummary(selection)'));
-assert(sheetScript.includes('function featChoiceSummary(selection)'));
+assert(renderFeatProgression.includes('featChoiceSummary(selection, selectedFeat)'));
+assert(sheetScript.includes('function featChoiceSummary(selection, feat = {})'));
+assert(sheetScript.includes('function legacySpellAdjustmentChoiceSummary('));
+assert(sheetScript.includes('filter.resolvedChoice'));
+const effectEditor = fs.readFileSync(
+  path.join(rootDir, "scripts", "effect-editor.js"),
+  "utf8",
+);
+assert(effectEditor.includes('resolvedChoice: true'));
 assert(sheetScript.includes('(Craft|Knowledge|Perform|Profession)'));
+
+global.window = {};
+require("./buff-calculator.js");
+const featData = JSON.parse(
+  fs.readFileSync(path.join(rootDir, "data", "feats.json"), "utf8"),
+);
+const spellFocus = featData.feats.find(
+  (feat) => feat.id === "spell-focus-145",
+);
+assert(spellFocus, "Core Spell Focus feat is missing");
+const resolvedSpellFocus = structuredClone(spellFocus.spellDcBonuses[0]);
+resolvedSpellFocus.targetFilters = [
+  { targetMode: "school", targets: ["evocation"], resolvedChoice: true },
+];
+const spellFocusBuff = {
+  source: "Feat: Spell Focus",
+  spellDcBonuses: [resolvedSpellFocus],
+};
+assert.strictEqual(
+  window.PFBuffs.effectiveSpellDc(15, [spellFocusBuff], {
+    school: "Evocation",
+    spellSource: "strict-spells",
+  }).total,
+  16,
+);
+assert.strictEqual(
+  window.PFBuffs.effectiveSpellDc(15, [spellFocusBuff], {
+    school: "Conjuration",
+    spellSource: "strict-spells",
+  }).total,
+  15,
+);
 assert(
   !renderFeatProgression.includes(
     '<article class="class-feature-row border rounded p-2">',

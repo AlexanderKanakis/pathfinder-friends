@@ -153,6 +153,7 @@
           <div class="vstack gap-1 mt-3" data-save-conditionals></div>
         </div>
         <div class="modal-footer">
+          <button class="btn btn-outline-warning" type="button" data-save-reroll><i class="bi bi-arrow-clockwise me-1"></i>Reroll</button>
           <button class="btn btn-outline-light" type="button" data-save-result="cancel">Cancel</button>
           <button class="btn btn-outline-info d-none" type="button" data-save-result="partial">Apply Partial</button>
           <button class="btn btn-primary" type="button" data-save-result="full">Apply Effect</button>
@@ -187,10 +188,13 @@
     const totalNode = modal.querySelector("[data-save-total]");
     const conditionalNode = modal.querySelector("[data-save-conditional]");
     const noteNode = modal.querySelector("[data-save-note]");
-    const die = Math.floor(random() * 20) + 1;
-    let animation = root.setInterval(() => {
-      dieNode.textContent = Math.floor(Math.random() * 20) + 1;
-    }, 55);
+    const rerollButton = modal.querySelector("[data-save-reroll]");
+    const fullButton = modal.querySelector('[data-save-result="full"]');
+    const cancelButton = modal.querySelector('[data-save-result="cancel"]');
+    let die = 1;
+    let animation = null;
+    let revealTimer = null;
+    let rolling = false;
     const update = () => {
       const conditional = [...selected].reduce((sum, index) => sum + conditionalValue(conditionals[index]), 0);
       const total = die + profile.bonus + conditional;
@@ -201,8 +205,8 @@
       noteNode.classList.toggle("text-success", outcome.success === true);
       noteNode.classList.toggle("text-danger", outcome.success === false);
       noteNode.classList.toggle("text-secondary", !outcome.known);
-      modal.querySelector('[data-save-result="full"]').disabled = die === 20;
-      modal.querySelector('[data-save-result="cancel"]').disabled = die === 1;
+      fullButton.disabled = die === 20;
+      cancelButton.disabled = die === 1;
       partialButton.disabled = die === 1;
       return { conditional, total, success: outcome.success };
     };
@@ -210,25 +214,60 @@
     list.innerHTML = conditionals.length
       ? `<div class="small text-secondary">Applicable conditionals</div>${conditionals.map((entry, index) => `<label class="form-check"><input class="form-check-input" type="checkbox" data-save-conditional-index="${index}"><span class="form-check-label">${escapeHtml(entry.source || entry.name || entry.label || entry.appliesWhen || "Conditional")} (${conditionalValue(entry) >= 0 ? "+" : ""}${conditionalValue(entry)})</span></label>`).join("")}`
       : "";
-    list.querySelectorAll("[data-save-conditional-index]").forEach((input) => input.addEventListener("change", () => {
+    const conditionalInputs = [
+      ...list.querySelectorAll("[data-save-conditional-index]"),
+    ];
+    conditionalInputs.forEach((input) => input.addEventListener("change", () => {
       const index = Number(input.dataset.saveConditionalIndex);
       if (input.checked) selected.add(index); else selected.delete(index);
-      update();
+      if (!rolling) update();
     }));
+    const setRolling = (value) => {
+      rolling = value;
+      rerollButton.disabled = value;
+      fullButton.disabled = value;
+      partialButton.disabled = value;
+      conditionalInputs.forEach((input) => {
+        input.disabled = value;
+      });
+      if (value) {
+        totalNode.textContent = "...";
+        noteNode.textContent = "Rolling...";
+        noteNode.classList.remove("text-success", "text-danger");
+        noteNode.classList.add("text-secondary");
+      }
+    };
+    const roll = () => {
+      if (animation) root.clearInterval(animation);
+      if (revealTimer) root.clearTimeout(revealTimer);
+      die = Math.floor(random() * 20) + 1;
+      setRolling(true);
+      animation = root.setInterval(() => {
+        dieNode.textContent = Math.floor(Math.random() * 20) + 1;
+      }, 55);
+      revealTimer = root.setTimeout(() => {
+        root.clearInterval(animation);
+        animation = null;
+        revealTimer = null;
+        dieNode.textContent = die;
+        setRolling(false);
+        update();
+      }, 900);
+    };
     instance.show();
-    root.setTimeout(() => {
-      root.clearInterval(animation);
-      animation = null;
-      dieNode.textContent = die;
-      update();
-    }, 900);
+    roll();
     return new Promise((resolve) => {
       const finish = (action) => {
+        if (rolling && action !== "cancel") return;
         if (animation) root.clearInterval(animation);
+        if (revealTimer) root.clearTimeout(revealTimer);
+        animation = null;
+        revealTimer = null;
         const totals = update();
         instance.hide();
         resolve({ action, die, bonus: profile.bonus, ...totals });
       };
+      rerollButton.onclick = roll;
       modal.querySelectorAll("[data-save-result]").forEach((button) => {
         button.onclick = () => finish(button.dataset.saveResult);
       });

@@ -16,6 +16,16 @@ async function main() {
   const unchanged = { name: "No Save", effects: [bonus("attack", 1)] };
   assert.equal(saves.hasSave(unchanged), false);
 
+  const fortitude = saves.rowForCheck(
+    { calculated: { saves: [{ key: "fort", total: 12 }] } },
+    saveConfig(),
+  );
+  assert.equal(
+    fortitude.bonus,
+    12,
+    "Fortitude saves must use the target's calculated save total.",
+  );
+
   const failed = await saves.resolve(
     {
       name: "Failed Save",
@@ -151,6 +161,12 @@ async function main() {
   assert(editor.includes("appendSavedRow(applyConditionRowsEl, element, data)"));
   assert(editor.includes("partialMechanics: partialEditor.collect()"));
 
+  const saveRuntime = fs.readFileSync("scripts/effect-saves.js", "utf8");
+  assert(saveRuntime.includes("data-save-reroll"));
+  assert(saveRuntime.includes("rerollButton.onclick = roll;"));
+  assert(saveRuntime.includes("if (!rolling) update();"));
+  assert(saveRuntime.includes("die = Math.floor(random() * 20) + 1;"));
+
   const characterSheet = fs.readFileSync(
     "scripts/pages/character-sheet.js",
     "utf8",
@@ -176,6 +192,40 @@ async function main() {
       "...window.PFEffectMechanics?.copyActivationConfig?.(mechanics)",
     ),
     "Map spell definitions must retain save configuration.",
+  );
+
+  const pendingChoices = fs.readFileSync(
+    "modals/pending-effect-choices.js",
+    "utf8",
+  );
+  assert(
+    pendingChoices.includes("sheet: await pendingSaveSheet(request)"),
+    "Remote saves must resolve against the requested target's sheet.",
+  );
+  assert(
+    pendingChoices.includes("request.character_id"),
+    "Remote save sheet loading must preserve the target character identity.",
+  );
+  assert(
+    characterSheet.includes("saveRollSheetForCharacter"),
+    "The character-sheet bridge must expose a target-specific save snapshot.",
+  );
+  assert(
+    characterSheet.includes(
+      'new URLSearchParams(window.location.search).get("bridge") === "1"',
+    ) && !characterSheet.includes("PFCharacterSheetBridgeLoader = bridgeMode"),
+    "The bridge loader must not reference initCharacterSheet's local bridgeMode.",
+  );
+  assert(
+    map.includes("window.PFCharacterSheetBridgeLoader = characterSheetBridge"),
+    "The map must expose its hidden character-sheet bridge to remote saves.",
+  );
+  const appSupabase = fs.readFileSync("scripts/app-supabase.js", "utf8");
+  assert(
+    appSupabase.includes(
+      '.select("id,context_key,character_id,effect_name,ability,created_at")',
+    ),
+    "Pending save requests must retain their campaign context.",
   );
 
   for (const page of [

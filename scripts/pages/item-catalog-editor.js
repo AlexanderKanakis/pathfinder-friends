@@ -996,6 +996,7 @@ async function saveCatalogFile(key) {
     const writable = await fileHandle.createWritable();
     await writable.write(`${JSON.stringify(items, null, 2)}\n`);
     await writable.close();
+    await window.PFCatalogCache?.invalidate?.(catalog.file);
     return true;
   }
   const blob = new Blob([`${JSON.stringify(items, null, 2)}\n`], {
@@ -1007,6 +1008,7 @@ async function saveCatalogFile(key) {
   link.download = fileName;
   link.click();
   URL.revokeObjectURL(url);
+  await window.PFCatalogCache?.invalidate?.(catalog.file);
   return false;
 }
 

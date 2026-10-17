@@ -47,7 +47,8 @@
                 "levelMultiplier": {
                   "numerator": 1,
                   "denominator": 2
-                }
+                },
+                "minimumOne": true
               }
             }
           ],

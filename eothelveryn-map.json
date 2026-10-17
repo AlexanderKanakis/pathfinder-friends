@@ -1,0 +1,1768 @@
+{
+  "mapInstances": [
+    {
+      "contextKey": "game:b8e965ef-98ad-465f-98b8-82d49440e3be",
+      "mapSlot": 1,
+      "mapName": "",
+      "token": {
+        "h": 1,
+        "w": 1,
+        "x": 14,
+        "y": 13,
+        "ac": "21",
+        "hp": "83/83",
+        "id": "token_1791568735387_b8ce45ea3311a",
+        "kind": "character",
+        "name": "Eothelveryn Nanyodalee",
+        "color": "#8fd19e",
+        "zIndex": 8,
+        "ownerId": "505f90ad-9762-42d3-92a1-1dfe15c48335",
+        "imageUrl": "https://static.wikia.nocookie.net/dungeon-select/images/4/41/Naurraunc.png/revision/latest?cb=20181207154835",
+        "sizeLinked": true,
+        "characterId": "f2f25bed-35d5-4a09-b243-bf793d53f7c5",
+        "automaticAuras": []
+      }
+    },
+    {
+      "contextKey": "game:b8e965ef-98ad-465f-98b8-82d49440e3be",
+      "mapSlot": 2,
+      "mapName": "",
+      "token": {
+        "h": 1,
+        "w": 1,
+        "x": 7,
+        "y": 10,
+        "ac": "21",
+        "hp": "83/83",
+        "id": "token_1787590719519_3d02a2f0ff59d8",
+        "kind": "character",
+        "name": "Eothelveryn Nanyodalee",
+        "color": "#8fd19e",
+        "zIndex": 2,
+        "ownerId": "505f90ad-9762-42d3-92a1-1dfe15c48335",
+        "imageUrl": "https://static.wikia.nocookie.net/dungeon-select/images/4/41/Naurraunc.png/revision/latest?cb=20181207154835",
+        "sizeLinked": true,
+        "characterId": "f2f25bed-35d5-4a09-b243-bf793d53f7c5"
+      }
+    }
+  ],
+  "characterRecord": {
+    "id": "f2f25bed-35d5-4a09-b243-bf793d53f7c5",
+    "character_name": "Eothelveryn Nanyodalee",
+    "user_id": "505f90ad-9762-42d3-92a1-1dfe15c48335",
+    "sheet": {
+      "gear": [
+        {
+          "item": "Cloak of Resistance + 3",
+          "slot": "shoulders",
+          "details": "Flecks of silver or steel are often sown amid the fabric of these magical cloaks. This garment offers magical protection in the form of a +1 to +5 resistance bonus on all saving throws (Fortitude, Reflex, and Will).",
+          "sourceLootId": "3792ea05-737b-4c47-89db-7e706d819fa9"
+        },
+        {
+          "item": "+4 Gloves of Dexterity",
+          "slot": "belt",
+          "details": "The gloves grant the wearer an enhancement bonus to Dexterity of +2, +4, or +6. Treat this as a temporary ability bonus for the first 24 hours the gloves are worn.",
+          "sourceLootId": "723277f4-a004-4d1a-8c79-8b5afed8bc39"
+        },
+        {
+          "item": "+4 Headband of Vast Intelligence",
+          "slot": "headband",
+          "details": "This intricate gold headband is decorated with several small blue and deep purple gemstones. The headband grants the wearer an enhancement bonus to Intelligence of +2, +4, or +6. Treat this as a temporary ability bonus for the first 24 hours the headband is worn. A headband of vast intelligence has one skill associated with it per +2 bonus it grants. After being worn for 24 hours, the headband grants a number of skill ranks in those skills equal to the wearer\u2019s total Hit Dice. These ranks do not stack with the ranks a creature already possesses. These skills are chosen when the headband is created. If no skill is listed, the headband is assumed to grant skill ranks in randomly determined Knowledge skills.",
+          "sourceLootId": "336b0355-20eb-40b8-9ff1-032f88b4f830"
+        },
+        {
+          "item": "Lucky Horseshoe",
+          "slot": "none",
+          "details": "Although it appears to be a simple horseshoe, a lucky horseshoe focuses and channels the mystical energies of good fortune. As long as a lucky horseshoe\u2019s owner carries it on her person, she gains a +1 luck bonus on saving throws. Once per day, she can invoke the lucky horseshoe\u2019s power to gain a +4 luck bonus on a single saving throw. She must declare that she is using this ability before the roll is made.",
+          "sourceLootId": "22ab7c83-5e6b-4927-b009-ecf9bbdcfbb5"
+        },
+        {
+          "item": "+2 Belt of Mighty Constitution",
+          "slot": "belt",
+          "details": "This belt\u2019s golden buckle depicts a bear\u2019s head. The belt grants the wearer an enhancement bonus to Constitution of +2, +4, or +6. Treat this as a temporary ability bonus for the first 24 hours the belt is worn.",
+          "sourceLootId": "11008450-09ac-4d75-bac3-dfac98648c5e"
+        },
+        {
+          "item": "Amazing Tools of Manufacture",
+          "slot": "none",
+          "details": "Tools of this type always appear to be of the highest quality and wrought of the finest materials, most often mithral, darkwood, and adamantine. In the hands of a casual wielder, these items simply appear to be magically enhanced masterwork tools for a specific Craft skill (determined randomly), granting a +4 circumstance bonus on such skill checks.However, in the hands of a craftsman with 6 or more ranks in the selected Craft skill, the greater power of the amazing tools of manufacture becomes apparent. The wielder may use the tools to create items using the Craft skill much more surely and quickly. The wielder may take raw materials with a value equal to half the price of an object to be crafted, and produce a finished object in as little as 1 hour for an item with a final cost of 2,000 gp or less. For objects with a final cost of more than 2,000 gp, the wielder can perform 2,000 gp worth of work in a single hour, but only once each day. Only a single skill check is required to successfully complete the item, made on the last day of crafting and gaining the +4 circumstance bonus granted by the tools.",
+          "sourceLootId": "6afdfce2-3513-4d99-90eb-1d57c641d098"
+        }
+      ],
+      "armor": [
+        {
+          "item": "Leather",
+          "type": "Armor",
+          "bonus": "2",
+          "maxDex": "6",
+          "weight": "",
+          "failure": "10",
+          "penalty": "0",
+          "armorGroup": "Light Armors",
+          "enchantment": "",
+          "enhancement": "2",
+          "sourceLootId": "75d55ad6-7997-4a3e-9931-dc428621e81a",
+          "specialMaterial": ""
+        }
+      ],
+      "feats": {
+        "effect": {
+          "effect|1|race:Alternate Race: Elf Human-raised|0|Bonus Feat": {
+            "level": 1,
+            "featId": "skill-focus-143",
+            "source": "Bonus Feat",
+            "mechanics": {
+              "effects": [
+                {
+                  "stat": "skill:craftalchemy",
+                  "type": "untyped",
+                  "value": 3,
+                  "stacks": false,
+                  "bonusScale": {
+                    "every": null,
+                    "source": {
+                      "type": "caster"
+                    },
+                    "milestones": [],
+                    "skillRankThresholds": [
+                      {
+                        "ranks": 10,
+                        "value": 6
+                      }
+                    ]
+                  },
+                  "appliesWhen": "",
+                  "conditional": false
+                }
+              ]
+            }
+          }
+        },
+        "normal": {
+          "1": {
+            "level": 1,
+            "featId": "deadly-aim-34"
+          },
+          "3": {
+            "level": 3,
+            "featId": "master-alchemist",
+            "mechanics": {
+              "effects": [
+                {
+                  "stat": "skill:craftalchemy",
+                  "type": "untyped",
+                  "value": 2,
+                  "stacks": false,
+                  "skillName": "Craft (Alchemy)",
+                  "appliesWhen": "",
+                  "conditional": false
+                }
+              ]
+            }
+          },
+          "9": {
+            "level": 9,
+            "featId": "master-craftsman",
+            "mechanics": {
+              "effects": [
+                {
+                  "stat": "skill:craftalchemy",
+                  "type": "untyped",
+                  "value": 2,
+                  "stacks": false,
+                  "appliesWhen": "",
+                  "conditional": false
+                }
+              ]
+            }
+          }
+        },
+        "granted": {}
+      },
+      "saves": {
+        "fort": {
+          "base": "9",
+          "misc": "0"
+        },
+        "will": {
+          "base": "3",
+          "misc": "0"
+        },
+        "reflex": {
+          "base": "9",
+          "misc": "0"
+        }
+      },
+      "fields": {
+        "CP": "0",
+        "GP": "0",
+        "SP": "0",
+        "sq": "",
+        "xp": "",
+        "age": "17",
+        "bab": "8",
+        "aura": "",
+        "eyes": "Green",
+        "hair": "Brown",
+        "race": "Elf",
+        "size": "Medium",
+        "deity": "Not set",
+        "notes": "173 lbs. or less",
+        "reach": "5 ft.",
+        "acMisc": "0",
+        "gender": "Male",
+        "height": "1.82",
+        "senses": "",
+        "weight": "53 Kg",
+        "babBase": "8",
+        "babMisc": "0",
+        "cmbMisc": "2",
+        "cmdMisc": "2",
+        "subtype": "",
+        "flySpeed": "",
+        "homeland": "Taldor",
+        "imageUrl": "https://static.wikia.nocookie.net/dungeon-select/images/4/41/Naurraunc.png/revision/latest?cb=20181207154835",
+        "initMisc": "6",
+        "alignment": "Chaotic Evil",
+        "heavyLoad": "347-520 lbs.",
+        "hitPoints": "93",
+        "languages": "",
+        "lightLoad": "27",
+        "speedBase": "30 ft.",
+        "classLevel": "Gunslinger 1 / Alchemist 10",
+        "dragOrPush": "2600 lbs.",
+        "immunities": "",
+        "mediumLoad": "174-346 lbs.",
+        "speedArmor": "20 ft. 4 sq.",
+        "weaknesses": "",
+        "enemySpells": "{\"title\":\"Spells\",\"className\":\"\",\"cl\":\"\",\"concentration\":\"\",\"rows\":[]}",
+        "resistances": "",
+        "spellLikeCl": "",
+        "acDeflection": "0",
+        "liftOverHead": "520 lbs.",
+        "regeneration": "",
+        "acNaturalBase": "0",
+        "acNaturalMisc": "1",
+        "characterName": "Eothelveryn Nanyodalee",
+        "liftOffGround": "1040 lbs.",
+        "characterLevel": "11",
+        "hitPointsTotal": "83",
+        "specialAttacks": "",
+        "damageReduction": "",
+        "spellResistance": "",
+        "currentHitPoints": "93",
+        "enemySpellsKnown": "{\"title\":\"Spells Known\",\"className\":\"\",\"cl\":\"\",\"concentration\":\"\",\"rows\":[]}",
+        "specialAbilities": "",
+        "enemyPsychicMagic": "{\"title\":\"Psychic Magic\",\"className\":\"\",\"cl\":\"\",\"concentration\":\"\",\"rows\":[]}",
+        "defensiveAbilities": "",
+        "spellLikeAbilities": "[]",
+        "enemySpellsPrepared": "{\"title\":\"Spells Prepared\",\"className\":\"\",\"cl\":\"\",\"concentration\":\"\",\"rows\":[]}",
+        "spellLikeConcentration": ""
+      },
+      "skills": {
+        "Fly": {
+          "misc": "0",
+          "ranks": "0"
+        },
+        "Heal": {
+          "misc": "0",
+          "ranks": "0"
+        },
+        "Ride": {
+          "misc": "0",
+          "ranks": "0"
+        },
+        "Swim": {
+          "misc": "0",
+          "ranks": "0"
+        },
+        "Bluff": {
+          "misc": "3",
+          "ranks": "9"
+        },
+        "Climb": {
+          "misc": "0",
+          "ranks": "0"
+        },
+        "Stealth": {
+          "misc": "0",
+          "ranks": "5"
+        },
+        "Appraise": {
+          "misc": "3",
+          "ranks": "2"
+        },
+        "Disguise": {
+          "misc": "0",
+          "ranks": "0"
+        },
+        "Survival": {
+          "misc": "0",
+          "ranks": "5"
+        },
+        "Diplomacy": {
+          "misc": "0",
+          "ranks": "0"
+        },
+        "Acrobatics": {
+          "misc": "3",
+          "ranks": "4"
+        },
+        "CraftTraps": {
+          "misc": "0",
+          "ranks": "11"
+        },
+        "Intimidate": {
+          "misc": "0",
+          "ranks": "0"
+        },
+        "Perception": {
+          "misc": "0",
+          "ranks": "10"
+        },
+        "Spellcraft": {
+          "misc": "5",
+          "ranks": "7"
+        },
+        "Linguistics": {
+          "misc": "1",
+          "ranks": "0"
+        },
+        "SenseMotive": {
+          "misc": "0",
+          "ranks": "0"
+        },
+        "CraftAlchemy": {
+          "misc": "0",
+          "ranks": "10"
+        },
+        "EscapeArtist": {
+          "misc": "0",
+          "ranks": "4"
+        },
+        "HandleAnimal": {
+          "misc": "0",
+          "ranks": "0"
+        },
+        "CraftGunsmith": {
+          "misc": "0",
+          "ranks": "1"
+        },
+        "DisableDevice": {
+          "misc": "3",
+          "ranks": "7"
+        },
+        "SleightofHand": {
+          "misc": "2",
+          "ranks": "8"
+        },
+        "Knowledgelocal": {
+          "misc": "3",
+          "ranks": "2"
+        },
+        "UseMagicDevice": {
+          "misc": "16",
+          "ranks": "5"
+        },
+        "Knowledgearcana": {
+          "misc": "3",
+          "ranks": "6"
+        },
+        "Knowledgenature": {
+          "misc": "0",
+          "ranks": "6"
+        },
+        "Knowledgeplanes": {
+          "misc": "5",
+          "ranks": "4"
+        },
+        "Knowledgehistory": {
+          "misc": "0",
+          "ranks": "0"
+        },
+        "Knowledgenobility": {
+          "misc": "0",
+          "ranks": "0"
+        },
+        "Knowledgereligion": {
+          "misc": "0",
+          "ranks": "0"
+        },
+        "Knowledgegeography": {
+          "misc": "0",
+          "ranks": "3"
+        },
+        "Knowledgeengineering": {
+          "misc": "3",
+          "ranks": "5"
+        },
+        "Knowledgedungeoneering": {
+          "misc": "0",
+          "ranks": "0"
+        }
+      },
+      "spells": {
+        "Alchemist": {
+          "book": {
+            "1": [
+              "Crafter's Fortune",
+              "Cure Light Wounds",
+              "Detect Metal",
+              "Disguise Self",
+              "Enlarge Person",
+              "Heightened Awareness",
+              "Identify",
+              "Reduce Person",
+              "Shield",
+              "Tears to Wine",
+              "True Skill"
+            ],
+            "2": [
+              "Alchemical Allocation",
+              "Alter Self",
+              "Barkskin",
+              "Enchantment Sight",
+              "Full Pouch",
+              "Invisibility",
+              "See Invisibility",
+              "Skinsend",
+              "Undetectable Alignment"
+            ],
+            "3": [
+              "Arcane Sight",
+              "Burst of Speed",
+              "Fly",
+              "Haste",
+              "Heroism",
+              "Hypercognition",
+              "Marionette Possession",
+              "Nondetection",
+              "Remove Blindness/Deafness",
+              "Remove Curse",
+              "Undead Anatomy I",
+              "Voluminous Vocabulary",
+              "Vomit Twin"
+            ],
+            "6": [
+              "Chain Lightning"
+            ]
+          },
+          "prepared": {
+            "1": [
+              "Disguise Self",
+              "Enlarge Person",
+              "Identify",
+              "Tears to Wine"
+            ],
+            "2": [
+              "See Invisibility",
+              "Alter Self"
+            ],
+            "3": [
+              "Hypercognition",
+              "Fly",
+              "Vomit Twin",
+              "Heroism",
+              "Burst of Speed"
+            ],
+            "6": []
+          },
+          "extraSlots": {
+            "prepared": {
+              "1": 0
+            }
+          }
+        }
+      },
+      "weapons": [
+        {
+          "name": "Relic Rifle",
+          "range": "80 ft.",
+          "damage": "1d10",
+          "details": "",
+          "misfire": "1",
+          "capacity": "1",
+          "critical": "x4",
+          "deadlyAim": "yes",
+          "rapidShot": "yes",
+          "twoHanded": "no",
+          "attackMisc": "0",
+          "damageMisc": "0",
+          "damageType": "B and P",
+          "greaterTwf": "no",
+          "twfFeatOff": "no",
+          "weaponType": "Firearm (Two-Handed)",
+          "attackScale": "DEX",
+          "damageScale": "DEX",
+          "enchantment": "",
+          "enhancement": "1",
+          "extraDamage": "[]",
+          "improvedTwf": "no",
+          "powerAttack": "no",
+          "sourceLootId": "005b5d9e-8bbd-4e1d-b7f4-9f3a83c92bfc",
+          "twfNoFeatOff": "no",
+          "templateAttack": "",
+          "twfFeatPrimary": "no",
+          "specialMaterial": "",
+          "twfNoFeatPrimary": "no",
+          "naturalAttackKind": "Other",
+          "naturalAttackRole": ""
+        }
+      ],
+      "abilities": {
+        "cha": {
+          "score": "9"
+        },
+        "con": {
+          "score": "16"
+        },
+        "dex": {
+          "score": "19"
+        },
+        "int": {
+          "score": "21"
+        },
+        "str": {
+          "score": "9"
+        },
+        "wis": {
+          "score": "10"
+        }
+      },
+      "calculated": {
+        "hp": {
+          "total": "83",
+          "current": "83"
+        },
+        "size": {
+          "base": "Medium",
+          "final": "Medium",
+          "reach": "5 ft.",
+          "space": "5 ft.",
+          "changes": [],
+          "tokenSize": 1
+        },
+        "saves": [
+          {
+            "key": "fort",
+            "label": "Fortitude",
+            "total": "+15",
+            "conditionals": [
+              {
+                "type": "racial",
+                "label": "Fortitude vs enchantment spells and effects",
+                "total": "+17",
+                "value": 2,
+                "effect": "Race: Elf Elven Immunities",
+                "source": "Race: Elf Elven Immunities (racial)",
+                "rawTotal": "+17",
+                "appliesWhen": "vs enchantment spells and effects",
+                "displayTotal": "+17 (+2)"
+              },
+              {
+                "type": "untyped",
+                "label": "Fortitude Against Poison",
+                "total": "+21",
+                "value": 6,
+                "effect": "Poison Resistance",
+                "source": "Poison Resistance (untyped)",
+                "rawTotal": "+21",
+                "appliesWhen": "Against Poison",
+                "displayTotal": "+21 (+6)"
+              }
+            ]
+          },
+          {
+            "key": "reflex",
+            "label": "Reflex",
+            "total": "+19",
+            "conditionals": [
+              {
+                "type": "racial",
+                "label": "Reflex vs enchantment spells and effects",
+                "total": "+21",
+                "value": 2,
+                "effect": "Race: Elf Elven Immunities",
+                "source": "Race: Elf Elven Immunities (racial)",
+                "rawTotal": "+21",
+                "appliesWhen": "vs enchantment spells and effects",
+                "displayTotal": "+21 (+2)"
+              }
+            ]
+          },
+          {
+            "key": "will",
+            "label": "Will",
+            "total": "+7",
+            "conditionals": [
+              {
+                "type": "racial",
+                "label": "Will vs enchantment spells and effects",
+                "total": "+9",
+                "value": 2,
+                "effect": "Race: Elf Elven Immunities",
+                "source": "Race: Elf Elven Immunities (racial)",
+                "rawTotal": "+9",
+                "appliesWhen": "vs enchantment spells and effects",
+                "displayTotal": "+9 (+2)"
+              }
+            ]
+          }
+        ],
+        "combat": {
+          "cmb": "9",
+          "cmd": "24",
+          "conditionals": {
+            "cmb": [],
+            "cmd": []
+          }
+        },
+        "skills": [
+          {
+            "key": "Acrobatics",
+            "label": "Acrobatics",
+            "ranks": 4,
+            "total": "14",
+            "usable": true,
+            "classSkill": false,
+            "conditionals": []
+          },
+          {
+            "key": "Appraise",
+            "label": "Appraise",
+            "ranks": 2,
+            "total": "21",
+            "usable": true,
+            "classSkill": true,
+            "conditionals": []
+          },
+          {
+            "key": "Bluff",
+            "label": "Bluff",
+            "ranks": 9,
+            "total": "11",
+            "usable": true,
+            "classSkill": false,
+            "conditionals": []
+          },
+          {
+            "key": "Climb",
+            "label": "Climb",
+            "ranks": 0,
+            "total": "-1",
+            "usable": true,
+            "classSkill": false,
+            "conditionals": []
+          },
+          {
+            "key": "Diplomacy",
+            "label": "Diplomacy",
+            "ranks": 0,
+            "total": "-1",
+            "usable": true,
+            "classSkill": false,
+            "conditionals": []
+          },
+          {
+            "key": "DisableDevice",
+            "label": "Disable Device",
+            "ranks": 7,
+            "total": "20",
+            "usable": true,
+            "classSkill": true,
+            "conditionals": []
+          },
+          {
+            "key": "Disguise",
+            "label": "Disguise",
+            "ranks": 0,
+            "total": "-1",
+            "usable": true,
+            "classSkill": false,
+            "conditionals": []
+          },
+          {
+            "key": "EscapeArtist",
+            "label": "Escape Artist",
+            "ranks": 4,
+            "total": "11",
+            "usable": true,
+            "classSkill": false,
+            "conditionals": []
+          },
+          {
+            "key": "Fly",
+            "label": "Fly",
+            "ranks": 0,
+            "total": "7",
+            "usable": true,
+            "classSkill": true,
+            "conditionals": []
+          },
+          {
+            "key": "Heal",
+            "label": "Heal",
+            "ranks": 0,
+            "total": "5",
+            "usable": true,
+            "classSkill": false,
+            "conditionals": []
+          },
+          {
+            "key": "HandleAnimal",
+            "label": "Handle Animal",
+            "ranks": 0,
+            "total": "",
+            "usable": false,
+            "classSkill": false,
+            "conditionals": []
+          },
+          {
+            "key": "Intimidate",
+            "label": "Intimidate",
+            "ranks": 0,
+            "total": "-1",
+            "usable": true,
+            "classSkill": false,
+            "conditionals": []
+          },
+          {
+            "key": "Knowledgearcana",
+            "label": "Knowledge (arcana)",
+            "ranks": 6,
+            "total": "25",
+            "usable": true,
+            "classSkill": true,
+            "conditionals": []
+          },
+          {
+            "key": "Knowledgedungeoneering",
+            "label": "Knowledge (dungeoneering)",
+            "ranks": 0,
+            "total": "",
+            "usable": false,
+            "classSkill": false,
+            "conditionals": []
+          },
+          {
+            "key": "Knowledgeengineering",
+            "label": "Knowledge (engineering)",
+            "ranks": 5,
+            "total": "21",
+            "usable": true,
+            "classSkill": false,
+            "conditionals": []
+          },
+          {
+            "key": "Knowledgegeography",
+            "label": "Knowledge (geography)",
+            "ranks": 3,
+            "total": "16",
+            "usable": true,
+            "classSkill": false,
+            "conditionals": []
+          },
+          {
+            "key": "Knowledgehistory",
+            "label": "Knowledge (history)",
+            "ranks": 0,
+            "total": "",
+            "usable": false,
+            "classSkill": false,
+            "conditionals": []
+          },
+          {
+            "key": "Knowledgelocal",
+            "label": "Knowledge (local)",
+            "ranks": 2,
+            "total": "18",
+            "usable": true,
+            "classSkill": false,
+            "conditionals": []
+          },
+          {
+            "key": "Knowledgenature",
+            "label": "Knowledge (nature)",
+            "ranks": 6,
+            "total": "32",
+            "usable": true,
+            "classSkill": true,
+            "conditionals": []
+          },
+          {
+            "key": "Knowledgenobility",
+            "label": "Knowledge (nobility)",
+            "ranks": 0,
+            "total": "",
+            "usable": false,
+            "classSkill": false,
+            "conditionals": []
+          },
+          {
+            "key": "Knowledgeplanes",
+            "label": "Knowledge (planes)",
+            "ranks": 4,
+            "total": "22",
+            "usable": true,
+            "classSkill": false,
+            "conditionals": []
+          },
+          {
+            "key": "Knowledgereligion",
+            "label": "Knowledge (religion)",
+            "ranks": 0,
+            "total": "",
+            "usable": false,
+            "classSkill": false,
+            "conditionals": []
+          },
+          {
+            "key": "Linguistics",
+            "label": "Linguistics",
+            "ranks": 0,
+            "total": "",
+            "usable": false,
+            "classSkill": false,
+            "conditionals": []
+          },
+          {
+            "key": "Perception",
+            "label": "Perception",
+            "ranks": 10,
+            "total": "20",
+            "usable": true,
+            "classSkill": true,
+            "conditionals": []
+          },
+          {
+            "key": "Ride",
+            "label": "Ride",
+            "ranks": 0,
+            "total": "7",
+            "usable": true,
+            "classSkill": false,
+            "conditionals": []
+          },
+          {
+            "key": "SenseMotive",
+            "label": "Sense Motive",
+            "ranks": 0,
+            "total": "5",
+            "usable": true,
+            "classSkill": false,
+            "conditionals": []
+          },
+          {
+            "key": "SleightofHand",
+            "label": "Sleight of Hand",
+            "ranks": 8,
+            "total": "20",
+            "usable": true,
+            "classSkill": true,
+            "conditionals": []
+          },
+          {
+            "key": "Spellcraft",
+            "label": "Spellcraft",
+            "ranks": 7,
+            "total": "28",
+            "usable": true,
+            "classSkill": true,
+            "conditionals": []
+          },
+          {
+            "key": "Stealth",
+            "label": "Stealth",
+            "ranks": 5,
+            "total": "12",
+            "usable": true,
+            "classSkill": false,
+            "conditionals": []
+          },
+          {
+            "key": "Survival",
+            "label": "Survival",
+            "ranks": 5,
+            "total": "23",
+            "usable": true,
+            "classSkill": true,
+            "conditionals": []
+          },
+          {
+            "key": "Swim",
+            "label": "Swim",
+            "ranks": 0,
+            "total": "-1",
+            "usable": true,
+            "classSkill": false,
+            "conditionals": []
+          },
+          {
+            "key": "UseMagicDevice",
+            "label": "Use Magic Device",
+            "ranks": 5,
+            "total": "23",
+            "usable": true,
+            "classSkill": true,
+            "conditionals": []
+          },
+          {
+            "key": "CraftAlchemy",
+            "label": "Craft (Alchemy)",
+            "ranks": 10,
+            "total": "40",
+            "usable": true,
+            "classSkill": true,
+            "conditionals": [
+              {
+                "type": "untyped",
+                "cells": [
+                  "Craft (Alchemy) Alchemical Items",
+                  "51 (+11)"
+                ],
+                "label": "Craft (Alchemy) Alchemical Items",
+                "total": "51",
+                "value": 11,
+                "source": "Alchemy (untyped)",
+                "appliesWhen": "Alchemical Items",
+                "conditional": true,
+                "displayTotal": "51 (+11)"
+              }
+            ]
+          },
+          {
+            "key": "CraftGunsmith",
+            "label": "Craft (Gunsmith)",
+            "ranks": 1,
+            "total": "17",
+            "usable": true,
+            "classSkill": true,
+            "conditionals": []
+          },
+          {
+            "key": "CraftTraps",
+            "label": "Craft (Traps)",
+            "ranks": 11,
+            "total": "27",
+            "usable": true,
+            "classSkill": true,
+            "conditionals": []
+          }
+        ],
+        "weapons": [
+          {
+            "name": "Relic Rifle",
+            "attack": "+12/+12/+7",
+            "damage": "1d10+12 B and P",
+            "critical": "x4",
+            "attackConditionals": [],
+            "damageConditionals": []
+          }
+        ],
+        "abilities": [
+          {
+            "key": "str",
+            "mod": "-1",
+            "label": "STR",
+            "total": "9",
+            "conditionals": []
+          },
+          {
+            "key": "dex",
+            "mod": "+7",
+            "label": "DEX",
+            "total": "25",
+            "conditionals": []
+          },
+          {
+            "key": "con",
+            "mod": "+3",
+            "label": "CON",
+            "total": "16",
+            "conditionals": []
+          },
+          {
+            "key": "int",
+            "mod": "+8",
+            "label": "INT",
+            "total": "27",
+            "conditionals": []
+          },
+          {
+            "key": "wis",
+            "mod": "+0",
+            "label": "WIS",
+            "total": "10",
+            "conditionals": []
+          },
+          {
+            "key": "cha",
+            "mod": "-1",
+            "label": "CHA",
+            "total": "9",
+            "conditionals": []
+          }
+        ],
+        "armorClass": {
+          "ac": "21",
+          "flat": "15",
+          "touch": "16",
+          "maxDex": 6,
+          "conditionals": {
+            "ac": [],
+            "flat": [],
+            "touch": []
+          },
+          "spellFailure": 10
+        },
+        "initiative": "+13",
+        "skillRanks": {
+          "total": 0,
+          "sources": [],
+          "perLevel": 0,
+          "characterLevel": 11
+        },
+        "conditionals": {
+          "will": [
+            {
+              "type": "racial",
+              "label": "Will vs enchantment spells and effects",
+              "total": "+9",
+              "value": 2,
+              "effect": "Race: Elf Elven Immunities",
+              "source": "Race: Elf Elven Immunities (racial)",
+              "rawTotal": "+9",
+              "appliesWhen": "vs enchantment spells and effects",
+              "displayTotal": "+9 (+2)"
+            }
+          ],
+          "reflex": [
+            {
+              "type": "racial",
+              "label": "Reflex vs enchantment spells and effects",
+              "total": "+21",
+              "value": 2,
+              "effect": "Race: Elf Elven Immunities",
+              "source": "Race: Elf Elven Immunities (racial)",
+              "rawTotal": "+21",
+              "appliesWhen": "vs enchantment spells and effects",
+              "displayTotal": "+21 (+2)"
+            }
+          ],
+          "fortitude": [
+            {
+              "type": "racial",
+              "label": "Fortitude vs enchantment spells and effects",
+              "total": "+17",
+              "value": 2,
+              "effect": "Race: Elf Elven Immunities",
+              "source": "Race: Elf Elven Immunities (racial)",
+              "rawTotal": "+17",
+              "appliesWhen": "vs enchantment spells and effects",
+              "displayTotal": "+17 (+2)"
+            },
+            {
+              "type": "untyped",
+              "label": "Fortitude Against Poison",
+              "total": "+21",
+              "value": 6,
+              "effect": "Poison Resistance",
+              "source": "Poison Resistance (untyped)",
+              "rawTotal": "+21",
+              "appliesWhen": "Against Poison",
+              "displayTotal": "+21 (+6)"
+            }
+          ],
+          "skill:craftalchemy": [
+            {
+              "type": "untyped",
+              "label": "Craft (Alchemy) Alchemical Items",
+              "total": "51",
+              "value": 11,
+              "effect": "Alchemy",
+              "source": "Alchemy (untyped)",
+              "rawTotal": "51",
+              "appliesWhen": "Alchemical Items",
+              "displayTotal": "51 (+11)"
+            }
+          ]
+        },
+        "hpConditionals": [],
+        "initiativeConditionals": []
+      },
+      "preferences": {
+        "showAppliedBuffs": true
+      },
+      "customSkills": [
+        {
+          "name": "Craft (Alchemy)",
+          "ability": "int"
+        },
+        {
+          "name": "Craft (Gunsmith)",
+          "ability": "int"
+        },
+        {
+          "name": "Craft (Traps)",
+          "ability": "int"
+        }
+      ],
+      "racialTraits": {
+        "choices": {},
+        "alternateTraits": [
+          "Human-raised",
+          "Darkvision"
+        ]
+      },
+      "classResources": {
+        "alchemist:bombs": 15
+      },
+      "classProgression": [
+        {
+          "level": 1,
+          "className": "Gunslinger"
+        },
+        {
+          "level": 2,
+          "className": "Alchemist"
+        },
+        {
+          "level": 3,
+          "className": "Alchemist"
+        },
+        {
+          "level": 4,
+          "className": "Alchemist"
+        },
+        {
+          "level": 5,
+          "className": "Alchemist"
+        },
+        {
+          "level": 6,
+          "className": "Alchemist"
+        },
+        {
+          "level": 7,
+          "className": "Alchemist"
+        },
+        {
+          "level": 8,
+          "className": "Alchemist"
+        },
+        {
+          "level": 9,
+          "className": "Alchemist"
+        },
+        {
+          "level": 10,
+          "className": "Alchemist"
+        },
+        {
+          "level": 11,
+          "className": "Alchemist"
+        },
+        {
+          "level": 12,
+          "className": "Alchemist"
+        },
+        {
+          "level": 13,
+          "className": "Alchemist"
+        },
+        {
+          "level": 14,
+          "className": "Alchemist"
+        },
+        {
+          "level": 15,
+          "className": "Alchemist"
+        },
+        {
+          "level": 16,
+          "className": "Alchemist"
+        },
+        {
+          "level": 17,
+          "className": "Alchemist"
+        },
+        {
+          "level": 18,
+          "className": "Alchemist"
+        },
+        {
+          "level": 19,
+          "className": "Alchemist"
+        },
+        {
+          "level": 20,
+          "className": "Alchemist"
+        }
+      ],
+      "spellLikeChoices": {},
+      "classFeatureChoices": {
+        "Alchemist|3|2|Discovery|Discovery": "Sand Bomb",
+        "Alchemist|5|4|Discovery|Discovery": "Infusion",
+        "Alchemist|7|6|Discovery|Discovery": "Tumor Familiar",
+        "Alchemist|9|8|Discovery|Discovery": "Force Bomb"
+      },
+      "classFeatureVariableChoices": {}
+    }
+  },
+  "activeBuffs": [
+    {
+      "id": "condition-negative-level",
+      "name": "Negative Level",
+      "turns": 99971,
+      "source": "pf1e-condition",
+      "bonuses": [
+        {
+          "stat": "ability checks",
+          "type": "negative level",
+          "value": -2,
+          "stacks": true,
+          "negativeLevelPenalty": true
+        },
+        {
+          "stat": "melee attack",
+          "type": "negative level",
+          "value": -2,
+          "stacks": true,
+          "negativeLevelPenalty": true
+        },
+        {
+          "stat": "ranged attack",
+          "type": "negative level",
+          "value": -2,
+          "stacks": true,
+          "negativeLevelPenalty": true
+        },
+        {
+          "stat": "cmb",
+          "type": "negative level",
+          "value": -2,
+          "stacks": true,
+          "negativeLevelPenalty": true
+        },
+        {
+          "stat": "cmd",
+          "type": "negative level",
+          "value": -2,
+          "stacks": true,
+          "negativeLevelPenalty": true
+        },
+        {
+          "stat": "all saves",
+          "type": "negative level",
+          "value": -2,
+          "stacks": true,
+          "negativeLevelPenalty": true
+        },
+        {
+          "stat": "skill checks",
+          "type": "negative level",
+          "value": -2,
+          "stacks": true,
+          "negativeLevelPenalty": true
+        },
+        {
+          "stat": "hit points",
+          "type": "negative level",
+          "value": -10,
+          "stacks": true,
+          "negativeLevelPenalty": true
+        },
+        {
+          "stat": "current hit points",
+          "type": "negative level",
+          "value": -10,
+          "stacks": true,
+          "negativeLevelPenalty": true
+        }
+      ],
+      "builtIn": true,
+      "category": "Condition",
+      "duration": "permanent",
+      "permanent": false,
+      "remaining": 99971,
+      "casterLevel": 1,
+      "description": "Each negative level applies a cumulative -1 penalty to ability checks, attack rolls, combat maneuver checks, CMD, saving throws, and skill checks, and reduces current and total hit points by 5.",
+      "catalogEffect": true,
+      "durationLabel": "99971 rounds",
+      "durationConfig": {
+        "unit": "variable",
+        "count": null,
+        "factors": []
+      },
+      "computedDuration": 99999,
+      "adjustableCondition": {
+        "kind": "negative-level",
+        "label": "Value",
+        "amount": 2,
+        "minimum": 1
+      }
+    },
+    {
+      "id": "spell:spell:Alchemist:1:Tears to Wine",
+      "name": "Tears to Wine",
+      "spell": {
+        "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Tears to Wine",
+        "name": "Tears to Wine",
+        "details": {
+          "area": "",
+          "level": "alchemist 1, arcanist 2, bard 1, cleric 2, druid 1, hunter 1, investigator 1, medium 1, occultist 1, oracle 2, shaman 1, skald 1, sorcerer 2, warpriest 2, witch 2, wizard 2",
+          "range": "10 ft.",
+          "school": "transmutation",
+          "target": "1 cu. ft./2 levels of liquid (see text)",
+          "duration": "10 minutes/level",
+          "components": "V, S, M (a single grape)",
+          "description": "</h3>Legend claims runelords used this spell to literally benefit from drinking the tears of their captured foes. This spell turns nonmagic liquids\u2014including spoiled, rotten, diseased, poisonous, or otherwise contaminated drinks, tears, seawater, and similar fluids\u2014into mead or wine of average quality. This spell does not prevent subsequent natural decay or spoilage. Unholy water and similar liquids of significance are spoiled by <i>tears to wine</i>, but the spell has no effect on creatures of any type or on magic potions.<br/><br/> Creatures that drink the mead or wine created by this spell become sharp-witted and clear-minded, gaining a +2 enhancement bonus on all Intelligence- and Wisdom-based skill checks. This increases to a +5 bonus at caster level 9th, and to +10 (the maximum) at caster level 15th.",
+          "descriptors": [],
+          "casting_time": "1 standard action",
+          "saving_throw": "Will negates (object);",
+          "spell_resistance": "yes (object)"
+        },
+        "activeMechanics": {
+          "effects": [
+            {
+              "stat": "intelligence skill checks",
+              "type": "enhancement",
+              "value": 2,
+              "stacks": false,
+              "bonusScale": {
+                "every": null,
+                "source": {
+                  "type": "caster"
+                },
+                "milestones": [
+                  {
+                    "level": 10,
+                    "value": 5
+                  },
+                  {
+                    "level": 15,
+                    "value": 10
+                  }
+                ]
+              },
+              "appliesWhen": "",
+              "conditional": false
+            },
+            {
+              "stat": "wisdom skill checks",
+              "type": "enhancement",
+              "value": 2,
+              "stacks": false,
+              "bonusScale": {
+                "every": null,
+                "source": {
+                  "type": "caster"
+                },
+                "milestones": [
+                  {
+                    "level": 10,
+                    "value": 5
+                  },
+                  {
+                    "level": 15,
+                    "value": 10
+                  }
+                ]
+              },
+              "appliesWhen": "",
+              "conditional": false
+            }
+          ],
+          "bonusRanks": [],
+          "featGrants": [],
+          "immunities": [],
+          "damageRolls": [],
+          "sizeChanges": [],
+          "grantDomains": [],
+          "durationConfig": {
+            "unit": "minute",
+            "count": 10,
+            "factors": [
+              {
+                "type": "caster",
+                "numerator": 1,
+                "denominator": 1
+              }
+            ],
+            "factorMode": "multiply"
+          },
+          "spellDcBonuses": [],
+          "applyConditions": [],
+          "damageReduction": [],
+          "spellResistance": [],
+          "classSkillGrants": [],
+          "casterLevelBonuses": [],
+          "extraRanksPerLevel": [],
+          "generatedEquipment": [],
+          "spellLikeAbilities": [],
+          "conditionalVariables": [],
+          "effectiveAttributeBonuses": []
+        }
+      },
+      "source": "Alchemist",
+      "bonuses": [
+        {
+          "stat": "intelligence skill checks",
+          "type": "enhancement",
+          "value": 2,
+          "stacks": false,
+          "bonusScale": {
+            "every": null,
+            "source": {
+              "type": "caster"
+            },
+            "milestones": [
+              {
+                "level": 10,
+                "value": 5
+              },
+              {
+                "level": 15,
+                "value": 10
+              }
+            ]
+          },
+          "appliesWhen": "",
+          "conditional": false
+        },
+        {
+          "stat": "wisdom skill checks",
+          "type": "enhancement",
+          "value": 2,
+          "stacks": false,
+          "bonusScale": {
+            "every": null,
+            "source": {
+              "type": "caster"
+            },
+            "milestones": [
+              {
+                "level": 10,
+                "value": 5
+              },
+              {
+                "level": 15,
+                "value": 10
+              }
+            ]
+          },
+          "appliesWhen": "",
+          "conditional": false
+        }
+      ],
+      "category": "Spell",
+      "duration": "10 minutes / caster level",
+      "permanent": false,
+      "remaining": 972,
+      "spellMeta": {
+        "kind": "spell",
+        "level": 1,
+        "bucket": "book",
+        "className": "Alchemist"
+      },
+      "auraConfig": null,
+      "ownedSpell": true,
+      "casterLevel": 10,
+      "durationLabel": "972 rounds",
+      "durationConfig": {
+        "unit": "minute",
+        "count": 10,
+        "factors": [
+          {
+            "type": "caster",
+            "numerator": 1,
+            "denominator": 1
+          }
+        ],
+        "factorMode": "multiply"
+      },
+      "computedDuration": 1000,
+      "spellCalculations": {
+        "spellDc": {
+          "base": 19,
+          "used": [],
+          "bonus": 0,
+          "total": 19,
+          "ignored": [],
+          "conditional": []
+        },
+        "className": "Alchemist",
+        "slotLevel": 1,
+        "spellLevel": 1,
+        "casterLevel": {
+          "base": 10,
+          "used": [],
+          "bonus": 0,
+          "total": 10,
+          "ignored": [],
+          "conditional": []
+        },
+        "castingAbility": "INT",
+        "calculatedRange": "",
+        "rangeCasterLevel": {
+          "base": 10,
+          "used": [],
+          "bonus": 0,
+          "total": 10,
+          "ignored": [],
+          "conditional": []
+        },
+        "castingAbilityMod": 8,
+        "arcaneSpellFailure": {
+          "chance": 0,
+          "reason": "not an arcane spell",
+          "applies": false,
+          "entries": [
+            {
+              "item": {
+                "item": "Leather",
+                "type": "Armor",
+                "bonus": "2",
+                "maxDex": "6",
+                "weight": "",
+                "failure": "10",
+                "penalty": "0",
+                "armorGroup": "Light Armors",
+                "enchantment": "",
+                "enhancement": "2",
+                "sourceLootId": "75d55ad6-7997-4a3e-9931-dc428621e81a",
+                "generatedSource": "",
+                "specialMaterial": "",
+                "generatedEquipmentId": ""
+              },
+              "name": "Leather",
+              "maxDex": 6,
+              "category": "light",
+              "spellFailure": 10
+            }
+          ]
+        },
+        "calculatedDuration": "100 minutes at CL 10",
+        "durationCasterLevel": {
+          "base": 10,
+          "used": [],
+          "bonus": 0,
+          "total": 10,
+          "ignored": [],
+          "conditional": []
+        },
+        "calculatedCasterLevel": 10,
+        "baseCastingAbilityScore": 27,
+        "effectiveAttributeBonuses": {
+          "used": [],
+          "total": 0,
+          "ignored": [],
+          "conditional": []
+        },
+        "effectiveCastingAbilityScore": 27
+      }
+    },
+    {
+      "id": "spell:spell:Alchemist:3:Heroism",
+      "name": "Heroism",
+      "saveDc": 21,
+      "source": "Alchemist",
+      "bonuses": [
+        {
+          "stat": "attack",
+          "type": "morale",
+          "value": 2,
+          "stacks": false,
+          "appliesWhen": "",
+          "conditional": false,
+          "weaponNameRestriction": "all",
+          "weaponTypeRestriction": "all"
+        },
+        {
+          "stat": "all saves",
+          "type": "morale",
+          "value": 2,
+          "stacks": false,
+          "appliesWhen": "",
+          "conditional": false
+        },
+        {
+          "stat": "skill checks",
+          "type": "morale",
+          "value": 2,
+          "stacks": false,
+          "appliesWhen": "",
+          "conditional": false
+        }
+      ],
+      "category": "Spell",
+      "duration": "10 minutes / caster level",
+      "metamagic": [],
+      "permanent": false,
+      "remaining": 1000,
+      "spellMeta": {
+        "kind": "spell",
+        "level": 3,
+        "bucket": "prepared",
+        "className": "Alchemist",
+        "preparation": "spellbook"
+      },
+      "auraConfig": null,
+      "bonusRanks": [],
+      "featGrants": [],
+      "immunities": [],
+      "ownedSpell": true,
+      "casterLevel": 10,
+      "sizeChanges": [],
+      "grantDomains": [],
+      "useUntrained": [],
+      "durationLabel": "10 minutes / caster level | CL 10: 100 minutes",
+      "sourceTokenId": "token_1791568735387_b8ce45ea3311a",
+      "durationConfig": {
+        "unit": "minute",
+        "count": 10,
+        "factors": [
+          {
+            "type": "caster",
+            "numerator": 1,
+            "denominator": 1
+          }
+        ],
+        "factorMode": "multiply"
+      },
+      "spellDcBonuses": [],
+      "applyConditions": [],
+      "damageReduction": [],
+      "spellResistance": [],
+      "classSkillGrants": [],
+      "computedDuration": 1000,
+      "casterLevelBonuses": [],
+      "extraRanksPerLevel": [],
+      "generatedEquipment": [],
+      "spellLikeAbilities": [],
+      "conditionalVariables": [],
+      "durationAnchorTokenId": "token_1791568735387_b8ce45ea3311a",
+      "effectiveAttributeBonuses": [],
+      "metamagicDurationMultiplier": 1
+    },
+    {
+      "name": "Cloak of Resistance + 3",
+      "bonuses": [
+        {
+          "stat": "all saves",
+          "type": "resistance",
+          "value": 3,
+          "stacks": false,
+          "appliesWhen": "",
+          "conditional": false
+        }
+      ],
+      "category": "Item",
+      "permanent": true,
+      "sourceLootId": "3792ea05-737b-4c47-89db-7e706d819fa9",
+      "durationLabel": "Equipped"
+    },
+    {
+      "name": "Lucky Horseshoe",
+      "bonuses": [
+        {
+          "stat": "will",
+          "type": "luck",
+          "value": 1,
+          "stacks": false,
+          "appliesWhen": "",
+          "conditional": false
+        }
+      ],
+      "category": "Item",
+      "permanent": true,
+      "sourceLootId": "22ab7c83-5e6b-4927-b009-ecf9bbdcfbb5",
+      "durationLabel": "Equipped"
+    },
+    {
+      "name": "+4 Gloves of Dexterity",
+      "bonuses": [
+        {
+          "stat": "dexterity",
+          "type": "enhancement",
+          "value": 4,
+          "stacks": false,
+          "appliesWhen": "",
+          "conditional": false
+        }
+      ],
+      "category": "Item",
+      "permanent": true,
+      "sourceLootId": "723277f4-a004-4d1a-8c79-8b5afed8bc39",
+      "durationLabel": "Equipped"
+    },
+    {
+      "name": "+2 Belt of Mighty Constitution",
+      "bonuses": [
+        {
+          "stat": "constitution",
+          "type": "enhancement",
+          "value": 2,
+          "stacks": false,
+          "appliesWhen": "",
+          "conditional": false
+        }
+      ],
+      "category": "Item",
+      "permanent": true,
+      "sourceLootId": "11008450-09ac-4d75-bac3-dfac98648c5e",
+      "durationLabel": "Equipped"
+    },
+    {
+      "name": "+4 Headband of Vast Intelligence",
+      "bonuses": [
+        {
+          "stat": "intelligence",
+          "type": "enhancement",
+          "value": 4,
+          "stacks": false,
+          "appliesWhen": "",
+          "conditional": false
+        },
+        {
+          "stat": "skill:survival",
+          "type": "untyped",
+          "value": 10,
+          "stacks": true,
+          "appliesWhen": "",
+          "conditional": false
+        },
+        {
+          "stat": "skill:knowledgenature",
+          "type": "untyped",
+          "value": 10,
+          "stacks": false,
+          "appliesWhen": "",
+          "conditional": false
+        }
+      ],
+      "category": "Item",
+      "permanent": true,
+      "sourceLootId": "336b0355-20eb-40b8-9ff1-032f88b4f830",
+      "durationLabel": "Equipped"
+    },
+    {
+      "name": "Amazing Tools of Manufacture",
+      "bonuses": [
+        {
+          "stat": "skill:craftalchemy",
+          "type": "circumstance",
+          "value": 4,
+          "stacks": false,
+          "skillName": "Craft (Alchemy)",
+          "appliesWhen": "",
+          "conditional": false
+        }
+      ],
+      "category": "Item",
+      "permanent": true,
+      "sourceLootId": "6afdfce2-3513-4d99-90eb-1d57c641d098",
+      "durationLabel": "Equipped"
+    }
+  ]
+}

@@ -50,6 +50,41 @@
       : school;
   }
 
+  function adjustCasterLevelResult(
+    result = {},
+    calculatedCasterLevel = 1,
+    requestedCasterLevel = calculatedCasterLevel,
+    { preservePartModifiers = false } = {},
+  ) {
+    const base = Number(result.base || 0);
+    const calculatedTotal = Number(result.total ?? base);
+    const calculatedCore = Math.max(1, Number(calculatedCasterLevel) || 1);
+    const requestedCore = Math.max(
+      1,
+      Number.isFinite(Number(requestedCasterLevel))
+        ? Number(requestedCasterLevel)
+        : calculatedCore,
+    );
+    const adjustment = requestedCore - calculatedCore;
+    const total = Math.max(
+      1,
+      preservePartModifiers
+        ? calculatedTotal + adjustment
+        : requestedCore,
+    );
+    if (total === calculatedTotal) return result;
+    return {
+      ...result,
+      total,
+      bonus: total - base,
+      calculatedTotal,
+      calculatedBonus: calculatedTotal - base,
+      miscCasterLevelBonus: Math.max(0, total - calculatedTotal),
+      downcastBy: Math.max(0, calculatedTotal - total),
+      downcastFrom: calculatedTotal,
+    };
+  }
+
   function reset() {
     spellsPromise = null;
     descriptorsPromise = null;
@@ -66,10 +101,8 @@
     loadDomains,
     spellDescriptors,
     schoolWithDescriptors,
+    adjustCasterLevelResult,
     reset,
   };
 
-  loadSpells().catch((error) => {
-    console.warn("Could not preload spell data", error);
-  });
 })();

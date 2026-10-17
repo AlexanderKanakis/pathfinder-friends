@@ -22,6 +22,7 @@
   let appAdminCacheUserId = "";
   let appAdminCache = null;
   let appAdminPromise = null;
+  let lastCharacterSaveError = null;
 
   if (!missingConfig && window.supabase) {
     client = window.supabase.createClient(config.url, config.anonKey);
@@ -873,7 +874,7 @@
     if (!client || !ids.length) return [];
     const { data, error } = await client
       .from("effect_choice_requests")
-      .select("id,character_id,effect_name,ability,created_at")
+      .select("id,context_key,character_id,effect_name,ability,created_at")
       .in("character_id", ids)
       .eq("status", "pending")
       .order("created_at", { ascending: true });
@@ -924,8 +925,12 @@
       return { ok: false, error: new Error("Missing requestId") };
     const { error } = await client
       .from("effect_choice_requests")
-      .delete()
-      .eq("id", requestId);
+      .update({
+        status: "cancelled",
+        resolved_at: new Date().toISOString(),
+      })
+      .eq("id", requestId)
+      .eq("status", "pending");
     if (error) {
       console.error(error);
       return { ok: false, error };
@@ -1336,6 +1341,7 @@
     contextKey = getSelectedContextKey(),
     sheetId = null,
   ) {
+    lastCharacterSaveError = null;
     const user = await getUser();
     if (!client || !user || !characterName) return null;
     const context = normalizeContext(contextKey);
@@ -1367,6 +1373,7 @@
       }
 
       if (error) {
+        lastCharacterSaveError = error;
         console.error(error);
         return null;
       }
@@ -1394,6 +1401,7 @@
     }
 
     if (error) {
+      lastCharacterSaveError = error;
       console.error(error);
       return null;
     }
@@ -1483,6 +1491,7 @@
       sheet: character.sheet || {},
       username: character.username || "",
       email: character.email || "",
+      updatedAt: character.updated_at || "",
     }));
   }
 
@@ -2265,6 +2274,7 @@
     loadCharacterSheetContext,
     loadCharacterSheetForRecalculation,
     saveCharacterSheet,
+    getLastCharacterSaveError: () => lastCharacterSaveError,
     deleteCharacterSheet,
     updateCharacterSheetRaw,
     updateCharacterCalculatedSummary,

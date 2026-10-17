@@ -3935,6 +3935,7 @@
         nextFilters.push({
           targetMode: mode,
           targets: [pickedValue],
+          resolvedChoice: true,
           ...(mode === "class" && spellAdjustmentBloodline(filter) !== "any"
             ? { bloodline: spellAdjustmentBloodline(filter) }
             : {}),
