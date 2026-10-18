@@ -70,7 +70,7 @@ function createRuntime(pathname = "/map.html") {
 (async () => {
   const runtime = createRuntime();
   await runtime.window.PFCatalogCache.ready;
-  assert.equal(runtime.window.PFCatalogCache.version, "1");
+  assert.equal(runtime.window.PFCatalogCache.version, "2");
   assert.equal(runtime.caches.stores.has("pathfriends-rule-catalogs-old"), false);
 
   const first = await runtime.window.fetch("data/spells.json", { cache: "no-cache" });
@@ -135,7 +135,7 @@ function createRuntime(pathname = "/map.html") {
   ];
   cachedPages.forEach((path) => {
     assert(
-      fs.readFileSync(path, "utf8").includes("scripts/catalog-cache.js?v=1"),
+      fs.readFileSync(path, "utf8").includes("scripts/catalog-cache.js?v=2"),
       `${path} must initialize the shared catalog cache.`,
     );
   });

@@ -198,12 +198,7 @@ const MAP_SKILLS = [
   ["Swim", "str"],
   ["Use Magic Device", "cha"],
 ];
-const SHAPE_TEXTURES = [
-  { id: "flames", name: "Flames", url: "assets/shape icons/flames.png" },
-  { id: "grass", name: "Grass", url: "assets/shape icons/grass.png" },
-  { id: "pit", name: "Pit", url: "assets/shape icons/pit.png" },
-  { id: "stone", name: "Stone", url: "assets/shape icons/stone.png" },
-];
+const SHAPE_TEXTURES = window.PFTextureCatalog?.all?.() || [];
 const MAP_CONTEXT_DOCUMENTATION = [
   {
     id: "initiative",
@@ -3141,6 +3136,36 @@ function tokenAuraEntry(token, auraId = "manual") {
   return tokenAuraEntries(token).find((entry) => entry.id === auraId) || null;
 }
 
+function renderAuraTextureGrid(diameter, textureUrl) {
+  const size = Math.max(1, Math.round(Number(diameter || 1)));
+  const shape = { shape: "circle", w: size, h: size };
+  const mask = shapeMask(shape);
+  const renderAs3DSprites = view3DMode && !heightEditMode;
+  const spriteHtml = renderAs3DSprites
+    ? renderShape3DTextureSprite({ url: absoluteCssUrl(textureUrl) }, 1)
+    : "";
+  const cells = [];
+  for (let y = 0; y < mask.rows; y += 1) {
+    for (let x = 0; x < mask.cols; x += 1) {
+      if (!mask.occupied.has(`${x},${y}`)) {
+        cells.push("<span></span>");
+        continue;
+      }
+      if (renderAs3DSprites) {
+        cells.push(
+          `<span class="shape-3d-sprite-cell map-aura-texture-3d-cell"><span class="shape-3d-sprite map-aura-texture-3d-sprite">${spriteHtml}</span></span>`,
+        );
+        continue;
+      }
+      const tile = tilePosition(shapeTileIndex(shape, mask, x, y));
+      cells.push(
+        `<span class="shape-cell texture-cell" style="background-image:url('${absoluteCssUrl(textureUrl)}');--tile-x:${tile.x};--tile-y:${tile.y};"></span>`,
+      );
+    }
+  }
+  return `<span class="map-aura-texture-grid${renderAs3DSprites ? " is-3d" : ""}" style="--aura-texture-cols:${mask.cols};--aura-texture-rows:${mask.rows};--shape-sprite-rows:1;">${cells.join("")}</span>`;
+}
+
 function renderAura(token) {
   return tokenAuraEntries(token)
     .map(({ id, aura }) => {
@@ -3148,7 +3173,12 @@ function renderAura(token) {
       const size = radius * 2;
       const centerX = Number(token.x || 0) + Number(token.w || 1) / 2;
       const centerY = Number(token.y || 0) + Number(token.h || 1) / 2;
-      return `<div class="map-aura" data-aura-token-id="${escapeHtml(token.id)}" data-aura-id="${escapeHtml(id)}" data-aura-field="aura" style="--aura-x:${centerX - radius};--aura-y:${centerY - radius};--aura-size:${size};--aura-color:${escapeHtml(aura.color || "#8fd19e")};"></div>`;
+      const textureUrl = String(aura.textureUrl || "").trim();
+      const textureClass = textureUrl ? " map-aura-textured" : "";
+      const textureGrid = textureUrl
+        ? renderAuraTextureGrid(size, textureUrl)
+        : "";
+      return `<div class="map-aura${textureClass}" data-aura-token-id="${escapeHtml(token.id)}" data-aura-id="${escapeHtml(id)}" data-aura-field="aura" style="--aura-x:${centerX - radius};--aura-y:${centerY - radius};--aura-size:${size};--aura-color:${escapeHtml(aura.color || "#8fd19e")};">${textureGrid}</div>`;
     })
     .join("");
 }
@@ -3964,6 +3994,14 @@ function cssUrl(value) {
     .replaceAll("'", "%27")
     .replaceAll("(", "%28")
     .replaceAll(")", "%29");
+}
+
+function absoluteCssUrl(value) {
+  try {
+    return cssUrl(new URL(String(value || ""), window.location.href).href);
+  } catch (_error) {
+    return cssUrl(value);
+  }
 }
 
 function shapeMaskSignature(shape) {
@@ -12320,6 +12358,42 @@ function updateAuraRadiusText() {
     `${cells} cell${cells === 1 ? "" : "s"} / ${cells * 5} ft`;
 }
 
+function syncMapAuraTexturePicker(textureUrl = "") {
+  const selected = String(textureUrl || "").trim();
+  el("mapAuraTexturePicker")
+    ?.querySelectorAll("[data-map-aura-texture-url]")
+    .forEach((button) => {
+      const active = button.dataset.mapAuraTextureUrl === selected;
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-pressed", String(active));
+    });
+}
+
+function populateMapAuraTexturePicker() {
+  const picker = el("mapAuraTexturePicker");
+  if (!picker) return;
+  picker.innerHTML = `
+    <button class="aura-texture-option" type="button" data-map-aura-texture-url="" aria-label="No texture" title="No texture" aria-pressed="false">
+      <i class="bi bi-slash-circle"></i>
+    </button>
+    ${SHAPE_TEXTURES.map(
+      (texture) => `
+        <button class="aura-texture-option" type="button" data-map-aura-texture-url="${escapeHtml(texture.url)}" aria-label="${escapeHtml(texture.name)}" title="${escapeHtml(texture.name)}" aria-pressed="false">
+          <span style="background-image:url('${escapeHtml(texture.url)}')"></span>
+        </button>`,
+    ).join("")}
+  `;
+  picker.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-map-aura-texture-url]");
+    if (!button) return;
+    el("mapAuraTextureUrl").value = button.dataset.mapAuraTextureUrl || "";
+    syncMapAuraTexturePicker(el("mapAuraTextureUrl").value);
+  });
+  el("mapAuraTextureUrl").addEventListener("input", () =>
+    syncMapAuraTexturePicker(el("mapAuraTextureUrl").value),
+  );
+}
+
 function automaticAuraDurationText(aura = {}) {
   if (aura.permanent || aura.kind === "passive") return "Always on";
   if (aura.remaining === null || aura.remaining === undefined) return "Until dismissed";
@@ -12409,10 +12483,13 @@ function openCircleOptions(mode) {
   el("auraRadiusCells").value = Math.max(1, Number(field.radius || 1));
   el("auraColor").value =
     field.color || (token.kind === "enemy" ? "#b02a37" : "#8fd19e");
+  el("mapAuraTextureUrl").value = String(field.textureUrl || "");
+  syncMapAuraTexturePicker(el("mapAuraTextureUrl").value);
   el("auraRemoveOutOfRange").checked = Boolean(field.removeWhenOutOfRange);
   el("auraOptionsModalTitle").textContent = CIRCLE_MODE_LABEL[mode];
   el("auraVisibleLabel").textContent = mode === "aura" ? "Visible" : "Active";
   el("auraColorField").classList.toggle("d-none", mode !== "aura");
+  el("mapAuraTextureField").classList.toggle("d-none", mode !== "aura");
   el("auraEffectSection").classList.toggle("d-none", mode !== "aura");
   el("automaticAuraSection").classList.toggle("d-none", mode !== "aura");
   if (mode === "aura") renderAutomaticAuraList(token);
@@ -12443,6 +12520,8 @@ function saveAuraOptions(event) {
   };
   if (mode === "aura") {
     payload.color = el("auraColor").value || "#8fd19e";
+    const textureUrl = el("mapAuraTextureUrl").value.trim();
+    if (textureUrl) payload.textureUrl = textureUrl;
     payload.effect = auraEffectDraft ? structuredClone(auraEffectDraft) : null;
     const revealMode = auraEffectDraft?.auraConfig?.revealMode;
     if (["light", "specialVision"].includes(revealMode)) {
@@ -13122,6 +13201,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     confirmQuickEffectTargets,
   );
   auraModal = new bootstrap.Modal(el("auraOptionsModal"));
+  populateMapAuraTexturePicker();
   el("auraRadiusCells").addEventListener("input", updateAuraRadiusText);
   el("auraOptionsForm").addEventListener("submit", saveAuraOptions);
   el("initiativeForm").addEventListener("submit", addInitiativeEntry);

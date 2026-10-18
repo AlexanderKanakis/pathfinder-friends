@@ -1080,3 +1080,44 @@
     justify-self: end;
   }
 }
+
+
+.aura-texture-picker {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
+  gap: 6px;
+}
+
+.aura-texture-option {
+  position: relative;
+  aspect-ratio: 1;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #5f6368;
+  border-radius: 6px;
+  padding: 0;
+  color: #f8f9fa;
+  background: #171717;
+}
+
+.aura-texture-option span {
+  position: absolute;
+  inset: 0;
+  background-position: top left;
+  background-repeat: no-repeat;
+  background-size: 600% 400%;
+}
+
+.aura-texture-option i {
+  font-size: 18px;
+}
+
+.aura-texture-option:hover,
+.aura-texture-option:focus-visible {
+  border-color: #6edff6;
+}
+
+.aura-texture-option.active {
+  border-color: #0dcaf0;
+  box-shadow: 0 0 0 2px rgba(13, 202, 240, 0.35);
+}

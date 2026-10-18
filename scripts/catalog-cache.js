@@ -1,6 +1,6 @@
 (function (root) {
   const CACHE_PREFIX = "pathfriends-rule-catalogs-";
-  const CACHE_VERSION = "1";
+  const CACHE_VERSION = "2";
   const CACHE_NAME = `${CACHE_PREFIX}${CACHE_VERSION}`;
   const EDITOR_PAGE_PATTERN = /\/(?:class|class-feature-pool|feat|item-catalog|race|spell)-editor\.html$/i;
   const nativeFetch = root.fetch.bind(root);

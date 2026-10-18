@@ -6,6 +6,7 @@ let projectDirectoryHandle = null;
 let dataDirectoryHandle = null;
 let dirty = false;
 let decisionsOnly = false;
+let aurasOnly = false;
 let traitEffectEditors = new Map();
 let traitModifierOverrideEditors = new Map();
 let traitDurationConfigs = new Map();
@@ -286,6 +287,7 @@ function filteredRaceIndexes() {
       ({ race }) =>
         (!groupFilter || race.group === groupFilter) &&
         (!decisionsOnly || window.PFEffectDecisions.hasDecision(race)) &&
+        (!aurasOnly || window.PFEffectMechanics.hasAura(race)) &&
         (!term || String(race.name || "").toLowerCase().includes(term)),
     )
     .sort(
@@ -825,7 +827,7 @@ function traitCard(kind, trait, index, race = {}) {
   const attributeRequirement = normalizeAttributeRequirement(trait);
   const requirementOpen = hasAttributeRequirement(trait);
   return `
-    <article class="trait-card ${decisionsOnly && !window.PFEffectDecisions.hasDecision(trait) ? "d-none" : ""}" data-trait-kind="${kind}" data-trait-index="${index}">
+    <article class="trait-card ${(decisionsOnly && !window.PFEffectDecisions.hasDecision(trait)) || (aurasOnly && !window.PFEffectMechanics.hasAura(trait)) ? "d-none" : ""}" data-trait-kind="${kind}" data-trait-index="${index}">
       <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
         <strong>${escapeHtml(trait.name || "Trait")}</strong>
         <div class="d-flex gap-1">
@@ -918,8 +920,12 @@ function traitSection(title, kind, traits, race = {}) {
   const hasDecision = traits.some((trait) =>
     window.PFEffectDecisions.hasDecision(trait),
   );
+  const hasAura = traits.some((trait) =>
+    window.PFEffectMechanics.hasAura(trait),
+  );
+  const hidden = (decisionsOnly && !hasDecision) || (aurasOnly && !hasAura);
   return `
-    <section class="level-card mb-3 ${decisionsOnly && !hasDecision ? "d-none" : ""}">
+    <section class="level-card mb-3 ${hidden ? "d-none" : ""}">
       <div class="d-flex justify-content-between align-items-center gap-2 flex-wrap mb-2">
         <strong>${escapeHtml(title)}</strong>
         <button class="btn btn-outline-info btn-sm" type="button" data-add-trait="${kind}">
@@ -954,7 +960,7 @@ function favoredBonusRow(bonus, index) {
 function favoredBonusSection(race) {
   const bonuses = race.favoredClassBonuses || [];
   return `
-    <section class="level-card mb-3 ${decisionsOnly ? "d-none" : ""}">
+    <section class="level-card mb-3 ${decisionsOnly || aurasOnly ? "d-none" : ""}">
       <div class="d-flex justify-content-between align-items-center gap-2 flex-wrap mb-2">
         <strong>Paizo Favored Class Bonuses</strong>
         <button class="btn btn-outline-info btn-sm" type="button" data-add-favored>
@@ -1759,6 +1765,15 @@ el("raceSearch").addEventListener("input", (event) => {
 window.PFEffectDecisions.bindFilterButton(el("raceDecisionFilter"), (active) => {
   commitSelectedRace();
   decisionsOnly = active;
+  const indexes = filteredRaceIndexes();
+  if (!indexes.includes(selectedIndex)) selectedIndex = indexes[0] ?? -1;
+  renderRaceList();
+  renderSelectedRace();
+});
+
+window.PFEffectDecisions.bindFilterButton(el("raceAuraFilter"), (active) => {
+  commitSelectedRace();
+  aurasOnly = active;
   const indexes = filteredRaceIndexes();
   if (!indexes.includes(selectedIndex)) selectedIndex = indexes[0] ?? -1;
   renderRaceList();

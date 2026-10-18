@@ -6,6 +6,7 @@ let projectDirectoryHandle = null;
 let poolCatalogs = [];
 let dirty = false;
 let decisionsOnly = false;
+let aurasOnly = false;
 
 const CLASS_GROUPS = [
   ["core", "Core"],
@@ -603,6 +604,7 @@ function filteredClassIndexes() {
     .filter(
       ({ entry }) =>
         (!decisionsOnly || classHasDecision(entry)) &&
+        (!aurasOnly || classHasAura(entry)) &&
         (!term ||
           String(entry.name || "")
             .toLowerCase()
@@ -720,6 +722,25 @@ function classHasDecision(cls) {
   return (cls.levelProgression || []).some((level) =>
     (level.classFeatures || []).some((feature) =>
       classFeatureHasDecision(cls, feature),
+    ),
+  );
+}
+
+function classFeatureHasAura(cls, feature) {
+  return (
+    window.PFEffectMechanics.hasAura(feature) ||
+    featurePools(feature, cls).some((pool) =>
+      window.PFEffectMechanics.hasAura(pool),
+    )
+  );
+}
+
+function classHasAura(cls) {
+  const { __classFeaturePoolCatalogs: _catalogs, ...definition } = cls;
+  if (window.PFEffectMechanics.hasAura(definition)) return true;
+  return (cls.levelProgression || []).some((level) =>
+    (level.classFeatures || []).some((feature) =>
+      classFeatureHasAura(cls, feature),
     ),
   );
 }
@@ -929,8 +950,13 @@ function renderLevelCard(level, index) {
   const levelHasDecision = features.some((feature) =>
     classFeatureHasDecision(cls, feature),
   );
+  const levelHasAura = features.some((feature) =>
+    classFeatureHasAura(cls, feature),
+  );
+  const levelHidden =
+    (decisionsOnly && !levelHasDecision) || (aurasOnly && !levelHasAura);
   return `
-    <article class="level-card ${decisionsOnly && !levelHasDecision ? "d-none" : ""}" data-level-index="${index}">
+    <article class="level-card ${levelHidden ? "d-none" : ""}" data-level-index="${index}">
       <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
         <strong>Level ${level.level}</strong>
         <button class="btn btn-outline-info btn-sm" type="button" data-add-feature="${index}">
@@ -948,7 +974,7 @@ function renderLevelCard(level, index) {
           features
             .map(
               (feature, featureIndex) => `
-          <div class="feature-row ${decisionsOnly && !classFeatureHasDecision(cls, feature) ? "d-none" : ""}">
+          <div class="feature-row ${(decisionsOnly && !classFeatureHasDecision(cls, feature)) || (aurasOnly && !classFeatureHasAura(cls, feature)) ? "d-none" : ""}">
             <div>
               <strong>${escapeHtml(feature.name || "Class Feature")}</strong>
               <div class="small-text">${escapeHtml(String(feature.description || "").slice(0, 180))}${String(feature.description || "").length > 180 ? "..." : ""}</div>
@@ -1179,6 +1205,14 @@ window.PFEffectDecisions.bindFilterButton(
     renderSelectedClass();
   },
 );
+window.PFEffectDecisions.bindFilterButton(el("classAuraFilter"), (active) => {
+  commitSelectedClass();
+  aurasOnly = active;
+  const indexes = filteredClassIndexes();
+  if (!indexes.includes(selectedIndex)) selectedIndex = indexes[0] ?? -1;
+  renderClassList();
+  renderSelectedClass();
+});
 el("openProjectFolderBtn").addEventListener("click", async () => {
   try {
     await openProjectFolder();

@@ -1571,6 +1571,21 @@
     return parts.join("; ");
   }
 
+  function auraTextureOptions() {
+    return window.PFTextureCatalog?.all?.() || [];
+  }
+
+  function syncAuraTexturePicker(textureUrl = "") {
+    const selected = String(textureUrl || "").trim();
+    document
+      .querySelectorAll(`#sharedAuraDetailsModalTexturePicker [data-aura-texture-url]`)
+      .forEach((button) => {
+        const active = button.dataset.auraTextureUrl === selected;
+        button.classList.toggle("active", active);
+        button.setAttribute("aria-pressed", String(active));
+      });
+  }
+
   const AURA_DETAILS_MODAL_ID = "sharedAuraDetailsModal";
   let auraDetailsModal = null;
   let auraDetailsHideSignal = Promise.resolve();
@@ -1597,6 +1612,26 @@
               <div class="d-flex align-items-center gap-2 flex-wrap mb-3">
                 <button id="${AURA_DETAILS_MODAL_ID}Scale" class="btn btn-outline-info btn-sm" type="button">Range Scaling</button>
                 <span id="${AURA_DETAILS_MODAL_ID}ScaleSummary" class="small text-secondary"></span>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Texture</label>
+                <div id="${AURA_DETAILS_MODAL_ID}TexturePicker" class="aura-texture-picker" role="group" aria-label="Aura texture">
+                  <button class="aura-texture-option" type="button" data-aura-texture-url="" aria-label="No texture" title="No texture" aria-pressed="false">
+                    <i class="bi bi-slash-circle"></i>
+                  </button>
+                  ${auraTextureOptions()
+                    .map(
+                      (texture) => `
+                        <button class="aura-texture-option" type="button" data-aura-texture-url="${escapeHtml(texture.url)}" aria-label="${escapeHtml(texture.name)}" title="${escapeHtml(texture.name)}" aria-pressed="false">
+                          <span style="background-image:url('${escapeHtml(texture.url)}')"></span>
+                        </button>`,
+                    )
+                    .join("")}
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="${AURA_DETAILS_MODAL_ID}TextureUrl" class="form-label">Custom Texture URL</label>
+                <input id="${AURA_DETAILS_MODAL_ID}TextureUrl" class="form-control form-control-sm" type="text" placeholder="assets/auras/texture.png">
               </div>
               <div class="form-check form-switch mb-2">
                 <input id="${AURA_DETAILS_MODAL_ID}Linger" class="form-check-input" type="checkbox">
@@ -1653,6 +1688,20 @@
     document
       .getElementById(`${AURA_DETAILS_MODAL_ID}Save`)
       .addEventListener("click", () => auraDetailsSaveAction?.());
+    const textureInput = document.getElementById(
+      `${AURA_DETAILS_MODAL_ID}TextureUrl`,
+    );
+    document
+      .getElementById(`${AURA_DETAILS_MODAL_ID}TexturePicker`)
+      .addEventListener("click", (event) => {
+        const button = event.target.closest("[data-aura-texture-url]");
+        if (!button) return;
+        textureInput.value = button.dataset.auraTextureUrl || "";
+        syncAuraTexturePicker(textureInput.value);
+      });
+    textureInput.addEventListener("input", () =>
+      syncAuraTexturePicker(textureInput.value),
+    );
     const light = document.getElementById(`${AURA_DETAILS_MODAL_ID}Light`);
     const specialVision = document.getElementById(
       `${AURA_DETAILS_MODAL_ID}SpecialVision`,
@@ -1673,6 +1722,9 @@
           const modalEl = document.getElementById(AURA_DETAILS_MODAL_ID);
           const rangeInput = document.getElementById(
             `${AURA_DETAILS_MODAL_ID}Range`,
+          );
+          const textureUrl = document.getElementById(
+            `${AURA_DETAILS_MODAL_ID}TextureUrl`,
           );
           const affectsSource = document.getElementById(
             `${AURA_DETAILS_MODAL_ID}AffectsSource`,
@@ -1705,6 +1757,8 @@
             `${AURA_DETAILS_MODAL_ID}LingerSummary`,
           );
           rangeInput.value = Math.max(5, Number(existingConfig.rangeFeet || 5));
+          textureUrl.value = String(existingConfig.textureUrl || "");
+          syncAuraTexturePicker(textureUrl.value);
           affectsSource.checked = Boolean(existingConfig.affectsSource);
           independentToken.checked = Boolean(existingConfig.independentToken);
           light.checked = existingConfig.revealMode === "light";
@@ -1767,6 +1821,9 @@
               enabled: true,
               rangeFeet: Math.max(5, Number(rangeInput.value || 5)),
               ...(rangeScale ? { rangeScale } : {}),
+              ...(textureUrl.value.trim()
+                ? { textureUrl: textureUrl.value.trim() }
+                : {}),
               ...(linger.checked ? { lingerDurationConfig } : {}),
               affectsSource: affectsSource.checked,
               independentToken: independentToken.checked,
@@ -7059,6 +7116,9 @@ function createD20BoostRow(data = {}, { onDelete, onChange } = {}) {
         enabled: true,
         rangeFeet: Math.max(5, Number(config?.rangeFeet || 5)),
         ...(config?.rangeScale ? { rangeScale: config.rangeScale } : {}),
+        ...(String(config?.textureUrl || "").trim()
+          ? { textureUrl: String(config.textureUrl).trim() }
+          : {}),
         ...(config?.lingerDurationConfig
           ? { lingerDurationConfig: config.lingerDurationConfig }
           : {}),

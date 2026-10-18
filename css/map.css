@@ -617,6 +617,35 @@ body.map-booting .map-shell {
   }
 }
 
+.map-aura.map-aura-textured {
+  overflow: visible;
+}
+
+.map-aura-texture-grid {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(var(--aura-texture-cols), var(--cell));
+  grid-template-rows: repeat(var(--aura-texture-rows), var(--cell));
+  pointer-events: none;
+}
+
+.map-aura-texture-grid > span {
+  min-width: 0;
+  min-height: 0;
+}
+
+#mapStage.is-3d .map-aura.map-aura-textured,
+#mapStage.is-3d .map-aura-texture-grid.is-3d,
+#mapStage.is-3d .map-aura-texture-3d-cell {
+  transform-style: preserve-3d;
+}
+
+.map-aura-texture-grid:not(.is-3d) > .texture-cell,
+#mapStage.is-3d .map-aura-texture-3d-sprite {
+  opacity: 0.6;
+}
+
 .map-aura.map-reveal-light {
   border-style: dashed;
 }

@@ -3,6 +3,7 @@ let selectedIndex = -1;
 let searchTerm = "";
 let typeFilter = "";
 let decisionsOnly = false;
+let aurasOnly = false;
 let projectDirectoryHandle = null;
 let dataDirectoryHandle = null;
 let dirty = false;
@@ -325,6 +326,7 @@ function filteredFeatIndexes() {
       return (
         (!typeFilter || (feat.types || []).includes(typeFilter) || feat.type === typeFilter) &&
         (!decisionsOnly || window.PFEffectDecisions.hasDecision(feat)) &&
+        (!aurasOnly || window.PFEffectMechanics.hasAura(feat)) &&
         (!term || haystack.includes(term))
       );
     })
@@ -792,6 +794,15 @@ el("featSearch").addEventListener("input", (event) => {
 window.PFEffectDecisions.bindFilterButton(el("featDecisionFilter"), (active) => {
   commitSelectedFeat();
   decisionsOnly = active;
+  const indexes = filteredFeatIndexes();
+  if (!indexes.includes(selectedIndex)) selectedIndex = indexes[0] ?? -1;
+  renderFeatList();
+  renderSelectedFeat();
+});
+
+window.PFEffectDecisions.bindFilterButton(el("featAuraFilter"), (active) => {
+  commitSelectedFeat();
+  aurasOnly = active;
   const indexes = filteredFeatIndexes();
   if (!indexes.includes(selectedIndex)) selectedIndex = indexes[0] ?? -1;
   renderFeatList();

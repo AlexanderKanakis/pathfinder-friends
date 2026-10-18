@@ -151,6 +151,7 @@ let activeCatalogKey = "weapons";
 let selectedIndex = -1;
 let searchTerm = "";
 let decisionsOnly = false;
+let aurasOnly = false;
 let dirty = false;
 let projectDirectoryHandle = null;
 let dataDirectoryHandle = null;
@@ -460,6 +461,7 @@ function filteredItemIndexes() {
     .filter((index) => {
       const item = items[index] || {};
       if (decisionsOnly && !window.PFEffectDecisions.hasDecision(item)) return false;
+      if (aurasOnly && !window.PFEffectMechanics.hasAura(item)) return false;
       if (!term) return true;
       return [item.name, item.requirements, item.details?.requirements]
         .map((value) => String(value || "").toLowerCase())
@@ -1040,6 +1042,15 @@ window.PFEffectDecisions.bindFilterButton(el("itemDecisionFilter"), (active) => 
   renderItemList();
   renderSelectedItem();
 });
+window.PFEffectDecisions.bindFilterButton(el("itemAuraFilter"), (active) => {
+  commitSelectedItem();
+  aurasOnly = active;
+  const indexes = filteredItemIndexes();
+  if (!indexes.includes(selectedIndex)) selectedIndex = indexes[0] ?? -1;
+  renderItemList();
+  renderSelectedItem();
+});
+
 el("openProjectFolderBtn").addEventListener("click", async () => {
   try {
     await openProjectFolder();

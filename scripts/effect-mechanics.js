@@ -96,6 +96,16 @@
     );
   }
 
+  function hasAura(value, seen = new WeakSet()) {
+    if (!(seen instanceof WeakSet)) seen = new WeakSet();
+    if (!value || typeof value !== "object") return false;
+    if (seen.has(value)) return false;
+    seen.add(value);
+    if (value.auraConfig?.enabled === true) return true;
+    const children = Array.isArray(value) ? value : Object.values(value);
+    return children.some((child) => hasAura(child, seen));
+  }
+
   function copyMechanics(item = {}, keys = mechanicKeys()) {
     return Object.fromEntries(
       keys.map((key) => [key, Array.isArray(item?.[key]) ? item[key] : []]),
@@ -796,6 +806,9 @@
         ...(["light", "specialVision"].includes(config.revealMode)
           ? { revealMode: config.revealMode }
           : {}),
+        ...(String(config.textureUrl || "").trim()
+          ? { textureUrl: String(config.textureUrl).trim() }
+          : {}),
         color: sourceToken.kind === "enemy" ? "#b02a37" : "#8fd19e",
         effect: auraEffect,
         removeWhenOutOfRange: true,
@@ -1064,6 +1077,7 @@
     promptedChoiceMechanicKeys,
     hasMechanicList,
     hasAnyMechanics,
+    hasAura,
     copyMechanics,
     copyActivationConfig,
     contributionOptions,

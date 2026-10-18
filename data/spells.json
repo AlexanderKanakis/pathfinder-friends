@@ -1762,6 +1762,7 @@
       "casterLevelBonuses": [],
       "spellDcBonuses": [],
       "effectiveAttributeBonuses": [],
+      "attributeContributions": [],
       "generatedEquipment": [],
       "conditionalVariables": [],
       "durationConfig": {
@@ -1779,6 +1780,7 @@
       "auraConfig": {
         "enabled": true,
         "rangeFeet": 20,
+        "textureUrl": "assets/shape icons/poison fog.png",
         "affectsSource": false,
         "independentToken": true,
         "targetsEmitAura": false
@@ -4555,6 +4557,12 @@
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Aura of Greater Courage",
     "activeMechanics": {
       "effects": [],
+      "attackRolls": [],
+      "d20Boosts": [],
+      "damageRolls": [],
+      "weaponExtraDamage": [],
+      "weaponDamageSizeChanges": [],
+      "summonCreatures": [],
       "damageReduction": [],
       "spellResistance": [],
       "immunities": [
@@ -4566,6 +4574,7 @@
       ],
       "applyConditions": [],
       "classSkillGrants": [],
+      "useUntrained": [],
       "bonusRanks": [],
       "extraRanksPerLevel": [],
       "grantDomains": [],
@@ -4575,6 +4584,7 @@
       "casterLevelBonuses": [],
       "spellDcBonuses": [],
       "effectiveAttributeBonuses": [],
+      "attributeContributions": [],
       "generatedEquipment": [],
       "conditionalVariables": [],
       "durationConfig": {
@@ -4591,10 +4601,19 @@
       },
       "auraConfig": {
         "enabled": true,
-        "rangeFeet": 10
-      },
-      "damageRolls": []
-    }
+        "rangeFeet": 10,
+        "affectsSource": false,
+        "independentToken": false,
+        "targetsEmitAura": false
+      }
+    },
+    "immunities": [
+      {
+        "name": "fear",
+        "conditional": false,
+        "appliesWhen": ""
+      }
+    ]
   },
   {
     "name": "Aura of Inviolate Ownership",
@@ -20631,6 +20650,7 @@
       "auraConfig": {
         "enabled": true,
         "rangeFeet": 20,
+        "textureUrl": "assets/shape icons/fog.png",
         "lingerDurationConfig": {
           "count": 1,
           "unit": "round",
@@ -39966,7 +39986,12 @@
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Obscuring Mist",
     "activeMechanics": {
       "effects": [],
+      "attackRolls": [],
+      "d20Boosts": [],
       "damageRolls": [],
+      "weaponExtraDamage": [],
+      "weaponDamageSizeChanges": [],
+      "summonCreatures": [],
       "damageReduction": [],
       "spellResistance": [],
       "immunities": [],
@@ -39982,6 +40007,7 @@
       "casterLevelBonuses": [],
       "spellDcBonuses": [],
       "effectiveAttributeBonuses": [],
+      "attributeContributions": [],
       "generatedEquipment": [],
       "conditionalVariables": [],
       "durationConfig": {
@@ -39999,6 +40025,7 @@
       "auraConfig": {
         "enabled": true,
         "rangeFeet": 20,
+        "textureUrl": "assets/shape icons/fog.png",
         "affectsSource": false,
         "independentToken": true,
         "targetsEmitAura": false
@@ -42857,7 +42884,12 @@
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Prismatic Sphere",
     "activeMechanics": {
       "effects": [],
+      "attackRolls": [],
+      "d20Boosts": [],
       "damageRolls": [],
+      "weaponExtraDamage": [],
+      "weaponDamageSizeChanges": [],
+      "summonCreatures": [],
       "damageReduction": [],
       "spellResistance": [],
       "immunities": [],
@@ -42873,6 +42905,7 @@
       "casterLevelBonuses": [],
       "spellDcBonuses": [],
       "effectiveAttributeBonuses": [],
+      "attributeContributions": [],
       "generatedEquipment": [],
       "conditionalVariables": [],
       "durationConfig": {
@@ -42890,6 +42923,7 @@
       "auraConfig": {
         "enabled": true,
         "rangeFeet": 10,
+        "textureUrl": "assets/shape icons/prism.png",
         "affectsSource": false,
         "independentToken": false,
         "targetsEmitAura": false

@@ -4,6 +4,7 @@ let searchTerm = "";
 let schoolFilter = "";
 let levelFilter = "";
 let decisionsOnly = false;
+let aurasOnly = false;
 let projectDirectoryHandle = null;
 let dataDirectoryHandle = null;
 let dirty = false;
@@ -185,6 +186,7 @@ function filteredSpellIndexes() {
         (!schoolFilter || spellSchool(spell) === schoolFilter) &&
         (!levelFilter || levels.includes(Number(levelFilter))) &&
         (!decisionsOnly || window.PFEffectDecisions.hasDecision(spell)) &&
+        (!aurasOnly || window.PFEffectMechanics.hasAura(spell)) &&
         (!term || spellSearchHaystack(spell).includes(term))
       );
     })
@@ -590,6 +592,15 @@ window.PFEffectDecisions.bindFilterButton(
     renderSelectedSpell();
   },
 );
+
+window.PFEffectDecisions.bindFilterButton(el("spellAuraFilter"), (active) => {
+  commitSelectedSpell();
+  aurasOnly = active;
+  const indexes = filteredSpellIndexes();
+  if (!indexes.includes(selectedIndex)) selectedIndex = indexes[0] ?? -1;
+  renderSpellList();
+  renderSelectedSpell();
+});
 
 el("openProjectFolderBtn").addEventListener("click", async () => {
   try {
