@@ -116,6 +116,18 @@ assert.equal(
   3,
   "Attack count scaling must determine how many d20s are rolled.",
 );
+assert.equal(
+  attacks.calculateAttack(
+    {
+      attackCount: 1,
+      attackCountScale: { testIncrease: 5 },
+      attackCountMax: 4,
+    },
+    context,
+  ).count,
+  4,
+  "Maximum attacks must cap the final scaled attack count.",
+);
 
 const rolled = attacks.rollAttacks(
   [{ label: "Ray", attackCount: 2, attackType: "ranged-touch" }],
@@ -178,6 +190,10 @@ assert(editor.includes("Add Attack"), "Shared effect authoring must expose attac
 assert(
   editor.includes("Scale Original BAB"),
   "Attack authoring must expose original BAB scaling.",
+);
+assert(
+  editor.includes("Maximum Attacks"),
+  "Attack authoring must expose a maximum attack count.",
 );
 assert(editor.includes("Casting Modifier"), "Attack authoring must expose the casting modifier.");
 assert(editor.includes('value="cmb-trip"'), "Attack authoring must expose Trip maneuvers.");

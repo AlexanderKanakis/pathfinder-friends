@@ -17,6 +17,7 @@
     { id: "resource-allocation", owner: "caster" },
     { id: "aura-delivery", owner: "caster" },
     { id: "targeting", owner: "caster" },
+    { id: "attack-targeting", owner: "caster" },
     { id: "target-decisions", owner: "target" },
     { id: "attack-confirmation", owner: "caster" },
     { id: "saving-throws", owner: "target" },

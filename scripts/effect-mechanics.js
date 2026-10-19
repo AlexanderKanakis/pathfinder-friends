@@ -5,6 +5,7 @@
 })(typeof window !== "undefined" ? window : globalThis, function (root) {
   const BASE_EFFECT_KEY = "effects";
   const BRANCH_KEY = "branches";
+  const INDEPENDENT_EFFECTS_KEY = "independentEffects";
 
   const EXTRA_MECHANIC_KEYS = Object.freeze([
     "damageReduction",
@@ -90,6 +91,7 @@
   function hasAnyMechanics(item = {}, keys = mechanicKeys()) {
     return (
       keys.some((key) => hasMechanicList(item, key)) ||
+      independentEffects(item).length > 0 ||
       hasBranches(item) ||
       (Array.isArray(item?.emittedAuras) && item.emittedAuras.length > 0) ||
       Boolean(item?.auraConfig?.enabled)
@@ -110,6 +112,84 @@
     return Object.fromEntries(
       keys.map((key) => [key, Array.isArray(item?.[key]) ? item[key] : []]),
     );
+  }
+
+  function independentEffects(item = {}) {
+    const rows = Array.isArray(item?.[INDEPENDENT_EFFECTS_KEY])
+      ? item[INDEPENDENT_EFFECTS_KEY]
+      : [];
+    return rows.map((entry, index) => {
+      const child = JSON.parse(JSON.stringify(entry || {}));
+      delete child[INDEPENDENT_EFFECTS_KEY];
+      (Array.isArray(child.attackRolls) ? child.attackRolls : []).forEach(
+        (attack) => delete attack[INDEPENDENT_EFFECTS_KEY],
+      );
+      return {
+        ...child,
+        id: String(child.id || `independent-effect-${index + 1}`),
+        name: String(child.name || `Independent Effect ${index + 1}`).trim() || `Independent Effect ${index + 1}`,
+        trigger: {
+          scope: child.trigger?.scope === "attack" ? "attack" : "main",
+          outcome: String(child.trigger?.outcome || "applied"),
+          ...(child.trigger?.sourceId ? { sourceId: String(child.trigger.sourceId) } : {}),
+        },
+      };
+    });
+  }
+
+  function copyIndependentEffects(item = {}) {
+    const rows = independentEffects(item);
+    return rows.length ? { [INDEPENDENT_EFFECTS_KEY]: rows } : {};
+  }
+
+  function independentTriggerMatches(entry = {}, event = {}) {
+    const trigger = entry.trigger || {};
+    if (String(trigger.scope || "main") !== String(event.scope || "main")) return false;
+    if (String(trigger.outcome || "applied") !== String(event.outcome || "applied")) return false;
+    if (trigger.scope === "attack" && trigger.sourceId)
+      return String(trigger.sourceId) === String(event.sourceId || "");
+    return true;
+  }
+
+  function triggeredIndependentEffects(item = {}, event = {}) {
+    return independentEffects(item)
+      .filter((entry) => independentTriggerMatches(entry, event))
+      .map((entry) => {
+        const child = JSON.parse(JSON.stringify(entry));
+        delete child.trigger;
+        delete child[INDEPENDENT_EFFECTS_KEY];
+        return {
+          ...child,
+          name: child.name || item.name || "Independent Effect",
+          independentEffectDepth: 1,
+          independentEffectParentId: item.id || "",
+          independentEffectParentName: item.name || "",
+        };
+      });
+  }
+
+  function separateIndependentEffects(item = {}) {
+    const parent = JSON.parse(JSON.stringify(item || {}));
+    const attackChildren = Array.isArray(parent._triggeredIndependentEffects)
+      ? parent._triggeredIndependentEffects
+      : [];
+    const saveOutcome = String(parent._saveResolution || "");
+    const children = [
+      ...triggeredIndependentEffects(parent, { scope: "main", outcome: "applied" }),
+      ...(saveOutcome && saveOutcome !== "applied"
+        ? triggeredIndependentEffects(parent, { scope: "main", outcome: saveOutcome })
+        : []),
+      ...attackChildren,
+    ].map((child) => {
+      const clean = JSON.parse(JSON.stringify(child));
+      delete clean[INDEPENDENT_EFFECTS_KEY];
+      delete clean._triggeredIndependentEffects;
+      return clean;
+    });
+    delete parent[INDEPENDENT_EFFECTS_KEY];
+    delete parent._triggeredIndependentEffects;
+    delete parent._saveResolution;
+    return { parent, children };
   }
 
   function copyDecisionConfig(item = {}) {
@@ -491,6 +571,7 @@
         String(branch?.name || `Option ${index + 1}`).trim() ||
         `Option ${index + 1}`,
       ...copyMechanics(branch),
+      ...copyIndependentEffects(branch),
     }));
   }
 
@@ -543,6 +624,11 @@
           : [];
       resolved[targetKey] = [...baseRows, ...branchRows];
     });
+    resolved[INDEPENDENT_EFFECTS_KEY] = [
+      ...independentEffects(item),
+      ...independentEffects(selected),
+    ];
+    if (!resolved[INDEPENDENT_EFFECTS_KEY].length) delete resolved[INDEPENDENT_EFFECTS_KEY];
     resolved.selectedBranchId = selected.id;
     resolved.selectedBranchName = selected.name;
     const unresolved = { ...item };
@@ -571,6 +657,7 @@
   function passiveMechanics(item = {}) {
     return {
       ...copyMechanics(item),
+      ...copyIndependentEffects(item),
       ...copyDecisionConfig(item),
       ...copySaveConfig(item),
       ...(hasBranches(item) ? { branches: branches(item) } : {}),
@@ -582,6 +669,7 @@
     if (item?.activeMechanics && typeof item.activeMechanics === "object") {
       return {
         ...copyMechanics(item.activeMechanics),
+        ...copyIndependentEffects(item.activeMechanics),
         ...copyDecisionConfig(item.activeMechanics),
         ...copySaveConfig(item.activeMechanics),
         ...(hasBranches(item.activeMechanics)
@@ -600,6 +688,7 @@
     if (activeOnly) {
       return {
         ...copyMechanics(item),
+        ...copyIndependentEffects(item),
         ...copyDecisionConfig(item),
         ...copySaveConfig(item),
         ...(hasBranches(item) ? { branches: branches(item) } : {}),
@@ -1073,6 +1162,10 @@
     branchKey: BRANCH_KEY,
     extraKeys,
     mechanicKeys,
+    independentEffects,
+    copyIndependentEffects,
+    triggeredIndependentEffects,
+    separateIndependentEffects,
     choiceBearingExtraKeys,
     promptedChoiceMechanicKeys,
     hasMechanicList,

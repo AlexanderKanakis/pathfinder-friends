@@ -87,16 +87,22 @@
       ? attack.attackType
       : "melee-touch";
     const customBab = optionalNumber(attack.customBab);
+    const attackCountMax = optionalNumber(attack.attackCountMax);
     return {
       ...attack,
       id: String(attack.id || `attack-${index + 1}`),
       label: String(attack.label || `Attack ${index + 1}`).trim(),
       attackCount: Math.max(1, Math.floor(numberOr(attack.attackCount, 1))),
       attackCountScale: attack.attackCountScale || null,
+      attackCountMax:
+        attackCountMax === null
+          ? null
+          : Math.max(1, Math.floor(attackCountMax)),
       attackType,
       attackAbility: ATTACK_ABILITIES.has(attack.attackAbility)
         ? attack.attackAbility
         : "default",
+      multipleTargets: Boolean(attack.multipleTargets),
       originalBabScale: attack.originalBabScale || null,
       customBab:
         customBab === 0 && !attack.customBabScale ? null : customBab,
@@ -148,7 +154,7 @@
 
   function calculateAttack(attack, context = {}) {
     const normalized = normalizeAttack(attack);
-    const count = Math.max(
+    const scaledCount = Math.max(
       1,
       Math.floor(
         scaledValue(
@@ -158,6 +164,10 @@
         ),
       ),
     );
+    const count =
+      normalized.attackCountMax === null
+        ? scaledCount
+        : Math.min(scaledCount, normalized.attackCountMax);
     const bab =
       normalized.customBab === null
         ? scaledValue(
@@ -213,6 +223,218 @@
     });
   }
 
+  function hasMultipleTargets(attacks = []) {
+    return normalizeAttacks(attacks).some((attack) => attack.multipleTargets);
+  }
+
+  function targetPools(attacks = [], context = {}) {
+    return normalizeAttacks(attacks).flatMap((attack, attackIndex) => {
+      if (!attack.multipleTargets) return [];
+      const calculated = calculateAttack(attack, context);
+      return [{
+        id: calculated.id,
+        attackIndex,
+        label: calculated.label,
+        total: calculated.count,
+        attack: {
+          ...calculated,
+          attackCount: 1,
+          attackCountScale: null,
+        },
+      }];
+    });
+  }
+
+  async function assignTargets(attacks = [], context = {}, chooseAllocations) {
+    const pools = targetPools(attacks, context);
+    if (!pools.length) return [];
+    if (typeof chooseAllocations !== "function") return null;
+    const allocations = await chooseAllocations(pools);
+    if (!allocations) return null;
+    return allocations.flatMap((allocation) => {
+      const pool = pools.find((entry) => entry.id === allocation.attackId);
+      if (!pool) return [];
+      return Array.from(
+        { length: Math.max(0, Number(allocation.count || 0)) },
+        (_, sequence) => ({
+          id: `${pool.id}:${String(allocation.targetKey)}:${sequence + 1}`,
+          attackIndex: pool.attackIndex,
+          sequence,
+          label: pool.label,
+          attack: { ...pool.attack },
+          targetKey: String(allocation.targetKey),
+          target: allocation.target,
+        }),
+      );
+    });
+  }
+
+  function attacksForTarget(attacks = [], assignments = [], targetKey, options = {}) {
+    const includeShared = Boolean(options.includeShared);
+    const key = String(targetKey || "");
+    const shared = includeShared
+      ? normalizeAttacks(attacks).filter((attack) => !attack.multipleTargets)
+      : [];
+    const assigned = (Array.isArray(assignments) ? assignments : [])
+      .filter((assignment) => String(assignment.targetKey || "") === key)
+      .map((assignment) => normalizeAttack(assignment.attack));
+    return [...shared, ...assigned];
+  }
+
+  function ensureTargetModal() {
+    if (typeof document === "undefined") return null;
+    let modal = document.getElementById("effectAttackTargetModal");
+    if (modal) return modal;
+    document.body.insertAdjacentHTML(
+      "beforeend",
+      `<div class="modal fade" id="effectAttackTargetModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+          <div class="modal-content bg-dark text-white border-secondary">
+            <div class="modal-header border-secondary">
+              <h5 class="modal-title" id="effectAttackTargetModalLabel">Choose Target</h5>
+            </div>
+            <div class="modal-body">
+              <div class="shared-attack-target-list" id="effectAttackTargetList"></div>
+              <div class="small text-secondary mt-2" id="effectAttackTargetStatus"></div>
+            </div>
+            <div class="modal-footer border-secondary">
+              <button type="button" class="btn btn-outline-light btn-sm" data-bs-dismiss="modal">Cancel</button>
+              <button type="button" class="btn btn-success btn-sm" id="effectAttackTargetConfirm">Select</button>
+            </div>
+          </div>
+        </div>
+      </div>`,
+    );
+    return document.getElementById("effectAttackTargetModal");
+  }
+
+  function allocationTargetHtml(target, pool) {
+    const inputId = `attack-allocation-${String(pool.id).replace(/[^a-z0-9_-]/gi, "-")}-${String(target.key).replace(/[^a-z0-9_-]/gi, "-")}`;
+    return `<div class="shared-attack-allocation-target${target.isCaster ? " is-caster" : ""}">
+      <span class="shared-attack-allocation-name"><strong>${escapeHtml(target.name)}</strong><span class="small text-secondary d-block">${escapeHtml(target.isCaster ? `Caster | ${target.subtitle || ""}` : target.subtitle || "")}</span></span>
+      <div class="modal-number-stepper shared-attack-allocation-stepper">
+        <button class="btn btn-outline-light btn-sm modal-number-stepper-button" type="button" data-attack-allocation-step="-1" data-attack-pool="${escapeHtml(pool.id)}" data-attack-target="${escapeHtml(target.key)}" aria-label="Allocate one fewer attack to ${escapeHtml(target.name)}">-</button>
+        <input id="${escapeHtml(inputId)}" class="form-control form-control-sm text-center" type="number" min="0" max="${pool.total}" value="0" data-attack-allocation-input data-attack-pool="${escapeHtml(pool.id)}" data-attack-target="${escapeHtml(target.key)}">
+        <button class="btn btn-outline-light btn-sm modal-number-stepper-button" type="button" data-attack-allocation-step="1" data-attack-pool="${escapeHtml(pool.id)}" data-attack-target="${escapeHtml(target.key)}" aria-label="Allocate one more attack to ${escapeHtml(target.name)}">+</button>
+      </div>
+    </div>`;
+  }
+
+  function allocationGroupHtml(label, group, targets = [], pool) {
+    if (!targets.length) return "";
+    return `<section class="shared-attack-target-group">
+      <div class="shared-attack-target-group-title">${escapeHtml(label)}</div>
+      <div class="shared-attack-target-grid">
+        ${targets.map((target) => allocationTargetHtml(target, pool)).join("")}
+      </div>
+    </section>`;
+  }
+
+  async function allocateTargets({
+    title = "Allocate Attacks",
+    pools = [],
+    targets = [],
+  } = {}) {
+    const modalEl = ensureTargetModal();
+    if (!modalEl || !root?.bootstrap?.Modal) return null;
+    const available = Array.isArray(targets) ? targets : [];
+    modalEl.querySelector("#effectAttackTargetModalLabel").textContent = title;
+    modalEl.querySelector("#effectAttackTargetStatus").textContent = "";
+    modalEl.querySelector("#effectAttackTargetConfirm").textContent = "Roll";
+    modalEl.querySelector("#effectAttackTargetList").innerHTML =
+      available.length && pools.length
+      ? pools.map((pool) => `<section class="shared-attack-allocation-pool" data-attack-allocation-pool="${escapeHtml(pool.id)}" data-attack-total="${pool.total}">
+          <div class="shared-attack-allocation-heading">
+            <strong>${escapeHtml(pool.label)}</strong>
+            <span><span data-attack-available>${pool.total}</span> available / <span data-attack-total>${pool.total}</span> total</span>
+          </div>
+          ${allocationGroupHtml("Allies", "ally", available.filter((target) => target.group === "ally"), pool)}
+          ${allocationGroupHtml("Enemies", "enemy", available.filter((target) => target.group === "enemy"), pool)}
+        </section>`).join("")
+      : '<div class="small text-secondary">No valid targets are available.</div>';
+    const modal = root.bootstrap.Modal.getOrCreateInstance(modalEl, {
+      backdrop: "static",
+      keyboard: false,
+    });
+    return new Promise((resolve) => {
+      let selected = null;
+      const confirm = modalEl.querySelector("#effectAttackTargetConfirm");
+      const sync = () => {
+        let complete = available.length > 0 && pools.length > 0;
+        modalEl.querySelectorAll("[data-attack-allocation-pool]").forEach((section) => {
+          const total = Number(section.dataset.attackTotal || 0);
+          const inputs = [...section.querySelectorAll("[data-attack-allocation-input]")];
+          const assigned = inputs.reduce(
+            (sum, input) => sum + Math.max(0, Number(input.value || 0)),
+            0,
+          );
+          const remaining = Math.max(0, total - assigned);
+          section.querySelector("[data-attack-available]").textContent = remaining;
+          section.querySelectorAll('[data-attack-allocation-step="1"]').forEach(
+            (button) => { button.disabled = remaining === 0; },
+          );
+          complete = complete && assigned === total;
+        });
+        confirm.disabled = !complete;
+        modalEl.querySelector("#effectAttackTargetStatus").textContent =
+          complete || !available.length ? "" : "Allocate every available attack.";
+      };
+      modalEl.onclick = (event) => {
+        const button = event.target.closest("[data-attack-allocation-step]");
+        if (!button) return;
+        const section = button.closest("[data-attack-allocation-pool]");
+        const input = section?.querySelector(
+          `[data-attack-allocation-input][data-attack-target="${CSS.escape(button.dataset.attackTarget)}"]`,
+        );
+        if (!input) return;
+        const total = Number(section.dataset.attackTotal || 0);
+        const assigned = [...section.querySelectorAll("[data-attack-allocation-input]")]
+          .reduce((sum, entry) => sum + Math.max(0, Number(entry.value || 0)), 0);
+        const delta = Number(button.dataset.attackAllocationStep || 0);
+        const current = Math.max(0, Number(input.value || 0));
+        input.value = Math.max(
+          0,
+          Math.min(total, current + (delta > 0 && assigned >= total ? 0 : delta)),
+        );
+        sync();
+      };
+      modalEl.oninput = (event) => {
+        const input = event.target.closest("[data-attack-allocation-input]");
+        if (!input) return;
+        const section = input.closest("[data-attack-allocation-pool]");
+        const total = Number(section?.dataset.attackTotal || 0);
+        const others = [...section.querySelectorAll("[data-attack-allocation-input]")]
+          .filter((entry) => entry !== input)
+          .reduce((sum, entry) => sum + Math.max(0, Number(entry.value || 0)), 0);
+        input.value = Math.max(
+          0,
+          Math.min(total - others, Number(input.value || 0)),
+        );
+        sync();
+      };
+      const onHidden = () => {
+        modalEl.removeEventListener("hidden.bs.modal", onHidden);
+        resolve(selected);
+      };
+      modalEl.addEventListener("hidden.bs.modal", onHidden);
+      confirm.onclick = () => {
+        selected = [...modalEl.querySelectorAll("[data-attack-allocation-input]")]
+          .map((input) => ({
+            attackId: input.dataset.attackPool,
+            targetKey: input.dataset.attackTarget,
+            count: Math.max(0, Number(input.value || 0)),
+            target: available.find(
+              (target) => String(target.key) === input.dataset.attackTarget,
+            ),
+          }))
+          .filter((allocation) => allocation.count > 0 && allocation.target);
+        modal.hide();
+      };
+      sync();
+      modal.show();
+    });
+  }
+
   function payloadForSuccessfulAttacks(effect = {}, results = []) {
     const resolved = { ...effect };
     delete resolved.attackRolls;
@@ -235,6 +457,14 @@
       });
       resolved[targetKey] = [...base, ...additions];
     });
+    const independent = successful.flatMap((result) =>
+      root?.PFEffectMechanics?.triggeredIndependentEffects?.(result.attack, {
+        scope: "attack",
+        outcome: "success",
+        sourceId: result.attack.id,
+      }) || [],
+    );
+    if (independent.length) resolved._triggeredIndependentEffects = independent;
     return resolved;
   }
 
@@ -484,6 +714,11 @@
     PAYLOAD_KEYS,
     normalizeAttack,
     normalizeAttacks,
+    hasMultipleTargets,
+    targetPools,
+    assignTargets,
+    attacksForTarget,
+    allocateTargets,
     calculateAttack,
     rollAttacks,
     payloadForSuccessfulAttacks,

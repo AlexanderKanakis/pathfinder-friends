@@ -5642,15 +5642,91 @@ function createDamageRollRow(data = {}, { onDelete, onChange } = {}) {
   return { element: row, collect: row._collect };
 }
 
+let independentEffectEditorSequence = 0;
+
+function mountIndependentEffects(container, options = {}) {
+  const rows = [];
+  const trigger = options.trigger || { scope: "main", outcome: "applied" };
+  let triggerVisible = Boolean(options.triggerVisible);
+  const add = (data = {}) => {
+    const sequence = ++independentEffectEditorSequence;
+    const id = String(data.id || `independent-effect-${sequence}`);
+    const row = document.createElement("section");
+    row.className = "shared-independent-effect";
+    const selectedOutcome = String(data.trigger?.outcome || trigger.outcome || "applied");
+    const outcomeControl = trigger.scope === "main"
+      ? `<div data-independent-trigger-wrap class="${triggerVisible ? "" : "d-none"}"><label>Trigger</label><select class="form-select form-select-sm" data-independent-outcome><option value="applied"${selectedOutcome === "applied" ? " selected" : ""}>Main effect applies</option><option value="save-failure"${selectedOutcome === "save-failure" ? " selected" : ""}>Main save fails</option><option value="save-success"${selectedOutcome === "save-success" ? " selected" : ""}>Main save succeeds</option><option value="partial"${selectedOutcome === "partial" ? " selected" : ""}>Main partial applies</option></select></div>`
+      : "";
+    row.innerHTML = `<div class="shared-independent-effect-header${triggerVisible && trigger.scope === "main" ? " has-trigger" : ""}"><div><label>Name</label><input class="form-control form-control-sm" data-independent-name value="${escapeHtml(data.name || "Independent Effect")}"></div>${outcomeControl}<button class="btn btn-outline-danger btn-sm btn-icon" type="button" data-delete-independent aria-label="Delete independent effect"><i class="bi bi-trash"></i></button></div><div data-independent-mechanics></div>`;
+    container.appendChild(row);
+    const editor = mountMechanicGroups(row.querySelector("[data-independent-mechanics]"), {
+      ...options,
+      idPrefix: `${options.idPrefix || "Independent"}${sequence}`,
+      activeOnly: true,
+      allowIndependentEffects: false,
+      onChange: options.onChange,
+    });
+    editor.reset({ activeMechanics: data });
+    const record = { id, row, editor };
+    rows.push(record);
+    row.querySelector("[data-delete-independent]").addEventListener("click", () => {
+      const index = rows.indexOf(record);
+      if (index >= 0) rows.splice(index, 1);
+      row.remove();
+      options.onChange?.();
+    });
+    row.addEventListener("input", () => options.onChange?.());
+    row.addEventListener("change", () => options.onChange?.());
+    options.onChange?.();
+  };
+  const reset = (item = {}) => {
+    rows.splice(0);
+    container.innerHTML = "";
+    (window.PFEffectMechanics?.independentEffects?.(item) || []).forEach(add);
+  };
+  const setTriggerVisible = (visible) => {
+    triggerVisible = trigger.scope === "main" && Boolean(visible);
+    rows.forEach(({ row }) => {
+      row.querySelector("[data-independent-trigger-wrap]")?.classList.toggle(
+        "d-none",
+        !triggerVisible,
+      );
+      row.querySelector(".shared-independent-effect-header")?.classList.toggle(
+        "has-trigger",
+        triggerVisible,
+      );
+    });
+  };
+  const collect = () => rows.map(({ id, row, editor }, index) => {
+    const collected = editor.collect().activeMechanics || {};
+    delete collected.independentEffects;
+    (Array.isArray(collected.attackRolls) ? collected.attackRolls : []).forEach(
+      (attack) => delete attack.independentEffects,
+    );
+    return {
+      id,
+      name: row.querySelector("[data-independent-name]").value.trim() || `Independent Effect ${index + 1}`,
+      trigger: {
+        scope: trigger.scope,
+        outcome: row.querySelector("[data-independent-outcome]")?.value || trigger.outcome || "applied",
+        ...(trigger.sourceId ? { sourceId: trigger.sourceId } : {}),
+      },
+      ...collected,
+    };
+  });
+  return { add, reset, collect, setTriggerVisible };
+}
+
 let attackEditorSequence = 0;
 
 function createAttackRollRow(
   data = {},
-  { onDelete, onChange, skills, effectStats, titleCaseStat: formatStat } = {},
+  { onDelete, onChange, skills, effectStats, titleCaseStat: formatStat, allowIndependentEffects = true } = {},
 ) {
   const row = document.createElement("div");
   const sequence = ++attackEditorSequence;
   const editorPrefix = `SharedAttack${sequence}`;
+  const attackId = String(data.id || `attack-${sequence}`);
   const hasStoredCustomBab =
     data.customBab !== null &&
     data.customBab !== undefined &&
@@ -5665,7 +5741,8 @@ function createAttackRollRow(
       </div>
     </div>
     <div class="shared-attack-roll-grid">
-      <div><label>Number of Attacks</label><input class="form-control form-control-sm" type="number" min="1" data-attack-field="attackCount" value="${Math.max(1, Number(data.attackCount || 1))}"></div>
+      <div><label>Number of Attacks</label>${numberStepperMarkup({ id: `attack-count-${sequence}`, value: Math.max(1, Number(data.attackCount || 1)), min: 1, inputAttributes: 'data-attack-field="attackCount"', label: "number of attacks" })}</div>
+      <div><label>Maximum Attacks</label>${numberStepperMarkup({ id: `attack-count-max-${sequence}`, value: data.attackCountMax ?? "", min: 1, inputAttributes: 'data-attack-field="attackCountMax" placeholder="No maximum"', label: "maximum attacks" })}</div>
       <div><label>Roll Type</label><select class="form-select form-select-sm" data-attack-field="attackType">
         <option value="melee"${data.attackType === "melee" ? " selected" : ""}>Melee Attack</option>
         <option value="ranged"${data.attackType === "ranged" ? " selected" : ""}>Ranged Attack</option>
@@ -5698,9 +5775,14 @@ function createAttackRollRow(
       <div data-attack-scale-host="count"><button class="btn btn-outline-info btn-sm" type="button" data-attack-scale-button>Scale Attacks</button><span class="small text-secondary" data-attack-scale-summary></span></div>
       <div data-attack-scale-host="original-bab"><button class="btn btn-outline-info btn-sm" type="button" data-attack-scale-button>Scale Original BAB</button><span class="small text-secondary" data-attack-scale-summary></span></div>
       <div data-attack-scale-host="bab"><button class="btn btn-outline-info btn-sm" type="button" data-attack-scale-button>Scale Custom BAB</button><span class="small text-secondary" data-attack-scale-summary></span></div>
+      <label class="form-check form-switch shared-attack-multiple-targets">
+        <input class="form-check-input" type="checkbox" role="switch" data-attack-field="multipleTargets"${data.multipleTargets ? " checked" : ""}>
+        <span class="form-check-label">Multiple Targets</span>
+      </label>
     </div>
-    <div class="shared-attack-payload-heading">On Success</div>
-    <div data-attack-payload></div>`;
+    <div class="shared-attack-payload-heading"><span>On Success</span>${allowIndependentEffects ? `<button class="btn btn-outline-info btn-sm" type="button" data-add-attack-independent>Independent Effect</button>` : ""}</div>
+    <div data-attack-payload></div>
+    <div data-attack-independent-effects></div>`;
 
   const countHost = row.querySelector('[data-attack-scale-host="count"]');
   const originalBabHost = row.querySelector('[data-attack-scale-host="original-bab"]');
@@ -5735,6 +5817,7 @@ function createAttackRollRow(
   syncBabScaleMode();
 
   let payloadEditor = null;
+  let independentEditor = null;
   const initialize = () => {
     payloadEditor = mountEffectsAccordion(row.querySelector("[data-attack-payload]"), {
       idPrefix: editorPrefix,
@@ -5745,6 +5828,24 @@ function createAttackRollRow(
       onChange,
     });
     payloadEditor.reset(data);
+    if (allowIndependentEffects) {
+      independentEditor = mountIndependentEffects(
+        row.querySelector("[data-attack-independent-effects]"),
+        {
+          idPrefix: `${editorPrefix}Independent`,
+          trigger: { scope: "attack", outcome: "success", sourceId: attackId },
+          skills,
+          effectStats,
+          titleCaseStat: formatStat,
+          onChange,
+        },
+      );
+      independentEditor.reset(data);
+      row.querySelector("[data-add-attack-independent]").addEventListener(
+        "click",
+        () => independentEditor.add(),
+      );
+    }
   };
   row.querySelector("[data-delete-attack-roll]").addEventListener("click", () => {
     row.remove();
@@ -5756,7 +5857,7 @@ function createAttackRollRow(
     const customBabInput = row.querySelector('[data-attack-field="customBab"]');
     const hasCustomBab = customBabInput.value !== "";
     return {
-      id: String(data.id || `attack-${sequence}`),
+      id: attackId,
       label:
         row.querySelector('[data-attack-field="label"]').value.trim() ||
         "Attack",
@@ -5765,14 +5866,24 @@ function createAttackRollRow(
         Number(row.querySelector('[data-attack-field="attackCount"]').value) || 1,
       ),
       attackCountScale: countHost._bonusScale || null,
+      attackCountMax: (() => {
+        const value = row.querySelector(
+          '[data-attack-field="attackCountMax"]',
+        ).value;
+        return value === "" ? null : Math.max(1, Math.floor(Number(value) || 1));
+      })(),
       attackType: row.querySelector('[data-attack-field="attackType"]').value,
       attackAbility: row.querySelector('[data-attack-field="attackAbility"]').value,
+      multipleTargets: row.querySelector('[data-attack-field="multipleTargets"]').checked,
       originalBabScale: hasCustomBab
         ? null
         : originalBabHost._bonusScale || null,
       customBab: hasCustomBab ? Number(customBabInput.value) : null,
       customBabScale: hasCustomBab ? babHost._bonusScale || null : null,
       ...(payloadEditor?.collect?.() || {}),
+      ...(independentEditor?.collect().length
+        ? { independentEffects: independentEditor.collect() }
+        : {}),
     };
   };
   return { element: row, collect: row._collect, initialize };
@@ -6210,6 +6321,7 @@ function createD20BoostRow(data = {}, { onDelete, onChange } = {}) {
         skills: options.skills,
         effectStats: options.effectStats,
         titleCaseStat: options.titleCaseStat,
+        allowIndependentEffects: options.allowIndependentEffects !== false,
       });
       appendSavedRow(attackRollRowsEl, element, data);
       initialize();
@@ -6923,11 +7035,13 @@ function createD20BoostRow(data = {}, { onDelete, onChange } = {}) {
             <button id="${prefix}ActiveSave" class="btn btn-outline-info btn-sm" type="button"><i class="bi bi-shield-check me-1"></i>Save</button>
             ${auraControls("Active")}
             <button id="${prefix}EditDuration" class="btn btn-outline-light btn-sm" type="button">Edit Duration</button>
+            ${options.allowIndependentEffects === false ? "" : `<button id="${prefix}ActiveCreateIndependent" class="btn btn-outline-info btn-sm" type="button">Independent Effect</button>`}
             ${options.allowBranches === false ? "" : `<button id="${prefix}ActiveCreateBranch" class="btn btn-outline-info btn-sm" type="button">Create Branch</button>`}
             <span id="${prefix}DurationSummary" class="small-text"></span>
           </div>
         </div>
         <div id="${prefix}Active"></div>
+        <div id="${prefix}ActiveIndependentEffects"></div>
       </section>`;
 
     const newBranchId = () =>
@@ -7069,6 +7183,21 @@ function createD20BoostRow(data = {}, { onDelete, onChange } = {}) {
       : mountBranchingGroup("Passive", `${prefix}Passive`);
     const active = mountBranchingGroup("Active", `${prefix}Active`);
     const groupEditors = { Passive: passive, Active: active };
+    const independentEditor = options.allowIndependentEffects === false
+      ? null
+      : mountIndependentEffects(
+          document.getElementById(`${prefix}ActiveIndependentEffects`),
+          {
+            ...options,
+            idPrefix: `${prefix}ActiveIndependent`,
+            trigger: { scope: "main", outcome: "applied" },
+            onChange: options.onChange,
+          },
+        );
+    document.getElementById(`${prefix}ActiveCreateIndependent`)?.addEventListener(
+      "click",
+      () => independentEditor?.add(),
+    );
     const decisionOwnerSelect = (group) =>
       document.getElementById(`${prefix}${group}DecisionOwner`);
     const groupHasDecision = (group) =>
@@ -7181,6 +7310,7 @@ function createD20BoostRow(data = {}, { onDelete, onChange } = {}) {
       if (!result) return;
       activeSaveConfig = result.mode === "custom" ? result.config : null;
       syncSaveButton();
+      independentEditor?.setTriggerVisible(Boolean(activeSaveConfig?.enabled));
       options.onChange?.();
     });
 
@@ -7208,6 +7338,8 @@ function createD20BoostRow(data = {}, { onDelete, onChange } = {}) {
         activeSaveConfig = activeData.saveConfig?.enabled
           ? JSON.parse(JSON.stringify(activeData.saveConfig))
           : null;
+        independentEditor?.setTriggerVisible(Boolean(activeSaveConfig?.enabled));
+        independentEditor?.reset(activeData);
         syncSaveButton();
         resetAura("Active", activeData.auraConfig);
         updateDuration();
@@ -7234,6 +7366,7 @@ function createD20BoostRow(data = {}, { onDelete, onChange } = {}) {
             }
           : collectedActive;
         const activeAura = auraConfigFor("Active");
+        const independentEffects = independentEditor?.collect() || [];
         const hasActive = window.PFEffectMechanics?.hasAnyMechanics
           ? window.PFEffectMechanics.hasAnyMechanics(activeData)
           : Object.values(activeData).some(
@@ -7242,10 +7375,11 @@ function createD20BoostRow(data = {}, { onDelete, onChange } = {}) {
         return {
           ...passiveData,
           ...(passiveAura ? { auraConfig: passiveAura } : {}),
-          ...(hasActive || durationConfig || activeAura
+          ...(hasActive || durationConfig || activeAura || independentEffects.length
             ? {
                 activeMechanics: {
                   ...activeData,
+                  ...(independentEffects.length ? { independentEffects } : {}),
                   ...(activeSaveConfig ? { saveConfig: activeSaveConfig } : {}),
                   ...(durationConfig ? { durationConfig } : {}),
                   ...(activeAura ? { auraConfig: activeAura } : {}),
@@ -7307,6 +7441,7 @@ function createD20BoostRow(data = {}, { onDelete, onChange } = {}) {
     createD20BoostRow,
     mountExtraAccordion,
     mountEffectsAccordion,
+    mountIndependentEffects,
     mountMechanicGroups,
     classSkillGrantText,
     openScaleModal,

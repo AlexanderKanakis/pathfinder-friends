@@ -8251,10 +8251,11 @@ async function resolveQuickCasterDecisions(effect = {}) {
 
 function effectHasTargetMechanics(effect = {}) {
   if (effect.auraConfig?.enabled) return true;
+  if (window.PFEffectMechanics?.hasBranches?.(effect)) return true;
+  if (Array.isArray(effect._triggeredIndependentEffects) && effect._triggeredIndependentEffects.length) return true;
   if (effect.trackActive) return true;
   if (effectAttackRolls(effect).length || effectDamageRolls(effect).length)
     return true;
-  if (window.PFEffectMechanics?.hasBranches?.(effect)) return true;
   if (Array.isArray(effect.metamagicRiders) && effect.metamagicRiders.length)
     return true;
   if (Array.isArray(effect.bonuses) && effect.bonuses.length) return true;
@@ -8556,9 +8557,32 @@ async function chooseQuickEffect(effect, options = {}) {
           return { ...state, sourceSummon: true };
         const needsTargets = effectHasTargetMechanics(state.effect);
         if (!needsTargets) return state;
+        if (
+          window.PFAttackRolls?.hasMultipleTargets?.(
+            effectAttackRolls(state.effect),
+          )
+        )
+          return state;
         const paused = orchestrator.pause(state, "targeting");
         await openQuickEffectTargets(state.effect, selection, paused);
         return paused;
+      },
+      "attack-targeting": async (state) => {
+        if (
+          state.sourceAura ||
+          !window.PFAttackRolls?.hasMultipleTargets?.(
+            effectAttackRolls(state.effect),
+          )
+        )
+          return state;
+        const assignments = await chooseQuickAttackTargets(
+          state.effect,
+          selection,
+        );
+        if (!assignments) return null;
+        return orchestrator.pause(state, "attack-targeting", {
+          attackTargetAssignments: assignments,
+        });
       },
       "target-decisions": async (state) => {
         if (!state.sourceAura) return state;
@@ -8627,6 +8651,40 @@ async function chooseQuickEffect(effect, options = {}) {
       },
     },
   );
+  if (activation?.attackTargetAssignments?.length) {
+    const assignments = activation.attackTargetAssignments;
+    const resolvedByTarget = await rollQuickAssignedAttacks(
+      activation.effect,
+      selection.casterLevel,
+      assignments,
+    );
+    if (!resolvedByTarget) {
+      quickEffectModal.show();
+      return;
+    }
+    const targets = [
+      ...new Map(
+        assignments.map((assignment) => [
+          assignment.target.token.id,
+          assignment.target.token,
+        ]),
+      ).values(),
+    ];
+    quickEffectSelection = {
+      effect: activation.effect,
+      options: selection,
+      sourceTokenId: quickEffectSourceTokenId,
+      previousTargetIds: [],
+      activation,
+      attackTargetAssignments: assignments,
+      resolvedAttackEffects: resolvedByTarget,
+    };
+    await applyQuickEffectTargets(
+      targets,
+      targets.map((token) => token.id),
+    );
+    return;
+  }
   if (!activation && quickEffectModal) quickEffectModal.show();
 }
 
@@ -9497,6 +9555,7 @@ function quickEffectTargets() {
           (token.kind === "enemy" && token.visible !== false),
     )
     .map((token) => ({
+      key: token.id,
       token,
       name: displayTokenName(token),
       isCaster: token.id === quickEffectSourceTokenId,
@@ -9506,12 +9565,86 @@ function quickEffectTargets() {
           : token.kind === "enemy"
             ? "enemy"
             : "ally",
+      subtitle: token.kind === "enemy" ? "Enemy" : "Character",
     }))
     .sort(
       (a, b) =>
         Number(b.isCaster) - Number(a.isCaster) ||
         a.name.localeCompare(b.name),
     );
+}
+
+async function chooseQuickAttackTargets(effect, selection) {
+  const attacks = effectAttackRolls(effect);
+  const sourceToken = tokenById(quickEffectSourceTokenId);
+  const sourceCharacter =
+    sourceToken?.kind === "character" ? tokenCharacter(sourceToken) : null;
+  const context = {
+    ...mapEffectCastingScaleContext(
+      effect,
+      mapCharacterAttributeScaleContext(sourceCharacter || {}),
+    ),
+    casterLevel: selection.casterLevel,
+    classLevel: selection.casterLevel,
+  };
+  const targets = quickEffectTargets();
+  return window.PFAttackRolls?.assignTargets?.(
+    attacks,
+    context,
+    (pools) =>
+      window.PFAttackRolls.allocateTargets({
+        title: `${effect.name || "Effect"}: Allocate Attacks`,
+        pools,
+        targets,
+      }),
+  );
+}
+
+async function rollQuickAssignedAttacks(effect, casterLevel, assignments) {
+  const attacks = assignments.map((assignment) => assignment.attack);
+  const sourceToken = tokenById(quickEffectSourceTokenId);
+  const sourceCharacter =
+    sourceToken?.kind === "character" ? tokenCharacter(sourceToken) : null;
+  const context = {
+    ...mapEffectCastingScaleContext(
+      effect,
+      mapCharacterAttributeScaleContext(sourceCharacter || {}),
+    ),
+    casterLevel,
+    classLevel: casterLevel,
+  };
+  const boostSession = await mapD20BoostSession(sourceToken, "attacks");
+  if (boostSession) {
+    boostSession.onUsageChange = async (usage) => {
+      boostSession.usage = usage;
+      await saveMapD20BoostUsage(boostSession);
+    };
+    context.d20BoostSession = boostSession;
+  }
+  const results = await window.PFAttackRolls?.open?.({
+    title: `${effect.name || "Effect"} Attacks`,
+    attacks,
+    context,
+  });
+  if (!results) return null;
+  results.forEach((result, index) => {
+    result.targetKey = assignments[index]?.targetKey || "";
+  });
+  addTimeline(
+    `${sourceToken ? displayTokenName(sourceToken) : "A character"} uses ${effect.name || "an effect"}: ${window.PFAttackRolls.summary(results)}.`,
+  );
+  queueSave();
+  const byTarget = new Map();
+  results.forEach((result) => {
+    if (!byTarget.has(result.targetKey)) byTarget.set(result.targetKey, []);
+    byTarget.get(result.targetKey).push(result);
+  });
+  return new Map(
+    [...byTarget.entries()].map(([targetKey, targetResults]) => [
+      targetKey,
+      window.PFAttackRolls.payloadForSuccessfulAttacks(effect, targetResults),
+    ]),
+  );
 }
 
 function renderQuickEffectTargetGroup(
@@ -9732,7 +9865,7 @@ function sameAuraApplication(existing = {}, incoming = {}) {
   );
 }
 
-async function applyQuickEffectToToken(token, appliedEffect) {
+async function applyQuickEffectRecordToToken(token, appliedEffect) {
   if (effectHasSummons(appliedEffect)) {
     const summonSucceeded = await spawnQuickEffectCreatures(appliedEffect, token);
     if (!summonSucceeded) return false;
@@ -10721,6 +10854,10 @@ async function confirmQuickEffectTargets() {
     return;
   }
 
+  await applyQuickEffectTargets(targets, selectedTokenIds);
+}
+
+async function applyQuickEffectTargets(targets, selectedTokenIds) {
   el("confirmQuickEffectTargets").disabled = true;
   el("quickEffectApplyStatus").textContent = "Applying...";
   await hideQuickEffectTargetsBeforeChoices();
@@ -10768,8 +10905,11 @@ async function confirmQuickEffectTargets() {
   const readyActivations = [];
   const orchestrator = window.PFEffectActivationOrchestrator;
   for (const token of targets) {
+    const assignedEffect =
+      quickEffectSelection.resolvedAttackEffects?.get?.(String(token.id)) ||
+      quickEffectSelection.effect;
     const targetEffect = {
-      ...structuredClone(quickEffectSelection.effect),
+      ...structuredClone(assignedEffect),
       sourceTokenId: sourceTokenId || token.id,
       durationAnchorTokenId: sourceTokenId || token.id,
     };
@@ -10780,7 +10920,11 @@ async function confirmQuickEffectTargets() {
       : [targetEffect];
     if (!targetEffects) continue;
     for (const candidate of targetEffects) {
-      if (!effectHasTargetMechanics(candidate)) continue;
+      if (
+        !effectHasTargetMechanics(candidate) &&
+        !quickEffectSelection.attackTargetAssignments?.length
+      )
+        continue;
       const appliedEffect = appliedEffectFromQuickSelection(
         candidate,
         quickEffectSelection.options,
@@ -10804,7 +10948,9 @@ async function confirmQuickEffectTargets() {
           surface: "map",
           effect: appliedEffect,
           token,
-          resolvedAction: false,
+          resolvedAction: Boolean(
+            quickEffectSelection.attackTargetAssignments?.length,
+          ),
         },
         {
           "target-decisions": async (state) => {
@@ -10947,6 +11093,71 @@ async function confirmQuickEffectTargets() {
   quickEffectTargetsModal.hide();
   quickEffectSelection = null;
   renderAll();
+}
+
+async function resolveQuickIndependentEffect(token, child, parent) {
+  const casterLevel = Math.max(1, Number(parent.casterLevel || child.casterLevel || 1));
+  let effect = appliedEffectFromQuickSelection(
+    {
+      ...child,
+      source: child.source || parent.source,
+      sourceTokenId: child.sourceTokenId || parent.sourceTokenId,
+      durationAnchorTokenId:
+        child.durationAnchorTokenId || parent.durationAnchorTokenId,
+      saveDc: child.saveDc ?? parent.saveDc,
+    },
+    { casterLevel, turns: 1, permanent: Boolean(child.permanent) },
+    1,
+    { preserveRolls: true },
+  );
+  const choices = await resolveEffectChoicesForToken(token, effect);
+  if (choices.queued) return { queued: true, effect: null };
+  effect = choices.effect;
+  if (!effect) return null;
+  effect = await resolveEffectSaveForToken(token, effect);
+  if (!effect) return null;
+  if (effectAttackRolls(effect).length) {
+    effect = await rollQuickEffectAttacks(effect, casterLevel);
+    if (!effect) return null;
+  }
+  if (effectDamageRolls(effect).length) {
+    const damage = await rollQuickEffectDamage(effect, casterLevel);
+    if (!damage) return null;
+  }
+  effect = await rollQuickConditionAdjustments(effect, casterLevel);
+  if (!effect) return null;
+  effect = await rollQuickHealing(effect, casterLevel);
+  if (!effect) return null;
+  const { attackRolls, damageRolls, castRollContext, ...persistable } = effect;
+  return { queued: false, effect: persistable };
+}
+
+async function applyQuickEffectToToken(token, appliedEffect) {
+  const separated = window.PFEffectMechanics?.separateIndependentEffects?.(
+    appliedEffect,
+  ) || { parent: appliedEffect, children: [] };
+  let applied = false;
+  if (effectHasTargetMechanics(separated.parent))
+    applied = await applyQuickEffectRecordToToken(token, separated.parent);
+  for (const child of separated.children) {
+    const resolved = await resolveQuickIndependentEffect(
+      token,
+      child,
+      appliedEffect,
+    );
+    if (!resolved) continue;
+    if (resolved.queued) {
+      applied = true;
+      continue;
+    }
+    if (
+      resolved.effect &&
+      effectHasTargetMechanics(resolved.effect) &&
+      (await applyQuickEffectRecordToToken(token, resolved.effect))
+    )
+      applied = true;
+  }
+  return applied;
 }
 
 function toggleContextEnemyVisibility() {
@@ -13115,6 +13326,18 @@ document.addEventListener("DOMContentLoaded", async () => {
         selectQuickEffectGroup(button.dataset.effectBrowserGroup),
       ),
     );
+  const mapElementsCollapse = el("mapElementsCollapse");
+  const closeMapElementsMenu = () => {
+    if (!mapElementsCollapse.classList.contains("show")) return;
+    bootstrap.Collapse.getOrCreateInstance(mapElementsCollapse, {
+      toggle: false,
+    }).hide();
+  };
+  mapElementsCollapse.addEventListener("click", (event) => {
+    if (event.target.closest(".map-elements-menu > button")) {
+      closeMapElementsMenu();
+    }
+  });
   el("addCharacterToken").addEventListener("click", () =>
     addToken("character"),
   );

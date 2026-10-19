@@ -516,6 +516,8 @@
         "attackCount": 1,
         "attackCountScale": null,
         "attackType": "ranged-touch",
+        "attackAbility": "default",
+        "originalBabScale": null,
         "customBab": null,
         "customBabScale": null,
         "effects": [],
@@ -567,6 +569,8 @@
           "attackCount": 1,
           "attackCountScale": null,
           "attackType": "ranged-touch",
+          "attackAbility": "default",
+          "originalBabScale": null,
           "customBab": null,
           "customBabScale": null,
           "effects": [],
@@ -3294,8 +3298,7 @@
       "generatedEquipment": [],
       "conditionalVariables": [],
       "decisionOwner": "caster"
-    },
-    "needsReview": true
+    }
   },
   {
     "name": "Aquatic Trail",
@@ -5010,7 +5013,6 @@
       "area": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Barbed Chains",
-    "needsReview": true,
     "activeMechanics": {
       "effects": [],
       "damageReduction": [],
@@ -5049,26 +5051,14 @@
               "attackCount": 1,
               "attackCountScale": null,
               "attackType": "melee",
+              "attackAbility": "default",
               "originalBabScale": null,
-              "customBab": 0,
+              "customBab": null,
               "customBabScale": null,
               "effects": [],
               "attackRolls": [],
               "d20Boosts": [],
-              "damageRolls": [
-                {
-                  "label": "Damage",
-                  "diceCount": 1,
-                  "dieType": 6,
-                  "diceCountMax": null,
-                  "staticDamage": 0,
-                  "staticDamageMax": null,
-                  "damageType": "slashing",
-                  "diceCountScale": null,
-                  "staticDamageScale": null,
-                  "conditionals": []
-                }
-              ],
+              "damageRolls": [],
               "weaponExtraDamage": [],
               "weaponDamageSizeChanges": [],
               "summonCreatures": [],
@@ -5089,7 +5079,92 @@
               "effectiveAttributeBonuses": [],
               "attributeContributions": [],
               "generatedEquipment": [],
-              "conditionalVariables": []
+              "conditionalVariables": [],
+              "independentEffects": [
+                {
+                  "id": "independent-effect-1",
+                  "name": "Shaken Effect",
+                  "trigger": {
+                    "scope": "attack",
+                    "outcome": "success",
+                    "sourceId": "attack-1"
+                  },
+                  "effects": [],
+                  "attackRolls": [],
+                  "d20Boosts": [],
+                  "damageRolls": [],
+                  "weaponExtraDamage": [],
+                  "weaponDamageSizeChanges": [],
+                  "summonCreatures": [],
+                  "damageReduction": [],
+                  "spellResistance": [],
+                  "immunities": [],
+                  "applyConditions": [
+                    {
+                      "conditionId": "condition-shaken",
+                      "name": "Shaken",
+                      "condition": {
+                        "id": "condition-shaken",
+                        "name": "Shaken",
+                        "category": "Condition",
+                        "duration": "variable",
+                        "durationConfig": {
+                          "count": null,
+                          "unit": "variable",
+                          "factors": []
+                        },
+                        "adjustableCondition": null,
+                        "bonuses": [
+                          {
+                            "stat": "attack",
+                            "value": -2,
+                            "type": "penalty",
+                            "stacks": true
+                          },
+                          {
+                            "stat": "all saves",
+                            "value": -2,
+                            "type": "penalty",
+                            "stacks": true
+                          },
+                          {
+                            "stat": "skill checks",
+                            "value": -2,
+                            "type": "penalty",
+                            "stacks": true
+                          }
+                        ],
+                        "damageReduction": [],
+                        "spellResistance": [],
+                        "immunities": [],
+                        "classSkillGrants": [],
+                        "useUntrained": [],
+                        "extraRanksPerLevel": [],
+                        "sizeChanges": [],
+                        "casterLevelBonuses": [],
+                        "spellDcBonuses": [],
+                        "spellLikeAbilities": [],
+                        "generatedEquipment": [],
+                        "description": "Fear penalties to attacks, saves, and skill checks."
+                      }
+                    }
+                  ],
+                  "classSkillGrants": [],
+                  "useUntrained": [],
+                  "bonusRanks": [],
+                  "extraRanksPerLevel": [],
+                  "grantDomains": [],
+                  "featGrants": [],
+                  "sizeChanges": [],
+                  "spellLikeAbilities": [],
+                  "casterLevelBonuses": [],
+                  "spellDcBonuses": [],
+                  "effectiveAttributeBonuses": [],
+                  "attributeContributions": [],
+                  "generatedEquipment": [],
+                  "conditionalVariables": []
+                }
+              ]
             }
           ],
           "d20Boosts": [],
@@ -20620,7 +20695,6 @@
       "area": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Euphoric Cloud",
-    "needsReview": true,
     "activeMechanics": {
       "effects": [],
       "attackRolls": [],
@@ -20632,7 +20706,46 @@
       "damageReduction": [],
       "spellResistance": [],
       "immunities": [],
-      "applyConditions": [],
+      "applyConditions": [
+        {
+          "conditionId": "condition-fascinated",
+          "name": "Fascinated",
+          "condition": {
+            "id": "condition-fascinated",
+            "name": "Fascinated",
+            "category": "Condition",
+            "duration": "variable",
+            "durationConfig": {
+              "count": null,
+              "unit": "variable",
+              "factors": []
+            },
+            "adjustableCondition": null,
+            "bonuses": [
+              {
+                "stat": "skill checks",
+                "value": -4,
+                "type": "penalty",
+                "stacks": true,
+                "conditional": true,
+                "appliesWhen": "skill checks made as reactions"
+              }
+            ],
+            "damageReduction": [],
+            "spellResistance": [],
+            "immunities": [],
+            "classSkillGrants": [],
+            "useUntrained": [],
+            "extraRanksPerLevel": [],
+            "sizeChanges": [],
+            "casterLevelBonuses": [],
+            "spellDcBonuses": [],
+            "spellLikeAbilities": [],
+            "generatedEquipment": [],
+            "description": "Focused on an effect and penalized on reactive skill checks."
+          }
+        }
+      ],
       "classSkillGrants": [],
       "useUntrained": [],
       "bonusRanks": [],
@@ -20661,7 +20774,47 @@
         "independentToken": true,
         "targetsEmitAura": false
       }
-    }
+    },
+    "applyConditions": [
+      {
+        "conditionId": "condition-fascinated",
+        "name": "Fascinated",
+        "condition": {
+          "id": "condition-fascinated",
+          "name": "Fascinated",
+          "category": "Condition",
+          "duration": "variable",
+          "durationConfig": {
+            "count": null,
+            "unit": "variable",
+            "factors": []
+          },
+          "adjustableCondition": null,
+          "bonuses": [
+            {
+              "stat": "skill checks",
+              "value": -4,
+              "type": "penalty",
+              "stacks": true,
+              "conditional": true,
+              "appliesWhen": "skill checks made as reactions"
+            }
+          ],
+          "damageReduction": [],
+          "spellResistance": [],
+          "immunities": [],
+          "classSkillGrants": [],
+          "useUntrained": [],
+          "extraRanksPerLevel": [],
+          "sizeChanges": [],
+          "casterLevelBonuses": [],
+          "spellDcBonuses": [],
+          "spellLikeAbilities": [],
+          "generatedEquipment": [],
+          "description": "Focused on an effect and penalized on reactive skill checks."
+        }
+      }
+    ]
   },
   {
     "name": "Euphoric Tranquility",
@@ -21978,7 +22131,133 @@
       "area": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Fiery Shuriken",
-    "needsReview": true
+    "needsReview": true,
+    "attackRolls": [
+      {
+        "id": "attack-1",
+        "label": "Attack",
+        "attackCount": 2,
+        "attackCountScale": {
+          "source": {
+            "type": "caster"
+          },
+          "milestones": [],
+          "every": {
+            "fromLevel": 3,
+            "everyLevels": 2,
+            "increase": 1
+          }
+        },
+        "attackCountMax": 8,
+        "attackType": "melee-touch",
+        "attackAbility": "default",
+        "multipleTargets": true,
+        "originalBabScale": null,
+        "customBab": null,
+        "customBabScale": null,
+        "effects": [],
+        "attackRolls": [],
+        "d20Boosts": [],
+        "damageRolls": [],
+        "weaponExtraDamage": [],
+        "weaponDamageSizeChanges": [],
+        "summonCreatures": [],
+        "damageReduction": [],
+        "spellResistance": [],
+        "immunities": [],
+        "applyConditions": [],
+        "classSkillGrants": [],
+        "useUntrained": [],
+        "bonusRanks": [],
+        "extraRanksPerLevel": [],
+        "grantDomains": [],
+        "featGrants": [],
+        "sizeChanges": [],
+        "spellLikeAbilities": [],
+        "casterLevelBonuses": [],
+        "spellDcBonuses": [],
+        "effectiveAttributeBonuses": [],
+        "attributeContributions": [],
+        "generatedEquipment": [],
+        "conditionalVariables": []
+      }
+    ],
+    "activeMechanics": {
+      "effects": [],
+      "attackRolls": [
+        {
+          "id": "attack-1",
+          "label": "Attack",
+          "attackCount": 2,
+          "attackCountScale": {
+            "source": {
+              "type": "caster"
+            },
+            "milestones": [],
+            "every": {
+              "fromLevel": 3,
+              "everyLevels": 2,
+              "increase": 1
+            }
+          },
+          "attackCountMax": 8,
+          "attackType": "melee-touch",
+          "attackAbility": "default",
+          "multipleTargets": true,
+          "originalBabScale": null,
+          "customBab": null,
+          "customBabScale": null,
+          "effects": [],
+          "attackRolls": [],
+          "d20Boosts": [],
+          "damageRolls": [],
+          "weaponExtraDamage": [],
+          "weaponDamageSizeChanges": [],
+          "summonCreatures": [],
+          "damageReduction": [],
+          "spellResistance": [],
+          "immunities": [],
+          "applyConditions": [],
+          "classSkillGrants": [],
+          "useUntrained": [],
+          "bonusRanks": [],
+          "extraRanksPerLevel": [],
+          "grantDomains": [],
+          "featGrants": [],
+          "sizeChanges": [],
+          "spellLikeAbilities": [],
+          "casterLevelBonuses": [],
+          "spellDcBonuses": [],
+          "effectiveAttributeBonuses": [],
+          "attributeContributions": [],
+          "generatedEquipment": [],
+          "conditionalVariables": []
+        }
+      ],
+      "d20Boosts": [],
+      "damageRolls": [],
+      "weaponExtraDamage": [],
+      "weaponDamageSizeChanges": [],
+      "summonCreatures": [],
+      "damageReduction": [],
+      "spellResistance": [],
+      "immunities": [],
+      "applyConditions": [],
+      "classSkillGrants": [],
+      "useUntrained": [],
+      "bonusRanks": [],
+      "extraRanksPerLevel": [],
+      "grantDomains": [],
+      "featGrants": [],
+      "sizeChanges": [],
+      "spellLikeAbilities": [],
+      "casterLevelBonuses": [],
+      "spellDcBonuses": [],
+      "effectiveAttributeBonuses": [],
+      "attributeContributions": [],
+      "generatedEquipment": [],
+      "conditionalVariables": []
+    }
   },
   {
     "name": "Film of Filth",

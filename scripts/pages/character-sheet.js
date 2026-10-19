@@ -10210,11 +10210,15 @@ function spellEffectPayloads(spell = {}) {
     ? mechanics.metamagicRiders
     : [];
   const hasSave = Boolean(window.PFEffectSaves?.hasSave?.(mechanics));
+  const hasIndependent = Boolean(
+    window.PFEffectMechanics?.independentEffects?.(mechanics).length,
+  );
   const hasBasePayload =
     bonusRows.length ||
     hasInlineEffect ||
     hasBranches ||
     hasSave ||
+    hasIndependent ||
     Boolean(mechanics.auraConfig?.enabled);
   if (!hasBasePayload && !metamagicRiders.length) return [];
   const payload = {
@@ -10226,6 +10230,7 @@ function spellEffectPayloads(spell = {}) {
     metamagicDurationMultiplier: mechanics.metamagicDurationMultiplier || 1,
     duration: spell.duration || spell.details?.duration || "",
     ...window.PFEffectMechanics?.copyActivationConfig?.(mechanics),
+    ...window.PFEffectMechanics?.copyIndependentEffects?.(mechanics),
     ...(window.PFEffectMechanics?.hasBranches?.(mechanics)
       ? { branches: mechanics.branches }
       : {}),
@@ -10261,6 +10266,8 @@ function spellAttackRolls(spell = {}) {
 function spellTargetPayloadHasMechanics(payload = {}) {
   return Boolean(
     (Array.isArray(payload.bonuses) && payload.bonuses.length) ||
+      (Array.isArray(payload._triggeredIndependentEffects) &&
+        payload._triggeredIndependentEffects.length) ||
       window.PFEffectMechanics?.hasAnyMechanics?.(payload),
   );
 }
@@ -10438,6 +10445,9 @@ function spellAttackTargetPayload(spell = {}, resolved = {}) {
     bonuses: Array.isArray(resolved.effects) ? resolved.effects : [],
     durationConfig: mechanics.durationConfig || spell.durationConfig || null,
     duration: spell.duration || spell.details?.duration || "",
+    ...(Array.isArray(resolved._triggeredIndependentEffects)
+      ? { _triggeredIndependentEffects: cloneJson(resolved._triggeredIndependentEffects) }
+      : {}),
   };
   (window.PFEffectMechanics?.extraKeys?.() || []).forEach((key) => {
     if (["attackRolls", "damageRolls"].includes(key)) return;
@@ -10825,6 +10835,26 @@ async function openSpellCastTargetModal(spell = {}) {
   });
 }
 
+async function chooseSpellAttackTargets(
+  spell,
+  attacks,
+  casterLevel,
+  calculations,
+) {
+  const targets = await spellCastTargetsFromCurrentMap();
+  const context = spellCastingScaleContext(calculations, casterLevel);
+  return window.PFAttackRolls?.assignTargets?.(
+    attacks,
+    context,
+    (pools) =>
+      window.PFAttackRolls.allocateTargets({
+        title: `${spell.name || "Spell"}: Allocate Attacks`,
+        pools,
+        targets,
+      }),
+  );
+}
+
 async function spellTargetSheet(target) {
   if (target.group === "ally") {
     const saved = await PFApp.loadCharacterSheet(
@@ -11135,7 +11165,7 @@ async function prepareConditionEffectForSpellTarget(target, effect) {
   return restoration.effect;
 }
 
-async function applySpellEffectToTarget(target, effect) {
+async function applySpellEffectRecordToTarget(target, effect) {
   if (spellEffectHasSummons(effect)) {
     const summoned = await spawnSpellCreaturesOnCurrentMap(
       effect,
@@ -11204,6 +11234,101 @@ async function applySpellEffectToTarget(target, effect) {
     await applyHealingAfterSpellTarget(target, effect);
   }
   return Boolean(saved);
+}
+
+async function resolveIndependentSpellEffect(target, child, parent) {
+  const casterLevel = Math.max(1, Number(parent.casterLevel || child.casterLevel || 1));
+  const spell = {
+    name: parent.sourceSpellName || parent.name || "Independent Effect",
+    details: { duration: "" },
+  };
+  let effect = appliedSpellEffect(
+    {
+      ...child,
+      source: child.source || parent.source,
+      sourceTokenId: child.sourceTokenId || parent.sourceTokenId,
+      durationAnchorTokenId:
+        child.durationAnchorTokenId || parent.durationAnchorTokenId,
+      saveDc: child.saveDc ?? parent.saveDc,
+    },
+    spell,
+    casterLevel,
+    0,
+    1,
+    parent.spellCalculations || null,
+  );
+  const choice = await resolveSpellCastEffectForTarget(
+    target,
+    effect,
+    spell,
+    null,
+    { skipMetamagic: true },
+  );
+  if (choice.queued) return { queued: true, effect: null };
+  effect = choice.effect;
+  if (!effect) return null;
+  effect = await resolveSpellTargetSave(target, effect, effect.name || spell.name);
+  if (!effect) return null;
+  const attacks = window.PFAttackRolls?.normalizeAttacks?.(effect.attackRolls || []) || [];
+  if (attacks.length) {
+    const results = await rollSpellAttacksFromDetails(
+      { name: effect.name || spell.name },
+      casterLevel,
+      attacks,
+      parent.spellCalculations || null,
+    );
+    if (!results) return null;
+    effect = window.PFAttackRolls?.payloadForSuccessfulAttacks?.(effect, results) || effect;
+  }
+  effect = await window.PFConditionConfig?.resolveAdjustments?.(effect, {
+    title: effect.name || spell.name,
+    context: spellCastingScaleContext(parent.spellCalculations || null, casterLevel),
+  });
+  if (!effect) return null;
+  effect = await resolveSpellHealingRolls(
+    effect,
+    { name: effect.name || spell.name },
+    casterLevel,
+    parent.spellCalculations || null,
+  );
+  if (!effect) return null;
+  const damageRolls = Array.isArray(effect.damageRolls) ? effect.damageRolls : [];
+  if (damageRolls.length) {
+    const damage = await rollSpellDamageFromDetails(
+      { name: effect.name || spell.name },
+      casterLevel,
+      damageRolls,
+      parent.spellCalculations || null,
+    );
+    if (!damage) return null;
+  }
+  const { attackRolls, damageRolls: _damageRolls, ...persistable } = effect;
+  return { queued: false, effect: persistable };
+}
+
+async function applySpellEffectToTarget(target, effect) {
+  const separated = window.PFEffectMechanics?.separateIndependentEffects?.(effect) || {
+    parent: effect,
+    children: [],
+  };
+  let applied = false;
+  if (spellTargetPayloadHasMechanics(separated.parent))
+    applied = await applySpellEffectRecordToTarget(target, separated.parent);
+  for (const child of separated.children) {
+    const resolved = await resolveIndependentSpellEffect(target, child, effect);
+    if (!resolved) continue;
+    if (resolved.queued) {
+      applied = true;
+      continue;
+    }
+    if (
+      resolved.effect &&
+      spellTargetPayloadHasMechanics(resolved.effect) &&
+      (await applySpellEffectRecordToTarget(target, resolved.effect))
+    )
+      applied = true;
+  }
+  return applied;
 }
 
 function nextSpellCastMapZIndex() {
@@ -11368,19 +11493,89 @@ async function activateTargetedAuraFromCharacterSheet(
   effect,
   { beforeApply } = {},
 ) {
-  const targets = await openSpellCastTargetModal({ name: effect.name || "Effect" });
-  if (!targets) return false;
+  const orchestrator = window.PFEffectActivationOrchestrator;
+  const casterLevel = Math.max(1, Number(effect.casterLevel || 1) || 1);
+  const attacks =
+    window.PFAttackRolls?.normalizeAttacks?.(effect.attackRolls || []) || [];
+  const hasMultipleAttackTargets =
+    window.PFAttackRolls?.hasMultipleTargets?.(attacks);
+  let attackTargetAssignments = [];
+  let resolvedAttackEffects = null;
+  let targets = null;
+  if (hasMultipleAttackTargets) {
+    const targeted = await orchestrator.run(
+      {
+        sourceType:
+          window.PFEffectTracker?.sourceGroup?.(effect) ||
+          effect.sourceType ||
+          "other",
+        surface: "character-sheet",
+        effect,
+      },
+      {
+        "attack-targeting": async (state) => {
+          const assignments = await chooseSpellAttackTargets(
+            { name: effect.name || "Effect" },
+            attacks,
+            casterLevel,
+            effect.spellCalculations || null,
+          );
+          return assignments
+            ? { ...state, attackTargetAssignments: assignments }
+            : null;
+        },
+      },
+      { nodeIds: ["attack-targeting"] },
+    );
+    if (!targeted) return false;
+    attackTargetAssignments = targeted.attackTargetAssignments;
+    targets = [
+      ...new Map(
+        attackTargetAssignments.map((assignment) => [
+          assignment.target.key,
+          assignment.target,
+        ]),
+      ).values(),
+    ];
+    const results = await rollSpellAttacksFromDetails(
+      { name: effect.name || "Effect" },
+      casterLevel,
+      attackTargetAssignments.map((assignment) => assignment.attack),
+      effect.spellCalculations || null,
+    );
+    if (!results) return false;
+    results.forEach((result, index) => {
+      result.targetKey = attackTargetAssignments[index]?.targetKey || "";
+    });
+    const grouped = new Map();
+    results.forEach((result) => {
+      if (!grouped.has(result.targetKey)) grouped.set(result.targetKey, []);
+      grouped.get(result.targetKey).push(result);
+    });
+    resolvedAttackEffects = new Map(
+      [...grouped.entries()].map(([targetKey, targetResults]) => [
+        targetKey,
+        window.PFAttackRolls.payloadForSuccessfulAttacks(
+          effect,
+          targetResults,
+        ),
+      ]),
+    );
+  } else {
+    targets = await openSpellCastTargetModal({
+      name: effect.name || "Effect",
+    });
+    if (!targets) return false;
+  }
   if (beforeApply && !(await beforeApply())) return false;
 
   const sourceToken = currentSheetSourceToken(spellCastTargetMapState);
   let appliedCount = 0;
   let queuedCount = 0;
   const locallyAppliedTargets = new Set();
-  const orchestrator = window.PFEffectActivationOrchestrator;
-  const casterLevel = Math.max(1, Number(effect.casterLevel || 1) || 1);
   for (const target of targets) {
     const targetEffect = {
-      ...cloneJson(effect),
+      ...cloneJson(resolvedAttackEffects?.get(target.key) || effect),
       sourceTokenId: sourceToken?.id || effect.sourceTokenId || "",
     };
     const activation = await orchestrator.run(
@@ -11392,6 +11587,7 @@ async function activateTargetedAuraFromCharacterSheet(
         surface: "character-sheet",
         effect: targetEffect,
         target,
+        resolvedAction: hasMultipleAttackTargets,
       },
       {
         "target-decisions": async (state) => {
@@ -11789,7 +11985,18 @@ async function performCastSpellFromDetails({
   let resolvedPayloads = prepared.payloads;
   damageRolls = prepared.damageRolls;
   let targets = null;
-  if (attackRolls.length) {
+  const hasMultipleAttackTargets =
+    window.PFAttackRolls?.hasMultipleTargets?.(attackRolls);
+  const sharedAttackRolls = attackRolls.filter(
+    (attack) => !attack.multipleTargets,
+  );
+  const needsSharedTargets = Boolean(
+    !hasMultipleAttackTargets ||
+      sharedAttackRolls.length ||
+      resolvedPayloads.length ||
+      damageRolls.length,
+  );
+  if (attackRolls.length && needsSharedTargets) {
     activationState = await orchestrator.run(
       activationState,
       {
@@ -11805,6 +12012,35 @@ async function performCastSpellFromDetails({
     if (!activationState) return { close: true };
     targets = activationState.targets;
   }
+  if (hasMultipleAttackTargets) {
+    activationState = await orchestrator.run(
+      activationState,
+      {
+        "attack-targeting": async (state) => {
+          const assignments = await chooseSpellAttackTargets(
+            spell,
+            attackRolls,
+            casterLevel,
+            calculations,
+          );
+          if (!assignments) return null;
+          return { ...state, attackTargetAssignments: assignments };
+        },
+      },
+      { nodeIds: ["attack-targeting"] },
+    );
+    if (!activationState) return { close: true };
+    const assignedTargets = activationState.attackTargetAssignments.map(
+      (assignment) => assignment.target,
+    );
+    targets = [
+      ...(targets || []),
+      ...assignedTargets.filter(
+        (target) =>
+          !(targets || []).some((existing) => existing.key === target.key),
+      ),
+    ];
+  }
   if (attackRolls.length) {
     activationState = await orchestrator.run(
       {
@@ -11814,29 +12050,70 @@ async function performCastSpellFromDetails({
       },
       {
         "attack-confirmation": async (state) => {
+          const assignments = state.attackTargetAssignments || [];
+          const attacksToRoll = [
+            ...sharedAttackRolls,
+            ...assignments.map((assignment) => assignment.attack),
+          ];
           const attackResults = await rollSpellAttacksFromDetails(
             spell,
             casterLevel,
-            attackRolls,
+            attacksToRoll,
             calculations,
           );
           if (!attackResults) return null;
-          const resolvedAttacks =
-            window.PFAttackRolls?.payloadForSuccessfulAttacks?.(
-              { attackRolls },
-              attackResults,
-            ) || {};
+          const context = spellCastingScaleContext(calculations, casterLevel);
+          const sharedResultCount = sharedAttackRolls.reduce(
+            (total, attack) =>
+              total +
+              (window.PFAttackRolls?.calculateAttack?.(attack, context)?.count ||
+                1),
+            0,
+          );
+          const targetKeys = [
+            ...Array(sharedResultCount).fill(""),
+            ...assignments.map((assignment) => assignment.targetKey),
+          ];
+          attackResults.forEach((result, index) => {
+            result.targetKey = targetKeys[index] || "";
+          });
           const payloads = [...state.payloads];
-          const attackPayload = spellAttackTargetPayload(spell, resolvedAttacks);
-          if (attackPayload) payloads.push(attackPayload);
+          const resultGroups = new Map();
+          attackResults.forEach((result) => {
+            const key = result.targetKey || "";
+            if (!resultGroups.has(key)) resultGroups.set(key, []);
+            resultGroups.get(key).push(result);
+          });
+          const resolvedGroups = [...resultGroups.entries()].map(
+            ([targetKey, results]) => [
+              targetKey,
+              window.PFAttackRolls?.payloadForSuccessfulAttacks?.(
+                { attackRolls: attacksToRoll },
+                results,
+              ) || {},
+            ],
+          );
+          resolvedGroups.forEach(([targetKey, resolvedAttacks]) => {
+            const attackPayload = spellAttackTargetPayload(
+              spell,
+              resolvedAttacks,
+            );
+            if (attackPayload)
+              payloads.push({
+                ...attackPayload,
+                ...(targetKey ? { _attackTargetKey: targetKey } : {}),
+              });
+          });
           return {
             ...state,
             payloads,
             damageRolls: [
               ...state.damageRolls,
-              ...(Array.isArray(resolvedAttacks.damageRolls)
-                ? resolvedAttacks.damageRolls
-                : []),
+              ...resolvedGroups.flatMap(([, resolvedAttacks]) =>
+                Array.isArray(resolvedAttacks.damageRolls)
+                  ? resolvedAttacks.damageRolls
+                  : [],
+              ),
             ],
           };
         },
@@ -11976,8 +12253,19 @@ async function performCastSpellFromDetails({
   for (const target of targets) {
     const metamagicSaveResults = new Map();
     for (let index = 0; index < resolvedPayloads.length; index += 1) {
+      if (
+        resolvedPayloads[index]._attackTargetKey &&
+        resolvedPayloads[index]._attackTargetKey !== target.key
+      )
+        continue;
+      const isAssignedAttackPayload = Boolean(
+        resolvedPayloads[index]._attackTargetKey,
+      );
       const unresolvedEffect = appliedSpellEffect(
-        resolvedPayloads[index],
+        {
+          ...resolvedPayloads[index],
+          _attackTargetKey: undefined,
+        },
         spell,
         casterLevel,
         index,
@@ -11999,7 +12287,7 @@ async function performCastSpellFromDetails({
           surface: "character-sheet",
           effect: unresolvedEffect,
           target,
-          resolvedAction: false,
+          resolvedAction: isAssignedAttackPayload,
         },
         {
           "target-decisions": async (state) => {

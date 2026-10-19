@@ -169,7 +169,7 @@ const targetModal = functionBody(sheet, "ensureSpellCastTargetModal");
 assert(targetModal.includes('"hidden.bs.modal"'));
 assert(targetModal.includes("() => next?.(selected)"));
 
-const mapApply = functionBody(map, "confirmQuickEffectTargets");
+const mapApply = functionBody(map, "applyQuickEffectTargets");
 assert(
   mapApply.indexOf("hideQuickEffectTargetsBeforeChoices") <
     mapApply.indexOf("resolveEffectChoicesForToken"),

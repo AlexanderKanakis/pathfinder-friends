@@ -45,6 +45,7 @@ const expectedNodes = [
   "resource-allocation",
   "aura-delivery",
   "targeting",
+  "attack-targeting",
   "target-decisions",
   "attack-confirmation",
     "saving-throws",
@@ -114,7 +115,7 @@ const root = path.resolve(__dirname, "..");
   const html = fs.readFileSync(path.join(root, file), "utf8");
   const decisionsAt = html.indexOf("scripts/effect-decisions.js?v=owner-1");
   const orchestratorAt = html.indexOf(
-    "scripts/effect-activation-orchestrator.js?v=3",
+    "scripts/effect-activation-orchestrator.js?v=4",
   );
   const editorAt = html.indexOf("scripts/effect-editor.js?v=");
   assert(decisionsAt >= 0, `${file} is missing effect decisions.`);

@@ -308,6 +308,7 @@
         if (rows.length) exempt[key] = rows;
       });
       if (result.action === "full") {
+        next._saveResolution = "save-failure";
         delete next.saveConfig;
         mechanicKeys().forEach((key) => {
           if (!Array.isArray(next[key])) return;
@@ -319,7 +320,11 @@
         });
       } else if (result.action === "partial") {
         next = mergeMechanics(exempt, next.saveConfig.partialMechanics);
-      } else next = exempt;
+        next._saveResolution = "partial";
+      } else {
+        next = exempt;
+        next._saveResolution = "save-success";
+      }
     }
     for (const key of mechanicKeys()) {
       const rows = Array.isArray(next[key]) ? next[key] : [];
