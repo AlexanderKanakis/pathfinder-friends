@@ -1052,14 +1052,24 @@
   // previous open must never be able to resolve a later one.
   // ---------------------------------------------------------------
   const SCALE_MODAL_ID = "sharedBonusScaleModal";
+  const SCALE_MODAL_STYLE_ID = "sharedBonusScaleModalStyles";
   let scaleModal = null;
   let scaleHideSignal = Promise.resolve();
 
   function ensureScaleModal() {
     if (document.getElementById(SCALE_MODAL_ID)) return;
+    if (!document.getElementById(SCALE_MODAL_STYLE_ID)) {
+      const style = document.createElement("style");
+      style.id = SCALE_MODAL_STYLE_ID;
+      style.textContent = `
+        .shared-bonus-scale-modal { z-index: 1105; }
+        .shared-bonus-scale-backdrop { z-index: 1100; }
+      `;
+      document.head.appendChild(style);
+    }
     const wrapper = document.createElement("div");
     wrapper.innerHTML = `
-      <div class="modal fade" id="${SCALE_MODAL_ID}" tabindex="-1" aria-hidden="true">
+      <div class="modal fade shared-bonus-scale-modal" id="${SCALE_MODAL_ID}" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
           <div class="modal-content bg-dark text-white border-secondary">
             <div class="modal-header">
@@ -1154,6 +1164,12 @@
       </div>
     `;
     document.body.appendChild(wrapper.firstElementChild);
+    document
+      .getElementById(SCALE_MODAL_ID)
+      .addEventListener("shown.bs.modal", () => {
+        const backdrops = [...document.querySelectorAll(".modal-backdrop")];
+        backdrops.at(-1)?.classList.add("shared-bonus-scale-backdrop");
+      });
     document
       .getElementById(`${SCALE_MODAL_ID}AddAttribute`)
       .addEventListener("click", () => addScaleAttributeRow());
@@ -7167,9 +7183,11 @@ function createD20BoostRow(data = {}, { onDelete, onChange } = {}) {
             ${decisionOwnerControl("Active")}
             <button id="${prefix}ActiveSave" class="btn btn-outline-info btn-sm" type="button"><i class="bi bi-shield-check me-1"></i>Save</button>
             ${auraControls("Active")}
-            <button id="${prefix}EditDuration" class="btn btn-outline-light btn-sm" type="button">Edit Duration</button>
             ${options.allowBranches === false ? "" : `<button id="${prefix}ActiveCreateBranch" class="btn btn-outline-info btn-sm" type="button">Create Branch</button>`}
-            <span id="${prefix}DurationSummary" class="small-text"></span>
+            <div class="d-flex align-items-center gap-2">
+              <button id="${prefix}EditDuration" class="btn btn-outline-light btn-sm" type="button">Edit Duration</button>
+              <span id="${prefix}DurationSummary" class="small-text"></span>
+            </div>
           </div>
         </div>
         <div id="${prefix}Active"></div>
