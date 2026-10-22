@@ -509,7 +509,6 @@
       "area": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Acid Arrow",
-    "needsReview": true,
     "attackRolls": [
       {
         "id": "attack-2",
@@ -565,8 +564,8 @@
         "conditionalVariables": [],
         "independentEffects": [
           {
-            "id": "independent-effect-3",
-            "name": "Acid Arrow",
+            "id": "independent-effect-4",
+            "name": "Arrow of Acid Lasting effect",
             "trigger": {
               "scope": "attack",
               "outcome": "success",
@@ -576,7 +575,24 @@
             "attackRolls": [],
             "d20Boosts": [],
             "damageRolls": [],
-            "periodicEffects": [],
+            "periodicEffects": [
+              {
+                "id": "periodic-1792695321962-hy9184",
+                "label": "Acid Arrow Periodic Effect",
+                "timing": "caster-turn-start",
+                "delivery": "attached",
+                "operation": "damage",
+                "ability": "",
+                "diceCount": 2,
+                "dieType": 4,
+                "diceCountMax": null,
+                "diceCountScale": null,
+                "staticValue": 0,
+                "staticValueMax": null,
+                "staticValueScale": null,
+                "damageType": "acid"
+              }
+            ],
             "weaponExtraDamage": [],
             "weaponDamageSizeChanges": [],
             "summonCreatures": [],
@@ -603,7 +619,13 @@
               "dieType": 6,
               "staticValue": 1,
               "unit": "round",
-              "factors": [],
+              "factors": [
+                {
+                  "type": "caster",
+                  "numerator": 1,
+                  "denominator": 3
+                }
+              ],
               "factorMode": "multiply"
             }
           }
@@ -667,8 +689,8 @@
           "conditionalVariables": [],
           "independentEffects": [
             {
-              "id": "independent-effect-3",
-              "name": "Acid Arrow",
+              "id": "independent-effect-4",
+              "name": "Arrow of Acid Lasting effect",
               "trigger": {
                 "scope": "attack",
                 "outcome": "success",
@@ -678,7 +700,24 @@
               "attackRolls": [],
               "d20Boosts": [],
               "damageRolls": [],
-              "periodicEffects": [],
+              "periodicEffects": [
+                {
+                  "id": "periodic-1792695321962-hy9184",
+                  "label": "Acid Arrow Periodic Effect",
+                  "timing": "caster-turn-start",
+                  "delivery": "attached",
+                  "operation": "damage",
+                  "ability": "",
+                  "diceCount": 2,
+                  "dieType": 4,
+                  "diceCountMax": null,
+                  "diceCountScale": null,
+                  "staticValue": 0,
+                  "staticValueMax": null,
+                  "staticValueScale": null,
+                  "damageType": "acid"
+                }
+              ],
               "weaponExtraDamage": [],
               "weaponDamageSizeChanges": [],
               "summonCreatures": [],
@@ -705,7 +744,13 @@
                 "dieType": 6,
                 "staticValue": 1,
                 "unit": "round",
-                "factors": [],
+                "factors": [
+                  {
+                    "type": "caster",
+                    "numerator": 1,
+                    "denominator": 3
+                  }
+                ],
                 "factorMode": "multiply"
               }
             }
@@ -737,15 +782,11 @@
       "generatedEquipment": [],
       "conditionalVariables": [],
       "durationConfig": {
-        "count": 1,
-        "unit": "round",
-        "factors": [
-          {
-            "type": "caster",
-            "numerator": 1,
-            "denominator": 3
-          }
-        ],
+        "diceCount": 0,
+        "dieType": 6,
+        "staticValue": null,
+        "unit": "variable",
+        "factors": [],
         "factorMode": "multiply"
       }
     }
