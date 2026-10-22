@@ -648,6 +648,7 @@
       );
       this.diceCountScale = null;
       this.staticValueScale = null;
+      this.formulaScaleOpen = false;
       this.modal
         .querySelector("[data-duration-add-level]")
         .addEventListener("click", () => this.addFactor({ type: "caster" }));
@@ -729,17 +730,31 @@
     }
 
     async openFormulaScale(kind) {
-      if (!window.PFEffectEditor?.openScaleModal) return;
+      if (!window.PFEffectEditor?.openScaleModal || this.formulaScaleOpen)
+        return;
+      this.formulaScaleOpen = true;
       const property = kind === "dice" ? "diceCountScale" : "staticValueScale";
       const current = this[property] || null;
-      const scale = await window.PFEffectEditor.openScaleModal(current, {
-        title: kind === "dice" ? "Duration Dice Scale" : "Duration Static Scale",
-        preserveOnCancel: true,
-      });
-      this[property] = scale || null;
-      this.syncScaleSummaries();
+      const durationModal = bootstrap.Modal.getOrCreateInstance(this.modal);
+      if (this.modal.classList.contains("show")) {
+        await new Promise((resolve) => {
+          this.modal.addEventListener("hidden.bs.modal", resolve, { once: true });
+          durationModal.hide();
+        });
+      }
+      try {
+        const scale = await window.PFEffectEditor.openScaleModal(current, {
+          title:
+            kind === "dice" ? "Duration Dice Scale" : "Duration Static Scale",
+          preserveOnCancel: true,
+        });
+        this[property] = scale || null;
+        this.syncScaleSummaries();
+      } finally {
+        durationModal.show();
+        this.formulaScaleOpen = false;
+      }
     }
-
     addFactor(factor) {
       const row = document.createElement("div");
       row.className = "row g-2 align-items-end";

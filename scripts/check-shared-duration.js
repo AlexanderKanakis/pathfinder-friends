@@ -94,6 +94,10 @@ assert(editor.includes("data-duration-split-targets"));
 assert(editor.includes("data-duration-dice-count"));
 assert(editor.includes("data-duration-scale-dice"));
 assert(editor.includes("data-duration-scale-static"));
+assert(editor.includes("this.formulaScaleOpen"));
+assert(editor.includes('this.modal.addEventListener("hidden.bs.modal", resolve'));
+assert(editor.indexOf("durationModal.hide();") < editor.indexOf("PFEffectEditor.openScaleModal"));
+assert(editor.indexOf("PFEffectEditor.openScaleModal") < editor.indexOf("durationModal.show();"));
 
 const characterSheet = fs.readFileSync(
   require.resolve("./pages/character-sheet.js"),

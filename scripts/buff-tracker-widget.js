@@ -33,6 +33,7 @@
       "conditionalVariables",
       "attackRolls",
       "damageRolls",
+      "periodicEffects",
       "d20Boosts",
     ];
 
@@ -518,6 +519,9 @@
     return Boolean(
       isCondition(effect) ||
         (Array.isArray(effect.bonuses) && effect.bonuses.length > 0) ||
+        (Array.isArray(effect._triggeredIndependentEffects) &&
+          effect._triggeredIndependentEffects.length > 0) ||
+        (window.PFEffectMechanics?.independentEffects?.(effect)?.length > 0) ||
         effect.trackActive ||
         effect.auraConfig?.enabled ||
         window.PFEffectMechanics?.hasBranches?.(effect) ||
@@ -531,6 +535,43 @@
     return String(
       effect.name || effect.conditionName || effect.condition?.name || "",
     ).trim();
+  }
+
+  function activeEffectTitle(effect = {}, tab = "") {
+    if (tab !== "condition") return String(effect.name || "Effect");
+    const appliedNames = (Array.isArray(effect.applyConditions)
+      ? effect.applyConditions
+      : []
+    )
+      .map(conditionName)
+      .filter(Boolean);
+    const names = [
+      ...new Set(
+        appliedNames.length
+          ? appliedNames
+          : isCondition(effect)
+            ? [conditionName(effect)]
+            : [],
+      ),
+    ];
+    if (!names.length) return String(effect.name || "Effect");
+    const conditionText = names.join(", ");
+    const attachedToEffect = Boolean(
+      appliedNames.length ||
+        effect.appliedCondition ||
+        effect.sourceEffectId ||
+        effect.sourceEffectTab,
+    );
+    const source = attachedToEffect
+      ? String(
+          appliedNames.length
+            ? effect.name || effect.source || ""
+            : effect.source || effect.sourceEffectName || "",
+        ).trim()
+      : "";
+    return source && source.toLowerCase() !== conditionText.toLowerCase()
+      ? `${conditionText} (${source})`
+      : conditionText;
   }
 
   function fearRank(effect = {}) {
@@ -1049,6 +1090,17 @@
       );
   }
 
+  function shouldResetPickerCache(
+    options = {},
+    currentKey = "",
+    currentRevision = "",
+  ) {
+    if (options.preservePickerCache !== true) return true;
+    const nextKey = String(options.pickerCacheKey || options.characterId || "");
+    const nextRevision = String(options.pickerCacheRevision || "");
+    return nextKey !== currentKey || nextRevision !== currentRevision;
+  }
+
   class EffectTracker {
     constructor(container, options) {
       this.container = container;
@@ -1069,6 +1121,8 @@
       this.pickerSpellPanels = {};
       this.pickerVisibleLimit = PICKER_RESULT_BATCH_SIZE;
       this.refreshGeneration = 0;
+      this.pickerCacheKey = "";
+      this.pickerCacheRevision = "";
     }
 
     async mount() {
@@ -1140,8 +1194,22 @@
     async refresh(options = this.options) {
       const generation = ++this.refreshGeneration;
       this.options = { ...this.options, ...options };
-      this.pickerEffects = [];
-      this.pickerLoadedGroups.clear();
+      const pickerCacheKey = String(
+        this.options.pickerCacheKey || this.options.characterId || "",
+      );
+      const pickerCacheRevision = String(this.options.pickerCacheRevision || "");
+      const pickerCacheChanged = shouldResetPickerCache(
+        this.options,
+        this.pickerCacheKey,
+        this.pickerCacheRevision,
+      );
+      if (pickerCacheChanged) {
+        this.pickerEffects = [];
+        this.pickerLoadedGroups.clear();
+        this.pickerSpellPanels = {};
+      }
+      this.pickerCacheKey = pickerCacheKey;
+      this.pickerCacheRevision = pickerCacheRevision;
       if (!this.options.characterId) {
         this.effects = [];
         this.active = [];
@@ -1163,11 +1231,16 @@
           ));
       if (generation !== this.refreshGeneration) return;
       this.active = Array.isArray(saved) ? saved : saved?.buffs || [];
-      this.passiveEffects = [];
+      this.passiveEffects = Array.isArray(this.options.initialPassiveEffects)
+        ? this.options.initialPassiveEffects
+        : [];
       this.updateSearchVisibility();
       this.renderResults();
       this.renderActive();
-      if (this.options.loadPassiveEffects) {
+      if (
+        this.options.loadPassiveEffects &&
+        !Array.isArray(this.options.initialPassiveEffects)
+      ) {
         const loadPassives = async () => {
           try {
             const passives = await this.options.loadPassiveEffects();
@@ -2291,6 +2364,85 @@
       );
     }
 
+    prepareIndependentEffect(child = {}, parent = {}, casterLevel = 1, casterContext = {}) {
+      const effect = {
+        ...child,
+        category: child.category || parent.category,
+        source: child.source || parent.name || parent.source || "Effect",
+        sourceType: child.sourceType || parent.sourceType,
+        sourceTokenId: child.sourceTokenId || parent.sourceTokenId,
+        durationAnchorTokenId:
+          child.durationAnchorTokenId || parent.durationAnchorTokenId,
+        saveDc: child.saveDc ?? parent.saveDc,
+        casterLevel: child.casterLevel || parent.casterLevel || casterLevel,
+      };
+      const trackedTurns = conditionUsesTurns(effect);
+      const calculatedDuration = trackedTurns
+        ? Math.max(1, Number(effect.turns || 1))
+        : parseDuration(effect, { ...casterContext, casterLevel });
+      const baseDurationLabel = durationLabel(effect);
+      return {
+        ...effect,
+        turns: trackedTurns ? calculatedDuration : undefined,
+        permanent: Boolean(effect.permanent),
+        remaining: effect.permanent ? null : calculatedDuration,
+        computedDuration: calculatedDuration,
+        durationLabel: effect.permanent
+          ? "Permanent"
+          : calculatedDuration === null
+            ? baseDurationLabel
+            : `${baseDurationLabel} | ${formatDurationRounds(calculatedDuration)}`,
+      };
+    }
+
+    async resolveIndependentEffect(child, parent, casterLevel, casterContext) {
+      let effect = this.prepareIndependentEffect(
+        child,
+        parent,
+        casterLevel,
+        casterContext,
+      );
+      if (window.PFEffectActivationOrchestrator?.targetMustAnswer?.(effect)) {
+        effect =
+          this.options.isOwnCharacter === false
+            ? await this.requestEffectChoice(effect)
+            : await this.resolveActivationDecisions(effect, casterContext);
+      } else {
+        effect = await this.resolveActivationDecisions(effect, casterContext);
+      }
+      if (!effect) return null;
+      if (window.PFEffectSaves?.hasImmediateSave?.(effect)) {
+        effect = await window.PFEffectSaves.resolve(effect, {
+          sheet:
+            this.options.targetSheet?.() ||
+            window.PFCharacterSheetBridge?.currentSheetSnapshot?.() ||
+            {},
+          title: effect.name || parent.name || "Effect",
+          targetName: this.options.targetName || "This character",
+        });
+        if (!effect) return null;
+      }
+      effect = await this.resolveAttackRolls(effect, casterLevel, casterContext);
+      if (!effect) return null;
+      effect = await this.resolveDamageRolls(effect, casterLevel, casterContext);
+      if (!effect) return null;
+      effect = await this.resolveConditionAdjustments(
+        effect,
+        casterLevel,
+        casterContext,
+      );
+      if (!effect) return null;
+      effect = await this.resolveHealingRolls(effect, casterLevel, casterContext);
+      if (!effect) return null;
+      const {
+        attackRolls: _attackRolls,
+        damageRolls: _damageRolls,
+        castRollContext: _castRollContext,
+        ...persistable
+      } = effect;
+      return persistable;
+    }
+
     async resolveActivationDecisions(effect, casterAttributeContext = {}) {
       let resolvedEffect = effect;
       if (window.PFEffectMechanics?.hasContributionOptions?.(resolvedEffect)) {
@@ -2447,26 +2599,52 @@
       );
     }
 
-    async persistActivationEffect(finalizedEffect, selection = {}) {
-      await this.options.onHealingApply?.(finalizedEffect);
-      const restoration = window.PFConditionConfig?.applyRestorations?.(
-        this.active,
+    async persistActivationEffect(
+      finalizedEffect,
+      selection = {},
+      casterLevel = 1,
+      casterContext = {},
+    ) {
+      const separated = window.PFEffectMechanics?.separateIndependentEffects?.(
         finalizedEffect,
-      );
-      if (restoration) {
-        this.active = restoration.activeEffects;
-        finalizedEffect = restoration.effect;
+      ) || { parent: finalizedEffect, children: [] };
+      const candidates = [];
+      if (hasPersistentEffectMechanics(separated.parent))
+        candidates.push(separated.parent);
+      for (const child of separated.children) {
+        const resolved = await this.resolveIndependentEffect(
+          child,
+          finalizedEffect,
+          casterLevel,
+          casterContext,
+        );
+        if (resolved && hasPersistentEffectMechanics(resolved))
+          candidates.push(resolved);
       }
-      if (!hasPersistentEffectMechanics(finalizedEffect)) {
+      const activeEffects = [];
+      for (let candidate of candidates) {
+        await this.options.onHealingApply?.(candidate);
+        const restoration = window.PFConditionConfig?.applyRestorations?.(
+          this.active,
+          candidate,
+        );
+        if (restoration) {
+          this.active = restoration.activeEffects;
+          candidate = restoration.effect;
+        }
+        if (!hasPersistentEffectMechanics(candidate)) continue;
+        activeEffects.push(...(await this.expandAppliedConditions(candidate)));
+      }
+      if (!activeEffects.length) {
         this.renderActive();
         this.notifyChange({ collectionChanged: true });
         this.queueSave();
         this.finishPicker();
         return true;
       }
-      let activeEffects = await this.expandAppliedConditions(finalizedEffect);
+      let persistedEffects = activeEffects;
       if (selection.runtime && typeof selection.runtime === "object") {
-        activeEffects = activeEffects.map((nextEffect) => ({
+        persistedEffects = activeEffects.map((nextEffect) => ({
           ...nextEffect,
           ...selection.runtime,
           selectedBranchId: nextEffect.selectedBranchId,
@@ -2475,7 +2653,7 @@
         }));
       }
       if (Number.isInteger(selection.replaceIndex)) {
-        this.active.splice(selection.replaceIndex, 1, ...activeEffects);
+        this.active.splice(selection.replaceIndex, 1, ...persistedEffects);
       } else {
         if (finalizedEffect.activationGroup) {
           const sourceId = String(finalizedEffect.activationSourceId || "");
@@ -2487,11 +2665,11 @@
               ),
           );
         }
-        for (const nextEffect of activeEffects) {
+        for (const nextEffect of persistedEffects) {
           await this.addActiveEffectWithFearEscalation(nextEffect);
         }
       }
-      this.showActiveEffectCategory(activeEffects[0] || finalizedEffect);
+      this.showActiveEffectCategory(persistedEffects[0] || finalizedEffect);
       this.renderActive();
       this.notifyChange({ collectionChanged: true });
       this.queueSave();
@@ -2516,6 +2694,22 @@
       );
       const permanent = Boolean(selection.permanent);
       const trackedTurns = conditionUsesTurns(effect);
+      const spellCalculations = effect.spellCalculations || null;
+      const baseAttributeContext =
+        effect.attributeScaleContext || effect.abilityContext || {};
+      const casterAttributeContext = {
+        ...baseAttributeContext,
+        castingAbility:
+          spellCalculations?.castingAbility ||
+          baseAttributeContext.castingAbility ||
+          "",
+        castingAbilityMod: Number(
+          spellCalculations?.castingAbilityMod ??
+            baseAttributeContext.castingAbilityMod ??
+            0,
+        ),
+        spellCalculations,
+      };
       const durationArg = {
         ...casterAttributeContext,
         ...(effect.fromAbility ? effect.abilityContext || {} : {}),
@@ -2544,22 +2738,6 @@
       // in here, BEFORE the choice is resolved, so a request sent to
       // another player (see requestEffectChoice) only ever needs them to
       // answer "which skill/target", never redo any of this.
-      const spellCalculations = effect.spellCalculations || null;
-      const baseAttributeContext =
-        effect.attributeScaleContext || effect.abilityContext || {};
-      const casterAttributeContext = {
-        ...baseAttributeContext,
-        castingAbility:
-          spellCalculations?.castingAbility ||
-          baseAttributeContext.castingAbility ||
-          "",
-        castingAbilityMod: Number(
-          spellCalculations?.castingAbilityMod ??
-            baseAttributeContext.castingAbilityMod ??
-            0,
-        ),
-        spellCalculations,
-      };
       const {
         fromAbility,
         abilityContext,
@@ -2666,7 +2844,7 @@
             if (
               state.targetedAura ||
               Number.isInteger(selection.replaceIndex) ||
-              !window.PFEffectSaves?.hasSave?.(state.effect)
+              !window.PFEffectSaves?.hasImmediateSave?.(state.effect)
             )
               return state;
             const resolved = await window.PFEffectSaves.resolve(state.effect, {
@@ -2763,6 +2941,8 @@
             return (await this.persistActivationEffect(
               finalizedEffect,
               selection,
+              casterLevel,
+              casterAttributeContext,
             ))
               ? { ...state, effect: finalizedEffect, applied: true }
               : null;
@@ -3031,7 +3211,7 @@
           <article class="effect-tracker-active">
             <div class="effect-active-head">
               <div>
-                <strong>${escapeHtml(effect.name)}</strong>
+                <strong>${escapeHtml(activeEffectTitle(effect, this.activeTypeFilter))}</strong>
                 <div class="small-text">${escapeHtml(activeDuration(effect))}</div>
                 ${passive ? "" : this.activeAdjustmentControls(effect, index)}
               </div>
@@ -3108,6 +3288,8 @@
 
   window.PFEffectTracker = {
     sourceGroup: effectSourceGroup,
+    activeTitle: activeEffectTitle,
+    shouldResetPickerCache,
     preferOwnedPickerEffects,
     browser: {
       groups: EFFECT_BROWSER_GROUPS.map(([value, label]) => ({ value, label })),

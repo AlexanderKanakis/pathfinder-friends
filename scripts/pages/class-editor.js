@@ -7,6 +7,7 @@ let poolCatalogs = [];
 let dirty = false;
 let decisionsOnly = false;
 let aurasOnly = false;
+let summonsOnly = false;
 
 const CLASS_GROUPS = [
   ["core", "Core"],
@@ -605,6 +606,7 @@ function filteredClassIndexes() {
       ({ entry }) =>
         (!decisionsOnly || classHasDecision(entry)) &&
         (!aurasOnly || classHasAura(entry)) &&
+        (!summonsOnly || classHasSummon(entry)) &&
         (!term ||
           String(entry.name || "")
             .toLowerCase()
@@ -741,6 +743,25 @@ function classHasAura(cls) {
   return (cls.levelProgression || []).some((level) =>
     (level.classFeatures || []).some((feature) =>
       classFeatureHasAura(cls, feature),
+    ),
+  );
+}
+
+function classFeatureHasSummon(cls, feature) {
+  return (
+    window.PFSummonCreatures.hasSummon(feature) ||
+    featurePools(feature, cls).some((pool) =>
+      window.PFSummonCreatures.hasSummon(pool),
+    )
+  );
+}
+
+function classHasSummon(cls) {
+  const { __classFeaturePoolCatalogs: _catalogs, ...definition } = cls;
+  if (window.PFSummonCreatures.hasSummon(definition)) return true;
+  return (cls.levelProgression || []).some((level) =>
+    (level.classFeatures || []).some((feature) =>
+      classFeatureHasSummon(cls, feature),
     ),
   );
 }
@@ -953,8 +974,13 @@ function renderLevelCard(level, index) {
   const levelHasAura = features.some((feature) =>
     classFeatureHasAura(cls, feature),
   );
+  const levelHasSummon = features.some((feature) =>
+    classFeatureHasSummon(cls, feature),
+  );
   const levelHidden =
-    (decisionsOnly && !levelHasDecision) || (aurasOnly && !levelHasAura);
+    (decisionsOnly && !levelHasDecision) ||
+    (aurasOnly && !levelHasAura) ||
+    (summonsOnly && !levelHasSummon);
   return `
     <article class="level-card ${levelHidden ? "d-none" : ""}" data-level-index="${index}">
       <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
@@ -974,7 +1000,7 @@ function renderLevelCard(level, index) {
           features
             .map(
               (feature, featureIndex) => `
-          <div class="feature-row ${(decisionsOnly && !classFeatureHasDecision(cls, feature)) || (aurasOnly && !classFeatureHasAura(cls, feature)) ? "d-none" : ""}">
+          <div class="feature-row ${(decisionsOnly && !classFeatureHasDecision(cls, feature)) || (aurasOnly && !classFeatureHasAura(cls, feature)) || (summonsOnly && !classFeatureHasSummon(cls, feature)) ? "d-none" : ""}">
             <div>
               <strong>${escapeHtml(feature.name || "Class Feature")}</strong>
               <div class="small-text">${escapeHtml(String(feature.description || "").slice(0, 180))}${String(feature.description || "").length > 180 ? "..." : ""}</div>
@@ -1208,6 +1234,14 @@ window.PFEffectDecisions.bindFilterButton(
 window.PFEffectDecisions.bindFilterButton(el("classAuraFilter"), (active) => {
   commitSelectedClass();
   aurasOnly = active;
+  const indexes = filteredClassIndexes();
+  if (!indexes.includes(selectedIndex)) selectedIndex = indexes[0] ?? -1;
+  renderClassList();
+  renderSelectedClass();
+});
+window.PFEffectDecisions.bindFilterButton(el("classSummonFilter"), (active) => {
+  commitSelectedClass();
+  summonsOnly = active;
   const indexes = filteredClassIndexes();
   if (!indexes.includes(selectedIndex)) selectedIndex = indexes[0] ?? -1;
   renderClassList();

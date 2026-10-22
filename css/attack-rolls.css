@@ -27,6 +27,17 @@
   font-weight: 400;
 }
 
+.attack-roll-target {
+  margin-top: 4px;
+  color: #aaa;
+  font-size: 12px;
+}
+
+.attack-roll-target strong {
+  color: #fff;
+  font-weight: 600;
+}
+
 .attack-roll-die-value {
   color: #f0d58c;
   font-size: 46px;
@@ -82,10 +93,14 @@
   align-items: center;
   gap: 7px;
   margin-top: 12px;
-  padding: 6px 12px;
-  border: 1px solid #666;
-  border-radius: 5px;
+  padding: 4px;
   cursor: pointer;
+}
+
+.attack-roll-hit .form-check-input {
+  float: none;
+  flex: 0 0 auto;
+  margin: 0;
 }
 
 @keyframes attack-roll-pulse {

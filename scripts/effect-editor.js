@@ -1613,6 +1613,19 @@
                 <button id="${AURA_DETAILS_MODAL_ID}Scale" class="btn btn-outline-info btn-sm" type="button">Range Scaling</button>
                 <span id="${AURA_DETAILS_MODAL_ID}ScaleSummary" class="small text-secondary"></span>
               </div>
+              <div class="row g-2 mb-3">
+                <div class="col-sm-6">
+                  <label for="${AURA_DETAILS_MODAL_ID}Volume" class="form-label">3D Volume</label>
+                  <select id="${AURA_DETAILS_MODAL_ID}Volume" class="form-select form-select-sm">
+                    <option value="sphere">Sphere</option>
+                    <option value="cylinder">Cylinder</option>
+                  </select>
+                </div>
+                <div id="${AURA_DETAILS_MODAL_ID}HeightWrap" class="col-sm-6 d-none">
+                  <label for="${AURA_DETAILS_MODAL_ID}Height" class="form-label">Height (ft.)</label>
+                  <input id="${AURA_DETAILS_MODAL_ID}Height" class="form-control form-control-sm" type="number" min="5" step="5" value="10">
+                </div>
+              </div>
               <div class="mb-3">
                 <label class="form-label">Texture</label>
                 <div id="${AURA_DETAILS_MODAL_ID}TexturePicker" class="aura-texture-picker" role="group" aria-label="Aura texture">
@@ -1712,6 +1725,12 @@
     specialVision.addEventListener("change", () => {
       if (specialVision.checked) light.checked = false;
     });
+    const volume = document.getElementById(`${AURA_DETAILS_MODAL_ID}Volume`);
+    volume.addEventListener("change", () => {
+      document
+        .getElementById(`${AURA_DETAILS_MODAL_ID}HeightWrap`)
+        .classList.toggle("d-none", volume.value !== "cylinder");
+    });
   }
 
   function openAuraDetailsModal(existingConfig = {}, { allowTargetsEmit = false } = {}) {
@@ -1725,6 +1744,15 @@
           );
           const textureUrl = document.getElementById(
             `${AURA_DETAILS_MODAL_ID}TextureUrl`,
+          );
+          const volume = document.getElementById(
+            `${AURA_DETAILS_MODAL_ID}Volume`,
+          );
+          const heightWrap = document.getElementById(
+            `${AURA_DETAILS_MODAL_ID}HeightWrap`,
+          );
+          const heightInput = document.getElementById(
+            `${AURA_DETAILS_MODAL_ID}Height`,
           );
           const affectsSource = document.getElementById(
             `${AURA_DETAILS_MODAL_ID}AffectsSource`,
@@ -1757,6 +1785,14 @@
             `${AURA_DETAILS_MODAL_ID}LingerSummary`,
           );
           rangeInput.value = Math.max(5, Number(existingConfig.rangeFeet || 5));
+          volume.value = existingConfig.volumeShape === "cylinder"
+            ? "cylinder"
+            : "sphere";
+          heightInput.value = Math.max(
+            5,
+            Number(existingConfig.heightFeet || Number(rangeInput.value) * 2),
+          );
+          heightWrap.classList.toggle("d-none", volume.value !== "cylinder");
           textureUrl.value = String(existingConfig.textureUrl || "");
           syncAuraTexturePicker(textureUrl.value);
           affectsSource.checked = Boolean(existingConfig.affectsSource);
@@ -1820,6 +1856,10 @@
             settle({
               enabled: true,
               rangeFeet: Math.max(5, Number(rangeInput.value || 5)),
+              volumeShape: volume.value === "cylinder" ? "cylinder" : "sphere",
+              ...(volume.value === "cylinder"
+                ? { heightFeet: Math.max(5, Number(heightInput.value || 5)) }
+                : {}),
               ...(rangeScale ? { rangeScale } : {}),
               ...(textureUrl.value.trim()
                 ? { textureUrl: textureUrl.value.trim() }
@@ -5533,6 +5573,7 @@ function damageProfileMarkup(data = {}, { conditional = false } = {}) {
         <div><label>Maximum Dice</label>${numberStepperMarkup({ id: "damage-dice-max", value: maximum(data.diceCountMax), min: 0, inputAttributes: 'data-damage-field="diceCountMax" placeholder="No maximum"', label: "maximum damage dice" })}</div>
         <div><label>Static Damage</label>${numberStepperMarkup({ id: "damage-static", value: Number(data.staticDamage || 0), inputAttributes: 'data-damage-field="staticDamage"', label: "static damage" })}</div>
         <div><label>Maximum Static</label>${numberStepperMarkup({ id: "damage-static-max", value: maximum(data.staticDamageMax), min: 0, inputAttributes: 'data-damage-field="staticDamageMax" placeholder="No maximum"', label: "maximum static damage" })}</div>
+        <div><label>Denominator</label>${numberStepperMarkup({ id: "damage-denominator", value: Math.max(1, Number(data.damageDenominator || 1)), min: 1, inputAttributes: 'data-damage-field="damageDenominator"', label: "damage denominator" })}</div>
         <div><label>Damage Type</label><input class="form-control form-control-sm" list="sharedDamageTypes" data-damage-field="damageType" value="${escapeHtml(data.damageType || "untyped")}" placeholder="fire"></div>
       </div>
       <div class="shared-damage-scale-row">
@@ -5581,10 +5622,79 @@ function collectDamageProfile(profile, { conditional = false } = {}) {
     diceCountMax: optionalNumber("diceCountMax"),
     staticDamage: Number(value("staticDamage")) || 0,
     staticDamageMax: optionalNumber("staticDamageMax"),
+    damageDenominator: Math.max(1, Number(value("damageDenominator")) || 1),
     damageType: value("damageType").trim() || "untyped",
     diceCountScale: diceHost?._bonusScale || null,
     staticDamageScale: staticHost?._bonusScale || null,
   };
+}
+
+function createPeriodicEffectRow(data = {}, { onDelete, onChange } = {}) {
+  const normalized = window.PFPeriodicEffects?.normalize?.(data) || data;
+  const row = document.createElement("div");
+  row.className = "shared-periodic-effect-row";
+  row.innerHTML = `
+    <div class="shared-damage-roll-heading">
+      <div><label>Name</label><input class="form-control form-control-sm" data-periodic-field="label" value="${escapeHtml(normalized.label || "Periodic Effect")}"></div>
+      <div class="shared-mechanic-row-actions"><button class="btn btn-outline-danger btn-sm btn-icon" type="button" data-delete-periodic aria-label="Delete periodic effect"><i class="bi bi-trash"></i></button></div>
+    </div>
+    <div class="shared-damage-profile-grid mb-2">
+      <div><label>Operation</label><select class="form-select form-select-sm" data-periodic-field="operation"><option value="damage">HP Damage</option><option value="healing">Healing</option><option value="ability-damage">Ability Damage</option><option value="ability-drain">Ability Drain</option></select></div>
+      <div><label>Timing</label><select class="form-select form-select-sm" data-periodic-field="timing"><option value="target-turn-start">Beginning of target turn</option><option value="target-turn-end">End of target turn</option><option value="caster-turn-start">Beginning of caster turn</option><option value="caster-turn-end">End of caster turn</option></select></div>
+      <div><label>Delivery</label><select class="form-select form-select-sm" data-periodic-field="delivery"><option value="attached">Attached effect</option><option value="area">Aura occupants only</option></select></div>
+      <div data-periodic-ability><label>Ability</label><select class="form-select form-select-sm" data-periodic-field="ability">${(window.PFConditionConfig?.CONCRETE_ABILITIES || [["strength", "Strength"], ["dexterity", "Dexterity"], ["constitution", "Constitution"], ["intelligence", "Intelligence"], ["wisdom", "Wisdom"], ["charisma", "Charisma"]]).map(([value, label]) => `<option value="${value}">${label}</option>`).join("")}</select></div>
+    </div>
+    <div data-periodic-formula>${damageProfileMarkup({ ...normalized, staticDamage: normalized.staticValue, staticDamageMax: normalized.staticValueMax })}</div>`;
+  row.querySelector('[data-periodic-field="operation"]').value = normalized.operation || "damage";
+  row.querySelector('[data-periodic-field="timing"]').value = normalized.timing || "target-turn-end";
+  row.querySelector('[data-periodic-field="delivery"]').value = normalized.delivery || "attached";
+  row.querySelector('[data-periodic-field="ability"]').value = normalized.ability || "strength";
+  const profile = row.querySelector("[data-damage-profile]");
+  profile.querySelector(".small.text-secondary")?.remove();
+  profile.querySelector('[data-damage-field="damageDenominator"]')?.closest("div")?.remove();
+  wireDamageProfile(profile, {
+    ...normalized,
+    staticDamageScale: normalized.staticValueScale,
+  });
+  const sync = () => {
+    const operation = row.querySelector('[data-periodic-field="operation"]').value;
+    row.querySelector("[data-periodic-ability]").classList.toggle(
+      "d-none",
+      !["ability-damage", "ability-drain"].includes(operation),
+    );
+    const damageType = profile.querySelector('[data-damage-field="damageType"]')?.closest("div");
+    damageType?.classList.toggle("d-none", operation !== "damage");
+  };
+  row.querySelector("[data-delete-periodic]").addEventListener("click", () => {
+    row.remove();
+    onDelete?.();
+  });
+  row.addEventListener("input", () => onChange?.());
+  row.addEventListener("change", () => {
+    sync();
+    onChange?.();
+  });
+  row._collect = () => {
+    const damage = collectDamageProfile(profile);
+    return window.PFPeriodicEffects?.normalize?.({
+      id: normalized.id,
+      label: row.querySelector('[data-periodic-field="label"]').value,
+      operation: row.querySelector('[data-periodic-field="operation"]').value,
+      timing: row.querySelector('[data-periodic-field="timing"]').value,
+      delivery: row.querySelector('[data-periodic-field="delivery"]').value,
+      ability: row.querySelector('[data-periodic-field="ability"]').value,
+      diceCount: damage.diceCount,
+      dieType: damage.dieType,
+      diceCountMax: damage.diceCountMax,
+      diceCountScale: damage.diceCountScale,
+      staticValue: damage.staticDamage,
+      staticValueMax: damage.staticDamageMax,
+      staticValueScale: damage.staticDamageScale,
+      damageType: damage.damageType,
+    });
+  };
+  sync();
+  return { element: row, collect: row._collect };
 }
 
 function createDamageRollRow(data = {}, { onDelete, onChange } = {}) {
@@ -5647,7 +5757,7 @@ let independentEffectEditorSequence = 0;
 function mountIndependentEffects(container, options = {}) {
   const rows = [];
   const trigger = options.trigger || { scope: "main", outcome: "applied" };
-  let triggerVisible = Boolean(options.triggerVisible);
+  let triggerEnabled = Boolean(options.triggerVisible);
   const add = (data = {}) => {
     const sequence = ++independentEffectEditorSequence;
     const id = String(data.id || `independent-effect-${sequence}`);
@@ -5655,9 +5765,9 @@ function mountIndependentEffects(container, options = {}) {
     row.className = "shared-independent-effect";
     const selectedOutcome = String(data.trigger?.outcome || trigger.outcome || "applied");
     const outcomeControl = trigger.scope === "main"
-      ? `<div data-independent-trigger-wrap class="${triggerVisible ? "" : "d-none"}"><label>Trigger</label><select class="form-select form-select-sm" data-independent-outcome><option value="applied"${selectedOutcome === "applied" ? " selected" : ""}>Main effect applies</option><option value="save-failure"${selectedOutcome === "save-failure" ? " selected" : ""}>Main save fails</option><option value="save-success"${selectedOutcome === "save-success" ? " selected" : ""}>Main save succeeds</option><option value="partial"${selectedOutcome === "partial" ? " selected" : ""}>Main partial applies</option></select></div>`
+      ? `<div data-independent-trigger-wrap><label>Trigger</label><select class="form-select form-select-sm" data-independent-outcome${triggerEnabled ? "" : " disabled"}><option value="applied"${selectedOutcome === "applied" ? " selected" : ""}>Main effect applies</option><option value="save-failure"${selectedOutcome === "save-failure" ? " selected" : ""}>Main save fails</option><option value="save-success"${selectedOutcome === "save-success" ? " selected" : ""}>Main save succeeds</option><option value="partial"${selectedOutcome === "partial" ? " selected" : ""}>Main partial applies</option></select><div class="small-text${triggerEnabled ? " d-none" : ""}" data-independent-trigger-note>Configure the main Save to choose a save outcome.</div></div>`
       : "";
-    row.innerHTML = `<div class="shared-independent-effect-header${triggerVisible && trigger.scope === "main" ? " has-trigger" : ""}"><div><label>Name</label><input class="form-control form-control-sm" data-independent-name value="${escapeHtml(data.name || "Independent Effect")}"></div>${outcomeControl}<button class="btn btn-outline-danger btn-sm btn-icon" type="button" data-delete-independent aria-label="Delete independent effect"><i class="bi bi-trash"></i></button></div><div data-independent-mechanics></div>`;
+    row.innerHTML = `<div class="shared-independent-effect-header${trigger.scope === "main" ? " has-trigger" : ""}"><div><label>Name</label><input class="form-control form-control-sm" data-independent-name value="${escapeHtml(data.name || "Independent Effect")}"></div>${outcomeControl}<button class="btn btn-outline-danger btn-sm btn-icon" type="button" data-delete-independent aria-label="Delete independent effect"><i class="bi bi-trash"></i></button></div><div data-independent-mechanics></div>`;
     container.appendChild(row);
     const editor = mountMechanicGroups(row.querySelector("[data-independent-mechanics]"), {
       ...options,
@@ -5685,15 +5795,13 @@ function mountIndependentEffects(container, options = {}) {
     (window.PFEffectMechanics?.independentEffects?.(item) || []).forEach(add);
   };
   const setTriggerVisible = (visible) => {
-    triggerVisible = trigger.scope === "main" && Boolean(visible);
+    triggerEnabled = trigger.scope === "main" && Boolean(visible);
     rows.forEach(({ row }) => {
-      row.querySelector("[data-independent-trigger-wrap]")?.classList.toggle(
+      const select = row.querySelector("[data-independent-outcome]");
+      if (select) select.disabled = !triggerEnabled;
+      row.querySelector("[data-independent-trigger-note]")?.classList.toggle(
         "d-none",
-        !triggerVisible,
-      );
-      row.querySelector(".shared-independent-effect-header")?.classList.toggle(
-        "has-trigger",
-        triggerVisible,
+        triggerEnabled,
       );
     });
   };
@@ -5780,7 +5888,7 @@ function createAttackRollRow(
         <span class="form-check-label">Multiple Targets</span>
       </label>
     </div>
-    <div class="shared-attack-payload-heading"><span>On Success</span>${allowIndependentEffects ? `<button class="btn btn-outline-info btn-sm" type="button" data-add-attack-independent>Independent Effect</button>` : ""}</div>
+    <div class="shared-attack-payload-heading"><span>On Success</span>${allowIndependentEffects ? `<button class="btn btn-outline-info btn-sm" type="button" data-add-attack-independent>Add Independent Effect</button>` : ""}</div>
     <div data-attack-payload></div>
     <div data-attack-independent-effects></div>`;
 
@@ -6018,6 +6126,13 @@ function createD20BoostRow(data = {}, { onDelete, onChange } = {}) {
             </div>
             <div class="shared-extra-subsection">
               <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
+                <div class="small text-secondary">Periodic Effects</div>
+                <button id="${prefix}AddPeriodicEffect" class="btn btn-outline-info btn-sm" type="button">Add Periodic Effect</button>
+              </div>
+              <div id="${prefix}PeriodicEffectRows" class="vstack gap-2"></div>
+            </div>
+            <div class="shared-extra-subsection">
+              <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
                 <div class="small text-secondary">Equipped Weapon Extra Damage</div>
                 <button id="${prefix}AddWeaponExtraDamage" class="btn btn-outline-info btn-sm" type="button">Add Weapon Damage</button>
               </div>
@@ -6176,6 +6291,7 @@ function createD20BoostRow(data = {}, { onDelete, onChange } = {}) {
     const attackRollRowsEl = document.getElementById(`${prefix}AttackRollRows`);
     const d20BoostRowsEl = document.getElementById(`${prefix}D20BoostRows`);
     const damageRollRowsEl = document.getElementById(`${prefix}DamageRollRows`);
+    const periodicEffectRowsEl = document.getElementById(`${prefix}PeriodicEffectRows`);
     const weaponExtraDamageRowsEl = document.getElementById(
       `${prefix}WeaponExtraDamageRows`,
     );
@@ -6233,6 +6349,7 @@ function createD20BoostRow(data = {}, { onDelete, onChange } = {}) {
         (attackRollRowsEl?.children.length || 0) +
         d20BoostRowsEl.children.length +
         damageRollRowsEl.children.length +
+        periodicEffectRowsEl.children.length +
         weaponExtraDamageRowsEl.children.length +
         weaponDamageSizeRowsEl.children.length +
         summonCreatureRowsEl.children.length +
@@ -6334,6 +6451,14 @@ function createD20BoostRow(data = {}, { onDelete, onChange } = {}) {
         onChange: updateCount,
       });
       appendSavedRow(damageRollRowsEl, element, data);
+      updateCount();
+    };
+    const addPeriodicEffect = (data = {}) => {
+      const { element } = createPeriodicEffectRow(data, {
+        onDelete: updateCount,
+        onChange: updateCount,
+      });
+      appendSavedRow(periodicEffectRowsEl, element, data);
       updateCount();
     };
     const addD20Boost = (data = {}) => {
@@ -6510,6 +6635,9 @@ function createD20BoostRow(data = {}, { onDelete, onChange } = {}) {
     document
       .getElementById(`${prefix}AddDamageRoll`)
       .addEventListener("click", () => addDamageRoll());
+    document
+      .getElementById(`${prefix}AddPeriodicEffect`)
+      .addEventListener("click", () => addPeriodicEffect());
     document.getElementById(`${prefix}AddD20Boost`).addEventListener("click", () => addD20Boost());
     document
       .getElementById(`${prefix}AddWeaponExtraDamage`)
@@ -6582,6 +6710,7 @@ function createD20BoostRow(data = {}, { onDelete, onChange } = {}) {
       addAttackRoll,
       addD20Boost,
       addDamageRoll,
+      addPeriodicEffect,
       addWeaponExtraDamage,
       addWeaponDamageSize,
       addSummonCreatures,
@@ -6635,6 +6764,9 @@ function createD20BoostRow(data = {}, { onDelete, onChange } = {}) {
         (Array.isArray(item.d20Boosts) ? item.d20Boosts : []).forEach(addD20Boost);
         (Array.isArray(item.damageRolls) ? item.damageRolls : []).forEach(
           addDamageRoll,
+        );
+        (Array.isArray(item.periodicEffects) ? item.periodicEffects : []).forEach(
+          addPeriodicEffect,
         );
         (Array.isArray(item.weaponExtraDamage)
           ? item.weaponExtraDamage
@@ -6722,6 +6854,7 @@ function createD20BoostRow(data = {}, { onDelete, onChange } = {}) {
           attackRolls: attackRollRowsEl ? collectRows(attackRollRowsEl) : [],
           d20Boosts: collectRows(d20BoostRowsEl),
           damageRolls: collectRows(damageRollRowsEl),
+          periodicEffects: collectRows(periodicEffectRowsEl),
           weaponExtraDamage: collectRows(weaponExtraDamageRowsEl),
           weaponDamageSizeChanges: collectRows(weaponDamageSizeRowsEl),
           summonCreatures: collectRows(summonCreatureRowsEl),
@@ -7035,13 +7168,18 @@ function createD20BoostRow(data = {}, { onDelete, onChange } = {}) {
             <button id="${prefix}ActiveSave" class="btn btn-outline-info btn-sm" type="button"><i class="bi bi-shield-check me-1"></i>Save</button>
             ${auraControls("Active")}
             <button id="${prefix}EditDuration" class="btn btn-outline-light btn-sm" type="button">Edit Duration</button>
-            ${options.allowIndependentEffects === false ? "" : `<button id="${prefix}ActiveCreateIndependent" class="btn btn-outline-info btn-sm" type="button">Independent Effect</button>`}
             ${options.allowBranches === false ? "" : `<button id="${prefix}ActiveCreateBranch" class="btn btn-outline-info btn-sm" type="button">Create Branch</button>`}
             <span id="${prefix}DurationSummary" class="small-text"></span>
           </div>
         </div>
         <div id="${prefix}Active"></div>
-        <div id="${prefix}ActiveIndependentEffects"></div>
+        ${options.allowIndependentEffects === false ? "" : `<section class="shared-independent-effects-section">
+          <div class="shared-independent-effects-heading">
+            <strong>Independent Effects</strong>
+            <button id="${prefix}ActiveCreateIndependent" class="btn btn-outline-info btn-sm" type="button">Add Independent Effect</button>
+          </div>
+          <div id="${prefix}ActiveIndependentEffects"></div>
+        </section>`}
       </section>`;
 
     const newBranchId = () =>
@@ -7244,6 +7382,15 @@ function createD20BoostRow(data = {}, { onDelete, onChange } = {}) {
       auraConfigs[group] = {
         enabled: true,
         rangeFeet: Math.max(5, Number(config?.rangeFeet || 5)),
+        volumeShape: config?.volumeShape === "cylinder" ? "cylinder" : "sphere",
+        ...(config?.volumeShape === "cylinder"
+          ? {
+              heightFeet: Math.max(
+                5,
+                Number(config?.heightFeet || Number(config?.rangeFeet || 5) * 2),
+              ),
+            }
+          : {}),
         ...(config?.rangeScale ? { rangeScale: config.rangeScale } : {}),
         ...(String(config?.textureUrl || "").trim()
           ? { textureUrl: String(config.textureUrl).trim() }

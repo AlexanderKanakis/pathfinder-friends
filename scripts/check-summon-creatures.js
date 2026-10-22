@@ -26,6 +26,20 @@ const monsters = [
     skills: [{ name: "Perception", bonus: 4 }],
     weapons: [],
   },
+  {
+    name: "Wolf",
+    url: "wolf",
+    creatureType: "animal",
+    size: "Medium",
+    hpText: "13 (2d8+4)",
+  },
+  {
+    name: "Goblin",
+    url: "goblin",
+    creatureType: "humanoid",
+    size: "Small",
+    hpText: "6 (1d10+1)",
+  },
 ];
 
 global.fetch = async () => ({ ok: true, json: async () => monsters });
@@ -42,7 +56,11 @@ const decisions = require("./effect-decisions.js");
   const config = summons.normalize({
     countMode: "fixed",
     count: 2,
-    monsterKeys: ["dire-rat"],
+    selector: {
+      mode: "custom",
+      monsterKeys: ["dire-rat"],
+      filters: [],
+    },
   });
   assert.equal(config.countMode, "fixed");
   assert.equal(config.countMax, null);
@@ -76,25 +94,62 @@ const decisions = require("./effect-decisions.js");
 
   assert.deepEqual(
     summons.availableMonsters(
-      { sourceMode: "size", sizeOperator: "eq", sizeValue: "Small" },
+      {
+        selector: {
+          mode: "filtered",
+          monsterKeys: [],
+          filters: [{ kind: "size", operator: "eq", value: "Small" }],
+        },
+      },
       monsters,
     ).map((monster) => monster.name),
-    ["Dire Rat"],
+    ["Dire Rat", "Goblin"],
   );
   assert.equal(
     summons.availableMonsters(
-      { sourceMode: "size", sizeOperator: "lt", sizeValue: "Medium" },
+      {
+        selector: {
+          mode: "filtered",
+          monsterKeys: [],
+          filters: [{ kind: "size", operator: "lt", value: "Medium" }],
+        },
+      },
       monsters,
     ).length,
-    1,
+    2,
   );
   assert.equal(
     summons.availableMonsters(
-      { sourceMode: "size", sizeOperator: "lt", sizeValue: "Small" },
+      {
+        selector: {
+          mode: "filtered",
+          monsterKeys: [],
+          filters: [{ kind: "size", operator: "lt", value: "Small" }],
+        },
+      },
       monsters,
     ).length,
     0,
   );
+  assert.deepEqual(
+    summons.availableMonsters(
+      {
+        selector: {
+          mode: "filtered",
+          monsterKeys: [],
+          filters: [
+            { kind: "type", values: ["animal"] },
+            { kind: "size", operator: "eq", value: "Small" },
+            { kind: "hd", operator: "eq", value: 1 },
+          ],
+        },
+      },
+      monsters,
+    ).map((monster) => monster.name),
+    ["Dire Rat"],
+    "Summon catalog filters must combine with AND semantics.",
+  );
+  assert.equal("sourceMode" in config, false, "Legacy selector fields must not survive normalization.");
 
   const unresolved = {
     name: "Summon Nature's Ally",
@@ -136,6 +191,7 @@ const decisions = require("./effect-decisions.js");
   assert.match(effectEditorSource, /removeEventListener\("click", scaleBtn\._effectScaleClickHandler\)/);
 
   const summonSource = fs.readFileSync("scripts/summon-creatures.js", "utf8");
+  assert.doesNotMatch(summonSource, /config\.sourceMode|config\.monsterKeys|config\.creatureTypes/);
   ["countMax", "diceCountMax", "staticValueMax"].forEach((field) =>
     assert.match(summonSource, new RegExp('stepper\\("' + field + '"')),
   );
@@ -145,6 +201,31 @@ const decisions = require("./effect-decisions.js");
       new RegExp('data-summon-field="' + field + '"'),
     ),
   );
+  assert.match(summonSource, /data-summon-filter-enabled="type"/);
+  assert.match(summonSource, /data-summon-filter-enabled="hd"/);
+  assert.match(summonSource, /data-summon-filter-enabled="size"/);
+  assert.match(summonSource, /row\.selector\.filters\.every/);
+
+  const spells = JSON.parse(fs.readFileSync("data/spells.json", "utf8"));
+  let authoredSummons = 0;
+  const inspect = (node) => {
+    if (!node || typeof node !== "object") return;
+    if (Array.isArray(node)) {
+      node.forEach(inspect);
+      return;
+    }
+    if (Array.isArray(node.summonCreatures)) {
+      node.summonCreatures.forEach((entry) => {
+        authoredSummons += 1;
+        assert.ok(entry.selector, "Every authored summon must use the canonical selector object.");
+        ["sourceMode", "monsterKeys", "creatureTypes", "hdOperator", "hdValue", "sizeOperator", "sizeValue"]
+          .forEach((key) => assert.equal(key in entry, false, `Legacy summon field ${key} must be removed.`));
+      });
+    }
+    Object.values(node).forEach(inspect);
+  };
+  inspect(spells);
+  assert.ok(authoredSummons > 0, "The spell catalog must retain its authored summon effects.");
 
   const mapSource = fs.readFileSync("scripts/pages/map.js", "utf8");
   assert.match(mapSource, /function controlsSummonedCreature\(token\)/);

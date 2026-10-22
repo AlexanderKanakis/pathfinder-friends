@@ -4,6 +4,7 @@ let searchTerm = "";
 let typeFilter = "";
 let decisionsOnly = false;
 let aurasOnly = false;
+let summonsOnly = false;
 let projectDirectoryHandle = null;
 let dataDirectoryHandle = null;
 let dirty = false;
@@ -327,6 +328,7 @@ function filteredFeatIndexes() {
         (!typeFilter || (feat.types || []).includes(typeFilter) || feat.type === typeFilter) &&
         (!decisionsOnly || window.PFEffectDecisions.hasDecision(feat)) &&
         (!aurasOnly || window.PFEffectMechanics.hasAura(feat)) &&
+        (!summonsOnly || window.PFSummonCreatures.hasSummon(feat)) &&
         (!term || haystack.includes(term))
       );
     })
@@ -614,6 +616,7 @@ function commitSelectedFeat() {
     conditionalVariables: extras.conditionalVariables || [],
     attackRolls: extras.attackRolls || [],
     damageRolls: extras.damageRolls || [],
+    periodicEffects: extras.periodicEffects || [],
     d20Boosts: extras.d20Boosts || [],
     ...(extras.decisionOwner
       ? { decisionOwner: extras.decisionOwner }
@@ -803,6 +806,15 @@ window.PFEffectDecisions.bindFilterButton(el("featDecisionFilter"), (active) => 
 window.PFEffectDecisions.bindFilterButton(el("featAuraFilter"), (active) => {
   commitSelectedFeat();
   aurasOnly = active;
+  const indexes = filteredFeatIndexes();
+  if (!indexes.includes(selectedIndex)) selectedIndex = indexes[0] ?? -1;
+  renderFeatList();
+  renderSelectedFeat();
+});
+
+window.PFEffectDecisions.bindFilterButton(el("featSummonFilter"), (active) => {
+  commitSelectedFeat();
+  summonsOnly = active;
   const indexes = filteredFeatIndexes();
   if (!indexes.includes(selectedIndex)) selectedIndex = indexes[0] ?? -1;
   renderFeatList();

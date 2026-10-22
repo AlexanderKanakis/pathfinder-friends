@@ -77,6 +77,7 @@ let pendingAuraCleanupTokenIds = new Set();
 let currentActorNamePromise = null;
 let mapEffectSourceCache = new Map();
 let mapSpellDetailCache = new Map();
+let mapEffectSnapshotCache = new Map();
 let mapEffectPrefetchGeneration = 0;
 let quickEffectDefinitions = [];
 const quickEffectLoadedGroups = new Set();
@@ -92,6 +93,7 @@ let auraEffectDraft = null;
 let auraEffectDismissed = new Set();
 let auraEffectInside = new Set();
 let auraEffectApplying = new Set();
+let mapToastNotices = [];
 let turnAdvanceBusy = false;
 let seenTurnEffectNotices = new Set();
 let dpadJoystickState = null;
@@ -296,7 +298,8 @@ const MAP_CONTEXT_DOCUMENTATION = [
       "Create a visible radius around a token and optionally offer an effect to creatures inside it.",
     usage: [
       "Set whether the aura is visible, its radius in grid cells, and its color. One cell represents 5 feet.",
-      "An aura can carry an effect. Eligible characters inside the radius receive a prompt and choose whether to apply it.",
+      "In 3D, a sphere uses the radius in every direction. A cylinder uses the radius horizontally and its configured height vertically.",
+      "An aura can carry an effect. Eligible characters inside its 3D volume receive a prompt and choose whether to apply it.",
       "Remove when out of range removes an accepted aura effect after its target leaves the radius.",
     ],
     access:
@@ -1702,8 +1705,53 @@ async function hydrateMapCharacterSheets() {
   const refreshed = await PFApp.loadContextCharacters(mapContextKey);
   if (!Array.isArray(refreshed)) return;
   mapCharacters = refreshed;
+  await hydrateMapCharacterEffectStates();
   mapEffectPrefetchGeneration += 1;
-  mapEffectSourceCache.clear();
+}
+
+async function hydrateMapCharacterEffectStates(characterIds = null) {
+  const wanted = characterIds
+    ? new Set((Array.isArray(characterIds) ? characterIds : [characterIds]).map(String))
+    : null;
+  const characters = mapCharacters.filter(
+    (character) => !wanted || wanted.has(String(character.id)),
+  );
+  await Promise.all(
+    characters.map(async (character) => {
+      const activeEffects =
+        (await PFApp.loadCharacterBuffStateForRecalculation?.(
+          character.id,
+          mapContextKey,
+        )) || [];
+      character.sheet = character.sheet || {};
+      character.sheet.activeBuffs = Array.isArray(activeEffects)
+        ? activeEffects
+        : [];
+    }),
+  );
+}
+
+async function refreshMapCharacterEffectTarget(characterId) {
+  const id = String(characterId || "");
+  if (!id) return false;
+  const character = mapCharacters.find((entry) => String(entry.id) === id);
+  if (!character) return false;
+  await hydrateMapCharacterEffectStates([id]);
+  const token = state.tokens.find(
+    (entry) => entry.kind === "character" && String(entry.characterId) === id,
+  );
+  if (!token) return false;
+  const activeEffects = character.sheet?.activeBuffs || [];
+  if (
+    mapEffectsModal &&
+    el("mapEffectsModal")?.classList.contains("show") &&
+    mapEffectTrackerInstance?.options?.characterId === id
+  ) {
+    mapEffectTrackerInstance.setActiveEffects(activeEffects);
+  }
+  if (reconcileTokenLinkedAuras(token, activeEffects)) queueSave();
+  renderAll(false);
+  return true;
 }
 
 function syncTokenFromSheet(token, source) {
@@ -1818,8 +1866,13 @@ async function refreshMapSheetTarget(targetType, targetId) {
   let source = null;
   let token = null;
   if (targetType === "character") {
-    source = await PFApp.loadCharacterSheet("", mapContextKey, id);
+    const [loadedSource, activeEffects] = await Promise.all([
+      PFApp.loadCharacterSheet("", mapContextKey, id),
+      PFApp.loadCharacterBuffStateForRecalculation?.(id, mapContextKey),
+    ]);
+    source = loadedSource;
     if (!source?.sheet || String(source.id) !== id) return false;
+    source.sheet.activeBuffs = Array.isArray(activeEffects) ? activeEffects : [];
     const index = mapCharacters.findIndex((entry) => String(entry.id) === id);
     if (index >= 0) mapCharacters[index] = source;
     else mapCharacters.push(source);
@@ -1838,6 +1891,7 @@ async function refreshMapSheetTarget(targetType, targetId) {
   }
   if (!token || !source) return false;
   mapEffectSourceCache.delete(id);
+  mapEffectSnapshotCache.delete(mapEffectSnapshotKey(token));
   let changed = syncTokenFromSheet(token, source);
   const auraChanged = await syncTokenPassiveAuras(token);
   changed = auraChanged || changed;
@@ -3166,10 +3220,61 @@ function renderAuraTextureGrid(diameter, textureUrl) {
   return `<span class="map-aura-texture-grid${renderAs3DSprites ? " is-3d" : ""}" style="--aura-texture-cols:${mask.cols};--aura-texture-rows:${mask.rows};--shape-sprite-rows:1;">${cells.join("")}</span>`;
 }
 
+function auraVolumeShape(aura = {}) {
+  return window.PFEffectMechanics?.auraVolumeShape?.(aura) ||
+    (aura.volumeShape === "cylinder" ? "cylinder" : "sphere");
+}
+
+function auraHeightFeet(aura = {}) {
+  const rangeFeet = Math.max(5, Number(aura.rangeFeet || aura.radius * 5 || 5));
+  return window.PFEffectMechanics?.auraHeightFeet?.(aura, rangeFeet) ||
+    (auraVolumeShape(aura) === "cylinder"
+      ? Math.max(5, Number(aura.heightFeet || rangeFeet * 2))
+      : rangeFeet * 2);
+}
+
+function auraWorldElevationFeet(token = {}) {
+  return (
+    tallestHeightFeetUnder(
+      Number(token.x || 0),
+      Number(token.y || 0),
+      Number(token.w || 1),
+      Number(token.h || 1),
+    ) + Number(token.elevationFeet || 0)
+  );
+}
+
+function renderAuraVolume(aura = {}, radiusPx = 0) {
+  if (!view3DMode || heightEditMode) return "";
+  if (auraVolumeShape(aura) === "cylinder") {
+    const faces = Array.from(
+      { length: 12 },
+      (_, index) =>
+        `<span class="map-aura-cylinder-face" style="--aura-face-angle:${index * 30}deg"></span>`,
+    ).join("");
+    return `<span class="map-aura-volume map-aura-volume-cylinder"><span class="map-aura-cylinder-cap is-top"></span><span class="map-aura-cylinder-cap is-bottom"></span>${faces}</span>`;
+  }
+  const horizontalRings = [
+    { offset: -0.75, scale: 0.661 },
+    { offset: -0.5, scale: 0.866 },
+    { offset: 0.5, scale: 0.866 },
+    { offset: 0.75, scale: 0.661 },
+  ]
+    .map(
+      ({ offset, scale }) =>
+        `<span class="map-aura-sphere-ring is-horizontal" style="--aura-ring-z:${offset * radiusPx}px;--aura-ring-scale:${scale}"></span>`,
+    )
+    .join("");
+  return `<span class="map-aura-volume map-aura-volume-sphere">${horizontalRings}<span class="map-aura-sphere-ring is-vertical is-x"></span><span class="map-aura-sphere-ring is-vertical is-y"></span></span>`;
+}
+
 function renderAura(token) {
   return tokenAuraEntries(token)
     .map(({ id, aura }) => {
-      const radius = Math.max(1, Number(aura.radius || 1));
+      const radius = Math.max(
+        1,
+        Number(aura.rangeFeet || Number(aura.radius || 1) * 5) / 5,
+      );
       const size = radius * 2;
       const centerX = Number(token.x || 0) + Number(token.w || 1) / 2;
       const centerY = Number(token.y || 0) + Number(token.h || 1) / 2;
@@ -3178,7 +3283,12 @@ function renderAura(token) {
       const textureGrid = textureUrl
         ? renderAuraTextureGrid(size, textureUrl)
         : "";
-      return `<div class="map-aura${textureClass}" data-aura-token-id="${escapeHtml(token.id)}" data-aura-id="${escapeHtml(id)}" data-aura-field="aura" style="--aura-x:${centerX - radius};--aura-y:${centerY - radius};--aura-size:${size};--aura-color:${escapeHtml(aura.color || "#8fd19e")};">${textureGrid}</div>`;
+      const heightFeet = auraHeightFeet(aura);
+      const heightPx = (heightFeet / 5) * Number(localGridSize || 48);
+      const radiusPx = radius * Number(localGridSize || 48);
+      const worldElevationPx = feetToPreviewPx(auraWorldElevationFeet(token));
+      const volumeShape = auraVolumeShape(aura);
+      return `<div class="map-aura${textureClass} map-aura-${volumeShape}" data-aura-token-id="${escapeHtml(token.id)}" data-aura-id="${escapeHtml(id)}" data-aura-field="aura" style="--aura-x:${centerX - radius};--aura-y:${centerY - radius};--aura-size:${size};--aura-color:${escapeHtml(aura.color || "#8fd19e")};--aura-radius-px:${radiusPx}px;--aura-height-px:${heightPx}px;--aura-face-width-px:${radiusPx * 0.54}px;--aura-z:${worldElevationPx}px;">${renderAuraVolume(aura, radiusPx)}${textureGrid}</div>`;
     })
     .join("");
 }
@@ -3501,15 +3611,33 @@ function renderLimitedViewGrayscale() {
     .join("");
 }
 
-function tokenInAura(token, auraToken, aura = auraToken?.aura || {}) {
+function tokenInAura(
+  token,
+  auraToken,
+  aura = auraToken?.aura || {},
+  { ignoreVisibility = false } = {},
+) {
   if (!aura.visible || !aura.effect || token.id === auraToken.id) return false;
-  if (String(token.id) === String(aura.emitterTokenId || aura.casterTokenId || ""))
+  if (
+    !aura.affectsSource &&
+    String(token.id) === String(aura.emitterTokenId || aura.casterTokenId || "")
+  )
     return false;
-  if (!canSeeToken(token) || !canSeeToken(auraToken)) return false;
-  const radius = Math.max(1, Number(aura.radius || 1));
+  if (!ignoreVisibility && (!canSeeToken(token) || !canSeeToken(auraToken)))
+    return false;
   const a = tokenCenter(auraToken);
   const b = tokenCenter(token);
-  return Math.hypot(a.x - b.x, a.y - b.y) <= radius;
+  const sourcePoint = {
+    ...a,
+    elevationFeet: auraWorldElevationFeet(auraToken),
+  };
+  const targetPoint = {
+    ...b,
+    elevationFeet: auraWorldElevationFeet(token),
+  };
+  return window.PFEffectMechanics?.pointInAuraVolume
+    ? window.PFEffectMechanics.pointInAuraVolume(sourcePoint, targetPoint, aura)
+    : Math.hypot(a.x - b.x, a.y - b.y) <= Math.max(1, Number(aura.radius || 1));
 }
 
 function auraPromptKey(tokenId, auraTokenId, auraId = "manual") {
@@ -3522,7 +3650,14 @@ function currentAuraEffectEntries() {
     .flatMap((auraToken) =>
       tokenAuraEntries(auraToken)
         .filter(
-          ({ aura }) => aura.visible && aura.effect && !aura.visualOnly,
+          ({ aura }) =>
+            aura.visible &&
+            aura.effect &&
+            !aura.visualOnly &&
+            effectHasTargetMechanics(
+              window.PFPeriodicEffects?.withoutAreaRows?.(aura.effect) ||
+                aura.effect,
+            ),
         )
         .map((entry) => ({ ...entry, auraToken })),
     );
@@ -3593,7 +3728,14 @@ function renderAuraEffectToasts() {
   if (!container) return;
   updateAuraToastPosition();
   const prompts = auraEffectPrompts();
-  container.innerHTML = prompts
+  const notices = mapToastNotices
+    .map(({ id, message, tone }) => `
+      <div class="aura-effect-toast map-notification-toast map-notification-toast-${escapeHtml(tone)}" data-map-toast="${escapeHtml(id)}" role="${tone === "danger" ? "alert" : "status"}">
+        ${escapeHtml(message)}
+      </div>
+    `)
+    .join("");
+  const auraPrompts = prompts
     .map(({ token, auraToken, aura, auraId, key }) => {
       const applying = auraEffectApplying.has(key);
       return `
@@ -3610,6 +3752,7 @@ function renderAuraEffectToasts() {
       `;
     })
     .join("");
+  container.innerHTML = `${notices}${auraPrompts}`;
   container.querySelectorAll("[data-dismiss-aura]").forEach((button) => {
     button.addEventListener("click", () => {
       auraEffectDismissed.add(button.dataset.dismissAura);
@@ -4132,8 +4275,25 @@ function heightFeetLabel(feet) {
   return `${value} ft`;
 }
 
-function showMapToast(message) {
-  window.PFToast?.show(message, { tone: "info", duration: 2200 });
+function showMapToast(message, options = {}) {
+  const text = String(message || "").trim();
+  if (!text) return null;
+  const tone = ["danger", "info", "success", "warning"].includes(options.tone)
+    ? options.tone
+    : "info";
+  const notice = {
+    id: uid("map_toast"),
+    message: text,
+    tone,
+  };
+  mapToastNotices.push(notice);
+  renderAuraEffectToasts();
+  const duration = Math.max(1200, Number(options.duration || 4200) || 4200);
+  window.setTimeout(() => {
+    mapToastNotices = mapToastNotices.filter((item) => item.id !== notice.id);
+    renderAuraEffectToasts();
+  }, duration);
+  return notice;
 }
 
 function shapeDepth(shape) {
@@ -6237,10 +6397,17 @@ function updateAuraDragPreview(token) {
       const data = auraId
         ? tokenAuraEntry(token, auraId)?.aura || {}
         : token[field] || {};
-      const radius = Math.max(1, Number(data.radius || 1));
+      const radius = Math.max(
+        1,
+        Number(data.rangeFeet || Number(data.radius || 1) * 5) / 5,
+      );
       const center = tokenCenter(token);
       node.style.setProperty("--aura-x", center.x - radius);
       node.style.setProperty("--aura-y", center.y - radius);
+      node.style.setProperty(
+        "--aura-z",
+        `${feetToPreviewPx(auraWorldElevationFeet(token))}px`,
+      );
     });
 }
 
@@ -7396,7 +7563,7 @@ async function spendMapClassResource(
   if (!status.pool) return { ok: true, current: null };
   if (!status.ok) {
     const message = window.PFClassResources.insufficientMessage(effect, status);
-    window.PFToast?.show(message, { tone: "warning" });
+    showMapToast(message, { tone: "warning" });
     addTimeline(
       `${displayTokenName(token)}: ${message}`,
     );
@@ -7593,13 +7760,107 @@ function mapSpellDetailRevision(character = {}) {
   const buffStamp = localStorage.getItem(
     `pf_buffs_updated_${mapContextKey}_${characterId}`,
   ) || "";
+  const powerIndex = character.sheet?.powerIndex || {};
   const payload = JSON.stringify({
-    updatedAt: character.updatedAt || "",
+    updatedAt: character.updatedAt || character.updated_at || "",
     sheetStamp,
     buffStamp,
-    sheet: character.sheet || {},
+    powerIndexVersion: powerIndex.version || "",
+    powerIndexSignature: powerIndex.signature || "",
+    powerIndexCatalogSignature: powerIndex.catalogSignature || "",
+    powerIndexGeneratedAt: powerIndex.generatedAt || "",
   });
   return hashMapSpellDetailRevision(payload);
+}
+
+function mapEffectSnapshotKey(token = {}) {
+  const targetId =
+    token.kind === "enemy" ? token.enemyId : token.characterId;
+  return [mapContextKey, token.kind || "token", targetId || token.id || ""]
+    .map(String)
+    .join(":");
+}
+
+function mapTokenSource(token = {}) {
+  if (token.kind === "character") return tokenCharacter(token);
+  if (token.kind === "enemy")
+    return mapEnemies.find((entry) => entry.id === token.enemyId) || token;
+  return token;
+}
+
+function mapEffectRevisions(token = {}) {
+  const source = mapTokenSource(token) || token;
+  const sheet = source.sheet || token.sheet || {};
+  const targetId = String(
+    token.kind === "enemy" ? token.enemyId : token.characterId || token.id || "",
+  );
+  const sheetStamp = localStorage.getItem(
+    token.kind === "enemy"
+      ? `pf_enemy_sheet_updated_${mapContextKey}_${targetId}`
+      : `pf_character_sheet_updated_${mapContextKey}_${targetId}`,
+  ) || "";
+  const buffStamp = localStorage.getItem(
+    `pf_buffs_updated_${mapContextKey}_${targetId}`,
+  ) || "";
+  const activeEffects = Array.isArray(sheet.activeBuffs)
+    ? sheet.activeBuffs
+    : [];
+  const sheetRevision = [
+    source.updatedAt || source.updated_at || "",
+    sheetStamp,
+  ].join(":");
+  const effectsRevision = hashMapSpellDetailRevision(
+    JSON.stringify([buffStamp, activeEffects]),
+  );
+  const powerIndex = sheet.powerIndex;
+  const powersRevision = powerIndex
+    ? [
+        "power-index",
+        powerIndex.version || "",
+        powerIndex.signature || "",
+        powerIndex.catalogSignature || "",
+        powerIndex.generatedAt || "",
+      ].join(":")
+    : `sheet:${sheetRevision}`;
+  return {
+    activeEffects,
+    effectsRevision,
+    powersRevision,
+    sheetRevision,
+  };
+}
+
+function mapEffectSnapshot(token = {}) {
+  const key = mapEffectSnapshotKey(token);
+  const revisions = mapEffectRevisions(token);
+  const cached = mapEffectSnapshotCache.get(key);
+  const snapshot = {
+    key,
+    effectsRevision: revisions.effectsRevision,
+    powersRevision: revisions.powersRevision,
+    sheetRevision: revisions.sheetRevision,
+    activeEffects: revisions.activeEffects,
+    passiveEffects:
+      cached?.powersRevision === revisions.powersRevision
+        ? cached.passiveEffects
+        : null,
+  };
+  mapEffectSnapshotCache.set(key, snapshot);
+  return snapshot;
+}
+
+async function loadMapEffectSnapshotPassives(token, character) {
+  const before = mapEffectSnapshot(token);
+  if (Array.isArray(before.passiveEffects)) return before.passiveEffects;
+  const passiveEffects =
+    (await characterMapEffectSources(character)).passives || [];
+  const after = mapEffectSnapshot(token);
+  if (after.powersRevision !== before.powersRevision) {
+    return loadMapEffectSnapshotPassives(token, character);
+  }
+  after.passiveEffects = passiveEffects;
+  mapEffectSnapshotCache.set(after.key, after);
+  return passiveEffects;
 }
 
 async function mapSpellDetailsForEffect(sourceToken, effect = {}, casterLevel = null) {
@@ -7948,6 +8209,28 @@ function hideMapEffectsForPicker() {
   });
 }
 
+function mergeEffectSources(...groups) {
+  const merged = new Map();
+  groups.flat().filter(Boolean).forEach((effect) => {
+    const key = String(
+      effect.id ||
+        `${effect.category || "Effect"}:${effect.source || ""}:${effect.name || ""}`,
+    ).toLowerCase();
+    merged.set(key, effect);
+  });
+  return [...merged.values()];
+}
+
+async function templateEffectSourcesForSheet(sheet = {}, group = "passive") {
+  if (!window.PFTemplateData || !Array.isArray(sheet.templates)) return [];
+  const data = await window.PFTemplateData.load();
+  return window.PFTemplateData.effectsForIds(
+    data,
+    sheet.templates,
+    group,
+  );
+}
+
 async function openMapEffects(tokenId, openOptions = null) {
   const powersOnly = openOptions?.powersOnly === true;
   const token = tokenById(tokenId);
@@ -7978,11 +8261,25 @@ async function openMapEffects(tokenId, openOptions = null) {
     tokenCharacter(token)?.userId === currentUserId;
   const sourceCharacter =
     token.kind === "character" ? tokenCharacter(token) : null;
+  const snapshot = mapEffectSnapshot(token);
+  const templatePassives = powersOnly
+    ? []
+    : await templateEffectSourcesForSheet(rollTokenSheet(token), "passive");
+  if (templatePassives.length) {
+    snapshot.passiveEffects = mergeEffectSources(
+      snapshot.passiveEffects || [],
+      templatePassives,
+    );
+  }
   const activatableAbilities = [];
   const options = {
     contextKey: mapContextKey,
     characterId: effectTargetId,
     activatableAbilities,
+    preservePickerCache: true,
+    pickerCacheKey: snapshot.key,
+    pickerCacheRevision: snapshot.powersRevision,
+    initialPassiveEffects: snapshot.passiveEffects,
     effectPickerEffects: () => sourceEffectDefinitions(token),
     loadEffectPickerGroup: (group) => sourceEffectDefinitions(token, group),
     hydratePickerEffect: (effect) => hydrateMapPickerEffect(token, effect),
@@ -8022,6 +8319,8 @@ async function openMapEffects(tokenId, openOptions = null) {
       };
       return session;
     },
+    targetSheet: () => rollTokenSheet(token),
+    targetName: tokenActualName(token),
     isOwnCharacter,
     choicePoolSkills:
       token.kind === "character"
@@ -8054,21 +8353,16 @@ async function openMapEffects(tokenId, openOptions = null) {
       });
       return true;
     },
-    loadActiveEffects:
-      token.kind === "enemy"
-        ? async () => {
-            if (token.summonedCreature)
-              return token.sheet?.activeBuffs || [];
-            const enemy = await PFApp.loadEnemy(token.enemyId, mapContextKey);
-            if (enemy?.sheet) token.sheet = structuredClone(enemy.sheet);
-            return token.sheet?.activeBuffs || [];
-          }
-        : undefined,
-    loadPassiveEffects:
-      token.kind === "character" && !powersOnly
-        ? async () =>
-            (await characterMapEffectSources(sourceCharacter)).passives || []
-        : undefined,
+    loadActiveEffects: async () => mapEffectSnapshot(token).activeEffects,
+    loadPassiveEffects: !powersOnly
+      ? async () => {
+          const passives =
+            token.kind === "character"
+              ? await loadMapEffectSnapshotPassives(token, sourceCharacter)
+              : [];
+          return mergeEffectSources(passives, templatePassives);
+        }
+      : undefined,
     onBeforeApply: async (effect, { replaceIndex } = {}) => {
       if (Number.isInteger(replaceIndex)) return true;
       return (await spendMapClassResource(token, effect)).ok;
@@ -8259,6 +8553,8 @@ function effectHasTargetMechanics(effect = {}) {
   if (Array.isArray(effect.metamagicRiders) && effect.metamagicRiders.length)
     return true;
   if (Array.isArray(effect.bonuses) && effect.bonuses.length) return true;
+  if (Array.isArray(effect.periodicEffects) && effect.periodicEffects.length)
+    return true;
   return (window.PFEffectMechanics?.extraKeys?.() || [])
     .filter((key) => key !== "damageRolls")
     .filter((key) => key !== "attackRolls")
@@ -8295,6 +8591,23 @@ async function spawnQuickEffectCreatures(effect = {}, placementToken = null) {
         : sourceToken.ownerId || currentUserId),
   });
   if (!result.ok) return false;
+  if (result.tokens.some((token) => token.sheet?.templates?.length)) {
+    try {
+      const bridge = await characterSheetBridge();
+      for (const token of result.tokens) {
+        if (!token.sheet?.templates?.length) continue;
+        const calculated = await bridge?.recalculateTransientSheet?.(
+          token.sheet,
+          token.name,
+        );
+        if (!calculated) continue;
+        token.sheet.calculated = calculated;
+        syncTokenFromSheet(token, { name: token.name, sheet: token.sheet });
+      }
+    } catch (error) {
+      console.error("Could not calculate summoned creature templates.", error);
+    }
+  }
   addTimeline(
     `${displayTokenName(sourceToken)} summons ${result.tokens.map((token) => token.name).join(", ")}.`,
   );
@@ -9412,7 +9725,12 @@ function scheduleAccessibleEffectSourcePrefetch() {
   const prefetch = async () => {
     for (const character of characters) {
       if (generation !== mapEffectPrefetchGeneration) return;
-      indexedCharacterSpellSources(character);
+      await characterMapEffectSources(character);
+      const token = state.tokens.find(
+        (entry) =>
+          entry.kind === "character" && entry.characterId === character.id,
+      );
+      if (token) await loadMapEffectSnapshotPassives(token, character);
       await new Promise((resolve) => window.setTimeout(resolve, 0));
     }
   };
@@ -9441,15 +9759,17 @@ async function sourceEffectDefinitions(sourceToken, group = "") {
   if (sourceCharacter && group === "class") {
     return indexedCharacterClassAbilities(sourceCharacter);
   }
-  const [catalog, sources] = await Promise.all([
+  const [catalog, sources, templateAbilities] = await Promise.all([
     authoredCatalogEffects(),
     sourceCharacter
       ? characterMapEffectSources(sourceCharacter)
       : Promise.resolve({ activatable: [], spells: [], passives: [] }),
+    templateEffectSourcesForSheet(rollTokenSheet(sourceToken), "active"),
   ]);
   const effects = [
     ...(sources.activatable || []),
     ...(sources.spells || []),
+    ...templateAbilities,
     ...catalog,
   ];
   const preferred =
@@ -10741,7 +11061,9 @@ async function applyAuraEffectToToken(tokenId, auraTokenId, auraId = "manual") {
     return;
   }
   const applied = {
-    ...structuredClone(effect),
+    ...structuredClone(
+      window.PFPeriodicEffects?.withoutAreaRows?.(effect) || effect,
+    ),
     auraSourceId: sourceId,
     auraTokenId,
     auraId,
@@ -10811,7 +11133,7 @@ async function endActivationGroupForToken(
 }
 
 async function resolveEffectSaveForToken(token, effect) {
-  if (!window.PFEffectSaves?.hasSave?.(effect)) return effect;
+  if (!window.PFEffectSaves?.hasImmediateSave?.(effect)) return effect;
   const character = token?.kind === "character" ? tokenCharacter(token) : null;
   const remote =
     character?.userId && String(character.userId) !== String(currentUserId);
@@ -11204,8 +11526,6 @@ function showExpiredEffectNotice(token, effect) {
 }
 
 function renderTurnEffectNotices() {
-  const container = el("turnEffectNotices");
-  if (!container) return;
   const now = Date.now();
   state.effectNotices
     .filter(
@@ -11220,14 +11540,12 @@ function renderTurnEffectNotices() {
       const name = token
         ? displayTokenName(token)
         : maskHiddenTokenNames(notice.tokenName || "Token");
-      const node = document.createElement("div");
-      node.className = "turn-effect-notice";
-      node.textContent = `${name} lost ${notice.effectName || "an effect"}.`;
-      container.appendChild(node);
-      setTimeout(() => node.remove(), 2000);
+      showMapToast(`${name} lost ${notice.effectName || "an effect"}.`, {
+        tone: "warning",
+        duration: 2000,
+      });
     });
 }
-
 async function advanceAutomaticAuras(endingTokenId) {
   if (!endingTokenId) return;
   let changed = false;
@@ -11444,26 +11762,211 @@ async function processEndedTurnEffects(endingRow, turnEventId) {
   await refreshTurnEffectChanges(result.changes);
 }
 
-async function applyFastHealingForEndedTurn(endingRow) {
-  const token = endingRow?.tokenId ? tokenById(endingRow.tokenId) : null;
-  if (!token || !window.PFEffectHealing) return;
-  const active =
-    cachedTokenActiveEffects(token) || (await loadTokenActiveEffects(token));
-  const amount = window.PFEffectHealing.fastHealingValue(active, {
-    activeBuffs: active,
+function periodicCombatTokens() {
+  return state.tokens.filter(
+    (token) => token.kind === "character" || token.kind === "enemy",
+  );
+}
+
+function periodicEffectContext(effect = {}) {
+  return {
+    ...mapEffectCastingScaleContext(effect),
+    casterLevel: Math.max(1, Number(effect.casterLevel || 1)),
+    classLevel: Math.max(1, Number(effect.casterLevel || 1)),
+  };
+}
+
+function periodicResultMessage(token, row, amount, effect) {
+  const target = displayTokenName(token);
+  const source = effect.name || row.label || "Periodic Effect";
+  if (row.operation === "healing")
+    return `${target} recovers ${amount} HP from ${source}.`;
+  if (row.operation === "damage")
+    return `${target} takes ${amount} ${row.damageType || "untyped"} damage from ${source}.`;
+  const ability = window.PFConditionConfig?.abilityLabel?.(row.ability) || row.ability;
+  const kind = row.operation === "ability-drain" ? "drain" : "damage";
+  return `${target} takes ${amount} ${ability} ${kind} from ${source}.`;
+}
+
+async function resolvePeriodicSaveForToken(token, row, effect) {
+  if (!window.PFEffectSaves?.enabled?.(row.saveConfig))
+    return { action: "full", rows: [row] };
+  const character = token?.kind === "character" ? tokenCharacter(token) : null;
+  const remote =
+    character?.userId && String(character.userId) !== String(currentUserId);
+  if (remote) {
+    const orchestrator = window.PFEffectActivationOrchestrator;
+    const result = await orchestrator.waitForRemoteDecision({
+      createRequest: window.PFApp?.createEffectChoiceRequest,
+      loadStatus: window.PFApp?.loadEffectChoiceRequestStatus,
+      request: {
+        contextKey: mapContextKey,
+        characterId: character.id,
+        ability: {
+          name: effect.name || row.label || "Periodic Effect",
+          saveDc: effect.saveDc,
+          recurringSaveDc: effect.recurringSaveDc,
+          spellCalculations: effect.spellCalculations,
+          castRollContext: effect.castRollContext,
+          periodicEffects: [row],
+          activationRequest: {
+            mode: orchestrator.REMOTE_RECURRING_SAVE_MODE,
+            version: 1,
+          },
+        },
+      },
+    });
+    return result?.ok
+      ? result.effect?.periodicSaveResolution || {
+          action: "save-success",
+          rows: [],
+        }
+      : { action: "save-success", rows: [] };
+  }
+  return window.PFEffectSaves.resolveRecurringRow(effect, row, {
+    sheet: rollTokenSheet(token),
+    title: effect.name || row.label || "Periodic Effect",
+    targetName: tokenActualName(token),
   });
-  if (amount <= 0) return;
-  const result = window.PFEffectHealing.healingResult(
-    tokenCurrentHp(token),
-    tokenTotalHp(token),
-    amount,
+}
+
+async function applyResolvedPeriodicRow(token, row, effect) {
+  const amount = window.PFPeriodicEffects.roll(
+    row,
+    periodicEffectContext(effect),
   );
-  if (!result.changed || !(await persistTokenHealing(token, result.current)))
-    return;
-  addTimeline(
-    `${displayTokenName(token)} recovers ${result.healed} HP from Fast Healing.`,
-  );
+  if (amount <= 0) return false;
+  let appliedAmount = amount;
+  if (row.operation === "healing") {
+    const result = window.PFEffectHealing.healingResult(
+      tokenCurrentHp(token),
+      tokenTotalHp(token),
+      amount,
+    );
+    if (!result.changed || !(await persistTokenHealing(token, result.current)))
+      return false;
+    appliedAmount = result.healed;
+  } else if (["ability-damage", "ability-drain"].includes(row.operation)) {
+    const condition = window.PFPeriodicEffects.abilityCondition(
+      row,
+      amount,
+      effect,
+    );
+    if (!condition) return false;
+    const active = await loadTokenActiveEffects(token);
+    if (!(await saveTokenActiveEffects(token, [...active, condition]))) return false;
+  }
+  const message = periodicResultMessage(token, row, appliedAmount, effect);
+  showMapToast(message, {
+    tone: row.operation === "healing" ? "success" : "warning",
+    duration: 3200,
+  });
+  addTimeline(message);
   queueSave();
+  return true;
+}
+
+async function applyPeriodicRow(token, row, effect) {
+  const resolution = await resolvePeriodicSaveForToken(token, row, effect);
+  if (!resolution?.rows?.length) {
+    if (resolution?.action === "save-success")
+      addTimeline(
+        `${displayTokenName(token)} succeeds the save against ${effect.name || row.label || "Periodic Effect"}.`,
+      );
+    return false;
+  }
+  let applied = false;
+  for (const resolvedRow of resolution.rows) {
+    const normalized = window.PFPeriodicEffects.normalize(resolvedRow);
+    applied =
+      (await applyResolvedPeriodicRow(token, normalized, effect)) || applied;
+  }
+  return applied;
+}
+async function processAttachedPeriodicEffects(turnToken, timing) {
+  const targets = timing.startsWith("target-")
+    ? [turnToken]
+    : periodicCombatTokens();
+  for (const token of targets) {
+    const active =
+      cachedTokenActiveEffects(token) || (await loadTokenActiveEffects(token));
+    for (const effect of active) {
+      if (
+        timing.startsWith("caster-") &&
+        String(effect.sourceTokenId || effect.casterTokenId || "") !==
+          String(turnToken.id)
+      )
+        continue;
+      const rows = window.PFPeriodicEffects
+        .explicitRows(effect, { delivery: "attached" })
+        .filter((row) => row.timing === timing);
+      for (const row of rows) await applyPeriodicRow(token, row, effect);
+    }
+    if (timing === "target-turn-end") {
+      const amount = window.PFEffectHealing?.fastHealingValue?.(active, {
+        activeBuffs: active,
+      });
+      if (amount > 0) {
+        await applyPeriodicRow(
+          token,
+          {
+            label: "Fast Healing",
+            operation: "healing",
+            staticValue: amount,
+            timing,
+            delivery: "attached",
+            implicitFastHealing: true,
+          },
+          { name: "Fast Healing" },
+        );
+      }
+    }
+  }
+}
+
+function areaPeriodicEntries() {
+  return state.tokens.flatMap((auraToken) =>
+    tokenAuraEntries(auraToken).flatMap(({ aura, id }) => {
+      if (!aura.visible || !aura.effect || aura.visualOnly) return [];
+      const rows = window.PFPeriodicEffects.explicitRows(aura.effect, {
+        delivery: "area",
+      });
+      return rows.length ? [{ auraToken, aura, auraId: id, rows }] : [];
+    }),
+  );
+}
+
+async function processAreaPeriodicEffects(turnToken, timing) {
+  for (const entry of areaPeriodicEntries()) {
+    const casterId = String(
+      entry.aura.casterTokenId ||
+        entry.aura.emitterTokenId ||
+        entry.aura.effect.sourceTokenId ||
+        entry.auraToken.id,
+    );
+    if (timing.startsWith("caster-") && casterId !== String(turnToken.id))
+      continue;
+    const targets = timing.startsWith("target-")
+      ? [turnToken]
+      : periodicCombatTokens();
+    for (const token of targets) {
+      if (
+        !tokenInAura(token, entry.auraToken, entry.aura, {
+          ignoreVisibility: true,
+        })
+      )
+        continue;
+      for (const row of entry.rows.filter((item) => item.timing === timing))
+        await applyPeriodicRow(token, row, entry.aura.effect);
+    }
+  }
+}
+
+async function processPeriodicTurnEvent(row, timing) {
+  const token = row?.tokenId ? tokenById(row.tokenId) : null;
+  if (!token || !window.PFPeriodicEffects) return;
+  await processAttachedPeriodicEffects(token, timing);
+  await processAreaPeriodicEffects(token, timing);
 }
 
 async function advanceClassResourcesForEndedTurn(endingRow) {
@@ -11708,11 +12211,16 @@ async function nextTurn() {
     }
     renderAll();
     if (endingRow && !endingRow.disabled) {
-      await applyFastHealingForEndedTurn(endingRow);
+      await processPeriodicTurnEvent(endingRow, "target-turn-end");
+      await processPeriodicTurnEvent(endingRow, "caster-turn-end");
       await processEndedTurnEffects(endingRow, turnEventId);
       await advanceAutomaticAuras(endingRow.tokenId);
       advanceSummonedCreatures(endingRow.tokenId);
       await advanceClassResourcesForEndedTurn(endingRow);
+    }
+    if (row && !row.disabled) {
+      await processPeriodicTurnEvent(row, "target-turn-start");
+      await processPeriodicTurnEvent(row, "caster-turn-start");
     }
   } catch (error) {
     console.error(error);
@@ -11913,6 +12421,16 @@ function rollNoteHtml(notes = []) {
     .join(notes.length > 1 ? ", " : "");
 }
 
+function rollConditionalLabel(entry = {}) {
+  return String(
+    entry.appliesWhen ||
+      entry.conditionalReason ||
+      (typeof entry.condition === "string" ? entry.condition : "") ||
+      entry.label ||
+      "Conditional bonus",
+  ).trim();
+}
+
 function renderRollConditionals(card, row) {
   const entries = (Array.isArray(row.conditionals) ? row.conditionals : [])
     .filter((entry) => Number(entry?.value ?? entry?.bonus ?? 0));
@@ -11921,7 +12439,7 @@ function renderRollConditionals(card, row) {
   row.appliedConditionals ||= [];
   host.innerHTML = `<div class="d20-boost-pool-title">Applicable conditionals</div>${entries.map((entry, index) => {
     const value = Number(entry.value ?? entry.bonus ?? 0);
-    const label = entry.source || entry.name || entry.appliesWhen || "Conditional";
+    const label = rollConditionalLabel(entry);
     return `<label class="form-check"><input class="form-check-input" type="checkbox" data-roll-conditional="${index}"><span class="form-check-label">${escapeHtml(label)} (${signedNumberText(value)})</span></label>`;
   }).join("")}`;
   host.querySelectorAll("[data-roll-conditional]").forEach((input) =>
@@ -12569,6 +13087,13 @@ function updateAuraRadiusText() {
     `${cells} cell${cells === 1 ? "" : "s"} / ${cells * 5} ft`;
 }
 
+function updateAuraVolumeFields() {
+  const isAura = auraEditingMode === "aura";
+  const cylinder = el("auraVolumeShape").value === "cylinder";
+  el("auraVolumeField").classList.toggle("d-none", !isAura);
+  el("auraHeightField").classList.toggle("d-none", !isAura || !cylinder);
+}
+
 function syncMapAuraTexturePicker(textureUrl = "") {
   const selected = String(textureUrl || "").trim();
   el("mapAuraTexturePicker")
@@ -12692,6 +13217,13 @@ function openCircleOptions(mode) {
     mode === "aura" && field.effect ? structuredClone(field.effect) : null;
   el("auraVisible").checked = Boolean(field.visible);
   el("auraRadiusCells").value = Math.max(1, Number(field.radius || 1));
+  el("auraVolumeShape").value = field.volumeShape === "cylinder"
+    ? "cylinder"
+    : "sphere";
+  el("auraHeightFeet").value = Math.max(
+    5,
+    Number(field.heightFeet || Number(el("auraRadiusCells").value) * 10),
+  );
   el("auraColor").value =
     field.color || (token.kind === "enemy" ? "#b02a37" : "#8fd19e");
   el("mapAuraTextureUrl").value = String(field.textureUrl || "");
@@ -12703,6 +13235,7 @@ function openCircleOptions(mode) {
   el("mapAuraTextureField").classList.toggle("d-none", mode !== "aura");
   el("auraEffectSection").classList.toggle("d-none", mode !== "aura");
   el("automaticAuraSection").classList.toggle("d-none", mode !== "aura");
+  updateAuraVolumeFields();
   if (mode === "aura") renderAutomaticAuraList(token);
   el("auraSaveButton").textContent = CIRCLE_MODE_SAVE_LABEL[mode];
   updateAuraRadiusText();
@@ -12730,6 +13263,12 @@ function saveAuraOptions(event) {
     radius: Math.max(1, Number(el("auraRadiusCells").value || 1)),
   };
   if (mode === "aura") {
+    payload.volumeShape = el("auraVolumeShape").value === "cylinder"
+      ? "cylinder"
+      : "sphere";
+    if (payload.volumeShape === "cylinder") {
+      payload.heightFeet = Math.max(5, Number(el("auraHeightFeet").value || 5));
+    }
     payload.color = el("auraColor").value || "#8fd19e";
     const textureUrl = el("mapAuraTextureUrl").value.trim();
     if (textureUrl) payload.textureUrl = textureUrl;
@@ -13017,6 +13556,7 @@ async function loadMap(contextKey, { eagerPassiveAuras = false } = {}) {
     PFApp.loadMapSlotSummaries(mapContextKey),
   ]);
   mapCharacters = characters;
+  await hydrateMapCharacterEffectStates();
   isGm = gm;
   mapSlotMeta = slotMeta;
   startPendingEffectChoicePolling();
@@ -13132,6 +13672,19 @@ function subscribeMapRealtime() {
         if (!row?.state) return;
         if (Number(row.map_slot || 1) !== subscribedSlot) return;
         applyRemoteMapState(row.state);
+      },
+    )
+    .on(
+      "postgres_changes",
+      {
+        event: "*",
+        schema: "public",
+        table: "user_buff_state",
+        filter: `context_key=eq.${mapContextKey}`,
+      },
+      (payload) => {
+        const row = payload.new || payload.old;
+        if (row?.character_id) void refreshMapCharacterEffectTarget(row.character_id);
       },
     )
     .on(
@@ -13426,6 +13979,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   auraModal = new bootstrap.Modal(el("auraOptionsModal"));
   populateMapAuraTexturePicker();
   el("auraRadiusCells").addEventListener("input", updateAuraRadiusText);
+  el("auraVolumeShape").addEventListener("change", updateAuraVolumeFields);
   el("auraOptionsForm").addEventListener("submit", saveAuraOptions);
   el("initiativeForm").addEventListener("submit", addInitiativeEntry);
   el("nextTurn").addEventListener("click", nextTurn);

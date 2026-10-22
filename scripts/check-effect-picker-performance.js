@@ -65,6 +65,7 @@ for (const group of [
 assert(!tracker.includes('data-effect-browser-group="personal"'));
 assert(!tracker.includes('data-effect-browser-group="passives"'));
 assert(tracker.includes("sourceGroup: effectSourceGroup"));
+assert(tracker.includes("activeTitle: activeEffectTitle"));
 assert(tracker.includes("function categorizedSourceGroup(effect = {})"));
 assert(tracker.includes("effect.catalogEffect &&"));
 assert(
@@ -72,6 +73,88 @@ assert(
     '["class", "racial", "feats", "items"].includes(categoryGroup)',
   ),
 );
+
+global.window = {};
+delete require.cache[require.resolve("./buff-tracker-widget.js")];
+require("./buff-tracker-widget.js");
+assert.equal(
+  window.PFEffectTracker.activeTitle(
+    {
+      name: "Iron Stake Effect",
+      applyConditions: [{ name: "Shaken" }],
+    },
+    "condition",
+  ),
+  "Shaken (Iron Stake Effect)",
+  "The Conditions tab must put the condition before its source effect.",
+);
+assert.equal(
+  window.PFEffectTracker.activeTitle(
+    {
+      name: "Shaken",
+      category: "Condition",
+      source: "Iron Stake Effect",
+      appliedCondition: true,
+      sourceEffectId: "iron-stake-effect",
+    },
+    "condition",
+  ),
+  "Shaken (Iron Stake Effect)",
+  "Expanded conditions must retain the same condition-first title.",
+);
+assert.equal(
+  window.PFEffectTracker.activeTitle(
+    {
+      name: "Shaken",
+      category: "Condition",
+      source: "pf1e-condition",
+      builtIn: true,
+    },
+    "condition",
+  ),
+  "Shaken",
+  "Standalone conditions must not display the internal condition catalog source.",
+);
+assert.equal(
+  window.PFEffectTracker.shouldResetPickerCache(
+    {
+      preservePickerCache: true,
+      pickerCacheKey: "campaign:character:one",
+      pickerCacheRevision: "powers:1",
+    },
+    "campaign:character:one",
+    "powers:1",
+  ),
+  false,
+  "An active-effect refresh must preserve a picker whose power revision is unchanged.",
+);
+assert.equal(
+  window.PFEffectTracker.shouldResetPickerCache(
+    {
+      preservePickerCache: true,
+      pickerCacheKey: "campaign:character:one",
+      pickerCacheRevision: "powers:2",
+    },
+    "campaign:character:one",
+    "powers:1",
+  ),
+  true,
+  "A changed power revision must invalidate the picker cache.",
+);
+assert.equal(
+  window.PFEffectTracker.shouldResetPickerCache(
+    {
+      preservePickerCache: true,
+      pickerCacheKey: "campaign:character:two",
+      pickerCacheRevision: "powers:1",
+    },
+    "campaign:character:one",
+    "powers:1",
+  ),
+  true,
+  "Switching tokens must invalidate the picker cache.",
+);
+delete global.window;
 assert(tracker.includes('if (/\\bclass(?: ability| feature)?\\b/.test(sourceText)) return "class";'));
 assert(tracker.includes('if (/\\b(?:race|racial)\\b/.test(sourceText)) return "racial";'));
 assert(tracker.includes('if (/\\bfeat\\b/.test(sourceText)) return "feats";'));
@@ -181,7 +264,7 @@ assert(map.includes("data-open-token-powers"));
 assert(map.includes("function openMapPowers(tokenId)"));
 assert(map.includes("return openMapEffects(tokenId, { powersOnly: true })"));
 assert(map.includes("isGm || character.userId === currentUserId"));
-assert(map.includes("indexedCharacterSpellSources(character);"));
+assert(map.includes("await characterMapEffectSources(character);"));
 assert(map.includes("const QUICK_EFFECT_BATCH_SIZE = 80;"));
 assert(map.includes("rows.slice(0, quickEffectVisibleLimit)"));
 assert(map.includes("data-effect-browser-more"));
@@ -210,9 +293,32 @@ assert(
   "The map Effects modal must open before tracker setup.",
 );
 assert(map.includes("const activatableAbilities = [];"));
-assert(map.includes("(await characterMapEffectSources(sourceCharacter)).passives || []"));
+assert(map.includes("loadMapEffectSnapshotPassives(token, sourceCharacter)"));
 assert(map.includes("let mapSpellDetailCache = new Map();"));
+assert(map.includes("let mapEffectSnapshotCache = new Map();"));
+assert(map.includes("function mapEffectRevisions(token = {})"));
+assert(map.includes("loadActiveEffects: async () => mapEffectSnapshot(token).activeEffects"));
+assert(map.includes("async function hydrateMapCharacterEffectStates(characterIds = null)"));
+assert(map.includes("await hydrateMapCharacterEffectStates();"));
+assert(map.includes('table: "user_buff_state"'));
+assert(map.includes("refreshMapCharacterEffectTarget(row.character_id)"));
+const mapEffectOptions = map.slice(
+  map.indexOf("async function openMapEffects"),
+  map.indexOf("function openMapPowers"),
+);
+assert(!mapEffectOptions.includes("PFApp.loadBuffState("));
+assert(!mapEffectOptions.includes("PFApp.loadEnemy("));
+assert(map.includes("preservePickerCache: true"));
+assert(map.includes("pickerCacheRevision: snapshot.powersRevision"));
+assert(map.includes("initialPassiveEffects: snapshot.passiveEffects"));
+assert(tracker.includes("const pickerCacheChanged = shouldResetPickerCache("));
 assert(map.includes("function mapSpellDetailRevision(character = {})"));
+const spellRevisionSource = map.slice(
+  map.indexOf("function mapSpellDetailRevision(character = {})"),
+  map.indexOf("function mapEffectSnapshotKey"),
+);
+assert(spellRevisionSource.includes("powerIndexSignature"));
+assert(!spellRevisionSource.includes("sheet: character.sheet"));
 assert(map.includes("async function mapSpellDetailsForEffect("));
 assert(map.includes("if (mapSpellDetailCache.has(key)) return mapSpellDetailCache.get(key);"));
 assert(map.includes("mapSpellDetailCache.set(key, pending);"));

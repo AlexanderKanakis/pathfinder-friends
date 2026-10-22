@@ -20,7 +20,7 @@
     />
     <link href="css/race-editor.css?v=trait-requirements-1" rel="stylesheet" />
     <link href="css/admin-review-marker.css?v=1" rel="stylesheet" />
-    <link href="css/effect-editor.css?v=attack-count-max-1" rel="stylesheet" />
+    <link href="css/effect-editor.css?v=damage-denominator-1" rel="stylesheet" />
     <link href="css/effect-rolls.css?v=healing-layout-1" rel="stylesheet" />
     <link href="modals/generated-equipment-picker.css?v=effect-labels-white-1" rel="stylesheet" />
     <link href="modals/magic-search.css" rel="stylesheet" />
@@ -82,6 +82,9 @@
           <button id="raceAuraFilter" class="btn btn-outline-info btn-sm w-100 mb-2" type="button" aria-pressed="false">
             <i class="bi bi-bullseye"></i> Auras
           </button>
+          <button id="raceSummonFilter" class="btn btn-outline-info btn-sm w-100 mb-2" type="button" aria-pressed="false">
+            <i class="bi bi-people"></i> Summons
+          </button>
           <div id="raceCount" class="small-text mb-2"></div>
           <div id="raceList" class="race-list"></div>
         </aside>
@@ -98,26 +101,28 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="scripts/supabase-config.js"></script>
     <script src="scripts/app-supabase.js?v=trained-skills-1"></script>
-    <script src="scripts/effect-mechanics.js?v=independent-effects-1"></script>
+    <script src="scripts/effect-mechanics.js?v=aura-volumes-1"></script>
     <script src="scripts/race-data.js?v=trained-skills-1"></script>
-    <script src="modals/effect-duration-editor.js?v=duration-formula-1"></script>
+    <script src="modals/effect-duration-editor.js?v=nested-scale-1"></script>
     <script src="scripts/effect-stat-options.js?v=weapon-damage-size-1"></script>
     <script src="modals/effect-choice-picker.js?v=named-skill-choice-1"></script>
     <script src="scripts/spell-data.js?v=spells-json-1"></script>
     <script src="modals/magic-search.js?v=sla-spell-list-1"></script>
     <script src="modals/custom-skill-list.js?v=skill-list-options-1"></script>
     <script src="scripts/condition-config.js?v=ability-groups-1"></script>
-    <script src="scripts/effect-rolls.js?v=duration-formula-1"></script>
+    <script src="scripts/effect-rolls.js?v=damage-denominator-1"></script>
+    <script src="scripts/effect-periodic.js?v=recurring-saves-1"></script>
     <script src="scripts/effect-decisions.js?v=owner-1"></script>
-    <script src="scripts/effect-saves.js?v=independent-effects-1"></script>
+    <script src="scripts/effect-saves.js?v=recurring-saves-1"></script>
     <script src="scripts/natural-weapons.js?v=3"></script>
-    <script src="scripts/summon-creatures.js?v=1"></script>
-    <script src="scripts/texture-catalog.js?v=2"></script>
-    <script src="scripts/effect-editor.js?v=attack-count-max-1"></script>
+    <script src="scripts/template-data.js?v=1"></script>
+    <script src="scripts/summon-creatures.js?v=creature-templates-1"></script>
+    <script src="scripts/texture-catalog.js?v=3"></script>
+    <script src="scripts/effect-editor.js?v=periodic-turns-1"></script>
     <script src="scripts/weapon-damage-components.js?v=2"></script>
     <script src="modals/generated-equipment-picker.js?v=natural-weapons-1"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="scripts/pages/race-editor.js?v=aura-filter-1"></script>
+    <script src="scripts/pages/race-editor.js?v=summon-filter-1"></script>
     <script src="scripts/modal-rules.js?v=mobile-compact-1"></script>
   </body>
 </html>

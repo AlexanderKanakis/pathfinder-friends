@@ -143,6 +143,14 @@ const singleRoll = attacks.rollAttacks(
   () => 0.45,
 );
 assert.equal(singleRoll.length, 1, "A single configured attack must produce one result.");
+assert.equal(
+  attacks.conditionalLabel({
+    source: "Feat: Example",
+    appliesWhen: "against incorporeal creatures",
+  }),
+  "against incorporeal creatures",
+  "Attack conditionals must describe their condition rather than their origin.",
+);
 
 rolled[0].hit = true;
 const resolved = attacks.payloadForSuccessfulAttacks(
@@ -181,6 +189,10 @@ assert(
     "if (effectAttackRolls(effect).length || effectDamageRolls(effect).length)",
   ),
   "Map targeting must retain effects whose only mechanics are attacks or damage.",
+);
+assert(
+  mapPage.includes("const label = rollConditionalLabel(entry);"),
+  "Map d20 conditionals must use condition-first labels.",
 );
 assert(
   mapPage.includes("{ preserveRolls: true }"),

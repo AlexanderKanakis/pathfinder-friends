@@ -98,6 +98,23 @@ const staticResult = damage.rollCalculated(staticScaled, () => {
 assert.deepStrictEqual(staticResult.dice, []);
 assert.strictEqual(staticResult.total, 8);
 
+const partialDamage = damage.calculateRoll(
+  {
+    label: "Partial damage",
+    diceCount: 3,
+    dieType: 6,
+    staticDamage: 2,
+    damageDenominator: 2,
+  },
+  {},
+);
+assert.strictEqual(partialDamage.damageDenominator, 2);
+assert.strictEqual(partialDamage.formula, "(3d6 + 2) / 2");
+const partialResult = damage.rollCalculated(partialDamage, () => 0);
+assert.deepStrictEqual(partialResult.dice, [1, 1, 1]);
+assert.strictEqual(partialResult.subtotal, 5);
+assert.strictEqual(partialResult.total, 2, "Half damage must round down after adding static damage.");
+
 assert.strictEqual(damage.normalizeRolls([searingLight, staticScaled]).length, 2);
 assert.strictEqual(damage.requiresProfileChoice([searingLight]), true);
 assert.strictEqual(damage.requiresProfileChoice([staticScaled]), false);
@@ -135,6 +152,11 @@ assert(
     damageSource.includes("damage-roll-total-row"),
   "Damage results must use the established attack-roll hierarchy.",
 );
+assert(damageSource.includes("Denominator"));
+
+const effectEditor = fs.readFileSync(require.resolve("./effect-editor.js"), "utf8");
+assert(effectEditor.includes('data-damage-field="damageDenominator"'));
+assert(effectEditor.includes('label: "damage denominator"'));
 assert(
   !damageCss.includes("grid-template-columns") &&
     !damageCss.includes("background: #222"),

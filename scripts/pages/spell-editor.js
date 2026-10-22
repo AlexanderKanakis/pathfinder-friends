@@ -5,6 +5,7 @@ let schoolFilter = "";
 let levelFilter = "";
 let decisionsOnly = false;
 let aurasOnly = false;
+let summonsOnly = false;
 let projectDirectoryHandle = null;
 let dataDirectoryHandle = null;
 let dirty = false;
@@ -34,6 +35,7 @@ const SPELL_EFFECT_EXTRA_KEYS = window.PFEffectMechanics?.extraKeys?.() || [
   "conditionalVariables",
   "attackRolls",
   "damageRolls",
+  "periodicEffects",
     "d20Boosts",
 ];
 
@@ -187,6 +189,7 @@ function filteredSpellIndexes() {
         (!levelFilter || levels.includes(Number(levelFilter))) &&
         (!decisionsOnly || window.PFEffectDecisions.hasDecision(spell)) &&
         (!aurasOnly || window.PFEffectMechanics.hasAura(spell)) &&
+        (!summonsOnly || window.PFSummonCreatures.hasSummon(spell)) &&
         (!term || spellSearchHaystack(spell).includes(term))
       );
     })
@@ -422,6 +425,7 @@ function commitSelectedSpell() {
     conditionalVariables: extras.conditionalVariables || [],
     attackRolls: extras.attackRolls || [],
     damageRolls: extras.damageRolls || [],
+    periodicEffects: extras.periodicEffects || [],
     d20Boosts: extras.d20Boosts || [],
     casterLevelBonuses: extras.casterLevelBonuses || [],
     spellDcBonuses: extras.spellDcBonuses || [],
@@ -596,6 +600,15 @@ window.PFEffectDecisions.bindFilterButton(
 window.PFEffectDecisions.bindFilterButton(el("spellAuraFilter"), (active) => {
   commitSelectedSpell();
   aurasOnly = active;
+  const indexes = filteredSpellIndexes();
+  if (!indexes.includes(selectedIndex)) selectedIndex = indexes[0] ?? -1;
+  renderSpellList();
+  renderSelectedSpell();
+});
+
+window.PFEffectDecisions.bindFilterButton(el("spellSummonFilter"), (active) => {
+  commitSelectedSpell();
+  summonsOnly = active;
   const indexes = filteredSpellIndexes();
   if (!indexes.includes(selectedIndex)) selectedIndex = indexes[0] ?? -1;
   renderSpellList();

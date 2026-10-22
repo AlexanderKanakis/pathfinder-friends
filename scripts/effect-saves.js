@@ -27,6 +27,14 @@
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&#039;");
   const enabled = (config) => Boolean(config?.enabled && config.check);
+  const conditionalLabel = (entry = {}) =>
+    String(
+      entry.appliesWhen ||
+        entry.conditionalReason ||
+        (typeof entry.condition === "string" ? entry.condition : "") ||
+        entry.label ||
+        "Conditional bonus",
+    ).trim();
   const normalize = (config = {}) => ({
     enabled: enabled(config),
     check: String(config.check || "fortitude").toLowerCase(),
@@ -42,6 +50,7 @@
     const candidates = [
       options.saveDc,
       effect.saveDc,
+      effect.recurringSaveDc,
       effect.spellCalculations?.spellDc?.total,
       effect.castRollContext?.spellCalculations?.spellDc?.total,
       config.dc,
@@ -70,11 +79,31 @@
 
   function hasSave(item = {}) {
     if (enabled(item.saveConfig)) return true;
-    return mechanicKeys().some((key) =>
+    if (mechanicKeys().some((key) =>
       (Array.isArray(item[key]) ? item[key] : []).some((row) =>
         enabled(row?.saveConfig),
       ),
-    );
+    ))
+      return true;
+    return (Array.isArray(item._triggeredIndependentEffects)
+      ? item._triggeredIndependentEffects
+      : []
+    ).some(hasSave);
+  }
+
+  function hasImmediateSave(item = {}) {
+    if (enabled(item.saveConfig)) return true;
+    if (mechanicKeys().some((key) =>
+      key !== "periodicEffects" &&
+      (Array.isArray(item[key]) ? item[key] : []).some((row) =>
+        enabled(row?.saveConfig),
+      ),
+    ))
+      return true;
+    return (Array.isArray(item._triggeredIndependentEffects)
+      ? item._triggeredIndependentEffects
+      : []
+    ).some(hasImmediateSave);
   }
 
   function rowForCheck(sheet = {}, config = {}) {
@@ -212,7 +241,7 @@
     };
     const list = modal.querySelector("[data-save-conditionals]");
     list.innerHTML = conditionals.length
-      ? `<div class="small text-secondary">Applicable conditionals</div>${conditionals.map((entry, index) => `<label class="form-check"><input class="form-check-input" type="checkbox" data-save-conditional-index="${index}"><span class="form-check-label">${escapeHtml(entry.source || entry.name || entry.label || entry.appliesWhen || "Conditional")} (${conditionalValue(entry) >= 0 ? "+" : ""}${conditionalValue(entry)})</span></label>`).join("")}`
+      ? `<div class="small text-secondary">Applicable conditionals</div>${conditionals.map((entry, index) => `<label class="form-check"><input class="form-check-input" type="checkbox" data-save-conditional-index="${index}"><span class="form-check-label">${escapeHtml(conditionalLabel(entry))} (${conditionalValue(entry) >= 0 ? "+" : ""}${conditionalValue(entry)})</span></label>`).join("")}`
       : "";
     const conditionalInputs = [
       ...list.querySelectorAll("[data-save-conditional-index]"),
@@ -293,6 +322,7 @@
 
   async function resolve(effect = {}, options = {}) {
     let next = clone(effect);
+    const recurringSaveDc = saveDifficulty(next, {}, options);
     if (enabled(next.saveConfig)) {
       const result = await prompt({ ...options, effect: next, config: next.saveConfig });
       if (!result) return null;
@@ -327,6 +357,7 @@
       }
     }
     for (const key of mechanicKeys()) {
+      if (key === "periodicEffects") continue;
       const rows = Array.isArray(next[key]) ? next[key] : [];
       const kept = [];
       for (const row of rows) {
@@ -353,18 +384,62 @@
       if (kept.length) next[key] = kept;
       else delete next[key];
     }
+    if (Array.isArray(next._triggeredIndependentEffects)) {
+      const resolvedChildren = [];
+      for (const child of next._triggeredIndependentEffects) {
+        const resolvedChild = await resolve(child, options);
+        if (resolvedChild) resolvedChildren.push(resolvedChild);
+      }
+      if (resolvedChildren.length)
+        next._triggeredIndependentEffects = resolvedChildren;
+      else delete next._triggeredIndependentEffects;
+    }
+    if (
+      Number.isFinite(recurringSaveDc) &&
+      (Array.isArray(next.periodicEffects) ? next.periodicEffects : []).some(
+        (row) => enabled(row?.saveConfig),
+      )
+    )
+      next.recurringSaveDc = recurringSaveDc;
     delete next.saveDc;
     return next;
+  }
+
+  async function resolveRecurringRow(effect = {}, row = {}, options = {}) {
+    if (!enabled(row.saveConfig))
+      return { action: "full", rows: [clone(row)] };
+    const result = await prompt({
+      ...options,
+      effect,
+      config: row.saveConfig,
+    });
+    if (!result || result.action === "cancel")
+      return { action: "save-success", rows: [] };
+    if (result.action === "partial") {
+      const partial = row.saveConfig.partialMechanics || {};
+      return {
+        action: "partial",
+        rows: clone(
+          Array.isArray(partial.periodicEffects)
+            ? partial.periodicEffects
+            : [],
+        ),
+      };
+    }
+    return { action: "save-failure", rows: [clone(row)] };
   }
 
   return {
     CHECKS,
     normalize,
     enabled,
+    conditionalLabel,
     hasSave,
+    hasImmediateSave,
     rowForCheck,
     saveOutcome,
     prompt,
     resolve,
+    resolveRecurringRow,
   };
 });

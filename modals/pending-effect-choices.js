@@ -38,6 +38,7 @@
       "conditionalVariables",
       "attackRolls",
       "damageRolls",
+      "periodicEffects",
       "d20Boosts",
     ];
   let pollTimer = null;
@@ -751,7 +752,25 @@
       const saveOnly =
         ability.activationRequest?.mode ===
         window.PFEffectActivationOrchestrator?.REMOTE_SAVE_MODE;
-      if (saveOnly) {
+      const recurringSaveOnly =
+        ability.activationRequest?.mode ===
+        window.PFEffectActivationOrchestrator?.REMOTE_RECURRING_SAVE_MODE;
+      if (recurringSaveOnly) {
+        const row = Array.isArray(ability.periodicEffects)
+          ? ability.periodicEffects[0]
+          : null;
+        const resolution = row
+          ? await window.PFEffectSaves?.resolveRecurringRow?.(ability, row, {
+              sheet: await pendingSaveSheet(request),
+              title: request.effect_name || ability.name || "Effect",
+              targetName: request.characterName || "Your character",
+            })
+          : { action: "save-success", rows: [] };
+        await completeRequest({
+          effect: { periodicSaveResolution: resolution },
+        });
+        return;
+      }      if (saveOnly) {
         const resolved = await window.PFEffectSaves?.resolve?.(ability, {
           sheet: await pendingSaveSheet(request),
           title: request.effect_name || ability.name || "Effect",

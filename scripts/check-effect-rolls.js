@@ -30,6 +30,18 @@ const maximized = rolls.rollFormula({
 assert.deepEqual(maximized.dice, [8, 8]);
 assert.equal(maximized.total, 28, "Maximize and Empower must cover the whole XdY + static result.");
 
+const divided = rolls.rollFormula({
+  diceCount: 2,
+  dieType: 6,
+  staticValue: 3,
+  valueMultiplier: 1.5,
+  valueDivisor: 2,
+}, {}, () => 0.99);
+assert.deepEqual(divided.dice, [6, 6]);
+assert.equal(divided.subtotal, 15);
+assert.equal(divided.total, 11, "Damage division must apply after dice, static damage, and metamagic multipliers, rounding down.");
+assert.equal(divided.formula, "(2d6 + 3 x 1.5) / 2");
+
 const legacyDamage = rolls.withDamageFormula(
   { label: "Damage", damageType: "fire" },
   rolls.damageFormula({
@@ -69,7 +81,7 @@ const transformed = rolls.mapEffectFormulas(
         },
       },
     ],
-    damageRolls: [{ diceCount: 1, dieType: 6, staticDamage: 2 }],
+    damageRolls: [{ diceCount: 1, dieType: 6, staticDamage: 2, damageDenominator: 2 }],
     weaponExtraDamage: [
       {
         stat: "choice:equipped-weapons",
@@ -106,6 +118,7 @@ assert.equal(transformed.effects[0].maximizeDice, true);
 assert.equal(transformed.effects[0].valueMultiplier, 1.5);
 assert.equal(transformed.applyConditions[0].conditionAdjustment.maximizeDice, true);
 assert.equal(transformed.damageRolls[0].damageMultiplier, 1.5);
+assert.equal(transformed.damageRolls[0].damageDenominator, 2);
 assert.equal(transformed.weaponExtraDamage[0].maximizeDice, true);
 assert.equal(transformed.weaponExtraDamage[0].damageMultiplier, 1.5);
 assert.equal(transformed.branches[0].effects[0].maximizeDice, true);

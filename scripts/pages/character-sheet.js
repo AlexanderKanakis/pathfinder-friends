@@ -371,6 +371,8 @@ let classResourceValues = {};
 let classResourceRenderSignature = "";
 let featDefinitions = { types: [], feats: [] };
 let characterFeats = {};
+let templateDefinitions = { templates: [] };
+let selectedTemplateIds = [];
 let activeSheetInfoTab = "character";
 let characterSheetReadyResolve = null;
 const characterSheetReady = new Promise((resolve) => {
@@ -3773,6 +3775,67 @@ function openRacialTraitsModal() {
   });
 }
 
+function selectedTemplates() {
+  const byId = new Map(
+    (templateDefinitions.templates || []).map((entry) => [
+      String(entry.id),
+      entry,
+    ]),
+  );
+  return selectedTemplateIds.map((id) => byId.get(String(id))).filter(Boolean);
+}
+
+function templateEffectSource(template = {}, group = "passive") {
+  return window.PFTemplateData?.effectSource?.(template, group) || null;
+}
+
+function collectSelectedTemplateBuffs() {
+  return selectedTemplates()
+    .map((template) => templateEffectSource(template, "passive"))
+    .filter(Boolean);
+}
+
+function updateCreatureTemplatesButton() {
+  const button = el("creatureTemplatesButton");
+  if (!button) return;
+  button.disabled = !templateDefinitions.templates?.length;
+  button.title = "Manage permanent creature templates";
+  const count = el("creatureTemplatesButtonCount");
+  if (count)
+    count.textContent = selectedTemplateIds.length
+      ? "(" + selectedTemplateIds.length + ")"
+      : "";
+}
+
+function setSelectedTemplateIds(ids = []) {
+  const available = new Set(
+    (templateDefinitions.templates || []).map((entry) => String(entry.id)),
+  );
+  selectedTemplateIds = [
+    ...new Set(
+      (Array.isArray(ids) ? ids : [])
+        .map(String)
+        .filter((id) => available.has(id)),
+    ),
+  ];
+  updateCreatureTemplatesButton();
+  currentPowerIndex = null;
+  invalidateEffectPickerDefinitions();
+  recalculateSheet();
+  queueSheetSave();
+}
+
+async function openCreatureTemplatesModal() {
+  if (!window.PFTemplatePicker) {
+    setStatus("Template picker is not available.", "warning");
+    return;
+  }
+  await window.PFTemplatePicker.open({
+    selectedIds: selectedTemplateIds,
+    onApply: setSelectedTemplateIds,
+  });
+}
+
 function normalizeCreatureSize(value = "") {
   const text = String(value || "").trim();
   if (!text) return "Medium";
@@ -5318,6 +5381,17 @@ async function loadFeatDefinitions() {
   return featDefinitions;
 }
 
+async function loadTemplateDefinitions() {
+  if (templateDefinitions.templates?.length) return templateDefinitions;
+  try {
+    templateDefinitions = await window.PFTemplateData.load();
+  } catch (error) {
+    console.warn("Could not load creature template data", error);
+    templateDefinitions = { templates: [] };
+  }
+  return templateDefinitions;
+}
+
 async function loadDomainDefinitions() {
   if (domainDefinitions.domains?.length) return domainDefinitions;
   try {
@@ -6489,9 +6563,21 @@ function collectActivatableAbilities() {
       ),
     )
     .filter(Boolean);
+  const templateAbilities = selectedTemplates()
+    .map((template) =>
+      mechanicAbility(
+        { ...template, name: "Template: " + template.name },
+        window.PFEffectMechanics?.activeMechanics?.(template) || {},
+        "Racial Template",
+        "Template",
+        "template:" + template.id + ":active",
+      ),
+    )
+    .filter(Boolean);
   return [
     ...classFeatureAbilities,
     ...collectActivatableRacialTraitAbilities(),
+    ...templateAbilities,
     ...featAbilities,
     ...itemAbilities,
   ].map((ability) => ({
@@ -6604,6 +6690,7 @@ function expandApplyConditionBuffs(buffs = []) {
 function calculationBuffs() {
   return expandApplyConditionBuffs([
     ...collectSelectedRaceBuffs(),
+    ...collectSelectedTemplateBuffs(),
     ...collectSelectedFeatBuffs(),
     ...activeBuffs,
     ...collectClassFeatureBuffs(),
@@ -10873,7 +10960,7 @@ async function spellTargetSheet(target) {
 }
 
 async function resolveSpellTargetSave(target, effect, title = "Effect") {
-  if (!window.PFEffectSaves?.hasSave?.(effect)) return effect;
+  if (!window.PFEffectSaves?.hasImmediateSave?.(effect)) return effect;
   const remote =
     target.group === "ally" &&
     target.ownerId &&
@@ -11878,7 +11965,7 @@ async function performCastSpellFromDetails({
   const spellMechanics = window.PFEffectMechanics?.activeMechanics?.(spell, {
     activeOnly: true,
   }) || spell;
-  let damageRolls = window.PFEffectSaves?.hasSave?.(spellMechanics)
+  let damageRolls = window.PFEffectSaves?.hasImmediateSave?.(spellMechanics)
     ? []
     : spellDamageRolls(spell);
   const failureChance = Number(
@@ -11925,7 +12012,7 @@ async function performCastSpellFromDetails({
           ...state.damageRolls,
           ...payloads.flatMap((payload) =>
             window.PFEffectMechanics?.hasBranches?.(payload) ||
-            window.PFEffectSaves?.hasSave?.(payload)
+            window.PFEffectSaves?.hasImmediateSave?.(payload)
               ? []
               : Array.isArray(payload.damageRolls)
                 ? payload.damageRolls
@@ -11936,7 +12023,7 @@ async function performCastSpellFromDetails({
           .map((payload) => {
             if (
               window.PFEffectMechanics?.hasBranches?.(payload) ||
-              window.PFEffectSaves?.hasSave?.(payload)
+              window.PFEffectSaves?.hasImmediateSave?.(payload)
             )
               return payload;
             const { damageRolls: _damageRolls, ...effectPayload } = payload;
@@ -16211,6 +16298,7 @@ function makeEnemyInventoryItem(source) {
     conditionalVariables: cloneJson(source.conditionalVariables || []),
     attackRolls: cloneJson(source.attackRolls || []),
     damageRolls: cloneJson(source.damageRolls || []),
+    periodicEffects: cloneJson(source.periodicEffects || []),
     d20Boosts: cloneJson(source.d20Boosts || []),
     activeMechanics: cloneJson(source.activeMechanics || null),
   };
@@ -17527,6 +17615,7 @@ function collectSheet() {
     alternateTraits: selectedRacialAlternateTraits.slice(),
     choices: selectedRacialTraitChoicesForSave(),
   };
+  sheet.templates = selectedTemplateIds.slice();
   sheet.classProgression = classProgression.map((row) => ({
     level: row.level,
     className: row.className,
@@ -17650,6 +17739,13 @@ function restoreSheet(sheet) {
   selectedRacialTraitChoices = normalizeSelectedRacialTraitChoices(
     data.racialTraits?.choices || {},
   );
+  const availableTemplateIds = new Set(
+    (templateDefinitions.templates || []).map((entry) => String(entry.id)),
+  );
+  selectedTemplateIds = [
+    ...new Set((Array.isArray(data.templates) ? data.templates : []).map(String)),
+  ].filter((id) => availableTemplateIds.has(id));
+  updateCreatureTemplatesButton();
   characterSpells =
     data.spells && typeof data.spells === "object" ? data.spells : {};
   selectedSpellLikeChoices = normalizeSpellLikeChoicesForSave(
@@ -18006,6 +18102,7 @@ function effectPickerSourceSignature() {
     feats: characterFeats,
     racialAlternateTraits: selectedRacialAlternateTraits,
     racialTraitChoices: selectedRacialTraitChoices,
+    templates: selectedTemplateIds,
     spells: characterSpells,
     spellLikeChoices: selectedSpellLikeChoices,
     itemSources,
@@ -18433,6 +18530,7 @@ function collectBridgePassiveEffectSources() {
   collectSelectedRaceBuffs().forEach((buff, index) =>
     add(passiveEffectSource(buff, buff.category || "Racial Trait", `passive:race:${index}:${buff.name}`)),
   );
+  collectSelectedTemplateBuffs().forEach((buff) => add(buff));
   collectSelectedFeatBuffs().forEach((buff, index) => {
     const selection = selectedFeatSelections({ activeOnly: true }).find(
       ({ id }) => String(featById(id)?.name || "") === String(buff.name || ""),
@@ -18744,6 +18842,23 @@ async function recalculateAndSaveEnemySheet(contextKey, enemyId) {
   );
 }
 
+async function recalculateTransientSheet(sheet = {}, name = "Summoned Creature") {
+  return queueSheetBridgeRecalculation(async () => {
+    await characterSheetReady;
+    isEnemySheetMode = true;
+    enemySheetId = "";
+    currentSheetId = "";
+    currentSheetOwnerId = currentUserId;
+    activeBuffs = Array.isArray(sheet.activeBuffs)
+      ? structuredClone(sheet.activeBuffs)
+      : [];
+    await restoreSheetWithClassDefinitions(sheet);
+    el("characterName").value = name;
+    recalculateSheet();
+    return collectCalculatedSummary();
+  });
+}
+
 async function recalculateAndSaveEnemySheetNow(contextKey, enemyId) {
   await characterSheetReady;
   if (!contextKey || !enemyId) return null;
@@ -18796,6 +18911,7 @@ window.PFCharacterSheetBridge = {
   saveRollSheetForCharacter,
   recalculateAndSaveCharacter: recalculateAndSaveCharacterSheet,
   recalculateAndSaveEnemy: recalculateAndSaveEnemySheet,
+  recalculateTransientSheet,
   recalculateCharacterSnapshot: recalculateAndSaveCharacterSnapshot,
   recalculateEnemySnapshot: recalculateAndSaveEnemySnapshot,
   spellEffectSourcesForCharacter,
@@ -18919,6 +19035,7 @@ async function initCharacterSheet() {
   const sharedDefinitionsPromise = Promise.all([
     loadRaceDefinitions(),
     loadFeatDefinitions(),
+    loadTemplateDefinitions(),
     loadDomainDefinitions(),
     loadBloodlineDefinitions(),
     window.PFNaturalWeapons?.loadCatalog?.(),
@@ -19051,6 +19168,9 @@ async function initCharacterSheet() {
     el("namedSkillManagerInput")?.focus(),
   );
   el("racialTraitsButton")?.addEventListener("click", openRacialTraitsModal);
+  el("creatureTemplatesButton")?.addEventListener("click", () => {
+    void openCreatureTemplatesModal();
+  });
   el("showAppliedBuffsToggle")?.addEventListener("click", toggleAppliedBuffs);
   effectTrackerModal = bootstrap.Modal.getOrCreateInstance(
     el("effectTrackerModal"),

@@ -1,0 +1,130 @@
+.template-picker-body {
+  display: grid;
+  grid-template-columns: minmax(240px, 320px) minmax(0, 1fr);
+  gap: 12px;
+  min-height: min(68vh, 720px);
+}
+
+.template-picker-sidebar,
+.template-picker-detail {
+  min-width: 0;
+}
+
+.template-picker-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.template-picker-list {
+  overflow: auto;
+  border: 1px solid #495057;
+  border-radius: 6px;
+}
+
+.template-picker-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 38px;
+  border-bottom: 1px solid #343a40;
+}
+
+.template-picker-row:last-child {
+  border-bottom: 0;
+}
+
+.template-picker-row.active {
+  background: #173441;
+}
+
+.template-picker-name {
+  display: grid;
+  gap: 2px;
+  width: 100%;
+  padding: 8px 10px;
+  border: 0;
+  color: #f8f9fa;
+  background: transparent;
+  text-align: left;
+}
+
+.template-picker-name span {
+  color: #adb5bd;
+  font-size: 0.78rem;
+}
+
+.template-picker-check {
+  display: grid;
+  place-items: center;
+  border-left: 1px solid #343a40;
+}
+
+.template-picker-detail {
+  overflow: auto;
+  padding: 4px 10px 12px;
+}
+
+.template-detail-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.template-detail-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.template-rule-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.template-rule-badge {
+  padding: 2px 6px;
+  border: 1px solid #5c636a;
+  border-radius: 4px;
+  color: #ced4da;
+  font-size: 0.75rem;
+}
+
+.template-rules-content {
+  line-height: 1.5;
+}
+
+.template-rules-content table {
+  width: 100%;
+  margin: 12px 0;
+  border-collapse: collapse;
+}
+
+.template-rules-content td,
+.template-rules-content th {
+  padding: 5px 7px;
+  border: 1px solid #5c636a;
+  vertical-align: top;
+}
+
+.template-rules-content a {
+  color: #67d9f5;
+}
+
+@media (max-width: 767.98px) {
+  .template-picker-body {
+    grid-template-columns: 1fr;
+    min-height: 0;
+  }
+
+  .template-picker-list {
+    max-height: 34vh;
+  }
+
+  .template-picker-detail {
+    max-height: 42vh;
+    padding-inline: 2px;
+  }
+}

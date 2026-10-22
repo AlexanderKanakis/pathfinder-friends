@@ -130,7 +130,7 @@ assert(sheetHtml.includes('scripts/toast.js?v=1'));
 assert(mapHtml.includes('scripts/toast.js?v=1'));
 assert(sheetJs.includes("spendCurrentCharacterResource(effect)"));
 assert(sheetJs.includes('PFToast.show(message, { tone: "warning" })'));
-assert(mapJs.includes('PFToast?.show(message, { tone: "warning" })'));
+assert(mapJs.includes('showMapToast(message, { tone: "warning" })'));
 assert(mapJs.includes("advanceClassResourcesForEndedTurn(endingRow)"));
 assert(mapJs.includes("await advanceClassResourcesForEndedTurn(endingRow);"));
 assert(trackerJs.includes("this.options.onBeforeApply?.(finalizedEffect"));

@@ -173,8 +173,8 @@ expect(
 );
 const map = fs.readFileSync(path.join(scriptRoot, "pages/map.js"), "utf8");
 expect(
-  map.includes("applyFastHealingForEndedTurn(endingRow)"),
-  "Map turn advancement does not process Fast Healing.",
+  map.includes('processPeriodicTurnEvent(endingRow, "target-turn-end")'),
+  "Map turn advancement does not process Fast Healing through periodic effects.",
 );
 
 if (failures.length) {

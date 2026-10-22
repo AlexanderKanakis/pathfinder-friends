@@ -261,7 +261,11 @@
           attackIndex: pool.attackIndex,
           sequence,
           label: pool.label,
-          attack: { ...pool.attack },
+          attack: {
+            ...pool.attack,
+            targetKey: String(allocation.targetKey),
+            targetName: String(allocation.target?.name || "Target"),
+          },
           targetKey: String(allocation.targetKey),
           target: allocation.target,
         }),
@@ -482,6 +486,16 @@
     return number >= 0 ? `+${number}` : String(number);
   }
 
+  function conditionalLabel(entry = {}) {
+    return String(
+      entry.appliesWhen ||
+        entry.conditionalReason ||
+        (typeof entry.condition === "string" ? entry.condition : "") ||
+        entry.label ||
+        "Conditional bonus",
+    ).trim();
+  }
+
   function ensureModal() {
     if (typeof document === "undefined") return null;
     let modal = document.getElementById("effectAttackRollModal");
@@ -508,8 +522,12 @@
 
   function resultCard(result, index, rolling, allowSelection) {
     const sequence = result.attack.count > 1 ? ` ${result.sequence + 1}` : "";
+    const target = result.attack.targetName
+      ? `<div class="attack-roll-target">Target: <strong>${escapeHtml(result.attack.targetName)}</strong></div>`
+      : "";
     return `<section class="attack-roll-card" data-attack-result-index="${index}">
       <div class="attack-roll-result-label">${escapeHtml(result.attack.label)}${sequence} <span>${escapeHtml(result.attack.attackTypeLabel)}</span></div>
+      ${target}
       <div class="attack-roll-die-value${rolling ? " is-rolling" : ""}" data-attack-die>${escapeHtml(rolling ? 0 : result.die)}</div>
       <div class="attack-roll-result-row"><span>Bonus</span><strong>${escapeHtml(signed(result.bonus))}</strong></div>
       <hr class="attack-roll-total-divider">
@@ -540,8 +558,7 @@
       host.innerHTML = `<div class="d20-boost-pool-title">Applicable conditionals</div>${entries
         .map((entry, index) => {
           const value = numberOr(entry.value ?? entry.bonus, 0);
-          const label =
-            entry.source || entry.name || entry.label || entry.appliesWhen || "Conditional";
+          const label = conditionalLabel(entry);
           return `<label class="form-check"><input class="form-check-input" type="checkbox" data-attack-conditional="${index}"><span class="form-check-label">${escapeHtml(label)} (${escapeHtml(signed(value))})</span></label>`;
         })
         .join("")}`;
@@ -720,6 +737,7 @@
     attacksForTarget,
     allocateTargets,
     calculateAttack,
+    conditionalLabel,
     rollAttacks,
     payloadForSuccessfulAttacks,
     open,

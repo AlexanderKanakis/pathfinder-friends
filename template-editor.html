@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>PathFriends Template Editor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="css/template-editor.css?v=1" rel="stylesheet">
+    <link href="css/effect-editor.css?v=damage-denominator-1" rel="stylesheet">
+    <link href="css/effect-rolls.css?v=healing-layout-1" rel="stylesheet">
+    <link href="modals/generated-equipment-picker.css?v=effect-labels-white-1" rel="stylesheet">
+    <link href="modals/magic-search.css" rel="stylesheet">
+    <link href="modals/custom-skill-list.css?v=custom-target-lists-1" rel="stylesheet">
+    <link href="css/modal-rules.css?v=mobile-workspace-1" rel="stylesheet">
+  </head>
+  <body>
+    <div id="appNavbar"></div>
+    <main class="container-fluid py-3">
+      <header class="d-flex justify-content-between align-items-start gap-2 flex-wrap mb-3">
+        <div>
+          <h3 class="mb-0">Creature Template Editor</h3>
+          <div class="text-secondary small">Static catalog and shared effect mechanics for <code>data/templates.json</code>.</div>
+        </div>
+        <div class="d-flex gap-2 flex-wrap">
+          <button id="openTemplateProjectBtn" class="btn btn-outline-info btn-sm" type="button"><i class="bi bi-folder2-open"></i> Open Project Folder</button>
+          <button id="saveTemplatesBtn" class="btn btn-primary btn-sm" type="button"><i class="bi bi-save"></i> Save to Project</button>
+        </div>
+      </header>
+      <div id="templateEditorStatus" class="alert d-none py-2"></div>
+      <div class="template-editor-shell">
+        <aside class="template-panel">
+          <div class="d-flex gap-2 mb-2">
+            <input id="templateSearch" class="form-control form-control-sm" placeholder="Search templates">
+            <button id="addTemplateBtn" class="btn btn-outline-info btn-sm" type="button"><i class="bi bi-plus-lg"></i></button>
+          </div>
+          <div class="template-filter-grid mb-2">
+            <button id="templateDecisionFilter" class="btn btn-outline-info btn-sm" type="button" aria-pressed="false">Decisions</button>
+            <button id="templateAuraFilter" class="btn btn-outline-info btn-sm" type="button" aria-pressed="false">Auras</button>
+            <button id="templateSummonFilter" class="btn btn-outline-info btn-sm" type="button" aria-pressed="false">Summons</button>
+          </div>
+          <div id="templateCount" class="small text-secondary mb-2"></div>
+          <div id="templateList" class="template-list"></div>
+        </aside>
+        <section id="templateEditorPanel" class="template-panel">
+          <div class="text-secondary small">Choose a template to edit.</div>
+        </section>
+      </div>
+    </main>
+    <script src="scripts/catalog-cache.js?v=2"></script>
+    <script src="scripts/navbar.js?v=responsive-navbar-1"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="scripts/supabase-config.js"></script>
+    <script src="scripts/app-supabase.js?v=weapon-damage-size-1"></script>
+    <script src="scripts/effect-mechanics.js?v=aura-volumes-1"></script>
+    <script src="scripts/template-data.js?v=1"></script>
+    <script src="modals/effect-duration-editor.js?v=nested-scale-1"></script>
+    <script src="scripts/effect-stat-options.js?v=weapon-damage-size-1"></script>
+    <script src="modals/effect-choice-picker.js?v=named-skill-choice-1"></script>
+    <script src="scripts/spell-data.js?v=spells-json-1"></script>
+    <script src="modals/magic-search.js?v=sla-spell-list-1"></script>
+    <script src="modals/custom-skill-list.js?v=skill-list-options-1"></script>
+    <script src="scripts/condition-config.js?v=ability-groups-1"></script>
+    <script src="scripts/effect-rolls.js?v=damage-denominator-1"></script>
+    <script src="scripts/effect-periodic.js?v=recurring-saves-1"></script>
+    <script src="scripts/effect-decisions.js?v=owner-1"></script>
+    <script src="scripts/effect-saves.js?v=recurring-saves-1"></script>
+    <script src="scripts/natural-weapons.js?v=3"></script>
+    <script src="scripts/summon-creatures.js?v=creature-templates-1"></script>
+    <script src="scripts/texture-catalog.js?v=3"></script>
+    <script src="scripts/effect-editor.js?v=periodic-turns-1"></script>
+    <script src="scripts/weapon-damage-components.js?v=2"></script>
+    <script src="modals/generated-equipment-picker.js?v=natural-weapons-1"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="scripts/pages/template-editor.js?v=1"></script>
+    <script src="scripts/modal-rules.js?v=mobile-compact-1"></script>
+  </body>
+</html>

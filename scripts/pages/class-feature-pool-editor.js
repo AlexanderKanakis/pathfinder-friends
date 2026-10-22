@@ -5,6 +5,7 @@ let poolDirectoryHandle = null;
 let poolDirty = false;
 let decisionsOnly = false;
 let aurasOnly = false;
+let summonsOnly = false;
 
 const el = (id) => document.getElementById(id);
 const cloneJson = (value) => JSON.parse(JSON.stringify(value || {}));
@@ -70,6 +71,7 @@ function filteredPoolIndexes() {
       if (decisionsOnly && !window.PFEffectDecisions.hasDecision(pool))
         return false;
       if (aurasOnly && !window.PFEffectMechanics.hasAura(pool)) return false;
+      if (summonsOnly && !window.PFSummonCreatures.hasSummon(pool)) return false;
       if (!term) return true;
       const optionNames = (pool.options || [])
         .map((option) => option.name || "")
@@ -148,7 +150,8 @@ function renderSelectedPool() {
         .filter(
           (option) =>
             (!decisionsOnly || window.PFEffectDecisions.hasDecision(option)) &&
-            (!aurasOnly || window.PFEffectMechanics.hasAura(option)),
+            (!aurasOnly || window.PFEffectMechanics.hasAura(option)) &&
+            (!summonsOnly || window.PFSummonCreatures.hasSummon(option)),
         )
         .map((option) => `<li>${escapeHtml(option.name || "Unnamed option")}</li>`)
         .join("") || '<li class="small-text">No options yet.</li>'}
@@ -321,6 +324,13 @@ async function initPoolEditor() {
   );
   window.PFEffectDecisions.bindFilterButton(el("poolAuraFilter"), (active) => {
     aurasOnly = active;
+    const indexes = filteredPoolIndexes();
+    if (!indexes.includes(selectedPoolIndex)) selectedPoolIndex = indexes[0] ?? -1;
+    renderPoolList();
+    renderSelectedPool();
+  });
+  window.PFEffectDecisions.bindFilterButton(el("poolSummonFilter"), (active) => {
+    summonsOnly = active;
     const indexes = filteredPoolIndexes();
     if (!indexes.includes(selectedPoolIndex)) selectedPoolIndex = indexes[0] ?? -1;
     renderPoolList();

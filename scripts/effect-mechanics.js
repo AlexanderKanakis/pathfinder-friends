@@ -32,6 +32,7 @@
     "attackRolls",
     "damageRolls",
     "d20Boosts",
+    "periodicEffects",
   ]);
 
   const CHOICE_BEARING_EXTRA_KEYS = Object.freeze([
@@ -847,6 +848,39 @@
     return Number.isFinite(range) ? Math.max(5, range) : baseRange;
   }
 
+  function auraVolumeShape(config = {}) {
+    return config.volumeShape === "cylinder" ? "cylinder" : "sphere";
+  }
+
+  function auraHeightFeet(config = {}, rangeFeet = 5) {
+    const radiusFeet = Math.max(5, Number(rangeFeet || 5));
+    return auraVolumeShape(config) === "cylinder"
+      ? Math.max(5, Number(config.heightFeet || radiusFeet * 2))
+      : radiusFeet * 2;
+  }
+
+  function pointInAuraVolume(source = {}, target = {}, aura = {}) {
+    const radiusFeet = Math.max(
+      5,
+      Number(aura.rangeFeet || Number(aura.radius || 1) * 5),
+    );
+    const horizontalFeet =
+      Math.hypot(
+        Number(target.x || 0) - Number(source.x || 0),
+        Number(target.y || 0) - Number(source.y || 0),
+      ) * 5;
+    const verticalFeet = Math.abs(
+      Number(target.elevationFeet || 0) - Number(source.elevationFeet || 0),
+    );
+    if (auraVolumeShape(aura) === "cylinder") {
+      return (
+        horizontalFeet <= radiusFeet &&
+        verticalFeet <= auraHeightFeet(aura, radiusFeet) / 2
+      );
+    }
+    return Math.hypot(horizontalFeet, verticalFeet) <= radiusFeet;
+  }
+
   function createAuraLink(sourceToken = {}, effect = {}, options = {}) {
     if (!effect?.auraConfig?.enabled) return null;
     const auraId =
@@ -855,6 +889,7 @@
     const kind = options.kind || "active";
     const config = effect.auraConfig || {};
     const rangeFeet = resolveAuraRange(effect);
+    const volumeShape = auraVolumeShape(config);
     const auraEffect = JSON.parse(
       JSON.stringify(options.recipientEffect || effect),
     );
@@ -892,6 +927,8 @@
         visible: true,
         radius: Math.max(1, Math.ceil(rangeFeet / 5)),
         rangeFeet,
+        volumeShape,
+        heightFeet: auraHeightFeet(config, rangeFeet),
         ...(["light", "specialVision"].includes(config.revealMode)
           ? { revealMode: config.revealMode }
           : {}),
@@ -900,6 +937,7 @@
           : {}),
         color: sourceToken.kind === "enemy" ? "#b02a37" : "#8fd19e",
         effect: auraEffect,
+        affectsSource: Boolean(config.affectsSource),
         removeWhenOutOfRange: true,
         permanent: Boolean(effect.permanent || kind === "passive"),
         remaining: effect.remaining ?? null,
@@ -1199,6 +1237,9 @@
     attributeScaleSource,
     resolveCasterAttributeScales,
     resolveAuraRange,
+    auraVolumeShape,
+    auraHeightFeet,
+    pointInAuraVolume,
     createAuraLink,
     createIndependentAuraToken,
     emittedAuraParentKey,

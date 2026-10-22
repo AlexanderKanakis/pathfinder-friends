@@ -31,6 +31,7 @@ Thumbs.db
 
 # Local-only project documentation and database migrations
 *.md
+CACHE-INVENTORY.md
 supabase/migrations/
 .local-tests/
 

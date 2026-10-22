@@ -22,16 +22,17 @@
 
     <link href="css/character-sheet.css?v=target-caster-highlight-1" rel="stylesheet" />
     <link href="css/feat-details.css?v=1" rel="stylesheet" />
-    <link href="css/effect-editor.css?v=attack-count-max-1" rel="stylesheet" />
+    <link href="css/effect-editor.css?v=damage-denominator-1" rel="stylesheet" />
     <link href="css/effect-rolls.css?v=healing-layout-1" rel="stylesheet" />
     <link href="css/damage-rolls.css?v=4" rel="stylesheet" />
-<link href="css/attack-rolls.css?v=d20-boosts-1" rel="stylesheet" />
+<link href="css/attack-rolls.css?v=attack-target-label-1" rel="stylesheet" />
     <link href="css/metamagic.css?v=details-1" rel="stylesheet" />
     <link href="modals/generated-equipment-picker.css?v=effect-labels-white-1" rel="stylesheet" />
     <link href="modals/magic-search.css" rel="stylesheet" />
     <link href="modals/custom-skill-list.css?v=custom-target-lists-1" rel="stylesheet" />
     <link href="modals/racial-traits.css?v=choice-button-layout-1" rel="stylesheet" />
     <link href="css/modal-rules.css?v=mobile-workspace-1" rel="stylesheet" />
+    <link href="modals/template-picker.css?v=1" rel="stylesheet" />
     <link href="css/toast.css?v=1" rel="stylesheet" />
   </head>
 
@@ -1227,6 +1228,20 @@
                   ></span>
                 </button>
               </section>
+              <section class="sheet-section">
+                <button
+                  id="creatureTemplatesButton"
+                  class="btn btn-outline-warning btn-sm w-100"
+                  type="button"
+                >
+                  <i class="bi bi-stars"></i>
+                  <span>Templates</span>
+                  <span
+                    id="creatureTemplatesButtonCount"
+                    class="text-secondary"
+                  ></span>
+                </button>
+              </section>
               <div class="enemy-section-stack enemy-only">
                 <section class="sheet-section">
                   <div class="sheet-title">Languages</div>
@@ -2234,25 +2249,27 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="scripts/supabase-config.js"></script>
     <script src="scripts/app-supabase.js?v=remote-cancel-1"></script>
-    <script src="scripts/effect-mechanics.js?v=independent-effects-1"></script>
+    <script src="scripts/effect-mechanics.js?v=aura-volumes-1"></script>
     <script src="scripts/buff-calculator.js?v=attribute-contribution-root-1"></script>
-    <script src="scripts/effect-rolls.js?v=duration-formula-1"></script>
+    <script src="scripts/effect-rolls.js?v=damage-denominator-1"></script>
+    <script src="scripts/effect-periodic.js?v=recurring-saves-1"></script>
     <script src="scripts/effect-healing.js?v=effect-rolls-1"></script>
-    <script src="scripts/damage-rolls.js?v=effect-rolls-1"></script>
+    <script src="scripts/damage-rolls.js?v=damage-denominator-1"></script>
     <script src="scripts/d20-boosts.js?v=1"></script>
     <script src="scripts/condition-config.js?v=ability-groups-1"></script>
-<script src="scripts/attack-rolls.js?v=attack-count-max-1"></script>
+<script src="scripts/attack-rolls.js?v=conditional-labels-1"></script>
     <script src="scripts/metamagic.js?v=effect-rolls-1"></script>
     <script src="scripts/armor-rules.js?v=1"></script>
     <script src="scripts/class-data.js?v=global-pool-catalogs-1"></script>
     <script src="scripts/class-resources.js?v=1"></script>
     <script src="scripts/toast.js?v=1"></script>
     <script src="scripts/race-data.js?v=trained-skills-1"></script>
+    <script src="scripts/template-data.js?v=1"></script>
     <script src="scripts/effect-decisions.js?v=owner-1"></script>
-    <script src="scripts/effect-saves.js?v=independent-effects-1"></script>
-    <script src="scripts/effect-activation-orchestrator.js?v=4"></script>
+    <script src="scripts/effect-saves.js?v=recurring-saves-1"></script>
+    <script src="scripts/effect-activation-orchestrator.js?v=recurring-saves-1"></script>
     <script src="scripts/class-feature-abilities.js?v=target-owned-contributions-1"></script>
-    <script src="modals/effect-duration-editor.js?v=duration-formula-1"></script>
+    <script src="modals/effect-duration-editor.js?v=nested-scale-1"></script>
     <script src="scripts/effect-stat-options.js?v=weapon-damage-size-1"></script>
     <script src="modals/effect-choice-picker.js?v=activation-queue-2"></script>
     <script src="modals/aura-delivery-choice.js?v=1"></script>
@@ -2260,11 +2277,11 @@
     <script src="modals/magic-search.js?v=sla-spell-list-1"></script>
     <script src="modals/custom-skill-list.js?v=skill-list-options-1"></script>
     <script src="scripts/natural-weapons.js?v=3"></script>
-    <script src="scripts/summon-creatures.js?v=1"></script>
-    <script src="scripts/texture-catalog.js?v=2"></script>
-    <script src="scripts/effect-editor.js?v=attack-count-max-1"></script>
+    <script src="scripts/summon-creatures.js?v=creature-templates-1"></script>
+    <script src="scripts/texture-catalog.js?v=3"></script>
+    <script src="scripts/effect-editor.js?v=periodic-turns-1"></script>
     <script src="modals/generated-equipment-picker.js?v=natural-weapons-1"></script>
-    <script src="modals/pending-effect-choices.js?v=remote-cancel-1"></script>
+    <script src="modals/pending-effect-choices.js?v=recurring-saves-1"></script>
     <script src="modals/class-feature-choice-picker.js"></script>
     <script src="scripts/feat-data.js?v=weapon-damage-size-1"></script>
     <script src="modals/feat-details.js?v=1"></script>
@@ -2274,15 +2291,16 @@
     <script src="modals/arcane-spell-failure.js?v=1"></script>
     <script src="modals/spellcasting-info.js"></script>
     <script src="modals/racial-traits.js?v=trained-skills-1"></script>
+    <script src="modals/template-picker.js?v=1"></script>
     <script src="scripts/effect-catalog.js?v=lazy-conditions-1"></script>
     <script src="scripts/power-index.js?v=power-index-ownership-1"></script>
-    <script src="scripts/buff-tracker-widget.js?v=fast-effects-1"></script>
+    <script src="scripts/buff-tracker-widget.js?v=effect-snapshot-cache-1"></script>
     <script src="scripts/item-data.js?v=1"></script>
     <script src="scripts/scripts.js"></script>
     <script src="modals/item-editor.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="scripts/weapon-damage-components.js?v=2"></script>
-    <script src="scripts/pages/character-sheet.js?v=attack-allocation-1"></script>
+    <script src="scripts/pages/character-sheet.js?v=creature-templates-1"></script>
     <script src="scripts/modal-rules.js?v=mobile-compact-1"></script>
   </body>
 </html>

@@ -13,6 +13,7 @@
     Object.freeze({ id: "poison-fog", name: "Poison Fog", url: "assets/shape icons/poison fog.png" }),
     Object.freeze({ id: "prism", name: "Prism", url: "assets/shape icons/prism.png" }),
     Object.freeze({ id: "stone", name: "Stone", url: "assets/shape icons/stone.png" }),
+    Object.freeze({ id: "webs", name: "Webs", url: "assets/shape icons/webs.png" }),
   ]);
 
   function all() {

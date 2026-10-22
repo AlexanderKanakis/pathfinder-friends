@@ -190,6 +190,7 @@
       conditionalVariables,
       attackRolls,
       damageRolls,
+      periodicEffects,
       d20Boosts,
       decisionOwner,
       auraConfig,
@@ -228,6 +229,7 @@
       feature.conditionalVariables = conditionalVariables;
     if (attackRolls.length) feature.attackRolls = attackRolls;
     if (damageRolls.length) feature.damageRolls = damageRolls;
+    if (periodicEffects.length) feature.periodicEffects = periodicEffects;
     if (d20Boosts.length) feature.d20Boosts = d20Boosts;
     if (decisionOwner) feature.decisionOwner = decisionOwner;
     if (auraConfig) feature.auraConfig = auraConfig;

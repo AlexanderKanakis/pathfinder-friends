@@ -29,6 +29,7 @@
       staticValueScale: formula.staticValueScale || null,
       maximizeDice: Boolean(formula.maximizeDice),
       valueMultiplier: Math.max(0, numberOr(formula.valueMultiplier, 1)),
+      valueDivisor: Math.max(1, numberOr(formula.valueDivisor, 1)),
     };
   }
 
@@ -139,7 +140,10 @@
         : String(normalized.staticValue)
       : "";
     const base = `${dice}${flat}` || "0";
-    return `${base}${normalized.maximizeDice && normalized.diceCount ? " (maximized)" : ""}${normalized.valueMultiplier !== 1 ? ` x ${normalized.valueMultiplier}` : ""}`;
+    const numerator = `${base}${normalized.maximizeDice && normalized.diceCount ? " (maximized)" : ""}${normalized.valueMultiplier !== 1 ? ` x ${normalized.valueMultiplier}` : ""}`;
+    return normalized.valueDivisor !== 1
+      ? `(${numerator}) / ${normalized.valueDivisor}`
+      : numerator;
   }
 
   function calculateFormula(formula = {}, context = {}) {
@@ -184,7 +188,9 @@
       ...calculated,
       dice,
       subtotal,
-      total: Math.floor(subtotal * calculated.valueMultiplier),
+      total: Math.floor(
+        (subtotal * calculated.valueMultiplier) / calculated.valueDivisor,
+      ),
     };
   }
 
@@ -195,6 +201,7 @@
       staticValueMax: profile.staticDamageMax,
       staticValueScale: profile.staticDamageScale,
       valueMultiplier: profile.damageMultiplier,
+      valueDivisor: profile.damageDenominator,
     });
   }
 
@@ -224,6 +231,7 @@
       staticValueMax: details.staticDamageMax,
       staticValueScale: details.staticDamageScale,
       valueMultiplier: details.damageMultiplier,
+      valueDivisor: details.damageDenominator,
     });
   }
 
@@ -241,6 +249,7 @@
       staticDamage: normalized.staticValue,
       staticDamageMax: normalized.staticValueMax,
       staticDamageScale: normalized.staticValueScale,
+      damageDenominator: normalized.valueDivisor,
       ...(normalized.maximizeDice ? { maximizeDice: true } : {}),
       ...(normalized.valueMultiplier !== 1
         ? { damageMultiplier: normalized.valueMultiplier }
@@ -353,6 +362,7 @@
       staticDamageMax: normalized.staticValueMax,
       diceCountScale: normalized.diceCountScale,
       staticDamageScale: normalized.staticValueScale,
+      damageDenominator: normalized.valueDivisor,
       ...(normalized.maximizeDice ? { maximizeDice: true } : {}),
       ...(normalized.valueMultiplier !== 1
         ? { damageMultiplier: normalized.valueMultiplier }

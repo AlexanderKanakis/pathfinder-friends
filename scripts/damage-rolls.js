@@ -38,6 +38,7 @@
       staticValueScale: profile.staticDamageScale || null,
       maximizeDice: Boolean(profile.maximizeDice),
       valueMultiplier: Math.max(0, numberOr(profile.damageMultiplier, 1)),
+      valueDivisor: Math.max(1, numberOr(profile.damageDenominator, 1)),
     };
     return {
       ...(conditional
@@ -56,6 +57,7 @@
       staticDamageScale: formula.staticValueScale,
       maximizeDice: formula.maximizeDice,
       damageMultiplier: formula.valueMultiplier,
+      damageDenominator: formula.valueDivisor,
     };
   }
 
@@ -121,6 +123,9 @@
       ...(calculated.valueMultiplier !== 1
         ? { damageMultiplier: calculated.valueMultiplier }
         : {}),
+      ...(calculated.valueDivisor !== 1
+        ? { damageDenominator: calculated.valueDivisor }
+        : {}),
       formula: calculated.formula,
     };
   }
@@ -133,6 +138,7 @@
         staticValue: calculated.staticDamage,
         maximizeDice: calculated.maximizeDice,
         valueMultiplier: calculated.damageMultiplier,
+        valueDivisor: calculated.damageDenominator,
       },
       {},
       random,
@@ -145,7 +151,10 @@
       subtotal,
       total:
         result?.total ??
-        Math.floor(subtotal * numberOr(calculated.damageMultiplier, 1)),
+        Math.floor(
+          (subtotal * numberOr(calculated.damageMultiplier, 1)) /
+            Math.max(1, numberOr(calculated.damageDenominator, 1)),
+        ),
     };
   }
 
@@ -250,6 +259,7 @@
               <hr class="damage-roll-total-divider">`
             : ""
         }
+        ${result.damageDenominator && result.damageDenominator !== 1 ? `<div class="damage-roll-result-row"><span>Denominator</span><strong>/ ${escapeHtml(result.damageDenominator)}</strong></div>` : ""}
         <div class="damage-roll-result-row damage-roll-total-row"><span>Total</span><strong data-damage-roll-total>${escapeHtml(rolling && hasDice ? "..." : result.total)}</strong></div>
       </div>
       <div class="damage-roll-result-note">${escapeHtml(result.formula)}${result.damageType ? ` ${escapeHtml(result.damageType)}` : ""}</div>

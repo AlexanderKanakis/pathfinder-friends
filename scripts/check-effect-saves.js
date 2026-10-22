@@ -15,6 +15,19 @@ const saveConfig = (partialMechanics = null) => ({
 async function main() {
   const unchanged = { name: "No Save", effects: [bonus("attack", 1)] };
   assert.equal(saves.hasSave(unchanged), false);
+  assert.equal(
+    saves.conditionalLabel({
+      source: "Race: Elf Elven Immunities (racial)",
+      appliesWhen: "vs enchantment spells and effects",
+    }),
+    "vs enchantment spells and effects",
+    "Save conditionals must describe when the bonus applies instead of its origin.",
+  );
+  assert.equal(
+    saves.conditionalLabel({ source: "Legacy origin only" }),
+    "Conditional bonus",
+    "Origin-only legacy conditionals must use a neutral label.",
+  );
 
   const fortitude = saves.rowForCheck(
     { calculated: { saves: [{ key: "fort", total: 12 }] } },
@@ -41,7 +54,7 @@ async function main() {
     {
       name: "Destruction",
       saveConfig: saveConfig({
-        damageRolls: [{ diceCount: 10, dieType: 6 }],
+        damageRolls: [{ diceCount: 10, dieType: 6, damageDenominator: 2 }],
       }),
       effects: [
         bonus("damage", 10),
@@ -53,6 +66,11 @@ async function main() {
   assert.equal(partial.effects.length, 1, "A no-save mechanic must survive a successful save.");
   assert.equal(partial.effects[0].stat, "armor class");
   assert.equal(partial.damageRolls.length, 1, "Apply Partial must substitute partial mechanics.");
+  assert.equal(
+    partial.damageRolls[0].damageDenominator,
+    2,
+    "Partial-save damage must preserve its authored denominator.",
+  );
 
   const negated = await saves.resolve(
     {
@@ -182,7 +200,7 @@ async function main() {
     "Save-bound damage must remain in the per-target payload.",
   );
   assert(
-    (characterSheet.match(/window\.PFEffectSaves\?\.hasSave\?\.\(payload\)/g) || [])
+    (characterSheet.match(/window\.PFEffectSaves\?\.hasImmediateSave\?\.\(payload\)/g) || [])
       .length >= 2,
     "Save-bound damage must not be rolled early or stripped during caster decisions.",
   );

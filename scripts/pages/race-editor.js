@@ -7,6 +7,7 @@ let dataDirectoryHandle = null;
 let dirty = false;
 let decisionsOnly = false;
 let aurasOnly = false;
+let summonsOnly = false;
 let traitEffectEditors = new Map();
 let traitModifierOverrideEditors = new Map();
 let traitDurationConfigs = new Map();
@@ -145,6 +146,7 @@ function normalizeTrait(trait = {}) {
       : [],
     attackRolls: Array.isArray(trait.attackRolls) ? trait.attackRolls : [],
     damageRolls: Array.isArray(trait.damageRolls) ? trait.damageRolls : [],
+    periodicEffects: Array.isArray(trait.periodicEffects) ? trait.periodicEffects : [],
     activatableAbilities: Array.isArray(trait.activatableAbilities)
       ? cloneJson(trait.activatableAbilities)
       : [],
@@ -288,6 +290,7 @@ function filteredRaceIndexes() {
         (!groupFilter || race.group === groupFilter) &&
         (!decisionsOnly || window.PFEffectDecisions.hasDecision(race)) &&
         (!aurasOnly || window.PFEffectMechanics.hasAura(race)) &&
+        (!summonsOnly || window.PFSummonCreatures.hasSummon(race)) &&
         (!term || String(race.name || "").toLowerCase().includes(term)),
     )
     .sort(
@@ -390,6 +393,7 @@ const TRAIT_MECHANIC_KEYS = window.PFEffectMechanics?.mechanicKeys?.() || [
   "conditionalVariables",
   "attackRolls",
   "damageRolls",
+  "periodicEffects",
     "d20Boosts",
 ];
 
@@ -418,6 +422,7 @@ const TRAIT_MECHANIC_LABELS = {
   conditionalVariables: "Vars",
   attackRolls: "Attacks",
   damageRolls: "Damage",
+  periodicEffects: "Periodic",
 };
 
 function traitMechanicCount(item = {}, key = "") {
@@ -827,7 +832,7 @@ function traitCard(kind, trait, index, race = {}) {
   const attributeRequirement = normalizeAttributeRequirement(trait);
   const requirementOpen = hasAttributeRequirement(trait);
   return `
-    <article class="trait-card ${(decisionsOnly && !window.PFEffectDecisions.hasDecision(trait)) || (aurasOnly && !window.PFEffectMechanics.hasAura(trait)) ? "d-none" : ""}" data-trait-kind="${kind}" data-trait-index="${index}">
+    <article class="trait-card ${(decisionsOnly && !window.PFEffectDecisions.hasDecision(trait)) || (aurasOnly && !window.PFEffectMechanics.hasAura(trait)) || (summonsOnly && !window.PFSummonCreatures.hasSummon(trait)) ? "d-none" : ""}" data-trait-kind="${kind}" data-trait-index="${index}">
       <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
         <strong>${escapeHtml(trait.name || "Trait")}</strong>
         <div class="d-flex gap-1">
@@ -923,7 +928,13 @@ function traitSection(title, kind, traits, race = {}) {
   const hasAura = traits.some((trait) =>
     window.PFEffectMechanics.hasAura(trait),
   );
-  const hidden = (decisionsOnly && !hasDecision) || (aurasOnly && !hasAura);
+  const hasSummon = traits.some((trait) =>
+    window.PFSummonCreatures.hasSummon(trait),
+  );
+  const hidden =
+    (decisionsOnly && !hasDecision) ||
+    (aurasOnly && !hasAura) ||
+    (summonsOnly && !hasSummon);
   return `
     <section class="level-card mb-3 ${hidden ? "d-none" : ""}">
       <div class="d-flex justify-content-between align-items-center gap-2 flex-wrap mb-2">
@@ -960,7 +971,7 @@ function favoredBonusRow(bonus, index) {
 function favoredBonusSection(race) {
   const bonuses = race.favoredClassBonuses || [];
   return `
-    <section class="level-card mb-3 ${decisionsOnly || aurasOnly ? "d-none" : ""}">
+    <section class="level-card mb-3 ${decisionsOnly || aurasOnly || summonsOnly ? "d-none" : ""}">
       <div class="d-flex justify-content-between align-items-center gap-2 flex-wrap mb-2">
         <strong>Paizo Favored Class Bonuses</strong>
         <button class="btn btn-outline-info btn-sm" type="button" data-add-favored>
@@ -1500,6 +1511,7 @@ function collectTrait(card) {
     conditionalVariables: extras.conditionalVariables || [],
     attackRolls: extras.attackRolls || [],
     damageRolls: extras.damageRolls || [],
+    periodicEffects: extras.periodicEffects || [],
     d20Boosts: extras.d20Boosts || [],
     ...(extras.decisionOwner
       ? { decisionOwner: extras.decisionOwner }
@@ -1774,6 +1786,15 @@ window.PFEffectDecisions.bindFilterButton(el("raceDecisionFilter"), (active) => 
 window.PFEffectDecisions.bindFilterButton(el("raceAuraFilter"), (active) => {
   commitSelectedRace();
   aurasOnly = active;
+  const indexes = filteredRaceIndexes();
+  if (!indexes.includes(selectedIndex)) selectedIndex = indexes[0] ?? -1;
+  renderRaceList();
+  renderSelectedRace();
+});
+
+window.PFEffectDecisions.bindFilterButton(el("raceSummonFilter"), (active) => {
+  commitSelectedRace();
+  summonsOnly = active;
   const indexes = filteredRaceIndexes();
   if (!indexes.includes(selectedIndex)) selectedIndex = indexes[0] ?? -1;
   renderRaceList();

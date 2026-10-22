@@ -10,6 +10,7 @@
   const AFTER_TARGETS = "after-targets";
   const REMOTE_DECISION_MODE = "decision-only";
   const REMOTE_SAVE_MODE = "save-only";
+  const REMOTE_RECURRING_SAVE_MODE = "recurring-save-only";
 
   const nodes = Object.freeze([
     { id: "arcane-spell-failure", owner: "caster", sourceTypes: ["spell"] },
@@ -237,6 +238,7 @@
     AFTER_TARGETS,
     REMOTE_DECISION_MODE,
     REMOTE_SAVE_MODE,
+    REMOTE_RECURRING_SAVE_MODE,
     nodes,
     createState,
     planFor,

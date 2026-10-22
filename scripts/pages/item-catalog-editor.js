@@ -152,6 +152,7 @@ let selectedIndex = -1;
 let searchTerm = "";
 let decisionsOnly = false;
 let aurasOnly = false;
+let summonsOnly = false;
 let dirty = false;
 let projectDirectoryHandle = null;
 let dataDirectoryHandle = null;
@@ -462,6 +463,7 @@ function filteredItemIndexes() {
       const item = items[index] || {};
       if (decisionsOnly && !window.PFEffectDecisions.hasDecision(item)) return false;
       if (aurasOnly && !window.PFEffectMechanics.hasAura(item)) return false;
+      if (summonsOnly && !window.PFSummonCreatures.hasSummon(item)) return false;
       if (!term) return true;
       return [item.name, item.requirements, item.details?.requirements]
         .map((value) => String(value || "").toLowerCase())
@@ -912,6 +914,7 @@ function commitSelectedItem() {
     conditionalVariables,
     attackRolls,
     damageRolls,
+    periodicEffects,
     d20Boosts,
     decisionOwner,
     activeMechanics,
@@ -943,6 +946,7 @@ function commitSelectedItem() {
   item.conditionalVariables = conditionalVariables;
   item.attackRolls = attackRolls;
   item.damageRolls = damageRolls;
+  item.periodicEffects = periodicEffects;
   item.d20Boosts = d20Boosts;
   if (decisionOwner) item.decisionOwner = decisionOwner;
   else delete item.decisionOwner;
@@ -1045,6 +1049,15 @@ window.PFEffectDecisions.bindFilterButton(el("itemDecisionFilter"), (active) => 
 window.PFEffectDecisions.bindFilterButton(el("itemAuraFilter"), (active) => {
   commitSelectedItem();
   aurasOnly = active;
+  const indexes = filteredItemIndexes();
+  if (!indexes.includes(selectedIndex)) selectedIndex = indexes[0] ?? -1;
+  renderItemList();
+  renderSelectedItem();
+});
+
+window.PFEffectDecisions.bindFilterButton(el("itemSummonFilter"), (active) => {
+  commitSelectedItem();
+  summonsOnly = active;
   const indexes = filteredItemIndexes();
   if (!indexes.includes(selectedIndex)) selectedIndex = indexes[0] ?? -1;
   renderItemList();

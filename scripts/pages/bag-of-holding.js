@@ -1346,6 +1346,7 @@ function lootEffectPayload(item = {}) {
     "conditionalVariables",
       "attackRolls",
       "damageRolls",
+      "periodicEffects",
     "d20Boosts",
   ];
   keys.forEach((key) => {

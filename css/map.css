@@ -641,6 +641,88 @@ body.map-booting .map-shell {
   transform-style: preserve-3d;
 }
 
+#mapStage.is-3d .map-aura {
+  transform: translateZ(var(--aura-z, 0px));
+  transform-style: preserve-3d;
+  backface-visibility: visible;
+}
+
+.map-aura-volume {
+  display: none;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transform-style: preserve-3d;
+}
+
+#mapStage.is-3d .map-aura-volume {
+  display: block;
+}
+
+.map-aura-sphere-ring,
+.map-aura-cylinder-cap,
+.map-aura-cylinder-face {
+  position: absolute;
+  border: 1px solid var(--aura-color);
+  background: transparent;
+  box-shadow: 0 0 6px var(--aura-color);
+  border: 1px solid color-mix(in srgb, var(--aura-color) 72%, transparent);
+  background: color-mix(in srgb, var(--aura-color) 7%, transparent);
+  box-shadow: 0 0 6px color-mix(in srgb, var(--aura-color) 22%, transparent);
+  pointer-events: none;
+  backface-visibility: visible;
+  transform-style: preserve-3d;
+}
+
+.map-aura-sphere-ring {
+  left: 50%;
+  top: 50%;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: transparent;
+}
+
+.map-aura-sphere-ring.is-horizontal {
+  transform: translate(-50%, -50%) translateZ(var(--aura-ring-z, 0px))
+    scale(var(--aura-ring-scale, 1));
+}
+
+.map-aura-sphere-ring.is-vertical {
+  transform-origin: center;
+}
+
+.map-aura-sphere-ring.is-vertical.is-x {
+  transform: translate(-50%, -50%) rotateX(90deg);
+}
+
+.map-aura-sphere-ring.is-vertical.is-y {
+  transform: translate(-50%, -50%) rotateY(90deg);
+}
+
+.map-aura-cylinder-cap {
+  inset: 0;
+  border-radius: 50%;
+}
+
+.map-aura-cylinder-cap.is-top {
+  transform: translateZ(calc(var(--aura-height-px) / 2));
+}
+
+.map-aura-cylinder-cap.is-bottom {
+  transform: translateZ(calc(var(--aura-height-px) / -2));
+}
+
+.map-aura-cylinder-face {
+  left: 50%;
+  top: 50%;
+  width: var(--aura-face-width-px);
+  height: var(--aura-height-px);
+  transform-origin: center;
+  transform: translate(-50%, -50%) rotateZ(var(--aura-face-angle))
+    translateY(calc(var(--aura-radius-px) * -1)) rotateX(90deg);
+}
+
 .map-aura-texture-grid:not(.is-3d) > .texture-cell,
 #mapStage.is-3d .map-aura-texture-3d-sprite {
   opacity: 0.6;
@@ -1035,6 +1117,27 @@ body.map-booting .map-shell {
   border-radius: 8px;
   padding: 9px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
+.map-notification-toast {
+  pointer-events: none;
+  color: #fff;
+}
+
+.map-notification-toast-info {
+  border-left-color: #0dcaf0;
+}
+
+.map-notification-toast-success {
+  border-left-color: #198754;
+}
+
+.map-notification-toast-warning {
+  border-left-color: #ffc107;
+}
+
+.map-notification-toast-danger {
+  border-left-color: #dc3545;
 }
 
 .map-shape {
@@ -1946,29 +2049,6 @@ body.map-booting .map-shell {
   border: 1px solid #333;
   border-top: 0;
   padding: 8px;
-}
-
-.turn-effect-notices {
-  position: fixed;
-  z-index: 1100;
-  left: 50%;
-  top: 88px;
-  transform: translateX(-50%);
-  display: grid;
-  gap: 7px;
-  width: min(360px, calc(100vw - 24px));
-  pointer-events: none;
-}
-
-.turn-effect-notice {
-  border: 1px solid rgba(224, 93, 93, 0.75);
-  border-left: 4px solid #e05d5d;
-  border-radius: 8px;
-  background: rgba(36, 36, 36, 0.9);
-  color: #fff;
-  padding: 9px 11px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
-  text-align: center;
 }
 
 .timeline-list {
