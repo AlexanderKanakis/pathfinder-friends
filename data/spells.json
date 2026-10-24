@@ -511,8 +511,8 @@
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Acid Arrow",
     "attackRolls": [
       {
-        "id": "attack-2",
-        "label": "Arrow of Acid",
+        "id": "attack-4",
+        "label": "Attack",
         "attackCount": 1,
         "attackCountScale": null,
         "attackCountMax": null,
@@ -527,14 +527,14 @@
         "d20Boosts": [],
         "damageRolls": [
           {
-            "label": "Arrow of Acid",
+            "label": "Damage",
             "diceCount": 2,
             "dieType": 4,
             "diceCountMax": null,
             "staticDamage": 0,
             "staticDamageMax": null,
             "damageDenominator": 1,
-            "damageType": "untyped",
+            "damageType": "acid",
             "diceCountScale": null,
             "staticDamageScale": null,
             "conditionals": []
@@ -564,12 +564,12 @@
         "conditionalVariables": [],
         "independentEffects": [
           {
-            "id": "independent-effect-4",
-            "name": "Arrow of Acid Lasting effect",
+            "id": "independent-effect-5",
+            "name": "Independent Effect",
             "trigger": {
               "scope": "attack",
               "outcome": "success",
-              "sourceId": "attack-2"
+              "sourceId": "attack-4"
             },
             "effects": [],
             "attackRolls": [],
@@ -577,8 +577,8 @@
             "damageRolls": [],
             "periodicEffects": [
               {
-                "id": "periodic-1792695321962-hy9184",
-                "label": "Acid Arrow Periodic Effect",
+                "id": "periodic-1792696425069-p7gucd",
+                "label": "Periodic Effect",
                 "timing": "caster-turn-start",
                 "delivery": "attached",
                 "operation": "damage",
@@ -636,8 +636,8 @@
       "effects": [],
       "attackRolls": [
         {
-          "id": "attack-2",
-          "label": "Arrow of Acid",
+          "id": "attack-4",
+          "label": "Attack",
           "attackCount": 1,
           "attackCountScale": null,
           "attackCountMax": null,
@@ -652,14 +652,14 @@
           "d20Boosts": [],
           "damageRolls": [
             {
-              "label": "Arrow of Acid",
+              "label": "Damage",
               "diceCount": 2,
               "dieType": 4,
               "diceCountMax": null,
               "staticDamage": 0,
               "staticDamageMax": null,
               "damageDenominator": 1,
-              "damageType": "untyped",
+              "damageType": "acid",
               "diceCountScale": null,
               "staticDamageScale": null,
               "conditionals": []
@@ -689,12 +689,12 @@
           "conditionalVariables": [],
           "independentEffects": [
             {
-              "id": "independent-effect-4",
-              "name": "Arrow of Acid Lasting effect",
+              "id": "independent-effect-5",
+              "name": "Independent Effect",
               "trigger": {
                 "scope": "attack",
                 "outcome": "success",
-                "sourceId": "attack-2"
+                "sourceId": "attack-4"
               },
               "effects": [],
               "attackRolls": [],
@@ -702,8 +702,8 @@
               "damageRolls": [],
               "periodicEffects": [
                 {
-                  "id": "periodic-1792695321962-hy9184",
-                  "label": "Acid Arrow Periodic Effect",
+                  "id": "periodic-1792696425069-p7gucd",
+                  "label": "Periodic Effect",
                   "timing": "caster-turn-start",
                   "delivery": "attached",
                   "operation": "damage",
@@ -12046,7 +12046,173 @@
       "area": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Cloud of Seasickness",
-    "needsReview": true
+    "applyConditions": [
+      {
+        "conditionId": "condition-sickened",
+        "name": "Sickened",
+        "condition": {
+          "id": "condition-sickened",
+          "name": "Sickened",
+          "category": "Condition",
+          "duration": "variable",
+          "durationConfig": {
+            "count": null,
+            "unit": "variable",
+            "factors": []
+          },
+          "adjustableCondition": null,
+          "bonuses": [
+            {
+              "stat": "attack",
+              "value": -2,
+              "type": "penalty",
+              "stacks": true
+            },
+            {
+              "stat": "damage",
+              "value": -2,
+              "type": "penalty",
+              "stacks": true
+            },
+            {
+              "stat": "all saves",
+              "value": -2,
+              "type": "penalty",
+              "stacks": true
+            },
+            {
+              "stat": "skill checks",
+              "value": -2,
+              "type": "penalty",
+              "stacks": true
+            }
+          ],
+          "damageReduction": [],
+          "spellResistance": [],
+          "immunities": [],
+          "classSkillGrants": [],
+          "useUntrained": [],
+          "extraRanksPerLevel": [],
+          "sizeChanges": [],
+          "casterLevelBonuses": [],
+          "spellDcBonuses": [],
+          "spellLikeAbilities": [],
+          "generatedEquipment": [],
+          "description": "Penalties to attacks, weapon damage, saves, and skill checks."
+        }
+      }
+    ],
+    "activeMechanics": {
+      "effects": [],
+      "attackRolls": [],
+      "d20Boosts": [],
+      "damageRolls": [],
+      "periodicEffects": [],
+      "weaponExtraDamage": [],
+      "weaponDamageSizeChanges": [],
+      "summonCreatures": [],
+      "damageReduction": [],
+      "spellResistance": [],
+      "immunities": [],
+      "applyConditions": [
+        {
+          "conditionId": "condition-sickened",
+          "name": "Sickened",
+          "condition": {
+            "id": "condition-sickened",
+            "name": "Sickened",
+            "category": "Condition",
+            "duration": "variable",
+            "durationConfig": {
+              "count": null,
+              "unit": "variable",
+              "factors": []
+            },
+            "adjustableCondition": null,
+            "bonuses": [
+              {
+                "stat": "attack",
+                "value": -2,
+                "type": "penalty",
+                "stacks": true
+              },
+              {
+                "stat": "damage",
+                "value": -2,
+                "type": "penalty",
+                "stacks": true
+              },
+              {
+                "stat": "all saves",
+                "value": -2,
+                "type": "penalty",
+                "stacks": true
+              },
+              {
+                "stat": "skill checks",
+                "value": -2,
+                "type": "penalty",
+                "stacks": true
+              }
+            ],
+            "damageReduction": [],
+            "spellResistance": [],
+            "immunities": [],
+            "classSkillGrants": [],
+            "useUntrained": [],
+            "extraRanksPerLevel": [],
+            "sizeChanges": [],
+            "casterLevelBonuses": [],
+            "spellDcBonuses": [],
+            "spellLikeAbilities": [],
+            "generatedEquipment": [],
+            "description": "Penalties to attacks, weapon damage, saves, and skill checks."
+          }
+        }
+      ],
+      "classSkillGrants": [],
+      "useUntrained": [],
+      "bonusRanks": [],
+      "extraRanksPerLevel": [],
+      "grantDomains": [],
+      "featGrants": [],
+      "sizeChanges": [],
+      "spellLikeAbilities": [],
+      "casterLevelBonuses": [],
+      "spellDcBonuses": [],
+      "effectiveAttributeBonuses": [],
+      "attributeContributions": [],
+      "generatedEquipment": [],
+      "conditionalVariables": [],
+      "saveConfig": {
+        "enabled": true,
+        "check": "fortitude",
+        "checkDetail": "",
+        "partial": false
+      },
+      "durationConfig": {
+        "diceCount": 0,
+        "dieType": 6,
+        "staticValue": 1,
+        "unit": "round",
+        "factors": [
+          {
+            "type": "caster",
+            "numerator": 1,
+            "denominator": 1
+          }
+        ],
+        "factorMode": "multiply"
+      },
+      "auraConfig": {
+        "enabled": true,
+        "rangeFeet": 5,
+        "volumeShape": "sphere",
+        "affectsSource": false,
+        "independentToken": false,
+        "targetsEmitAura": false
+      }
+    }
   },
   {
     "name": "Cloud Shape",
@@ -27729,7 +27895,6 @@
       "target": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Glitterdust",
-    "needsReview": true,
     "applyConditions": [
       {
         "conditionId": "condition-blinded",
@@ -27799,6 +27964,7 @@
       "attackRolls": [],
       "d20Boosts": [],
       "damageRolls": [],
+      "periodicEffects": [],
       "weaponExtraDamage": [],
       "weaponDamageSizeChanges": [],
       "summonCreatures": [],
@@ -27883,15 +28049,10 @@
       "attributeContributions": [],
       "generatedEquipment": [],
       "conditionalVariables": [],
-      "saveConfig": {
-        "enabled": true,
-        "check": "will",
-        "checkDetail": "",
-        "partial": false
-      },
       "auraConfig": {
         "enabled": true,
         "rangeFeet": 10,
+        "volumeShape": "sphere",
         "affectsSource": false,
         "independentToken": false,
         "targetsEmitAura": true
@@ -31933,7 +32094,317 @@
       "area": ""
     },
     "link": "http://www.aonprd.com/SpellDisplay.aspx?ItemName=Holy Javelin",
-    "needsReview": true
+    "attackRolls": [
+      {
+        "id": "attack-5",
+        "label": "Holy Javelin",
+        "attackCount": 1,
+        "attackCountScale": null,
+        "attackCountMax": null,
+        "attackType": "ranged-touch",
+        "attackAbility": "default",
+        "multipleTargets": false,
+        "originalBabScale": null,
+        "customBab": null,
+        "customBabScale": null,
+        "effects": [],
+        "attackRolls": [],
+        "d20Boosts": [],
+        "damageRolls": [
+          {
+            "label": "Damage",
+            "diceCount": 1,
+            "dieType": 6,
+            "diceCountMax": null,
+            "staticDamage": 0,
+            "staticDamageMax": null,
+            "damageDenominator": 1,
+            "damageType": "untyped",
+            "diceCountScale": null,
+            "staticDamageScale": null,
+            "conditionals": []
+          }
+        ],
+        "periodicEffects": [],
+        "weaponExtraDamage": [],
+        "weaponDamageSizeChanges": [],
+        "summonCreatures": [],
+        "damageReduction": [],
+        "spellResistance": [],
+        "immunities": [],
+        "applyConditions": [],
+        "classSkillGrants": [],
+        "useUntrained": [],
+        "bonusRanks": [],
+        "extraRanksPerLevel": [],
+        "grantDomains": [],
+        "featGrants": [],
+        "sizeChanges": [],
+        "spellLikeAbilities": [],
+        "casterLevelBonuses": [],
+        "spellDcBonuses": [],
+        "effectiveAttributeBonuses": [],
+        "attributeContributions": [],
+        "generatedEquipment": [],
+        "conditionalVariables": [],
+        "independentEffects": [
+          {
+            "id": "independent-effect-6",
+            "name": "Holy Javelin Persisting Effect",
+            "trigger": {
+              "scope": "attack",
+              "outcome": "success",
+              "sourceId": "attack-5"
+            },
+            "effects": [
+              {
+                "stat": "attack",
+                "value": -2,
+                "type": "penalty",
+                "stacks": false,
+                "conditional": false,
+                "appliesWhen": "",
+                "weaponTypeRestriction": "all",
+                "weaponNameRestriction": "all"
+              },
+              {
+                "stat": "skill checks",
+                "value": -2,
+                "type": "penalty",
+                "stacks": false,
+                "conditional": false,
+                "appliesWhen": ""
+              }
+            ],
+            "attackRolls": [],
+            "d20Boosts": [],
+            "damageRolls": [],
+            "periodicEffects": [
+              {
+                "id": "periodic-1792697049159-d6u2ib",
+                "label": "Periodic Effect",
+                "timing": "caster-turn-start",
+                "delivery": "attached",
+                "operation": "damage",
+                "ability": "",
+                "diceCount": 1,
+                "dieType": 6,
+                "diceCountMax": null,
+                "diceCountScale": null,
+                "staticValue": 0,
+                "staticValueMax": null,
+                "staticValueScale": null,
+                "damageType": "untyped"
+              }
+            ],
+            "weaponExtraDamage": [],
+            "weaponDamageSizeChanges": [],
+            "summonCreatures": [],
+            "damageReduction": [],
+            "spellResistance": [],
+            "immunities": [],
+            "applyConditions": [],
+            "classSkillGrants": [],
+            "useUntrained": [],
+            "bonusRanks": [],
+            "extraRanksPerLevel": [],
+            "grantDomains": [],
+            "featGrants": [],
+            "sizeChanges": [],
+            "spellLikeAbilities": [],
+            "casterLevelBonuses": [],
+            "spellDcBonuses": [],
+            "effectiveAttributeBonuses": [],
+            "attributeContributions": [],
+            "generatedEquipment": [],
+            "conditionalVariables": [],
+            "durationConfig": {
+              "diceCount": 0,
+              "dieType": 6,
+              "staticValue": 1,
+              "unit": "round",
+              "factors": [
+                {
+                  "type": "caster",
+                  "numerator": 1,
+                  "denominator": 4
+                }
+              ],
+              "factorMode": "multiply"
+            }
+          }
+        ]
+      }
+    ],
+    "activeMechanics": {
+      "effects": [],
+      "attackRolls": [
+        {
+          "id": "attack-5",
+          "label": "Holy Javelin",
+          "attackCount": 1,
+          "attackCountScale": null,
+          "attackCountMax": null,
+          "attackType": "ranged-touch",
+          "attackAbility": "default",
+          "multipleTargets": false,
+          "originalBabScale": null,
+          "customBab": null,
+          "customBabScale": null,
+          "effects": [],
+          "attackRolls": [],
+          "d20Boosts": [],
+          "damageRolls": [
+            {
+              "label": "Damage",
+              "diceCount": 1,
+              "dieType": 6,
+              "diceCountMax": null,
+              "staticDamage": 0,
+              "staticDamageMax": null,
+              "damageDenominator": 1,
+              "damageType": "untyped",
+              "diceCountScale": null,
+              "staticDamageScale": null,
+              "conditionals": []
+            }
+          ],
+          "periodicEffects": [],
+          "weaponExtraDamage": [],
+          "weaponDamageSizeChanges": [],
+          "summonCreatures": [],
+          "damageReduction": [],
+          "spellResistance": [],
+          "immunities": [],
+          "applyConditions": [],
+          "classSkillGrants": [],
+          "useUntrained": [],
+          "bonusRanks": [],
+          "extraRanksPerLevel": [],
+          "grantDomains": [],
+          "featGrants": [],
+          "sizeChanges": [],
+          "spellLikeAbilities": [],
+          "casterLevelBonuses": [],
+          "spellDcBonuses": [],
+          "effectiveAttributeBonuses": [],
+          "attributeContributions": [],
+          "generatedEquipment": [],
+          "conditionalVariables": [],
+          "independentEffects": [
+            {
+              "id": "independent-effect-6",
+              "name": "Holy Javelin Persisting Effect",
+              "trigger": {
+                "scope": "attack",
+                "outcome": "success",
+                "sourceId": "attack-5"
+              },
+              "effects": [
+                {
+                  "stat": "attack",
+                  "value": -2,
+                  "type": "penalty",
+                  "stacks": false,
+                  "conditional": false,
+                  "appliesWhen": "",
+                  "weaponTypeRestriction": "all",
+                  "weaponNameRestriction": "all"
+                },
+                {
+                  "stat": "skill checks",
+                  "value": -2,
+                  "type": "penalty",
+                  "stacks": false,
+                  "conditional": false,
+                  "appliesWhen": ""
+                }
+              ],
+              "attackRolls": [],
+              "d20Boosts": [],
+              "damageRolls": [],
+              "periodicEffects": [
+                {
+                  "id": "periodic-1792697049159-d6u2ib",
+                  "label": "Periodic Effect",
+                  "timing": "caster-turn-start",
+                  "delivery": "attached",
+                  "operation": "damage",
+                  "ability": "",
+                  "diceCount": 1,
+                  "dieType": 6,
+                  "diceCountMax": null,
+                  "diceCountScale": null,
+                  "staticValue": 0,
+                  "staticValueMax": null,
+                  "staticValueScale": null,
+                  "damageType": "untyped"
+                }
+              ],
+              "weaponExtraDamage": [],
+              "weaponDamageSizeChanges": [],
+              "summonCreatures": [],
+              "damageReduction": [],
+              "spellResistance": [],
+              "immunities": [],
+              "applyConditions": [],
+              "classSkillGrants": [],
+              "useUntrained": [],
+              "bonusRanks": [],
+              "extraRanksPerLevel": [],
+              "grantDomains": [],
+              "featGrants": [],
+              "sizeChanges": [],
+              "spellLikeAbilities": [],
+              "casterLevelBonuses": [],
+              "spellDcBonuses": [],
+              "effectiveAttributeBonuses": [],
+              "attributeContributions": [],
+              "generatedEquipment": [],
+              "conditionalVariables": [],
+              "durationConfig": {
+                "diceCount": 0,
+                "dieType": 6,
+                "staticValue": 1,
+                "unit": "round",
+                "factors": [
+                  {
+                    "type": "caster",
+                    "numerator": 1,
+                    "denominator": 4
+                  }
+                ],
+                "factorMode": "multiply"
+              }
+            }
+          ]
+        }
+      ],
+      "d20Boosts": [],
+      "damageRolls": [],
+      "periodicEffects": [],
+      "weaponExtraDamage": [],
+      "weaponDamageSizeChanges": [],
+      "summonCreatures": [],
+      "damageReduction": [],
+      "spellResistance": [],
+      "immunities": [],
+      "applyConditions": [],
+      "classSkillGrants": [],
+      "useUntrained": [],
+      "bonusRanks": [],
+      "extraRanksPerLevel": [],
+      "grantDomains": [],
+      "featGrants": [],
+      "sizeChanges": [],
+      "spellLikeAbilities": [],
+      "casterLevelBonuses": [],
+      "spellDcBonuses": [],
+      "effectiveAttributeBonuses": [],
+      "attributeContributions": [],
+      "generatedEquipment": [],
+      "conditionalVariables": []
+    }
   },
   {
     "name": "Holy Shield",
